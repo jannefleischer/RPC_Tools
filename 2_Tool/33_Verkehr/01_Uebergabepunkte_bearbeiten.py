@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
+# REGIOPROJEKTCHECK
 # 01_Uebergabepunkte_bearbeiten.py
+# 
+# Description: Erstellung der Bevölkerungsprognose für das zu untersuchende Projekt
+# PROJECT URL: http://www.regioprojektcheck.de
 #
-# Description:
+# Author:
+# GGR Planung
 #
-#Author:
-#Achim Tack / Gertz Gutsche Rümenapp
+# LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 
-#############################################################################################################
+
 # Import arcpy modules
 import arcpy, os, gc, sys
 import verkehr_lib as v

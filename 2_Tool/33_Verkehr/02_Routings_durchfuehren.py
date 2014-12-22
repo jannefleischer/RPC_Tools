@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
+# REGIOPROJEKTCHECK
 # 02_Routings_durchfuehren.py
+# 
+# Description: Erstellung der Bevölkerungsprognose für das zu untersuchende Projekt
+# PROJECT URL: http://www.regioprojektcheck.de
 #
-# Description:
+# Author:
+# GGR Planung
 #
-#Author:
-#Achim Tack / Gertz Gutsche Rümenapp
+# LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 
-#############################################################################################################
+
 # Import arcpy modules
 import arcpy, os, pyodbc, shutil, gc, sys, imp
 from arcpy import env
