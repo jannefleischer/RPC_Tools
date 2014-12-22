@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# 02_Kostenermittlung.py
+# REGIOPROJEKTCHECK
+# 01_Kostenaufteilungsregel_anlegen.py
+# 
+# Description: Erstellung der Bevölkerungsprognose für das zu untersuchende Projekt
+# PROJECT URL: http://www.regioprojektcheck.de
 #
-# Description:
+# Author:
+# GGR Planung
 #
-#Author:
-#Achim Tack / Gertz Gutsche Rümenapp
+# LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 
-#############################################################################################################
+
 # Import arcpy modules
 import arcpy, os, inspect, pyodbc, shutil, gc
 import kosten_lib as k
