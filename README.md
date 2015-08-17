@@ -1,5 +1,21 @@
 RPC_Tools
 =========
 
-In der Siedlungs- und Flächenentwicklung in Deutschland nimmt die regionale Planungs- und Genehmigungsebene eine bedeutende Stellung ein und wird unter anderem bei der Aufstellung von regionalen Raumordnungsplänen und im Genehmigungsverfahren auf Kreisebene einbezogen. Die konkrete Ansiedlung von neuen Wohngebieten, Gewerbeflächen und Einzelhandelsbetrieben erfolgt allerdings auf kommunaler Ebene, während sich die positiven und negativen Wirkungen solcher Vorhaben oftmals nicht nur lokal, sondern auch regional bemerkbar machen. Verschiedene fiskalische, verkehrliche, ökologische und auch soziale Wirkungen enden eben nicht an den administrativen Grenzen einer Gemeinde oder Stadt, sondern gehen vielfach deutlich darüber hinaus und verändern das regionale Gefüge und die Entwicklung der miteinander verflochtenen Städte und Gemeinden.
-Den Abwägungs- und Aushandlungsprozessen der Akteure vor Ort aus Politik, Planung, Wirtschaft und Zivilgesellschaft - die weitestgehend formalisiert sind - kommt in Deutschland dabei grundsätzlich zwar eine große Bedeutung zu. Sie sind aber in der Regel räumlich und fachlich auf Teilräume bzw. auf spezifische Fachthemen beschränkt. Eine frühzeitige Gesamtbetrachtung und Abwägung der unterschiedlichen Wirkungen untereinander findet oft, zumindest bei der Entscheidungsfindung vor dem eigentlichen Bebauungsplanverfahren, nicht oder nur sehr eingeschränkt statt.
+neue Wohngebiete, Gewerbeansiedlungen und Einzelhandelsbetriebe haben Auswirkungen auf ihre unmittelbare Umgebung, die vorhandenen Strukturen in den Gemeinden und auf die Umwelt. Um solche Planungen frühzeitig im Hinblick auf eine nachhaltige Entwicklung zu überprüfen und optimieren zu können, wurde im Rahmen des BMBF-Forschungsprogramms „Nachhaltiges Landmanagement“ das neue Instrument RegioProjektCheck entwickelt.
+RegioProjektCheck betrachtet die folgenden Wirkungen: Kommunale Infrastrukturkosten, kommunale Einnahmen, Verkehrsauswirkungen im Projektumfeld, Energieverbrauch, Veränderung der ökologischen Wertigkeit von Flächen, Erreichbarkeit von infrastrukturellen Grundausstattungen und Arbeitsplätzen sowie bei der Neuansiedlung von Lebensmittelmärkten deren Standortkonkurrenz zueinander.
+RegioProjektCheck kann keine eingehenden Untersuchungen oder notwendige auf den Einzelfall bezogenen Gutachten ersetzen. Es kann aber zu einem sehr frühen Planungszeitpunkt Diskussionen vor Ort objektivieren und damit Abwägungsprozesse unterstützen.
+RegioProjektCheck basiert auf der Software ArcGIS 10.1. Es steht nun als Download auf der projekteigenen Internetseite kostenfrei zur Verfügung!
+Bitte folgen Sie dafür dem folgenden Link:
+http://www.regioprojektcheck.de/rpc-download/
+Zusätzlich sind die GIS-Tools beim Hosting-Dienst www.github.com zur inhaltlichen und technischen Weiterentwicklung durch die GIS-Community eingestellt.
+RegioProjektCheck wurde von einem Forschungsverbund bestehend aus HafenCityUniversität Hamburg (HCU) und Institut für Landes- und Stadtentwicklungsforschung (ILS, Dortmund) in Kooperation mit den Büros Gertz Gutsche Rümenapp (GGR) aus Hamburg und Raum & Energie aus Wedel entwickelt.
+
+Weitere Informationen zum Projekt finden Sie auf http://www.regioprojektcheck.de.
+
+Wir wünschen Ihnen viel Erfolg bei der Anwendung!
+
+Mit freundlichen Grüßen
+Ihr RegioProjektCheck-Team
+
+Thomas Krüger, HafenCity Universität Hamburg (HCU)
+Andrea Dittrich-Wesbuer, Institut für Landes- und Stadtentwicklungsforschung (ILS) 
