@@ -2,7 +2,7 @@
 # ---------------------------------------------------------------------------
 # REGIOPROJEKTCHECK
 # verkehr_lib.py
-# 
+#
 # Description: Erstellung der Bevölkerungsprognose für das zu untersuchende Projekt
 # PROJECT URL: http://www.regioprojektcheck.de
 #
@@ -50,7 +50,7 @@ def uebergabepunkt_bearbeiten(projektname,punkt_name,qp_wohnen,qp_versorgung,qp_
     # Delete cursor and row objects to remove locks on the data
     del row, rows
 
-def get_mapquest_route(route_id,lat_start,lon_start,lat_end,lon_end):
+def get_mapquest_route(route_id,lat_start,lon_start,lat_end,lon_end,mapquest_key):
 
     import urllib2
     import xml.dom.minidom as dom
@@ -64,7 +64,7 @@ def get_mapquest_route(route_id,lat_start,lon_start,lat_end,lon_end):
         origin = str(lat_start)+','+str(lon_start)
         destination = str(lat_end)+','+str(lon_end)
 
-        query = 'http://open.mapquestapi.com/directions/v1/route?outFormat=xml&from='+origin+'&to='+destination+'+&callback=renderNarrative&routeType='+mode+'&unit=k&shapeFormat=raw&generalize=0&key=Fmjtd%7Cluur2l6rn9%2Crn%3Do5-9012u6'
+        query = 'http://open.mapquestapi.com/directions/v1/route?outFormat=xml&from='+origin+'&to='+destination+'+&callback=renderNarrative&routeType='+mode+'&unit=k&shapeFormat=raw&generalize=0&key='+mapquest_key
         #arcpy.AddMessage(query)
 
         xml = urllib2.urlopen(query)

@@ -2,7 +2,7 @@
 # ---------------------------------------------------------------------------
 # REGIOPROJEKTCHECK
 # 02_Routings_durchfuehren.py
-# 
+#
 # Description: Erstellung der Bevölkerungsprognose für das zu untersuchende Projekt
 # PROJECT URL: http://www.regioprojektcheck.de
 #
@@ -27,6 +27,8 @@ arcpy.env.overwriteOutput = True
 i=-1
 
 i+=1 ; projektname = arcpy.GetParameterAsText(i)
+i+=1 ; mapquest_key = arcpy.GetParameterAsText(i)
+
 #projektname = "Bultweg-Sued_02_verdichtet_mit_Versorger"
 
 # Workspaces
@@ -363,7 +365,7 @@ for row in rows:
         lon_end = row.UP_lon
 
         # Routing via Openmapquest
-        waypoints = v.get_mapquest_route(route_id,lat_start,lon_start,lat_end,lon_end)
+        waypoints = v.get_mapquest_route(route_id,lat_start,lon_start,lat_end,lon_end,mapquest_key)
 
         featureList = []
         array = arcpy.Array()
@@ -399,7 +401,7 @@ for row in rows:
 
 del row,rows
 
-schrittmeldung = 'Geometrieerzeugug Siedlungszellen abgeschlossen \n'
+schrittmeldung = '\n Geometrieerzeugug Siedlungszellen abgeschlossen \n'
 arcpy.AddMessage(schrittmeldung)
 print schrittmeldung
 
