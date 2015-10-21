@@ -308,7 +308,7 @@ ws9 = wb.add_worksheet('Auswertungen_Einordnung Region')
 #ws10 = wb.add_worksheet('Ergebnisuebersicht')
 ws11 = wb.add_worksheet('Literatur')
 ws4 = wb.add_worksheet('Rohdaten')
-ws12 = wb.add_worksheet('Rohdaten')
+#ws12 = wb.add_worksheet('Rohdaten')
 
 ##Styles anlegen
 bold = wb.add_format({'bold': True})
@@ -343,7 +343,7 @@ for x in range(0,200):
         ws9.write(x,y,"", format)
         # ws10.write(x,y,"", format)
         ws11.write(x,y,"", format)
-        ws12.write(x,y,"", format)
+        #ws12.write(x,y,"", format)
 
 ###Spaltenbreiten definieren
 ws2.set_column(0, 0, 86)
@@ -365,14 +365,17 @@ Text3 = os.path.join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie3.pn
 Text4a = os.path.join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie4a.png')
 Text4b = os.path.join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie4b.png')
 Text5 = os.path.join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie5.png')
+Text6 = os.path.join(grafikpath_erlauterungstext, 'Haftungsausschluss.png')
 
 ###Grafiken einfügen
 ws2.insert_image(0, 0, Text1, {'x_scale': 0.32, 'y_scale': 0.32})
+ws2.insert_image(40, 0, Text6, {'x_scale': 0.32, 'y_scale': 0.32})
 ws3.insert_image(0, 0, Text2, {'x_scale': 0.32, 'y_scale': 0.32})
 ws6.insert_image(0, 0, Text3, {'x_scale': 0.32, 'y_scale': 0.32})
 ws8.insert_image(0, 0, Text4a, {'x_scale': 0.32, 'y_scale': 0.32})
 ws8.insert_image(40, 0, Text4b, {'x_scale': 0.32, 'y_scale': 0.32})
 ws11.insert_image(0, 0, Text5, {'x_scale': 0.32, 'y_scale': 0.32})
+
 
 ########
 ###### Tabellenblatt 4: Rohdaten einladen
@@ -863,14 +866,6 @@ if flaechentyp == "Wohnen":
     ws9.write_formula(j+15,i, formulastringWDK,normal)
     ws9.write_formula(j+16,i, formulastringWDT,normal)
     ws9.write_formula(j+17,i, formulastringWDB,normal)
-
-
-################################
-#Haftungsausschluss einfuegen
-haftung_grafik = os.path.join(base_path,"2_Tool","36_Flaeche_und_Oekologie","Erlaeuterungstexte","Haftungsausschluss.png")
-ws12.insert_image('B2', haftung_grafik, {'x_scale': 0.32, 'y_scale': 0.32}) #Korrigiert Verzerrung die bei 1x1 auftritt
-
-
 
 ######
 #Workbook speichern
