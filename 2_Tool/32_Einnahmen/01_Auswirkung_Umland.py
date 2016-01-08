@@ -3,7 +3,7 @@
 # REGIOPROJEKTCHECK
 # 01_Auswirkung_Umland.py
 #
-# Description: Erstellung der Bevölkerungsprognose für das zu untersuchende Projekt
+# Description: Erstellung der regionalen Auswirkungsabschätzung für das zu untersuchende Projekt
 # PROJECT URL: http://www.regioprojektcheck.de
 #
 # Author:
@@ -76,6 +76,9 @@ def getReGenesisAGS(ags_input):
     VG250 = os.path.join(workspace_basisdaten,'VG250')
     where = '"AGS"'+" ='"+ ags_input + "'"
 
+    ags_vg = ""
+    ags_regenesis = ags
+
     #Rheinland-Pfalz
     if ags[0:2] == "07":
 
@@ -111,11 +114,6 @@ def getReGenesisAGS(ags_input):
         else:
             ags_vg = ""
             ags_regenesis = ags
-
-    #Uebrige Laender
-    else:
-        ags_vg = ""
-        ags_regenesis = ags
 
     return ags_input, ags_vg, ags_regenesis
 
@@ -520,7 +518,7 @@ ausgabetabelle = (workspace_projekt_einnahmen,'AWU_WanderungsfaktorEW')
 
 nettoZuzugsQuote_EW = str(float(nettoZuzugsQuote_EW)/100)
 
-sql = """SELECT AWU_EWgewichtet.AGS, AWU_EWgewichtet.AGS_VG, AWU_EWgewichtet.AGS_Regenesis, ([AWU_EWgewichtet]/sumEW)*(1-nettoZuzugsQuote_EW) AS AWU_Wanderungsfaktor INTO AWU_WanderungsfaktorEW
+sql = """SELECT AWU_EWgewichtet.AGS, AWU_EWgewichtet.AGS_VG, AWU_EWgewichtet.AGS_Regenesis, ([AWU_EWgewichtet]/sumEW)*(nettoZuzugsQuote_EW) AS AWU_Wanderungsfaktor INTO AWU_WanderungsfaktorEW
 FROM AWU_EWgewichtet;
 """
 
@@ -586,7 +584,7 @@ ausgabetabelle = (workspace_projekt_einnahmen,'AWU_WanderungsfaktorAP')
 
 nettoZuzugsQuote_AP = str(float(nettoZuzugsQuote_AP)/100)
 
-sql = """SELECT AWU_APgewichtet.AGS, AWU_APgewichtet.AGS_VG, AWU_APgewichtet.AGS_Regenesis, ([AWU_APgewichtet]/sumAP)*(1-nettoZuzugsQuote_AP) AS AWU_Wanderungsfaktor INTO AWU_WanderungsfaktorAP
+sql = """SELECT AWU_APgewichtet.AGS, AWU_APgewichtet.AGS_VG, AWU_APgewichtet.AGS_Regenesis, ([AWU_APgewichtet]/sumAP)*(nettoZuzugsQuote_AP) AS AWU_Wanderungsfaktor INTO AWU_WanderungsfaktorAP
 FROM AWU_APgewichtet;
 """
 
