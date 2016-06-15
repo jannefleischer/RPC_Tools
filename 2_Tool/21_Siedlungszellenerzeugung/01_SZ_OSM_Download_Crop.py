@@ -70,33 +70,34 @@ rows = arcpy.SearchCursor(gemeinden_untersuchung)
 for row in rows:
     statecode = row.AGS[:2]
 
-statelist = [('schleswig-holstein', '01'),
-             ('hamburg', '02'),
-             ('niedersachsen', '03'),
-             ('bremen', '04'),
-             ('nordrhein-westfalen', '05'),
-             ('hessen', '06'),
-             ('rheinland-pfalz', '07'),
-             ('baden-wuerttemberg', '08'),
-             ('bayern', '09'),
-             ('saarland', '10'),
-             ('berlin', '11'),
-             ('brandenburg', '12'),
-             ('mecklenburg-vorpommern', '13'),
-             ('sachsen', '14'),
-             ('sachsen-anhalt', '15'),
-             ('thueringen', '16'),
+statelist = [('schleswig-holstein', '01', 'Schleswig-Holstein'),
+             ('hamburg', '02', 'Hamburg'),
+             ('niedersachsen', '03', 'Niedersachsen'),
+             ('bremen', '04', 'Bremen'),
+             ('nordrhein-westfalen', '05', 'Nordrhein-Westfalen'),
+             ('hessen', '06', 'Hessen'),
+             ('rheinland-pfalz', '07', 'Rheinland-Pfalz'),
+             ('baden-wuerttemberg', '08', 'Baden-Wuerttemberg'),
+             ('bayern', '09', 'Bayern'),
+             ('saarland', '10', 'Saarland'),
+             ('berlin', '11', 'Berlin'),
+             ('brandenburg', '12', 'Brandenburg'),
+             ('mecklenburg-vorpommern', '13', 'Mecklenburg-Vorpommern'),
+             ('sachsen', '14', 'Sachsen'),
+             ('sachsen-anhalt', '15', 'Sachsen-Anhalt'),
+             ('thueringen', '16', 'Thueringen'),
 ]
 
 for s in statelist:
     if s[1] == statecode:
         state = s[0]
+        state_capitalized = s[2]
         state_path = state.replace('-',
                                    '_')  #bundeslaender mit bindestrichen verursachen spaeter probleme bei der pfaderstellung
         county = ''
         city = ''
 
-statusmeldung = 'Untersuchungsgebiet liegt in ' + state.capitalize() + '\n'
+statusmeldung = 'Untersuchungsgebiet liegt in ' + state_capitalized + '\n'
 arcpy.AddMessage(statusmeldung)
 print statusmeldung
 
@@ -119,7 +120,7 @@ try:
         print statusmeldung
 
 except IOError:
-    statusmeldung = 'Download der Geodaten von OSM notwendig - Vorgang kann einige Minuten dauern \n'
+    statusmeldung = 'Download der Geodaten von OSM notwendig -\n - Dieser Vorgang kann je nach Geschwindigkeit der \n  Internetverbindung und des Rechners bis zu 30min dauern. \n'
     arcpy.AddMessage(statusmeldung)
     print statusmeldung
 
@@ -143,13 +144,14 @@ except IOError:
 
     try:
         urllib.urlretrieve(downloadurl, downloadpath)
+
     except Exception as e:
         arcpy.AddMessage(e)
 
 
 #############################################################################################################
 #Schritt 3 - Entzippen der Daten
-schrittmeldung = 'Dateien werden entpackt \n'
+schrittmeldung = 'Dateien werden entpackt\n - Dieser Vorgang kann je nach Geschwindigkeit der \n  Internetverbindung und des Rechners bis zu 30min dauern. \n'
 arcpy.AddMessage(schrittmeldung)
 print schrittmeldung
 
