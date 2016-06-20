@@ -36,7 +36,6 @@ base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
 workspace_projekt = os.path.join(base_path,'3_Projekte',projektname)
 workspace_projekt_definition = os.path.join(base_path,'3_Projekte',projektname,'FGDB_11_Definition_Projekt_'+projektname+'.gdb')
 workspace_projekt_verkehr = os.path.join(base_path,'3_Projekte',projektname,'FGDB_33_Verkehr_'+projektname+'.gdb')
-workspace_projekt_siedlungszellen = os.path.join(base_path,'3_Projekte',projektname,'FGDB_21_Siedlungszellen_'+projektname+'.gdb')
 workspace_tool_verkehr = os.path.join(base_path,"2_Tool","33_Verkehr","33_Verkehr_Tool.gdb")
 workspace_siedlungszellen = os.path.join(base_path,'3_Projekte',projektname,'FGDB_21_Siedlungszellen_'+projektname+'.gdb')
 
@@ -46,7 +45,7 @@ temp_mdb_path = os.path.join(out_folder_path,"PGDB_Temp.mdb")
 
 teilflaechen_plangebiet = os.path.join(workspace_projekt_definition,'Teilflaechen_Plangebiet')
 teilflaechen_plangebiet_centroid = os.path.join(workspace_projekt_definition,'Teilflaechen_Plangebiet_Centroide')
-siedlungszellen_centroid = os.path.join(workspace_projekt_siedlungszellen,'Siedlungszellen_Centroide')
+siedlungszellen_centroid = os.path.join(workspace_projekt_verkehr,'Siedlungszellen_Centroide')
 siedlungszellen_centroid_projektumfeld = os.path.join(workspace_projekt_verkehr,"L02_SZ_Umfeld")
 
 umfeldabgrenzung = os.path.join(workspace_projekt_verkehr,"L00_Umfeldabgrenzung")
@@ -65,9 +64,9 @@ routen_ergebniskacheln = os.path.join(workspace_projekt_verkehr,"L05_Ergebniskac
 routen_ergebniskacheln_sz_join = os.path.join(workspace_projekt_verkehr,"L05_Ergebniskacheln_sz_join")
 routen_ergebniskacheln_tf_join = os.path.join(workspace_projekt_verkehr,"L05_Ergebniskacheln_tf_join")
 
-gridname = 'Siedlungszellen'
-grid = os.path.join(workspace_siedlungszellen,gridname)
-grid_centroids = os.path.join(workspace_siedlungszellen,'Siedlungszellen_Centroide')
+gridname = 'Siedlungszellen_WGS84'
+grid = os.path.join(workspace_projekt_verkehr,gridname)
+grid_centroids = os.path.join(workspace_projekt_verkehr,'Siedlungszellen_Centroide')
 
 
 #############################################################################################################
@@ -90,7 +89,7 @@ try:
 except Exception as e:
     print e
 
-arcpy.CreateFeatureclass_management(workspace_siedlungszellen, "Siedlungszellen_Centroide", "POINT", "", "DISABLED", "DISABLED", "GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]];-400 -400 1000000000;-100000 10000;-100000 10000;8,98315284119522E-09;0,001;0,001;IsHighPrecision", "", "0", "0", "0")
+arcpy.CreateFeatureclass_management(workspace_projekt_verkehr, "Siedlungszellen_Centroide", "POINT", "", "DISABLED", "DISABLED", "GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]];-400 -400 1000000000;-100000 10000;-100000 10000;8,98315284119522E-09;0,001;0,001;IsHighPrecision", "", "0", "0", "0")
 
 # Set local variables
 fieldName = "SZ_ID"
@@ -250,8 +249,8 @@ arcpy.CopyFeatures_management("sz_centroid_lyr", siedlungszellen_centroid_projek
 #############################################################################################################
 #############################################################################################################
 
-# Erzeuge Leere DB
-schrittmeldung = 'Erzeuge Leere DB \n'
+# Erzeuge Routendatenbank
+schrittmeldung = 'Erzeuge Routendatenbank \n'
 arcpy.AddMessage(schrittmeldung)
 print schrittmeldung
 
@@ -299,7 +298,7 @@ conn.close()
 
 #############################################################################################################
 # Erzeuge Liste der SZ Routings
-schrittmeldung = 'Erzeuge Liste der SZ Routings \n'
+schrittmeldung = 'Erzeuge Liste der Verkehrszellenroutings \n'
 arcpy.AddMessage(schrittmeldung)
 print schrittmeldung
 
@@ -401,7 +400,7 @@ for row in rows:
 
 del row,rows
 
-schrittmeldung = '\n Geometrieerzeugug Siedlungszellen abgeschlossen \n'
+schrittmeldung = 'Geometrieerzeugug Siedlungszellen abgeschlossen \n'
 arcpy.AddMessage(schrittmeldung)
 print schrittmeldung
 
@@ -423,8 +422,8 @@ arcpy.Integrate_management(path, "5 Decimeters")
 #############################################################################################################
 #############################################################################################################
 
-# Erzeuge Leere DB
-schrittmeldung = 'Erzeuge Leere DB \n'
+# Erzeuge Erzeuge Routendatenbank
+schrittmeldung = 'Erzeuge Routendatenbank \n'
 arcpy.AddMessage(schrittmeldung)
 print schrittmeldung
 
@@ -461,18 +460,18 @@ conn = pyodbc.connect(connectionstring)
 cursor = conn.cursor()
 try:
     cursor.execute(sql)
-    arcpy.AddMessage("Befehl ausgefuehrt \n")
+    #arcpy.AddMessage("Befehl ausgefuehrt \n")
 except Exception as e:
     print sql
     print e
     print "sql-fehlerhaft"
-    arcpy.AddMessage("sql-fehlerhaft \n")
+    #arcpy.AddMessage("sql-fehlerhaft \n")
 conn.commit()
 conn.close()
 
 #############################################################################################################
 # Erzeuge Liste der Teilflaechen Routings
-schrittmeldung = 'Erzeuge Liste der Teilflaechen Routings \n'
+schrittmeldung = 'Erzeuge Liste der Teilflaechenroutings \n'
 arcpy.AddMessage(schrittmeldung)
 print schrittmeldung
 
@@ -516,7 +515,6 @@ rows = arcpy.SearchCursor(routen_tf)
 
 for row in rows:
     try:
-        print row.Routen_ID
         route_id = row.Routen_ID
         lat_start = row.TF_lat
         lon_start = row.TF_lon
@@ -524,7 +522,7 @@ for row in rows:
         lon_end = row.UP_lon
 
         # Routing via Openmapquest
-        waypoints = v.get_mapquest_route(route_id,lat_start,lon_start,lat_end,lon_end)
+        waypoints = v.get_mapquest_route(route_id,lat_start,lon_start,lat_end,lon_end,mapquest_key)
 
         featureList = []
         array = arcpy.Array()
@@ -557,6 +555,7 @@ for row in rows:
 
     except Exception as e:
         print e
+        arcpy.AddMessage(e)
 
 del row,rows
 
@@ -566,7 +565,7 @@ print schrittmeldung
 
 #############################################################################################################
 # Bereinige Geometrien aus Routings - Teilflaechen
-schrittmeldung = 'Bereinige Geometrien aus Routings - Teilflaechen \n Dieser Prozess kann u.U. sehr lang dauern'
+schrittmeldung = 'Bereinige Geometrien aus Routings - Teilflaechen'
 arcpy.AddMessage(schrittmeldung)
 print schrittmeldung
 

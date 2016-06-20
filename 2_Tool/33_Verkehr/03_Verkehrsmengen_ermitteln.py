@@ -104,7 +104,6 @@ workspace_projekt_definition = os.path.join(base_path,'3_Projekte',projektname,'
 workspace_projekt_bevoelkerung = os.path.join(base_path,'3_Projekte',projektname,'FGDB_22_BevModellierung_'+projektname+'.gdb')
 
 workspace_projekt_verkehr = os.path.join(base_path,'3_Projekte',projektname,'FGDB_33_Verkehr_'+projektname+'.gdb')
-workspace_projekt_siedlungszellen = os.path.join(base_path,'3_Projekte',projektname,'FGDB_21_Siedlungszellen_'+projektname+'.gdb')
 
 workspace_tool_verkehr = os.path.join(base_path,"2_Tool","33_Verkehr","33_Verkehr_Tool.gdb")
 
@@ -113,7 +112,7 @@ workspace_tool_verkehr = os.path.join(base_path,"2_Tool","33_Verkehr","33_Verkeh
 out_folder_path = os.path.join(workspace_projekt,"temp") # Pfad zur temporaeren mdb inkl.
 temp_mdb_path = os.path.join(out_folder_path,"PGDB_Temp.mdb")
 
-siedlungszellenlayer = os.path.join(workspace_projekt_siedlungszellen,'Siedlungszellen')
+siedlungszellenlayer = os.path.join(workspace_projekt_verkehr,'Siedlungszellen')
 siedlungszellenlayer_eingangsdaten = os.path.join(workspace_projekt_verkehr,'L12_SZ_Projektumfeld_Daten_Verkehrserzeugung')
 siedlungszellenlayer_eingangsdaten_temp1 = os.path.join(workspace_projekt_verkehr,'Siedlungszellen_Eingangsdaten_temp1')
 siedlungszellenlayer_eingangsdaten_temp2 = os.path.join(workspace_projekt_verkehr,'Siedlungszellen_Eingangsdaten_temp2')
@@ -555,13 +554,8 @@ mxd_template.saveACopy(mxdpfad)
 #Ersetze Datenquelle
 verkehr_mxd = arcpy.mapping.MapDocument(mxdpfad)
 
-arcpy.AddMessage(base_path)
-
 templatepath = os.path.join(base_path,"2_Tool","33_Verkehr","Style","template.gdb")
 resultpath = os.path.join(base_path,'3_Projekte',projektname,"FGDB_33_Verkehr_"+projektname+".gdb")
-
-arcpy.AddMessage(templatepath)
-arcpy.AddMessage(resultpath)
 
 verkehr_mxd.findAndReplaceWorkspacePaths(templatepath, resultpath)
 verkehr_mxd.save()
