@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 import contextlib
 import os
@@ -49,97 +49,97 @@ class Toolbox(object):
 class Flaechenbilanz(object):
     """C:\Users\handke\Dropbox\Regioprojectcheck\2_Tool\3_Art und Mass der Nutzung\3_Art und Mass der Nutzung.tbx\Flaechenbilanz"""
     # -*- coding: utf-8 -*-
-    
+
     import arcpy, os
     #Diese Datei muss in der Toolbox als Validator für das Projekt löschen Skript eingefügt werden,
     #damit die vorhandenen Projekte in der DropdownListe angezeigt werden
     class ToolValidator(object):
       """Class for validating a tool's parameter values and controlling
       the behavior of the tool's dialog."""
-    
+
       def __init__(self, parameters):
         """Setup arcpy and the list of tool parameters."""
         self.params = parameters
-    
+
       def initializeParameters(self):
         """Refine the properties of a tool's parameters.  This method is
         called when the tool is opened."""
         import datetime
-    
+
         tbx_path, tool_method = __file__.split('#')
         toolname = tool_method.split('.')[0]
-    
+
         base_path = os.path.dirname(tbx_path)
         base_path = os.path.dirname(base_path)
         base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-    
+
         tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-    
+
         try:
             rows_projects = arcpy.SearchCursor(tablepath_projects)
         except:
             rows_projects  = []
-    
+
         list_projects =[]
-    
+
         for row in rows_projects:
             list_projects.append(row.Name)
         list_projects = list(set(list_projects))
         list_projects = sorted(list_projects)
-    
+
         list_teilflaechen = []
-    
+
         i=-1
-    
+
         #set project
         i+=1 ; self.params[i].filter.list = list_projects
-    
+
         #set point
         i+=1 ; self.params[i].filter.list = list_teilflaechen
-    
+
         #Startjahr auf aktuelles Jahr setzen
         i+=1 ; self.params[i].value = datetime.datetime.now().year
-    
+
         i = 2
         heading = "01_Generelle Flächenaufteilung"
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
-    
+
         heading = "02_Aufteilung Nettobauland"
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
-    
+
         heading = "03_Aufteilung Verkehrsfläche"
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
-    
+
         heading = "04_Aufteilung Grünfläche"
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
-    
+
         return
-    
+
       def updateParameters(self):
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
         has been changed."""
-    
+
         def eingaben_auslesen():
             projectname = self.params[0].value
             teilflaeche = self.params[1].value
             tablepath_teilflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
             tablepath_flaechenbilanz = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Flaechenbilanz')
-    
+
             # Oberkategorien
             queries_S1 = ((1,'Erschliessungsflaeche'),(2,'Gruenflaeche'),(3,'Sonstige Flaechen'),(4,'Nettobauland'))
             fields = ['Teilflaeche_Plangebiet','Flaechennutzung_S1','Anteil_S1']
-    
+
             for query in queries_S1:
                 where_clause = """"Teilflaeche_Plangebiet" ='"""+teilflaeche+"'" + ' AND "Flaechennutzung_S1" = ' + "'" + query[1] + "'"
                 rows = arcpy.da.SearchCursor(tablepath_flaechenbilanz,fields,where_clause)
@@ -147,12 +147,12 @@ class Flaechenbilanz(object):
                 for row in rows:
                     value = row[2]
                 self.params[query[0]+2].value = value
-    
-    
+
+
             # Nettobauland
             queries_S2 = ((1,'Gewerbeflaeche'),(2,'Nettowohnbauland'))
             fields = ['Teilflaeche_Plangebiet','Flaechennutzung_S2','Anteil_S2']
-    
+
             for query in queries_S2:
                 where_clause = """"Teilflaeche_Plangebiet" ='"""+teilflaeche+"'" + ' AND "Flaechennutzung_S2" = ' + "'" + query[1] + "'"
                 rows = arcpy.da.SearchCursor(tablepath_flaechenbilanz,fields,where_clause)
@@ -160,12 +160,12 @@ class Flaechenbilanz(object):
                 for row in rows:
                     value = row[2]
                 self.params[query[0]+6].value = value
-    
-    
+
+
             # Verkehr
             queries_S2 = ((1,'Laermschutzanlagen'),(2,'Privat - Innere Erschliessung'),(3,'Oeffentlich - Aeussere Erschliessung'),(4,'Oeffentlich - Innere Erschliessung'))
             fields = ['Teilflaeche_Plangebiet','Flaechennutzung_S2','Anteil_S2']
-    
+
             for query in queries_S2:
                 where_clause = """"Teilflaeche_Plangebiet" ='"""+teilflaeche+"'" + ' AND "Flaechennutzung_S2" = ' + "'" + query[1] + "'"
                 rows = arcpy.da.SearchCursor(tablepath_flaechenbilanz,fields,where_clause)
@@ -173,11 +173,11 @@ class Flaechenbilanz(object):
                 for row in rows:
                     value = row[2]
                 self.params[query[0]+8].value = value
-    
+
             # Gruenflaechen
             queries_S2 = ((1,'Spielplaetze'),(2,'Strassenbegleitgruen'),(3,'Ausgleichs- und Ersatzflaechen'),(4,'Allgemeine Gruenflaechen'))
             fields = ['Teilflaeche_Plangebiet','Flaechennutzung_S2','Anteil_S2']
-    
+
             for query in queries_S2:
                 where_clause = """"Teilflaeche_Plangebiet" ='"""+teilflaeche+"'" + ' AND "Flaechennutzung_S2" = ' + "'" + query[1] + "'"
                 rows = arcpy.da.SearchCursor(tablepath_flaechenbilanz,fields,where_clause)
@@ -185,14 +185,14 @@ class Flaechenbilanz(object):
                 for row in rows:
                     value = row[2]
                 self.params[query[0]+10].value = value
-    
+
             return
-    
+
         def sliderSummenKontrolle(listeSliderID, zielwertSlidersumme):
             istsumme = 0
             for s in listeSliderID:
                 istsumme+=self.params[s].value
-    
+
             if istsumme <> zielwertSlidersumme:
                 abweichung = zielwertSlidersumme - istsumme
                 for s in reversed(listeSliderID):
@@ -205,19 +205,19 @@ class Flaechenbilanz(object):
                     abweichung = abweichung + alterWert - neuerWert
                     self.params[s].value = neuerWert
             return
-    
+
         # Pfad zum Ordner, in dem Script liegt, erzeugen
         tbx_path, tool_method = __file__.split('#')
         toolname = tool_method.split('.')[0]
         base_path = os.path.dirname(tbx_path)
         base_path = os.path.dirname(base_path)
         base_path = os.path.dirname(base_path)
-    
+
         # Auswahl Teilfläche
         i = 0
         if self.params[i].altered and not self.params[i].hasBeenValidated:
             projectname = self.params[i].value
-    
+
             tablepath_teilflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
             rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
             list_teilflaechen = []
@@ -225,56 +225,56 @@ class Flaechenbilanz(object):
                 list_teilflaechen.append(row.Name)
             list_teilflaechen = sorted(set(list_teilflaechen))
             i+=1 ; self.params[i].filter.list = list_teilflaechen
-    
+
             if len(list_teilflaechen) == 1:
                 self.params[i].value = list_teilflaechen[0]
                 eingaben_auslesen()
-    
+
         # bestehende Eingaben (falls vorhanden) übernehmen
         i = 1
         if self.params[i].altered and not self.params[i].hasBeenValidated:
             eingaben_auslesen()
-    
+
         # Slider generieren
         i = 2
         # Oberkategorien
         listeSliderID = [i+1,i+2,i+3,i+4]
         zielwertSlidersumme = 100
-    
+
         for r in listeSliderID:
             if self.params[r].altered:
                 sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
-    
+
         # Nettobauland
         listeSliderID = [i+5,i+6]
-    
+
         for r in listeSliderID:
             if self.params[r].altered:
                 sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
-    
-    
+
+
         # Verkehr
         listeSliderID = [i+7,i+8,i+9,i+10]
-    
+
         for r in listeSliderID:
             if self.params[r].altered:
                 sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
-    
+
         # Grünfläche
         listeSliderID = [i+11,i+12,i+13,i+14]
-    
+
         for r in listeSliderID:
             if self.params[r].altered:
                 sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
-    
-    
+
+
         return
-    
+
       def updateMessages(self):
         """Modify the messages created by internal validation for each tool
         parameter.  This method is called after internal validation."""
         return
-    
+
     def __init__(self):
         self.label = u'1 Fl\xe4chenbilanz eingeben'
         self.canRunInBackground = False
@@ -444,7 +444,6 @@ class Flaechenbilanz(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         with script_run_as(u'C:\\Users\\handke\\Dropbox\\Regioprojectcheck\\2_Tool\\3_Art und Mass der Nutzung\\flaechenbilanz.py'):
-            ﻿# -*- coding: utf-8 -*-
             # ---------------------------------------------------------------------------
             # REGIOPROJEKTCHECK
             # 10_Kostenmodell.py
@@ -457,72 +456,72 @@ class Flaechenbilanz(object):
             #
             # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
             # ---------------------------------------------------------------------------
-            
-            
+
+
             # Import arcpy modules
             import arcpy, os
             arcpy.env.overwriteOutput = True
-            
-            
+
+
             # Variablen definieren
             i=-1
             i+=1;projektname = parameters[i].valueAsText
             i+=1;teilflaeche = parameters[i].valueAsText
             i+=1;startjahr = parameters[i].valueAsText
-            
+
             i+=1;verkehrsflaeche = int(parameters[i].valueAsText)
             i+=1;gruenflaeche = int(parameters[i].valueAsText)
             i+=1;sonst_flaechen = int(parameters[i].valueAsText)
             i+=1;nettobauland = int(parameters[i].valueAsText)
-            
+
             i+=1;gewerbeflaeche = int(parameters[i].valueAsText)
             i+=1;nettowohnbauland = int(parameters[i].valueAsText)
-            
+
             i+=1;laermschutz = int(parameters[i].valueAsText)
             i+=1;privatwege = int(parameters[i].valueAsText)
             i+=1;aeussere_erschliessung = int(parameters[i].valueAsText)
             i+=1;innere_erschliessung = int(parameters[i].valueAsText)
-            
+
             i+=1;spielplatz = int(parameters[i].valueAsText)
             i+=1;strassenbegleitgruen = int(parameters[i].valueAsText)
             i+=1;ausgleich = int(parameters[i].valueAsText)
             i+=1;allg_gruenflaeche = int(parameters[i].valueAsText)
-            
+
             #Pfade einrichten
             base_path = str(sys.path[0]).split("2_Tool")[0]
             workspace_projekt_definition = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
             teilflaechen = os.path.join(workspace_projekt_definition,'Teilflaechen_Plangebiet')
             flaechenbilanz = os.path.join(workspace_projekt_definition,'Flaechenbilanz')
-            
+
             # Suche Größe der aktuellen Teilfläche heraus
             with arcpy.da.SearchCursor(teilflaechen, ['Name', 'Flaeche_ha']) as cursor:
                 for row in cursor:
                     if row[0] == teilflaeche:
                         flaeche = float(row[1])
-            
+
             # Lösche bisherige Eingaben für gewählte Teilfläche
             with arcpy.da.UpdateCursor(flaechenbilanz, "Teilflaeche_Plangebiet") as cursor:
                 for row in cursor:
                     if row[0] == teilflaeche:
                         cursor.deleteRow()
-            
+
             # Füge neue Eingaben für gewählte Teilfläche ein
             fields = ['Teilflaeche_Plangebiet', 'Startjahr', 'Flaechennutzung_S1', 'Flaechennutzung_S2', 'Anteil_S1', 'Anteil_S2', 'Flaeche_ha']
             cursor = arcpy.da.InsertCursor(flaechenbilanz, fields)
-            
+
             cursor.insertRow((teilflaeche,startjahr,'Nettobauland','Nettowohnbauland',nettobauland,nettowohnbauland, flaeche * nettobauland / 100 * nettowohnbauland / 100))
             cursor.insertRow((teilflaeche,startjahr,'Nettobauland','Gewerbeflaeche',nettobauland,gewerbeflaeche, flaeche * nettobauland / 100 * gewerbeflaeche / 100))
-            
+
             cursor.insertRow((teilflaeche,startjahr,'Erschliessungsflaeche','Laermschutzanlagen',verkehrsflaeche,laermschutz,flaeche * verkehrsflaeche / 100 * laermschutz / 100))
             cursor.insertRow((teilflaeche,startjahr,'Erschliessungsflaeche','Privat - Innere Erschliessung',verkehrsflaeche,privatwege,flaeche * verkehrsflaeche / 100 * privatwege / 100))
             cursor.insertRow((teilflaeche,startjahr,'Erschliessungsflaeche','Oeffentlich - Aeussere Erschliessung',verkehrsflaeche,aeussere_erschliessung,flaeche * verkehrsflaeche / 100 * aeussere_erschliessung / 100))
             cursor.insertRow((teilflaeche,startjahr,'Erschliessungsflaeche','Oeffentlich - Innere Erschliessung',verkehrsflaeche,innere_erschliessung,flaeche * verkehrsflaeche / 100 * innere_erschliessung / 100))
-            
+
             cursor.insertRow((teilflaeche,startjahr,'Gruenflaeche','Spielplaetze',gruenflaeche,spielplatz,flaeche * gruenflaeche / 100 * spielplatz / 100))
             cursor.insertRow((teilflaeche,startjahr,'Gruenflaeche','Strassenbegleitgruen',gruenflaeche,strassenbegleitgruen,flaeche * gruenflaeche / 100 * strassenbegleitgruen / 100))
             cursor.insertRow((teilflaeche,startjahr,'Gruenflaeche','Ausgleichs- und Ersatzflaechen',gruenflaeche,ausgleich,flaeche * gruenflaeche / 100 * ausgleich / 100))
             cursor.insertRow((teilflaeche,startjahr,'Gruenflaeche','Allgemeine Gruenflaechen',gruenflaeche,allg_gruenflaeche,flaeche * gruenflaeche / 100 * allg_gruenflaeche / 100))
-            
+
             cursor.insertRow((teilflaeche,startjahr,'Sonstige Flaechen','Sonstige Flaechen',sonst_flaechen,sonst_flaechen,flaeche* sonst_flaechen / 100))
 
 class Nutzungen(object):
@@ -535,80 +534,78 @@ class Nutzungen(object):
     class ToolValidator(object):
       """Class for validating a tool's parameter values and controlling
       the behavior of the tool's dialog."""
-    
+
       def __init__(self, parameters):
         """Setup arcpy and the list of tool parameters."""
         self.params = parameters
-    
+
       def initializeParameters(self):
         """Refine the properties of a tool's parameters.  This method is
         called when the tool is opened."""
         import os, arcpy, datetime
-    
+
         tbx_path, tool_method = __file__.split('#')
         toolname = tool_method.split('.')[0]
-    
+
         base_path = os.path.dirname(tbx_path)
         base_path = os.path.dirname(base_path)
         base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-    
+
         tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-    
+
         try:
             rows_projects = arcpy.SearchCursor(tablepath_projects)
-        message = "jep"
         except:
             rows_projects  = []
-            message = "nope"
-    
+
         list_projects =[]
-    
+
         for row in rows_projects:
             list_projects.append(row.Name)
         list_projects = list(set(list_projects))
         list_projects = sorted(list_projects)
-    
-    
+
+
         list_teilflaechen = []
-    
+
         list_EwProWE = []
         for i in range(1,5):
-        for j in range(0,10):
-            list_EwProWE.append(str(i)+","+str(j)+" Bewohner pro Wohneinheit")
-    
+            for j in range(0,10):
+                list_EwProWE.append(str(i)+","+str(j)+" Bewohner pro Wohneinheit")
+
         i=-1
-    
+
         #set project
         i+=1 ; self.params[i].filter.list = list_projects
-    
+
         #set point
         i+=1 ; self.params[i].filter.list = list_teilflaechen
-    
+
         heading = "1) Aufsiedlungszeitraum"
         i+=1 ; self.params[i].category = heading # Startjahr
         i+=1 ; self.params[i].category = heading # Aufsiedlungsdauer
-    
+
         heading = "2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen"
         i+=1 ; self.params[i].category = heading # Anzahl WE in Einfamilienhäusern
         i+=1 ; self.params[i].category = heading # Anzahl WE in Doppelhäusern
         i+=1 ; self.params[i].category = heading # Anzahl WE in Reihenhäusern
         i+=1 ; self.params[i].category = heading # Anzahl WE in Mehrfamilienhäusern
-    
+
         heading = "3) Wohnen - Anteile Eigentum und Miete"
         i+=1 ; self.params[i].category = heading # Anteil Eigentum in Einfamilienhäusern
         i+=1 ; self.params[i].category = heading # Anteil Eigentum in Doppelhäusern
         i+=1 ; self.params[i].category = heading # Anteil Eigentum in Reihenhäusern
         i+=1 ; self.params[i].category = heading # Anteil Eigentum in Mehrfamilienhäusern
-    
+
         heading = "4) Wohnen - Einwohner pro Wohneinheit"
         i+=1 ; self.params[i].filter.list = list_EwProWE ; self.params[i].category = heading # Ew pro WE in Einfamilienhäusern
         i+=1 ; self.params[i].filter.list = list_EwProWE ; self.params[i].category = heading # Ew pro WE in Doppelhäusern
         i+=1 ; self.params[i].filter.list = list_EwProWE ; self.params[i].category = heading # Ew pro WE in Reihenhäusern
         i+=1 ; self.params[i].filter.list = list_EwProWE ; self.params[i].category = heading # Ew pro WE in Mehrfamilienhäusern
-    
+
         heading = "5) Wohnen - Zuzugsquote"
         i+=1 ; self.params[i].category = heading # Zuzugsquote Wohnen
-    
+
         heading = "6) Gewerbe - Gebietstyp und Brachenstruktur"
         i+=1 ; self.params[i].category = heading # Gebietstyp Gewerbe
         i+=1 ; self.params[i].category = heading # Anteil Verarbeitendes Gewerbe
@@ -617,38 +614,38 @@ class Nutzungen(object):
         i+=1 ; self.params[i].category = heading # Anteil Verkehr und Lagerei
         i+=1 ; self.params[i].category = heading # Anteil Freiberufl. ... Dienstleistungen
         i+=1 ; self.params[i].category = heading # Anteil Sonstige Dienstleistungen
-    
+
         heading = "7) Gewerbe - Zuzugs- und Eigentumsquote"
         i+=1 ; self.params[i].category = heading # Zuzugsquote Gewerbe
         i+=1 ; self.params[i].category = heading # Anteil Eigentum Gewerbe
-    
+
         heading = "8) Einzelhandel (nur Lebensmitteleinzelhandel)"
         i+=1 ; self.params[i].category = heading # Verkaufsfläche
-    
+
         # Vorgabewerte für Aufsiedelung setzen
         self.params[2].value = datetime.datetime.now().year + 1
         self.params[3].value = 5
-    
+
         return
-    
-    
+
+
       def updateParameters(self):
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
         has been changed."""
-    
+
         def eingaben_auslesen():
-    
+
             projectname = self.params[0].value
             teilflaeche = self.params[1].value
-    
+
             tablepath_flaechenbilanz = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Wohneinheiten_Details')
             tabelle_gebaude = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Gebaeude_Details')
             tabelle_Versorgung_Verkaufsflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Versorgung_Verkaufsflaechen')
             flaechenbilanz = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Flaechenbilanz')
             plangebiet = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
             tabelle_gewerbeanteile = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Gewerbe_Anteile')
-    
+
             #Startjahr und Aufsiedlungsdauer
             fields = ['Beginn_Nutzung', 'Aufsiedlungsdauer', 'Name', 'Startjahr']
             rows = arcpy.da.SearchCursor(plangebiet,fields)
@@ -659,16 +656,16 @@ class Nutzungen(object):
                         self.params[2].value = row[0]
                     else:
                         self.params[2].value = row[3]
-    
+
             # Wohnen - Anzahl Wohneinheiten nach Gebäudetypen
             fields = ['Gebaeudetyp', 'Anzahl_Gebaeude', 'Teilflaeche_Plangebiet']
             rows = arcpy.da.SearchCursor(tabelle_gebaude,fields)
-    
+
             efh = 0
             zfh = 0
             rh = 0
             mfh = 0
-    
+
             for row in rows:
                 if row[2] == teilflaeche and row[0] == "Einfamilienhaus":
                     efh += row[1]
@@ -678,12 +675,12 @@ class Nutzungen(object):
                     rh += row[1]
                 if row[2] == teilflaeche and row[0] == "Mehrfamilienhaus":
                     mfh += row[1]
-    
+
             self.params[4].value = efh
             self.params[5].value = zfh
             self.params[6].value = rh
             self.params[7].value = mfh
-    
+
             #Wohnen - Anteile Eigentum und Miete
             fields = ['Gebaeudetyp', 'Ant_Eigentuemer', 'Teilflaeche_Plangebiet']
             rows = arcpy.da.SearchCursor(tablepath_flaechenbilanz,fields)
@@ -696,7 +693,7 @@ class Nutzungen(object):
                     self.params[10].value = row[1]
                 if row[2] == teilflaeche and row[0] == "Mehrfamilienhaus":
                     self.params[11].value = row[1]
-    
+
             #Wohnen - Einwohner pro Wohneinheit
             fields = ['Gebaeudetyp', 'EW_je_WE', 'Teilflaeche_Plangebiet']
             rows = arcpy.da.SearchCursor(tablepath_flaechenbilanz,fields)
@@ -709,7 +706,7 @@ class Nutzungen(object):
                     self.params[14].value = str(row[1]).replace(".", ",") + " Bewohner pro Wohneinheit"
                 if row[2] == teilflaeche and row[0] == "Mehrfamilienhaus":
                     self.params[15].value = str(row[1]).replace(".", ",") + " Bewohner pro Wohneinheit"
-    
+
             #Gewerbe
             rows = arcpy.da.SearchCursor(tabelle_gewerbeanteile, ["teilflaeche", "branche", "Anteil_A", "Anteil_B" , "Anteil_C" , "Anteil_D" , "Anteil_E", "Anteil_F", "Anteil_Zuzug", "Anteil_Eigentum"])
             for row in rows:
@@ -723,36 +720,36 @@ class Nutzungen(object):
                     self.params[23].value = row[7]
                     self.params[24].value = row[8]
                     self.params[25].value = row[9]
-    
-    
+
+
             #Einzelhandel (nur Lebensmitteleinzelhandel)
             fields = ['Verkaufsflaeche', 'Teilflaeche_Plangebiet']
             rows = arcpy.da.SearchCursor(tabelle_Versorgung_Verkaufsflaechen,fields)
             for row in rows:
                 if row[1] == teilflaeche:
                     self.params[26].value = row[0]
-    
+
             return
-    
-    
+
+
         #import os, arcpy, win32ui, win32con
         import os, arcpy
-    
+
         tbx_path, tool_method = __file__.split('#')
         toolname = tool_method.split('.')[0]
-    
+
         base_path = os.path.dirname(tbx_path)
         base_path = os.path.dirname(base_path)
         base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-    
+
     # Gebietstyp auswählen
         i=17
         if self.params[i].altered and not self.params[i].hasBeenValidated:
             gebtyp = self.params[i].value
             tablepath_gebietstyp = os.path.join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_gebietstypen')
-    
+
             rows = arcpy.SearchCursor(tablepath_gebietstyp)
-    
+
             for row in rows:
                 if gebtyp == row.Gebietstyp:
                     self.params[i+1].value = row.Ant_VerarbGew
@@ -761,13 +758,13 @@ class Nutzungen(object):
                     self.params[i+4].value = row.Ant_VerLag
                     self.params[i+5].value = row.Ant_FrWiTeDi
                     self.params[i+6].value = row.Ant_SoDi
-    
+
     # Automatische Anpassung der Slider
         def sliderSummenKontrolle(listeSliderID, zielwertSlidersumme):
             istsumme = 0
             for s in listeSliderID:
                 istsumme+=self.params[s].value
-    
+
             if istsumme <> zielwertSlidersumme:
                 abweichung = zielwertSlidersumme - istsumme
                 for s in reversed(listeSliderID):
@@ -780,19 +777,19 @@ class Nutzungen(object):
                     abweichung = abweichung + alterWert - neuerWert
                     self.params[s].value = neuerWert
             return
-    
+
         # Pfad zum Ordner, in dem Script liegt, erzeugen
         tbx_path, tool_method = __file__.split('#')
         toolname = tool_method.split('.')[0]
         base_path = os.path.dirname(tbx_path)
         base_path = os.path.dirname(base_path)
         base_path = os.path.dirname(base_path)
-    
+
         # Auswahl Teilfläche
         i = 0
         if self.params[i].altered and not self.params[i].hasBeenValidated:
             projectname = self.params[i].value
-    
+
             tablepath_teilflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
             rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
             list_teilflaechen = []
@@ -800,28 +797,28 @@ class Nutzungen(object):
                 list_teilflaechen.append(row.Name)
             list_teilflaechen = sorted(set(list_teilflaechen))
             i+=1 ; self.params[i].filter.list = list_teilflaechen
-    
+
             if len(list_teilflaechen) == 1:
                 self.params[i].value = list_teilflaechen[0]
                 eingaben_auslesen()
-    
-    
+
+
         # bestehende Eingaben (falls vorhanden) übernehmen
         i = 1
         if self.params[i].altered and not self.params[i].hasBeenValidated:
             eingaben_auslesen()
-    
-    
+
+
         # Slider für Anteile an Arbeitsplätzen nach Gewerbetyp generieren
         listeSliderID = [18, 19, 20, 21,22, 23]
         zielwertSlidersumme = 100
-    
+
         for r in listeSliderID:
             if self.params[r].altered:
                 sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
-    
+
         return
-    
+
       def updateMessages(self):
         """Modify the messages created by internal validation for each tool
         parameter.  This method is called after internal validation."""
@@ -1090,8 +1087,7 @@ class Nutzungen(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         with script_run_as(u'C:\\Users\\handke\\Dropbox\\Regioprojectcheck\\2_Tool\\3_Art und Mass der Nutzung\\nutzungen.py'):
-            ﻿# -*- coding: utf-8 -*-
-            
+
             import time
             import datetime
             import sys
@@ -1099,10 +1095,10 @@ class Nutzungen(object):
             import xlsxwriter
             from xlsxwriter.utility import xl_rowcol_to_cell, xl_col_to_name
             import arcpy, os
-            
+
             projectname = parameters[0].valueAsText
             parameterString = parameters[1].valueAsText
-            
+
             base_path = str(sys.path[0]).split("2_Tool")[0]
             Teilflaeche_Plangebiet = parameterString.split(" | ")[0]
             tabelle_gebaude = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Gebaeude_Details')
@@ -1112,65 +1108,65 @@ class Nutzungen(object):
             tabelle_betriebsflaeche = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Gewerbe_Betriebsflaechen')
             tabelle_betriebsstruktur = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Gewerbe_Betriebsstruktur')
             tabelle_gewerbeanteile = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Gewerbe_Anteile')
-            
+
             #Alte Eingaben löschen
-            
+
             with arcpy.da.UpdateCursor(tabelle_gebaude, 'Teilflaeche_Plangebiet') as cursor:
                 for row in cursor:
                     if row[0] == Teilflaeche_Plangebiet:
                         cursor.deleteRow()
-            
+
             with arcpy.da.UpdateCursor(tabelle_wohneinheiten_details, 'Teilflaeche_Plangebiet') as cursor:
                 for row in cursor:
                     if row[0] == Teilflaeche_Plangebiet:
                         cursor.deleteRow()
-            
+
             with arcpy.da.UpdateCursor(tabelle_verkaufsflaechen, 'Teilflaeche_Plangebiet') as cursor:
                 for row in cursor:
                     if row[0] == Teilflaeche_Plangebiet:
                         cursor.deleteRow()
-            
+
             with arcpy.da.UpdateCursor(tabelle_gewerbe, 'teilflaeche') as cursor:
                 for row in cursor:
                     if row[0] == Teilflaeche_Plangebiet:
                         cursor.deleteRow()
-            
-            
+
+
             with arcpy.da.UpdateCursor(tabelle_betriebsflaeche, 'teilflaeche') as cursor:
                 for row in cursor:
                     if row[0] == Teilflaeche_Plangebiet:
                         cursor.deleteRow()
-            
+
             with arcpy.da.UpdateCursor(tabelle_betriebsstruktur, 'teilflaeche') as cursor:
                 for row in cursor:
                     if row[0] == Teilflaeche_Plangebiet:
                         cursor.deleteRow()
-            
+
             with arcpy.da.UpdateCursor(tabelle_gewerbeanteile, 'teilflaeche') as cursor:
                 for row in cursor:
                     if row[0] == Teilflaeche_Plangebiet:
                         cursor.deleteRow()
-            
+
             # WOHNGEBÄUDE
-            
+
             flaechenbilanz = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Flaechenbilanz')
             plangebiet = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
-            
+
             cursor = arcpy.da.UpdateCursor(plangebiet, ['Name','Beginn_Nutzung','Aufsiedlungsdauer'])
             for row in cursor:
                 if row[0] == parameters[1].valueAsText:
                     row[1] = parameters[2].valueAsText
                     row[2] = parameters[3].valueAsText
                     cursor.updateRow(row)
-            
+
             for i in range(0,int(parameters[3].valueAsText)):
-            
+
                 jahr = int(parameters[2].valueAsText) + i
-            
+
                 messages.AddMessage(jahr)
                 Insert = arcpy.da.InsertCursor(tabelle_gebaude, ['Teilflaeche_Plangebiet','Gebaeudetyp','Anzahl_Gebaeude','Jahr'])
                 row = ["","","",""]
-            
+
                 #Ein- und Zweifamilienhäuser
                 if int(parameters[4].valueAsText) >0:
                     row[0] = parameters[1].valueAsText
@@ -1178,7 +1174,7 @@ class Nutzungen(object):
                     row[2] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText)
                     row[3] = jahr
                     Insert.insertRow(row)
-            
+
                 #Doppelhäuser
                 if int(parameters[5].valueAsText) >0:
                     row[0] = parameters[1].valueAsText
@@ -1186,7 +1182,7 @@ class Nutzungen(object):
                     row[2] =  int(parameters[5].valueAsText) / int(parameters[3].valueAsText)
                     row[3] = jahr
                     Insert.insertRow(row)
-            
+
                 #Reihenhäuser
                 if int(parameters[6].valueAsText) >0:
                     row[0] = parameters[1].valueAsText
@@ -1194,7 +1190,7 @@ class Nutzungen(object):
                     row[2] =  int(parameters[6].valueAsText) / int(parameters[3].valueAsText)
                     row[3] = jahr
                     Insert.insertRow(row)
-            
+
                 #Mehrfamilienhäuser
                 if int(parameters[7].valueAsText) >0:
                     row[0] = parameters[1].valueAsText
@@ -1202,20 +1198,20 @@ class Nutzungen(object):
                     row[2] =  int(parameters[7].valueAsText) / int(parameters[3].valueAsText)
                     row[3] = jahr
                     Insert.insertRow(row)
-            
+
                 del row, Insert
-            
+
                 #tabelle "Wohneinheiten_Details" oeffnen und Werte fuer Miete_Eigentum. und Anzahl Wohneinheiten speichern
                 tabelle_wohneinheiten_details = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Wohneinheiten_Details')
-            
+
                 Insert = arcpy.da.InsertCursor(tabelle_wohneinheiten_details, ['Gebaeudetyp','Teilflaeche_Plangebiet','Miete_Eigentum','EW_je_WE','Jahr','Anzahl_WE', 'Ant_Eigentuemer'])
                 row = ["","","","","","",""]
-            
+
                 #Ein- und Zweifamilienhäuser
                 eigentum = int(parameters[8].valueAsText)
                 miete = 100 - int(parameters[8].valueAsText)
                 nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
-            
+
                 for nutzungstyp in nutzungstypen:
                     row[0] = "Einfamilienhaus"
                     row[1] = parameters[1].valueAsText
@@ -1225,12 +1221,12 @@ class Nutzungen(object):
                     row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
                     row[6] = parameters[8].valueAsText
                     Insert.insertRow(row)
-            
+
                 #Doppelhäuser
                 eigentum = int(parameters[9].valueAsText)
                 miete = 100 - int(parameters[9].valueAsText)
                 nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
-            
+
                 for nutzungstyp in nutzungstypen:
                     row[0] = "Zweifamilien- oder Doppelhaus"
                     row[1] = parameters[1].valueAsText
@@ -1240,12 +1236,12 @@ class Nutzungen(object):
                     row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
                     row[6] = parameters[9].valueAsText
                     Insert.insertRow(row)
-            
+
                 #Reihenhäuser
                 eigentum = int(parameters[10].valueAsText)
                 miete = 100 - int(parameters[10].valueAsText)
                 nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
-            
+
                 for nutzungstyp in nutzungstypen:
                     row[0] = "Reihenhaus"
                     row[1] = parameters[1].valueAsText
@@ -1255,12 +1251,12 @@ class Nutzungen(object):
                     row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
                     row[6] = parameters[10].valueAsText
                     Insert.insertRow(row)
-            
+
                 #RMehrfamilienhäuser
                 eigentum = int(parameters[11].valueAsText)
                 miete = 100 - int(parameters[11].valueAsText)
                 nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
-            
+
                 for nutzungstyp in nutzungstypen:
                     row[0] = "Mehrfamilienhaus"
                     row[1] = parameters[1].valueAsText
@@ -1270,12 +1266,12 @@ class Nutzungen(object):
                     row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
                     row[6] = parameters[11].valueAsText
                     Insert.insertRow(row)
-            
+
             del row, Insert
-            
-            
+
+
             # GEWERBE
-            
+
             Insert = arcpy.InsertCursor(tabelle_gewerbeanteile)
             row = Insert.newRow()
             row.setValue("teilflaeche", parameters[1].valueAsText)
@@ -1290,14 +1286,14 @@ class Nutzungen(object):
             row.setValue("Anteil_Eigentum", parameters[25].valueAsText)
             Insert.insertRow(row)
             del row, Insert
-            
-            
+
+
             base_path = str(sys.path[0]).split("2_Tool")[0]
             sheetlibpath = os.path.join(base_path,'2_Tool',"2_Projektverwaltung",'sheet_lib.py')
             sl = imp.load_source('sheet_lib', sheetlibpath)
-            
+
             def beschaeftigte_gewerbe(projektname):
-            
+
                 #Pfade anlegen
                 base_path = str(sys.path[0]).split("2_Tool")[0]
                 shape_bkggemeiden=os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','bkg_gemeinden')
@@ -1305,13 +1301,13 @@ class Nutzungen(object):
                 workspace_Basis_Daten=os.path.join(base_path,'2_Tool',"3_Art und Mass der Nutzung",'FGDB_Definition_Projekt_Tool.gdb')
                 shape_teilflaeche = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb','Teilflaechen_Plangebiet')
                 workspace_definition= os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-            
-            
+
+
                 # Process: Layer lagebezogen auswählen
                 arcpy.MakeFeatureLayer_management(shape_bkggemeiden, 'bkg_gemeinden_lyr')
                 arcpy.SelectLayerByLocation_management('bkg_gemeinden_lyr', "CONTAINS",shape_teilflaeche , "", "NEW_SELECTION")
-            
-            
+
+
                 # If features matched criterias write them to a new feature class
                 matchcount = int(arcpy.GetCount_management('bkg_gemeinden_lyr').getOutput(0))
                 if matchcount == 0:
@@ -1328,26 +1324,26 @@ class Nutzungen(object):
                         print "AGS ",AGS
                         break
                     del cur_Search_Lry
-            
+
                     cur_Sear_GGEN= arcpy.SearchCursor(os.path.join(workspace_Basis_Daten_Versor,"Gesamtgemeinden"))
-            
+
                     array_ags_gags=[]
                     for speicher in cur_Sear_GGEN:
                         array_ags_gags.append([int(speicher.AGS),int(speicher.VAGS)])
-            
+
                     del speicher,cur_Sear_GGEN
-            
+
                     for b in array_ags_gags:
                         if AGS==b[0]:
                             GAGS=b[1]
                             print "GAGS ",GAGS
                             break
-            
+
                     del array_ags_gags
-            
+
                     array_branche_anzahl=[]
                     cur_Search_beschaeftigte= arcpy.SearchCursor(os.path.join(workspace_definition,"Gewerbe_Teilflaechen"))
-            
+
                     for c in cur_Search_beschaeftigte:
                         if len(array_branche_anzahl)==0:
                             array_branche_anzahl.append([str(c.branche),(c.beschaeftigte)])
@@ -1357,26 +1353,26 @@ class Nutzungen(object):
                                 for z in array_branche_anzahl:
                                     if z[0]==c.branche:
                                         z[1]+=(c.beschaeftigte)
-            
-            
+
+
                             else:
                                 array_branche_anzahl.append([str(c.branche),(c.beschaeftigte)])
-            
+
                     print array_branche_anzahl
                     del cur_Search_beschaeftigte
-            
-            
-            
+
+
+
                     #gesamtgemeinde + anzahl beschaeftigte pro branche -> multiplikation -> fertig
                     gesamt_anzahl=0
                     for hh in array_branche_anzahl:
                         gesamt_anzahl+=hh[1]
-            
+
                     print gesamt_anzahl
                     gesamt_anzahl=round(gesamt_anzahl)
                     print "Gesamt anzahl ",gesamt_anzahl
                     array_ergebnis=[]
-            
+
                     print "Teilzeit"
                     cur_Search_teilzeit = arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"gewerbe_teilzeit"))
                     for p in cur_Search_teilzeit:
@@ -1409,7 +1405,7 @@ class Nutzungen(object):
                             b1=int(b1)
                             array_ergebnis.append(["Geringfuegig",b1])
                             break
-            
+
             ##        print array_ergebnis
                     del cur_Search_gering
                     print "Akademisch"
@@ -1427,54 +1423,54 @@ class Nutzungen(object):
                             array_ergebnis.append(["Hochschulausbildung",b1])
                             array_ergebnis.append(["Gesamt",int(gesamt_anzahl)])
                             break
-            
+
                     print array_ergebnis
                     del cur_Search_akademisch,array_branche_anzahl,gesamt_anzahl
-            
-            
+
+
                     try:
                         arcpy.Delete_management(os.path.join(workspace_definition,"Gewerbe_Beschaeftigte_Zahlen"))
             ##            arcpy.Delete_management(os.path.join(workspace_definition,"Gewerbe_Beschaeftigte_Zahlen"))
             ##            arcpy.DeleteFeatures_management("Gewerbe_Beschaeftigte_Zahlen")
                     except:
                         pass
-            
+
                     try:
                         arcpy.CreateTable_management(workspace_definition,"Gewerbe_Beschaeftigte_Zahlen")
-            
+
                     except:
                         a="Fehler Gewerbe_Beschaeftigte_Zahlen konnte nicht erstellt werden. Bitte ArcGis neustarten oder alle Files schliessen."
                         print a
                         messages.AddErrorMessage(a)
                         exit(1)
-            
+
                     try:
                         arcpy.AddField_management(os.path.join(workspace_definition,"Gewerbe_Beschaeftigte_Zahlen"), "Info", "TEXT",250)
                         arcpy.AddField_management(os.path.join(workspace_definition,"Gewerbe_Beschaeftigte_Zahlen"), "Anzahl", "LONG")
-            
+
                     except:
                         a="Fehler Gewerbe_Beschaeftigte_Zahlen konnte nicht erstellt werden. Bitte ArcGis neustarten oder alle Files schliessen."
                         print a
                         messages.AddErrorMessage(a)
                         exit(1)
-            
+
                     cur_Ins_beschaef= arcpy.InsertCursor(os.path.join(workspace_definition,"Gewerbe_Beschaeftigte_Zahlen"))
                     for a in array_ergebnis:
                         row = cur_Ins_beschaef.newRow()
                         row.setValue("Info",a[0])
                         row.setValue("Anzahl",a[1])
                         cur_Ins_beschaef.insertRow(row)
-            
+
                     del cur_Ins_beschaef
-            
-            
-            
+
+
+
             schrittmeldung = 'Eingaben werden gelesen \n'
             messages.AddMessage(schrittmeldung)
             print schrittmeldung
-            
+
             #Parameter aus Tool auslesen
-            
+
             projektname = parameters[0].valueAsText
             teilflaeche = parameters[1].valueAsText
             startjahr = parameters[2].valueAsText
@@ -1488,13 +1484,13 @@ class Nutzungen(object):
             Ant_Betr_VerLag = parameters[21].valueAsText
             Ant_Betr_FrWiTeDi = parameters[22].valueAsText
             Ant_Betr_SoDi = parameters[23].valueAsText
-            
+
             if gebtyp != "<kein Gewerbegebiet vorhanden>":
-            
+
                 ######################################################
                 #Prüfung der Branchenstruktur auf 100%
                 SummeBranchen = int(Ant_Betr_VerarbGew) + int(Ant_Betr_BauGew) + int(Ant_Betr_HanKfZ) + int(Ant_Betr_VerLag) + int(Ant_Betr_FrWiTeDi) + int(Ant_Betr_SoDi)
-            
+
                 if SummeBranchen < 100:
                     schrittmeldung = 'Die Summe der Branchenanteile liegt unter 100 Prozent. Bitte ueberpruefen Sie Ihre Angaben \n'
                 elif SummeBranchen > 100:
@@ -1506,25 +1502,25 @@ class Nutzungen(object):
                     import datetime
                     ts = time.time()
                     timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-            
+
                     ######################################################
                     #Flaechenbilanz berechnen
-            
+
                     #Pfade anlegen
                     base_path = str(sys.path[0]).split("2_Tool")[0]
                     tabelle_flaechenbilanzgrundlage = os.path.join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_flaechenutzungsbilanz')
                     tabelle_flaechennutzung = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb','Flaechenbilanz_Planung_Prozent')
                     shape_teilflaeche = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb','Teilflaechen_Plangebiet')
                     flaechenbilanz = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb','Flaechenbilanz')
-            
+
                     #Größe der Gewerbefläche auslesen
                     flaechenbilanz_cursor = arcpy.SearchCursor(flaechenbilanz)
-            
+
                     for row in flaechenbilanz_cursor:
                         if row.Teilflaeche_Plangebiet == teilflaeche and row.Flaechennutzung_S2 == "Gewerbeflaeche":
                             flaechengroesse = row.Flaeche_ha
-            
-            
+
+
                     #In Abhaengigkeit vom Gebietstyp die Flaechenbilanz definieren
                     # Dazu zunächst die Anteilswerte aus Grundlagentabelle auslesen
                     rows_flaechenbilanzgrundlage = arcpy.SearchCursor(tabelle_flaechenbilanzgrundlage)
@@ -1532,7 +1528,7 @@ class Nutzungen(object):
                     ant_s2_strBeglGruen = 0
                     ant_s2_InErsch = 0
                     ant_s2_GewBauland = 0
-            
+
                     for row in rows_flaechenbilanzgrundlage:
                         if row.Flaechennutzung_S1 == "Gruenflaeche":
                             if row.Flaechennutzung_S2 == "Allgemeine Gruenflaechen":
@@ -1589,28 +1585,28 @@ class Nutzungen(object):
                                     ant_s2_GewBauland = row.Hoeher_Gewerbe
                                 elif gebtyp == "Technologiepark, Wissenschaftspark":
                                     ant_s2_GewBauland = row.TechWissPark
-            
-            
+
+
                     # und dann die definierten Anteile mit der Projektflaeche multiplizieren
                     s2_allgGrue = flaechengroesse * ant_s2_allgGruen / 100
                     s2_strBeglGrue = flaechengroesse * ant_s2_strBeglGruen / 100
                     s2_InErsch = flaechengroesse * ant_s2_InErsch / 100
                     s2_GewBauland = flaechengroesse * ant_s2_GewBauland / 100
-            
-            
+
+
                     ######################################################
                     # Anzahl der Betriebe nach Branchen bestimmen
                     schrittmeldung = 'Branchenstrukturberechnung wird vorbereitet \n'
                     messages.AddMessage(schrittmeldung)
                     print schrittmeldung
-            
+
                     # erstmal Pfade definieren
                     tabelle_BFG = os.path.join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_betriebsflaechengroesse')
                     tabelle_betriebsstruktur = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb','Gewerbe_Betriebsstruktur')
-            
+
                     # dann zunächst die Betriebsanteile mit den definierten Parzellengrößen gewichten
                     rows_BFG = arcpy.SearchCursor(tabelle_BFG)
-            
+
                     for row in rows_BFG:
                         if row.Branche == "C":
                             BFG_Betr_VerarbGew = float(row.Betriebsflaechengroesse_ha)
@@ -1624,21 +1620,21 @@ class Nutzungen(object):
                             BFG_Betr_FrWiTeDi = float(row.Betriebsflaechengroesse_ha)
                         if row.Branche == "N":
                             BFG_Betr_SoDi = float(row.Betriebsflaechengroesse_ha)
-            
+
                     Flaeche_Betr_VerarbGew_temp = float(Ant_Betr_VerarbGew) * BFG_Betr_VerarbGew
                     Flaeche_Betr_BauGew_temp = float(Ant_Betr_BauGew) * BFG_Betr_BauGew
                     Flaeche_Betr_HanKfZ_temp = float(Ant_Betr_HanKfZ) * BFG_Betr_HanKfZ
                     Flaeche_Betr_VerLag_temp = float(Ant_Betr_VerLag) * BFG_Betr_VerLag
                     Flaeche_Betr_FrWiTeDi_temp = float(Ant_Betr_FrWiTeDi) * BFG_Betr_FrWiTeDi
                     Flaeche_Betr_SoDi_temp = float(Ant_Betr_SoDi) * BFG_Betr_SoDi
-            
+
                     Flaeche_Gesamt_Temp = Flaeche_Betr_VerarbGew_temp + Flaeche_Betr_BauGew_temp + Flaeche_Betr_HanKfZ_temp + Flaeche_Betr_VerLag_temp + Flaeche_Betr_FrWiTeDi_temp + Flaeche_Betr_SoDi_temp
-            
+
                     #daraus die Flächenanteile ermitteln
                     schrittmeldung = 'Gewerbeflaeche nach Branchen wird berechnet \n'
                     messages.AddMessage(schrittmeldung)
                     print schrittmeldung
-            
+
                     gewerbebauland = float(s2_GewBauland)
                     Flaeche_Betr_VerarbGew = float(Flaeche_Betr_VerarbGew_temp) / float(Flaeche_Gesamt_Temp) * float(gewerbebauland)
                     Flaeche_Betr_BauGew = float(Flaeche_Betr_BauGew_temp) / float(Flaeche_Gesamt_Temp) * float(gewerbebauland)
@@ -1646,7 +1642,7 @@ class Nutzungen(object):
                     Flaeche_Betr_VerLag = float(Flaeche_Betr_VerLag_temp) / float(Flaeche_Gesamt_Temp) * float(gewerbebauland)
                     Flaeche_Betr_FrWiTeDi = float(Flaeche_Betr_FrWiTeDi_temp) / float(Flaeche_Gesamt_Temp) * float(gewerbebauland)
                     Flaeche_Betr_SoDi = float(Flaeche_Betr_SoDi_temp) / float(Flaeche_Gesamt_Temp) * float(gewerbebauland)
-            
+
                     #und über die BFG wieder zur Anzahl der Betriebe
                     schrittmeldung = 'Betriebszahl nach Branchen wird berechnet \n'
                     messages.AddMessage(schrittmeldung)
@@ -1670,13 +1666,13 @@ class Nutzungen(object):
                     Anz_Betr_VerLag = Flaeche_Betr_VerLag / (BFG_Betr_VerLag * BFGfaktor)
                     Anz_Betr_FrWiTeDi = Flaeche_Betr_FrWiTeDi / (BFG_Betr_FrWiTeDi * BFGfaktor)
                     Anz_Betr_SoDi = Flaeche_Betr_SoDi / (BFG_Betr_SoDi * BFGfaktor)
-            
+
                     #Betriebsflaechen nach Branchen in Tabelle schreiben
                     tabelle_betriebsflaeche = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb','Gewerbe_Betriebsflaechen')
                     tabelle_betriebsflaeche_Insert = arcpy.InsertCursor(tabelle_betriebsflaeche)
-            
+
                     rowBFins = tabelle_betriebsflaeche_Insert.newRow()
-            
+
                     rowBFins.teilflaeche = teilflaeche
                     rowBFins.gebietstyp = str(gebtyp)
                     rowBFins.Betriebsflaeche_C = float(Flaeche_Betr_VerarbGew)
@@ -1686,18 +1682,18 @@ class Nutzungen(object):
                     rowBFins.Betriebsflaeche_M = float(Flaeche_Betr_FrWiTeDi)
                     rowBFins.Betriebsflaeche_N = float(Flaeche_Betr_SoDi)
                     rowBFins.timestamp = str(timestamp)
-            
+
                     tabelle_betriebsflaeche_Insert.insertRow(rowBFins)
-            
-            
+
+
                     #und nun noch die Beschäftigten berechnen
                     schrittmeldung = 'Beschaeftigtenzahl nach Branchen wird berechnet \n'
                     messages.AddMessage(schrittmeldung)
                     print schrittmeldung
-            
+
                     tabelle_FKZ = os.path.join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_flaechenkennziffern')
                     rows_FKZ = arcpy.SearchCursor(tabelle_FKZ)
-            
+
                     for row in rows_FKZ:
                         if row.Branche == "C":
                             FKZ_VerarbGew = float(row.Beschaeftigte_je_Hektar)
@@ -1711,31 +1707,31 @@ class Nutzungen(object):
                             FKZ_FrWiTeDi = float(row.Beschaeftigte_je_Hektar)
                         if row.Branche == "N":
                             FKZ_SoDi = float(row.Beschaeftigte_je_Hektar)
-            
+
                     Besch_VerarbGew = float(Flaeche_Betr_VerarbGew) * float(FKZ_VerarbGew)
                     Besch_BauGew = float(Flaeche_Betr_BauGew) * float(FKZ_BauGew)
                     Besch_HanKfZ = float(Flaeche_Betr_HanKfZ) * float(FKZ_HanKfZ)
                     Besch_VerLag = float(Flaeche_Betr_VerLag) * float(FKZ_VerLag)
                     Besch_FrWiTeDi = float(Flaeche_Betr_FrWiTeDi) * float(FKZ_FrWiTeDi)
                     Besch_SoDi = float(Flaeche_Betr_SoDi) * float(FKZ_SoDi)
-            
+
                     ################################################
                     ### Aufsiedlugnsdauer einrechnen
                     schrittmeldung = 'Aufsiedlungsdauer wird auf Flaechen-, Betriebs- Beschaeftigtenstruktur umgelegt \n'
                     messages.AddMessage(schrittmeldung)
                     print schrittmeldung
-            
+
                     #### Aufsiedlugnsdauer Betriebe
                     # zuletzt die Anzahl noch in die Ausgabetabelle schreiben und dabei mit der Aufsiedlungszeit verrechnen
                     tabelle_parameter_aufsiedlungsdauer = os.path.join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_aufsiedlungsdauer')
                     tabelle_gewerbe_betriebsstruktur_Insert = arcpy.InsertCursor(tabelle_betriebsstruktur)
-            
+
                     #für Branche C
                     anzahl_betriebe_start = Anz_Betr_VerarbGew
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
-            
+
                     sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
-            
+
                     tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer, sql)
                     for row2 in tabelle_parameter_aufsiedlungsdauer_Search:
                         parameter_jahr1 = row2.Jahr1
@@ -1769,9 +1765,9 @@ class Nutzungen(object):
                         parameter_jahr29 = row2.Jahr29
                         parameter_jahr30 = row2.Jahr30
                     del tabelle_parameter_aufsiedlungsdauer_Search
-            
+
                     row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
-            
+
                     row3.anzahl_betriebe_jahr_0 = anzahl_betriebe_start * parameter_jahr1
                     row3.anzahl_betriebe_jahr_1 = anzahl_betriebe_start * parameter_jahr2
                     row3.anzahl_betriebe_jahr_2 = anzahl_betriebe_start * parameter_jahr3
@@ -1807,16 +1803,16 @@ class Nutzungen(object):
                     row3.teilflaeche = teilflaeche
                     row3.branche = "C"
                     row3.ID_ts = timestamp
-            
+
                     tabelle_gewerbe_betriebsstruktur_Insert.insertRow(row3)
-            
+
                     #für Branche F
                     anzahl_betriebe_start = Anz_Betr_BauGew
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
-            
+
                     sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
                     row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
-            
+
                     row3.anzahl_betriebe_jahr_0 = anzahl_betriebe_start * parameter_jahr1
                     row3.anzahl_betriebe_jahr_1 = anzahl_betriebe_start * parameter_jahr2
                     row3.anzahl_betriebe_jahr_2 = anzahl_betriebe_start * parameter_jahr3
@@ -1852,17 +1848,17 @@ class Nutzungen(object):
                     row3.teilflaeche = teilflaeche
                     row3.branche = "F"
                     row3.ID_ts = timestamp
-            
+
                     tabelle_gewerbe_betriebsstruktur_Insert.insertRow(row3)
-            
-            
+
+
                     #für Branche G
                     anzahl_betriebe_start = Anz_Betr_HanKfZ
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
-            
+
                     sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
                     row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
-            
+
                     row3.anzahl_betriebe_jahr_0 = anzahl_betriebe_start * parameter_jahr1
                     row3.anzahl_betriebe_jahr_1 = anzahl_betriebe_start * parameter_jahr2
                     row3.anzahl_betriebe_jahr_2 = anzahl_betriebe_start * parameter_jahr3
@@ -1898,17 +1894,17 @@ class Nutzungen(object):
                     row3.teilflaeche = teilflaeche
                     row3.branche = "G"
                     row3.ID_ts = timestamp
-            
+
                     tabelle_gewerbe_betriebsstruktur_Insert.insertRow(row3)
-            
-            
+
+
                     #für Branche H
                     anzahl_betriebe_start = Anz_Betr_VerLag
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
-            
+
                     sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
                     row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
-            
+
                     row3.anzahl_betriebe_jahr_0 = anzahl_betriebe_start * parameter_jahr1
                     row3.anzahl_betriebe_jahr_1 = anzahl_betriebe_start * parameter_jahr2
                     row3.anzahl_betriebe_jahr_2 = anzahl_betriebe_start * parameter_jahr3
@@ -1944,16 +1940,16 @@ class Nutzungen(object):
                     row3.teilflaeche = teilflaeche
                     row3.branche = "H"
                     row3.ID_ts = timestamp
-            
+
                     tabelle_gewerbe_betriebsstruktur_Insert.insertRow(row3)
-            
+
                     #für Branche M
                     anzahl_betriebe_start = Anz_Betr_FrWiTeDi
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
-            
+
                     sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
                     row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
-            
+
                     row3.anzahl_betriebe_jahr_0 = anzahl_betriebe_start * parameter_jahr1
                     row3.anzahl_betriebe_jahr_1 = anzahl_betriebe_start * parameter_jahr2
                     row3.anzahl_betriebe_jahr_2 = anzahl_betriebe_start * parameter_jahr3
@@ -1989,16 +1985,16 @@ class Nutzungen(object):
                     row3.teilflaeche = teilflaeche
                     row3.branche = "M"
                     row3.ID_ts = timestamp
-            
+
                     tabelle_gewerbe_betriebsstruktur_Insert.insertRow(row3)
-            
+
                     #für Branche N
                     anzahl_betriebe_start = Anz_Betr_SoDi
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
-            
+
                     sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
                     row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
-            
+
                     row3.anzahl_betriebe_jahr_0 = anzahl_betriebe_start * parameter_jahr1
                     row3.anzahl_betriebe_jahr_1 = anzahl_betriebe_start * parameter_jahr2
                     row3.anzahl_betriebe_jahr_2 = anzahl_betriebe_start * parameter_jahr3
@@ -2034,28 +2030,28 @@ class Nutzungen(object):
                     row3.teilflaeche = teilflaeche
                     row3.branche = "N"
                     row3.ID_ts = timestamp
-            
+
                     tabelle_gewerbe_betriebsstruktur_Insert.insertRow(row3)
-            
-            
-            
+
+
+
                     #### Aufsiedlugnsdauer Beschäftigte
                     # zuletzt die Anzahl noch in die Ausgabetabelle schreiben und dabei mit der Aufsiedlungszeit verrechnen
                     tabelle_parameter_aufsiedlungsdauer = os.path.join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_aufsiedlungsdauer')
                     tabelle_beschaeftigte = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb','Gewerbe_Beschaeftigte')
                     tabelle_beschaeftigte_insert = arcpy.InsertCursor(tabelle_beschaeftigte)
                     tabelle_projektrahmendaten = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb','Projektrahmendaten')
-            
+
                     #Beschaeftigte Branche C / Besch_VerarbGew
                     anzahl_Besch_max = float(Besch_VerarbGew)
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
                     tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer)
-            
+
                     rows_projektrahmen = arcpy.SearchCursor(tabelle_projektrahmendaten)
                     for row in rows_projektrahmen:
                         ende = row.Ende_Betrachtungszeitraum
                         ende = long(ende) + 1
-            
+
                     anfang = long(startjahr)
                     dauer = long(aufsiedlungsdauer)
                     jahr = long(startjahr) - 1
@@ -2065,7 +2061,7 @@ class Nutzungen(object):
                     jahrcount = -1
                     jahraufsiedlung = 1
                     vollaufsiedlung = long(startjahr) + long(aufsiedlungsdauer)
-            
+
                     for jahr in range(anfang, ende):
                         jahrcount = jahrcount + 1
                         jahr = jahr + 1
@@ -2076,12 +2072,12 @@ class Nutzungen(object):
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
                             jahraufsiedlung = jahraufsiedlung + 1
-            
+
                         else:
                             Besch_Jahr = float(anzahl_Besch_max)
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
-            
+
                         row3.jahr = long(jahrcount) + long(startjahr)
                         row3.Teilflaeche_Plangebiet = teilflaeche
                         row3.Branche = "C"
@@ -2089,18 +2085,18 @@ class Nutzungen(object):
                         row3.Anzahl_neu = float(Besch_Jahr_neu)
                         row3.ID_ts = timestamp
                         tabelle_beschaeftigte_insert.insertRow(row3)
-            
-            
+
+
                     #Beschaeftigte Branche F / Besch_BauGew
                     anzahl_Besch_max = float(Besch_BauGew)
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
                     tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer)
-            
+
                     rows_projektrahmen = arcpy.SearchCursor(tabelle_projektrahmendaten)
                     for row in rows_projektrahmen:
                         ende = row.Ende_Betrachtungszeitraum
                         ende = long(ende) + 1
-            
+
                     anfang = long(startjahr)
                     dauer = long(aufsiedlungsdauer)
                     jahr = long(startjahr) - 1
@@ -2110,7 +2106,7 @@ class Nutzungen(object):
                     jahrcount = -1
                     jahraufsiedlung = 1
                     vollaufsiedlung = long(startjahr) + long(aufsiedlungsdauer)
-            
+
                     for jahr in range(anfang, ende):
                         jahrcount = jahrcount + 1
                         jahr = jahr + 1
@@ -2121,12 +2117,12 @@ class Nutzungen(object):
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
                             jahraufsiedlung = jahraufsiedlung + 1
-            
+
                         else:
                             Besch_Jahr = float(anzahl_Besch_max)
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
-            
+
                         row3.jahr = long(jahrcount) + long(startjahr)
                         row3.Teilflaeche_Plangebiet = teilflaeche
                         row3.Branche = "F"
@@ -2134,18 +2130,18 @@ class Nutzungen(object):
                         row3.Anzahl_neu = float(Besch_Jahr_neu)
                         row3.ID_ts = timestamp
                         tabelle_beschaeftigte_insert.insertRow(row3)
-            
-            
+
+
                     #Beschaeftigte Branche G / Besch_HanKfZ
                     anzahl_Besch_max = float(Besch_HanKfZ)
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
                     tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer)
-            
+
                     rows_projektrahmen = arcpy.SearchCursor(tabelle_projektrahmendaten)
                     for row in rows_projektrahmen:
                         ende = row.Ende_Betrachtungszeitraum
                         ende = long(ende) + 1
-            
+
                     anfang = long(startjahr)
                     dauer = long(aufsiedlungsdauer)
                     jahr = long(startjahr) - 1
@@ -2155,7 +2151,7 @@ class Nutzungen(object):
                     jahrcount = -1
                     jahraufsiedlung = 1
                     vollaufsiedlung = long(startjahr) + long(aufsiedlungsdauer)
-            
+
                     for jahr in range(anfang, ende):
                         jahrcount = jahrcount + 1
                         jahr = jahr + 1
@@ -2166,12 +2162,12 @@ class Nutzungen(object):
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
                             jahraufsiedlung = jahraufsiedlung + 1
-            
+
                         else:
                             Besch_Jahr = float(anzahl_Besch_max)
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
-            
+
                         row3.jahr = long(jahrcount) + long(startjahr)
                         row3.Teilflaeche_Plangebiet = teilflaeche
                         row3.Branche = "G"
@@ -2179,19 +2175,19 @@ class Nutzungen(object):
                         row3.Anzahl_neu = float(Besch_Jahr_neu)
                         row3.ID_ts = timestamp
                         tabelle_beschaeftigte_insert.insertRow(row3)
-            
+
                     Besch_FrWiTeDi = float(Flaeche_Betr_FrWiTeDi) * float(FKZ_FrWiTeDi)
                     Besch_SoDi = float(Flaeche_Betr_SoDi) * float(FKZ_SoDi)
                     #Beschaeftigte Branche H / Besch_VerLag
                     anzahl_Besch_max = float(Besch_VerLag)
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
                     tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer)
-            
+
                     rows_projektrahmen = arcpy.SearchCursor(tabelle_projektrahmendaten)
                     for row in rows_projektrahmen:
                         ende = row.Ende_Betrachtungszeitraum
                         ende = long(ende) + 1
-            
+
                     anfang = long(startjahr)
                     dauer = long(aufsiedlungsdauer)
                     jahr = long(startjahr) - 1
@@ -2201,7 +2197,7 @@ class Nutzungen(object):
                     jahrcount = -1
                     jahraufsiedlung = 1
                     vollaufsiedlung = long(startjahr) + long(aufsiedlungsdauer)
-            
+
                     for jahr in range(anfang, ende):
                         jahrcount = jahrcount + 1
                         jahr = jahr + 1
@@ -2212,12 +2208,12 @@ class Nutzungen(object):
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
                             jahraufsiedlung = jahraufsiedlung + 1
-            
+
                         else:
                             Besch_Jahr = float(anzahl_Besch_max)
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
-            
+
                         row3.jahr = long(jahrcount) + long(startjahr)
                         row3.Teilflaeche_Plangebiet = teilflaeche
                         row3.Branche = "H"
@@ -2225,19 +2221,19 @@ class Nutzungen(object):
                         row3.Anzahl_neu = float(Besch_Jahr_neu)
                         row3.ID_ts = timestamp
                         tabelle_beschaeftigte_insert.insertRow(row3)
-            
-            
+
+
                     Besch_SoDi = float(Flaeche_Betr_SoDi) * float(FKZ_SoDi)
                     #Beschaeftigte Branche M / Besch_FrWiTeDi
                     anzahl_Besch_max = float(Besch_FrWiTeDi)
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
                     tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer)
-            
+
                     rows_projektrahmen = arcpy.SearchCursor(tabelle_projektrahmendaten)
                     for row in rows_projektrahmen:
                         ende = row.Ende_Betrachtungszeitraum
                         ende = long(ende) + 1
-            
+
                     anfang = long(startjahr)
                     dauer = long(aufsiedlungsdauer)
                     jahr = long(startjahr) - 1
@@ -2247,7 +2243,7 @@ class Nutzungen(object):
                     jahrcount = -1
                     jahraufsiedlung = 1
                     vollaufsiedlung = long(startjahr) + long(aufsiedlungsdauer)
-            
+
                     for jahr in range(anfang, ende):
                         jahrcount = jahrcount + 1
                         jahr = jahr + 1
@@ -2258,12 +2254,12 @@ class Nutzungen(object):
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
                             jahraufsiedlung = jahraufsiedlung + 1
-            
+
                         else:
                             Besch_Jahr = float(anzahl_Besch_max)
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
-            
+
                         row3.jahr = long(jahrcount) + long(startjahr)
                         row3.Teilflaeche_Plangebiet = teilflaeche
                         row3.Branche = "M"
@@ -2271,18 +2267,18 @@ class Nutzungen(object):
                         row3.Anzahl_neu = float(Besch_Jahr_neu)
                         row3.ID_ts = timestamp
                         tabelle_beschaeftigte_insert.insertRow(row3)
-            
-            
+
+
                     #Beschaeftigte Branche N / Besch_SoDi
                     anzahl_Besch_max = float(Besch_SoDi)
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
                     tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer)
-            
+
                     rows_projektrahmen = arcpy.SearchCursor(tabelle_projektrahmendaten)
                     for row in rows_projektrahmen:
                         ende = row.Ende_Betrachtungszeitraum
                         ende = long(ende) + 1
-            
+
                     anfang = long(startjahr)
                     dauer = long(aufsiedlungsdauer)
                     jahr = long(startjahr) - 1
@@ -2292,7 +2288,7 @@ class Nutzungen(object):
                     jahrcount = -1
                     jahraufsiedlung = 1
                     vollaufsiedlung = long(startjahr) + long(aufsiedlungsdauer)
-            
+
                     for jahr in range(anfang, ende):
                         jahrcount = jahrcount + 1
                         jahr = jahr + 1
@@ -2303,12 +2299,12 @@ class Nutzungen(object):
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
                             jahraufsiedlung = jahraufsiedlung + 1
-            
+
                         else:
                             Besch_Jahr = float(anzahl_Besch_max)
                             Besch_Jahr_neu = float(Besch_Jahr) * float(zuzugsquote) / 100
                             Besch_Jahr_neu = float(Besch_Jahr_neu)
-            
+
                         row3.jahr = long(jahrcount) + long(startjahr)
                         row3.Teilflaeche_Plangebiet = teilflaeche
                         row3.Branche = "N"
@@ -2316,24 +2312,24 @@ class Nutzungen(object):
                         row3.Anzahl_neu = float(Besch_Jahr_neu)
                         row3.ID_ts = timestamp
                         tabelle_beschaeftigte_insert.insertRow(row3)
-            
+
                     ##############################
                     ## Gebaeude berechnen
-            
+
                     schrittmeldung = 'Gebaeudedaten werden berechnet \n'
                     messages.AddMessage(schrittmeldung)
                     print str(schrittmeldung)
-            
+
                     tabelle_gebaeudegrundlagen = os.path.join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_gebaeude')
                     tabelle_gebaeudedetails = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb','Gebaeude_Details')
                     tabelle_gebaeudedetails_insert = arcpy.InsertCursor(tabelle_gebaeudedetails)
-            
+
                     rows_GGF = arcpy.SearchCursor(tabelle_gebaeudegrundlagen)
                     GGF_halle = 0
                     GGF_verwaltung = 0
                     GeVo_halle = 0
                     GeVo_verwlatung = 0
-            
+
                     for row in rows_GGF:
                         if row.Branche == "C":
                             GGF_halle_VerarbGew = float(row.anteil_halle) * float(Flaeche_Betr_VerarbGew)
@@ -2389,27 +2385,27 @@ class Nutzungen(object):
                             GGF_verwaltung = float(GGF_verwaltung) + float(GGF_verwaltung_SoDi)
                             GeVo_halle = float(GeVo_halle) + float(GeVo_halle_SoDi)
                             GeVo_verwlatung = float(GeVo_verwlatung) + float(GeVo_verwaltung_SoDi)
-            
-            
+
+
                     ## Gebaeude für Hallen nach Aufsiedlugnszeit berechnen
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
                     rows_projektrahmen = arcpy.SearchCursor(tabelle_projektrahmendaten)
                     for row in rows_projektrahmen:
                         ende = row.Ende_Betrachtungszeitraum
                         ende = long(ende) + 1
-            
+
                     anfang = long(startjahr)
                     dauer = long(aufsiedlungsdauer)
                     jahr = long(startjahr) - 1
                     GGF_jahr = 0
                     GeVo_jahr = 0
                     grundstuecksflaeche_jahr = 0
-            
+
                     rowGeb = tabelle_gebaeudedetails_insert.newRow()
                     jahrcount = -1
                     jahraufsiedlung = 1
                     vollaufsiedlung = long(startjahr) + long(aufsiedlungsdauer)
-            
+
                     for jahr in range(anfang, ende):
                         jahrcount = jahrcount + 1
                         jahr = jahr + 1
@@ -2423,7 +2419,7 @@ class Nutzungen(object):
                             GGF_jahr = float(GGF_halle) * 10000
                             GeVo_jahr = float(GeVo_halle) * 10000
                             grundstuecksflaeche_jahr = float(gewerbebauland) * 10000
-            
+
                         rowGeb.jahr = long(jahrcount) + long(startjahr)
                         rowGeb.Teilflaeche_Plangebiet = teilflaeche
                         rowGeb.Gebaeudetyp = "Hallen"
@@ -2431,29 +2427,29 @@ class Nutzungen(object):
                         rowGeb.Ueberbaute_Flaeche = float(GGF_jahr)
                         rowGeb.Bruttorauminhalt_m3 = float(GeVo_jahr)
                         rowGeb.Geb_ID = timestamp
-            
+
                         tabelle_gebaeudedetails_insert.insertRow(rowGeb)
-            
+
                     ## Gebaeude für Bürogebaude nach Aufsiedlugnszeit berechnen
                     aufsiedlungsdauer = str(aufsiedlungsdauer)
                     rows_projektrahmen = arcpy.SearchCursor(tabelle_projektrahmendaten)
                     for row in rows_projektrahmen:
                         ende = row.Ende_Betrachtungszeitraum
                         ende = long(ende) + 1
-            
+
                     anfang = long(startjahr)
                     dauer = long(aufsiedlungsdauer)
                     jahr = long(startjahr) - 1
                     GGF_jahr = 0
                     GeVo_jahr = 0
                     grundstuecksflaeche_jahr = 0
-            
-            
+
+
                     rowGeb = tabelle_gebaeudedetails_insert.newRow()
                     jahrcount = -1
                     jahraufsiedlung = 1
                     vollaufsiedlung = long(startjahr) + long(aufsiedlungsdauer)
-            
+
                     for jahr in range(anfang, ende):
                         jahrcount = jahrcount + 1
                         jahr = jahr + 1
@@ -2467,7 +2463,7 @@ class Nutzungen(object):
                             GGF_jahr = float(GGF_verwaltung) * 10000
                             GeVo_jahr = float(GeVo_verwlatung) * 10000
                             grundstuecksflaeche_jahr = float(gewerbebauland) * 10000
-            
+
                         rowGeb.jahr = long(jahrcount) + long(startjahr)
                         rowGeb.Teilflaeche_Plangebiet = teilflaeche
                         rowGeb.Gebaeudetyp = "Buerogebaeude"
@@ -2475,20 +2471,20 @@ class Nutzungen(object):
                         rowGeb.Ueberbaute_Flaeche = float(GGF_jahr)
                         rowGeb.Bruttorauminhalt_m3 = float(GeVo_jahr)
                         rowGeb.Geb_ID = timestamp
-            
+
                         tabelle_gebaeudedetails_insert.insertRow(rowGeb)
-            
+
                     ###############################
                     ## Tabelle Gewerbe_teilflaechen fuellen
-            
+
                     schrittmeldung = 'Projektinformationen werden zusammengefasst und in Datenbank geschrieben \n'
                     messages.AddMessage(schrittmeldung)
                     print str(schrittmeldung)
-            
+
                     tabelle_teilflaeche = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb','Gewerbe_Teilflaechen')
                     tabelle_teilflaeche_insert = arcpy.InsertCursor(tabelle_teilflaeche)
                     rowTF = tabelle_teilflaeche_insert.newRow()
-            
+
                     # Zeile für Branche C / VerarbGew
                     rowTF.teilflaeche = teilflaeche
                     rowTF.gebietstyp = str(gebtyp)
@@ -2500,9 +2496,9 @@ class Nutzungen(object):
                     rowTF.beschaeftigte = float(Besch_VerarbGew)
                     rowTF.anzahlBetriebe = int(Anz_Betr_VerarbGew)
                     rowTF.timestamp = timestamp
-            
+
                     tabelle_teilflaeche_insert.insertRow(rowTF)
-            
+
                     # Zeile für Branche F / BauGew
                     rowTF.teilflaeche = teilflaeche
                     rowTF.gebietstyp = str(gebtyp)
@@ -2514,9 +2510,9 @@ class Nutzungen(object):
                     rowTF.beschaeftigte = float(Besch_BauGew)
                     rowTF.anzahlBetriebe = int(Anz_Betr_BauGew)
                     rowTF.timestamp = timestamp
-            
+
                     tabelle_teilflaeche_insert.insertRow(rowTF)
-            
+
                     # Zeile für Branche G / HanKfZ
                     rowTF.teilflaeche = teilflaeche
                     rowTF.gebietstyp = str(gebtyp)
@@ -2528,9 +2524,9 @@ class Nutzungen(object):
                     rowTF.beschaeftigte = float(Besch_HanKfZ)
                     rowTF.anzahlBetriebe = int(Anz_Betr_HanKfZ)
                     rowTF.timestamp = timestamp
-            
+
                     tabelle_teilflaeche_insert.insertRow(rowTF)
-            
+
                     # Zeile für Branche H / VerLag
                     rowTF.teilflaeche = teilflaeche
                     rowTF.gebietstyp = str(gebtyp)
@@ -2542,9 +2538,9 @@ class Nutzungen(object):
                     rowTF.beschaeftigte = float(Besch_VerLag)
                     rowTF.anzahlBetriebe = int(Anz_Betr_VerLag)
                     rowTF.timestamp = timestamp
-            
+
                     tabelle_teilflaeche_insert.insertRow(rowTF)
-            
+
                     # Zeile für Branche M / FrWiTeDi
                     rowTF.teilflaeche = teilflaeche
                     rowTF.gebietstyp = str(gebtyp)
@@ -2556,9 +2552,9 @@ class Nutzungen(object):
                     rowTF.beschaeftigte = float(Besch_FrWiTeDi)
                     rowTF.anzahlBetriebe = int(Anz_Betr_FrWiTeDi)
                     rowTF.timestamp = timestamp
-            
+
                     tabelle_teilflaeche_insert.insertRow(rowTF)
-            
+
                     # Zeile für Branche N / SoDi
                     rowTF.teilflaeche = teilflaeche
                     rowTF.gebietstyp = str(gebtyp)
@@ -2570,24 +2566,24 @@ class Nutzungen(object):
                     rowTF.beschaeftigte = float(Besch_SoDi)
                     rowTF.anzahlBetriebe = int(Anz_Betr_SoDi)
                     rowTF.timestamp = timestamp
-            
+
                     tabelle_teilflaeche_insert.insertRow(rowTF)
-            
-            
+
+
                     beschaeftigte_gewerbe(projektname)
                     schrittmeldung = 'Die Berechnungen sind abgeschlossen  \n'
                     messages.AddMessage(schrittmeldung)
                     print str(schrittmeldung)
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
+
+
+
+
                 ##########################################################################
                 ##########################################################################
                 ##########################################################################
@@ -2597,7 +2593,7 @@ class Nutzungen(object):
                     schrittmeldung = 'Die Ergebnisausgabe wird erzeugt. Dies kann wenige Minuten in Anspruch nehmen. \n'
                     messages.AddMessage(schrittmeldung)
                     print str(schrittmeldung)
-            
+
                     # Pfade setzen
                     base_path = str(sys.path[0]).split("2_Tool")[0]
                     workspace_projekt_gewerbe = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
@@ -2607,16 +2603,16 @@ class Nutzungen(object):
                     tablepath_Gebaeude = os.path.join(workspace_projekt_gewerbe,'Gebaeude_Details')
                     tablepath_Betriebe = os.path.join(workspace_projekt_gewerbe,'Gewerbe_Betriebsstruktur')
                     grafikpath_erlauterungstext = os.path.join(base_path,'2_Tool','3_Art und Mass der Nutzung','Erlauterungstexte')
-            
+
                     logo = os.path.join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
                     ausgabeordner = os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
                     excelpfad = os.path.join(ausgabeordner,'11_Projektdefinition_Gewerbe.xlsx')
-            
+
                     try:
                         os.remove(excelpfad)
                     except:
                         pass
-            
+
                     # Workbook und Tabellenblätter anlegen
                     wb = xlsxwriter.Workbook(excelpfad)
                     sl.infosheet(projektname, str("Projektinformation").decode('utf-8'), wb)
@@ -2625,70 +2621,70 @@ class Nutzungen(object):
                     ws4 = wb.add_worksheet('Grafiken')
                     ws4_1 = wb.add_worksheet('Art der Arbeitsplaetze')
                     ws5 = wb.add_worksheet('Rohdaten')
-            
+
                     ##Styles anlegen
                     bold = wb.add_format({'bold': True})
                     bold.set_align('vtop')
                     bold.set_bg_color('white')
                     bold.set_border(0)
-            
+
                     wrap = wb.add_format()
                     wrap.set_text_wrap()
                     wrap.set_align('vtop')
                     wrap.set_bg_color('white')
                     wrap.set_border(0)
-            
+
                     normal = wb.add_format()
                     normal.set_bg_color('white')
                     normal.set_border(0)
-            
+
                     formatDez = wb.add_format()
                     formatDez.set_num_format(0x02)
                     formatDez.set_bg_color('white')
                     formatDez.set_border(0)
-            
+
                     formatDez1 = wb.add_format()
                     formatDez1.set_num_format(0x01)
                     formatDez1.set_bg_color('white')
                     formatDez1.set_border(0)
-            
+
                     ###Hintergrund weiss faerben
                     format = wb.add_format()
                     format.set_bg_color('white')
                     format.set_border(0)
-            
-            
+
+
                     for x in range(0,200):
                         for y in range(0,200):
                             ws2.write(x,y,"", format)
                             ws3.write(x,y,"", format)
                             ws4.write(x,y,"", format)
-            
+
                             ws4_1.write(x,y,"", format)
-            
+
                             ws5.write(x,y,"", format)
-            
+
                     ###Spaltenbreiten definieren
                     ws2.set_column(0, 0, 86)
                     for x in range(0,200):
                         ws3.set_column(x, 0, 10)
                     ws4.set_column(0, 0, 75)
-            
+
                     ### ToDo: Für Überschriften im Tabellenblatt noch Zellen zusammenfügen und grau einfärben
-            
+
                     ########
                     ## Erläuterungstexte einfügen
                     # Pfade zu Grafiken herstellen und einfügen
                     Erlaeuterung = os.path.join(grafikpath_erlauterungstext, 'Gewerbe.png')
                     # ws2.insert_image(0, 0, Erlaeuterung, {'x_scale': 0.32, 'y_scale': 0.32})
-            
+
                     ###### Tabellenblatt 5: Rohdaten einladen
                     ## Rohdaten tablepath_gewerbe
                     #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
                     rows = arcpy.SearchCursor(tablepath_gewerbe)
                     #Feldnamen auslesen
                     fieldnames = [f.name for f in arcpy.ListFields(tablepath_gewerbe)]
-            
+
                     j = 1
                     for row in rows:
                         i = 0
@@ -2699,10 +2695,10 @@ class Nutzungen(object):
                                 wert = row.getValue(fieldname)
                             ws5.write(j, i, wert,formatDez)
                             i = i+1
-            
+
                         j = j+1
-            
-            
+
+
                     #Felder als Header in Worksheet einfuegen
                     i = 0
                     for fieldname in fieldnames:
@@ -2710,16 +2706,16 @@ class Nutzungen(object):
                         ws5.set_column(i, i, column_with)
                         ws5.write(0, i, fieldname, bold)
                         i = i+1
-            
-            
+
+
                     ## Rohdaten tablepath_Beschaeftigte
                     #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
                     rows = arcpy.SearchCursor(tablepath_Beschaeftigte)
                     #Feldnamen auslesen
                     fieldnames = [f.name for f in arcpy.ListFields(tablepath_Beschaeftigte)]
-            
+
                     irestart = i + 2
-            
+
                     j = 1
                     for row in rows:
                         i = irestart
@@ -2730,9 +2726,9 @@ class Nutzungen(object):
                                 wert = row.getValue(fieldname)
                             ws5.write(j, i, wert,formatDez)
                             i = i+1
-            
+
                         j = j+1
-            
+
                     #Felder als Header in Worksheet einfuegen
                     i = irestart
                     for fieldname in fieldnames:
@@ -2740,16 +2736,16 @@ class Nutzungen(object):
                         ws5.set_column(i, i, column_with)
                         ws5.write(0, i, fieldname, bold)
                         i = i+1
-            
-            
+
+
                     ## Rohdaten tablepath_Flaechenbilanz
                     #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
                     rows = arcpy.SearchCursor(tablepath_Flaechenbilanz)
                     #Feldnamen auslesen
                     fieldnames = [f.name for f in arcpy.ListFields(tablepath_Flaechenbilanz)]
-            
+
                     irestart = i + 2
-            
+
                     j = 1
                     for row in rows:
                         i = irestart
@@ -2760,9 +2756,9 @@ class Nutzungen(object):
                                 wert = row.getValue(fieldname)
                             ws5.write(j, i, wert,formatDez)
                             i = i+1
-            
+
                         j = j+1
-            
+
                     #Felder als Header in Worksheet einfuegen
                     i = irestart
                     for fieldname in fieldnames:
@@ -2770,16 +2766,16 @@ class Nutzungen(object):
                         ws5.set_column(i, i, column_with)
                         ws5.write(0, i, fieldname, bold)
                         i = i+1
-            
-            
+
+
                     ## Rohdaten tablepath_Gebaeude
                     #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
                     rows = arcpy.SearchCursor(tablepath_Gebaeude)
                     #Feldnamen auslesen
                     fieldnames = [f.name for f in arcpy.ListFields(tablepath_Gebaeude)]
-            
+
                     irestart = i + 2
-            
+
                     j = 1
                     for row in rows:
                         i = irestart
@@ -2790,9 +2786,9 @@ class Nutzungen(object):
                                 wert = row.getValue(fieldname)
                             ws5.write(j, i, wert,formatDez)
                             i = i+1
-            
+
                         j = j+1
-            
+
                     #Felder als Header in Worksheet einfuegen
                     i = irestart
                     for fieldname in fieldnames:
@@ -2800,17 +2796,17 @@ class Nutzungen(object):
                         ws5.set_column(i, i, column_with)
                         ws5.write(0, i, fieldname, bold)
                         i = i+1
-            
-            
-            
+
+
+
                     ## Rohdaten tablepath_Betriebe
                     #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
                     rows = arcpy.SearchCursor(tablepath_Betriebe)
                     #Feldnamen auslesen
                     fieldnames = [f.name for f in arcpy.ListFields(tablepath_Betriebe)]
-            
+
                     irestart = i + 2
-            
+
                     j = 1
                     for row in rows:
                         i = irestart
@@ -2821,9 +2817,9 @@ class Nutzungen(object):
                                 wert = row.getValue(fieldname)
                             ws5.write(j, i, wert,formatDez)
                             i = i+1
-            
+
                         j = j+1
-            
+
                     #Felder als Header in Worksheet einfuegen
                     i = irestart
                     for fieldname in fieldnames:
@@ -2831,8 +2827,8 @@ class Nutzungen(object):
                         ws5.set_column(i, i, column_with)
                         ws5.write(0, i, fieldname, bold)
                         i = i+1
-            
-            
+
+
                     ###### Tabellenblatt 3: Tabellen erstellen
                     ## Tabelle Projektuebersicht
                     j = 0
@@ -2887,7 +2883,7 @@ class Nutzungen(object):
                         ws3.write(j, i, '=Rohdaten!'+cell+'', normal)
                         i = 0
                         j = j + 1
-            
+
                     ## Tabelle Beschäftigte
                     j = j + 2
                     i = 0
@@ -2956,8 +2952,8 @@ class Nutzungen(object):
                         ws3.write(j, i, '=SUMIFS(Rohdaten!$R:$R,Rohdaten!$Q:$Q,Tabellen!'+zellebranche+',Rohdaten!$O:$O,Tabellen!'+jahrcell+')', formatDez1)
                         i = i + 1
                     j = j + 1
-            
-            
+
+
                     ## Tabelle Neue Beschaeftigte
                     j = j + 2
                     i = 0
@@ -3028,8 +3024,8 @@ class Nutzungen(object):
                         ws3.write(j, i, '=SUMIFS(Rohdaten!$S:$S,Rohdaten!$Q:$Q,Tabellen!'+zellebranche+',Rohdaten!$O:$O,Tabellen!'+jahrcell+')', formatDez1)
                         i = i + 1
                     j = j + 1
-            
-            
+
+
                     ## Tabelle Betriebe
                     j = j + 2
                     i = 0
@@ -3048,7 +3044,7 @@ class Nutzungen(object):
                     jahrcol = xl_col_to_name(colcount)
                     j = j + 1
                     i = 1
-            
+
                     ws3.write(j, 0, 'C', normal)
                     zellebranche = xl_rowcol_to_cell(j,0)
                     for x in range(2, 33):
@@ -3059,7 +3055,7 @@ class Nutzungen(object):
                         i = i + 1
                     j = j + 1
                     i = 1
-            
+
                     ws3.write(j, 0, 'F', normal)
                     zellebranche = xl_rowcol_to_cell(j,0)
                     colcount = 46
@@ -3071,7 +3067,7 @@ class Nutzungen(object):
                         i = i + 1
                     j = j + 1
                     i = 1
-            
+
                     ws3.write(j, 0, 'G', normal)
                     zellebranche = xl_rowcol_to_cell(j,0)
                     colcount = 46
@@ -3083,7 +3079,7 @@ class Nutzungen(object):
                         i = i + 1
                     j = j + 1
                     i = 1
-            
+
                     ws3.write(j, 0, 'H', normal)
                     zellebranche = xl_rowcol_to_cell(j,0)
                     colcount = 46
@@ -3095,7 +3091,7 @@ class Nutzungen(object):
                         i = i + 1
                     j = j + 1
                     i = 1
-            
+
                     ws3.write(j, 0, 'M', normal)
                     zellebranche = xl_rowcol_to_cell(j,0)
                     colcount = 46
@@ -3107,7 +3103,7 @@ class Nutzungen(object):
                         i = i + 1
                     j = j + 1
                     i = 1
-            
+
                     ws3.write(j, 0, 'N', normal)
                     zellebranche = xl_rowcol_to_cell(j,0)
                     colcount = 46
@@ -3119,7 +3115,7 @@ class Nutzungen(object):
                         i = i + 1
                     j = j + 1
                     i = 1
-            
+
                 ###### Charts anlegen
                     # Chart Branchenstruktur anlegen
                     chart_Branchenstruktur = wb.add_chart({'type': 'bar', 'subtype': 'percent_stacked'})
@@ -3128,7 +3124,7 @@ class Nutzungen(object):
                     chart_Branchenstruktur.set_chartarea({'border': {'none': True},'fill': {'none': True}})
                     chart_Branchenstruktur.set_legend({'position': 'right'})
                     chart_Branchenstruktur.set_title({'name': 'Branchenstruktur','name_font':  {'name': 'Calibri', 'size': 12}})
-            
+
                     # Werte in Chartobjekte schreiben
                     chart_Branchenstruktur.add_series({
                         'values': "=Tabellen!$G$3:$H$3",
@@ -3160,7 +3156,7 @@ class Nutzungen(object):
                         'categories': "=Tabellen!$G$2:$H$2",
                         'name': "=Tabellen!$I$8",
                     })
-            
+
                     # Chart Beschaeftigte anlegen
                     chart_Beschaeftigte = wb.add_chart({'type': 'bar'})
                     chart_Beschaeftigte.set_style(40)
@@ -3168,13 +3164,13 @@ class Nutzungen(object):
                     chart_Beschaeftigte.set_chartarea({'border': {'none': True},'fill': {'none': True}})
                     chart_Beschaeftigte.set_title({'name': 'Beschaeftigte nach Branche','name_font':  {'name': 'Calibri', 'size': 12}})
                     chart_Beschaeftigte.set_legend({'none': True})
-            
+
                     # Werte in Chartobjekte schreiben
                     chart_Beschaeftigte.add_series({
                         'values': "=Tabellen!$G$3:$G$8",
                         'categories': "=Tabellen!$I$3:$I$8",
                     })
-            
+
                     # Chart Betriebe anlegen
                     chart_Betriebe = wb.add_chart({'type': 'bar'})
                     chart_Betriebe.set_style(40)
@@ -3182,15 +3178,15 @@ class Nutzungen(object):
                     chart_Betriebe.set_chartarea({'border': {'none': True},'fill': {'none': True}})
                     chart_Betriebe.set_title({'name': 'Betriebe nach Branche','name_font':  {'name': 'Calibri', 'size': 12}})
                     chart_Betriebe.set_legend({'none': True})
-            
+
                     # Werte in Chartobjekte schreiben
                     chart_Betriebe.add_series({
                         'values': "=Tabellen!$H$3:$H$8",
                         'categories': "=Tabellen!$I$3:$I$8",
                         'name': "=Tabellen!$I$8",
                     })
-            
-            
+
+
                     # Chart Beschaeftigte kum anlegen
                     chart_Besch_kum = wb.add_chart({'type': 'area', 'subtype': 'stacked'})
                     chart_Besch_kum.set_style(40)
@@ -3198,7 +3194,7 @@ class Nutzungen(object):
                     chart_Besch_kum.set_chartarea({'border': {'none': True},'fill': {'none': True}})
                     chart_Besch_kum.set_legend({'position': 'bottom'})
                     chart_Besch_kum.set_title({'name': 'Beschaeftigte im Zeitverlauf','name_font':  {'name': 'Calibri', 'size': 12}})
-            
+
                     # Werte in Chartobjekte schreiben
                     chart_Besch_kum.add_series({
                         'values': "=Tabellen!$B$13:$AF$13",
@@ -3230,10 +3226,10 @@ class Nutzungen(object):
                         'categories': "=Tabellen!$B$12:$AF$12",
                         'name': "=Tabellen!$A$18",
                     })
-            
-            
-            
-            
+
+
+
+
                     # Chart Betriebe kum anlegen
                     chart_Betriebe_kum = wb.add_chart({'type': 'area', 'subtype': 'stacked'})
                     chart_Betriebe_kum.set_style(40)
@@ -3241,7 +3237,7 @@ class Nutzungen(object):
                     chart_Betriebe_kum.set_chartarea({'border': {'none': True},'fill': {'none': True}})
                     chart_Betriebe_kum.set_legend({'position': 'bottom'})
                     chart_Betriebe_kum.set_title({'name': 'Betriebe im Zeitverlauf','name_font':  {'name': 'Calibri', 'size': 12}})
-            
+
                     # Werte in Chartobjekte schreiben
                     chart_Betriebe_kum.add_series({
                         'values': "=Tabellen!$B$33:$AF$33",
@@ -3273,16 +3269,16 @@ class Nutzungen(object):
                         'categories': "=Tabellen!$B$32:$AF$32",
                         'name': "=Tabellen!$A$38",
                     })
-            
-            
-            
+
+
+
                     # Charts in Tabelle schreiben
                     ws4.insert_chart('A2', chart_Branchenstruktur)
                     ws4.insert_chart('A14', chart_Beschaeftigte)
                     ws4.insert_chart('A29', chart_Betriebe)
                     ws4.insert_chart('A44', chart_Besch_kum)
                     ws4.insert_chart('A59', chart_Betriebe_kum)
-            
+
                     ######
                     #Gewerbe Beschaeftigte Art der beschaeftigung
                     if arcpy.Exists(os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb',"Gewerbe_Beschaeftigte_Zahlen")):
@@ -3290,30 +3286,30 @@ class Nutzungen(object):
                         datenauslesen=[]
                         for uu in arcpy.SearchCursor(path_beschaeftigte_Zahlen):
                             datenauslesen.append(uu.Anzahl)
-            
+
                         if len(datenauslesen)==4:
                             #Alles okay mit den Daten - eigentlich quatsch aber absicherung
-            
+
                             ws4_1.write(2, 1, "Art der Arbeitsplaetze".decode('utf-8'), bold)
                             ws4_1.write(4, 1, "Von den   "+str(datenauslesen[3])+"   Arbeitsplaetzen, die durch die Gewerbeansiedlung entstehen werden, sind vermutlich".decode('utf-8'))
                             ws4_1.write(5, 1, str(datenauslesen[0])+"   Arbeitsplaetze fuer Teilzeitbeschaeftigte,")
                             ws4_1.write(6, 1, str(datenauslesen[1])+"   Arbeitsplaetze fuer geringfuegig entlohnte Beschaeftigte (Minijobber) und")
                             ws4_1.write(7, 1, str(datenauslesen[2])+"   Arbeitsplaetze fuer Beschaeftigte mit einer akademischen Ausbildung (d.h. mit Fach- oder Hochschulabschluss).")
-            
+
                             del path_beschaeftigte_Zahlen, datenauslesen
-            
-            
+
+
                     #Workbook speichern
                     try:
                         wb.close()
                     except:
                         messages.AddMessage("Es liegt ein Fehler beim Speichern der Ausgabedatei vor. Ist diese ggf. noch geoeffnet?")
-            
+
                     schrittmeldung = 'Die Ergebnisausgabe wurde erzeugt. Das Tool wurde erfolgreich angewendet.  \n'
                     messages.AddMessage(schrittmeldung)
-            
-            
-            
+
+
+
             #EINZELHANDEL
             projectname = parameters[0].valueAsText
             tabelle_gebaude = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Gebaeude_Details')
@@ -3323,7 +3319,7 @@ class Nutzungen(object):
             row.Gebaeudetyp = "Einzelhandel"
             Insert.insertRow(row)
             del row, Insert
-            
+
             #tabelle "Wohneinheiten_Details" oeffnen und Werte fuer Miete_Eigentum, Qualitastsstufe und Anzahl Wohneinheiten speichern
             tabelle_wohneineheiten_details = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Wohneinheiten_Details')
             Insert = arcpy.InsertCursor(tabelle_wohneineheiten_details)
@@ -3337,7 +3333,7 @@ class Nutzungen(object):
             row.EW_je_WE = 0
             Insert.insertRow(row)
             del row, Insert
-            
+
             #tabelle "Versorgung_Verkaufsflaechen" oeffnen und Werte  speichern
             tabelle_Versorgung_Verkaufsflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Versorgung_Verkaufsflaechen')
             Insert = arcpy.InsertCursor(tabelle_Versorgung_Verkaufsflaechen)
@@ -3346,4 +3342,3 @@ class Nutzungen(object):
             row.Verkaufsflaeche = parameters[26].valueAsText
             Insert.insertRow(row)
             del row, Insert
-            
