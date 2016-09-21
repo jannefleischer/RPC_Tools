@@ -34,7 +34,7 @@ def set_parameter_as_text(params, index, val):
     else:
         params[index].value = val
 
-# Export of toolbox C:\Users\handke\Dropbox\Regioprojectcheck\2_Tool\3_Art und Mass der Nutzung\3_Art und Mass der Nutzung.tbx
+# Export of toolbox N:\Projekte\RPC_easy\RPC_Tools\2_Tool\3_Art und Mass der Nutzung\3_Art und Mass der Nutzung.tbx
 
 import arcpy
 
@@ -47,7 +47,7 @@ class Toolbox(object):
 # Tool implementation code
 
 class Flaechenbilanz(object):
-    """C:\Users\handke\Dropbox\Regioprojectcheck\2_Tool\3_Art und Mass der Nutzung\3_Art und Mass der Nutzung.tbx\Flaechenbilanz"""
+    """N:\Projekte\RPC_easy\RPC_Tools\2_Tool\3_Art und Mass der Nutzung\3_Art und Mass der Nutzung.tbx\Flaechenbilanz"""
     # -*- coding: utf-8 -*-
 
     import arcpy, os
@@ -286,7 +286,7 @@ class Flaechenbilanz(object):
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = u'String'
-        param_1.filter.list = [u'Test_Achim_2', u'thomas_test_neu']
+        param_1.filter.list = [u'Test_999']
 
         # Teilfläche
         param_2 = arcpy.Parameter()
@@ -443,7 +443,7 @@ class Flaechenbilanz(object):
         if validator:
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
-        with script_run_as(u'C:\\Users\\handke\\Dropbox\\Regioprojectcheck\\2_Tool\\3_Art und Mass der Nutzung\\flaechenbilanz.py'):
+        with script_run_as(u'N:\\Projekte\\RPC_easy\\RPC_Tools\\2_Tool\\3_Art und Mass der Nutzung\\flaechenbilanz.py'):
             # ---------------------------------------------------------------------------
             # REGIOPROJEKTCHECK
             # 10_Kostenmodell.py
@@ -525,7 +525,7 @@ class Flaechenbilanz(object):
             cursor.insertRow((teilflaeche,startjahr,'Sonstige Flaechen','Sonstige Flaechen',sonst_flaechen,sonst_flaechen,flaeche* sonst_flaechen / 100))
 
 class Nutzungen(object):
-    """C:\Users\handke\Dropbox\Regioprojectcheck\2_Tool\3_Art und Mass der Nutzung\3_Art und Mass der Nutzung.tbx\Nutzungen"""
+    """N:\Projekte\RPC_easy\RPC_Tools\2_Tool\3_Art und Mass der Nutzung\3_Art und Mass der Nutzung.tbx\Nutzungen"""
     # -*- coding: utf-8 -*-
     import arcpy
     import os
@@ -834,7 +834,7 @@ class Nutzungen(object):
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = u'String'
-        param_1.filter.list = [u'Test_Achim_2', u'thomas_test_neu']
+        param_1.filter.list = [u'Test_999']
 
         # Teilfläche
         param_2 = arcpy.Parameter()
@@ -1086,7 +1086,7 @@ class Nutzungen(object):
         if validator:
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
-        with script_run_as(u'C:\\Users\\handke\\Dropbox\\Regioprojectcheck\\2_Tool\\3_Art und Mass der Nutzung\\nutzungen.py'):
+        with script_run_as(u'N:\\Projekte\\RPC_easy\\RPC_Tools\\2_Tool\\3_Art und Mass der Nutzung\\nutzungen.py'):
 
             import time
             import datetime
