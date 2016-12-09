@@ -1,2 +1,5 @@
 *.wpu
 *.wpr
+3_projekte/
+*.pyc
+*.lock
