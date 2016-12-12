@@ -138,8 +138,8 @@ def main():
     layers = arcpy.mapping.ListLayers(mxd, "*", df)
 
     for layer in layers:
-      if layer.name in names:
-        layer.visible = False
+        if layer.name in names:
+            layer.visible = False
 
     arcpy.RefreshTOC()
     arcpy.RefreshActiveView()
