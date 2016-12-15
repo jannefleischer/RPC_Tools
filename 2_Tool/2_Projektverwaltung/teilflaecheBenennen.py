@@ -15,12 +15,12 @@
 
 import arcpy, os, shutil, sys
 
-def main():
+def main(parameters):
     # Teilfläche speichern
-    projectname = arcpy.GetParameterAsText(0)
-    flaechenname = arcpy.GetParameterAsText(1)
+    projectname = parameters[0].value
+    flaechenname = parameters[1].value
     alter_name = flaechenname.split('|')[2].strip()
-    neuer_name = arcpy.GetParameterAsText(2)
+    neuer_name = parameters[2].value
     flaechenname_id = flaechenname.split('|')[0].replace('Nr.','').strip()
 
     base_path = str(sys.path[0]).split("2_Tool")[0]
@@ -31,7 +31,7 @@ def main():
 
     rows = arcpy.UpdateCursor(tabelle_teilflaechen,where)
     for row in rows:
-        row.NAME = neuer_name  #arcpy.GetParameterAsText(2)
+        row.NAME = neuer_name  #parameters[2].valueAsText
         rows.updateRow(row)
 
     del rows
@@ -109,4 +109,4 @@ def main():
             rows.updateRow(row)
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)

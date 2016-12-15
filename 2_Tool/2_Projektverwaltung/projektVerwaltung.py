@@ -15,18 +15,18 @@
 
 import arcpy, os, shutil, sys
 
-def main():
+def main(parameters):
 
-    if arcpy.GetParameterAsText(0) == "Neues Projekt anlegen":
+    if parameters[0].valueAsText == "Neues Projekt anlegen":
 
         arcpy.env.overwriteOutput = True
 
         try:
         #get new Project input Data
-            projectName = arcpy.GetParameterAsText(2)
-            flaeche = arcpy.GetParameterAsText(3)
-            beginn_betrachtung = arcpy.GetParameterAsText(4)
-            ende_betrachtung = arcpy.GetParameterAsText(5)
+            projectName = parameters[2].valueAsText
+            flaeche = parameters[3].valueAsText
+            beginn_betrachtung = parameters[4].valueAsText
+            ende_betrachtung = parameters[5].valueAsText
 
         #get the working directory and split it for the upper level path
             #Pfad anlegen
@@ -40,19 +40,19 @@ def main():
                 x = x+1
             if x > 0:
                 print "Es scheint bereits ein Projekt mit diesem Namen zu existieren"
-                arcpy.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
+                messages.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
                 print "Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox"
-                arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
+                messages.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
                 sys.exit()
 
         #register new project in the database
         #Am Ende das erfolgreich angelegte Projekt in "FGDB_01_Basisdaten-deutschland.gdb/angelegteProjekte" registrieren
-            #arcpy.AddMessage(fcPfad)
+            #messages.AddMessage(fcPfad)
             cursor = arcpy.InsertCursor(fcPfad)
             row = cursor.newRow()
             row.Name = projectName
             cursor.insertRow(row)
-            arcpy.AddMessage("Projekt wird in der Datenbank registriert \n")
+            messages.AddMessage("Projekt wird in der Datenbank registriert \n")
             print "Projekt wird in der Datenbank registriert \n"
             del row, cursor
 
@@ -63,20 +63,20 @@ def main():
             try:
                 shutil.copytree(templatePath, projectPath)
             except Exception as e:
-                arcpy.AddMessage(e)
+                messages.AddMessage(e)
                 print e
-                arcpy.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
-                arcpy.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
-                arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
+                messages.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
+                messages.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
+                messages.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
                 sys.exit()
         ##rename copied files
         #list all files in directory
             files = os.listdir(projectPath)
         #check if filenames contain "Template"
-            arcpy.AddMessage("Erstelle Kopien der Basisdaten: ")
+            messages.AddMessage("Erstelle Kopien der Basisdaten: ")
             print "Erstelle Kopien der Basisdaten: "
             for file in files:
-                arcpy.AddMessage("    -" + file)
+                messages.AddMessage("    -" + file)
                 if "Template" in file:
                     #split filename and add projectName as new filename
                     newName = file.replace("Template",projectName)
@@ -92,7 +92,7 @@ def main():
                 filename = dsc.baseName
                 filename = filename.replace(" ","_")
                 filename = filename.replace("-","_")
-                arcpy.AddMessage(filename)
+                messages.AddMessage(filename)
 
                 arcpy.env.workspace = gdbPfad
                 fcs = arcpy.ListFeatureClasses()
@@ -100,7 +100,7 @@ def main():
                 try:
                     arcpy.Rename_management(fcsPfad,"Teilflaechen_Plangebiet")
                 except:
-                    arcpy.AddMessage("Fehler: Umbenennung nicht erfolgreich")
+                    messages.AddMessage("Fehler: Umbenennung nicht erfolgreich")
                 fcs = arcpy.ListFeatureClasses()
 
 
@@ -162,7 +162,7 @@ def main():
             #Wenn Flaeche = 1, ags extrahieren
             n = arcpy.GetCount_management("bkg_lyr").getOutput(0)
             if(int(n) > 1):
-                arcpy.AddMessage("Die Projektflaechen liegen innerhalb mehrerer Gemeinden, das Tool unterstuetzt zur Zeit keine interkommunalen Projekte.")
+                messages.AddMessage("Die Projektflaechen liegen innerhalb mehrerer Gemeinden, das Tool unterstuetzt zur Zeit keine interkommunalen Projekte.")
                 ## TODO Dateien loeschen und Projektregistrierung loeschen
 
                 sys.exit()
@@ -192,7 +192,7 @@ def main():
 
         #Minimap erzeugen
             schrittmeldung = 'Erzeuge Uebersichtskarte \n'
-            arcpy.AddMessage(schrittmeldung)
+            messages.AddMessage(schrittmeldung)
             print schrittmeldung
 
             #Kopiere Template.mxd
@@ -225,23 +225,23 @@ def main():
 
         #output information to user
             print("Basisdaten erfolgreich kopiert")
-            arcpy.AddMessage("Basisdaten erfolgreich kopiert \n")
+            messages.AddMessage("Basisdaten erfolgreich kopiert \n")
             #print("Neues Projekt angelegt im Ordner " + projectPath)
-            arcpy.AddMessage("Neues Projekt angelegt im Ordner " + projectPath + '\n')
+            messages.AddMessage("Neues Projekt angelegt im Ordner " + projectPath + '\n')
         except Exception as e:
-            arcpy.AddMessage(e)
+            messages.AddMessage(e)
             print e
 
 
 
-    elif arcpy.GetParameterAsText(0) == "Bestehendes Projekt kopieren":
+    elif parameters[0].valueAsText == "Bestehendes Projekt kopieren":
 
         try:
         #get new Project Name as input
-            projectNameOld = arcpy.GetParameterAsText(1)
+            projectNameOld = parameters[1].valueAsText
             #projectNameOld = "Bultweg_Sued_fiktiv"
         #allow the upload of a shapefile containg the projektgebiet
-            projectNameNew = arcpy.GetParameterAsText(2)
+            projectNameNew = parameters[2].valueAsText
             #projectNameNew = "test"
         #get the working directory and split it for the upper level path
             #Pfad anlegen
@@ -255,9 +255,9 @@ def main():
                 x = x+1
             if x > 0:
                 print "Es scheint bereits ein Projekt mit diesem Namen zu existieren"
-                arcpy.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
+                messages.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
                 print "Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox"
-                arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
+                messages.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
                 sys.exit()
 
         #copy template folder
@@ -267,17 +267,17 @@ def main():
             try:
                 shutil.copytree(templatePath, projectPath)
             except Exception as e:
-                arcpy.AddMessage(e)
-                arcpy.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
-                arcpy.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
-                arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
+                messages.AddMessage(e)
+                messages.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
+                messages.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
+                messages.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
                 sys.exit()
         ##rename copied files
         #list all files in directory
             files = os.listdir(projectPath)
         #check if filenames contain "Template"
             for file in files:
-                arcpy.AddMessage(file)
+                messages.AddMessage(file)
                 if projectNameOld in file:
                     #split filename and add projectName as new filename
                     newName = file.replace(projectNameOld,projectNameNew)
@@ -288,27 +288,27 @@ def main():
 
         #register new project in the database
         #Am Ende das erfolgreich angelegte Projekt in "FGDB_Basisdaten-deutschland.gdb/angelegteProjekte" registrieren
-            arcpy.AddMessage(fcPfad)
+            messages.AddMessage(fcPfad)
             cursor = arcpy.InsertCursor(fcPfad)
             row = cursor.newRow()
             row.Name = projectNameNew
             cursor.insertRow(row)
-            arcpy.AddMessage("Inserting")
+            messages.AddMessage("Inserting")
             del row, cursor
 
         #output information to user
             print("Succesfully copied")
-            arcpy.AddMessage("Succesfully copied")
+            messages.AddMessage("Succesfully copied")
             print("New Project registered at " + projectPath)
-            arcpy.AddMessage("New Project registered at " + projectPath)
+            messages.AddMessage("New Project registered at " + projectPath)
         except Exception as e:
-            arcpy.AddMessage(e)
+            messages.AddMessage(e)
 
 
     else:
 
         #Das zu löschende Projekt
-        projektName = arcpy.GetParameterAsText(1)
+        projektName = parameters[1].valueAsText
 
         #aktuelles Arbeitsverzeichnis bekommen
         pfad = str(sys.path[0]).split("2_Tool")[0]
@@ -316,10 +316,10 @@ def main():
         #Mit dem Projektnamen zum neuen Projektpfad zusammenführen"
         projektePfad = os.path.join(pfad,'3_Projekte')
         projektPfad= os.path.join(projektePfad,projektName)
-        arcpy.AddMessage("Suche Ordner: " + projektPfad)
+        messages.AddMessage("Suche Ordner: " + projektPfad)
 
         #entferne alle aktuellen Layer aus dem TOC (Locks aufheben)
-        arcpy.AddMessage("Loese aktive Layer aus MXD \n")
+        messages.AddMessage("Loese aktive Layer aus MXD \n")
         mxd = arcpy.mapping.MapDocument("CURRENT")
         for df in arcpy.mapping.ListDataFrames(mxd):
             for lyr in arcpy.mapping.ListLayers(mxd, "", df):
@@ -329,54 +329,54 @@ def main():
         try:
             #Überprüfen, ob ein Eintrag in der Datenbank vorliegt
             fcPfad = os.path.join(pfad,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-            #arcpy.AddMessage(fcPfad)
+            #messages.AddMessage(fcPfad)
             sql = "Name = '" + projektName +"'"
             x=0
             cursor = arcpy.UpdateCursor(fcPfad,sql)
             for row in cursor:
-                #arcpy.AddMessage(row.Name)
+                #messages.AddMessage(row.Name)
                 x = x+1
             del cursor, row
 
             #Überprüfen, ob der Projektordner existiert
             if(os.path.isdir(projektPfad)):
                 print("Projektordner gefunden")
-                arcpy.AddMessage("Projektordner gefunden \n")
+                messages.AddMessage("Projektordner gefunden \n")
                 shutil.rmtree(projektPfad)
                 print("Projektordner gelöscht")
-                arcpy.AddMessage("Projektordner gelöscht \n")
+                messages.AddMessage("Projektordner gelöscht \n")
             else:
                 print("Projektordner "+ projektName + " nicht gefunden \n")
-                arcpy.AddMessage("Projektordner "+ projektName + " nicht gefunden \n")
+                messages.AddMessage("Projektordner "+ projektName + " nicht gefunden \n")
 
             if x == 1:
                 print "Eintrag in der Datenbank gefunden"
-                arcpy.AddMessage("Eintrag in der Datenbank gefunden \n")
+                messages.AddMessage("Eintrag in der Datenbank gefunden \n")
                 delcursor = arcpy.UpdateCursor(fcPfad,sql)
                 try:
                     for fc in delcursor:
-                        #arcpy.AddMessage("Loeschschleife")
-                        #arcpy.AddMessage(fc.Name)
+                        #messages.AddMessage("Loeschschleife")
+                        #messages.AddMessage(fc.Name)
                         delcursor.deleteRow(fc)
                         print("Eintrag gelöscht")
-                        arcpy.AddMessage("Eintrag gelöscht \n")
+                        messages.AddMessage("Eintrag gelöscht \n")
                 except:
-                    arcpy.AddMessage("Löschen fehlgeschlagen \n")
+                    messages.AddMessage("Löschen fehlgeschlagen \n")
 
                 del delcursor
 
 
             else:
                 print("Projekt "+ projektName + " nicht gefunden")
-                arcpy.AddMessage("Projekt "+ projektName + " nicht gefunden \n")
+                messages.AddMessage("Projekt "+ projektName + " nicht gefunden \n")
 
 
-            arcpy.AddMessage("*********************************************************************************")
-            arcpy.AddMessage("Das Projekt " + projektName + " wurde erfolgreich entfernt \n")
+            messages.AddMessage("*********************************************************************************")
+            messages.AddMessage("Das Projekt " + projektName + " wurde erfolgreich entfernt \n")
 
         except Exception as e:
             print(e)
-            arcpy.AddMessage(e)
+            messages.AddMessage(e)
         finally:
             try:
                 del cursor, delcursor
@@ -384,5 +384,4 @@ def main():
                 print""
 
 if __name__ == "__main__":
-    main()
-
+    main(sys.argv)
