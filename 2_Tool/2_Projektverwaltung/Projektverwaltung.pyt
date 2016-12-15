@@ -6,7 +6,8 @@ import argparse
 import gc
 
 import arcpy
-import teilflaecheBenennen, projektVerwaltung
+import teilflaecheBenennen
+import _projektVerwaltung
 
 def set_parameter_as_text(params, index, val):
     if (hasattr(params[index].value, 'value')):
@@ -16,13 +17,11 @@ def set_parameter_as_text(params, index, val):
 
 # Export of toolbox C:\GGR\RPC_Tools\2_Tool\2_Projektverwaltung\T2_Projektverwaltung.tbx
 
-import arcpy
-
 class Toolbox(object):
     def __init__(self):
-        self.label = u'B Projektverwaltung'
-        self.alias = ''
-        self.tools = [TeilflaecheBenennen, Projektverwaltung]
+        self.label = u'Projektverwaltung'
+        self.alias = ''             
+        self.tools = [TeilflaecheBenennen, ProjektVerwaltung]
 
 # Tool implementation code
 
@@ -91,7 +90,7 @@ class TeilflaecheBenennen(object):
             tbx_path = __file__
 
             base_path = os.path.dirname(tbx_path)
-            #base_path = os.path.dirname(base_path)
+            base_path = os.path.dirname(base_path)
             base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
 
             #Projekt auswählen
@@ -154,6 +153,7 @@ class TeilflaecheBenennen(object):
 
     def __init__(self):
         self.label = u'2 Teilflaechen verwalten'
+        reload(teilflaecheBenennen)
         self.canRunInBackground = False
 
     def getParameterInfo(self):
@@ -207,11 +207,10 @@ class TeilflaecheBenennen(object):
             return validator(parameters).updateMessages()
 
     def execute(self, parameters, messages):
-        teilflaecheBenennen.main(parameters)
+        teilflaecheBenennen.main(parameters, messages)
 
-class Projektverwaltung(object):
+class ProjektVerwaltung(object):
     """C:\GGR\RPC_Tools\2_Tool\2_Projektverwaltung\T2_Projektverwaltung.tbx\Projektverwaltung"""
-    import os, arcpy, datetime
 
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
@@ -220,6 +219,7 @@ class Projektverwaltung(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
+            reload(_projektVerwaltung)
 
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -373,7 +373,8 @@ class Projektverwaltung(object):
 
         parameters = [param_1, param_2, param_3, param_4, param_5, param_6]
 
-        self.ToolValidator(parameters).initializeParameters()
+        validator = getattr(self, 'ToolValidator', None)
+        validator(parameters).initializeParameters()
         return parameters
 
     def isLicensed(self):
@@ -390,11 +391,11 @@ class Projektverwaltung(object):
             return validator(parameters).updateMessages()
 
     def execute(self, parameters, messages):
-        projektVerwaltung.main(parameters)
+        _projektVerwaltung.main(parameters, messages)
 
 def main():
     tbx = Toolbox()
-    tool = Projektverwaltung()
+    tool = ProjektVerwaltung()
     tool.execute(tool.getParameterInfo(), None)
 
 if __name__ == '__main__':

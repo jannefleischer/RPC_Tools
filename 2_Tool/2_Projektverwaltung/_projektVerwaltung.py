@@ -13,20 +13,22 @@
 # ---------------------------------------------------------------------------
 
 
-import arcpy, os, shutil, sys
+import arcpy, os, shutil, sys, gc
 
-def main(parameters):
+def main(parameters, messages):
+    # way to remove file-locks in arcgis
+    gc.collect()
 
-    if parameters[0].valueAsText == "Neues Projekt anlegen":
+    if parameters[0].value == "Neues Projekt anlegen":
 
         arcpy.env.overwriteOutput = True
 
         try:
         #get new Project input Data
-            projectName = parameters[2].valueAsText
-            flaeche = parameters[3].valueAsText
-            beginn_betrachtung = parameters[4].valueAsText
-            ende_betrachtung = parameters[5].valueAsText
+            projectName = parameters[2].value
+            flaeche = parameters[3].value
+            beginn_betrachtung = parameters[4].value
+            ende_betrachtung = parameters[5].value
 
         #get the working directory and split it for the upper level path
             #Pfad anlegen
@@ -198,6 +200,7 @@ def main(parameters):
             #Kopiere Template.mxd
             mxd_template = arcpy.mapping.MapDocument(os.path.join(mainPath, "2_Tool","2_Projektverwaltung","Style_Minimap","template.mxd"))
             ausgabeordner_img = os.path.join(mainPath,'3_Projekte',projectName,'Ergebnisausgabe','Abbildungen')
+            os.makedirs(ausgabeordner_img)
             mxdpfad = os.path.join(ausgabeordner_img,'Definition_Projekt.mxd')
             mxd_template.saveACopy(mxdpfad)
 
@@ -315,7 +318,7 @@ def main(parameters):
 
         #Mit dem Projektnamen zum neuen Projektpfad zusammenführen"
         projektePfad = os.path.join(pfad,'3_Projekte')
-        projektPfad= os.path.join(projektePfad,projektName)
+        projektPfad = os.path.join(projektePfad,projektName)
         messages.AddMessage("Suche Ordner: " + projektPfad)
 
         #entferne alle aktuellen Layer aus dem TOC (Locks aufheben)
@@ -383,5 +386,3 @@ def main(parameters):
             except:
                 print""
 
-if __name__ == "__main__":
-    main(sys.argv)

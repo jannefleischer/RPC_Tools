@@ -14,3 +14,6 @@
 
 import os, sys, arcpy
 
+def main():
+    pass
+

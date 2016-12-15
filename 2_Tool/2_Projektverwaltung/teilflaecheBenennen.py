@@ -15,7 +15,7 @@
 
 import arcpy, os, shutil, sys
 
-def main(parameters):
+def main(parameters, messages):
     # Teilfläche speichern
     projectname = parameters[0].value
     flaechenname = parameters[1].value
@@ -107,6 +107,3 @@ def main(parameters):
         if row.Teilflaeche == alter_name:
             row.Teilflaeche = neuer_name
             rows.updateRow(row)
-
-if __name__ == "__main__":
-    main(sys.argv)

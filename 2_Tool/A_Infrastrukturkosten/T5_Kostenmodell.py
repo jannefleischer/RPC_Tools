@@ -17,7 +17,7 @@
 import arcpy, os, inspect, pyodbc, shutil, gc, sys, datetime, xlsxwriter, imp
 from xlsxwriter.utility import xl_rowcol_to_cell
 
-def main():
+def main(parameters, messages):
 
     sheetlibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
     sl = imp.load_source('sheet_lib', sheetlibpath)
@@ -34,40 +34,40 @@ def main():
     #Kostenaufteilungsregeln speichern
     #-----------------------
 
-    projektname = arcpy.GetParameterAsText(0)
+    projektname = parameters[0].valueAsText
 
     i=7
     #"01 Planungskosten"
-    i+=1 ; KB1_KP1 = arcpy.GetParameterAsText(i)
+    i+=1 ; KB1_KP1 = parameters[i].valueAsText
 
     #"02 Grün-, Ausgleichs- und Ersatzflächen"
-    i+=1 ; KB2_KP1 = arcpy.GetParameterAsText(i)
-    i+=1 ; KB2_KP2 = arcpy.GetParameterAsText(i)
-    i+=1 ; KB2_KP3 = arcpy.GetParameterAsText(i)
+    i+=1 ; KB2_KP1 = parameters[i].valueAsText
+    i+=1 ; KB2_KP2 = parameters[i].valueAsText
+    i+=1 ; KB2_KP3 = parameters[i].valueAsText
 
     #"03 Innere Verkehrserschliessung"
-    i+=1 ; KB3_KP1 = arcpy.GetParameterAsText(i)
-    i+=1 ; KB3_KP2 = arcpy.GetParameterAsText(i)
-    i+=1 ; KB3_KP3 = arcpy.GetParameterAsText(i)
+    i+=1 ; KB3_KP1 = parameters[i].valueAsText
+    i+=1 ; KB3_KP2 = parameters[i].valueAsText
+    i+=1 ; KB3_KP3 = parameters[i].valueAsText
 
     #"04 Äußere Verkehrserschliessung"
-    i+=1 ; KB4_KP1 = arcpy.GetParameterAsText(i)
-    i+=1 ; KB4_KP2 = arcpy.GetParameterAsText(i)
-    i+=1 ; KB4_KP3 = arcpy.GetParameterAsText(i)
+    i+=1 ; KB4_KP1 = parameters[i].valueAsText
+    i+=1 ; KB4_KP2 = parameters[i].valueAsText
+    i+=1 ; KB4_KP3 = parameters[i].valueAsText
 
     #"05 Wasserversorgung"
-    i+=1 ; KB5_KP1 = arcpy.GetParameterAsText(i)
-    i+=1 ; KB5_KP2 = arcpy.GetParameterAsText(i)
-    i+=1 ; KB5_KP3 = arcpy.GetParameterAsText(i)
+    i+=1 ; KB5_KP1 = parameters[i].valueAsText
+    i+=1 ; KB5_KP2 = parameters[i].valueAsText
+    i+=1 ; KB5_KP3 = parameters[i].valueAsText
 
     #"06 Abwasserentsorgung"
-    i+=1 ; KB6_KP1 = arcpy.GetParameterAsText(i)
-    i+=1 ; KB6_KP2 = arcpy.GetParameterAsText(i)
-    i+=1 ; KB6_KP3 = arcpy.GetParameterAsText(i)
+    i+=1 ; KB6_KP1 = parameters[i].valueAsText
+    i+=1 ; KB6_KP2 = parameters[i].valueAsText
+    i+=1 ; KB6_KP3 = parameters[i].valueAsText
 
     #"07 Lärmschutz"
-    i+=1 ; KB7_KP1 = arcpy.GetParameterAsText(i)
-    i+=1 ; KB7_KP2 = arcpy.GetParameterAsText(i)
+    i+=1 ; KB7_KP1 = parameters[i].valueAsText
+    i+=1 ; KB7_KP2 = parameters[i].valueAsText
 
 
     base_path = str(sys.path[0]).split("2_Tool")[0]
@@ -98,29 +98,29 @@ def main():
                         ziel = "KB"+str(kb)+"_"+"KP"+str(kp)
                         ziel_value = eval(ziel)
 
-                        arcpy.AddMessage(row.Kostenbereich + row.Kostenphase + ": " + ziel_value)
+                        messages.AddMessage(row.Kostenbereich + row.Kostenphase + ": " + ziel_value)
 
                         row.Kostenaufteilungsregel = ziel_value
                         rows.updateRow(row)
 
                 del rows, row
             except Exception as e:
-                arcpy.AddMessage(e)
+                messages.AddMessage(e)
 
     #-----------------------
 
 
     # Variablen definieren
     i=-1
-    i+=1;projektname = arcpy.GetParameterAsText(i)
-    i+=1;sonderkostenfaktor = (float(arcpy.GetParameterAsText(i))+100)/100
-    i+=1;entwaesserungssystem = arcpy.GetParameterAsText(i)
-    i+=1;rueckhaltebecken_typ = arcpy.GetParameterAsText(i)
-    i+=1;rueckhaltebecken_m3 = arcpy.GetParameterAsText(i)
-    i+=1;zus_kanalmeter = arcpy.GetParameterAsText(i)
+    i+=1;projektname = parameters[i].valueAsText
+    i+=1;sonderkostenfaktor = (float(parameters[i].valueAsText)+100)/100
+    i+=1;entwaesserungssystem = parameters[i].valueAsText
+    i+=1;rueckhaltebecken_typ = parameters[i].valueAsText
+    i+=1;rueckhaltebecken_m3 = parameters[i].valueAsText
+    i+=1;zus_kanalmeter = parameters[i].valueAsText
 
-    i+=1;zus_herstellungskosten = arcpy.GetParameterAsText(i)
-    i+=1;zus_betriebskosten = arcpy.GetParameterAsText(i)
+    i+=1;zus_herstellungskosten = parameters[i].valueAsText
+    i+=1;zus_betriebskosten = parameters[i].valueAsText
 
     #Pfade einrichten
     base_path = str(sys.path[0]).split("2_Tool")[0]
@@ -149,12 +149,12 @@ def main():
     #
     #############################################################################################################
     beginmeldung = 'Starte Mengenermittlung \n'
-    arcpy.AddMessage(beginmeldung)
+    messages.AddMessage(beginmeldung)
     print beginmeldung
     #############################################################################################################
     # Schritt 1 - Aggregiere Teilflaechen nach Flaechentypen
     schrittmeldung = 'Aggregiere Teilflaechen nach Flaechentypen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     eingangstabellen = [
@@ -164,17 +164,17 @@ def main():
     ausgabetabelle = (workspace_projekt_definition,'Flaechenbilanz_gruppiert')
 
     sql = """SELECT Flaechenbilanz.Teilflaeche_Plangebiet,Flaechenbilanz.Startjahr, Flaechenbilanz.Flaechennutzung_S1, Flaechenbilanz.Flaechennutzung_S2, Sum(Flaechenbilanz.Flaeche_ha) AS Flaeche_ha
-    INTO Flaechenbilanz_gruppiert
-    FROM Flaechenbilanz
-    GROUP BY Flaechenbilanz.Teilflaeche_Plangebiet, Flaechenbilanz.Startjahr, Flaechenbilanz.Flaechennutzung_S1, Flaechenbilanz.Flaechennutzung_S2;
-    """
+                INTO Flaechenbilanz_gruppiert
+                FROM Flaechenbilanz
+                GROUP BY Flaechenbilanz.Teilflaeche_Plangebiet, Flaechenbilanz.Startjahr, Flaechenbilanz.Flaechennutzung_S1, Flaechenbilanz.Flaechennutzung_S2;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #############################################################################################################
     # Schritt 2 - Erzeuge Elementmengen
     schrittmeldung = 'Erzeuge Elementmengen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     import ast #string to python parser - wird weiter unten gebraucht
@@ -257,7 +257,7 @@ def main():
     #############################################################################################################
     # Schritt 2a - Berechne Regenwasserretention
     schrittmeldung = 'Berechne Regenwasserretention \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     # Aktualisiere Elementmengentabelle
@@ -310,7 +310,7 @@ def main():
                 kosten_m3 = 275
         try:
             message =  rueckhaltebecken_typ+" "+str(kosten_m3)
-            #arcpy.AddMessage(message)
+            #messages.AddMessage(message)
         except:
             pass
 
@@ -328,7 +328,7 @@ def main():
     #############################################################################################################
     # Schritt 2b - Ergaenze zusaetzliche Kanalmeter
     schrittmeldung = 'Ergaenze zusaetzliche Kanalmeter \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     #Loesche ggf. aus vorigen Berechnungen angelegte Kanallaengen
@@ -398,7 +398,7 @@ def main():
     #############################################################################################################
     # Schritt 3 - Ergaenze Herstellungskostentabelle um Zusatzwerte
     schrittmeldung = 'Ergaenze Herstellungskostentabelle um Zusatzwerte \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     # Loesche ggf. bereits vorhandenen Typ in T03MEG_Element_und_Preisliste und aktualisiere den Wert
@@ -429,7 +429,7 @@ def main():
     #############################################################################################################
     # Schritt 3 - Erzeuge Herstellungskostentabelle
     schrittmeldung = 'Berechne Herstellungskosten \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     eingangstabellen = [
@@ -443,18 +443,18 @@ def main():
     ausgabetabelle = (workspace_projekt_kosten,'T04KOM_01_Herstellungskosten')
 
     sql = """SELECT MEG_Mengenermittlung.Teilflaeche_Plangebiet, T01DEF_Untersuchungsjahre.Jahr, MEG_Mengenermittlung.Kostenbereich, T03MEG_Element_und_Preisliste.Element AS Element, T03MEG_Element_und_Preisliste.Einheit, [Menge]*[Herstellungskosten_einmalig]*[Projektspezifischer_Sonderkostenfaktor]*[Faktor_BKI] AS Herstellungskosten INTO T04KOM_01_Herstellungskosten
-    FROM (MEG_Mengenermittlung INNER JOIN T01DEF_Untersuchungsjahre ON MEG_Mengenermittlung.Startjahr = T01DEF_Untersuchungsjahre.Jahr) INNER JOIN T03MEG_Element_und_Preisliste ON (MEG_Mengenermittlung.Element = T03MEG_Element_und_Preisliste.Element) AND (MEG_Mengenermittlung.Kostenbereich = T03MEG_Element_und_Preisliste.Kostenbereich), Projektrahmendaten INNER JOIN T01DEF_Regionalfaktoren ON Projektrahmendaten.AGS = T01DEF_Regionalfaktoren.AGS
-    WHERE (((T01DEF_Untersuchungsjahre.Jahr) Between [Beginn_Betrachtungszeitraum] And [Ende_Betrachtungszeitraum]))
-    GROUP BY MEG_Mengenermittlung.Teilflaeche_Plangebiet, T01DEF_Untersuchungsjahre.Jahr, MEG_Mengenermittlung.Kostenbereich, T03MEG_Element_und_Preisliste.Element, T03MEG_Element_und_Preisliste.Einheit, [Menge]*[Herstellungskosten_einmalig]*[Projektspezifischer_Sonderkostenfaktor]*[Faktor_BKI]
-    ORDER BY MEG_Mengenermittlung.Teilflaeche_Plangebiet, T01DEF_Untersuchungsjahre.Jahr, MEG_Mengenermittlung.Kostenbereich;
-    """
+                FROM (MEG_Mengenermittlung INNER JOIN T01DEF_Untersuchungsjahre ON MEG_Mengenermittlung.Startjahr = T01DEF_Untersuchungsjahre.Jahr) INNER JOIN T03MEG_Element_und_Preisliste ON (MEG_Mengenermittlung.Element = T03MEG_Element_und_Preisliste.Element) AND (MEG_Mengenermittlung.Kostenbereich = T03MEG_Element_und_Preisliste.Kostenbereich), Projektrahmendaten INNER JOIN T01DEF_Regionalfaktoren ON Projektrahmendaten.AGS = T01DEF_Regionalfaktoren.AGS
+                WHERE (((T01DEF_Untersuchungsjahre.Jahr) Between [Beginn_Betrachtungszeitraum] And [Ende_Betrachtungszeitraum]))
+                GROUP BY MEG_Mengenermittlung.Teilflaeche_Plangebiet, T01DEF_Untersuchungsjahre.Jahr, MEG_Mengenermittlung.Kostenbereich, T03MEG_Element_und_Preisliste.Element, T03MEG_Element_und_Preisliste.Einheit, [Menge]*[Herstellungskosten_einmalig]*[Projektspezifischer_Sonderkostenfaktor]*[Faktor_BKI]
+                ORDER BY MEG_Mengenermittlung.Teilflaeche_Plangebiet, T01DEF_Untersuchungsjahre.Jahr, MEG_Mengenermittlung.Kostenbereich;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #############################################################################################################
     # Schritt 4 - Erzeuge Betriebs- und Unterhaltungskostentabelle
     schrittmeldung = 'Berechne Betriebs- und Unterhaltungskosten \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     eingangstabellen = [
@@ -468,18 +468,18 @@ def main():
     ausgabetabelle = (workspace_projekt_kosten,'T04KOM_02_Betrieb_Unterhaltung')
 
     sql = """SELECT MEG_Mengenermittlung.Teilflaeche_Plangebiet, T01DEF_Untersuchungsjahre.Jahr, MEG_Mengenermittlung.Kostenbereich, MEG_Mengenermittlung.Element, Sum([Menge]*[Betriebs_und_Unterhaltungskosten_jaehrlich]) AS Betriebskosten INTO T04KOM_02_Betrieb_Unterhaltung
-    FROM T01DEF_Untersuchungsjahre, Projektrahmendaten, MEG_Mengenermittlung INNER JOIN T03MEG_Element_und_Preisliste ON (MEG_Mengenermittlung.Element = T03MEG_Element_und_Preisliste.Element) AND (MEG_Mengenermittlung.Kostenbereich = T03MEG_Element_und_Preisliste.Kostenbereich)
-    WHERE (((MEG_Mengenermittlung.Startjahr)<=[Jahr]) AND ((T01DEF_Untersuchungsjahre.Jahr) Between [Beginn_Betrachtungszeitraum] And [Ende_Betrachtungszeitraum]))
-    GROUP BY MEG_Mengenermittlung.Teilflaeche_Plangebiet, T01DEF_Untersuchungsjahre.Jahr, MEG_Mengenermittlung.Kostenbereich, MEG_Mengenermittlung.Element
-    ORDER BY MEG_Mengenermittlung.Teilflaeche_Plangebiet, T01DEF_Untersuchungsjahre.Jahr, MEG_Mengenermittlung.Kostenbereich;
-    """
+                FROM T01DEF_Untersuchungsjahre, Projektrahmendaten, MEG_Mengenermittlung INNER JOIN T03MEG_Element_und_Preisliste ON (MEG_Mengenermittlung.Element = T03MEG_Element_und_Preisliste.Element) AND (MEG_Mengenermittlung.Kostenbereich = T03MEG_Element_und_Preisliste.Kostenbereich)
+                WHERE (((MEG_Mengenermittlung.Startjahr)<=[Jahr]) AND ((T01DEF_Untersuchungsjahre.Jahr) Between [Beginn_Betrachtungszeitraum] And [Ende_Betrachtungszeitraum]))
+                GROUP BY MEG_Mengenermittlung.Teilflaeche_Plangebiet, T01DEF_Untersuchungsjahre.Jahr, MEG_Mengenermittlung.Kostenbereich, MEG_Mengenermittlung.Element
+                ORDER BY MEG_Mengenermittlung.Teilflaeche_Plangebiet, T01DEF_Untersuchungsjahre.Jahr, MEG_Mengenermittlung.Kostenbereich;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #############################################################################################################
     # Schritt 5 - Erzeuge Erneuerungskostentabelle
     schrittmeldung = 'Berechne Erneuerungskosten \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     eingangstabellen = [
@@ -494,17 +494,17 @@ def main():
     ausgabetabelle = (workspace_projekt_kosten,'T04KOM_03_Erneuerung')
 
     sql = """SELECT MEG_Mengenermittlung.Teilflaeche_Plangebiet, [Startjahr]+[NrErneuerungszyklus]*[Dauer_Erneuerungszyklus] AS Jahr, MEG_Mengenermittlung.Kostenbereich, MEG_Mengenermittlung.Element, T01DEF_Erneuerungszyklen.NrErneuerungszyklus, [Erneuerungskosten_pro_Zyklus]*[Menge]*[Projektspezifischer_Sonderkostenfaktor] AS Erneuerungskosten INTO T04KOM_03_Erneuerung
-    FROM T01DEF_Erneuerungszyklen, Projektrahmendaten, T03MEG_Element_und_Preisliste INNER JOIN MEG_Mengenermittlung ON (T03MEG_Element_und_Preisliste.Kostenbereich=MEG_Mengenermittlung.Kostenbereich) AND (T03MEG_Element_und_Preisliste.Element=MEG_Mengenermittlung.Element)
-    WHERE ((([Startjahr]+[NrErneuerungszyklus]*[Dauer_Erneuerungszyklus])<=[Ende_Betrachtungszeitraum]) And (([Erneuerungskosten_pro_Zyklus]*[Menge]*[Projektspezifischer_Sonderkostenfaktor])>0))
-    ORDER BY MEG_Mengenermittlung.Kostenbereich;
-    """
+                FROM T01DEF_Erneuerungszyklen, Projektrahmendaten, T03MEG_Element_und_Preisliste INNER JOIN MEG_Mengenermittlung ON (T03MEG_Element_und_Preisliste.Kostenbereich=MEG_Mengenermittlung.Kostenbereich) AND (T03MEG_Element_und_Preisliste.Element=MEG_Mengenermittlung.Element)
+                WHERE ((([Startjahr]+[NrErneuerungszyklus]*[Dauer_Erneuerungszyklus])<=[Ende_Betrachtungszeitraum]) And (([Erneuerungskosten_pro_Zyklus]*[Menge]*[Projektspezifischer_Sonderkostenfaktor])>0))
+                ORDER BY MEG_Mengenermittlung.Kostenbereich;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #############################################################################################################
     # Schritt 6 - Kosten nach Kostenphasen
     schrittmeldung = 'Berechne Kosten nach Kostenphasen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     eingangstabellen = [
@@ -516,24 +516,24 @@ def main():
     ausgabetabelle = (workspace_projekt_kosten,'T04KOM_04_Kosten_nach_Kostenphasen')
 
     sql = """SELECT * INTO T04KOM_04_Kosten_nach_Kostenphasen
-    FROM(
-    SELECT '1 - Erstmalige Herstellung' AS Kostenphase, [T04KOM_01_Herstellungskosten].Teilflaeche_Plangebiet, [T04KOM_01_Herstellungskosten].Jahr, [T04KOM_01_Herstellungskosten].Kostenbereich, [T04KOM_01_Herstellungskosten].Element, [T04KOM_01_Herstellungskosten].Herstellungskosten AS Kosten
-    FROM [T04KOM_01_Herstellungskosten]
-    union
-    SELECT '2 - Betrieb und Unterhaltung' AS Kostenphase, T04KOM_02_Betrieb_Unterhaltung.Teilflaeche_Plangebiet, T04KOM_02_Betrieb_Unterhaltung.Jahr, T04KOM_02_Betrieb_Unterhaltung.Kostenbereich, T04KOM_02_Betrieb_Unterhaltung.Element, T04KOM_02_Betrieb_Unterhaltung.Betriebskosten AS Kosten
-    FROM T04KOM_02_Betrieb_Unterhaltung
-    union
-    SELECT '3 - Erneuerung' AS Kostenphase, T04KOM_03_Erneuerung.Teilflaeche_Plangebiet, T04KOM_03_Erneuerung.Jahr, T04KOM_03_Erneuerung.Kostenbereich, T04KOM_03_Erneuerung.Element, T04KOM_03_Erneuerung.Erneuerungskosten AS Kosten
-    FROM T04KOM_03_Erneuerung)
-    as a;
-    """
+                FROM(
+                SELECT '1 - Erstmalige Herstellung' AS Kostenphase, [T04KOM_01_Herstellungskosten].Teilflaeche_Plangebiet, [T04KOM_01_Herstellungskosten].Jahr, [T04KOM_01_Herstellungskosten].Kostenbereich, [T04KOM_01_Herstellungskosten].Element, [T04KOM_01_Herstellungskosten].Herstellungskosten AS Kosten
+                FROM [T04KOM_01_Herstellungskosten]
+                union
+                SELECT '2 - Betrieb und Unterhaltung' AS Kostenphase, T04KOM_02_Betrieb_Unterhaltung.Teilflaeche_Plangebiet, T04KOM_02_Betrieb_Unterhaltung.Jahr, T04KOM_02_Betrieb_Unterhaltung.Kostenbereich, T04KOM_02_Betrieb_Unterhaltung.Element, T04KOM_02_Betrieb_Unterhaltung.Betriebskosten AS Kosten
+                FROM T04KOM_02_Betrieb_Unterhaltung
+                union
+                SELECT '3 - Erneuerung' AS Kostenphase, T04KOM_03_Erneuerung.Teilflaeche_Plangebiet, T04KOM_03_Erneuerung.Jahr, T04KOM_03_Erneuerung.Kostenbereich, T04KOM_03_Erneuerung.Element, T04KOM_03_Erneuerung.Erneuerungskosten AS Kosten
+                FROM T04KOM_03_Erneuerung)
+                as a;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #############################################################################################################
     # Schritt 6 - Kostenaufteilung
     schrittmeldung = 'Berechne Kostenaufteilung \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     eingangstabellen = [
@@ -546,17 +546,17 @@ def main():
     ausgabetabelle = (workspace_projekt_kosten,'T05KAM_01_Kostenaufteilung')
 
     sql = """SELECT T04KOM_04_Kosten_nach_Kostenphasen.Teilflaeche_Plangebiet, T04KOM_04_Kosten_nach_Kostenphasen.Kostenphase, T04KOM_04_Kosten_nach_Kostenphasen.Jahr, T04KOM_04_Kosten_nach_Kostenphasen.Kostenbereich, Projektspez_Kostenauft.Kostenaufteilungsregel, T01DEF_Kostentraeger.Kostentraeger, T01DEF_Kostenaufteilungsregeln.Anteil, Sum([Kosten]*[Anteil]) AS Kosten_Summe INTO T05KAM_01_Kostenaufteilung
-    FROM ((Projektspez_Kostenauft INNER JOIN T04KOM_04_Kosten_nach_Kostenphasen ON (Projektspez_Kostenauft.Kostenbereich = T04KOM_04_Kosten_nach_Kostenphasen.Kostenbereich) AND (Projektspez_Kostenauft.Kostenphase = T04KOM_04_Kosten_nach_Kostenphasen.Kostenphase)) INNER JOIN T01DEF_Kostenaufteilungsregeln ON Projektspez_Kostenauft.Kostenaufteilungsregel = T01DEF_Kostenaufteilungsregeln.Kostenregelname) INNER JOIN T01DEF_Kostentraeger ON T01DEF_Kostenaufteilungsregeln.Kostentraeger = T01DEF_Kostentraeger.OBJECTID
-    GROUP BY T04KOM_04_Kosten_nach_Kostenphasen.Teilflaeche_Plangebiet, T04KOM_04_Kosten_nach_Kostenphasen.Kostenphase, T04KOM_04_Kosten_nach_Kostenphasen.Jahr, T04KOM_04_Kosten_nach_Kostenphasen.Kostenbereich, Projektspez_Kostenauft.Kostenaufteilungsregel, T01DEF_Kostentraeger.Kostentraeger, T01DEF_Kostenaufteilungsregeln.Anteil
-    ORDER BY T04KOM_04_Kosten_nach_Kostenphasen.Teilflaeche_Plangebiet, T04KOM_04_Kosten_nach_Kostenphasen.Kostenphase, T04KOM_04_Kosten_nach_Kostenphasen.Jahr, T04KOM_04_Kosten_nach_Kostenphasen.Kostenbereich;
-    """
+                FROM ((Projektspez_Kostenauft INNER JOIN T04KOM_04_Kosten_nach_Kostenphasen ON (Projektspez_Kostenauft.Kostenbereich = T04KOM_04_Kosten_nach_Kostenphasen.Kostenbereich) AND (Projektspez_Kostenauft.Kostenphase = T04KOM_04_Kosten_nach_Kostenphasen.Kostenphase)) INNER JOIN T01DEF_Kostenaufteilungsregeln ON Projektspez_Kostenauft.Kostenaufteilungsregel = T01DEF_Kostenaufteilungsregeln.Kostenregelname) INNER JOIN T01DEF_Kostentraeger ON T01DEF_Kostenaufteilungsregeln.Kostentraeger = T01DEF_Kostentraeger.OBJECTID
+                GROUP BY T04KOM_04_Kosten_nach_Kostenphasen.Teilflaeche_Plangebiet, T04KOM_04_Kosten_nach_Kostenphasen.Kostenphase, T04KOM_04_Kosten_nach_Kostenphasen.Jahr, T04KOM_04_Kosten_nach_Kostenphasen.Kostenbereich, Projektspez_Kostenauft.Kostenaufteilungsregel, T01DEF_Kostentraeger.Kostentraeger, T01DEF_Kostenaufteilungsregeln.Anteil
+                ORDER BY T04KOM_04_Kosten_nach_Kostenphasen.Teilflaeche_Plangebiet, T04KOM_04_Kosten_nach_Kostenphasen.Kostenphase, T04KOM_04_Kosten_nach_Kostenphasen.Jahr, T04KOM_04_Kosten_nach_Kostenphasen.Kostenbereich;
+                """
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
 
     #############################################################################################################
     # Schritt 6 - Datenexport in Excel-Datei
     schrittmeldung = 'Datenexport in Excel-Datei  \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     #projektname = 'LKH_Bultweg' # haendische Ueberbrueckung bei manueller Scriptnutzung
@@ -1012,12 +1012,9 @@ def main():
     try:
         wb.close()
     except Exception as e:
-        arcpy.AddMessage(e)
-        arcpy.AddMessage("Es liegt ein Fehler beim Speichern der Ausgabedatei vor. Ist diese ggf. noch geoeffnet?")
+        messages.AddMessage(e)
+        messages.AddMessage("Es liegt ein Fehler beim Speichern der Ausgabedatei vor. Ist diese ggf. noch geoeffnet?")
 
     # Endmeldung
     print 'Berechnung abgeschlossen'
-    arcpy.AddMessage('Berechnung abgeschlossen')
-
-if __name__ == "__main__":
-    main()
+    messages.AddMessage('Berechnung abgeschlossen')
