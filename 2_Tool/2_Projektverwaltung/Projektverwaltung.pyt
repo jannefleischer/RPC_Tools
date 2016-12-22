@@ -156,7 +156,7 @@ class TeilflaecheBenennen(object):
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = u'GPString'
-        param_1.filter.list = [u'04-10-16', u'test', u'test_template']
+        param_1.filter.list = []
         #param_1.value = u'test'
 
         # Teilfläche

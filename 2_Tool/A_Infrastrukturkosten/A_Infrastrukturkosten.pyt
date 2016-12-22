@@ -314,7 +314,7 @@ class Infrastrukturkostenermittlung(object):
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = u'Zeichenfolge'
-        param_1.filter.list = [u'04-10-16', u'test']
+        param_1.filter.list = []
 
         # Kostenauf-___abschlag____
         param_2 = arcpy.Parameter()
