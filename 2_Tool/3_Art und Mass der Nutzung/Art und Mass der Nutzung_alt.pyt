@@ -273,6 +273,8 @@ class Flaechenbilanz(object):
         param_3.direction = 'Input'
         param_3.datatype = u'Long'
         param_3.value = u'2016'
+        param_3.filter.type = 'Range'
+        param_3.filter.list = [2010, 2050]
 
         # Verkehrsfläche____
         param_4 = arcpy.Parameter()
@@ -282,6 +284,8 @@ class Flaechenbilanz(object):
         param_4.direction = 'Input'
         param_4.datatype = u'Long'
         param_4.value = u'0'
+        param_4.filter.type = 'Range'
+        param_4.filter.list = [0, 100]
 
         # Grünfläche____
         param_5 = arcpy.Parameter()
@@ -291,6 +295,8 @@ class Flaechenbilanz(object):
         param_5.direction = 'Input'
         param_5.datatype = u'Long'
         param_5.value = u'0'
+        param_5.filter.type = 'Range'
+        param_5.filter.list = [0, 100]
 
         # Sonstige_Flächen____
         param_6 = arcpy.Parameter()
@@ -300,6 +306,8 @@ class Flaechenbilanz(object):
         param_6.direction = 'Input'
         param_6.datatype = u'Long'
         param_6.value = u'0'
+        param_6.filter.type = 'Range'
+        param_6.filter.list = [0, 100]
 
         # Nettobauland____
         param_7 = arcpy.Parameter()
@@ -309,6 +317,8 @@ class Flaechenbilanz(object):
         param_7.direction = 'Input'
         param_7.datatype = u'Long'
         param_7.value = u'100'
+        param_7.filter.type = 'Range'
+        param_7.filter.list = [0, 100]
 
         # Gewerbeflaeche____
         param_8 = arcpy.Parameter()
@@ -318,6 +328,8 @@ class Flaechenbilanz(object):
         param_8.direction = 'Input'
         param_8.datatype = u'Long'
         param_8.value = u'0'
+        param_8.filter.type = 'Range'
+        param_8.filter.list = [0, 100]
 
         # Nettowohnbauland____
         param_9 = arcpy.Parameter()
@@ -327,6 +339,8 @@ class Flaechenbilanz(object):
         param_9.direction = 'Input'
         param_9.datatype = u'Long'
         param_9.value = u'100'
+        param_9.filter.type = 'Range'
+        param_9.filter.list = [0, 100]
 
         # Flächen_für_Lärmschutz____
         param_10 = arcpy.Parameter()
@@ -336,6 +350,8 @@ class Flaechenbilanz(object):
         param_10.direction = 'Input'
         param_10.datatype = u'Long'
         param_10.value = u'0'
+        param_10.filter.type = 'Range'
+        param_10.filter.list = [0, 100]
 
         # Privatwege____
         param_11 = arcpy.Parameter()
@@ -345,6 +361,8 @@ class Flaechenbilanz(object):
         param_11.direction = 'Input'
         param_11.datatype = u'Long'
         param_11.value = u'0'
+        param_11.filter.type = 'Range'
+        param_11.filter.list = [0, 100]
 
         # Äußere_Erschließung____
         param_12 = arcpy.Parameter()
@@ -354,6 +372,8 @@ class Flaechenbilanz(object):
         param_12.direction = 'Input'
         param_12.datatype = u'Long'
         param_12.value = u'0'
+        param_12.filter.type = 'Range'
+        param_12.filter.list = [0, 100]
 
         # Innere_Erschließung____
         param_13 = arcpy.Parameter()
@@ -363,6 +383,8 @@ class Flaechenbilanz(object):
         param_13.direction = 'Input'
         param_13.datatype = u'Long'
         param_13.value = u'100'
+        param_13.filter.type = 'Range'
+        param_13.filter.list = [0, 100]
 
         # Spielplatzfläche____
         param_14 = arcpy.Parameter()
@@ -372,6 +394,8 @@ class Flaechenbilanz(object):
         param_14.direction = 'Input'
         param_14.datatype = u'Long'
         param_14.value = u'0'
+        param_14.filter.type = 'Range'
+        param_14.filter.list = [0, 100]
 
         # Straßenbegleitgrün____
         param_15 = arcpy.Parameter()
@@ -381,6 +405,8 @@ class Flaechenbilanz(object):
         param_15.direction = 'Input'
         param_15.datatype = u'Long'
         param_15.value = u'0'
+        param_15.filter.type = 'Range'
+        param_15.filter.list = [0, 100]
 
         # Ausgleichs-_und_Ersatzflächen
         param_16 = arcpy.Parameter()
@@ -390,6 +416,8 @@ class Flaechenbilanz(object):
         param_16.direction = 'Input'
         param_16.datatype = u'Long'
         param_16.value = u'0'
+        param_16.filter.type = 'Range'
+        param_16.filter.list = [0, 100]
 
         # Allgemeine_Grünflächen
         param_17 = arcpy.Parameter()
@@ -399,6 +427,8 @@ class Flaechenbilanz(object):
         param_17.direction = 'Input'
         param_17.datatype = u'Long'
         param_17.value = u'100'
+        param_17.filter.type = 'Range'
+        param_17.filter.list = [0, 100]
 
         parameters= [param_1, param_2, param_3, param_4, param_5, param_6, 
                      param_7, param_8, param_9, param_10, param_11, param_12, 
@@ -748,6 +778,8 @@ class Nutzungen(object):
         param_3.direction = 'Input'
         param_3.datatype = u'Long'
         param_3.value = u'2017'
+        param_3.filter.type = 'Range'
+        param_3.filter.list = [2010, 2050]
 
         # Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_
         param_4 = arcpy.Parameter()
@@ -757,6 +789,8 @@ class Nutzungen(object):
         param_4.direction = 'Input'
         param_4.datatype = u'Long'
         param_4.value = u'5'
+        param_4.filter.type = 'Range'
+        param_4.filter.list = [1, 20]
 
         # Anzahl_WE_in_Ein-_und_Zweifamilienhäusern
         param_5 = arcpy.Parameter()
@@ -766,6 +800,8 @@ class Nutzungen(object):
         param_5.direction = 'Input'
         param_5.datatype = u'Long'
         param_5.value = u'0'
+        param_5.filter.type = 'Range'
+        param_5.filter.list = [0, 500]
 
         # Anzahl_WE_in_Doppelhäusern
         param_6 = arcpy.Parameter()
@@ -775,6 +811,8 @@ class Nutzungen(object):
         param_6.direction = 'Input'
         param_6.datatype = u'Long'
         param_6.value = u'0'
+        param_6.filter.type = 'Range'
+        param_6.filter.list = [0, 500]
 
         # Anzahl_WE_in_Reihenhäusern
         param_7 = arcpy.Parameter()
@@ -784,6 +822,8 @@ class Nutzungen(object):
         param_7.direction = 'Input'
         param_7.datatype = u'Long'
         param_7.value = u'0'
+        param_7.filter.type = 'Range'
+        param_7.filter.list = [0, 500]
 
         # Anzahl_WE_in_Mehrfamilienhäusern
         param_8 = arcpy.Parameter()
@@ -793,6 +833,8 @@ class Nutzungen(object):
         param_8.direction = 'Input'
         param_8.datatype = u'Long'
         param_8.value = u'0'
+        param_8.filter.type = 'Range'
+        param_8.filter.list = [0, 500]
 
         # Anteil_Eigentümernutzung_in_Ein-_und_Zweifamilienhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_
         param_9 = arcpy.Parameter()
@@ -802,6 +844,8 @@ class Nutzungen(object):
         param_9.direction = 'Input'
         param_9.datatype = u'Long'
         param_9.value = u'90'
+        param_9.filter.type = 'Range'
+        param_9.filter.list = [0, 100]
 
         # Anteil_Eigentümernutzung_in_Doppelhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_
         param_10 = arcpy.Parameter()
@@ -811,6 +855,8 @@ class Nutzungen(object):
         param_10.direction = 'Input'
         param_10.datatype = u'Long'
         param_10.value = u'80'
+        param_10.filter.type = 'Range'
+        param_10.filter.list = [0, 100]
 
         # Anteil_Eigentümernutzung_in_Reihenhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_
         param_11 = arcpy.Parameter()
@@ -820,6 +866,8 @@ class Nutzungen(object):
         param_11.direction = 'Input'
         param_11.datatype = u'Long'
         param_11.value = u'70'
+        param_11.filter.type = 'Range'
+        param_11.filter.list = [0, 100]
 
         # Anteil_Eigentümernutzung_in_Mehrfamilienhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_
         param_12 = arcpy.Parameter()
@@ -829,6 +877,8 @@ class Nutzungen(object):
         param_12.direction = 'Input'
         param_12.datatype = u'Long'
         param_12.value = u'20'
+        param_12.filter.type = 'Range'
+        param_12.filter.list = [0, 100]
 
         # Mittlere_Anzahl_Einwohner_pro_WE_in_Einfamilienhäusern__kurz_nach_dem_Bezug_
         param_13 = arcpy.Parameter()
@@ -878,6 +928,8 @@ class Nutzungen(object):
         param_17.direction = 'Input'
         param_17.datatype = u'Long'
         param_17.value = u'80'
+        param_17.filter.type = 'Range'
+        param_17.filter.list = [0, 100]
 
         # Gebietstyp_auswählen
         param_18 = arcpy.Parameter()
@@ -897,6 +949,8 @@ class Nutzungen(object):
         param_19.direction = 'Input'
         param_19.datatype = u'Long'
         param_19.value = u'40'
+        param_19.filter.type = 'Range'
+        param_19.filter.list = [0, 100]
 
         # Anteil_der_Arbeitsplätze_im_Baugewerbe__in_Prozent_
         param_20 = arcpy.Parameter()
@@ -906,6 +960,8 @@ class Nutzungen(object):
         param_20.direction = 'Input'
         param_20.datatype = u'Long'
         param_20.value = u'6'
+        param_20.filter.type = 'Range'
+        param_20.filter.list = [0, 100]
 
         # Anteil_der_Arbeitsplätze_im_Handel__inkl__Kfz___in_Prozent_
         param_21 = arcpy.Parameter()
@@ -915,6 +971,8 @@ class Nutzungen(object):
         param_21.direction = 'Input'
         param_21.datatype = u'Long'
         param_21.value = u'17'
+        param_21.filter.type = 'Range'
+        param_21.filter.list = [0, 100]
 
         # Anteil_der_Arbeitsplätze_im_Verkehrs-_und_Lagereibereich___in_Prozent_
         param_22 = arcpy.Parameter()
@@ -924,6 +982,8 @@ class Nutzungen(object):
         param_22.direction = 'Input'
         param_22.datatype = u'Long'
         param_22.value = u'10'
+        param_22.filter.type = 'Range'
+        param_22.filter.list = [0, 100]
 
         # Anteil_der_Arbeitsplätze_im_Bereich_der_freiberuflichen__wissenschaftl__bzw__techn__Dienstleistungen__in_Prozent_
         param_23 = arcpy.Parameter()
@@ -933,6 +993,8 @@ class Nutzungen(object):
         param_23.direction = 'Input'
         param_23.datatype = u'Long'
         param_23.value = u'14'
+        param_23.filter.type = 'Range'
+        param_23.filter.list = [0, 100]
 
         # Anteil_der_Arbeitsplätze_im_Bereich_sonstiger_Diensteistungen
         param_24 = arcpy.Parameter()
@@ -942,6 +1004,8 @@ class Nutzungen(object):
         param_24.direction = 'Input'
         param_24.datatype = u'Long'
         param_24.value = u'13'
+        param_24.filter.type = 'Range'
+        param_24.filter.list = [0, 100]
 
         # Wie_viel_Prozent_der_Unternehmen_werden_neu_in_die_Gemeinde_ziehen_
         param_25 = arcpy.Parameter()
@@ -951,6 +1015,8 @@ class Nutzungen(object):
         param_25.direction = 'Input'
         param_25.datatype = u'Long'
         param_25.value = u'80'
+        param_25.filter.type = 'Range'
+        param_25.filter.list = [0, 100]
 
         # Welcher_Anteil_der_Gebäude_ist_voraussichtlich_im_Eigentum_der_Unternehmen_
         param_26 = arcpy.Parameter()
@@ -960,6 +1026,8 @@ class Nutzungen(object):
         param_26.direction = 'Input'
         param_26.datatype = u'Long'
         param_26.value = u'100'
+        param_26.filter.type = 'Range'
+        param_26.filter.list = [0, 100]
 
         # Verkaufsfläche__in_Quadratmetern_
         param_27 = arcpy.Parameter()
@@ -969,6 +1037,8 @@ class Nutzungen(object):
         param_27.direction = 'Input'
         param_27.datatype = u'Long'
         param_27.value = u'0'
+        param_27.filter.type = 'Range'
+        param_27.filter.list = [0, 20000]
     
         parameters= [param_1, param_2, param_3, param_4, param_5, param_6, 
                      param_7, param_8, param_9, param_10, param_11, param_12, 
