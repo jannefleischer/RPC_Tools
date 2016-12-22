@@ -21,14 +21,14 @@ import sys
 import arcpy
 
 
-def main():
+def main(parameters, messages):
     arcpy.env.overwriteOutput = True
 
     #Pfade einrichten
 
     i=-1
 
-    i+=1 ; projektname = arcpy.GetParameterAsText(i)
+    i+=1 ; projektname = parameters[i].valueAsText
 
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
     workspace_projekt_definition =  os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
@@ -60,13 +60,13 @@ def main():
     #############################################################################################################
     #Puffern und Entstehende Elemente Zusammenfuehren (Dissolve)
     schrittmeldung = '2000m Umring um Teilflaechen des Plangebietes erstellen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     arcpy.Buffer_analysis(Teilflaechen_Plangebiet, Teilflaechen_Plangebiet_Buffer, "2000 Meters", "FULL", "ROUND", "NONE", "")
 
     schrittmeldung = 'Entstehende Elemente zu einem Projektumkreis zusammenfuehren \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     arcpy.Dissolve_management(Teilflaechen_Plangebiet_Buffer, bounding_box, "", "", "MULTI_PART", "DISSOLVE_LINES")
@@ -74,7 +74,7 @@ def main():
     #############################################################################################################
     #Zensus 2011 Raster zuschneiden
     schrittmeldung = 'Zensus-2011-Raster zuschneiden'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     # ClipDeutschlandRaster
@@ -86,7 +86,7 @@ def main():
     #############################################################################################################
     #SiedlungszellenIDs erzeugen
     schrittmeldung = 'SiedlungszellenIDs und Einwohnerzahl erzeugen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     # Felder hinzufügen
@@ -103,13 +103,13 @@ def main():
     #############################################################################################################
     # Einladen der Umgebungslayer
     beginmeldung = 'Starte Ueberarbeitung Uebergabepunkte \n'
-    arcpy.AddMessage(beginmeldung)
+    messages.AddMessage(beginmeldung)
     print beginmeldung
 
     #############################################################################################################
     # Schritt 1 - Fuege Layer hinzu
     schrittmeldung = 'Fuege Layer hinzu \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     OSM_Baselayer = arcpy.mapping.Layer(os.path.join(directory_tool_verkehr,'OpenStreetMap.lyr'))
@@ -147,7 +147,7 @@ def main():
     #############################################################################################################
     #Aufraeumen und ueberfluessige Variablen loeschen
     schrittmeldung = 'Aufraeumen und ueberfluessige Variablen loeschen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     deletelist = [clippedRaster, bounding_box, Teilflaechen_Plangebiet_Buffer]
@@ -166,7 +166,4 @@ def main():
     gc.collect()
     message = 'Script abgeschlossen'
     print message
-    arcpy.AddMessage(message)
-
-if __name__ == '__main__':
-    main()
+    messages.AddMessage(message)
