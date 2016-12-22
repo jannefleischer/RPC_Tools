@@ -16,33 +16,33 @@
 # Import arcpy modules
 import arcpy, os, sys
 
-def main():
+def main(parameters, messages):
     arcpy.env.overwriteOutput = True
 
 
     # Variablen definieren
     i=-1
-    i+=1;projektname = arcpy.GetParameterAsText(i)
-    i+=1;teilflaeche = arcpy.GetParameterAsText(i)
-    i+=1;startjahr = arcpy.GetParameterAsText(i)
+    i+=1;projektname = parameters[i].valueAsText
+    i+=1;teilflaeche = parameters[i].valueAsText
+    i+=1;startjahr = parameters[i].valueAsText
 
-    i+=1;verkehrsflaeche = int(arcpy.GetParameterAsText(i))
-    i+=1;gruenflaeche = int(arcpy.GetParameterAsText(i))
-    i+=1;sonst_flaechen = int(arcpy.GetParameterAsText(i))
-    i+=1;nettobauland = int(arcpy.GetParameterAsText(i))
+    i+=1;verkehrsflaeche = int(parameters[i].valueAsText)
+    i+=1;gruenflaeche = int(parameters[i].valueAsText)
+    i+=1;sonst_flaechen = int(parameters[i].valueAsText)
+    i+=1;nettobauland = int(parameters[i].valueAsText)
 
-    i+=1;gewerbeflaeche = int(arcpy.GetParameterAsText(i))
-    i+=1;nettowohnbauland = int(arcpy.GetParameterAsText(i))
+    i+=1;gewerbeflaeche = int(parameters[i].valueAsText)
+    i+=1;nettowohnbauland = int(parameters[i].valueAsText)
 
-    i+=1;laermschutz = int(arcpy.GetParameterAsText(i))
-    i+=1;privatwege = int(arcpy.GetParameterAsText(i))
-    i+=1;aeussere_erschliessung = int(arcpy.GetParameterAsText(i))
-    i+=1;innere_erschliessung = int(arcpy.GetParameterAsText(i))
+    i+=1;laermschutz = int(parameters[i].valueAsText)
+    i+=1;privatwege = int(parameters[i].valueAsText)
+    i+=1;aeussere_erschliessung = int(parameters[i].valueAsText)
+    i+=1;innere_erschliessung = int(parameters[i].valueAsText)
 
-    i+=1;spielplatz = int(arcpy.GetParameterAsText(i))
-    i+=1;strassenbegleitgruen = int(arcpy.GetParameterAsText(i))
-    i+=1;ausgleich = int(arcpy.GetParameterAsText(i))
-    i+=1;allg_gruenflaeche = int(arcpy.GetParameterAsText(i))
+    i+=1;spielplatz = int(parameters[i].valueAsText)
+    i+=1;strassenbegleitgruen = int(parameters[i].valueAsText)
+    i+=1;ausgleich = int(parameters[i].valueAsText)
+    i+=1;allg_gruenflaeche = int(parameters[i].valueAsText)
 
     #Pfade einrichten
     base_path = str(sys.path[0]).split("2_Tool")[0]
@@ -80,6 +80,3 @@ def main():
     cursor.insertRow((teilflaeche,startjahr,'Gruenflaeche','Allgemeine Gruenflaechen',gruenflaeche,allg_gruenflaeche,flaeche * gruenflaeche / 100 * allg_gruenflaeche / 100))
 
     cursor.insertRow((teilflaeche,startjahr,'Sonstige Flaechen','Sonstige Flaechen',sonst_flaechen,sonst_flaechen,flaeche* sonst_flaechen / 100))
-
-if __name__ == "__main__":
-    main()

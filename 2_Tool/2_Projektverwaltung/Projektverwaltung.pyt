@@ -9,12 +9,6 @@ import arcpy
 import teilflaecheBenennen
 import _projektVerwaltung
 
-def set_parameter_as_text(params, index, val):
-    if (hasattr(params[index].value, 'value')):
-        params[index].value.value = val
-    else:
-        params[index].value = val
-
 # Export of toolbox C:\GGR\RPC_Tools\2_Tool\2_Projektverwaltung\T2_Projektverwaltung.tbx
 
 class Toolbox(object):
@@ -41,7 +35,6 @@ class TeilflaecheBenennen(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            import os, arcpy
 
             tbx_path = __file__
 
@@ -85,7 +78,6 @@ class TeilflaecheBenennen(object):
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             #import os, arcpy, win32ui, win32con
-            import os, arcpy
 
             tbx_path = __file__
 

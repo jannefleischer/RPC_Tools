@@ -9,9 +9,10 @@ from xlsxwriter.utility import xl_rowcol_to_cell, xl_col_to_name
 import arcpy, os
 import gc
 
-def main():
-    projectname = arcpy.GetParameterAsText(0)
-    parameterString = arcpy.GetParameterAsText(1)
+def main(parameters, messages):
+    
+    projectname = parameters[0].valueAsText
+    parameterString = parameters[1].valueAsText
 
     base_path = str(sys.path[0]).split("2_Tool")[0]
     Teilflaeche_Plangebiet = parameterString.split(" | ")[0]
@@ -68,48 +69,48 @@ def main():
 
     cursor = arcpy.da.UpdateCursor(plangebiet, ['Name','Beginn_Nutzung','Aufsiedlungsdauer'])
     for row in cursor:
-        if row[0] == arcpy.GetParameterAsText(1):
-            row[1] = arcpy.GetParameterAsText(2)
-            row[2] = arcpy.GetParameterAsText(3)
+        if row[0] == parameters[1].valueAsText:
+            row[1] = parameters[2].valueAsText
+            row[2] = parameters[3].valueAsText
             cursor.updateRow(row)
 
-    for i in range(0,int(arcpy.GetParameterAsText(3))):
+    for i in range(0,int(parameters[3].valueAsText)):
 
-        jahr = int(arcpy.GetParameterAsText(2)) + i
+        jahr = int(parameters[2].valueAsText) + i
 
-        arcpy.AddMessage(jahr)
+        messages.AddMessage(jahr)
         Insert = arcpy.da.InsertCursor(tabelle_gebaude, ['Teilflaeche_Plangebiet','Gebaeudetyp','Anzahl_Gebaeude','Jahr'])
         row = ["","","",""]
 
         #Ein- und Zweifamilienhäuser
-        if int(arcpy.GetParameterAsText(4)) >0:
-            row[0] = arcpy.GetParameterAsText(1)
+        if int(parameters[4].valueAsText) >0:
+            row[0] = parameters[1].valueAsText
             row[1] = "Einfamilienhaus"
-            row[2] = int(arcpy.GetParameterAsText(4)) / int(arcpy.GetParameterAsText(3))
+            row[2] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText)
             row[3] = jahr
             Insert.insertRow(row)
 
         #Doppelhäuser
-        if int(arcpy.GetParameterAsText(5)) >0:
-            row[0] = arcpy.GetParameterAsText(1)
+        if int(parameters[5].valueAsText) >0:
+            row[0] = parameters[1].valueAsText
             row[1] = "Zweifamilien- oder Doppelhaus"
-            row[2] =  int(arcpy.GetParameterAsText(5)) / int(arcpy.GetParameterAsText(3))
+            row[2] =  int(parameters[5].valueAsText) / int(parameters[3].valueAsText)
             row[3] = jahr
             Insert.insertRow(row)
 
         #Reihenhäuser
-        if int(arcpy.GetParameterAsText(6)) >0:
-            row[0] = arcpy.GetParameterAsText(1)
+        if int(parameters[6].valueAsText) >0:
+            row[0] = parameters[1].valueAsText
             row[1] = "Reihenhaus"
-            row[2] =  int(arcpy.GetParameterAsText(6)) / int(arcpy.GetParameterAsText(3))
+            row[2] =  int(parameters[6].valueAsText) / int(parameters[3].valueAsText)
             row[3] = jahr
             Insert.insertRow(row)
 
         #Mehrfamilienhäuser
-        if int(arcpy.GetParameterAsText(7)) >0:
-            row[0] = arcpy.GetParameterAsText(1)
+        if int(parameters[7].valueAsText) >0:
+            row[0] = parameters[1].valueAsText
             row[1] = "Mehrfamilienhaus"
-            row[2] =  int(arcpy.GetParameterAsText(7)) / int(arcpy.GetParameterAsText(3))
+            row[2] =  int(parameters[7].valueAsText) / int(parameters[3].valueAsText)
             row[3] = jahr
             Insert.insertRow(row)
 
@@ -122,63 +123,63 @@ def main():
         row = ["","","","","","",""]
 
         #Ein- und Zweifamilienhäuser
-        eigentum = int(arcpy.GetParameterAsText(8))
-        miete = 100 - int(arcpy.GetParameterAsText(8))
+        eigentum = int(parameters[8].valueAsText)
+        miete = 100 - int(parameters[8].valueAsText)
         nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
         for nutzungstyp in nutzungstypen:
             row[0] = "Einfamilienhaus"
-            row[1] = arcpy.GetParameterAsText(1)
+            row[1] = parameters[1].valueAsText
             row[2] = nutzungstyp[1]
-            row[3] = float((arcpy.GetParameterAsText(12).split(" ")[0]).replace(",", "."))
+            row[3] = float((parameters[12].valueAsText.split(" ")[0]).replace(",", "."))
             row[4] = jahr
-            row[5] = int(arcpy.GetParameterAsText(4)) / int(arcpy.GetParameterAsText(3)) * nutzungstyp[0] / 100
-            row[6] = arcpy.GetParameterAsText(8)
+            row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
+            row[6] = parameters[8].valueAsText
             Insert.insertRow(row)
 
         #Doppelhäuser
-        eigentum = int(arcpy.GetParameterAsText(9))
-        miete = 100 - int(arcpy.GetParameterAsText(9))
+        eigentum = int(parameters[9].valueAsText)
+        miete = 100 - int(parameters[9].valueAsText)
         nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
         for nutzungstyp in nutzungstypen:
             row[0] = "Zweifamilien- oder Doppelhaus"
-            row[1] = arcpy.GetParameterAsText(1)
+            row[1] = parameters[1].valueAsText
             row[2] = nutzungstyp[1]
-            row[3] = float((arcpy.GetParameterAsText(12).split(" ")[0]).replace(",", "."))
+            row[3] = float((parameters[12].valueAsText.split(" ")[0]).replace(",", "."))
             row[4] = jahr
-            row[5] = int(arcpy.GetParameterAsText(4)) / int(arcpy.GetParameterAsText(3)) * nutzungstyp[0] / 100
-            row[6] = arcpy.GetParameterAsText(9)
+            row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
+            row[6] = parameters[9].valueAsText
             Insert.insertRow(row)
 
         #Reihenhäuser
-        eigentum = int(arcpy.GetParameterAsText(10))
-        miete = 100 - int(arcpy.GetParameterAsText(10))
+        eigentum = int(parameters[10].valueAsText)
+        miete = 100 - int(parameters[10].valueAsText)
         nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
         for nutzungstyp in nutzungstypen:
             row[0] = "Reihenhaus"
-            row[1] = arcpy.GetParameterAsText(1)
+            row[1] = parameters[1].valueAsText
             row[2] = nutzungstyp[1]
-            row[3] = float((arcpy.GetParameterAsText(12).split(" ")[0]).replace(",", "."))
+            row[3] = float((parameters[12].valueAsText.split(" ")[0]).replace(",", "."))
             row[4] = jahr
-            row[5] = int(arcpy.GetParameterAsText(4)) / int(arcpy.GetParameterAsText(3)) * nutzungstyp[0] / 100
-            row[6] = arcpy.GetParameterAsText(10)
+            row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
+            row[6] = parameters[10].valueAsText
             Insert.insertRow(row)
 
         #RMehrfamilienhäuser
-        eigentum = int(arcpy.GetParameterAsText(11))
-        miete = 100 - int(arcpy.GetParameterAsText(11))
+        eigentum = int(parameters[11].valueAsText)
+        miete = 100 - int(parameters[11].valueAsText)
         nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
         for nutzungstyp in nutzungstypen:
             row[0] = "Mehrfamilienhaus"
-            row[1] = arcpy.GetParameterAsText(1)
+            row[1] = parameters[1].valueAsText
             row[2] = nutzungstyp[1]
-            row[3] = float((arcpy.GetParameterAsText(12).split(" ")[0]).replace(",", "."))
+            row[3] = float((parameters[12].valueAsText.split(" ")[0]).replace(",", "."))
             row[4] = jahr
-            row[5] = int(arcpy.GetParameterAsText(4)) / int(arcpy.GetParameterAsText(3)) * nutzungstyp[0] / 100
-            row[6] = arcpy.GetParameterAsText(11)
+            row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
+            row[6] = parameters[11].valueAsText
             Insert.insertRow(row)
 
     del row, Insert
@@ -188,16 +189,16 @@ def main():
 
     Insert = arcpy.InsertCursor(tabelle_gewerbeanteile)
     row = Insert.newRow()
-    row.setValue("teilflaeche", arcpy.GetParameterAsText(1))
-    row.setValue("branche", arcpy.GetParameterAsText(17))
-    row.setValue("Anteil_A", arcpy.GetParameterAsText(18))
-    row.setValue("Anteil_B", arcpy.GetParameterAsText(19))
-    row.setValue("Anteil_C", arcpy.GetParameterAsText(20))
-    row.setValue("Anteil_D", arcpy.GetParameterAsText(21))
-    row.setValue("Anteil_E", arcpy.GetParameterAsText(22))
-    row.setValue("Anteil_F", arcpy.GetParameterAsText(23))
-    row.setValue("Anteil_Zuzug", arcpy.GetParameterAsText(24))
-    row.setValue("Anteil_Eigentum", arcpy.GetParameterAsText(25))
+    row.setValue("teilflaeche", parameters[1].valueAsText)
+    row.setValue("branche", parameters[17].valueAsText)
+    row.setValue("Anteil_A", parameters[18].valueAsText)
+    row.setValue("Anteil_B", parameters[19].valueAsText)
+    row.setValue("Anteil_C", parameters[20].valueAsText)
+    row.setValue("Anteil_D", parameters[21].valueAsText)
+    row.setValue("Anteil_E", parameters[22].valueAsText)
+    row.setValue("Anteil_F", parameters[23].valueAsText)
+    row.setValue("Anteil_Zuzug", parameters[24].valueAsText)
+    row.setValue("Anteil_Eigentum", parameters[25].valueAsText)
     Insert.insertRow(row)
     del row, Insert
 
@@ -227,7 +228,7 @@ def main():
         if matchcount == 0:
             b='Zuordnung zu einer Gemeinde unmoeglich - Kontaktieren Sie den Programmierer.'
             print b
-            arcpy.AddMessage(b)
+            messages.AddMessage(b)
             exit(1)
         else:
             AGS=0
@@ -292,20 +293,20 @@ def main():
             for p in cur_Search_teilzeit:
                 laenge= len(str(p.NR))
                 if (p.Nr == int(str(GAGS)[:laenge])):
-    ##                print p.Nr
+            ##                print p.Nr
                     b1=0
                     faktor=0
                     for branchen in array_branche_anzahl:
                         faktor=p.getValue(branchen[0])
                         b1 += (faktor*branchen[1])/100.
-    ##                    print "Faktor ",faktor,"Branche",branchen[0],"Anzahl Besch",branchen[1] ,"Ergebnis",faktor*branchen[1]
+                ##                    print "Faktor ",faktor,"Branche",branchen[0],"Anzahl Besch",branchen[1] ,"Ergebnis",faktor*branchen[1]
                     b1=int(b1)
                     array_ergebnis.append(["Teilzeit",b1])
                     break
-    ##        print "Summe der einzelnen Ergebnisse ",b1
-    ##        print array_ergebnis
+        ##        print "Summe der einzelnen Ergebnisse ",b1
+        ##        print array_ergebnis
             del cur_Search_teilzeit
-    ##        print "Geringfuegig"
+        ##        print "Geringfuegig"
             cur_Search_gering = arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"gewerbe_geringfuegig"))
             for p in cur_Search_gering:
                 laenge= len(str(p.NR))
@@ -320,7 +321,7 @@ def main():
                     array_ergebnis.append(["Geringfuegig",b1])
                     break
 
-    ##        print array_ergebnis
+        ##        print array_ergebnis
             del cur_Search_gering
             print "Akademisch"
             cur_Search_akademisch = arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"gewerbe_akademisch"))
@@ -344,8 +345,8 @@ def main():
 
             try:
                 arcpy.Delete_management(os.path.join(workspace_definition,"Gewerbe_Beschaeftigte_Zahlen"))
-    ##            arcpy.Delete_management(os.path.join(workspace_definition,"Gewerbe_Beschaeftigte_Zahlen"))
-    ##            arcpy.DeleteFeatures_management("Gewerbe_Beschaeftigte_Zahlen")
+        ##            arcpy.Delete_management(os.path.join(workspace_definition,"Gewerbe_Beschaeftigte_Zahlen"))
+        ##            arcpy.DeleteFeatures_management("Gewerbe_Beschaeftigte_Zahlen")
             except:
                 pass
 
@@ -355,7 +356,7 @@ def main():
             except:
                 a="Fehler Gewerbe_Beschaeftigte_Zahlen konnte nicht erstellt werden. Bitte ArcGis neustarten oder alle Files schliessen."
                 print a
-                arcpy.AddError(a)
+                messages.AddErrorMessage(a)
                 exit(1)
 
             try:
@@ -365,7 +366,7 @@ def main():
             except:
                 a="Fehler Gewerbe_Beschaeftigte_Zahlen konnte nicht erstellt werden. Bitte ArcGis neustarten oder alle Files schliessen."
                 print a
-                arcpy.AddError(a)
+                messages.AddErrorMessage(a)
                 exit(1)
 
             cur_Ins_beschaef= arcpy.InsertCursor(os.path.join(workspace_definition,"Gewerbe_Beschaeftigte_Zahlen"))
@@ -380,24 +381,24 @@ def main():
 
 
     schrittmeldung = 'Eingaben werden gelesen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     #Parameter aus Tool auslesen
 
-    projektname = arcpy.GetParameterAsText(0)
-    teilflaeche = arcpy.GetParameterAsText(1)
-    startjahr = arcpy.GetParameterAsText(2)
-    aufsiedlungsdauer = arcpy.GetParameterAsText(3)
-    gebtyp = arcpy.GetParameterAsText(17)
-    zuzugsquote = arcpy.GetParameterAsText(24)
-    eigentumsquote = arcpy.GetParameterAsText(25)
-    Ant_Betr_VerarbGew = arcpy.GetParameterAsText(18)
-    Ant_Betr_BauGew = arcpy.GetParameterAsText(19)
-    Ant_Betr_HanKfZ = arcpy.GetParameterAsText(20)
-    Ant_Betr_VerLag = arcpy.GetParameterAsText(21)
-    Ant_Betr_FrWiTeDi = arcpy.GetParameterAsText(22)
-    Ant_Betr_SoDi = arcpy.GetParameterAsText(23)
+    projektname = parameters[0].valueAsText
+    teilflaeche = parameters[1].valueAsText
+    startjahr = parameters[2].valueAsText
+    aufsiedlungsdauer = parameters[3].valueAsText
+    gebtyp = parameters[17].valueAsText
+    zuzugsquote = parameters[24].valueAsText
+    eigentumsquote = parameters[25].valueAsText
+    Ant_Betr_VerarbGew = parameters[18].valueAsText
+    Ant_Betr_BauGew = parameters[19].valueAsText
+    Ant_Betr_HanKfZ = parameters[20].valueAsText
+    Ant_Betr_VerLag = parameters[21].valueAsText
+    Ant_Betr_FrWiTeDi = parameters[22].valueAsText
+    Ant_Betr_SoDi = parameters[23].valueAsText
 
     if gebtyp != "<kein Gewerbegebiet vorhanden>":
 
@@ -511,7 +512,7 @@ def main():
             ######################################################
             # Anzahl der Betriebe nach Branchen bestimmen
             schrittmeldung = 'Branchenstrukturberechnung wird vorbereitet \n'
-            arcpy.AddMessage(schrittmeldung)
+            messages.AddMessage(schrittmeldung)
             print schrittmeldung
 
             # erstmal Pfade definieren
@@ -546,7 +547,7 @@ def main():
 
             #daraus die Flächenanteile ermitteln
             schrittmeldung = 'Gewerbeflaeche nach Branchen wird berechnet \n'
-            arcpy.AddMessage(schrittmeldung)
+            messages.AddMessage(schrittmeldung)
             print schrittmeldung
 
             gewerbebauland = float(s2_GewBauland)
@@ -559,7 +560,7 @@ def main():
 
             #und über die BFG wieder zur Anzahl der Betriebe
             schrittmeldung = 'Betriebszahl nach Branchen wird berechnet \n'
-            arcpy.AddMessage(schrittmeldung)
+            messages.AddMessage(schrittmeldung)
             print schrittmeldung
             BFGfaktor = 1.00
             if gebtyp == "Industriegebiet":
@@ -602,7 +603,7 @@ def main():
 
             #und nun noch die Beschäftigten berechnen
             schrittmeldung = 'Beschaeftigtenzahl nach Branchen wird berechnet \n'
-            arcpy.AddMessage(schrittmeldung)
+            messages.AddMessage(schrittmeldung)
             print schrittmeldung
 
             tabelle_FKZ = os.path.join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_flaechenkennziffern')
@@ -632,7 +633,7 @@ def main():
             ################################################
             ### Aufsiedlugnsdauer einrechnen
             schrittmeldung = 'Aufsiedlungsdauer wird auf Flaechen-, Betriebs- Beschaeftigtenstruktur umgelegt \n'
-            arcpy.AddMessage(schrittmeldung)
+            messages.AddMessage(schrittmeldung)
             print schrittmeldung
 
             #### Aufsiedlugnsdauer Betriebe
@@ -1231,7 +1232,7 @@ def main():
             ## Gebaeude berechnen
 
             schrittmeldung = 'Gebaeudedaten werden berechnet \n'
-            arcpy.AddMessage(schrittmeldung)
+            messages.AddMessage(schrittmeldung)
             print str(schrittmeldung)
 
             tabelle_gebaeudegrundlagen = os.path.join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_gebaeude')
@@ -1392,7 +1393,7 @@ def main():
             ## Tabelle Gewerbe_teilflaechen fuellen
 
             schrittmeldung = 'Projektinformationen werden zusammengefasst und in Datenbank geschrieben \n'
-            arcpy.AddMessage(schrittmeldung)
+            messages.AddMessage(schrittmeldung)
             print str(schrittmeldung)
 
             tabelle_teilflaeche = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb','Gewerbe_Teilflaechen')
@@ -1486,7 +1487,7 @@ def main():
 
             beschaeftigte_gewerbe(projektname)
             schrittmeldung = 'Die Berechnungen sind abgeschlossen  \n'
-            arcpy.AddMessage(schrittmeldung)
+            messages.AddMessage(schrittmeldung)
             print str(schrittmeldung)
 
 
@@ -1505,7 +1506,7 @@ def main():
         ##########################################################################
         ## Ergebnisausgabe
             schrittmeldung = 'Die Ergebnisausgabe wird erzeugt. Dies kann wenige Minuten in Anspruch nehmen. \n'
-            arcpy.AddMessage(schrittmeldung)
+            messages.AddMessage(schrittmeldung)
             print str(schrittmeldung)
 
             # Pfade setzen
@@ -2217,19 +2218,19 @@ def main():
             try:
                 wb.close()
             except:
-                arcpy.AddMessage("Es liegt ein Fehler beim Speichern der Ausgabedatei vor. Ist diese ggf. noch geoeffnet?")
+                messages.AddMessage("Es liegt ein Fehler beim Speichern der Ausgabedatei vor. Ist diese ggf. noch geoeffnet?")
 
             schrittmeldung = 'Die Ergebnisausgabe wurde erzeugt. Das Tool wurde erfolgreich angewendet.  \n'
-            arcpy.AddMessage(schrittmeldung)
+            messages.AddMessage(schrittmeldung)
 
 
 
     #EINZELHANDEL
-    projectname = arcpy.GetParameterAsText(0)
+    projectname = parameters[0].valueAsText
     tabelle_gebaude = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Gebaeude_Details')
     Insert = arcpy.InsertCursor(tabelle_gebaude)
     row = Insert.newRow()
-    row.Teilflaeche_Plangebiet = arcpy.GetParameterAsText(1)
+    row.Teilflaeche_Plangebiet = parameters[1].valueAsText
     row.Gebaeudetyp = "Einzelhandel"
     Insert.insertRow(row)
     del row, Insert
@@ -2240,7 +2241,7 @@ def main():
     row = Insert.newRow()
     row.Gebaeudetyp = "Einzelhandel"
     row.Wohnflaeche_qm = 0
-    row.Teilflaeche_Plangebiet = arcpy.GetParameterAsText(1)
+    row.Teilflaeche_Plangebiet = parameters[1].valueAsText
     row.Miete_Eigentum = 100
     row.Anzahl_WE = 0
     row.Jahr = jahr
@@ -2252,11 +2253,8 @@ def main():
     tabelle_Versorgung_Verkaufsflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Versorgung_Verkaufsflaechen')
     Insert = arcpy.InsertCursor(tabelle_Versorgung_Verkaufsflaechen)
     row = Insert.newRow()
-    row.Teilflaeche_Plangebiet = arcpy.GetParameterAsText(1)
-    row.Verkaufsflaeche = arcpy.GetParameterAsText(26)
+    row.Teilflaeche_Plangebiet = parameters[1].valueAsText
+    row.Verkaufsflaeche = parameters[26].valueAsText
     Insert.insertRow(row)
     del row, Insert
     gc.collect()
-
-if __name__ == "__main__":
-    main()

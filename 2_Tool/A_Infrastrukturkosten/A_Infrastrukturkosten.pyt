@@ -16,8 +16,6 @@ def set_parameter_as_text(params, index, val):
 
 # Export of toolbox F:\ggr Projekte\RPC_Tools\2_Tool\A_Infrastrukturkosten\A_Infrastrukturkosten.tbx
 
-import arcpy
-
 class Toolbox(object):
     def __init__(self):
         self.label = u'11_Definition_Projekt_Tool'
@@ -41,7 +39,6 @@ class Infrastrukturkostenermittlung(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            import os, arcpy
         
             tbx_path = __file__
     
@@ -117,9 +114,7 @@ class Infrastrukturkostenermittlung(object):
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
-            has been changed."""
-            import os, arcpy
-        
+            has been changed."""        
             
             tbx_path = __file__
     
