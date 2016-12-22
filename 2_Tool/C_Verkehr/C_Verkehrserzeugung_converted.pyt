@@ -28,6 +28,7 @@ class Routingsdurchfuehren(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
+            reload(T2_Routings_durchfuehren)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -146,7 +147,7 @@ class VerkehrsmengenErmitteln(object):
         
             i+=1 ; self.params[0].filter.list = list_projects 
         
-            heading = "01 - Parameter für Wohnnutzungen".encode('CP1252')
+            heading = u"01 - Parameter für Wohnnutzungen"
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
@@ -154,7 +155,7 @@ class VerkehrsmengenErmitteln(object):
             i+=1 ; self.params[i].category = heading
         
         
-            heading = "02 - Parameter für Einzelhandel".encode('CP1252')
+            heading = u"02 - Parameter für Einzelhandel"
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
@@ -163,7 +164,7 @@ class VerkehrsmengenErmitteln(object):
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
         
-            heading = "03 - Parameter für Gewerbebetriebe".encode('CP1252')
+            heading = u"03 - Parameter für Gewerbebetriebe"
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
@@ -171,7 +172,7 @@ class VerkehrsmengenErmitteln(object):
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
         
-            heading = "04 - Parameter für Schulen".encode('CP1252')
+            heading = "04 - Parameter für Schulen"
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
@@ -467,6 +468,7 @@ class Basisdatenbearbeiten(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
+            reload(T1_Basisdaten_bearbeiten)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -537,5 +539,5 @@ class Basisdatenbearbeiten(object):
         if validator:
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
-        T3_Verkehrsmengen_ermitteln.main(parameters, messages)
+        T1_Basisdaten_bearbeiten.main(parameters, messages)
             
