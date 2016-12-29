@@ -46,31 +46,31 @@ def main(parameters, messages):
 
     #Eingangsparameter Wohnen
     i+=1 ; Wohnen_Wege_EW = parameters[i].value
-    i+=1 ; Wohnen_MIV_Anteil = parameters[i].value
+    i+=1 ; Wohnen_MIV_Anteil = parameters[i].value / 100.
     i+=1 ; Wohnen_Pers_KFZ = parameters[i].value
-    i+=1 ; Wohnen_Anteil_Besucherfahrten = parameters[i].value
+    i+=1 ; Wohnen_Anteil_Besucherfahrten = parameters[i].value / 100.
     i+=1 ; Wohnen_WF_Fahrten_je_EW = parameters[i].value
 
     #Eingangsparameter Versorgung
     i+=1 ; Versorgung_BGF_Beschaeftigter = parameters[i].value
     i+=1 ; Versorgung_Anwesenheit = parameters[i].value
     i+=1 ; Versorgung_Wege_Beschaeftigter = parameters[i].value
-    i+=1 ; Versorgung_MIV_Anteil = parameters[i].value
+    i+=1 ; Versorgung_MIV_Anteil = parameters[i].value / 100.
     i+=1 ; Versorgung_Pers_KFZ = parameters[i].value
     i+=1 ; Versorgung_Besucher_Tag = parameters[i].value
     i+=1 ; Versorgung_Lieferwege_100m2 = parameters[i].value
 
     #Eingangsparameter Gewerbe
-    i+=1 ; Gewerbe_Anwesenheit = parameters[i].value
+    i+=1 ; Gewerbe_Anwesenheit = parameters[i].value / 100.
     i+=1 ; Gewerbe_Wege_Beschaeftigter = parameters[i].value
-    i+=1 ; Gewerbe_MIV_Anteil = parameters[i].value
+    i+=1 ; Gewerbe_MIV_Anteil = parameters[i].value / 100.
     i+=1 ; Gewerbe_Pers_KFZ = parameters[i].value
-    i+=1 ; Gewerbe_Anteil_Besucherfahrten = parameters[i].value
+    i+=1 ; Kundenwege_Beschaeftigte = parameters[i].value
     i+=1 ; Gewerbe_Lieferwege_Beschaeftigte = parameters[i].value
 
     #Eingangsparameter Schulen
     i+=1 ; Schulen_Wege_Schueler = parameters[i].value
-    i+=1 ; Schulen_MIV_Anteil = parameters[i].value
+    i+=1 ; Schulen_MIV_Anteil = parameters[i].value / 100.
     i+=1 ; Schulen_Schueler_KFZ = parameters[i].value
     i+=1 ; Schulen_Schueler_je_Lehrer = parameters[i].value
     i+=1 ; Schulen_Wege_Lehrer = parameters[i].value
@@ -327,7 +327,7 @@ def main(parameters, messages):
         #Starte Berechnungen je Siedlungszelle
         fahrten_EW = v.verkehrserzeugung_einwohner(EW,Wohnen_Wege_EW,Wohnen_MIV_Anteil,Wohnen_Pers_KFZ,Wohnen_Anteil_Besucherfahrten,Wohnen_WF_Fahrten_je_EW)
         fahrten_versorgung = v.verkehrserzeugung_einzelhandel(BGF,Versorgung_BGF_Beschaeftigter,Versorgung_Anwesenheit,Versorgung_Wege_Beschaeftigter,Versorgung_MIV_Anteil,Versorgung_Pers_KFZ,Versorgung_Besucher_Tag,Versorgung_Lieferwege_100m2)
-        fahrten_gewerbe = v.verkehrserzeugung_gewerbe(Beschaeftigte,Gewerbe_Anwesenheit,Gewerbe_Wege_Beschaeftigter,Gewerbe_MIV_Anteil,Gewerbe_Pers_KFZ,Gewerbe_Anteil_Besucherfahrten,Gewerbe_Lieferwege_Beschaeftigte)
+        fahrten_gewerbe = v.verkehrserzeugung_gewerbe(Beschaeftigte,Gewerbe_Anwesenheit,Gewerbe_Wege_Beschaeftigter,Gewerbe_MIV_Anteil,Gewerbe_Pers_KFZ,Kundenwege_Beschaeftigte,Gewerbe_Lieferwege_Beschaeftigte)
         fahrten_schule = v.verkehrserzeugung_schulen(Schueler,Schulen_Wege_Schueler,Schulen_MIV_Anteil,Schulen_Schueler_KFZ,Schulen_Schueler_je_Lehrer,Schulen_Wege_Lehrer,Schulen_Pers_KFZ,Schulen_Lieferwege_Schueler)
 
         rows2 = arcpy.UpdateCursor(siedlungszellenlayer_eingangsdaten)
@@ -382,7 +382,7 @@ def main(parameters, messages):
         #Starte Berechnungen je Projektteilflaeche
         fahrten_EW = v.verkehrserzeugung_einwohner(EW,Wohnen_Wege_EW,Wohnen_MIV_Anteil,Wohnen_Pers_KFZ,Wohnen_Anteil_Besucherfahrten,Wohnen_WF_Fahrten_je_EW)
         fahrten_versorgung = v.verkehrserzeugung_einzelhandel(BGF,Versorgung_BGF_Beschaeftigter,Versorgung_Anwesenheit,Versorgung_Wege_Beschaeftigter,Versorgung_MIV_Anteil,Versorgung_Besucher_Tag,Versorgung_Pers_KFZ,Versorgung_Lieferwege_100m2)
-        fahrten_gewerbe = v.verkehrserzeugung_gewerbe(Beschaeftigte,Gewerbe_Anwesenheit,Gewerbe_Wege_Beschaeftigter,Gewerbe_MIV_Anteil,Gewerbe_Pers_KFZ,Gewerbe_Anteil_Besucherfahrten,Gewerbe_Lieferwege_Beschaeftigte)
+        fahrten_gewerbe = v.verkehrserzeugung_gewerbe(Beschaeftigte,Gewerbe_Anwesenheit,Gewerbe_Wege_Beschaeftigter,Gewerbe_MIV_Anteil,Gewerbe_Pers_KFZ,Kundenwege_Beschaeftigte,Gewerbe_Lieferwege_Beschaeftigte)
         fahrten_schule = v.verkehrserzeugung_schulen(Schueler,Schulen_Wege_Schueler,Schulen_MIV_Anteil,Schulen_Schueler_KFZ,Schulen_Schueler_je_Lehrer,Schulen_Wege_Lehrer,Schulen_Pers_KFZ,Schulen_Lieferwege_Schueler)
 
         rows2 = arcpy.UpdateCursor(projektlayer_eingangsdaten)

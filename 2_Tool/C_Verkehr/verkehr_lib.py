@@ -116,9 +116,9 @@ def verkehrserzeugung_einzelhandel(BGF,BGF_Beschaeftigter,Anwesenheit,Wege_Besch
 
     return(fahrten_beschaeftigte_tag,fahrten_kunden_tag,fahrten_wf_tag)
 
-def verkehrserzeugung_gewerbe(Beschaeftigte,Anwesenheit,Wege_Beschaeftigter,MIV_Anteil,Pers_KFZ,Anteil_Besucherfahrten,Lieferwege_Beschaeftigte):
+def verkehrserzeugung_gewerbe(Beschaeftigte,Anwesenheit,Wege_Beschaeftigter,MIV_Anteil,Pers_KFZ,Kundenwege_Beschaeftigte,Lieferwege_Beschaeftigte):
     fahrten_beschaeftigte_tag = int((float(Beschaeftigte)*float(Anwesenheit)*float(Wege_Beschaeftigter)*float(MIV_Anteil)/float(Pers_KFZ)))
-    fahrten_besucher_tag = int((fahrten_beschaeftigte_tag)*float(Anteil_Besucherfahrten))
+    fahrten_besucher_tag = int((float(Beschaeftigte)*float(Kundenwege_Beschaeftigte)*float(MIV_Anteil)/float(Pers_KFZ)))
     fahrten_wf_tag = int((float(Beschaeftigte)*float(Lieferwege_Beschaeftigte)))
 
     return(fahrten_beschaeftigte_tag,fahrten_besucher_tag,fahrten_wf_tag)

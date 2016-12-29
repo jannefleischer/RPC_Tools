@@ -147,7 +147,7 @@ class VerkehrsmengenErmitteln(object):
         
             i+=1 ; self.params[0].filter.list = list_projects 
         
-            heading = u"01 - Parameter für Wohnnutzungen"
+            heading = u"01 - Parameter für Wohnnutzungen".encode('CP1252')
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
@@ -155,7 +155,7 @@ class VerkehrsmengenErmitteln(object):
             i+=1 ; self.params[i].category = heading
         
         
-            heading = u"02 - Parameter für Einzelhandel"
+            heading = u"02 - Parameter für Einzelhandel".encode('CP1252')
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
@@ -164,7 +164,7 @@ class VerkehrsmengenErmitteln(object):
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
         
-            heading = u"03 - Parameter für Gewerbebetriebe"
+            heading = u"03 - Parameter für Gewerbebetriebe".encode('CP1252')
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
@@ -172,7 +172,7 @@ class VerkehrsmengenErmitteln(object):
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
         
-            heading = "04 - Parameter für Schulen"
+            heading = u"04 - Parameter für Schulen".encode('CP1252')
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
@@ -211,7 +211,7 @@ class VerkehrsmengenErmitteln(object):
         # Wohnen_Wege_EW
         param_2 = arcpy.Parameter()
         param_2.name = u'Wohnen_Wege_EW'
-        param_2.displayName = u'Wohnen_Wege_EW'
+        param_2.displayName = u'Wege je Einwohner und Werktag'
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
         param_2.datatype = u'GPDouble'
@@ -220,16 +220,18 @@ class VerkehrsmengenErmitteln(object):
         # Wohnen_MIV_Anteil
         param_3 = arcpy.Parameter()
         param_3.name = u'Wohnen_MIV_Anteil'
-        param_3.displayName = u'Wohnen_MIV_Anteil'
+        param_3.displayName = u'MIV-Anteil'
         param_3.parameterType = 'Required'
         param_3.direction = 'Input'
-        param_3.datatype = u'GPDouble'
-        param_3.value = 0.65
+        param_3.datatype = u'Long'
+        param_3.value = 65
+        param_3.filter.type = 'Range'
+        param_3.filter.list = [0, 100]
 
         # Wohnen_Pers_KFZ
         param_4 = arcpy.Parameter()
         param_4.name = u'Wohnen_Pers_KFZ'
-        param_4.displayName = u'Wohnen_Pers_KFZ'
+        param_4.displayName = u'Personen je KFZ'
         param_4.parameterType = 'Required'
         param_4.direction = 'Input'
         param_4.datatype = u'GPDouble'
@@ -238,16 +240,18 @@ class VerkehrsmengenErmitteln(object):
         # Wohnen_Anteil_Besucherfahrten
         param_5 = arcpy.Parameter()
         param_5.name = u'Wohnen_Anteil_Besucherfahrten'
-        param_5.displayName = u'Wohnen_Anteil_Besucherfahrten'
+        param_5.displayName = u'Anteil der Besucherfahrten am Verkehrsaufkommen'
         param_5.parameterType = 'Required'
         param_5.direction = 'Input'
-        param_5.datatype = u'GPDouble'
-        param_5.value = 0.15
+        param_5.datatype = u'Long'
+        param_5.value = 15
+        param_5.filter.type = 'Range'
+        param_5.filter.list = [0, 100]
 
         # Wohnen_WF_Fahrten_je_EW
         param_6 = arcpy.Parameter()
         param_6.name = u'Wohnen_WF_Fahrten_je_EW'
-        param_6.displayName = u'Wohnen_WF_Fahrten_je_EW'
+        param_6.displayName = u'Wirtschaftsverkehrsfahrten je Einwohner und Werktag'
         param_6.parameterType = 'Required'
         param_6.direction = 'Input'
         param_6.datatype = u'GPDouble'
@@ -256,7 +260,7 @@ class VerkehrsmengenErmitteln(object):
         # Versorgung_BGF_Beschaeftigter
         param_7 = arcpy.Parameter()
         param_7.name = u'Versorgung_BGF_Beschaeftigter'
-        param_7.displayName = u'Versorgung_BGF_Beschaeftigter'
+        param_7.displayName = u'Bruttogeschossfläche je beschäftigter Person (m²)'.encode('CP1252')
         param_7.parameterType = 'Required'
         param_7.direction = 'Input'
         param_7.datatype = u'GPDouble'
@@ -265,16 +269,18 @@ class VerkehrsmengenErmitteln(object):
         # Versorgung_Anwesenheit
         param_8 = arcpy.Parameter()
         param_8.name = u'Versorgung_Anwesenheit'
-        param_8.displayName = u'Versorgung_Anwesenheit'
+        param_8.displayName = u'Anwesenheit beschäftigter Personen'.encode('CP1252')
         param_8.parameterType = 'Required'
         param_8.direction = 'Input'
         param_8.datatype = u'GPDouble'
-        param_8.value = 0.9
+        param_8.value = 90
+        param_8.filter.type = 'Range'
+        param_8.filter.list = [0, 100]
 
         # Versorgung_Wege_Beschaeftigter
         param_9 = arcpy.Parameter()
         param_9.name = u'Versorgung_Wege_Beschaeftigter'
-        param_9.displayName = u'Versorgung_Wege_Beschaeftigter'
+        param_9.displayName = u'Wege je beschäftigter Person und Werktag'.encode('CP1252')
         param_9.parameterType = 'Required'
         param_9.direction = 'Input'
         param_9.datatype = u'GPDouble'
@@ -283,16 +289,18 @@ class VerkehrsmengenErmitteln(object):
         # Versorgung_MIV_Anteil
         param_10 = arcpy.Parameter()
         param_10.name = u'Versorgung_MIV_Anteil'
-        param_10.displayName = u'Versorgung_MIV_Anteil'
+        param_10.displayName = u'MIV-Anteil'
         param_10.parameterType = 'Required'
         param_10.direction = 'Input'
-        param_10.datatype = u'GPDouble'
-        param_10.value = 0.65
+        param_10.datatype = u'Long'
+        param_10.value = 65
+        param_10.filter.type = 'Range'
+        param_10.filter.list = [0, 100]
 
         # Versorgung_Pers_KFZ
         param_11 = arcpy.Parameter()
         param_11.name = u'Versorgung_Pers_KFZ'
-        param_11.displayName = u'Versorgung_Pers_KFZ'
+        param_11.displayName = u'Personen je KFZ'
         param_11.parameterType = 'Required'
         param_11.direction = 'Input'
         param_11.datatype = u'GPDouble'
@@ -301,7 +309,7 @@ class VerkehrsmengenErmitteln(object):
         # Versorgung_Besucher_Tag
         param_12 = arcpy.Parameter()
         param_12.name = u'Versorgung_Besucher_Tag'
-        param_12.displayName = u'Versorgung_Besucher_Tag'
+        param_12.displayName = u'Kunden je Bruttogeschossfläche und Werktag'.encode('CP1252')
         param_12.parameterType = 'Required'
         param_12.direction = 'Input'
         param_12.datatype = u'GPDouble'
@@ -310,7 +318,7 @@ class VerkehrsmengenErmitteln(object):
         # Versorgung_Lieferwege_100m2
         param_13 = arcpy.Parameter()
         param_13.name = u'Versorgung_Lieferwege_100m2'
-        param_13.displayName = u'Versorgung_Lieferwege_100m2'
+        param_13.displayName = u'Lieferwege je 100m² Bruttogeschossfläche'.encode('CP1252')
         param_13.parameterType = 'Required'
         param_13.direction = 'Input'
         param_13.datatype = u'GPDouble'
@@ -319,16 +327,19 @@ class VerkehrsmengenErmitteln(object):
         # Gewerbe_Anwesenheit
         param_14 = arcpy.Parameter()
         param_14.name = u'Gewerbe_Anwesenheit'
-        param_14.displayName = u'Gewerbe_Anwesenheit'
+        param_14.displayName = u'Anwesenheit beschäftigter Personen'.encode('CP1252')
         param_14.parameterType = 'Required'
         param_14.direction = 'Input'
         param_14.datatype = u'GPDouble'
-        param_14.value = 0.9
+        param_14.value = 90
+        param_14.filter.type = 'Range'
+        param_14.filter.list = [0, 100]
+
 
         # Gewerbe_Wege_Beschaeftigter
         param_15 = arcpy.Parameter()
         param_15.name = u'Gewerbe_Wege_Beschaeftigter'
-        param_15.displayName = u'Gewerbe_Wege_Beschaeftigter'
+        param_15.displayName = u'Wege je beschäftigter Person und Werkag'.encode('CP1252')
         param_15.parameterType = 'Required'
         param_15.direction = 'Input'
         param_15.datatype = u'GPDouble'
@@ -337,16 +348,18 @@ class VerkehrsmengenErmitteln(object):
         # Gewerbe_MIV_Anteil
         param_16 = arcpy.Parameter()
         param_16.name = u'Gewerbe_MIV_Anteil'
-        param_16.displayName = u'Gewerbe_MIV_Anteil'
+        param_16.displayName = u'MIV-Anteil'
         param_16.parameterType = 'Required'
         param_16.direction = 'Input'
-        param_16.datatype = u'GPDouble'
-        param_16.value = 0.65
+        param_16.datatype = u'Long'
+        param_16.value = 65
+        param_16.filter.type = 'Range'
+        param_16.filter.list = [0, 100]
 
         # Gewerbe_Pers_KFZ
         param_17 = arcpy.Parameter()
         param_17.name = u'Gewerbe_Pers_KFZ'
-        param_17.displayName = u'Gewerbe_Pers_KFZ'
+        param_17.displayName = u'Personen je KFZ '
         param_17.parameterType = 'Required'
         param_17.direction = 'Input'
         param_17.datatype = u'GPDouble'
@@ -354,17 +367,17 @@ class VerkehrsmengenErmitteln(object):
 
         # Gewerbe_Anteil_Besucherfahrten
         param_18 = arcpy.Parameter()
-        param_18.name = u'Gewerbe_Anteil_Besucherfahrten'
-        param_18.displayName = u'Gewerbe_Anteil_Besucherfahrten'
+        param_18.name = u'Gewerbe_Kundenwege_Beschaeftigte'
+        param_18.displayName = u'Wege der Kunden je Beschäftigtem'.encode('CP1252')
         param_18.parameterType = 'Required'
         param_18.direction = 'Input'
         param_18.datatype = u'GPDouble'
-        param_18.value = 0.05
+        param_18.value = 1
 
         # Gewerbe_Lieferwege_Beschaeftigte
         param_19 = arcpy.Parameter()
         param_19.name = u'Gewerbe_Lieferwege_Beschaeftigte'
-        param_19.displayName = u'Gewerbe_Lieferwege_Beschaeftigte'
+        param_19.displayName = u'Lieferwege je Beschäftigtem'.encode('CP1252')
         param_19.parameterType = 'Required'
         param_19.direction = 'Input'
         param_19.datatype = u'GPDouble'
@@ -373,7 +386,7 @@ class VerkehrsmengenErmitteln(object):
         # Schulen_Wege_Schueler
         param_20 = arcpy.Parameter()
         param_20.name = u'Schulen_Wege_Schueler'
-        param_20.displayName = u'Schulen_Wege_Schueler'
+        param_20.displayName = u'Wege je Schüler'.encode('CP1252')
         param_20.parameterType = 'Required'
         param_20.direction = 'Input'
         param_20.datatype = u'GPDouble'
@@ -382,16 +395,18 @@ class VerkehrsmengenErmitteln(object):
         # Schulen_MIV_Anteil
         param_21 = arcpy.Parameter()
         param_21.name = u'Schulen_MIV_Anteil'
-        param_21.displayName = u'Schulen_MIV_Anteil'
+        param_21.displayName = u'MIV-Anteil'
         param_21.parameterType = 'Required'
         param_21.direction = 'Input'
-        param_21.datatype = u'GPDouble'
-        param_21.value = 0.65
+        param_21.datatype = u'Long'
+        param_21.value = 65
+        param_21.filter.type = 'Range'
+        param_21.filter.list = [0, 100]
 
         # Schulen_Schueler_KFZ
         param_22 = arcpy.Parameter()
         param_22.name = u'Schulen_Schueler_KFZ'
-        param_22.displayName = u'Schulen_Schueler_KFZ'
+        param_22.displayName = u'Schüler je KFZ'.encode('CP1252')
         param_22.parameterType = 'Required'
         param_22.direction = 'Input'
         param_22.datatype = u'GPDouble'
@@ -400,7 +415,7 @@ class VerkehrsmengenErmitteln(object):
         # Schulen_Schueler_je_Lehrer
         param_23 = arcpy.Parameter()
         param_23.name = u'Schulen_Schueler_je_Lehrer'
-        param_23.displayName = u'Schulen_Schueler_je_Lehrer'
+        param_23.displayName = u'Schüler je Lehrkraft'.encode('CP1252')
         param_23.parameterType = 'Required'
         param_23.direction = 'Input'
         param_23.datatype = u'GPDouble'
@@ -409,7 +424,7 @@ class VerkehrsmengenErmitteln(object):
         # Schulen_Wege_Lehrer
         param_24 = arcpy.Parameter()
         param_24.name = u'Schulen_Wege_Lehrer'
-        param_24.displayName = u'Schulen_Wege_Lehrer'
+        param_24.displayName = u'Wege je Lehrkraft'
         param_24.parameterType = 'Required'
         param_24.direction = 'Input'
         param_24.datatype = u'GPDouble'
@@ -418,7 +433,7 @@ class VerkehrsmengenErmitteln(object):
         # Schulen_Pers_KFZ
         param_25 = arcpy.Parameter()
         param_25.name = u'Schulen_Pers_KFZ'
-        param_25.displayName = u'Schulen_Pers_KFZ'
+        param_25.displayName = u'Lehrkraft je KFZ'
         param_25.parameterType = 'Required'
         param_25.direction = 'Input'
         param_25.datatype = u'GPDouble'
@@ -427,7 +442,7 @@ class VerkehrsmengenErmitteln(object):
         # Schulen_Lieferwege_Schueler
         param_26 = arcpy.Parameter()
         param_26.name = u'Schulen_Lieferwege_Schueler'
-        param_26.displayName = u'Schulen_Lieferwege_Schueler'
+        param_26.displayName = u'Lieferwege je Schüler'.encode('CP1252')
         param_26.parameterType = 'Required'
         param_26.direction = 'Input'
         param_26.datatype = u'GPDouble'

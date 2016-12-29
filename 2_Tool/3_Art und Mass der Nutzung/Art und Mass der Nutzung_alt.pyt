@@ -13,7 +13,7 @@ import argparse
 
 class Toolbox(object):
     def __init__(self):
-        self.label = u'Art und Mass der Nutzung'
+        self.label = u'Art und Maß der Nutzung'.encode('CP1252')
         self.alias = ''
         self.tools = [Flaechenbilanz, Nutzungen]
 
