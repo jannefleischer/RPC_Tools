@@ -29,7 +29,6 @@ class Vorberechnungen(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T1_Vorberechnungen)
         
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -73,6 +72,8 @@ class Vorberechnungen(object):
     def __init__(self):
         self.label = u'1 Vorberechnungen'
         self.canRunInBackground = False
+        reload(T1_Vorberechnungen)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -113,7 +114,6 @@ class ZentraleOrte_OEPNV(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T2_Zentrale_Orte_OEPNV_Abfrage)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -214,6 +214,8 @@ class ZentraleOrte_OEPNV(object):
     def __init__(self):
         self.label = u'2 Erreichbarkeit Zentraler Orte (ÖPNV)'.encode('CP1252')
         self.canRunInBackground = False
+        reload(T2_Zentrale_Orte_OEPNV_Abfrage)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -278,8 +280,7 @@ class Erreichbarkeit_OEPNV(object):
       
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
-            self.params = parameters            
-            reload(T3_Erreichbarkeit_OEPNV)
+            self.params = parameters          
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -378,7 +379,9 @@ class Erreichbarkeit_OEPNV(object):
             return
     def __init__(self):
         self.label = u'3 Haltestellen und Linientaktung (\xd6PNV)'
-        self.canRunInBackground = False
+        self.canRunInBackground = False        
+        reload(T3_Erreichbarkeit_OEPNV)        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -444,7 +447,6 @@ class ErgebnisAusgabe(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T5_Ergebnissammler)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -486,6 +488,8 @@ class ErgebnisAusgabe(object):
     def __init__(self):
         self.label = u'5 Ergebnisse sammeln und exportieren'
         self.canRunInBackground = False
+        reload(T5_Ergebnissammler)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -525,7 +529,6 @@ class Einrichtungen(object):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
             self.initializeParameters() # ruft InitializeParameters auf
-            reload(T4_Erreichbarkeit_Einrichtungen)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -677,6 +680,7 @@ class Einrichtungen(object):
     def __init__(self):
         self.label = u'4 Laden von Einrichtungen'
         self.canRunInBackground = False
+        reload(T4_Erreichbarkeit_Einrichtungen)
         
     def getParameterInfo(self):
         # Projektnamen

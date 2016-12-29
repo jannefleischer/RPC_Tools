@@ -130,6 +130,7 @@ class Ersteinrichtung(object):
     def __init__(self):
         self.label = u'Ersteinrichtung'
         self.canRunInBackground = False
+        reload(Installation_pruefen)
         
     def getParameterInfo(self):
         # Pfad_zur_Python_Installation_

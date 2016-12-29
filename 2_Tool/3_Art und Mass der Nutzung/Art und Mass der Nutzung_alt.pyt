@@ -32,7 +32,6 @@ class Flaechenbilanz(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(_flaechenbilanz)
     
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -247,6 +246,7 @@ class Flaechenbilanz(object):
     def __init__(self):
         self.label = u'1 Fl\xe4chenbilanz eingeben'
         self.canRunInBackground = False
+        reload(_flaechenbilanz)
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -470,7 +470,6 @@ class Nutzungen(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(nutzungen)
   
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -518,7 +517,7 @@ class Nutzungen(object):
             i+=1 ; self.params[i].category = heading # Startjahr
             i+=1 ; self.params[i].category = heading # Aufsiedlungsdauer
     
-            heading = "2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen".encode('CP1252')
+            heading = u"2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen".encode('CP1252')
             i+=1 ; self.params[i].category = heading # Anzahl WE in Einfamilienhäusern
             i+=1 ; self.params[i].category = heading # Anzahl WE in Doppelhäusern
             i+=1 ; self.params[i].category = heading # Anzahl WE in Reihenhäusern
@@ -752,6 +751,7 @@ class Nutzungen(object):
     def __init__(self):
         self.label = u'2 Nutzungen eingeben'
         self.canRunInBackground = False
+        reload(nutzungen)
     def getParameterInfo(self):
         # Projekt
         param_1 = arcpy.Parameter()

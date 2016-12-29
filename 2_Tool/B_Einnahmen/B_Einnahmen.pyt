@@ -29,7 +29,6 @@ class Vorberechnungen(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T1_Vorberechnungen)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -84,6 +83,8 @@ class Vorberechnungen(object):
     def __init__(self):
         self.label = u'1 Vorberechnungen'
         self.canRunInBackground = False
+        reload(T1_Vorberechnungen)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -166,7 +167,6 @@ class KFA(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T6_KFA)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -208,6 +208,8 @@ class KFA(object):
     def __init__(self):
         self.label = u'6 Kommunaler Finanzausgleich'
         self.canRunInBackground = False
+        reload(T6_KFA)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -247,7 +249,6 @@ class Einkommensteuer(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T2_Einkommensteuer)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -292,6 +293,7 @@ class Einkommensteuer(object):
     def __init__(self):
         self.label = u'2 Einkommensteuer'
         self.canRunInBackground = False
+        reload(T2_Einkommensteuer)
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -331,7 +333,6 @@ class Familienleistungsausgleich(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T3_Familienleistungsausgleich)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -376,6 +377,8 @@ class Familienleistungsausgleich(object):
     def __init__(self):
         self.label = u'3 Familienleistungsausgleich'
         self.canRunInBackground = False
+        reload(T3_Familienleistungsausgleich)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -415,7 +418,6 @@ class Grundsteuer(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T4_Grundsteuer)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -470,6 +472,8 @@ class Grundsteuer(object):
     def __init__(self):
         self.label = u'4 Grundsteuer'
         self.canRunInBackground = False
+        reload(T4_Grundsteuer)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -580,7 +584,6 @@ class Gewerbesteuer(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T5_Gewerbesteuer)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -622,6 +625,8 @@ class Gewerbesteuer(object):
     def __init__(self):
         self.label = u'5 Gewerbesteuer'
         self.canRunInBackground = False
+        reload(T5_Gewerbesteuer)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -669,7 +674,6 @@ class KRU(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T7_KRU)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -710,6 +714,8 @@ class KRU(object):
     def __init__(self):
         self.label = u'7 Kreisumlage'
         self.canRunInBackground = False
+        reload(T7_KRU)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()

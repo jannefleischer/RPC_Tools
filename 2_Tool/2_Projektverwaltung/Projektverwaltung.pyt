@@ -211,8 +211,6 @@ class ProjektVerwaltung(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(_projektVerwaltung)
-
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
@@ -307,6 +305,7 @@ class ProjektVerwaltung(object):
     def __init__(self):
         self.label = u'1 Projekte verwalten'
         self.canRunInBackground = False
+        reload(_projektVerwaltung)
 
     def getParameterInfo(self):
         # Was_möchten_Sie_tun_

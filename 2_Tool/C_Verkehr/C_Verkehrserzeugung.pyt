@@ -28,7 +28,6 @@ class Routingsdurchfuehren(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T2_Routings_durchfuehren)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -70,6 +69,8 @@ class Routingsdurchfuehren(object):
     def __init__(self):
         self.label = u'2 Routings durchf\xfchren'
         self.canRunInBackground = False
+        reload(T2_Routings_durchfuehren)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -118,7 +119,6 @@ class VerkehrsmengenErmitteln(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T3_Verkehrsmengen_ermitteln)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -198,6 +198,8 @@ class VerkehrsmengenErmitteln(object):
     def __init__(self):
         self.label = u'3 Verkehrsmengen ermitteln'
         self.canRunInBackground = False
+        reload(T3_Verkehrsmengen_ermitteln)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -483,7 +485,6 @@ class Basisdatenbearbeiten(object):
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-            reload(T1_Basisdaten_bearbeiten)
       
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
@@ -527,6 +528,8 @@ class Basisdatenbearbeiten(object):
     def __init__(self):
         self.label = u'1 Basisdaten bearbeiten'
         self.canRunInBackground = False
+        reload(T1_Basisdaten_bearbeiten)
+        
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
