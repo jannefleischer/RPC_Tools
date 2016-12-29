@@ -518,7 +518,7 @@ class Nutzungen(object):
             i+=1 ; self.params[i].category = heading # Startjahr
             i+=1 ; self.params[i].category = heading # Aufsiedlungsdauer
     
-            heading = "2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen"
+            heading = "2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen".encode('CP1252')
             i+=1 ; self.params[i].category = heading # Anzahl WE in Einfamilienhäusern
             i+=1 ; self.params[i].category = heading # Anzahl WE in Doppelhäusern
             i+=1 ; self.params[i].category = heading # Anzahl WE in Reihenhäusern
