@@ -85,6 +85,10 @@ class Energieverbrauch(object):
         parameters = [param_1]
         validator = getattr(self, 'ToolValidator', None)
         validator(parameters).initializeParameters()    
+        
+        parameters = [param_1]
+        validator = getattr(self, 'ToolValidator', None)
+        validator(parameters).initializeParameters()    
         return parameters
     
     def isLicensed(self):
