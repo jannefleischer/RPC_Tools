@@ -8,6 +8,12 @@ import shutil
 import T1_Vorberechnungen, T2_Zentrale_Orte_OEPNV_Abfrage
 import T3_Erreichbarkeit_OEPNV, T4_Erreichbarkeit_Einrichtungen
 import T5_Ergebnissammler
+import imp
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+                                         '..', '..'))
+LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib', 
+                              os.path.join(LIB_PATH, 'project_lib.py'))
 
 # Export of toolbox F:\ggr Projekte\RPC_Tools\2_Tool\D_Erreichbarkeit\D_Erreichbarkeit.tbx
 class Toolbox(object):
@@ -34,26 +40,7 @@ class Vorberechnungen(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            
-            tbx_path = __file__
-        
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten',
-                                              'FGBD_Basisdaten_deutschland.gdb',
-                                              'angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-            except:
-                rows_projects  = []
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
         
             #set parameters
@@ -120,39 +107,16 @@ class ZentraleOrte_OEPNV(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-        
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-                message = "jep"
-            except:
-                rows_projects  = []
-                message = "nope"
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-                list_projects = list(set(list_projects))
-                list_projects = sorted(list_projects)
-        
-            list_Ort1 = []
-            list_Ort2 = []
-            list_Ort3 = []
-        
+            list_projects = project_lib.get_projects()
+            list_projects = sorted(list_projects)
+                
             #set project
             self.params[0].filter.list = list_projects
         
             #set Orte
-            self.params[1].filter.list = list_Ort1
-            self.params[2].filter.list = list_Ort2
-            self.params[3].filter.list = list_Ort3
+            self.params[1].filter.list = []
+            self.params[2].filter.list = []
+            self.params[3].filter.list = []
         
             return
       
@@ -160,11 +124,6 @@ class ZentraleOrte_OEPNV(object):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
-        
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
       
             #Projekt auswählen
             if self.params[0].altered and not self.params[0].hasBeenValidated:
@@ -172,7 +131,7 @@ class ZentraleOrte_OEPNV(object):
                 self.params[1].value = ""
                 self.params[2].value = ""
                 self.params[3].value = ""
-                path_Orte = os.path.join(base_path,'3_Projekte',projectname,
+                path_Orte = os.path.join(BASE_PATH,'3_Projekte',projectname,
                                          'FGDB_Erreichbarkeit_Projekt_'+projectname+'.gdb',
                                          'Zentrale_Orte_75km')
         
@@ -288,41 +247,15 @@ class Erreichbarkeit_OEPNV(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-        
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten',
-                                              'FGBD_Basisdaten_deutschland.gdb',
-                                              'angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-                message = "jep"
-            except:
-                rows_projects  = []
-                message = "nope"
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-                list_projects = list(set(list_projects))
-                list_projects = sorted(list_projects)
-        
-            list_Halte1 = []
-            list_Halte2 = []
-            list_Halte3 = []
-        
+            list_projects = project_lib.get_projects()
+            list_projects = sorted(list_projects)
             #set project
             self.params[0].filter.list = list_projects
         
             #set Haltestellen
-            self.params[1].filter.list = list_Halte1
-            self.params[2].filter.list = list_Halte2
-            self.params[3].filter.list = list_Halte3
+            self.params[1].filter.list = []
+            self.params[2].filter.list = []
+            self.params[3].filter.list = []
         
             return
       
@@ -330,11 +263,6 @@ class Erreichbarkeit_OEPNV(object):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
-        
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
     
             #Projekt auswählen
             if self.params[0].altered and not self.params[0].hasBeenValidated:
@@ -342,7 +270,7 @@ class Erreichbarkeit_OEPNV(object):
                 self.params[1].value = ""
                 self.params[2].value = ""
                 self.params[3].value = ""
-                path_Halte = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Erreichbarkeit_Projekt_'+projectname+'.gdb','OEPNV_Haltestellen')
+                path_Halte = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Erreichbarkeit_Projekt_'+projectname+'.gdb','OEPNV_Haltestellen')
         
                 rows_Halte = arcpy.SearchCursor(path_Halte)
                 list_Halte1 = []
@@ -456,25 +384,7 @@ class ErgebnisAusgabe(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            tbx_path = __file__      
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten',
-                                              'FGBD_Basisdaten_deutschland.gdb',
-                                              'angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-            except:
-                rows_projects  = []
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
         
             #set parameters
@@ -540,27 +450,7 @@ class Einrichtungen(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten',
-                                              'FGBD_Basisdaten_deutschland.gdb',
-                                              'angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-                message = "jep"
-            except:
-                rows_projects  = []
-                message = "nope"
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
         
             i=-1
@@ -593,10 +483,6 @@ class Einrichtungen(object):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parmater
             has been changed."""
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
             i=-1
             i+=1 ;
             #Immer aus
@@ -606,29 +492,29 @@ class Einrichtungen(object):
                 projectname=self.params[0].value
         
                 #check ob alle 5 template excel datein vorhanden
-                if os.path.isfile(os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))==False:
-                    shutil.copyfile(os.path.join(base_path,'2_Tool','D_Erreichbarkeit','Einrichtungen_Kitas_template.xls'),os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))
-                if os.path.isfile(os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Grundschulen.xls"))==False:
-                    shutil.copyfile(os.path.join(base_path,'2_Tool','D_Erreichbarkeit','Einrichtungen_Grundschulen_template.xls'),os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Grundschulen.xls"))
-                if os.path.isfile(os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))==False:
-                    shutil.copyfile(os.path.join(base_path,'2_Tool','D_Erreichbarkeit','Einrichtungen_Einzelhandel_template.xls'),os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))
-                if os.path.isfile(os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Apotheken.xls"))==False:
-                    shutil.copyfile(os.path.join(base_path,'2_Tool','D_Erreichbarkeit','Einrichtungen_Apotheken_template.xls'),os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Apotheken.xls"))
-                if os.path.isfile(os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Aerzte.xls"))==False:
-                    shutil.copyfile(os.path.join(base_path,'2_Tool','D_Erreichbarkeit','Einrichtungen_Aerzte_template.xls'),os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Aerzte.xls"))
-                if os.path.isfile(os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))==False:
-                    shutil.copyfile(os.path.join(base_path,'2_Tool','D_Erreichbarkeit','Einrichtungen_Krankenhaeuser_template.xls'),os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))
-                if os.path.isfile(os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Sonstige.xls"))==False:
-                    shutil.copyfile(os.path.join(base_path,'2_Tool','D_Erreichbarkeit','Einrichtungen_Sonstige_template.xls'),os.path.join(base_path,'3_Projekte',projectname,"Einrichtungen_Sonstige.xls"))
+                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))==False:
+                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Kitas_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))
+                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Grundschulen.xls"))==False:
+                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Grundschulen_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Grundschulen.xls"))
+                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))==False:
+                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Einzelhandel_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))
+                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Apotheken.xls"))==False:
+                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Apotheken_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Apotheken.xls"))
+                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Aerzte.xls"))==False:
+                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Aerzte_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Aerzte.xls"))
+                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))==False:
+                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Krankenhaeuser_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))
+                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Sonstige.xls"))==False:
+                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Sonstige_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Sonstige.xls"))
         
         
-                tablepath_template_kitas =  os.path.join(base_path,'3_Projekte',projectname,'Einrichtungen_Kindertagesstaetten.xls')
-                tablepath_template_grundschulen = os.path.join(base_path,'3_Projekte',projectname,'Einrichtungen_Grundschulen.xls')
-                tablepath_template_einzelhandel = os.path.join(base_path,'3_Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
-                tablepath_template_apotheken = os.path.join(base_path,'3_Projekte',projectname,'Einrichtungen_Apotheken.xls')
-                tablepath_template_aerzte = os.path.join(base_path,'3_Projekte',projectname,'Einrichtungen_Aerzte.xls')
-                tablepath_template_kh = os.path.join(base_path,'3_Projekte',projectname,'Einrichtungen_Krankenhaeuser.xls')
-                tablepath_template_sons = os.path.join(base_path,'3_Projekte',projectname,'Einrichtungen_Sonstige.xls')
+                tablepath_template_kitas =  os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Kindertagesstaetten.xls')
+                tablepath_template_grundschulen = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Grundschulen.xls')
+                tablepath_template_einzelhandel = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
+                tablepath_template_apotheken = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Apotheken.xls')
+                tablepath_template_aerzte = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Aerzte.xls')
+                tablepath_template_kh = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Krankenhaeuser.xls')
+                tablepath_template_sons = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Sonstige.xls')
         
                 self.params[self.Kita].value=tablepath_template_kitas
                 self.params[self.Grundschulen].value=tablepath_template_grundschulen
@@ -668,13 +554,13 @@ class Einrichtungen(object):
         
             if self.params[self.BooleanEinzel].value==True:
                 projectname=self.params[0].value
-                tablepath_einzelhandel = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Standortdaten')
+                tablepath_einzelhandel = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Standortdaten')
                 self.params[self.Einzelhandel_feature].value=tablepath_einzelhandel
                 self.params[self.Einzelhandel].enabled=0
                 self.params[self.Einzelhandel_feature].enabled=1
             elif self.params[self.Projekt].value!=None and self.params[self.Kita].enabled!=0:
                 projectname=self.params[0].value
-                tablepath_template_einzelhandel = os.path.join(base_path,'3_Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
+                tablepath_template_einzelhandel = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
                 self.params[self.Einzelhandel].value=tablepath_template_einzelhandel
                 self.params[self.Einzelhandel].enabled=1
                 self.params[self.Einzelhandel_feature].enabled=0

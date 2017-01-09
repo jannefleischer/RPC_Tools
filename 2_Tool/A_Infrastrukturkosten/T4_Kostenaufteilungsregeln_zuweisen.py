@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
 # REGIOPROJEKTCHECK
 # 03_Kostenaufteilungsregeln_zuweisen.py
@@ -11,6 +11,12 @@
 #
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
+
+
+
+
+# TODO: NEVER USED! REMOVE?
+
 
 
 # Import arcpy modules

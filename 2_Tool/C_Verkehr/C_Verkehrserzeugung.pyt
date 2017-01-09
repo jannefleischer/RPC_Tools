@@ -6,6 +6,12 @@ import sys
 import T1_Basisdaten_bearbeiten, T2_Routings_durchfuehren
 import T3_Verkehrsmengen_ermitteln
 import arcpy
+import imp
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+                                         '..', '..'))
+LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib', 
+                              os.path.join(LIB_PATH, 'project_lib.py'))
 
 # Export of toolbox F:\ggr Projekte\RPC_Tools\2_Tool\C_Verkehr\C_Verkehrserzeugung.tbx
 
@@ -32,23 +38,7 @@ class Routingsdurchfuehren(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            tbx_path = __file__        
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-            except:
-                rows_projects  = []
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
         
             #set parameters
@@ -123,23 +113,7 @@ class VerkehrsmengenErmitteln(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""        
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-            except:
-                rows_projects  = []
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
         
             #set parameters
@@ -489,24 +463,7 @@ class Basisdatenbearbeiten(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-        
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-            except:
-                rows_projects  = []
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
         
             #set parameters
