@@ -7,6 +7,12 @@ import arcpy
 
 import bewertung_wohnflaechendichte, Bodenbedeckungbeschreiben
 import schutzwuerdigeBoedenTesten, oekologische_folgen
+import imp
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+                                         '..', '..'))
+LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib', 
+                              os.path.join(LIB_PATH, 'project_lib.py'))
 
 class Toolbox(object):
     def __init__(self):
@@ -29,36 +35,16 @@ class wohnflaechendichte(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-                message = "jep"
-            except:
-                rows_projects  = []
-                message = "nope"
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
+            
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
-        
-            list_teilflaechen = []
         
             i=-1
         
             #set project
             i+=1 ; self.params[i].filter.list = list_projects
         
-            heading = "Durchschnittliche überbaute Fläche nach Gebäudetyp"
+            heading = u"Durchschnittliche überbaute Fläche nach Gebäudetyp".encode('CP1252')
             self.params[1].category = heading
             self.params[2].category = heading
             self.params[3].category = heading
@@ -100,6 +86,8 @@ class wohnflaechendichte(object):
         param_2.direction = 'Input'
         param_2.datatype = u'Long'
         param_2.value = u'100'
+        param_2.filter.type = 'Range'
+        param_2.filter.list = [0, 100]
 
         # Durchschnittliche_überbaute_Fläche_je_Wohneinheit_in_Doppelhäusern__qm_
         param_3 = arcpy.Parameter()
@@ -109,6 +97,8 @@ class wohnflaechendichte(object):
         param_3.direction = 'Input'
         param_3.datatype = u'Long'
         param_3.value = u'100'
+        param_3.filter.type = 'Range'
+        param_3.filter.list = [0, 100]
 
         # Durchschnittliche_überbaute_Fläche_je_Wohneinheit_in_Reihenhäusern__qm_
         param_4 = arcpy.Parameter()
@@ -118,6 +108,8 @@ class wohnflaechendichte(object):
         param_4.direction = 'Input'
         param_4.datatype = u'Long'
         param_4.value = u'100'
+        param_4.filter.type = 'Range'
+        param_4.filter.list = [0, 100]
 
         # Durchschnittliche_überbaute_Fläche_je_Wohneinheit_in_Mehrfamilienhäusern__qm_
         param_5 = arcpy.Parameter()
@@ -127,6 +119,8 @@ class wohnflaechendichte(object):
         param_5.direction = 'Input'
         param_5.datatype = u'Long'
         param_5.value = u'100'
+        param_5.filter.type = 'Range'
+        param_5.filter.list = [0, 100]
 
         parameters = [param_1, param_2, param_3, param_4, param_5]
         validator = getattr(self, 'ToolValidator', None)
@@ -162,26 +156,8 @@ class BodenbedeckungPlanfall(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-                message = "jep"
-            except:
-                rows_projects  = []
-                message = "nope"
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
-            list_projects = sorted(list_projects)
+            
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
         
             list_teilflaechen = []
@@ -215,10 +191,6 @@ class BodenbedeckungPlanfall(object):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
         #Projekt auswaehlen
             i=-1
             i+=1
@@ -229,7 +201,7 @@ class BodenbedeckungPlanfall(object):
             if self.params[i].altered and not self.params[i].hasBeenValidated:
                 projectname = self.params[i].value
         
-                tablepath_teilflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
+                tablepath_teilflaechen = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
         
                 rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
                 list_teilflaechen = []
@@ -287,7 +259,7 @@ class BodenbedeckungPlanfall(object):
                 projectname = self.params[i-1].value
                 flaechenname = self.params[i].value
         
-                tablepath_teilflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
+                tablepath_teilflaechen = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
                 sql = "Name ='"+self.params[1].value +"'"
                 rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen,sql)
         ##        try:
@@ -343,14 +315,10 @@ class BodenbedeckungPlanfall(object):
                 if self.params[2].value =="Natuerliche Wasserflaeche":
                     NF_Spalte ="NF_Wasserflaeche"
         #Flächengröße der Teilflächen ermitteln um aus den Anteilen absolute Werte zu machen
-                tbx_path = __file__
-                base_path = os.path.dirname(tbx_path)
-                base_path = os.path.dirname(base_path)
-                base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
                 #Projektname
                 projekt = self.params[0].value
                 gdb = "FGDB_Definition_Projekt_" + projekt + ".gdb"
-                pfad_flaeche = os.path.join(base_path,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
+                pfad_flaeche = os.path.join(BASE_PATH,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
         ##        try:
         ##            arcpy.AddField_management(pfad_flaeche,"area_hektares","FLOAT")
         ##        except:
@@ -369,7 +337,7 @@ class BodenbedeckungPlanfall(object):
                 #PF_Absolut = teilflaeche * (float(PF_Anteil)/100)
         
                 projectname = self.params[0].value
-                tabelle_bodenbedeckung = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Flaeche_und_Oekologie_Projekt_'+projectname+'.gdb','Bodenbedeckung')
+                tabelle_bodenbedeckung = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Flaeche_und_Oekologie_Projekt_'+projectname+'.gdb','Bodenbedeckung')
                 Insert = arcpy.InsertCursor(tabelle_bodenbedeckung)
                 row = Insert.newRow()
                 row.Teilflaeche = self.params[1].value
@@ -477,29 +445,9 @@ class Ueberschneidung(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-                message = "jep"
-            except:
-                rows_projects  = []
-                message = "nope"
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
+            
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
-        
-            list_teilflaechen = []
         
             i=-1
         
@@ -566,29 +514,10 @@ class Vornutzungbeschreiben(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-        
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-                message = "jep"
-            except:
-                rows_projects  = []
-                message = "nope"
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
+            
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
             list_teilflaechen = []
-        
             i=-1
         
             #Filterliste fUer Bedeckungsarten
@@ -618,10 +547,6 @@ class Vornutzungbeschreiben(object):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""        
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
         #Projekt auswaehlen
             i=-1
             i+=1
@@ -632,7 +557,7 @@ class Vornutzungbeschreiben(object):
             if self.params[i].altered and not self.params[i].hasBeenValidated:
                 projectname = self.params[i].value
         
-                tablepath_teilflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
+                tablepath_teilflaechen = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
         
                 rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
                 list_teilflaechen = []
@@ -690,7 +615,7 @@ class Vornutzungbeschreiben(object):
                 projectname = self.params[i-1].value
                 flaechenname = self.params[i].value
         
-                tablepath_teilflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
+                tablepath_teilflaechen = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
                 sql = "Name ='"+self.params[1].value +"'"
                 rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen,sql)
         ##        try:
@@ -746,14 +671,10 @@ class Vornutzungbeschreiben(object):
                 if self.params[2].value =="Natuerliche Wasserflaeche":
                     PF_Spalte ="PF_Wasserflaeche"
         #Flächengröße der Teilflächen ermitteln um aus den Anteilen absolute Werte zu machen
-                tbx_path = __file__
-                base_path = os.path.dirname(tbx_path)
-                base_path = os.path.dirname(base_path)
-                base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
                 #Projektname
                 projekt = self.params[0].value
                 gdb = "FGDB_Definition_Projekt_" + projekt + ".gdb"
-                pfad_flaeche = os.path.join(base_path,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
+                pfad_flaeche = os.path.join(BASE_PATH,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
         
                 sql = "Name = '"+ self.params[1].value +"'"
                 cursor = arcpy.SearchCursor(pfad_flaeche,sql)
@@ -766,7 +687,7 @@ class Vornutzungbeschreiben(object):
                 PF_Absolut = teilflaeche * (float(PF_Anteil)/100)
         
                 projectname = self.params[0].value
-                tabelle_bodenbedeckung = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Flaeche_und_Oekologie_Projekt_'+projectname+'.gdb','Bodenbedeckung')
+                tabelle_bodenbedeckung = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Flaeche_und_Oekologie_Projekt_'+projectname+'.gdb','Bodenbedeckung')
                 Insert = arcpy.InsertCursor(tabelle_bodenbedeckung)
                 row = Insert.newRow()
                 row.Teilflaeche = self.params[1].value
@@ -874,30 +795,9 @@ class OekologischeFolgen(object):
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            tbx_path = __file__    
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-    
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-            tablepath_teilflaeche = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-    
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-                message = "jep"
-            except:
-                rows_projects  = []
-                message = "nope"
-    
-            list_projects =[]
-    
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
+            
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-    
-    
-            list_teilflaechen = []
     
             i=-1
     
@@ -931,14 +831,10 @@ class OekologischeFolgen(object):
     #            self.params[4].value = flaechengroesse
     
             if self.params[i].altered and not self.params[i].hasBeenValidated:
-                tbx_path = __file__
-                base_path = os.path.dirname(tbx_path)
-                base_path = os.path.dirname(base_path)
-                base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
                 #Projektname
                 projekt = self.params[i].value
                 gdb = "FGDB_Definition_Projekt_" + projekt + ".gdb"
-                pfad_umfang = os.path.join(base_path,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
+                pfad_umfang = os.path.join(BASE_PATH,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
     
     
             #try:
@@ -981,7 +877,7 @@ class OekologischeFolgen(object):
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = u'Zeichenfolge'
-        param_1.filter.list = [u'04-10-16', u'test']
+        param_1.filter.list = []
 
         # Region_auswählen
         param_2 = arcpy.Parameter()

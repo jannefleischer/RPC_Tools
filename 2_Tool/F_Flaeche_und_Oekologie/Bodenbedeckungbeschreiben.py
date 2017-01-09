@@ -13,6 +13,7 @@
 # ---------------------------------------------------------------------------
 import os
 import arcpy
+import sys
 
 def main(parameters, messages):
     wcd = os.getcwd()
