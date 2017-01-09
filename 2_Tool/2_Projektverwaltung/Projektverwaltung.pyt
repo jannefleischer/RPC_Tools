@@ -7,7 +7,14 @@ import gc
 
 import arcpy
 import teilflaecheBenennen
-import _projektVerwaltung
+import T1_Projektverwaltung
+import imp
+
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+                                         '..', '..'))
+LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib', 
+                              os.path.join(LIB_PATH, 'project_lib.py'))
 
 # Export of toolbox C:\GGR\RPC_Tools\2_Tool\2_Projektverwaltung\T2_Projektverwaltung.tbx
 
@@ -34,31 +41,10 @@ class TeilflaecheBenennen(object):
 
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
-            called when the tool is opened."""
-
-            tbx_path = __file__
-
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-                message = "jep"
-            except:
-                rows_projects  = []
-                message = "nope"
-
-            list_projects =[]
-
-            for row in rows_projects:
-                list_projects.append(row.Name)
-
-            list_projects = list(set(list_projects))
+            called when the tool is opened."""     
+            
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-
 
             list_teilflaechen = []
 
@@ -69,7 +55,6 @@ class TeilflaecheBenennen(object):
 
             #set set teilflaeche
             i+=1 ; self.params[i].filter.list = list_teilflaechen
-
 
             return
 
@@ -240,21 +225,9 @@ class ProjektVerwaltung(object):
 
             # Eingaben in Abhängigkeit von Vorhaben aktivieren/deaktivieren
             if self.params[0].altered and not self.params[0].hasBeenValidated:
-
-                tbx_path = __file__
-                base_path = os.path.dirname(tbx_path)
-                base_path = os.path.dirname(base_path)
-                base_path = os.path.dirname(base_path)
-                tablePfad = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-                try:
-                    rows = arcpy.SearchCursor(tablePfad)
-                    list = []
-                    for row in rows:
-                        list.append(row.Name)
-                except:
-                    list = []
-
-                list = sorted(list)
+    
+                list_projects = project_lib.get_projects()
+                list_projects = sorted(list_projects)
 
                 if self.params[0].value == "Neues Projekt anlegen":
                     self.params[1].enabled = False
@@ -265,7 +238,9 @@ class ProjektVerwaltung(object):
                     self.params[1].value = " "
                     self.params[1].filter.list = [" "]
                     self.params[2].value = None
-                    self.params[3].value = os.path.join(base_path,'3_Projekte','projektflaechen_template.shp')
+                    self.params[3].value = os.path.join(BASE_PATH,
+                                                        '3_Projekte',
+                                                        'projektflaechen_template.shp')
 
                 elif self.params[0].value == "Bestehendes Projekt kopieren":
                     self.params[1].enabled = True
@@ -274,7 +249,7 @@ class ProjektVerwaltung(object):
                     self.params[4].enabled = False
                     self.params[5].enabled = False
                     self.params[1].value = None
-                    self.params[1].filter.list = list
+                    self.params[1].filter.list = list_projects
                     self.params[2].value = None
                     self.params[3].value = None
 
@@ -286,7 +261,7 @@ class ProjektVerwaltung(object):
                     self.params[4].enabled = False
                     self.params[5].enabled = False
                     self.params[1].value = None
-                    self.params[1].filter.list = list
+                    self.params[1].filter.list = list_projects
                     self.params[2].value = " "
                     self.params[3].value = None
 
@@ -305,7 +280,7 @@ class ProjektVerwaltung(object):
     def __init__(self):
         self.label = u'1 Projekte verwalten'
         self.canRunInBackground = False
-        reload(_projektVerwaltung)
+        reload(T1_Projektverwaltung)
 
     def getParameterInfo(self):
         # Was_möchten_Sie_tun_
@@ -382,7 +357,7 @@ class ProjektVerwaltung(object):
             return validator(parameters).updateMessages()
 
     def execute(self, parameters, messages):
-        _projektVerwaltung.main(parameters, messages)
+        T1_Projektverwaltung.main(parameters, messages)
 
 def main():
     tbx = Toolbox()

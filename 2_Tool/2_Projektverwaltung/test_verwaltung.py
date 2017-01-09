@@ -5,13 +5,12 @@ import _projektVerwaltung, teilflaecheBenennen
 import arcpy
 import os, shutil, gc
 from time import gmtime, strftime
+from project_lib import PROJECT_FOLDER
 
-#tmp_project = 'test_tmp_' + strftime("%H-%M-%S_%d-%m-%Y", gmtime())
-project_folder = os.path.join(os.getcwd().split("2_Tool")[0], "3_Projekte")
 tmp_project = 'unittest'
-tmp_project_folder = os.path.join(project_folder, tmp_project)
+tmp_project_folder = os.path.join(PROJECT_FOLDER, tmp_project)
 
-shp_template = os.path.join(project_folder, "projektflaechen_template.shp")
+shp_template = os.path.join(PROJECT_FOLDER, "projektflaechen_template.shp")
 params_verwaltung = ['', tmp_project, tmp_project, shp_template, 2010, 2050]
 flaechenname = 'Nr. 1 | 50.77 ha | Flaeche_1'
 

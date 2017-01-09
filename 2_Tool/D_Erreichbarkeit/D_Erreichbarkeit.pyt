@@ -14,7 +14,8 @@ class Toolbox(object):
     def __init__(self):
         self.label = u'11_Definition_Projekt_Tool'
         self.alias = ''
-        self.tools = [Vorberechnungen, ZentraleOrte_OEPNV, Erreichbarkeit_OEPNV, ErgebnisAusgabe, Einrichtungen]
+        self.tools = [Vorberechnungen, ZentraleOrte_OEPNV, 
+                      Erreichbarkeit_OEPNV, ErgebnisAusgabe, Einrichtungen]
 
 # Tool implementation code
 
@@ -38,9 +39,10 @@ class Vorberechnungen(object):
         
             base_path = os.path.dirname(tbx_path)
             base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
         
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
+            tablepath_projects = os.path.join(base_path,'1_Basisdaten',
+                                              'FGBD_Basisdaten_deutschland.gdb',
+                                              'angelegteProjekte')
         
             try:
                 rows_projects = arcpy.SearchCursor(tablepath_projects)
@@ -170,7 +172,9 @@ class ZentraleOrte_OEPNV(object):
                 self.params[1].value = ""
                 self.params[2].value = ""
                 self.params[3].value = ""
-                path_Orte = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Erreichbarkeit_Projekt_'+projectname+'.gdb','Zentrale_Orte_75km')
+                path_Orte = os.path.join(base_path,'3_Projekte',projectname,
+                                         'FGDB_Erreichbarkeit_Projekt_'+projectname+'.gdb',
+                                         'Zentrale_Orte_75km')
         
                 rows_Orte = arcpy.SearchCursor(path_Orte)
                 list_Ort1 = []
@@ -271,7 +275,6 @@ class ZentraleOrte_OEPNV(object):
 
 class Erreichbarkeit_OEPNV(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\D_Erreichbarkeit\D_Erreichbarkeit.tbx\03ErreichbarkeitÖPNV"""
-    import arcpy
     #Diese Datei muss in der Toolbox als Validator für das Projekt löschen Skript eingefügt werden,
     #damit die vorhandenen Projekte in der DropdownListe angezeigt werden
     class ToolValidator(object):
@@ -291,7 +294,9 @@ class Erreichbarkeit_OEPNV(object):
             base_path = os.path.dirname(base_path)
             base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
         
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
+            tablepath_projects = os.path.join(base_path,'1_Basisdaten',
+                                              'FGBD_Basisdaten_deutschland.gdb',
+                                              'angelegteProjekte')
         
             try:
                 rows_projects = arcpy.SearchCursor(tablepath_projects)
@@ -456,7 +461,9 @@ class ErgebnisAusgabe(object):
             base_path = os.path.dirname(base_path)
             base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
         
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
+            tablepath_projects = os.path.join(base_path,'1_Basisdaten',
+                                              'FGBD_Basisdaten_deutschland.gdb',
+                                              'angelegteProjekte')
         
             try:
                 rows_projects = arcpy.SearchCursor(tablepath_projects)
@@ -538,7 +545,9 @@ class Einrichtungen(object):
             base_path = os.path.dirname(base_path)
             base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
         
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
+            tablepath_projects = os.path.join(base_path,'1_Basisdaten',
+                                              'FGBD_Basisdaten_deutschland.gdb',
+                                              'angelegteProjekte')
         
             try:
                 rows_projects = arcpy.SearchCursor(tablepath_projects)

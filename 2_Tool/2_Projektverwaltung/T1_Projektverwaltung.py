@@ -34,29 +34,6 @@ def main(parameters, messages):
             #Pfad anlegen
             mainPath = str(sys.path[0]).split("2_Tool")[0]
 
-            fcPfad = os.path.join(mainPath,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-            sql = "Name = '" + projectName +"'"
-            x=0
-            cursor = arcpy.SearchCursor(fcPfad,sql)
-            for row in cursor:
-                x = x+1
-            if x > 0:
-                print "Es scheint bereits ein Projekt mit diesem Namen zu existieren"
-                messages.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
-                print "Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox"
-                messages.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
-                sys.exit()
-
-        #register new project in the database
-        #Am Ende das erfolgreich angelegte Projekt in "FGDB_01_Basisdaten-deutschland.gdb/angelegteProjekte" registrieren
-            #messages.AddMessage(fcPfad)
-            cursor = arcpy.InsertCursor(fcPfad)
-            row = cursor.newRow()
-            row.Name = projectName
-            cursor.insertRow(row)
-            messages.AddMessage("Projekt wird in der Datenbank registriert \n")
-            print "Projekt wird in der Datenbank registriert \n"
-            del row, cursor
 
         #copy template folder
             #templatePath = os.path.join(mainPath,'3_Projekte','Template.gdb') #Fehler im Script - geandert durch AT
@@ -146,7 +123,6 @@ def main(parameters, messages):
                 #row.setValue("Bilanzsumme", 0)
                 cursor.updateRow(row)
                 i+= 1
-
 
         #add project-data to Projektrahmendaten
 
@@ -250,19 +226,6 @@ def main(parameters, messages):
             #Pfad anlegen
             mainPath = str(sys.path[0]).split("2_Tool")[0]
 
-            fcPfad = os.path.join(mainPath,"1_Basisdaten","FGBD_Basisdaten_deutschland.gdb","angelegteProjekte")
-            sql = "Name = '" + projectNameNew +"'"
-            x=0
-            cursor = arcpy.SearchCursor(fcPfad,sql)
-            for row in cursor:
-                x = x+1
-            if x > 0:
-                print "Es scheint bereits ein Projekt mit diesem Namen zu existieren"
-                messages.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
-                print "Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox"
-                messages.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
-                sys.exit()
-
         #copy template folder
             templatePath = os.path.join(mainPath,"3_Projekte",projectNameOld)
             projectPath = os.path.join(mainPath,"3_Projekte",projectNameNew)
@@ -288,16 +251,6 @@ def main(parameters, messages):
                     newFilePath = os.path.join(projectPath,newName)
 
                     os.rename(filePath,newFilePath)
-
-        #register new project in the database
-        #Am Ende das erfolgreich angelegte Projekt in "FGDB_Basisdaten-deutschland.gdb/angelegteProjekte" registrieren
-            messages.AddMessage(fcPfad)
-            cursor = arcpy.InsertCursor(fcPfad)
-            row = cursor.newRow()
-            row.Name = projectNameNew
-            cursor.insertRow(row)
-            messages.AddMessage("Inserting")
-            del row, cursor
 
         #output information to user
             print("Succesfully copied")
@@ -330,16 +283,6 @@ def main(parameters, messages):
         del mxd
 
         try:
-            #Überprüfen, ob ein Eintrag in der Datenbank vorliegt
-            fcPfad = os.path.join(pfad,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-            #messages.AddMessage(fcPfad)
-            sql = "Name = '" + projektName +"'"
-            x=0
-            cursor = arcpy.UpdateCursor(fcPfad,sql)
-            for row in cursor:
-                #messages.AddMessage(row.Name)
-                x = x+1
-            del cursor, row
 
             #Überprüfen, ob der Projektordner existiert
             if(os.path.isdir(projektPfad)):
@@ -351,28 +294,6 @@ def main(parameters, messages):
             else:
                 print("Projektordner "+ projektName + " nicht gefunden \n")
                 messages.AddMessage("Projektordner "+ projektName + " nicht gefunden \n")
-
-            if x == 1:
-                print "Eintrag in der Datenbank gefunden"
-                messages.AddMessage("Eintrag in der Datenbank gefunden \n")
-                delcursor = arcpy.UpdateCursor(fcPfad,sql)
-                try:
-                    for fc in delcursor:
-                        #messages.AddMessage("Loeschschleife")
-                        #messages.AddMessage(fc.Name)
-                        delcursor.deleteRow(fc)
-                        print("Eintrag gelöscht")
-                        messages.AddMessage("Eintrag gelöscht \n")
-                except:
-                    messages.AddMessage("Löschen fehlgeschlagen \n")
-
-                del delcursor
-
-
-            else:
-                print("Projekt "+ projektName + " nicht gefunden")
-                messages.AddMessage("Projekt "+ projektName + " nicht gefunden \n")
-
 
             messages.AddMessage("*********************************************************************************")
             messages.AddMessage("Das Projekt " + projektName + " wurde erfolgreich entfernt \n")
