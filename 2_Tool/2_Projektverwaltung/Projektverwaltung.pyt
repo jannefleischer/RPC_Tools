@@ -9,7 +9,6 @@ import arcpy
 import teilflaecheBenennen
 import T1_Projektverwaltung
 import imp
-
 BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
                                          '..', '..'))
 LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')

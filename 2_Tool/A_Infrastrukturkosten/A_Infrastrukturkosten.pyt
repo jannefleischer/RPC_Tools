@@ -5,14 +5,14 @@ import os
 import sys
 import arcpy
 import argparse
-
-import T2_Kostenaufteilungsregel_verwalten, T5_Kostenmodell
-
-def set_parameter_as_text(params, index, val):
-    if (hasattr(params[index].value, 'value')):
-        params[index].value.value = val
-    else:
-        params[index].value = val
+import kosten_lib as k
+import T5_Kostenmodell
+import imp
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+                                         '..', '..'))
+LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib', 
+                              os.path.join(LIB_PATH, 'project_lib.py'))
 
 # Export of toolbox F:\ggr Projekte\RPC_Tools\2_Tool\A_Infrastrukturkosten\A_Infrastrukturkosten.tbx
 
@@ -40,38 +40,23 @@ class Infrastrukturkostenermittlung(object):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
         
-            tbx_path = __file__
-    
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-            tablepath_costrules = os.path.join(base_path,'2_Tool','A_Infrastrukturkosten','FGDB_Kosten_Tool.gdb','T01DEF_Kostenaufteilungsregeln')
+            list_projects = project_lib.get_projects()
+            list_projects = sorted(list_projects)
+            tablepath_costrules = os.path.join(BASE_PATH,'2_Tool','A_Infrastrukturkosten','FGDB_Kosten_Tool.gdb','T01DEF_Kostenaufteilungsregeln')
         
             try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
                 rows_costrules = arcpy.SearchCursor(tablepath_costrules)
                 message = "jep"
             except:
-                rows_projects  = []
                 rows_costrules = []
-                message = "nope"
-        
-            list_projects =[]
-        
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
-            list_projects = sorted(list_projects)
-        
+                message = "nope"        
+               
             list_costrules = []
             for row in rows_costrules:
                 list_costrules.append(row.Kostenregelname)
             list_costrules = list(set(list_costrules))
             list_costrules = sorted(list_costrules)
-        
-        
+            
             list_teilflaechen = []
         
             #set parameters
@@ -607,15 +592,8 @@ class KostenaufteilungsregelnVerwalten(object):
                         abweichung = abweichung + alterWert - neuerWert
                         self.params[s].value = neuerWert
                 return
-        
-            # Setting up paths
-            tbx_path = __file__
-    
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
-            tablepath_rules = os.path.join(base_path,'2_Tool','A_Infrastrukturkosten','FGDB_Kosten_Tool.gdb','T01DEF_Kostenaufteilungsregeln')
+                
+            tablepath_rules = os.path.join(BASE_PATH,'2_Tool','A_Infrastrukturkosten','FGDB_Kosten_Tool.gdb','T01DEF_Kostenaufteilungsregeln')
         
             i = 0
         
@@ -756,7 +734,20 @@ class KostenaufteilungsregelnVerwalten(object):
             return validator(parameters).updateMessages()
         
     def execute(self, parameters, messages):
-        T2_Kostenaufteilungsregel_verwalten.main(parameters, messages)
+        action = parameters[0].valueAsText
+        name = parameters[1].valueAsText
+        
+        gemeinden = parameters[2].value/100.
+        kreis = parameters[3].value/100.
+        private = parameters[4].value/100.
+        if action == 'Kostenaufteilungsregel anlegen':
+            k.kostenregel_anlegen(name,gemeinden,kreis,private)
+    
+        elif action == 'Kostenaufteilungsregel bearbeiten':
+            k.kostenregel_bearbeiten(name,gemeinden,kreis,private)
+    
+        elif action == 'Kostenaufteilungsregel entfernen':        
+            k.kostenregel_loeschen(name)
         
 def main():
     tbx = Toolbox()

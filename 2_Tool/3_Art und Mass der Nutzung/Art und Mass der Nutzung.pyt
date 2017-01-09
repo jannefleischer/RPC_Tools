@@ -5,11 +5,16 @@ import os
 import sys
 import datetime
 import arcpy
-import _flaechenbilanz, nutzungen
+import flaechen_bilanz, nutzungen
 import argparse
+import imp
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+                                         '..', '..'))
+LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib', 
+                              os.path.join(LIB_PATH, 'project_lib.py'))
 
 # Export of toolbox C:\GGR\RPC_Tools\2_Tool\3_Art und Mass der Nutzung\3_Art und Mass der Nutzung_alt.tbx
-
 
 class Toolbox(object):
     def __init__(self):
@@ -35,25 +40,9 @@ class Flaechenbilanz(object):
     
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
-            called when the tool is opened."""
-      
-            tbx_path = __file__
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-      
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-      
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-            except:
-                rows_projects  = []
-      
-            list_projects =[]
-      
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
+            called when the tool is opened."""      
+            
+            list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
       
             list_teilflaechen = []
@@ -246,7 +235,7 @@ class Flaechenbilanz(object):
     def __init__(self):
         self.label = u'1 Fl\xe4chenbilanz eingeben'
         self.canRunInBackground = False
-        reload(_flaechenbilanz)
+        reload(flaechen_bilanz)
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -456,7 +445,7 @@ class Flaechenbilanz(object):
             return validator(parameters).updateMessages()
          
     def execute(self, parameters, messages):
-        _flaechenbilanz.main(parameters, messages)
+        flaechen_bilanz.main(parameters, messages)
 
 
 class Nutzungen(object):
@@ -473,30 +462,10 @@ class Nutzungen(object):
   
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
-            called when the tool is opened."""
-    
-            tbx_path = __file__
-    
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-    
-            tablepath_projects = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','angelegteProjekte')
-    
-            try:
-                rows_projects = arcpy.SearchCursor(tablepath_projects)
-                message = "jep"
-            except:
-                rows_projects  = []
-                message = "nope"
-    
-            list_projects =[]
-    
-            for row in rows_projects:
-                list_projects.append(row.Name)
-            list_projects = list(set(list_projects))
-            list_projects = sorted(list_projects)
-    
+            called when the tool is opened."""    
+            
+            list_projects = project_lib.get_projects()
+            list_projects = sorted(list_projects)    
     
             list_teilflaechen = []
     
