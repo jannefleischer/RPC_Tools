@@ -23,7 +23,7 @@ import arcpy
 
 import verkehr_lib as v
 
-def main():
+def main(parameters, messages):
     gc.collect()
 
     sheetlibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
@@ -40,42 +40,42 @@ def main():
     # Variables
     i=-1
 
-    i+=1 ; projektname = arcpy.GetParameterAsText(i)
+    i+=1 ; projektname = parameters[i].valueAsText
 
     #projektname = "HCU_ZGB_OT_Salzdahlum"
 
     #Eingangsparameter Wohnen
-    i+=1 ; Wohnen_Wege_EW = arcpy.GetParameterAsText(i)
-    i+=1 ; Wohnen_MIV_Anteil = arcpy.GetParameterAsText(i)
-    i+=1 ; Wohnen_Pers_KFZ = arcpy.GetParameterAsText(i)
-    i+=1 ; Wohnen_Anteil_Besucherfahrten = arcpy.GetParameterAsText(i)
-    i+=1 ; Wohnen_WF_Fahrten_je_EW = arcpy.GetParameterAsText(i)
+    i+=1 ; Wohnen_Wege_EW = parameters[i].value
+    i+=1 ; Wohnen_MIV_Anteil = parameters[i].value / 100.
+    i+=1 ; Wohnen_Pers_KFZ = parameters[i].value
+    i+=1 ; Wohnen_Anteil_Besucherfahrten = parameters[i].value / 100.
+    i+=1 ; Wohnen_WF_Fahrten_je_EW = parameters[i].value
 
     #Eingangsparameter Versorgung
-    i+=1 ; Versorgung_BGF_Beschaeftigter = arcpy.GetParameterAsText(i)
-    i+=1 ; Versorgung_Anwesenheit = arcpy.GetParameterAsText(i)
-    i+=1 ; Versorgung_Wege_Beschaeftigter = arcpy.GetParameterAsText(i)
-    i+=1 ; Versorgung_MIV_Anteil = arcpy.GetParameterAsText(i)
-    i+=1 ; Versorgung_Pers_KFZ = arcpy.GetParameterAsText(i)
-    i+=1 ; Versorgung_Besucher_Tag = arcpy.GetParameterAsText(i)
-    i+=1 ; Versorgung_Lieferwege_100m2 = arcpy.GetParameterAsText(i)
+    i+=1 ; Versorgung_BGF_Beschaeftigter = parameters[i].value
+    i+=1 ; Versorgung_Anwesenheit = parameters[i].value
+    i+=1 ; Versorgung_Wege_Beschaeftigter = parameters[i].value
+    i+=1 ; Versorgung_MIV_Anteil = parameters[i].value / 100.
+    i+=1 ; Versorgung_Pers_KFZ = parameters[i].value
+    i+=1 ; Versorgung_Besucher_Tag = parameters[i].value
+    i+=1 ; Versorgung_Lieferwege_100m2 = parameters[i].value
 
     #Eingangsparameter Gewerbe
-    i+=1 ; Gewerbe_Anwesenheit = arcpy.GetParameterAsText(i)
-    i+=1 ; Gewerbe_Wege_Beschaeftigter = arcpy.GetParameterAsText(i)
-    i+=1 ; Gewerbe_MIV_Anteil = arcpy.GetParameterAsText(i)
-    i+=1 ; Gewerbe_Pers_KFZ = arcpy.GetParameterAsText(i)
-    i+=1 ; Gewerbe_Anteil_Besucherfahrten = arcpy.GetParameterAsText(i)
-    i+=1 ; Gewerbe_Lieferwege_Beschaeftigte = arcpy.GetParameterAsText(i)
+    i+=1 ; Gewerbe_Anwesenheit = parameters[i].value / 100.
+    i+=1 ; Gewerbe_Wege_Beschaeftigter = parameters[i].value
+    i+=1 ; Gewerbe_MIV_Anteil = parameters[i].value / 100.
+    i+=1 ; Gewerbe_Pers_KFZ = parameters[i].value
+    i+=1 ; Kundenwege_Beschaeftigte = parameters[i].value
+    i+=1 ; Gewerbe_Lieferwege_Beschaeftigte = parameters[i].value
 
     #Eingangsparameter Schulen
-    i+=1 ; Schulen_Wege_Schueler = arcpy.GetParameterAsText(i)
-    i+=1 ; Schulen_MIV_Anteil = arcpy.GetParameterAsText(i)
-    i+=1 ; Schulen_Schueler_KFZ = arcpy.GetParameterAsText(i)
-    i+=1 ; Schulen_Schueler_je_Lehrer = arcpy.GetParameterAsText(i)
-    i+=1 ; Schulen_Wege_Lehrer = arcpy.GetParameterAsText(i)
-    i+=1 ; Schulen_Pers_KFZ = arcpy.GetParameterAsText(i)
-    i+=1 ; Schulen_Lieferwege_Schueler = arcpy.GetParameterAsText(i)
+    i+=1 ; Schulen_Wege_Schueler = parameters[i].value
+    i+=1 ; Schulen_MIV_Anteil = parameters[i].value / 100.
+    i+=1 ; Schulen_Schueler_KFZ = parameters[i].value
+    i+=1 ; Schulen_Schueler_je_Lehrer = parameters[i].value
+    i+=1 ; Schulen_Wege_Lehrer = parameters[i].value
+    i+=1 ; Schulen_Pers_KFZ = parameters[i].value
+    i+=1 ; Schulen_Lieferwege_Schueler = parameters[i].value
 
 
     # Workspaces
@@ -117,7 +117,7 @@ def main():
     #
     #############################################################################################################
     beginmeldung = 'Erzeugen der Eingangsdaten je Siedlungszelle \n'
-    arcpy.AddMessage(beginmeldung)
+    messages.AddMessage(beginmeldung)
     print beginmeldung
 
     # First, make a layer from the feature class
@@ -139,9 +139,9 @@ def main():
 
     #Fuege Felder fuer die Ergebniseintraege an
     addfiellist =["fahrten_wohnen_ew_tag","fahrten_wohnen_besucher_tag","fahrten_wohnen_wf_tag",
-    "fahrten_versorgung_beschaeftigte_tag","fahrten_versorgung_kunden_tag","fahrten_versorgung_wf_tag",
-    "fahrten_gewerbe_beschaeftigte_tag","fahrten_gewerbe_besucher_tag","fahrten_gewerbe_wf_tag",
-    "fahrten_schulen_schueler_tag","fahrten_schulen_lehrer_tag","fahrten_schulen_wf_tag"]
+                  "fahrten_versorgung_beschaeftigte_tag","fahrten_versorgung_kunden_tag","fahrten_versorgung_wf_tag",
+                  "fahrten_gewerbe_beschaeftigte_tag","fahrten_gewerbe_besucher_tag","fahrten_gewerbe_wf_tag",
+                  "fahrten_schulen_schueler_tag","fahrten_schulen_lehrer_tag","fahrten_schulen_wf_tag"]
 
     for f in addfiellist:
         arcpy.AddField_management(siedlungszellenlayer_eingangsdaten, f, "Double", "", "", "")
@@ -149,7 +149,7 @@ def main():
 
     #############################################################################################################
     beginmeldung = 'Erzeugen der Eingangsdaten je Teilfaeche Plangebiet \n'
-    arcpy.AddMessage(beginmeldung)
+    messages.AddMessage(beginmeldung)
     print beginmeldung
 
     #kopiere Teilflaechenlayer als Eingangsdatenlayer fuer Verkehrsmengenerzeugung und loesche nicht benoetigte felder
@@ -178,18 +178,18 @@ def main():
     ausgabetabelle = (workspace_projekt_definition,'Einwohnerzahl_max')
 
     sql = """SELECT Einwohnerzahl.Teilflaeche_Plangebiet, Max(Einwohnerzahl.Einwohnerzahl) AS EW INTO Einwohnerzahl_max
-    FROM Einwohnerzahl
-    GROUP BY Einwohnerzahl.Teilflaeche_Plangebiet;
-    """
+                FROM Einwohnerzahl
+                GROUP BY Einwohnerzahl.Teilflaeche_Plangebiet;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
 
     #Fuege Felder fuer die Ergebniseintraege an
     addfiellist = ["TF_Einwohner","Verkaufsflaeche","Arbeitsplaetze","Schueler","fahrten_wohnen_ew_tag","fahrten_wohnen_besucher_tag","fahrten_wohnen_wf_tag",
-    "fahrten_versorgung_beschaeftigte_tag","fahrten_versorgung_kunden_tag","fahrten_versorgung_wf_tag",
-    "fahrten_gewerbe_beschaeftigte_tag","fahrten_gewerbe_besucher_tag","fahrten_gewerbe_wf_tag",
-    "fahrten_schulen_schueler_tag","fahrten_schulen_lehrer_tag","fahrten_schulen_wf_tag"]
+                   "fahrten_versorgung_beschaeftigte_tag","fahrten_versorgung_kunden_tag","fahrten_versorgung_wf_tag",
+                   "fahrten_gewerbe_beschaeftigte_tag","fahrten_gewerbe_besucher_tag","fahrten_gewerbe_wf_tag",
+                   "fahrten_schulen_schueler_tag","fahrten_schulen_lehrer_tag","fahrten_schulen_wf_tag"]
 
     for f in addfiellist:
         arcpy.AddField_management(projektlayer_eingangsdaten, f, "Double", "", "", "")
@@ -219,10 +219,10 @@ def main():
     ausgabetabelle = (workspace_projekt_definition,'Gewerbe_Beschaeftigte_temp')
 
     sql = """SELECT Gewerbe_Beschaeftigte.Jahr, Gewerbe_Beschaeftigte.Teilflaeche_Plangebiet, Sum(Gewerbe_Beschaeftigte.Anzahl) AS Summe INTO Gewerbe_Beschaeftigte_temp
-    FROM Gewerbe_Beschaeftigte
-    GROUP BY Gewerbe_Beschaeftigte.Jahr, Gewerbe_Beschaeftigte.Teilflaeche_Plangebiet
-    ORDER BY Gewerbe_Beschaeftigte.Jahr, Gewerbe_Beschaeftigte.Teilflaeche_Plangebiet, Sum(Gewerbe_Beschaeftigte.Anzahl);
-    """
+                FROM Gewerbe_Beschaeftigte
+                GROUP BY Gewerbe_Beschaeftigte.Jahr, Gewerbe_Beschaeftigte.Teilflaeche_Plangebiet
+                ORDER BY Gewerbe_Beschaeftigte.Jahr, Gewerbe_Beschaeftigte.Teilflaeche_Plangebiet, Sum(Gewerbe_Beschaeftigte.Anzahl);
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
@@ -233,9 +233,9 @@ def main():
     ausgabetabelle = (workspace_projekt_definition,'Gewerbe_Beschaeftigte_Max')
 
     sql = """SELECT Gewerbe_Beschaeftigte_temp.Teilflaeche_Plangebiet, Max(Gewerbe_Beschaeftigte_temp.Summe) AS [Max] INTO Gewerbe_Beschaeftigte_Max
-    FROM Gewerbe_Beschaeftigte_temp
-    GROUP BY Gewerbe_Beschaeftigte_temp.Teilflaeche_Plangebiet;
-    """
+                FROM Gewerbe_Beschaeftigte_temp
+                GROUP BY Gewerbe_Beschaeftigte_temp.Teilflaeche_Plangebiet;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
@@ -265,10 +265,10 @@ def main():
     ausgabetabelle = (workspace_projekt_definition,'Versorgung_Verkaufsflaechen_temp')
 
     sql = """SELECT Versorgung_Verkaufsflaechen.Jahr, Versorgung_Verkaufsflaechen.Teilflaeche_Plangebiet, Sum(Versorgung_Verkaufsflaechen.Verkaufsflaeche) AS Summe INTO Versorgung_Verkaufsflaechen_temp
-    FROM Versorgung_Verkaufsflaechen
-    GROUP BY Versorgung_Verkaufsflaechen.Jahr, Versorgung_Verkaufsflaechen.Teilflaeche_Plangebiet
-    ORDER BY Versorgung_Verkaufsflaechen.Jahr, Versorgung_Verkaufsflaechen.Teilflaeche_Plangebiet, Sum(Versorgung_Verkaufsflaechen.Verkaufsflaeche);
-    """
+                FROM Versorgung_Verkaufsflaechen
+                GROUP BY Versorgung_Verkaufsflaechen.Jahr, Versorgung_Verkaufsflaechen.Teilflaeche_Plangebiet
+                ORDER BY Versorgung_Verkaufsflaechen.Jahr, Versorgung_Verkaufsflaechen.Teilflaeche_Plangebiet, Sum(Versorgung_Verkaufsflaechen.Verkaufsflaeche);
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
@@ -279,9 +279,9 @@ def main():
     ausgabetabelle = (workspace_projekt_definition,'Versorgung_Verkaufsflaechen_Max')
 
     sql = """SELECT Versorgung_Verkaufsflaechen_temp.Teilflaeche_Plangebiet, Max(Versorgung_Verkaufsflaechen_temp.Summe) AS [Max] INTO Versorgung_Verkaufsflaechen_Max
-    FROM Versorgung_Verkaufsflaechen_temp
-    GROUP BY Versorgung_Verkaufsflaechen_temp.Teilflaeche_Plangebiet;
-    """
+                FROM Versorgung_Verkaufsflaechen_temp
+                GROUP BY Versorgung_Verkaufsflaechen_temp.Teilflaeche_Plangebiet;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
@@ -303,7 +303,7 @@ def main():
 
     #############################################################################################################
     beginmeldung = 'Verkehrsmengenerzeugung Nullfall \n'
-    arcpy.AddMessage(beginmeldung)
+    messages.AddMessage(beginmeldung)
     print beginmeldung
 
     rows = arcpy.SearchCursor(siedlungszellenlayer_eingangsdaten)
@@ -327,7 +327,7 @@ def main():
         #Starte Berechnungen je Siedlungszelle
         fahrten_EW = v.verkehrserzeugung_einwohner(EW,Wohnen_Wege_EW,Wohnen_MIV_Anteil,Wohnen_Pers_KFZ,Wohnen_Anteil_Besucherfahrten,Wohnen_WF_Fahrten_je_EW)
         fahrten_versorgung = v.verkehrserzeugung_einzelhandel(BGF,Versorgung_BGF_Beschaeftigter,Versorgung_Anwesenheit,Versorgung_Wege_Beschaeftigter,Versorgung_MIV_Anteil,Versorgung_Pers_KFZ,Versorgung_Besucher_Tag,Versorgung_Lieferwege_100m2)
-        fahrten_gewerbe = v.verkehrserzeugung_gewerbe(Beschaeftigte,Gewerbe_Anwesenheit,Gewerbe_Wege_Beschaeftigter,Gewerbe_MIV_Anteil,Gewerbe_Pers_KFZ,Gewerbe_Anteil_Besucherfahrten,Gewerbe_Lieferwege_Beschaeftigte)
+        fahrten_gewerbe = v.verkehrserzeugung_gewerbe(Beschaeftigte,Gewerbe_Anwesenheit,Gewerbe_Wege_Beschaeftigter,Gewerbe_MIV_Anteil,Gewerbe_Pers_KFZ,Kundenwege_Beschaeftigte,Gewerbe_Lieferwege_Beschaeftigte)
         fahrten_schule = v.verkehrserzeugung_schulen(Schueler,Schulen_Wege_Schueler,Schulen_MIV_Anteil,Schulen_Schueler_KFZ,Schulen_Schueler_je_Lehrer,Schulen_Wege_Lehrer,Schulen_Pers_KFZ,Schulen_Lieferwege_Schueler)
 
         rows2 = arcpy.UpdateCursor(siedlungszellenlayer_eingangsdaten)
@@ -359,7 +359,7 @@ def main():
 
     #############################################################################################################
     beginmeldung = 'Verkehrsmengenerzeugung Planfall \n'
-    arcpy.AddMessage(beginmeldung)
+    messages.AddMessage(beginmeldung)
     print beginmeldung
 
     rows = arcpy.SearchCursor(projektlayer_eingangsdaten)
@@ -382,7 +382,7 @@ def main():
         #Starte Berechnungen je Projektteilflaeche
         fahrten_EW = v.verkehrserzeugung_einwohner(EW,Wohnen_Wege_EW,Wohnen_MIV_Anteil,Wohnen_Pers_KFZ,Wohnen_Anteil_Besucherfahrten,Wohnen_WF_Fahrten_je_EW)
         fahrten_versorgung = v.verkehrserzeugung_einzelhandel(BGF,Versorgung_BGF_Beschaeftigter,Versorgung_Anwesenheit,Versorgung_Wege_Beschaeftigter,Versorgung_MIV_Anteil,Versorgung_Besucher_Tag,Versorgung_Pers_KFZ,Versorgung_Lieferwege_100m2)
-        fahrten_gewerbe = v.verkehrserzeugung_gewerbe(Beschaeftigte,Gewerbe_Anwesenheit,Gewerbe_Wege_Beschaeftigter,Gewerbe_MIV_Anteil,Gewerbe_Pers_KFZ,Gewerbe_Anteil_Besucherfahrten,Gewerbe_Lieferwege_Beschaeftigte)
+        fahrten_gewerbe = v.verkehrserzeugung_gewerbe(Beschaeftigte,Gewerbe_Anwesenheit,Gewerbe_Wege_Beschaeftigter,Gewerbe_MIV_Anteil,Gewerbe_Pers_KFZ,Kundenwege_Beschaeftigte,Gewerbe_Lieferwege_Beschaeftigte)
         fahrten_schule = v.verkehrserzeugung_schulen(Schueler,Schulen_Wege_Schueler,Schulen_MIV_Anteil,Schulen_Schueler_KFZ,Schulen_Schueler_je_Lehrer,Schulen_Wege_Lehrer,Schulen_Pers_KFZ,Schulen_Lieferwege_Schueler)
 
         rows2 = arcpy.UpdateCursor(projektlayer_eingangsdaten)
@@ -415,7 +415,7 @@ def main():
 
     #############################################################################################################
     beginmeldung = 'Verkehrsmengen an Routen anspielen  \n'
-    arcpy.AddMessage(beginmeldung)
+    messages.AddMessage(beginmeldung)
     print beginmeldung
 
     #Abschnitt Nullfall
@@ -430,9 +430,9 @@ def main():
     ausgabetabelle = (workspace_projekt_verkehr,'L13_SZ_Routen_Verkehrsmenge')
 
     sql = """SELECT L03_Routen_SZ.Routen_ID, L03_Routen_SZ.SZ_ID, L03_Routen_SZ.Punkt_Name, ([QP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2 AS Wohnen_QP, ([ZP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2 AS Wohnen_ZP, ([QP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2 AS Versorgung_QP, ([QP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2 AS Schulen_QP, ([ZP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2 AS Versorgung_ZP, ([QP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2 AS Gewerbe_QP, ([ZP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2 AS Gewerbe_ZP, ([ZP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2 AS Schulen_ZP INTO L13_SZ_Routen_Verkehrsmenge
-    FROM (L01_Uebergabepunkte INNER JOIN L03_Routen_SZ ON L01_Uebergabepunkte.Punkt_Name = L03_Routen_SZ.Punkt_Name) INNER JOIN L12_SZ_Projektumfeld_Daten_Verkehrserzeugung ON L03_Routen_SZ.SZ_ID = L12_SZ_Projektumfeld_Daten_Verkehrserzeugung.SZ_ID
-    GROUP BY L03_Routen_SZ.Routen_ID, L03_Routen_SZ.SZ_ID, L03_Routen_SZ.Punkt_Name, ([QP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([ZP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([QP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2, ([ZP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2;
-    """
+                FROM (L01_Uebergabepunkte INNER JOIN L03_Routen_SZ ON L01_Uebergabepunkte.Punkt_Name = L03_Routen_SZ.Punkt_Name) INNER JOIN L12_SZ_Projektumfeld_Daten_Verkehrserzeugung ON L03_Routen_SZ.SZ_ID = L12_SZ_Projektumfeld_Daten_Verkehrserzeugung.SZ_ID
+                GROUP BY L03_Routen_SZ.Routen_ID, L03_Routen_SZ.SZ_ID, L03_Routen_SZ.Punkt_Name, ([QP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([ZP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([QP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2, ([ZP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
@@ -449,14 +449,14 @@ def main():
     ausgabetabelle = (workspace_projekt_verkehr,'L13_TF_Routen_Verkehrsmenge')
 
     sql = """SELECT L03_Routen_TF.Routen_ID, L03_Routen_TF.TF_ID, L03_Routen_TF.Punkt_Name, ([QP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2 AS Wohnen_QP, ([ZP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2 AS Wohnen_ZP, ([QP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2 AS Versorgung_QP, ([QP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2 AS Schulen_QP, ([ZP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2 AS Versorgung_ZP, ([QP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2 AS Gewerbe_QP, ([ZP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2 AS Gewerbe_ZP, ([ZP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2 AS Schulen_ZP INTO L13_TF_Routen_Verkehrsmenge
-    FROM (L01_Uebergabepunkte INNER JOIN L03_Routen_TF ON L01_Uebergabepunkte.Punkt_Name = L03_Routen_TF.Punkt_Name) INNER JOIN L12_TF_Daten_Verkehrserzeugung ON L03_Routen_TF.TF_ID = L12_TF_Daten_Verkehrserzeugung.TF_ID
-    GROUP BY L03_Routen_TF.Routen_ID, L03_Routen_TF.TF_ID, L03_Routen_TF.Punkt_Name, ([QP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([ZP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([QP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2, ([ZP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2;"""
+                FROM (L01_Uebergabepunkte INNER JOIN L03_Routen_TF ON L01_Uebergabepunkte.Punkt_Name = L03_Routen_TF.Punkt_Name) INNER JOIN L12_TF_Daten_Verkehrserzeugung ON L03_Routen_TF.TF_ID = L12_TF_Daten_Verkehrserzeugung.TF_ID
+                GROUP BY L03_Routen_TF.Routen_ID, L03_Routen_TF.TF_ID, L03_Routen_TF.Punkt_Name, ([QP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([ZP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([QP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2, ([ZP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2;"""
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #############################################################################################################
     beginmeldung = 'Routenmengen an Ausgaberaster anspielen \n'
-    arcpy.AddMessage(beginmeldung)
+    messages.AddMessage(beginmeldung)
     print beginmeldung
 
     eingangstabellen = [
@@ -468,9 +468,9 @@ def main():
     ausgabetabelle = (workspace_projekt_verkehr,'L14_SZ_Grid_Verkehrsmenge')
 
     sql = """SELECT L06_Routen_je_Kachel.GRID_ID, Sum([L13_TF_Routen_Verkehrsmenge]![Wohnen_QP]+[L13_TF_Routen_Verkehrsmenge]![Wohnen_ZP]+[L13_TF_Routen_Verkehrsmenge]![Versorgung_QP]+[L13_TF_Routen_Verkehrsmenge]![Versorgung_ZP]+[L13_TF_Routen_Verkehrsmenge]![Gewerbe_QP]+[L13_TF_Routen_Verkehrsmenge]![Gewerbe_ZP]+[L13_TF_Routen_Verkehrsmenge]![Schulen_QP]+[L13_TF_Routen_Verkehrsmenge]![Schulen_ZP]) AS Traffic_Plangebiet, Sum([L13_SZ_Routen_Verkehrsmenge]![Wohnen_QP]+[L13_SZ_Routen_Verkehrsmenge]![Wohnen_ZP]+[L13_SZ_Routen_Verkehrsmenge]![Versorgung_QP]+[L13_SZ_Routen_Verkehrsmenge]![Versorgung_ZP]+[L13_SZ_Routen_Verkehrsmenge]![Gewerbe_QP]+[L13_SZ_Routen_Verkehrsmenge]![Gewerbe_ZP]+[L13_SZ_Routen_Verkehrsmenge]![Schulen_QP]+[L13_SZ_Routen_Verkehrsmenge]![Schulen_ZP]) AS Traffic_Nullfall INTO L14_SZ_Grid_Verkehrsmenge
-    FROM (L06_Routen_je_Kachel LEFT JOIN L13_TF_Routen_Verkehrsmenge ON L06_Routen_je_Kachel.Route_ID = L13_TF_Routen_Verkehrsmenge.Routen_ID) LEFT JOIN L13_SZ_Routen_Verkehrsmenge ON L06_Routen_je_Kachel.Route_ID = L13_SZ_Routen_Verkehrsmenge.Routen_ID
-    GROUP BY L06_Routen_je_Kachel.GRID_ID;
-    """
+                FROM (L06_Routen_je_Kachel LEFT JOIN L13_TF_Routen_Verkehrsmenge ON L06_Routen_je_Kachel.Route_ID = L13_TF_Routen_Verkehrsmenge.Routen_ID) LEFT JOIN L13_SZ_Routen_Verkehrsmenge ON L06_Routen_je_Kachel.Route_ID = L13_SZ_Routen_Verkehrsmenge.Routen_ID
+                GROUP BY L06_Routen_je_Kachel.GRID_ID;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
@@ -502,7 +502,7 @@ def main():
     #############################################################################################################
     #Setze Pfad auf Vorlagen - MXD und tausche Datenquelle aus
     schrittmeldung = 'Vorbereitung Ergebnisexport \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     #Checke Pfad der mxd_template und tausche diesen aus
@@ -547,7 +547,7 @@ def main():
     #############################################################################################################
     #Aufraeumen und ueberfluessige Variablen loeschen
     schrittmeldung = 'Aufraeumen und ueberfluessige Variablen loeschen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     routen_ergebniskacheln_sz_join = os.path.join(workspace_projekt_verkehr,"L05_Ergebniskacheln_sz_join")
@@ -568,6 +568,3 @@ def main():
     # Endmeldung
     message = 'Script abgeschlossen'
     print message
-
-if __name__ == '__main__':
-    main()

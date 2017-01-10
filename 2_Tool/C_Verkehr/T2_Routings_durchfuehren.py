@@ -26,7 +26,7 @@ from arcpy import env
 
 import verkehr_lib as v
 
-def main():
+def main(parameters, messages):
     mdblibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
     mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
@@ -35,8 +35,8 @@ def main():
     # Variables
     i=-1
 
-    i+=1 ; projektname = arcpy.GetParameterAsText(i)
-    i+=1 ; mapquest_key = arcpy.GetParameterAsText(i)
+    i+=1 ; projektname = parameters[i].valueAsText
+    i+=1 ; mapquest_key = parameters[i].valueAsText
 
     #projektname = "Bultweg-Sued_02_verdichtet_mit_Versorger"
 
@@ -82,12 +82,12 @@ def main():
     #
     #############################################################################################################
     beginmeldung = 'Starte Routenberechnung und Verkehrsmengenerzeugung \n'
-    arcpy.AddMessage(beginmeldung)
+    messages.AddMessage(beginmeldung)
     print beginmeldung
     #############################################################################################################
     # Punktlayer aus Siedlungszellen erzeugen
     schrittmeldung = 'Punktlayer aus Siedlungszellen erzeugen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     # Process: Feature-Class erstellen
@@ -117,7 +117,7 @@ def main():
         feat = polygon_row.getValue(shapeName)
         SZ_ID = polygon_row.SZ_ID
         werte = (SZ_ID, feat.trueCentroid)
-        #arcpy.AddMessage(werte)
+        #messages.AddMessage(werte)
         #print werte
 
         latValue = str(feat.trueCentroid).split(' ')[1]
@@ -143,7 +143,7 @@ def main():
     #############################################################################################################
     # TeilflaechenIDs erzeugen
     schrittmeldung = 'TeilflaechenIDs erzeugen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     try:
@@ -160,7 +160,7 @@ def main():
     #############################################################################################################
     # Erzeuge Punktlayer fuer Teilflaechen
     schrittmeldung = 'Erzeuge Punktlayer fuer Teilflaechen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     try:
@@ -189,7 +189,7 @@ def main():
         feat = polygon_row.getValue(shapeName)
         TF_ID = polygon_row.TF_ID
         #werte = (TF_ID, feat.trueCentroid)
-        #arcpy.AddMessage(werte)
+        #messages.AddMessage(werte)
         #print werte
 
         latValue = str(feat.trueCentroid).split(' ')[1]
@@ -215,7 +215,7 @@ def main():
     #############################################################################################################
     # XY-Koordinaten fuer Uebergabepunkte erzeugen
     schrittmeldung = 'XY-Koordinaten fuer Uebergabepunkte erzeugen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     try:
@@ -237,7 +237,7 @@ def main():
     #############################################################################################################
     # Selektiere Siedlungszellen im Projektumfeld
     schrittmeldung = 'Selektiere Siedlungszellen im Projektumfeld \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     # First, make a layer from the feature class
@@ -258,7 +258,7 @@ def main():
 
     # Erzeuge Routendatenbank
     schrittmeldung = 'Erzeuge Routendatenbank \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     arcpy.env.overwriteOutput = True
@@ -279,14 +279,14 @@ def main():
 
     # run SQL code to create table in PGDB
     sql = """CREATE TABLE routes
-    (
-    route_id int,
-    lat1 double,
-    lon1 double,
-    lat2 double,
-    lon2 double,
-    checksum double
-    );"""
+                (
+                route_id int,
+                lat1 double,
+                lon1 double,
+                lat2 double,
+                lon2 double,
+                checksum double
+                );"""
 
     connectionstring = 'DRIVER={Microsoft Access Driver (*.mdb)};DBQ='+temp_mdb_path # create connection string
 
@@ -294,19 +294,19 @@ def main():
     cursor = conn.cursor()
     try:
         cursor.execute(sql)
-        arcpy.AddMessage("Befehl ausgefuehrt \n")
+        messages.AddMessage("Befehl ausgefuehrt \n")
     except Exception as e:
         print sql
         print e
         print "sql-fehlerhaft"
-        arcpy.AddMessage("sql-fehlerhaft \n")
+        messages.AddMessage("sql-fehlerhaft \n")
     conn.commit()
     conn.close()
 
     #############################################################################################################
     # Erzeuge Liste der SZ Routings
     schrittmeldung = 'Erzeuge Liste der Verkehrszellenroutings \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     eingangstabellen = [
@@ -317,17 +317,17 @@ def main():
     ausgabetabelle = (workspace_projekt_verkehr,'L03_Routen_SZ')
 
     sql = """SELECT L02_SZ_Umfeld.SZ_ID, L02_SZ_Umfeld.POINT_Y AS SZ_lat, L02_SZ_Umfeld.POINT_X AS SZ_lon, L01_Uebergabepunkte.Punkt_Name, L01_Uebergabepunkte.POINT_Y AS UP_lat, L01_Uebergabepunkte.POINT_X AS UP_lon
-    INTO L03_Routen_SZ
-    FROM L01_Uebergabepunkte, L02_SZ_Umfeld
-    ORDER BY L02_SZ_Umfeld.SZ_ID, L01_Uebergabepunkte.Punkt_Name;
-    """
+                INTO L03_Routen_SZ
+                FROM L01_Uebergabepunkte, L02_SZ_Umfeld
+                ORDER BY L02_SZ_Umfeld.SZ_ID, L01_Uebergabepunkte.Punkt_Name;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #############################################################################################################
     # RoutingIDs - SZ erzeugen
     schrittmeldung = 'RoutingIDs - SZ erzeugen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     arcpy.AddField_management(routen_sz, "Routen_ID", "LONG", 9, "", "", "SZ_ID", "NULLABLE", "REQUIRED")
@@ -336,7 +336,7 @@ def main():
     #############################################################################################################
     # Durchfuehrung Routings - SZ (kann einige Zeit dauern)
     schrittmeldung = 'Durchfuehrung Routings und Geometrieerzeugung - SZ (kann einige Zeit dauern) \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     # Process: Feature-Class erstellen
@@ -360,7 +360,7 @@ def main():
         count = count - 1
         if count % 50 == 0:
             meldung = "Noch "+ str(count) + " Routen werden berechnet."
-            arcpy.AddMessage(meldung)
+            messages.AddMessage(meldung)
 
         try:
             print row.Routen_ID
@@ -403,18 +403,18 @@ def main():
             del feat,cursor,array
 
         except Exception as e:
-            print arcpy.AddMessage(e)
+            print messages.AddMessage(e)
 
     del rows
 
     schrittmeldung = 'Geometrieerzeugug Siedlungszellen abgeschlossen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     #############################################################################################################
     # Bereinige Geometrien aus Routings - SZ
     schrittmeldung = 'Bereinige Geometrien aus Routings \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     # Local variables:
@@ -431,7 +431,7 @@ def main():
 
     # Erzeuge Erzeuge Routendatenbank
     schrittmeldung = 'Erzeuge Routendatenbank \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     arcpy.env.overwriteOutput = True
@@ -452,14 +452,14 @@ def main():
 
     # run SQL code to create table in PGDB
     sql = """CREATE TABLE routes
-    (
-    route_id int,
-    lat1 double,
-    lon1 double,
-    lat2 double,
-    lon2 double,
-    checksum double
-    );"""
+                (
+                route_id int,
+                lat1 double,
+                lon1 double,
+                lat2 double,
+                lon2 double,
+                checksum double
+                );"""
 
     connectionstring = 'DRIVER={Microsoft Access Driver (*.mdb)};DBQ='+temp_mdb_path # create connection string
 
@@ -467,19 +467,19 @@ def main():
     cursor = conn.cursor()
     try:
         cursor.execute(sql)
-        #arcpy.AddMessage("Befehl ausgefuehrt \n")
+        #messages.AddMessage("Befehl ausgefuehrt \n")
     except Exception as e:
         print sql
         print e
         print "sql-fehlerhaft"
-        #arcpy.AddMessage("sql-fehlerhaft \n")
+        #messages.AddMessage("sql-fehlerhaft \n")
     conn.commit()
     conn.close()
 
     #############################################################################################################
     # Erzeuge Liste der Teilflaechen Routings
     schrittmeldung = 'Erzeuge Liste der Teilflaechenroutings \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     eingangstabellen = [
@@ -490,17 +490,17 @@ def main():
     ausgabetabelle = (workspace_projekt_verkehr,'L03_Routen_TF')
 
     sql = """SELECT Teilflaechen_Plangebiet_Centroide.TF_ID, Teilflaechen_Plangebiet_Centroide.POINT_Y AS TF_lat, Teilflaechen_Plangebiet_Centroide.POINT_X AS TF_lon, L01_Uebergabepunkte.Punkt_Name, L01_Uebergabepunkte.POINT_Y AS UP_lat, L01_Uebergabepunkte.POINT_X AS UP_lon
-    INTO L03_Routen_TF
-    FROM L01_Uebergabepunkte, Teilflaechen_Plangebiet_Centroide
-    ORDER BY Teilflaechen_Plangebiet_Centroide.TF_ID, L01_Uebergabepunkte.Punkt_Name;
-    """
+                INTO L03_Routen_TF
+                FROM L01_Uebergabepunkte, Teilflaechen_Plangebiet_Centroide
+                ORDER BY Teilflaechen_Plangebiet_Centroide.TF_ID, L01_Uebergabepunkte.Punkt_Name;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #############################################################################################################
     # RoutingIDs - Teilflaechen erzeugen
     schrittmeldung = 'RoutingIDs - Teilflaechen erzeugen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     arcpy.AddField_management(routen_tf, "Routen_ID", "LONG", 9, "", "", "SZ_ID", "NULLABLE", "REQUIRED")
@@ -509,7 +509,7 @@ def main():
     #############################################################################################################
     # Durchfuehrung Routings und Geometrieerzeugung - TF (kann einige Zeit dauern)
     schrittmeldung = 'Durchfuehrung Routings und Geometrieerzeugung - TF (kann einige Zeit dauern) \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     # Process: Feature-Class erstellen
@@ -562,18 +562,18 @@ def main():
 
         except Exception as e:
             print e
-            arcpy.AddMessage(e)
+            messages.AddMessage(e)
 
     del rows
 
     schrittmeldung = 'Geometrieerzeugug Teilflaechen abgeschlossen  \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     #############################################################################################################
     # Bereinige Geometrien aus Routings - Teilflaechen
     schrittmeldung = 'Bereinige Geometrien aus Routings - Teilflaechen'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     # Local variables:
@@ -587,7 +587,7 @@ def main():
     #############################################################################################################
     # Erzeuge Zielkacheln
     schrittmeldung = 'Erzeuge Zielkacheln \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     env.outputCoordinateSystem = arcpy.SpatialReference(4326)
@@ -643,7 +643,7 @@ def main():
     #############################################################################################################
     # Schreibe Werte an Zielkacheln
     schrittmeldung = 'Schreibe Werte an Zielkacheln \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     variablestring1 = "GRID_ID \"GRID_ID\" true true true 4 Long 0 0 ,First,#,"+routen_geometrie_sz+",GRID_ID,-1,-1;Route_ID \"Route_ID\" true true false 8 Double 0 0 ,First,#,"+routen_geometrie_sz+",Route_ID,-1,-1"
@@ -656,7 +656,7 @@ def main():
     #############################################################################################################
     # Erzeuge Liste der Routen je Ergebniskachel
     schrittmeldung = 'Erzeuge Liste der Routen je Ergebniskachel \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     eingangstabellen = [
@@ -668,26 +668,26 @@ def main():
 
     sql = """select * into L06_Routen_je_Kachel
 
-    from (
-    SELECT L05_Ergebniskacheln_sz_join.GRID_ID, L05_Ergebniskacheln_sz_join.Route_ID
-    FROM L05_Ergebniskacheln_sz_join
-    GROUP BY L05_Ergebniskacheln_sz_join.GRID_ID, L05_Ergebniskacheln_sz_join.Route_ID
+                from (
+                SELECT L05_Ergebniskacheln_sz_join.GRID_ID, L05_Ergebniskacheln_sz_join.Route_ID
+                FROM L05_Ergebniskacheln_sz_join
+                GROUP BY L05_Ergebniskacheln_sz_join.GRID_ID, L05_Ergebniskacheln_sz_join.Route_ID
 
-    union
+                union
 
-    SELECT L05_Ergebniskacheln_tf_join.GRID_ID, L05_Ergebniskacheln_tf_join.Route_ID
-    FROM L05_Ergebniskacheln_tf_join
-    GROUP BY L05_Ergebniskacheln_tf_join.GRID_ID, L05_Ergebniskacheln_tf_join.Route_ID
-    )
-    as a;
-    """
+                SELECT L05_Ergebniskacheln_tf_join.GRID_ID, L05_Ergebniskacheln_tf_join.Route_ID
+                FROM L05_Ergebniskacheln_tf_join
+                GROUP BY L05_Ergebniskacheln_tf_join.GRID_ID, L05_Ergebniskacheln_tf_join.Route_ID
+                )
+                as a;
+                """
 
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #############################################################################################################
     #Aufraeumen und ueberfluessige Variablen loeschen
     schrittmeldung = 'Aufraeumen und ueberfluessige Variablen loeschen \n'
-    arcpy.AddMessage(schrittmeldung)
+    messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
     shutil.rmtree(out_folder_path)
@@ -697,7 +697,4 @@ def main():
     # Endmeldung
     message = 'Script abgeschlossen'
     print message
-    arcpy.AddMessage(message)
-
-if __name__ == '__main__':
-    main()
+    messages.AddMessage(message)

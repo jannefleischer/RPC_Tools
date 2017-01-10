@@ -17,10 +17,9 @@
 # Allgemeine Funktionen
 #
 
+import sys, os, arcpy
 
 def kostenregel_anlegen(name,gemeinden,kreis,private):
-    print "anlegen"
-    import sys, os, arcpy
     # Create Paths
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
     kosten_tool = os.path.join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
@@ -32,6 +31,7 @@ def kostenregel_anlegen(name,gemeinden,kreis,private):
     row.Kostenregelname = name
     row.Kostentraeger = 1
     row.Anteil = gemeinden
+    row.Vorgabewert = 0
     rows.insertRow(row)
 
     #kreis
@@ -40,6 +40,7 @@ def kostenregel_anlegen(name,gemeinden,kreis,private):
     row.Kostenregelname = name
     row.Kostentraeger = 2
     row.Anteil = kreis
+    row.Vorgabewert = 0
     rows.insertRow(row)
 
     #private
@@ -48,6 +49,7 @@ def kostenregel_anlegen(name,gemeinden,kreis,private):
     row.Kostenregelname = name
     row.Kostentraeger = 3
     row.Anteil = private
+    row.Vorgabewert = 0
     rows.insertRow(row)
 
     #text = gemeinden,kreis,private
@@ -60,8 +62,6 @@ def kostenregel_anlegen(name,gemeinden,kreis,private):
 
 
 def kostenregel_bearbeiten(name,gemeinden,kreis,private):
-    import sys, os, arcpy
-    print "bearbeiten"
     # Create Paths
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
     kosten_tool = os.path.join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
@@ -85,6 +85,7 @@ def kostenregel_bearbeiten(name,gemeinden,kreis,private):
     row.Kostenregelname = name
     row.Kostentraeger = 1
     row.Anteil = gemeinden
+    row.Vorgabewert = 0
     rows.insertRow(row)
 
     #kreis
@@ -93,6 +94,7 @@ def kostenregel_bearbeiten(name,gemeinden,kreis,private):
     row.Kostenregelname = name
     row.Kostentraeger = 2
     row.Anteil = kreis
+    row.Vorgabewert = 0
     rows.insertRow(row)
 
     #private
@@ -101,6 +103,7 @@ def kostenregel_bearbeiten(name,gemeinden,kreis,private):
     row.Kostenregelname = name
     row.Kostentraeger = 3
     row.Anteil = private
+    row.Vorgabewert = 0
     rows.insertRow(row)
 
     # Delete cursor and row objects to remove locks on the data
@@ -108,8 +111,6 @@ def kostenregel_bearbeiten(name,gemeinden,kreis,private):
     del row, rows
 
 def kostenregel_loeschen(name):
-    import sys, os, arcpy
-    print "loeschen"
     # Create Paths
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
     kosten_tool = os.path.join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")

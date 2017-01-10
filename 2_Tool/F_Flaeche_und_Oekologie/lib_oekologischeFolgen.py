@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
 # REGIOPROJEKTCHECK
 # lib_oekologischeFolgen.py
@@ -12,9 +12,9 @@
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 
+import arcpy, os, datetime, sys, gc
 
 def oekologischeFolgen(bedeckungNullfall, bedeckungPlanfall):
-    import arcpy
     try:
         arcpy.AddMessage("================================")
         print("================================")
@@ -227,7 +227,6 @@ def oekologischeFolgen(bedeckungNullfall, bedeckungPlanfall):
 
 def oekologischeWertigkeit(projektName):
     ##In diesem Modul wir überprüft, ob die Planfläche sich mit verschiedenen, schützenswerten Naturgebieten überschneidet
-    import arcpy, os, datetime, sys
     try:
         arcpy.AddMessage("========================")
         arcpy.AddMessage("Raeumliche Ueberschneidungen")
@@ -333,17 +332,16 @@ def IntegrationsGrad(GrenzeSiedlungskoerper,GrenzeGesamt):
     #Länge der Grenze der Projektfläche zum bestehenden Siedlungskörper (in m)
     #Länge der gesamten Grenze der Projektfläche (Umfang) (in m)
     integrationsgrad = float(GrenzeSiedlungskoerper)/float(GrenzeGesamt)
-    integrationsgrad = str(integrationsgrad).replace(",",".")
     #arcpy.AddMessage(integrationsgrad)
-    if integrationsgrad < '0.25':
+    if integrationsgrad < 0.25:
         bewertung = 1
-    elif integrationsgrad < '0.5':
+    elif integrationsgrad < 0.5:
         bewertung = 2
-    elif integrationsgrad < '0.75':
+    elif integrationsgrad < 0.75:
         bewertung = 3
-    elif integrationsgrad < '1':
+    elif integrationsgrad < 1:
         bewertung = 4
-    elif integrationsgrad > '1':
+    elif integrationsgrad >= 1:
         bewertung = 5
     else:
         bewertung = 0
@@ -351,7 +349,6 @@ def IntegrationsGrad(GrenzeSiedlungskoerper,GrenzeGesamt):
     return [integrationsgrad,bewertung]
 
 def uzvr(projektName, Region):
-    import arcpy, os, sys, gc
     arcpy.AddMessage("========================")
     arcpy.AddMessage("Unzerschnittene verkehrsarme Raeume: Nullfall\n")
     print("========================")
@@ -690,17 +687,12 @@ def uzvr(projektName, Region):
         rueckgabe = [bewertungUZVR, begegnungswahrscheinlichkeit,begegnungswahrscheinlichkeit_clipped,groUZVR]
         return rueckgabe
 
-
-        del uzvr_betroffen, uzvr_betroffen_clipped, gebiet
     except:
         e = sys.exc_info()[0]
-        return e
-        arcpy.AddMessage(e)
-        arcpy.AddMessage(sys.exc_traceback.tb_lineno)
-        print(e)
-        del uzvr_betroffen, uzvr_betroffen_clipped
+        raise e
     #return bewertung
     finally:
+        del uzvr_betroffen, uzvr_betroffen_clipped
         gc.collect()
         arcpy.Delete_management("in_memory\\uzvr_lyr_clipped")
 
