@@ -61,14 +61,6 @@ class TeilflaecheBenennen(object):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
-            #import os, arcpy, win32ui, win32con
-
-            tbx_path = __file__
-
-            base_path = os.path.dirname(tbx_path)
-            base_path = os.path.dirname(base_path)
-            base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-
             #Projekt auswählen
             i=-1
             i+=1
@@ -78,7 +70,7 @@ class TeilflaecheBenennen(object):
                 projectname = self.params[i].value
                 self.params[1].value = ''
 
-                tablepath_teilflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname +'.gdb','Teilflaechen_Plangebiet')
+                tablepath_teilflaechen = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname +'.gdb','Teilflaechen_Plangebiet')
 
                 rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
                 list_teilflaechen = []
@@ -110,12 +102,8 @@ class TeilflaecheBenennen(object):
 
 
             if self.params[0].value != None and self.params[2].value != None:
-                tbx_path = __file__
-                base_path = os.path.dirname(tbx_path)
-                base_path = os.path.dirname(base_path)
-                base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
                 projectname= self.params[0].value
-                tablepath_teilflaechen = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname +'.gdb','Teilflaechen_Plangebiet')
+                tablepath_teilflaechen = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname +'.gdb','Teilflaechen_Plangebiet')
                 namen_cursor = arcpy.da.SearchCursor(tablepath_teilflaechen, "Name")
 
                 self.params[2].clearMessage()

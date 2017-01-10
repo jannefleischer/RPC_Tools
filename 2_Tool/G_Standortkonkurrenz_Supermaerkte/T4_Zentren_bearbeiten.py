@@ -12,3 +12,5 @@
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 
+def main(parameters, messages):
+    pass
