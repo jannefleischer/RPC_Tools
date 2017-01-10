@@ -23,6 +23,11 @@ import xml.dom.minidom as minidom
 import unicodedata
 
 import arcpy
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+                                         '..', '..'))
+LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+url_lib = imp.load_source('url_lib', 
+                          os.path.join(LIB_PATH, 'url_lib.py'))
 
 def main(parameters, messages):
     gc.collect()
@@ -715,51 +720,17 @@ def main(parameters, messages):
     ##messages.AddMessage(Strasse)
     ##messages.AddMessage(Ort)
 
-
-    url ='http://query.yahooapis.com/v1/public/yql?q=select * from geo.placefinder where house="'+house+'" and street="'+Strasse+'" and city="'+Ort+'"and country="Germany" and postal="'+str(postcode)+'"&appid=hxByDcDV34HxMu78xKN0b33dXezfkwQskuSVJ9PTUKswLDUaVicYpMWGQScmliWv7IP7SEgQKrlvWC7v1jbcU8gZJU62HTk'
-    ##messages.AddMessage( url)
-    [lat,longi,a]=gibmirxy(url)
-    ##print lat,longi,a
-    if lat==0 and longi==0 and a==0:
-        messages.AddMessage("\n\n\n\nWARNUNG: ")
-        messages.AddMessage("Georeferenzierung derzeit nicht moeglich")
-        messages.AddMessage("Bitte versuchen sie es spaeter erneut")
-
+    location, errmsg = url_lib.get_location(Strasse, house, Ort, 
+                                            postcode)    
+    if location is None:
+        messages.AddErrorMessage(errmsg)
+        messages.AddMessage("Georeferenzierung derzeit nicht moeglich - "
+                            "Georeferenzierungswebsite down bzw. mit Verbindungsproblemen.")
         exit(1)
 
-    ##messages.AddMessage( str(lat)+" "+ str(longi)+ " "+a)
-    if int(a)<85:
-
-        Ort = Ort.split('-')[0]
-        messages.AddMessage( "Georeferenzierung unter 85 % Qualitaet - erneute Abfrage mit anderen Variablen")
-
-        url ='http://query.yahooapis.com/v1/public/yql?q=select * from geo.placefinder where house="'+house+'" and street="'+Strasse+'" and city="'+(Ort)+'"and state="'+state+'" and country="Germany" and postal="'+str(postcode)+'"&appid=hxByDcDV34HxMu78xKN0b33dXezfkwQskuSVJ9PTUKswLDUaVicYpMWGQScmliWv7IP7SEgQKrlvWC7v1jbcU8gZJU62HTk'
-##                        messages.AddMessage( url)
-##    print url
-        [lat,longi,a]=gibmirxy(url)
-
-    if int(a)<85:
-
-        Ort = state
-        messages.AddMessage( "Georeferenzierung unter 85 % Qualitaet - erneute Abfrage mit anderen Variablen Typ 2 \n")
-
-        url ='http://query.yahooapis.com/v1/public/yql?q=select * from geo.placefinder where house="'+house+'" and street="'+Strasse+'" and city="'+(Ort)+'" and country="Germany" and postal="'+str(postcode)+'"&appid=hxByDcDV34HxMu78xKN0b33dXezfkwQskuSVJ9PTUKswLDUaVicYpMWGQScmliWv7IP7SEgQKrlvWC7v1jbcU8gZJU62HTk'
-        messages.AddMessage( url)
-##    print url
-        [lat,longi,a]=gibmirxy(url)
-    if int(a)<85:
-        messages.AddMessage( "\n\nNoch immer unter 85 % Quali bitte Lat und Lon Koordinaten WGS84 angeben, um Qualitaet zu verbessern")
-        messages.AddMessage( "\n\n\nABBRUCH DES VORGANGS\n\n\n")
-        exit(1)
-
-    if lat==0 and longi==0 and a==0:
-        messages.AddMessage( url)
-        messages.AddMessage("\n\n\n\nWARNUNG: ")
-        messages.AddMessage("Georeferenzierung derzeit nicht moeglich - Georeferenzierungswebsite down bzw. mit Verbindungsproblemen.")
-        messages.AddMessage("Bitte versuchen sie es spaeter erneut.\n")
-
-        exit(1)
-    messages.AddMessage("Georeferenziert")
+    lat = location[0]
+    longi = location[1]
+    messages.AddMessage("Georeferenziert")    
     if radiobutton==False:
         messages.AddMessage("keinen weiteren Markt festgelegt.")
         try:
@@ -872,7 +843,7 @@ def main(parameters, messages):
         zeile.setValue("VKFL_Gesamt",int(VKFL))
         zeile.setValue("Lat",float(lat))
         zeile.setValue("Lon",float(longi))
-        zeile.setValue("Qualitaet",int(a))
+        #zeile.setValue("Qualitaet",int(a))
         zeile.setValue("Bonifaktor",float(boni))
         zeile.setValue("EntfallenderMarktID",int(erweiterungsmarktid))
 
@@ -986,7 +957,7 @@ def main(parameters, messages):
         zeile.setValue("VKFL_Gesamt",int(VKFL))
         zeile.setValue("Lat",float(lat))
         zeile.setValue("Lon",float(longi))
-        zeile.setValue("Qualitaet",int(a))
+        #zeile.setValue("Qualitaet",int(a))
         zeile.setValue("Bonifaktor",float(boni))
         zeile.setValue("EntfallenderMarktID",int(erweiterungsmarktid))
         zeile.shape = pnt
@@ -1030,51 +1001,16 @@ def main(parameters, messages):
             Ort=Ort.replace('Ä','Ae')
             Ort=Ort.replace('ß','ss')
 
-
-            url ='http://query.yahooapis.com/v1/public/yql?q=select * from geo.placefinder where house="'+house+'" and street="'+Strasse+'" and city="'+str(Ort)+'"and country="Germany" and postal="'+str(postcode)+'"&appid=hxByDcDV34HxMu78xKN0b33dXezfkwQskuSVJ9PTUKswLDUaVicYpMWGQScmliWv7IP7SEgQKrlvWC7v1jbcU8gZJU62HTk'
-            ##messages.AddMessage( url)
-            [lat,longi,a]=gibmirxy(url)
-            ##print lat,longi,a
-            if lat==0 and longi==0 and a==0:
-                messages.AddMessage("\n\n\n\nWARNUNG: ")
-                messages.AddMessage("Georeferenzierung derzeit nicht moeglich")
-                messages.AddMessage("Bitte versuchen sie es spaeter erneut")
-
-                exit(1)
-
-            ##messages.AddMessage( str(lat)+" "+ str(longi)+ " "+a)
-            if int(a)<85:
-
-                Ort = Ort.split('-')[0]
-                messages.AddMessage( "Georeferenzierung unter 85 % Qualitaet - erneute Abfrage mit anderen Variablen")
-
-                url ='http://query.yahooapis.com/v1/public/yql?q=select * from geo.placefinder where house="'+house+'" and street="'+Strasse+'" and city="'+str(Ort)+'"and state="'+state+'" and country="Germany" and postal="'+str(postcode)+'"&appid=hxByDcDV34HxMu78xKN0b33dXezfkwQskuSVJ9PTUKswLDUaVicYpMWGQScmliWv7IP7SEgQKrlvWC7v1jbcU8gZJU62HTk'
-##                        messages.AddMessage( url)
-##    print url
-                [lat,longi,a]=gibmirxy(url)
-
-            if int(a)<85:
-
-                Ort = state
-                messages.AddMessage( "Georeferenzierung unter 85 % Qualitaet - erneute Abfrage mit anderen Variablen Typ 2 \n")
-
-                url ='http://query.yahooapis.com/v1/public/yql?q=select * from geo.placefinder where house="'+house+'" and street="'+Strasse+'" and city="'+str(Ort)+'" and country="Germany" and postal="'+str(postcode)+'"&appid=hxByDcDV34HxMu78xKN0b33dXezfkwQskuSVJ9PTUKswLDUaVicYpMWGQScmliWv7IP7SEgQKrlvWC7v1jbcU8gZJU62HTk'
-                messages.AddMessage( url)
-##    print url
-                [lat,longi,a]=gibmirxy(url)
-
-            if int(a)<85:
-                messages.AddMessage( "\n\nNoch immer unter 85 % Quali bitte Lat und Lon Koordinaten WGS84 angeben, um Qualitaet zu verbessern")
-                messages.AddMessage( "\n\n\nABBRUCH DES VORGANGS\n\n\n")
-                exit(1)
-
-            if lat==0 and longi==0 and a==0:
-                messages.AddMessage( url)
-                messages.AddMessage("\n\n\n\nWARNUNG: ")
-                messages.AddMessage("Georeferenzierung derzeit nicht moeglich - Georeferenzierungswebsite down bzw. mit Verbindungsproblemen.")
-                messages.AddMessage("Bitte versuchen sie es spaeter erneut.\n")
-
-                exit(1)
+            location, errmsg = url_lib.get_location(Strasse, house, Ort, 
+                                                    postcode)
+                
+            if location is None:
+                messages.AddErrorMessage(errmsg)
+                cur_Standorte_temp.deleteRow(zeile)
+                continue
+            
+            lat = location[0]
+            longi = location[1]
 
             pnt = arcpy.CreateObject("Point")
 
