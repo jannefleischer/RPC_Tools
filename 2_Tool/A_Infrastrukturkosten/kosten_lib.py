@@ -61,7 +61,7 @@ def kostenregel_anlegen(name,gemeinden,kreis,private):
     del rows
 
 
-def kostenregel_bearbeiten(name,gemeinden,kreis,private:
+def kostenregel_bearbeiten(name,gemeinden,kreis,private):
     # Create Paths
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
     kosten_tool = os.path.join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")

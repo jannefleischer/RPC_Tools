@@ -224,7 +224,7 @@ def main(parameters, messages):
     try:
         arcpy.DeleteFeatures_management(Teilflaechen_Plangebiet_Centroide)
     except Exception as e:
-        print e
+        print 'Plangebiet Centroide nicht vorhanden, werden erstellt'
     
     arcpy.env.overwriteOutput = True
     arcpy.CreateFeatureclass_management(workspace_projekt_definition, "Teilflaechen_Plangebiet_Centroide", "POINT", "", "DISABLED", "DISABLED", projektflaechen, "", "0", "0", "0")
@@ -258,7 +258,7 @@ def main(parameters, messages):
     try:
         arcpy.DeleteFeatures_management(Teilflaechen_Plangebiet_CentroideGK3)
     except Exception as e:
-        print e
+        print 'Plangebiet CentroideGK3 nicht vorhanden, werden erstellt'
     
     arcpy.Project_management(Teilflaechen_Plangebiet_Centroide, Teilflaechen_Plangebiet_CentroideGK3, "PROJCS['DHDN_3_Degree_Gauss_Zone_3',GEOGCS['GCS_Deutsches_Hauptdreiecksnetz',DATUM['D_Deutsches_Hauptdreiecksnetz',SPHEROID['Bessel_1841',6377397.155,299.1528128]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Gauss_Kruger'],PARAMETER['False_Easting',3500000.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',9.0],PARAMETER['Scale_Factor',1.0],PARAMETER['Latitude_Of_Origin',0.0],UNIT['Meter',1.0]]", "DHDN_To_WGS_1984_5x", "GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]]")
     arcpy.AddXY_management(Teilflaechen_Plangebiet_CentroideGK3)
@@ -287,7 +287,7 @@ def main(parameters, messages):
     try:
         arcpy.DeleteFeatures_management(gemeindenWirkraumEW_Centroide)
     except Exception as e:
-        print e
+        print 'Gemeinden-Wirkraum Centroide nicht vorhanden, werden erstellt'
     
     gemeindenWirkraumEW = os.path.join(workspace_projekt_einnahmen, 'AWU_gemeindenWirkraumEW')
     arcpy.CreateFeatureclass_management(workspace_projekt_definition, "gemeindenWirkraumEW_Centroide", "POINT", "", "DISABLED", "DISABLED", gemeindenWirkraumEW, "", "0", "0", "0")
@@ -362,7 +362,7 @@ def main(parameters, messages):
     try:
         arcpy.DeleteFeatures_management(gemeindenWirkraumAP_Centroide)
     except Exception as e:
-        print e
+        print 'Gemeinden-Wirkraum Centroide nicht vorhanden, werden erstellt'
     
     gemeindenWirkraumAP = os.path.join(workspace_projekt_einnahmen, 'AWU_gemeindenWirkraumAP')
     arcpy.CreateFeatureclass_management(workspace_projekt_definition, "gemeindenWirkraumAP_Centroide", "POINT", "", "DISABLED", "DISABLED", gemeindenWirkraumAP, "", "0", "0", "0")

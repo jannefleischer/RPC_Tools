@@ -63,8 +63,12 @@ class TeilflaecheBenennen(object):
             has been changed."""
             #Projekt auswählen
             i=-1
+        
             i+=1
-
+            if self.params[i].altered and not self.params[i].hasBeenValidated:
+                list_projects = project_lib.get_projects()
+                list_projects = sorted(list_projects)
+                self.params[i].filter.list = list_projects
 
             if self.params[i].altered and not self.params[i].hasBeenValidated:
                 projectname = self.params[i].value

@@ -17,36 +17,20 @@ import gc
 import os
 import re
 import sys
-import urllib
+import urllib, urllib2
 import time
 import xml.dom.minidom as minidom
-import urllib2
 import math
-import json
 
 import arcpy
 import xlrd
+import imp
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+                                         '..', '..'))
+LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+url_lib = imp.load_source('url_lib', 
+                          os.path.join(LIB_PATH, 'url_lib.py'))
 
-API_URL = ("http://maps.googleapis.com/maps/api/geocode/json?address=" +
-           "{zipcode},{city},{street}%20{number}")
-
-def get_google_location(street, number, city, zipcode):
-    url = API_URL.format(zipcode=zipcode,
-                         city=urllib.quote_plus(city.encode('utf8')),
-                         street=urllib.quote_plus(street.encode('utf8')),
-                         number=number)
-
-    response = urllib2.urlopen(url)
-    res_json = json.load(response)
-    address = u'{z} {c}, {s} {n}'.format(z=zipcode, c=city, s=street, n=number)   
-    if 'results' not in res_json or len(res_json['results']) == 0:
-        return None, 'Adresse ' + address + ' nicht gefunden'
-    if len(res_json['results']) > 1:
-        return None, 'Adresse ' + address + ' nicht eindeutig'
-    result = res_json['results'][0]
-    loc = result['geometry']['location']
-    
-    return (loc['lat'], loc['lng']), ''
 
 #---------------------------------------------------------------------------------------
 # Unicode
@@ -670,7 +654,8 @@ def main(parameters, messages):
                 zipcode = str(zeile.PLZ)[:5]
                 city = zeile.Ort
                 #Ort=str(decode_unicode_references(zeile.Ort).encode('utf-8'))
-                location, errmsg = get_google_location(street, number, city, zipcode)
+                location, errmsg = url_lib.get_location(street, number, city, 
+                                                        zipcode)
                 
                 if location is None:
                     messages.AddErrorMessage(errmsg)

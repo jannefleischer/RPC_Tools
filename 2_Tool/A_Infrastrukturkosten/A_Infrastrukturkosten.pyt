@@ -5,7 +5,7 @@ import os
 import sys
 import arcpy
 import argparse
-import kosten_lib as k
+import kosten_lib as kosten
 import T5_Kostenmodell
 import imp
 BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
@@ -661,7 +661,7 @@ class KostenaufteilungsregelnVerwalten(object):
     def __init__(self):
         self.label = u'2 Kostenaufteilungsregeln verwalten'
         self.canRunInBackground = False
-        reload(T2_Kostenaufteilungsregel_verwalten)
+        reload(kosten)
         
     def getParameterInfo(self):
         # Was_wollen_Sie_tun_
@@ -741,22 +741,10 @@ class KostenaufteilungsregelnVerwalten(object):
         kreis = parameters[3].value/100.
         private = parameters[4].value/100.
         if action == 'Kostenaufteilungsregel anlegen':
-            k.kostenregel_anlegen(name,gemeinden,kreis,private)
+            kosten.kostenregel_anlegen(name,gemeinden,kreis,private)
     
         elif action == 'Kostenaufteilungsregel bearbeiten':
-            k.kostenregel_bearbeiten(name,gemeinden,kreis,private)
+            kosten.kostenregel_bearbeiten(name,gemeinden,kreis,private)
     
         elif action == 'Kostenaufteilungsregel entfernen':        
-            k.kostenregel_loeschen(name)
-        
-def main():
-    tbx = Toolbox()
-    tool = KostenaufteilungsregelnVerwalten()
-    tool.execute(tool.getParameterInfo(), None)
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--debug', action="store_true")
-    options = parser.parse_args()
-    if options.debug:
-        main()        
+            kosten.kostenregel_loeschen(name)

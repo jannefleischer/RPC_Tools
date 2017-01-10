@@ -350,6 +350,7 @@ def main(parameters, messages):
             except:
                 pass
 
+
             try:
                 arcpy.CreateTable_management(workspace_definition,"Gewerbe_Beschaeftigte_Zahlen")
 

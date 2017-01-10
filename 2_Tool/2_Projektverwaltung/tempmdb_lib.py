@@ -60,7 +60,7 @@ def temp_mdb(eingangstabellen,sql,ausgabetabelle):
     except Exception as e:
         arcpy.AddMessage("sql-fehlerhaft \n")
         arcpy.AddMessage(sql)
-        #sys.exit()
+        sys.exit()
 
     conn.commit()
     conn.close()

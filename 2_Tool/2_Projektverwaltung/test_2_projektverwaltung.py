@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import _projektVerwaltung, teilflaecheBenennen
+import T1_Projektverwaltung, teilflaecheBenennen
 import arcpy
 import os, shutil, gc
 from time import gmtime, strftime
 from project_lib import PROJECT_FOLDER
 
-tmp_project = 'unittest'
-tmp_project_folder = os.path.join(PROJECT_FOLDER, tmp_project)
+PROJECT_FOLDER = os.path.join(os.getcwd().split("2_Tool")[0], "3_Projekte")
+PROJECT_TMP = '__unittest__'
 
 shp_template = os.path.join(PROJECT_FOLDER, "projektflaechen_template.shp")
-params_verwaltung = ['', tmp_project, tmp_project, shp_template, 2010, 2050]
+params_verwaltung = ['', PROJECT_TMP, PROJECT_TMP, shp_template, 2010, 2050]
 flaechenname = 'Nr. 1 | 50.77 ha | Flaeche_1'
 
 def to_arcpy_params(lst):
@@ -22,10 +22,11 @@ def to_arcpy_params(lst):
         arcpy_params.append(ap)
     return arcpy_params
 
-class Test2_Projektverwaltung(unittest.TestCase):
+class Test2Projektverwaltung(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls):        
+        tmp_project_folder = os.path.join(PROJECT_FOLDER, PROJECT_TMP)
         if os.path.exists(tmp_project_folder):
             shutil.rmtree(tmp_project_folder)
       
@@ -37,17 +38,17 @@ class Test2_Projektverwaltung(unittest.TestCase):
     def test1_anlegen(self):
         params = params_verwaltung
         params[0] = "Neues Projekt anlegen"
-        _projektVerwaltung.main(to_arcpy_params(params), arcpy)
+        T1_Projektverwaltung.main(to_arcpy_params(params), arcpy)
 
     def test2_teilflaeche_benennen(self):        
-        params = [tmp_project, flaechenname, flaechenname]        
+        params = [PROJECT_TMP, flaechenname + 'dfas', flaechenname + 'neu']        
         teilflaecheBenennen.main(to_arcpy_params(params), arcpy)
         gc.collect()
 
     def test3_loeschen(self):
         params = params_verwaltung
         params[0] = "Bestehendes Projekt löschen"
-        _projektVerwaltung.main(to_arcpy_params(params), arcpy)
+        T1_Projektverwaltung.main(to_arcpy_params(params), arcpy)
 
 if __name__ == '__main__':
     unittest.main()
