@@ -840,16 +840,16 @@ class OekologischeFolgen(object):
             #try:
                 #arcpy.CalculateField_management(pfad_umfang,"umfang_meter","!shape.length@METER!","PYTHON_9.3")
             #except:
-            #pass
+            #pass    
     
                 flaechenumfang = 0
                 cursor = arcpy.SearchCursor(pfad_umfang)
                 for umfang in cursor:
                     flaechenumfang = flaechenumfang + umfang.umfang_meter
     
-            flaechenumfang = round(flaechenumfang)
-            flaechenumfang = str(flaechenumfang)
-            self.params[3].value = flaechenumfang
+                flaechenumfang = round(flaechenumfang)
+                flaechenumfang = str(flaechenumfang)
+                self.params[3].value = flaechenumfang
     
     
     

@@ -14,7 +14,7 @@
 
 
 import os
-
+import sys
 import arcpy
 
 def main(parameters, messages):
@@ -23,8 +23,8 @@ def main(parameters, messages):
     #Pfade einrichten
     base_path = str(sys.path[0]).split("2_Tool")[0]
 
-    workspace_projekt = os.path.join(base_path,'3_Projekte',projektname,'FGDB_11_Definition_Projekt_'+projektname+'.gdb')
-    workspace_tool = os.path.join(base_path,'2_Tool','36_Flaeche_und_Oekologie')
+    workspace_projekt = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
+    workspace_tool = os.path.join(base_path,'2_Tool','F_Flaeche_und_Oekologie')
 
     pfadNiSa = os.path.join(workspace_tool,'bodenNiSa.lyr')
     pfadNRW = os.path.join(workspace_tool,'bodenNRW.lyr')

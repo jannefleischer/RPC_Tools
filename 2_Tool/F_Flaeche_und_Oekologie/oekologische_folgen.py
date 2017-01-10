@@ -22,7 +22,7 @@ import arcpy
 import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell, xl_range
 
-import lib_oekologischeFolgen as f
+import lib_oekologischeFolgen as lib_oeko
 
 def main(parameters, messages):
     sheetlibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
@@ -133,7 +133,7 @@ def main(parameters, messages):
         messages.AddMessage(schrittmeldung)
         print schrittmeldung
 
-        oekologischeFlaechenleistungPunkte = f.oekologischeFolgen(bedeckungNullfall, bedeckungPlanfall)
+        oekologischeFlaechenleistungPunkte = lib_oeko.oekologischeFolgen(bedeckungNullfall, bedeckungPlanfall)
         #Rueckgabe: Liste: ['Punktwert Nullfall=x', 'Punktwert Planfall=y']
         punktwertNullfall = oekologischeFlaechenleistungPunkte[0].split("=")[1]
         punktwertPlanfall = oekologischeFlaechenleistungPunkte[1].split("=")[1]
@@ -143,7 +143,7 @@ def main(parameters, messages):
         messages.AddMessage(schrittmeldung)
         print schrittmeldung
 
-        uzvr = f.uzvr(projektName, region)
+        uzvr = lib_oeko.uzvr(projektName, region)
         bewertungUZVRNullfall = uzvr[0]
         begegnungswahrscheinlichkeitUZVRNullfall = uzvr[1]
         begegnungswahrscheinlichkeitUZVRPlanfall = uzvr[2]
@@ -166,7 +166,7 @@ def main(parameters, messages):
         messages.AddMessage(schrittmeldung)
         print schrittmeldung
 
-        ueberschneidungen = f.oekologischeWertigkeit(projektName)
+        ueberschneidungen = lib_oeko.oekologischeWertigkeit(projektName)
         ueberschneidungBiotope = ueberschneidungen[0].split("=")[1]
         ueberschneidungNaturschutzgebiete = ueberschneidungen[1].split("=")[1]
         ueberschneidungNationalparke = ueberschneidungen[2].split("=")[1]
@@ -197,10 +197,9 @@ def main(parameters, messages):
         messages.AddMessage(schrittmeldung)
         print schrittmeldung
 
-        integrationsgrad = f.IntegrationsGrad(gemeinsameGrenze,gesamteGrenze)[0]
-        bewertungIntegration = f.IntegrationsGrad(gemeinsameGrenze,gesamteGrenze)[1]
+        integrationsgrad, bewertungIntegration = lib_oeko.IntegrationsGrad(gemeinsameGrenze,gesamteGrenze)
         #def flaechenInanspruchname(neuinanspruchname, projektName, bebauungsdichte, integrationsgrad,bauluecke,typ):
-        flaecheninanspruchname = f.flaechenInanspruchname(integrationsgrad, flaechentyp)
+        flaecheninanspruchname = lib_oeko.flaechenInanspruchname(integrationsgrad, flaechentyp)
         #bewertungQuantitaet = flaecheninanspruchname[0]
         #bewertungDichte = flaecheninanspruchname[1]
         #bewertungIntegration = flaecheninanspruchname[2]
