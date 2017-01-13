@@ -9,10 +9,10 @@ import arcpy
 import teilflaecheBenennen
 import T1_Projektverwaltung
 import imp
-BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                          '..', '..'))
 LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
-project_lib = imp.load_source('project_lib', 
+project_lib = imp.load_source('project_lib',
                               os.path.join(LIB_PATH, 'project_lib.py'))
 
 # Export of toolbox C:\GGR\RPC_Tools\2_Tool\2_Projektverwaltung\T2_Projektverwaltung.tbx
@@ -20,7 +20,7 @@ project_lib = imp.load_source('project_lib',
 class Toolbox(object):
     def __init__(self):
         self.label = u'Projektverwaltung'
-        self.alias = ''             
+        self.alias = ''
         self.tools = [TeilflaecheBenennen, ProjektVerwaltung]
 
 # Tool implementation code
@@ -40,8 +40,8 @@ class TeilflaecheBenennen(object):
 
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
-            called when the tool is opened."""     
-            
+            called when the tool is opened."""
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
 
@@ -63,7 +63,7 @@ class TeilflaecheBenennen(object):
             has been changed."""
             #Projekt auswählen
             i=-1
-        
+
             i+=1
             if self.params[i].altered and not self.params[i].hasBeenValidated:
                 list_projects = project_lib.get_projects()
@@ -131,9 +131,9 @@ class TeilflaecheBenennen(object):
         param_1.displayName = u'Projekt'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = u'GPString'
-        param_1.filter.list = []
-        #param_1.value = u'test'
+        param_1.datatype = u'Zeichenfolge'
+        param_1.value = u' '
+        param_1.filter.list = [u' ']
 
         # Teilfläche
         param_2 = arcpy.Parameter()
@@ -216,7 +216,7 @@ class ProjektVerwaltung(object):
 
             # Eingaben in Abhängigkeit von Vorhaben aktivieren/deaktivieren
             if self.params[0].altered and not self.params[0].hasBeenValidated:
-    
+
                 list_projects = project_lib.get_projects()
                 list_projects = sorted(list_projects)
 
@@ -229,9 +229,9 @@ class ProjektVerwaltung(object):
                     self.params[1].value = " "
                     self.params[1].filter.list = [" "]
                     self.params[2].value = None
-                    self.params[3].value = os.path.join(BASE_PATH,
-                                                        '3_Projekte',
-                                                        'projektflaechen_template.shp')
+                    #self.params[3].value = os.path.join(BASE_PATH,
+                    #                                    '3_Projekte',
+                    #                                    'projektflaechen_template.shp')
 
                 elif self.params[0].value == "Bestehendes Projekt kopieren":
                     self.params[1].enabled = True
@@ -242,7 +242,7 @@ class ProjektVerwaltung(object):
                     self.params[1].value = None
                     self.params[1].filter.list = list_projects
                     self.params[2].value = None
-                    self.params[3].value = None
+                    #self.params[3].value = None
 
 
                 else:
@@ -254,7 +254,7 @@ class ProjektVerwaltung(object):
                     self.params[1].value = None
                     self.params[1].filter.list = list_projects
                     self.params[2].value = " "
-                    self.params[3].value = None
+                    #self.params[3].value = None
 
             #Ende des Betrachtungszeitraumes prüfen und ggf. auf ein Jahr nach Beginn setzen
             if self.params[5].value <= self.params[4].value:
@@ -306,9 +306,10 @@ class ProjektVerwaltung(object):
         param_4 = arcpy.Parameter()
         param_4.name = u'Shapefile_des_Plangebiets____shp_'
         param_4.displayName = u'Shapefile des Plangebiets (*.shp)'
-        param_4.parameterType = 'Optional'
+        param_4.parameterType = 'Required'
         param_4.direction = 'Input'
         param_4.datatype = u'Shapefile'
+        param_4.value = os.path.join(BASE_PATH, '3_Projekte', 'projektflaechen_template.shp')
 
         # Beginn_des_Betrachtungszeitraumes
         param_5 = arcpy.Parameter()
