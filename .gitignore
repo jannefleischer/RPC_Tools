@@ -3,3 +3,5 @@
 3_projekte/
 *.pyc
 *.lock
+PGDB_temp.mdb
+*.ldb
