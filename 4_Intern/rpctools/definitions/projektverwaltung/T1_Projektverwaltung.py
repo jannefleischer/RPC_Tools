@@ -12,7 +12,14 @@
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 
-
+from os.path import abspath, dirname, join
+BASE_PATH = dirname(dirname(abspath(__file__)))
+sys.path.append(join(BASE_PATH, '4_Intern'))
+from rpctools.utils.project_lib import (PROJECT_FOLDER,
+                                        TEMPLATE_FOLDER,
+                                        PROJECT_TEMPLATE,
+                                        get_gdb,
+                                        get_table)
 import arcpy, os, shutil, sys, gc
 
 def main(parameters, messages):
@@ -36,9 +43,8 @@ def main(parameters, messages):
 
 
         #copy template folder
-            #templatePath = os.path.join(mainPath,'3_Projekte','Template.gdb') #Fehler im Script - geandert durch AT
-            templatePath = os.path.join(mainPath,'3_Projekte','Template')
-            projectPath = os.path.join(mainPath,'3_Projekte', projectName)
+            templatePath = join(TEMPLATE_FOLDER, PROJECT_TEMPLATE)
+            projectPath = os.path.join(PROJECT_FOLDER, projectName)
             try:
                 shutil.copytree(templatePath, projectPath)
             except Exception as e:
@@ -64,7 +70,7 @@ def main(parameters, messages):
                     os.rename(filePath,newFilePath)
         #If shapefile was uploaded, add to gdb
             if flaeche != "":
-                gdbPfad = os.path.join(mainPath,'3_Projekte',projectName,'FGDB_Definition_Projekt_'+projectName+'.gdb')
+                gdbPfad = get_gdb(projectName, 'FGDB_Definition_Projekt.gdb')
                 arcpy.FeatureClassToGeodatabase_conversion(flaeche, gdbPfad)
 
                 dsc = arcpy.Describe(flaeche)
