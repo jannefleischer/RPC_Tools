@@ -22,10 +22,10 @@ def uebergabepunkt_bearbeiten(projektname,punkt_name,qp_wohnen,qp_versorgung,qp_
     print "bearbeiten"
     # Create Paths
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    workspace_projekt_verkehr = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Verkehr_'+projektname+'.gdb')
-    workspace_tool_verkehr = os.path.join(base_path,"2_Tool","C_Verkehr","33_Verkehr_Tool.gdb")
+    workspace_projekt_verkehr = join(base_path,'3_Projekte',projektname,'FGDB_Verkehr.gdb')
+    workspace_tool_verkehr = join(base_path,"2_Tool","C_Verkehr","33_Verkehr_Tool.gdb")
 
-    uebergabepunkt_tabelle = os.path.join(workspace_projekt_verkehr,'L01_Uebergabepunkte')
+    uebergabepunkt_tabelle = join(workspace_projekt_verkehr,'L01_Uebergabepunkte')
 
     rows = arcpy.UpdateCursor(uebergabepunkt_tabelle)
 

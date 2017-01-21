@@ -248,17 +248,17 @@ def oekologischeWertigkeit(projektName):
         #rootPfad = rootPfad + "\\00_Entwicklungsumgebung"
         #Pfad zur Ergebnistabelle
 
-##        ergebnisTabelle = rootPfad + "\\3_Projekte\\" + projektName + "\\FGDB_36_Flaeche_und_Oekologie_Projekt_" + projektName + ".gdb\\Ergebnisse_oekologischeWertigkeit"
+##        ergebnisTabelle = rootPfad + "\\3_Projekte\\" + projektName + "\\FGDB_36_Flaeche_und_Oekologie_" + projektName + ".gdb\\Ergebnisse_oekologischeWertigkeit"
 ##        #insert Cursor für die Ergebnistabelle erstellen
 ##        ergebnisCursor = arcpy.InsertCursor(ergebnisTabelle)
 ##        #eine neue Zeile für das Ergebnis dieses Durchlaufs anlegen
 ##        ergebnisZeile = ergebnisCursor.newRow()
         #Die Flächen des Plangebietes als Layer verfügbar machen
 
-        flaechenPlangebiet = os.path.join(rootPfad,"3_Projekte",projektName,"FGDB_Definition_Projekt_"+projektName+ ".gdb","Teilflaechen_Plangebiet")
+        flaechenPlangebiet = join(rootPfad,"3_Projekte",projektName,"FGDB_Definition_Projekt_"+projektName+ ".gdb","Teilflaechen_Plangebiet")
         arcpy.MakeFeatureLayer_management(flaechenPlangebiet,"flaechenPlangebiet_lyr")
         #Aus der Featureclass eine Liste mit allen Schutzgebieten iterieren
-        arcpy.env.workspace = os.path.join(rootPfad,"2_Tool","F_Flaeche_und_Oekologie","FGDB_Flaeche_und_Oekologie_Tool.gdb","NRW")
+        arcpy.env.workspace = join(rootPfad,"2_Tool","F_Flaeche_und_Oekologie","FGDB_Flaeche_und_Oekologie_Tool.gdb","NRW")
         #print arcpy.env.workspace
         #arcpy.AddMessage(arcpy.env.workspace)
         liste = arcpy.ListFeatureClasses()
@@ -360,22 +360,22 @@ def uzvr(projektName, Region):
         wcd = sys.path[0].split("\\2_Tool")[0]
         #arcpy.AddMessage(wcd)
         #Pfad zur Ergebnistabelle
-        projektOrdner = os.path.join(wcd,"3_Projekte",projektName,"FGDB_Flaeche_und_Oekologie_Projekt_" + projektName +".gdb")
+        projektOrdner = join(wcd,"3_Projekte",projektName,"FGDB_Flaeche_und_Oekologie_" + projektName +".gdb")
         #arcpy.AddMessage(projektOrdner)
-        #ergebnisTabelle = rootPfad + "\\3_Projekte\\" + projektName + "\\FGDB_36_Flaeche_und_Oekologie_Projekt_" + projektName + ".gdb\\Ergebnisse_oekologischeWertigkeit"
-        ergebnisTabelle = os.path.join(projektOrdner,"Ergebnisse_oekologischeWertigkeit")
+        #ergebnisTabelle = rootPfad + "\\3_Projekte\\" + projektName + "\\FGDB_36_Flaeche_und_Oekologie_" + projektName + ".gdb\\Ergebnisse_oekologischeWertigkeit"
+        ergebnisTabelle = join(projektOrdner,"Ergebnisse_oekologischeWertigkeit")
        # arcpy.AddMessage(ergebnisTabelle)
         #Pfad zu den Geodaten
         #projektFlaeche = rootPfad + "\\3_Projekte\\" + projektName + "\\FGDB_11_Definition_Projekt_" + projektName + ".gdb\\Teilflaechen_Plangebiet"
-        projektFlaeche = os.path.join(wcd,"3_Projekte",projektName,"FGDB_Definition_Projekt_" + projektName+".gdb","Teilflaechen_Plangebiet")
+        projektFlaeche = join(wcd,"3_Projekte",projektName,"FGDB_Definition_Projekt_" + projektName+".gdb","Teilflaechen_Plangebiet")
         #arcpy.AddMessage(projektFlaeche)
         #Pfad zu den UZVR
         #uzvr =rootPfad + "\\2_Tool\\36_Flaeche_und_Oekologie\\FGDB_36_Flaeche_und_Oekologie_Tool.gdb\\uzvr_de"
 
-        # uzvr = os.path.join(wcd,"3_Projekte",projektName,"FGDB_36_Flaeche_und_Oekologie_Projekt_" + projektName +".gdb","uzvr_de")
+        # uzvr = join(wcd,"3_Projekte",projektName,"FGDB_36_Flaeche_und_Oekologie_" + projektName +".gdb","uzvr_de")
         # auskommentiert, da die uzvr jetzt zentral vorgehalten werden
 
-        uzvr = os.path.join(wcd,"2_Tool","F_Flaeche_und_Oekologie","FGDB_Flaeche_und_Oekologie_Tool.gdb","uzvr_de")
+        uzvr = join(wcd,"2_Tool","F_Flaeche_und_Oekologie","FGDB_Flaeche_und_Oekologie_Tool.gdb","uzvr_de")
 
         #arcpy.AddMessage(uzvr)
         #Nullfall

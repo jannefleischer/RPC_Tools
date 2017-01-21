@@ -9,35 +9,35 @@ import T3_Erreichbarkeit_OEPNV
 import T4_Erreichbarkeit_Einrichtungen
 import T5_Ergebnissammler
 
-PROJECT_FOLDER = os.path.join(os.getcwd().split("2_Tool")[0], "3_Projekte")
+PROJECT_FOLDER = join(os.getcwd().split("2_Tool")[0], "3_Projekte")
 TEST_TEMPLATE = 'Test_Template'
 PROJECT_TMP = '__unittest__'
 
-tmp_project_folder = os.path.join(PROJECT_FOLDER, PROJECT_TMP)
-PATH_HALTE = os.path.join(tmp_project_folder, 
-                          'FGDB_Erreichbarkeit_Projekt_{}.gdb'.format(TEST_TEMPLATE),
+tmp_project_folder = join(PROJECT_FOLDER, PROJECT_TMP)
+PATH_HALTE = join(tmp_project_folder,
+                          'FGDB_Erreichbarkeit_{}.gdb'.format(TEST_TEMPLATE),
                           'OEPNV_Haltestellen')
-PATH_ORTE = os.path.join(tmp_project_folder,
-                         'FGDB_Erreichbarkeit_Projekt_{}.gdb'.format(TEST_TEMPLATE),
+PATH_ORTE = join(tmp_project_folder,
+                         'FGDB_Erreichbarkeit_{}.gdb'.format(TEST_TEMPLATE),
                          'Zentrale_Orte_75km')
 
 params_common = [PROJECT_TMP]
-template_kitas = os.path.join(tmp_project_folder, 'Einrichtungen_Kindertagesstaetten.xls')
-template_grundschulen = os.path.join(tmp_project_folder, 'Einrichtungen_Grundschulen.xls')
-template_einzelhandel = os.path.join(tmp_project_folder, 'Einrichtungen_Einzelhandel.xls')
-template_apotheken = os.path.join(tmp_project_folder, 'Einrichtungen_Apotheken.xls')
-template_aerzte = os.path.join(tmp_project_folder, 'Einrichtungen_Aerzte.xls')
-template_kh = os.path.join(tmp_project_folder, 'Einrichtungen_Krankenhaeuser.xls')
-template_sons = os.path.join(tmp_project_folder, 'Einrichtungen_Sonstige.xls')
+template_kitas = join(tmp_project_folder, 'Einrichtungen_Kindertagesstaetten.xls')
+template_grundschulen = join(tmp_project_folder, 'Einrichtungen_Grundschulen.xls')
+template_einzelhandel = join(tmp_project_folder, 'Einrichtungen_Einzelhandel.xls')
+template_apotheken = join(tmp_project_folder, 'Einrichtungen_Apotheken.xls')
+template_aerzte = join(tmp_project_folder, 'Einrichtungen_Aerzte.xls')
+template_kh = join(tmp_project_folder, 'Einrichtungen_Krankenhaeuser.xls')
+template_sons = join(tmp_project_folder, 'Einrichtungen_Sonstige.xls')
 
 def load_csv_params(csv_file, prepend=[]):
     params = prepend[:]
     with open(csv_file, 'r') as f:
         reader = csv.reader(f, delimiter=';')
         for row in reader:
-            params.append(row[1])    
+            params.append(row[1])
     return params
-            
+
 def to_arcpy_params(lst):
     arcpy_params = []
     for p in lst:
@@ -45,7 +45,7 @@ def to_arcpy_params(lst):
         if isinstance(p, bool):
             ap.datatype = 'GPBoolean'
         try:
-            p = float(p)      
+            p = float(p)
             ap.datatype = 'GPDouble'
         except:
             pass
@@ -58,17 +58,17 @@ class TestDErreichbarkeit(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         arcpy.AddErrorMessage = arcpy.AddError
-        
+
         if os.path.exists(tmp_project_folder):
             shutil.rmtree(tmp_project_folder)
         shutil.copytree(
-            os.path.join(PROJECT_FOLDER, TEST_TEMPLATE),
-            os.path.join(tmp_project_folder)
+            join(PROJECT_FOLDER, TEST_TEMPLATE),
+            join(tmp_project_folder)
         )
-        
+
     def test1_vorberechnungen(self):
         T1_Vorberechnungen.main(to_arcpy_params(params_common), arcpy)
-                                
+
     def test2_zentrale_orte(self):
         params = params_common[:]
         params.extend(['', '', ''])
@@ -77,8 +77,8 @@ class TestDErreichbarkeit(unittest.TestCase):
             if i > 1:
                 break
             params[i+1] = row.Name
-        T2_Zentrale_Orte_OEPNV_Abfrage.main(to_arcpy_params(params), arcpy)        
-    
+        T2_Zentrale_Orte_OEPNV_Abfrage.main(to_arcpy_params(params), arcpy)
+
     def test3_erreichbarkeit_oepnv(self):
         params = params_common[:]
         params.extend(['', '', ''])
@@ -91,24 +91,24 @@ class TestDErreichbarkeit(unittest.TestCase):
 
     def test4_einrichtungen(self):
         params = params_common[:]
-        params.extend([False, template_kitas, template_grundschulen, 
-                       template_aerzte, template_apotheken, 
-                       template_kh, template_sons, False, 
+        params.extend([False, template_kitas, template_grundschulen,
+                       template_aerzte, template_apotheken,
+                       template_kh, template_sons, False,
                        template_einzelhandel, ''])
         T4_Erreichbarkeit_Einrichtungen.main(to_arcpy_params(params), arcpy)
-        
+
     def test5_ergebnisse(self):
-        T5_Ergebnissammler.main(to_arcpy_params(params_common), arcpy)        
-        
+        T5_Ergebnissammler.main(to_arcpy_params(params_common), arcpy)
+
     @classmethod
     def tearDownClass(cls):
         try:
             shutil.rmtree(tmp_project_folder)
         except WindowsError:
             print u'Fehler beim Löschen des temporären Unittest-Verzeichnisses'
-                
+
 if __name__ == '__main__':
     unittest.main()
-        
-        
+
+
 

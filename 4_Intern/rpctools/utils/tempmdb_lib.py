@@ -27,8 +27,8 @@ def temp_mdb(eingangstabellen,sql,ausgabetabelle):
 
     # Create Temp Folder
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    out_folder_path = os.path.join(base_path,'2_Tool',"2_Projektverwaltung","temp") # Pfad zur temporaeren mdb inkl.
-    temp_mdb_path =  os.path.join(out_folder_path,"PGDB_Temp.mdb")
+    out_folder_path = join(base_path,'2_Tool',"2_Projektverwaltung","temp") # Pfad zur temporaeren mdb inkl.
+    temp_mdb_path =  join(out_folder_path,"PGDB_Temp.mdb")
 
     if not os.path.exists(out_folder_path):
         os.makedirs(out_folder_path)
@@ -44,8 +44,8 @@ def temp_mdb(eingangstabellen,sql,ausgabetabelle):
 
     # Copy given tables to Temporary MDB File
     for eingangstabelle in eingangstabellen:
-        eingangstabelle_pfad = os.path.join(eingangstabelle[0], eingangstabelle[1])
-        temptabelle_pfad = os.path.join(temp_mdb_path, eingangstabelle[1].replace(' ','_'))
+        eingangstabelle_pfad = join(eingangstabelle[0], eingangstabelle[1])
+        temptabelle_pfad = join(temp_mdb_path, eingangstabelle[1].replace(' ','_'))
 
         arcpy.CopyRows_management(eingangstabelle_pfad, temptabelle_pfad, "")
 
@@ -66,8 +66,8 @@ def temp_mdb(eingangstabellen,sql,ausgabetabelle):
     conn.close()
 
     # Copy resulting table to FGDB
-    fgdb_eingangstabelle_pfad = os.path.join(temp_mdb_path, ausgabetabelle[1])
-    fgdb_ausgabetabelle_pfad = os.path.join(ausgabetabelle[0], ausgabetabelle[1])
+    fgdb_eingangstabelle_pfad = join(temp_mdb_path, ausgabetabelle[1])
+    fgdb_ausgabetabelle_pfad = join(ausgabetabelle[0], ausgabetabelle[1])
 
     arcpy.CopyRows_management(fgdb_eingangstabelle_pfad, fgdb_ausgabetabelle_pfad, "")
 

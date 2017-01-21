@@ -31,21 +31,21 @@ def main(parameters, messages):
     i+=1 ; projektname = parameters[i].valueAsText
 
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    workspace_projekt_definition =  os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-    workspace_projekt_verkehr = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Verkehr_'+projektname+'.gdb')
-    directory_tool_verkehr = os.path.join(base_path,"2_Tool","C_Verkehr")
+    workspace_projekt_definition =  join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    workspace_projekt_verkehr = join(base_path,'3_Projekte',projektname,'FGDB_Verkehr.gdb')
+    directory_tool_verkehr = join(base_path,"2_Tool","C_Verkehr")
 
     #Abgeleitete Variablen
-    Teilflaechen_Plangebiet = os.path.join(workspace_projekt_definition, 'Teilflaechen_Plangebiet')
-    Teilflaechen_Plangebiet_Proj = os.path.join(workspace_projekt_verkehr, 'Teilflaechen_Plangebiet')
-    Teilflaechen_Plangebiet_Buffer = os.path.join(workspace_projekt_verkehr, 'Teilflaechen_Plangebiet_Buffer')
-    bounding_box = os.path.join(workspace_projekt_verkehr, 'Teilflaechen_Plangebiet_BBox')
+    Teilflaechen_Plangebiet = join(workspace_projekt_definition, 'Teilflaechen_Plangebiet')
+    Teilflaechen_Plangebiet_Proj = join(workspace_projekt_verkehr, 'Teilflaechen_Plangebiet')
+    Teilflaechen_Plangebiet_Buffer = join(workspace_projekt_verkehr, 'Teilflaechen_Plangebiet_Buffer')
+    bounding_box = join(workspace_projekt_verkehr, 'Teilflaechen_Plangebiet_BBox')
 
-    gridWGS84 = os.path.join(workspace_projekt_verkehr, 'Siedlungszellen')
-    grid_bound = os.path.join(workspace_projekt_verkehr, 'Gridbound')
+    gridWGS84 = join(workspace_projekt_verkehr, 'Siedlungszellen')
+    grid_bound = join(workspace_projekt_verkehr, 'Gridbound')
 
-    zensusRaster = os.path.join(base_path, '1_Basisdaten','ZensusGrid','Zensus2011GridWGS84_int.tif')
-    clippedRaster = os.path.join(base_path, '3_Projekte', projektname,'clippedZensus100mGrid.tif')
+    zensusRaster = join(base_path, '1_Basisdaten','ZensusGrid','Zensus2011GridWGS84_int.tif')
+    clippedRaster = join(base_path, '3_Projekte', projektname,'clippedZensus100mGrid.tif')
 
     #ggf vorhandene Layer loeschen
     deletelist = [gridWGS84, clippedRaster, bounding_box, Teilflaechen_Plangebiet_Buffer]
@@ -112,13 +112,13 @@ def main(parameters, messages):
     messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
-    OSM_Baselayer = arcpy.mapping.Layer(os.path.join(directory_tool_verkehr,'OpenStreetMap.lyr'))
-    Teilflaechen_Plangebiet = arcpy.mapping.Layer(os.path.join(workspace_projekt_definition,'Teilflaechen_Plangebiet'))
-    L00_Umfeldabgrenzung = arcpy.mapping.Layer(os.path.join(workspace_projekt_verkehr,'L00_Umfeldabgrenzung'))
-    L01_Uebergabepunkte = arcpy.mapping.Layer(os.path.join(workspace_projekt_verkehr,'L01_Uebergabepunkte'))
-    L10_Bestand_Arbeitsplaetze = arcpy.mapping.Layer(os.path.join(workspace_projekt_verkehr,'L10_Bestand_Arbeitsplaetze'))
-    L11_Bestand_Einzelhandelsflaechen = arcpy.mapping.Layer(os.path.join(workspace_projekt_verkehr,'L11_Bestand_Einzelhandelsflaechen'))
-    L11_Bestand_Schulen = arcpy.mapping.Layer(os.path.join(workspace_projekt_verkehr,'L11_Bestand_Schulen'))
+    OSM_Baselayer = arcpy.mapping.Layer(join(directory_tool_verkehr,'OpenStreetMap.lyr'))
+    Teilflaechen_Plangebiet = arcpy.mapping.Layer(join(workspace_projekt_definition,'Teilflaechen_Plangebiet'))
+    L00_Umfeldabgrenzung = arcpy.mapping.Layer(join(workspace_projekt_verkehr,'L00_Umfeldabgrenzung'))
+    L01_Uebergabepunkte = arcpy.mapping.Layer(join(workspace_projekt_verkehr,'L01_Uebergabepunkte'))
+    L10_Bestand_Arbeitsplaetze = arcpy.mapping.Layer(join(workspace_projekt_verkehr,'L10_Bestand_Arbeitsplaetze'))
+    L11_Bestand_Einzelhandelsflaechen = arcpy.mapping.Layer(join(workspace_projekt_verkehr,'L11_Bestand_Einzelhandelsflaechen'))
+    L11_Bestand_Schulen = arcpy.mapping.Layer(join(workspace_projekt_verkehr,'L11_Bestand_Schulen'))
 
     mxd = arcpy.mapping.MapDocument("CURRENT")
     df = arcpy.mapping.ListDataFrames(mxd, "*")[0]

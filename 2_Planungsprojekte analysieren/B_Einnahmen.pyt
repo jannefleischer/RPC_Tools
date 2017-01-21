@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import _rpcpath
 import contextlib
 import os
 import sys
@@ -8,11 +9,11 @@ import T4_Grundsteuer, T5_Gewerbesteuer, T6_KFA, T7_KRU
 import argparse
 import arcpy
 import imp
-BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+BASE_PATH = os.path.abspath(join(os.path.dirname(__file__),
                                          '..', '..'))
-LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
-project_lib = imp.load_source('project_lib', 
-                              os.path.join(LIB_PATH, 'project_lib.py'))
+LIB_PATH = join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib',
+                              join(LIB_PATH, 'project_lib.py'))
 
 # Export of toolbox F:\ggr Projekte\RPC_Tools\2_Tool\B_Einnahmen\B_Einnahmen.tbx
 
@@ -31,49 +32,49 @@ class Vorberechnungen(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-        
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
-            self.params[0].filter.list = list_projects 
-        
+            self.params[0].filter.list = list_projects
+
             i=0
-        
+
             heading1 = "01 Nettozuzugsquoten (in %)"
-            i+=1 ; self.params[i].category = heading1 
-            i+=1 ; self.params[i].category = heading1 
-        
+            i+=1 ; self.params[i].category = heading1
+            i+=1 ; self.params[i].category = heading1
+
             heading2 = "02 Einzugsbereich (in km)"
-            i+=1 ; self.params[i].category = heading2 
-            i+=1 ; self.params[i].category = heading2 
-        
+            i+=1 ; self.params[i].category = heading2
+            i+=1 ; self.params[i].category = heading2
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'1 Vorberechnungen'
         self.canRunInBackground = False
         reload(T1_Vorberechnungen)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -127,13 +128,13 @@ class Vorberechnungen(object):
         param_5.value = u'25'
         param_5.filter.type = 'Range'
         param_5.filter.list = [0, 50]
-        
+
         parameters = [param_1, param_2, param_3, param_4, param_5]
         validator = getattr(self, 'ToolValidator', None)
         validator(parameters).initializeParameters()
-    
+
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -152,37 +153,37 @@ class KFA(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-        
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
-            self.params[0].filter.list = list_projects 
-      
+            self.params[0].filter.list = list_projects
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'6 Kommunaler Finanzausgleich'
         self.canRunInBackground = False
         reload(T6_KFA)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -192,11 +193,11 @@ class KFA(object):
         param_1.direction = 'Input'
         param_1.datatype = u'Zeichenfolge'
         param_1.filter.list = []
-    
+
         parameters = [param_1]
         validator = getattr(self, 'ToolValidator', None)
         validator(parameters).initializeParameters()
-    
+
         return parameters
     def isLicensed(self):
         return True
@@ -218,35 +219,35 @@ class Einkommensteuer(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-        
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
-            self.params[0].filter.list = list_projects 
-        
-        
+            self.params[0].filter.list = list_projects
+
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'2 Einkommensteuer'
         self.canRunInBackground = False
@@ -260,11 +261,11 @@ class Einkommensteuer(object):
         param_1.direction = 'Input'
         param_1.datatype = u'Zeichenfolge'
         param_1.filter.list = []
-    
+
         parameters = [param_1]
         validator = getattr(self, 'ToolValidator', None)
         validator(parameters).initializeParameters()
-    
+
         return parameters
     def isLicensed(self):
         return True
@@ -286,40 +287,40 @@ class Familienleistungsausgleich(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-        
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
-            self.params[0].filter.list = list_projects 
-        
-        
+            self.params[0].filter.list = list_projects
+
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'3 Familienleistungsausgleich'
         self.canRunInBackground = False
         reload(T3_Familienleistungsausgleich)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -329,11 +330,11 @@ class Familienleistungsausgleich(object):
         param_1.direction = 'Input'
         param_1.datatype = u'Zeichenfolge'
         param_1.filter.list = []
-    
+
         parameters = [param_1]
         validator = getattr(self, 'ToolValidator', None)
         validator(parameters).initializeParameters()
-    
+
         return parameters
     def isLicensed(self):
         return True
@@ -355,51 +356,51 @@ class Grundsteuer(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
-            self.params[0].filter.list = list_projects 
-        
+            self.params[0].filter.list = list_projects
+
             i=2
-        
+
             heading1 = u"01 Monatsrohmieten (in €)".encode('CP1252')
-            i+=1 ; self.params[i].category = heading1 
             i+=1 ; self.params[i].category = heading1
             i+=1 ; self.params[i].category = heading1
             i+=1 ; self.params[i].category = heading1
-        
+            i+=1 ; self.params[i].category = heading1
+
             heading2 = u"02 Jahresrohmieten (in €)".encode('CP1252')
             i+=1 ; self.params[i].category = heading2
             i+=1 ; self.params[i].category = heading2
-        
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'4 Grundsteuer'
         self.canRunInBackground = False
         reload(T4_Grundsteuer)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -417,11 +418,11 @@ class Grundsteuer(object):
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
         param_2.datatype = u'Zeichenfolge'
-        param_2.filter.list = [u'unter 2000 EW', 
-                               u'2000 bis 5000 EW', 
-                               u'5000 bis 10000 EW', 
-                               u'10000 bis 50000 EW', 
-                               u'50000 bis 500000 EW', 
+        param_2.filter.list = [u'unter 2000 EW',
+                               u'2000 bis 5000 EW',
+                               u'5000 bis 10000 EW',
+                               u'10000 bis 50000 EW',
+                               u'50000 bis 500000 EW',
                                u'über 500000 EW'.encode('CP1252')]
 
         # Grundsteuerhebesatz_als_vH_Satz
@@ -480,11 +481,11 @@ class Grundsteuer(object):
         param_9.direction = 'Input'
         param_9.datatype = u'GPDouble'
 
-        parameters = [param_1, param_2, param_3, param_4, param_5, param_6, 
+        parameters = [param_1, param_2, param_3, param_4, param_5, param_6,
                       param_7, param_8, param_9]
         validator = getattr(self, 'ToolValidator', None)
         validator(parameters).initializeParameters()
-    
+
         return parameters
     def isLicensed(self):
         return True
@@ -506,38 +507,38 @@ class Gewerbesteuer(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-           
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
-            self.params[0].filter.list = list_projects         
+            self.params[0].filter.list = list_projects
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'5 Gewerbesteuer'
         self.canRunInBackground = False
         reload(T5_Gewerbesteuer)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -555,13 +556,13 @@ class Gewerbesteuer(object):
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
         param_2.datatype = u'Zeichenfolge'
-    
+
         parameters = [param_1, param_2]
         validator = getattr(self, 'ToolValidator', None)
         validator(parameters).initializeParameters()
-    
+
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -574,44 +575,44 @@ class Gewerbesteuer(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         T5_Gewerbesteuer.main(parameters, messages)
-                
+
 
 class KRU(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\B_Einnahmen\B_Einnahmen.tbx\KRU"""
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
-            self.params[0].filter.list = list_projects 
-      
+            self.params[0].filter.list = list_projects
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'7 Kreisumlage'
         self.canRunInBackground = False
         reload(T7_KRU)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -621,7 +622,7 @@ class KRU(object):
         param_1.direction = 'Input'
         param_1.datatype = u'Zeichenfolge'
         param_1.filter.list = []
-        
+
         parameters = [param_1]
         validator = getattr(self, 'ToolValidator', None)
         validator(parameters).initializeParameters()
@@ -639,8 +640,8 @@ class KRU(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         T7_KRU.main(parameters, messages)
-        
-        
+
+
 def main():
     tbx = Toolbox()
     tool = Vorberechnungen()
@@ -651,4 +652,4 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--debug', action="store_true")
     options = parser.parse_args()
     if options.debug:
-        main()        
+        main()

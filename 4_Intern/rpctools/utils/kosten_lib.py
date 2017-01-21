@@ -22,8 +22,8 @@ import sys, os, arcpy
 def kostenregel_anlegen(name,gemeinden,kreis,private):
     # Create Paths
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    kosten_tool = os.path.join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
-    kostenaufteilungsregel_tabelle = os.path.join(kosten_tool,'T01DEF_Kostenaufteilungsregeln')
+    kosten_tool = join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
+    kostenaufteilungsregel_tabelle = join(kosten_tool,'T01DEF_Kostenaufteilungsregeln')
 
     #gemeinden
     rows = arcpy.InsertCursor(kostenaufteilungsregel_tabelle)
@@ -64,8 +64,8 @@ def kostenregel_anlegen(name,gemeinden,kreis,private):
 def kostenregel_bearbeiten(name,gemeinden,kreis,private):
     # Create Paths
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    kosten_tool = os.path.join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
-    kostenaufteilungsregel_tabelle = os.path.join(kosten_tool,'T01DEF_Kostenaufteilungsregeln')
+    kosten_tool = join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
+    kostenaufteilungsregel_tabelle = join(kosten_tool,'T01DEF_Kostenaufteilungsregeln')
 
     # Step 1 - delete rule
     rows = arcpy.UpdateCursor(kostenaufteilungsregel_tabelle)
@@ -113,8 +113,8 @@ def kostenregel_bearbeiten(name,gemeinden,kreis,private):
 def kostenregel_loeschen(name):
     # Create Paths
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    kosten_tool = os.path.join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
-    kostenaufteilungsregel_tabelle = os.path.join(kosten_tool,'T01DEF_Kostenaufteilungsregeln')
+    kosten_tool = join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
+    kostenaufteilungsregel_tabelle = join(kosten_tool,'T01DEF_Kostenaufteilungsregeln')
 
     rows = arcpy.UpdateCursor(kostenaufteilungsregel_tabelle)
 

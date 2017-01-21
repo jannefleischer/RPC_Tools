@@ -7,7 +7,7 @@ import T1_Basisdaten_bearbeiten
 import T2_Routings_durchfuehren
 import T3_Verkehrsmengen_ermitteln
 
-PROJECT_FOLDER = os.path.join(os.getcwd().split("2_Tool")[0], "3_Projekte")
+PROJECT_FOLDER = join(os.getcwd().split("2_Tool")[0], "3_Projekte")
 TEST_TEMPLATE = 'Test_Template'
 PROJECT_TMP = '__unittest__'
 MAPQUEST_KEY = 'D0CXAXhgKGKmuAxA3x7HZq10MvbqhPiF'
@@ -20,9 +20,9 @@ def load_csv_params(csv_file, prepend=[]):
     with open(csv_file, 'r') as f:
         reader = csv.reader(f, delimiter=';')
         for row in reader:
-            params.append(row[1])    
+            params.append(row[1])
     return params
-            
+
 def to_arcpy_params(lst):
     arcpy_params = []
     for p in lst:
@@ -30,7 +30,7 @@ def to_arcpy_params(lst):
         if isinstance(p, bool):
             ap.datatype = 'GPBoolean'
         try:
-            p = float(p)      
+            p = float(p)
             ap.datatype = 'GPDouble'
         except:
             pass
@@ -43,8 +43,8 @@ class TestCVerkehr(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         test_mxd = arcpy.mapping.MapDocument("test.mxd")
-        
-        # mock the function to get the currently opened mxd 
+
+        # mock the function to get the currently opened mxd
         document = arcpy.mapping.MapDocument
         def current_mocked(path):
             if path == 'CURRENT':
@@ -53,13 +53,13 @@ class TestCVerkehr(unittest.TestCase):
                 return document(path)
         arcpy.mapping.MapDocument = current_mocked
         arcpy.AddErrorMessage = arcpy.AddError
-        
-        tmp_project_folder = os.path.join(PROJECT_FOLDER, PROJECT_TMP)
+
+        tmp_project_folder = join(PROJECT_FOLDER, PROJECT_TMP)
         if os.path.exists(tmp_project_folder):
             shutil.rmtree(tmp_project_folder)
         shutil.copytree(
-            os.path.join(PROJECT_FOLDER, TEST_TEMPLATE),
-            os.path.join(tmp_project_folder)
+            join(PROJECT_FOLDER, TEST_TEMPLATE),
+            join(tmp_project_folder)
         )
 
     def test1_basisdaten(self):
@@ -76,15 +76,15 @@ class TestCVerkehr(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        tmp_project_folder = os.path.join(PROJECT_FOLDER, PROJECT_TMP)
+        tmp_project_folder = join(PROJECT_FOLDER, PROJECT_TMP)
         try:
             shutil.rmtree(tmp_project_folder)
         except WindowsError:
             print u'Fehler beim Löschen des temporären Unittest-Verzeichnisses'
-                
+
 if __name__ == '__main__':
     unittest.main()
     # -*- coding: utf-8 -*-
-    
-    
+
+
 

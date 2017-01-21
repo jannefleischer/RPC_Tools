@@ -19,23 +19,23 @@ def infosheet(projektname, wirkungsfeld, wb):
 
     # Pfade setzen
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_factsheet = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-    tablepath_vor = os.path.join(workspace_factsheet,'Vornutzungen_Details_Prozent')
-    tablepath_teil = os.path.join(workspace_factsheet,'Teilflaechen_Plangebiet')
-    tablepath_neu  = os.path.join(workspace_factsheet,'Flaechenbilanz_gruppiert')
+    workspace_factsheet = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    tablepath_vor = join(workspace_factsheet,'Vornutzungen_Details_Prozent')
+    tablepath_teil = join(workspace_factsheet,'Teilflaechen_Plangebiet')
+    tablepath_neu  = join(workspace_factsheet,'Flaechenbilanz_gruppiert')
 
-    tablepath_rahmendaten = os.path.join(workspace_factsheet,'Projektrahmendaten')
-    tablepath_WE = os.path.join(workspace_factsheet,'Wohneinheiten_Details')
-    tablepath_Gewerbe = os.path.join(workspace_factsheet,'Gewerbe_Beschaeftigte')
-    tablepath_EZH = os.path.join(workspace_factsheet,'Versorgung_Verkaufsflaechen_Max')
-    logo = os.path.join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+    tablepath_rahmendaten = join(workspace_factsheet,'Projektrahmendaten')
+    tablepath_WE = join(workspace_factsheet,'Wohneinheiten_Details')
+    tablepath_Gewerbe = join(workspace_factsheet,'Gewerbe_Beschaeftigte')
+    tablepath_EZH = join(workspace_factsheet,'Versorgung_Verkaufsflaechen_Max')
+    logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
 
     ####################################################################
     #erstelle Diverse Tabellen zur Erzeugung des Uebersichtsdatenblattes
     ####################################################################
 
     #Importiere das Modul temp_mdb
-    mdblibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
+    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
     mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
 
@@ -47,7 +47,7 @@ def infosheet(projektname, wirkungsfeld, wb):
     FROM Flaechenbilanz
     GROUP BY Flaechenbilanz.Teilflaeche_Plangebiet, Flaechenbilanz.Startjahr, Flaechenbilanz.Flaechennutzung_S1, Flaechenbilanz.Flaechennutzung_S2;
     """
-    #if not os.path.exists(os.path.join(workspace_factsheet,'Flaechenbilanz_Planung_gruppiert')):
+    #if not os.path.exists(join(workspace_factsheet,'Flaechenbilanz_Planung_gruppiert')):
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
 
@@ -59,10 +59,10 @@ def infosheet(projektname, wirkungsfeld, wb):
     FROM Gewerbe_Beschaeftigte
     GROUP BY Gewerbe_Beschaeftigte.Teilflaeche_Plangebiet;
     """
-    #if not os.path.exists(os.path.join(workspace_factsheet,'Gewerbe_Beschaeftigte_Max')):
+    #if not os.path.exists(join(workspace_factsheet,'Gewerbe_Beschaeftigte_Max')):
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
-    Gewerbe_Beschaeftigte_Max = os.path.join(workspace_factsheet,'Gewerbe_Beschaeftigte_Max')
+    Gewerbe_Beschaeftigte_Max = join(workspace_factsheet,'Gewerbe_Beschaeftigte_Max')
 
     #Tabelle: "Versorgung_Verkaufsflaechen_Max" erzeugen, falls noch nicht vorhanden
     eingangstabellen = [(workspace_factsheet,'Versorgung_Verkaufsflaechen')]
@@ -72,7 +72,7 @@ def infosheet(projektname, wirkungsfeld, wb):
     FROM Versorgung_Verkaufsflaechen
     GROUP BY Versorgung_Verkaufsflaechen.Teilflaeche_Plangebiet;
     """
-    #if not os.path.exists(os.path.join(workspace_factsheet,'Versorgung_Verkaufsflaechen_Max')):
+    #if not os.path.exists(join(workspace_factsheet,'Versorgung_Verkaufsflaechen_Max')):
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
 
@@ -289,7 +289,7 @@ def infosheet(projektname, wirkungsfeld, wb):
 
     # Karte in Excelmappe einfuegen
 
-    minimap = os.path.join(os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen', 'Minimap.jpg'))
+    minimap = join(join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen', 'Minimap.jpg'))
     if os.path.isfile(minimap):
         ws1.insert_image('L5', minimap, {'x_scale': 0.29, 'y_scale': 0.25}) #Korrigiert Verzerrung die bei 1x1 auftritt
     else:

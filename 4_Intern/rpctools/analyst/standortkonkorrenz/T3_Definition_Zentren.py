@@ -18,13 +18,13 @@ import os
 
 import arcpy
 def main(parameters, messages):
-    gc.collect()    
+    gc.collect()
     projektname=parameters[0].valueAsText
     base_path = str(sys.path[0]).split("2_Tool")[0]
 
-    workspace_projekt = os.path.join(base_path, '3_Projekte', projektname,'FGDB_Standortkonkurrenz_Supermaerkte_' + projektname + '.gdb')
+    workspace_projekt = join(base_path, '3_Projekte', projektname,'FGDB_Standortkonkurrenz_Supermaerkte_' + projektname + '.gdb')
 
-    cur_checker= arcpy.SearchCursor(os.path.join(workspace_projekt,"Zentren"))
+    cur_checker= arcpy.SearchCursor(join(workspace_projekt,"Zentren"))
     array_checker=[]
     gefunden=0
     for rows in cur_checker:

@@ -19,10 +19,10 @@ from xlsxwriter.utility import xl_rowcol_to_cell
 
 def main(parameters, messages):
 
-    sheetlibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
+    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
     sl = imp.load_source('sheet_lib', sheetlibpath)
 
-    mdblibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
+    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
     mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
     gc.collect()
@@ -71,10 +71,10 @@ def main(parameters, messages):
 
 
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    kosten_tool = os.path.join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
-    kosten_projekt = os.path.join(base_path,'3_Projekte',projektname,"FGDB_Kosten_"+projektname+".gdb")
+    kosten_tool = join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
+    kosten_projekt = join(base_path,'3_Projekte',projektname,"FGDB_Kosten_"+projektname+".gdb")
 
-    tablepath_costrules_project = os.path.join(kosten_projekt,'Projektspez_Kostenauft')
+    tablepath_costrules_project = join(kosten_projekt,'Projektspez_Kostenauft')
 
     kostenbereiche = [('01 - Planungsaufwand',1),('02 - Gruen-, Ausgleichs- und Ersatzflaechen',2),('03 - Innere Verkehrserschliessung',3),('04 - Aeussere Verkehrserschliessung',4),('05 - Wasserversorgung',5),('06 - Abwasserentsorgung',6),('07 - Laermschutz',7),('08 - Zusatzkosten',8)]
     kostenphasen = [('1 - Erstmalige Herstellung',1),('2 - Betrieb und Unterhaltung',2),('3 - Erneuerung',3)]
@@ -125,16 +125,16 @@ def main(parameters, messages):
     #Pfade einrichten
     base_path = str(sys.path[0]).split("2_Tool")[0]
 
-    workspace_projekt_definition = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-    workspace_projekt_kosten = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Kosten_'+projektname+'.gdb')
-    workspace_tool_kosten = os.path.join(base_path,"2_Tool","A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
+    workspace_projekt_definition = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    workspace_projekt_kosten = join(base_path,'3_Projekte',projektname,'FGDB_Kosten.gdb')
+    workspace_tool_kosten = join(base_path,"2_Tool","A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
 
-    flaechenbilanz_planung = os.path.join(workspace_projekt_definition,'Flaechenbilanz')
-    flaechenbilanz_planung_gruppiert = os.path.join(workspace_projekt_definition,'Flaechenbilanz_gruppiert')
-    element_und_preisliste = os.path.join(workspace_tool_kosten,'T03MEG_Element_und_Preisliste')
-    infrastrukturmenge = os.path.join(workspace_projekt_kosten,"MEG_Mengenermittlung")
-    teilflaechenlayer = os.path.join(workspace_projekt_definition,'Teilflaechen_Plangebiet')
-    projektrahmendaten = os.path.join(workspace_projekt_definition,'projektrahmendaten')
+    flaechenbilanz_planung = join(workspace_projekt_definition,'Flaechenbilanz')
+    flaechenbilanz_planung_gruppiert = join(workspace_projekt_definition,'Flaechenbilanz_gruppiert')
+    element_und_preisliste = join(workspace_tool_kosten,'T03MEG_Element_und_Preisliste')
+    infrastrukturmenge = join(workspace_projekt_kosten,"MEG_Mengenermittlung")
+    teilflaechenlayer = join(workspace_projekt_definition,'Teilflaechen_Plangebiet')
+    projektrahmendaten = join(workspace_projekt_definition,'projektrahmendaten')
 
     #Update Sonderkostenfaktor in Projektrahmendaten
     cursor = arcpy.UpdateCursor(projektrahmendaten)
@@ -182,7 +182,7 @@ def main(parameters, messages):
 
     #erzeuge Zieltabelle
 
-    template = os.path.join(workspace_tool_kosten,"T01MEG_Template_Mengenermittlung")
+    template = join(workspace_tool_kosten,"T01MEG_Template_Mengenermittlung")
 
     arcpy.CreateTable_management(workspace_projekt_kosten, "MEG_Mengenermittlung", template, "")
 
@@ -563,13 +563,13 @@ def main(parameters, messages):
 
     # Pfade setzen
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_projekt_kosten = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Kosten_'+projektname+'.gdb')
-    tablepath = os.path.join(workspace_projekt_kosten,'T05KAM_01_Kostenaufteilung')
-    infrastrukturpath = os.path.join(workspace_projekt_kosten,'MEG_Mengenermittlung')
+    workspace_projekt_kosten = join(base_path,'3_Projekte',projektname,'FGDB_Kosten.gdb')
+    tablepath = join(workspace_projekt_kosten,'T05KAM_01_Kostenaufteilung')
+    infrastrukturpath = join(workspace_projekt_kosten,'MEG_Mengenermittlung')
 
-    logo = os.path.join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
-    ausgabeordner = os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
-    excelpfad = os.path.join(ausgabeordner,'Infrastrukturkosten.xlsx')
+    logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+    ausgabeordner = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
+    excelpfad = join(ausgabeordner,'Infrastrukturkosten.xlsx')
 
     try:
         os.remove(excelpfad)
@@ -999,12 +999,12 @@ def main(parameters, messages):
 
     ################################
     #Methodikblatt einfuegen
-    methodik_grafik = os.path.join(base_path,"2_Tool","A_Infrastrukturkosten","Erlaeuterungstexte","Methodik_KommunaleInfrastrukturkosten.png")
+    methodik_grafik = join(base_path,"2_Tool","A_Infrastrukturkosten","Erlaeuterungstexte","Methodik_KommunaleInfrastrukturkosten.png")
     ws6.insert_image('B2', methodik_grafik, {'x_scale': 0.32, 'y_scale': 0.32}) #Korrigiert Verzerrung die bei 1x1 auftritt
 
     ################################
     #Haftungsausschluss einfuegen
-    haftung_grafik = os.path.join(base_path,"2_Tool","A_Infrastrukturkosten","Erlaeuterungstexte","Haftungsausschluss.png")
+    haftung_grafik = join(base_path,"2_Tool","A_Infrastrukturkosten","Erlaeuterungstexte","Haftungsausschluss.png")
     ws7.insert_image('B2', haftung_grafik, {'x_scale': 0.32, 'y_scale': 0.32}) #Korrigiert Verzerrung die bei 1x1 auftritt
 
     ################################

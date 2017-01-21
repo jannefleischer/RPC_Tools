@@ -10,7 +10,7 @@ import T6_KFA
 import T7_KRU
 import arcpy, csv, shutil, os
 
-PROJECT_FOLDER = os.path.join(os.getcwd().split("2_Tool")[0], "3_Projekte")
+PROJECT_FOLDER = join(os.getcwd().split("2_Tool")[0], "3_Projekte")
 TEST_TEMPLATE = 'Test_Template'
 PROJECT_TMP = '__unittest__'
 
@@ -24,9 +24,9 @@ def load_csv_params(csv_file, prepend=[]):
     with open(csv_file, 'r') as f:
         reader = csv.reader(f, delimiter=';')
         for row in reader:
-            params.append(row[1])    
+            params.append(row[1])
     return params
-            
+
 def to_arcpy_params(lst):
     arcpy_params = []
     for p in lst:
@@ -43,42 +43,42 @@ class TestBEinnahmen(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         arcpy.AddErrorMessage = arcpy.AddError
-        
-        tmp_project_folder = os.path.join(PROJECT_FOLDER, PROJECT_TMP)
+
+        tmp_project_folder = join(PROJECT_FOLDER, PROJECT_TMP)
         if os.path.exists(tmp_project_folder):
             shutil.rmtree(tmp_project_folder)
         shutil.copytree(
-            os.path.join(PROJECT_FOLDER, TEST_TEMPLATE),
-            os.path.join(tmp_project_folder)
+            join(PROJECT_FOLDER, TEST_TEMPLATE),
+            join(tmp_project_folder)
         )
 
     def test1_vorberechnungen(self):
         params = load_csv_params(params_vorberechnungen_csv, params_common)
         T1_Vorberechnungen.main(to_arcpy_params(params), arcpy)
-        
+
     def test2_einkommensteuer(self):
-        T2_Einkommensteuer.main(to_arcpy_params(params_common), arcpy)  
-        
+        T2_Einkommensteuer.main(to_arcpy_params(params_common), arcpy)
+
     def test3_familienausgleich(self):
         T3_Familienleistungsausgleich.main(to_arcpy_params(params_common), arcpy)
-        
+
     def test4_grundsteuer(self):
         params = load_csv_params(params_grundsteuer_csv, params_common)
         T4_Grundsteuer.main(to_arcpy_params(params), arcpy)
-        
+
     def test5_gewerbesteuer(self):
         params = load_csv_params(params_gewerbesteuer_csv, params_common)
         T5_Gewerbesteuer.main(to_arcpy_params(params), arcpy)
-         
+
     def test6_KFA(self):
-        T6_KFA.main(to_arcpy_params(params_common), arcpy)   
-        
+        T6_KFA.main(to_arcpy_params(params_common), arcpy)
+
     def test7_KRU(self):
-        T7_KRU.main(to_arcpy_params(params_common), arcpy) 
-        
+        T7_KRU.main(to_arcpy_params(params_common), arcpy)
+
     @classmethod
     def tearDownClass(cls):
-        tmp_project_folder = os.path.join(PROJECT_FOLDER, PROJECT_TMP)
+        tmp_project_folder = join(PROJECT_FOLDER, PROJECT_TMP)
         try:
             shutil.rmtree(tmp_project_folder)
         except WindowsError:

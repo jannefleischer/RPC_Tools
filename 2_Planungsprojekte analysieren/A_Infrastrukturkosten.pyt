@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import _rpcpath
 import contextlib
 import os
 import sys
@@ -8,11 +9,11 @@ import argparse
 import kosten_lib as kosten
 import T5_Kostenmodell
 import imp
-BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+BASE_PATH = os.path.abspath(join(os.path.dirname(__file__),
                                          '..', '..'))
-LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
-project_lib = imp.load_source('project_lib', 
-                              os.path.join(LIB_PATH, 'project_lib.py'))
+LIB_PATH = join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib',
+                              join(LIB_PATH, 'project_lib.py'))
 
 # Export of toolbox F:\ggr Projekte\RPC_Tools\2_Tool\A_Infrastrukturkosten\A_Infrastrukturkosten.tbx
 
@@ -31,47 +32,47 @@ class Infrastrukturkostenermittlung(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-        
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-            tablepath_costrules = os.path.join(BASE_PATH,'2_Tool','A_Infrastrukturkosten','FGDB_Kosten_Tool.gdb','T01DEF_Kostenaufteilungsregeln')
-        
+            tablepath_costrules = join(BASE_PATH,'2_Tool','A_Infrastrukturkosten','FGDB_Kosten_Tool.gdb','T01DEF_Kostenaufteilungsregeln')
+
             try:
                 rows_costrules = arcpy.SearchCursor(tablepath_costrules)
                 message = "jep"
             except:
                 rows_costrules = []
-                message = "nope"        
-               
+                message = "nope"
+
             list_costrules = []
             for row in rows_costrules:
                 list_costrules.append(row.Kostenregelname)
             list_costrules = list(set(list_costrules))
             list_costrules = sorted(list_costrules)
-            
+
             list_teilflaechen = []
-        
+
             #set parameters
             self.params[0].filter.list = list_projects
             self.params[2].filter.list = ["Mischwassersystem","Trennwassersystem","Oberflaechenentwaesserung"]
             self.params[3].filter.list = ["Rueckhaltebecken - offen","Rueckhaltebecken - geschlossen","Rueckhaltebecken - Stauraumkanal","Rueckhaltebecken - Retentionsbodenfilter"]
-        
+
             #self.params[2].category = "01 - Zusatzangaben Entwässerung"
             self.params[3].category = u"01 - Zusatzangaben Entw\xe4sserung"
             self.params[4].category = u"01 - Zusatzangaben Entw\xe4sserung"
             self.params[5].category = u"01 - Zusatzangaben Entw\xe4sserung"
-        
+
             self.params[6].category = u"02 - Zus\xe4tzliche Kostenfaktoren"
             self.params[7].category = u"02 - Zus\xe4tzliche Kostenfaktoren"
-        
+
             i=7
             heading = u'03 - Aufteilung der Kosten auf Kostentr\xe4ger'
             i+=1; self.params[i].category = heading; self.params[i].filter.list = list_costrules
@@ -92,205 +93,205 @@ class Infrastrukturkostenermittlung(object):
             i+=1; self.params[i].category = heading; self.params[i].filter.list = list_costrules
             i+=1; self.params[i].category = heading; self.params[i].filter.list = list_costrules
             i+=1; self.params[i].category = heading; self.params[i].filter.list = list_costrules
-        
-        
+
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
-            has been changed."""        
-            
+            has been changed."""
+
             tbx_path = __file__
-    
+
             base_path = os.path.dirname(tbx_path)
             base_path = os.path.dirname(base_path)
             base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
-        
+
             if self.params[0].altered and not self.params[0].hasBeenValidated:
-        
+
                 projektname = self.params[0].value
                 projekt_fgdb = "FGDB_Definition_Projekt_"+self.params[0].value+".gdb"
-        
-                tablepath_teilflaechen = os.path.join(base_path,'3_Projekte',projektname,projekt_fgdb,"Teilflaechen_Plangebiet")
-        
+
+                tablepath_teilflaechen = join(base_path,'3_Projekte',projektname,projekt_fgdb,"Teilflaechen_Plangebiet")
+
                 rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
-        
+
                 list_teilflaechen =[]
-        
+
                 for row in rows_teilflaechen:
                     list_teilflaechen.append(row.Name)
                 list_teilflaechen = list(set(list_teilflaechen))
                 list_teilflaechen = sorted(list_teilflaechen)
-        
+
                 #self.params[5].filter.list = list_teilflaechen
-        
-        
+
+
             #Alte Kostenaufteilung einlesen
-        
+
             if self.params[0].altered and not self.params[0].hasBeenValidated:
-        
+
                 projectname = self.params[0].value
-        
-                tablepath_costrules_project = os.path.join(base_path,'3_Projekte',projectname,'FGDB_Kosten_'+projectname+'.gdb','Projektspez_Kostenauft')
-        
+
+                tablepath_costrules_project = join(base_path,'3_Projekte',projectname,'FGDB_Kosten.gdb','Projektspez_Kostenauft')
+
                 where_clause = """"Kostenbereich" = '01 - Planungsaufwand' and "Kostenphase" = '1 - Erstmalige Herstellung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB1_KP1 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '02 - Gruen-, Ausgleichs- und Ersatzflaechen' and "Kostenphase" = '1 - Erstmalige Herstellung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB2_KP1 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '02 - Gruen-, Ausgleichs- und Ersatzflaechen' and "Kostenphase" = '2 - Betrieb und Unterhaltung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB2_KP2 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '02 - Gruen-, Ausgleichs- und Ersatzflaechen' and "Kostenphase" = '3 - Erneuerung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB2_KP3 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '03 - Innere Verkehrserschliessung' and "Kostenphase" = '1 - Erstmalige Herstellung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB3_KP1 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '03 - Innere Verkehrserschliessung' and "Kostenphase" = '2 - Betrieb und Unterhaltung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB3_KP2 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '03 - Innere Verkehrserschliessung' and "Kostenphase" = '3 - Erneuerung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB3_KP3 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '04 - Aeussere Verkehrserschliessung' and "Kostenphase" = '1 - Erstmalige Herstellung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB4_KP1 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '04 - Aeussere Verkehrserschliessung' and "Kostenphase" = '2 - Betrieb und Unterhaltung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB4_KP2 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '04 - Aeussere Verkehrserschliessung' and "Kostenphase" = '3 - Erneuerung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB4_KP3 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '05 - Wasserversorgung' and "Kostenphase" = '1 - Erstmalige Herstellung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB5_KP1 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '05 - Wasserversorgung' and "Kostenphase" = '2 - Betrieb und Unterhaltung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB5_KP2 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '05 - Wasserversorgung' and "Kostenphase" = '3 - Erneuerung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB5_KP3 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '06 - Abwasserentsorgung' and "Kostenphase" = '1 - Erstmalige Herstellung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB6_KP1 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '06 - Abwasserentsorgung' and "Kostenphase" = '2 - Betrieb und Unterhaltung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB6_KP2 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '06 - Abwasserentsorgung' and "Kostenphase" = '3 - Erneuerung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB6_KP3 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '07 - Laermschutz' and "Kostenphase" = '1 - Erstmalige Herstellung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB7_KP1 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '07 - Laermschutz' and "Kostenphase" = '2 - Betrieb und Unterhaltung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB7_KP2 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '07 - Laermschutz' and "Kostenphase" = '3 - Erneuerung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB7_KP3 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '08 - Zusatzkosten' and "Kostenphase" = '1 - Erstmalige Herstellung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB8_KP1 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '08 - Zusatzkosten' and "Kostenphase" = '2 - Betrieb und Unterhaltung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB8_KP2 = row[0]
-        
+
                 where_clause = """"Kostenbereich" = '08 - Zusatzkosten' and "Kostenphase" = '3 - Erneuerung' """
                 rows = arcpy.da.SearchCursor(tablepath_costrules_project,'Kostenaufteilungsregel',where_clause)
                 for row in rows:
                     KB8_KP3 = row[0]
-        
-        
+
+
                 i = 7
                 #"01 Planungskosten"
                 i+=1 ; self.params[i].value = KB1_KP1
-        
+
                 #"02 Grün-, Ausgleichs- und Ersatzflächen"
                 i+=1 ; self.params[i].value = KB2_KP1
                 i+=1 ; self.params[i].value = KB2_KP2
                 i+=1 ; self.params[i].value = KB2_KP3
-        
+
                 #"03 Innere Verkehrserschließung"
                 i+=1 ; self.params[i].value = KB3_KP1
                 i+=1 ; self.params[i].value = KB3_KP2
                 i+=1 ; self.params[i].value = KB3_KP3
-        
+
                 #"04 Äußere Verkehrserschließung"
                 i+=1 ; self.params[i].value = KB4_KP1
                 i+=1 ; self.params[i].value = KB4_KP2
                 i+=1 ; self.params[i].value = KB4_KP3
-        
+
                 #"05 Wasserversorgung"
                 i+=1 ; self.params[i].value = KB5_KP1
                 i+=1 ; self.params[i].value = KB5_KP2
                 i+=1 ; self.params[i].value = KB5_KP3
-        
+
                 #"06 Abwasserentsorgung"
                 i+=1 ; self.params[i].value = KB6_KP1
                 i+=1 ; self.params[i].value = KB6_KP2
                 i+=1 ; self.params[i].value = KB6_KP3
-        
+
                 #"07 Lärmschutz"
                 i+=1 ; self.params[i].value = KB7_KP1
                 i+=1 ; self.params[i].value = KB7_KP2
-        
+
             return
-      
-      
+
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-        
+
     def __init__(self):
         self.label = u'1 Infrastrukturkosten ermitteln'
         self.canRunInBackground = False
         reload(T5_Kostenmodell)
-        
+
     def getParameterInfo(self):
         # Projekt_auswählen
         param_1 = arcpy.Parameter()
@@ -521,31 +522,31 @@ class Infrastrukturkostenermittlung(object):
         param_26.direction = 'Input'
         param_26.datatype = u'Zeichenfolge'
         param_26.filter.list = [u'Investor zahlt alles', u'Kommune zahlt alles', u'TestName', u'\xa7127 BauGB']
-        
-        parameters = [param_1, param_2, param_3, param_4, param_5, param_6, 
-                      param_7, param_8, param_9, param_10, param_11, param_12, 
-                      param_13, param_14, param_15, param_16, param_17, 
-                      param_18, param_19, param_20, param_21, param_22, 
+
+        parameters = [param_1, param_2, param_3, param_4, param_5, param_6,
+                      param_7, param_8, param_9, param_10, param_11, param_12,
+                      param_13, param_14, param_15, param_16, param_17,
+                      param_18, param_19, param_20, param_21, param_22,
                       param_23, param_24, param_25, param_26]
-        
+
         validator = getattr(self, 'ToolValidator', None)
         validator(parameters).initializeParameters()
 
         return parameters
-    
+
     def isLicensed(self):
         return True
-    
+
     def updateParameters(self, parameters):
         validator = getattr(self, 'ToolValidator', None)
         if validator:
             return validator(parameters).updateParameters()
-        
+
     def updateMessages(self, parameters):
         validator = getattr(self, 'ToolValidator', None)
         if validator:
             return validator(parameters).updateMessages()
-        
+
     def execute(self, parameters, messages):
         T5_Kostenmodell.main(parameters, messages)
 
@@ -554,32 +555,32 @@ class KostenaufteilungsregelnVerwalten(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-        
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-        
+
             i = 0
             self.params[i+2].enabled = 0; self.params[i+3].enabled = 0; self.params[i+4].enabled = 0
-        
+
             self.params[i+1].filter.list = []
-        
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
-        
+
             def sliderSummenKontrolle(listeSliderID, zielwertSlidersumme):
                 istsumme = 0
                 for s in listeSliderID:
                     istsumme+=self.params[s].value
-        
+
                 if istsumme <> zielwertSlidersumme:
                     abweichung = zielwertSlidersumme - istsumme
                     for s in reversed(listeSliderID):
@@ -592,57 +593,57 @@ class KostenaufteilungsregelnVerwalten(object):
                         abweichung = abweichung + alterWert - neuerWert
                         self.params[s].value = neuerWert
                 return
-                
-            tablepath_rules = os.path.join(BASE_PATH,'2_Tool','A_Infrastrukturkosten','FGDB_Kosten_Tool.gdb','T01DEF_Kostenaufteilungsregeln')
-        
+
+            tablepath_rules = join(BASE_PATH,'2_Tool','A_Infrastrukturkosten','FGDB_Kosten_Tool.gdb','T01DEF_Kostenaufteilungsregeln')
+
             i = 0
-        
+
             rows_rules = arcpy.SearchCursor(tablepath_rules, 'Vorgabewert = 0')
             list_rules = []
             for row in rows_rules:
                 list_rules.append(row.Kostenregelname)
             list_rules = sorted(set(list_rules))
             self.params[i+1].filter.list = list_rules
-        
-              
+
+
             if self.params[i].value == 'Kostenaufteilungsregel anlegen':
                 self.params[i+1].enabled = 1
                 self.params[i+1].filter.list = []
                 self.params[i+2].enabled = 1
                 self.params[i+2].enabled = 1; self.params[i+3].enabled = 1; self.params[i+4].enabled = 1
-        
+
             elif self.params[i].value == 'Kostenaufteilungsregel bearbeiten':
                 self.params[i+1].enabled = 1
                 self.params[i+1].filter.list = list_rules
                 self.params[i+2].enabled = 1; self.params[i+3].enabled = 1; self.params[i+4].enabled = 1
-        
+
             elif self.params[i].value == 'Kostenaufteilungsregel entfernen':
                 self.params[i+1].enabled = 1
                 self.params[i+1].filter.list = list_rules
                 self.params[i+2].enabled = 0
                 self.params[i+2].enabled = 0; self.params[i+3].enabled = 0; self.params[i+4].enabled = 0
-        
+
             if self.params[i+1].altered and not self.params[i+1].hasBeenValidated:
                 self.params[i+1].filter.list = list_rules
-        
-                tablepath_rules = os.path.join(base_path,'2_Tool','A_Infrastrukturkosten','FGDB_Kosten_Tool.gdb','T01DEF_Kostenaufteilungsregeln')
+
+                tablepath_rules = join(base_path,'2_Tool','A_Infrastrukturkosten','FGDB_Kosten_Tool.gdb','T01DEF_Kostenaufteilungsregeln')
                 fields = ['Anteil']
-        
+
                 where_clause = '"Kostenregelname" = ' + "'" + self.params[i+1].value + "'" + ' AND Kostentraeger = 1'
                 rows = arcpy.da.SearchCursor(tablepath_rules,fields,where_clause)
                 for row in rows:
                     self.params[2].value = row[0]*100
-        
+
                 where_clause = '"Kostenregelname" = ' + "'" + self.params[i+1].value + "'" + ' AND Kostentraeger = 2'
                 rows = arcpy.da.SearchCursor(tablepath_rules,fields,where_clause)
                 for row in rows:
                     self.params[3].value = row[0]*100
-        
+
                 where_clause = '"Kostenregelname" = ' + "'" + self.params[i+1].value + "'" + ' AND Kostentraeger = 3'
                 rows = arcpy.da.SearchCursor(tablepath_rules,fields,where_clause)
                 for row in rows:
                     self.params[4].value = row[0]*100
-        
+
             # Anteile verteilen
             i = 1
             listeSliderID = [i+1,i+2,i+3]
@@ -650,19 +651,19 @@ class KostenaufteilungsregelnVerwalten(object):
             for r in listeSliderID:
                 if self.params[r].altered:
                     sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
-                    
+
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'2 Kostenaufteilungsregeln verwalten'
         self.canRunInBackground = False
         reload(kosten)
-        
+
     def getParameterInfo(self):
         # Was_wollen_Sie_tun_
         param_1 = arcpy.Parameter()
@@ -719,32 +720,32 @@ class KostenaufteilungsregelnVerwalten(object):
         validator(parameters).initializeParameters()
 
         return parameters
-    
+
     def isLicensed(self):
         return True
-    
+
     def updateParameters(self, parameters):
         validator = getattr(self, 'ToolValidator', None)
         if validator:
             return validator(parameters).updateParameters()
-        
+
     def updateMessages(self, parameters):
         validator = getattr(self, 'ToolValidator', None)
         if validator:
             return validator(parameters).updateMessages()
-        
+
     def execute(self, parameters, messages):
         action = parameters[0].valueAsText
         name = parameters[1].valueAsText
-        
+
         gemeinden = parameters[2].value/100.
         kreis = parameters[3].value/100.
         private = parameters[4].value/100.
         if action == 'Kostenaufteilungsregel anlegen':
             kosten.kostenregel_anlegen(name,gemeinden,kreis,private)
-    
+
         elif action == 'Kostenaufteilungsregel bearbeiten':
             kosten.kostenregel_bearbeiten(name,gemeinden,kreis,private)
-    
-        elif action == 'Kostenaufteilungsregel entfernen':        
+
+        elif action == 'Kostenaufteilungsregel entfernen':
             kosten.kostenregel_loeschen(name)

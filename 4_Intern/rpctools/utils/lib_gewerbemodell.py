@@ -2,12 +2,12 @@
 # ---------------------------------------------------------------------------
 # REGIOPROJEKTCHECK
 # lib_gewerbemodell.py
-# 
-# Description: 
+#
+# Description:
 # PROJECT URL: http://www.regioprojektcheck.de
 #
 # Author:
-# ILS gGmbH 
+# ILS gGmbH
 #
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
@@ -20,7 +20,7 @@ def betriebsflaechenErmitteln(projektname):
     #ueberpruefen, ob schon Angaben zu den Betriebsstrukturen gemacht wurden
     #pfade anlegen
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    tabelle_gewerbe = os.path.join(base_path,'3_Projekte',projektname,'FGDB_11_Definition_Projekt_'+projektname+'.gdb','Gewerbe_Teilflaechen')
+    tabelle_gewerbe = join(base_path,'3_Projekte',projektname,'FGDB_11_Definition_Projekt.gdb','Gewerbe_Teilflaechen')
     counter = 0
     gewerbe_teilflaechen = arcpy.SearchCursor(tabelle_gewerbe)
     for flaeche in gewerbe_teilflaechen:
@@ -32,7 +32,7 @@ def betriebsflaechenErmitteln(projektname):
 
     #betriebsflaechengroessen berechnen
     #flaechengroessen parameter laden
-    betriebgroesse_parameter = os.path.join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_betriebsflaechengroesse')
+    betriebgroesse_parameter = join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_betriebsflaechengroesse')
     betriebgroesse_parameter_cursor = arcpy.SearchCursor(betriebgroesse_parameter)
     for parameter in betriebgroesse_parameter_cursor:
         if parameter.Branche == "C":
@@ -110,7 +110,7 @@ def betriebsflaechenErmitteln(projektname):
                 #arcpy.AddMessage(row2.betriebsflaeche_gewichtet)
                 summeFlaeche = summeFlaeche + betriebsflaeche
         #Das nettobauland fuer die gesamte Teilflaeche ermitteln
-        tabelle_gewerbe = os.path.join(base_path,'3_Projekte',projektname,'FGDB_11_Definition_Projekt_'+projektname+'.gdb','Gewerbe_Teilflaechen')
+        tabelle_gewerbe = join(base_path,'3_Projekte',projektname,'FGDB_11_Definition_Projekt.gdb','Gewerbe_Teilflaechen')
         gewerbe_teilflaechen_temp = arcpy.UpdateCursor(tabelle_gewerbe)
         nettoflaeche = 0
         for row3 in gewerbe_teilflaechen_temp:
@@ -138,13 +138,13 @@ def flaechebilanzErmitteln(projektname,nameTeilflaeche,gebietstyp):
 
     #Pfade festlegen
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    #workspace_basis = os.path.join(base_path, '1_Basisdaten', 'FGBD_01_Basisdaten_deutschland.gdb')
-    workspace_projekt = os.path.join(base_path, '3_Projekte', projektname,
+    #workspace_basis = join(base_path, '1_Basisdaten', 'FGBD_01_Basisdaten_deutschland.gdb')
+    workspace_projekt = join(base_path, '3_Projekte', projektname,
                                  'FGDB_11_Definition_Projekt_' + projektname + '.gdb')
 
 
     #Bruttoflaeche aus dem Shapefile ermitteln
-    pfad_teilflaeche = os.path.join(workspace_projekt,'Teilflaechen_Plangebiet')
+    pfad_teilflaeche = join(workspace_projekt,'Teilflaechen_Plangebiet')
     sql = "Name ='"+nameTeilflaeche +"'"
     Plangebiet = arcpy.SearchCursor(pfad_teilflaeche,sql)
     bruttoflaeche = 0
@@ -155,7 +155,7 @@ def flaechebilanzErmitteln(projektname,nameTeilflaeche,gebietstyp):
     #Flaechengroessen berechnen
     #Nettoflaeche berechnen
     #aus Parametertabelle gewerbe_flaechenbilanzen die Parameter fuer den Gebietstypen ermitteln
-    pfad_flaechenbilanz = os.path.join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_flaechenbilanzen')
+    pfad_flaechenbilanz = join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_flaechenbilanzen')
     #sql = 'Gebietstyp = '+"'"+gebietstyp+"'"
     #arcpy.AddMessage(sql)
     parameter_Anteil_Nettobauland = 0
@@ -190,13 +190,13 @@ def nutzungsstruktur(projektname):
     import sys, os, arcpy
     arcpy.AddMessage("Nutzungstruktur berechnen")
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    tabelle_gewerbe = os.path.join(base_path,'3_Projekte',projektname,'FGDB_11_Definition_Projekt_'+projektname+'.gdb','Gewerbe_Teilflaechen')
+    tabelle_gewerbe = join(base_path,'3_Projekte',projektname,'FGDB_11_Definition_Projekt.gdb','Gewerbe_Teilflaechen')
     tabelle_gewerbe_update = arcpy.UpdateCursor(tabelle_gewerbe)
     for row in tabelle_gewerbe_update:
         branche = row.gewerbetyp.split(" -")[0]
         nettobauland = row.nettobauland
 
-        tabelle_flaechenkenziffer = os.path.join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_flaechenkennziffern')
+        tabelle_flaechenkenziffer = join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_flaechenkennziffern')
         sql = "Branche = '" + branche+"'"
         #arcpy.AddMessage(sql)
         #Flaechenkennziffer vorbereiten
@@ -205,14 +205,14 @@ def nutzungsstruktur(projektname):
             flaechenkennziffer = row2.Beschaeftigte_je_Hektar
         del tabelle_flaechenkenziffer, row2
         #Parameter Flaechengroesse Hallen und Verwaltung vorbereiten
-        tabelle_gewerbe_verhaeltnis_hallen_verwaltung = os.path.join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_verhaeltnis_hallen_verwaltung')
+        tabelle_gewerbe_verhaeltnis_hallen_verwaltung = join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_verhaeltnis_hallen_verwaltung')
         tabelle_gewerbe_verhaeltnis_hallen_verwaltung_Search = arcpy.SearchCursor(tabelle_gewerbe_verhaeltnis_hallen_verwaltung,sql)
         for row3 in tabelle_gewerbe_verhaeltnis_hallen_verwaltung_Search:
             parameter_hallen = row3.Hallen
             parameter_verwaltung = row3.Verwaltung
         del row3, tabelle_gewerbe_verhaeltnis_hallen_verwaltung_Search
         #Parameter Volumen vorbereiten
-        gewerbe_gebaeudehoehen_tabelle = os.path.join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_verhaeltnis_hallen_verwaltung')
+        gewerbe_gebaeudehoehen_tabelle = join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_verhaeltnis_hallen_verwaltung')
         gewerbe_gebaeudehoehen_tabelle_Search = arcpy.SearchCursor(gewerbe_gebaeudehoehen_tabelle,sql)
         for row4 in gewerbe_gebaeudehoehen_tabelle_Search:
             parameter_hallen_hoehe = row4.Hallen
@@ -231,7 +231,7 @@ def nutzungsstruktur(projektname):
         row.ueberbaute_Flaeche = row.flaeche_hallen+row.flaeche_verwaltung
         #flaechenbedeckung ermittelen
         #parametertabelle laden
-        gewerbe_flaechennutzung = os.path.join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_flaechennutzungNettobaulandAllgemein')
+        gewerbe_flaechennutzung = join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_flaechennutzungNettobaulandAllgemein')
         tabelle_gewerbe_flaechennutzung = arcpy.SearchCursor(gewerbe_flaechennutzung,sql)
         for row5 in tabelle_gewerbe_flaechennutzung:
             parameter_flaeche_asphalt_beton = row5.Asphalt_Beton
@@ -263,11 +263,11 @@ def betriebsstruktur(projektname):
     import sys,os,arcpy
     #Pfade festlegen
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_projekt = os.path.join(base_path, '3_Projekte', projektname,'FGDB_11_Definition_Projekt_' + projektname + '.gdb')
+    workspace_projekt = join(base_path, '3_Projekte', projektname,'FGDB_11_Definition_Projekt_' + projektname + '.gdb')
 
-    tabelle_gewerbe_teilflaechen = os.path.join(workspace_projekt, "Gewerbe_Teilflaechen")
-    tabelle_gewerbe_betriebsstruktur = os.path.join(workspace_projekt, "Gewerbe_Betriebsstruktur")
-    tabelle_parameter_aufsiedlungsdauer = os.path.join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_aufsiedlungsdauer')
+    tabelle_gewerbe_teilflaechen = join(workspace_projekt, "Gewerbe_Teilflaechen")
+    tabelle_gewerbe_betriebsstruktur = join(workspace_projekt, "Gewerbe_Betriebsstruktur")
+    tabelle_parameter_aufsiedlungsdauer = join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_aufsiedlungsdauer')
 
     tabelle_gewerbe_teilflaechen_Search = arcpy.SearchCursor(tabelle_gewerbe_teilflaechen)
     tabelle_gewerbe_betriebsstruktur_Insert = arcpy.InsertCursor(tabelle_gewerbe_betriebsstruktur)
@@ -367,7 +367,7 @@ def betriebsstruktur(projektname):
 
 ##Bodenbedeckung berechnen
 #    #Parameter extrahieren
-#    bodenbedeckung_pfad = os.path.join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_flaechennutzungNettobaulandAllgemein')
+#    bodenbedeckung_pfad = join(base_path,'2_Tool','11_Definition_Projekt','FGDB_11_Definition_Projekt_Tool.gdb','gewerbe_flaechennutzungNettobaulandAllgemein')
 #    bodenbedeckung_cursor = arcpy.SearchCursor(bodenbedeckung_pfad)
 #    for row in bodenbedeckung_cursor:
 #        if row.Branche == "C":

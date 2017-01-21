@@ -29,21 +29,21 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import  FuncFormatter
 import numpy as np
 
-def main(parameters, messages): 
+def main(parameters, messages):
     #---------------------------------------------------------------------------------------
-    # Unicode 
+    # Unicode
     def _callback(matches):
         id = matches.group(1)
         try:
             return unichr(int(id))
         except:
             return id
-    
+
     def decode_unicode_references(data):
         return re.sub("&#(\d+)(;|(?=\s))", _callback, data)
-    
-    
-    
+
+
+
     #--------------------------------------------------------------------------------------------------
     # Abfahrt
     class Verkehrsmittel:
@@ -51,7 +51,7 @@ def main(parameters, messages):
             self.verkehrsmittel=[]
             self.ziel =[]
             self.uhrzeit = []
-    
+
     def escape1(html):
         rueck=[]
         for usd in html:
@@ -60,20 +60,20 @@ def main(parameters, messages):
             usd= decode_unicode_references(usd)
             usd= usd.encode('utf-8')
             rueck.append(usd)
-    
+
         return rueck
     #----------------------------------------------------------------------------------------------------------------------------------------------
     # Abfahrtfunktion für Barcode
     def Abfahrt(base_path,projektname,Daten):
-    
-        workspace_projekt_wertveraenderung = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Erreichbarkeit_Projekt_'+projektname+'.gdb')
-    
+
+        workspace_projekt_wertveraenderung = join(base_path,'3_Projekte',projektname,'FGDB_Erreichbarkeit.gdb')
+
         fahrzeug_array_alle_Haltestellen=[]
         for z in Daten:
-    
+
             str1='&gt;&gt;'
             str2='<span class="bold">'
-    
+
             max="99999"
             evaID=str(z[0])
     ##        print z[0]
@@ -84,16 +84,16 @@ def main(parameters, messages):
             verkehrsmittel=[]
             ziel=[]
             bla=[]
-    
+
             uu=0
             for zeilen in f:
                 if uu==1:
                     ziel.append(zeilen)
                     uu=0
-    
+
                 if zeilen.find(str1)==0:
                     uu=1
-    
+
                 if zeilen.find(str2)==0:
                     bla.append(zeilen)
                     m = re.findall(r">[0-9][0-9]:[0-9][0-9]<",zeilen)
@@ -101,17 +101,17 @@ def main(parameters, messages):
                         uhrzeit_falsch.append(m)
                         bla.remove(zeilen)
             f.close()
-    
+
             for n in uhrzeit_falsch:
                 uhrzeit.append(repr(n).replace('>',"").replace('<',""))
-    
+
             for h in bla:
                 test=h.replace('<span class="bold">',"").replace('</span>',"").replace('\n',"")
                 if len(test)>2:
                     verkehrsmittel.append(test)
-    
+
             ziel = escape1(ziel)
-    
+
             gefunden=0
             i=0
             fahrzeug_array= []
@@ -124,49 +124,49 @@ def main(parameters, messages):
                     fahrzeug.uhrzeit.append(uhrzeit[0])
                     fahrzeug_array.append(fahrzeug)
                     gefunden=1
-    
+
                 else:
                     for h in fahrzeug_array:
-    
+
                         if(verkehrsmittel[i]==str(h.verkehrsmittel).replace("'","").replace("[","").replace("]","")) and (str(ziel[i]).decode('utf-8')==''.join(h.ziel)):
                             h.uhrzeit.append(uhrzeit[i])
                             gefunden=1
-    
+
                     if(gefunden==0):
                         fahrzeug = Verkehrsmittel()
                         fahrzeug.verkehrsmittel.append(verkehrsmittel[i])
                         fahrzeug.ziel.append(str(ziel[i]).decode('String_Escape'))
                         fahrzeug.uhrzeit.append(uhrzeit[i])
                         fahrzeug_array.append(fahrzeug)
-    
+
                 i=i+1
                 gefunden=0
-    
+
             del uhrzeit , uhrzeit_falsch,bla,ziel, i
-    
+
             fahrzeug_array_alle_Haltestellen.append(fahrzeug_array)
-    
+
         return fahrzeug_array_alle_Haltestellen
     #----------------------------------------------------------------------------------------------------------------------------------------------
     # Alte Abfahrt funktion
     def Abfahrt2(base_path,projektname,Daten):
-    
-        workspace_projekt_wertveraenderung = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Erreichbarkeit_Projekt_'+projektname+'.gdb')
-        workspace_projekt_ergebnisse = os.path.join(base_path,'3_Projekte',projektname, 'Ergebnisausgabe', 'Abbildungen')
+
+        workspace_projekt_wertveraenderung = join(base_path,'3_Projekte',projektname,'FGDB_Erreichbarkeit.gdb')
+        workspace_projekt_ergebnisse = join(base_path,'3_Projekte',projektname, 'Ergebnisausgabe', 'Abbildungen')
         myfile = open(workspace_projekt_ergebnisse+"/Informationen_Abfahrt.csv", "wb")
         writer = csv.writer(myfile,dialect='excel',delimiter=' ')
         trenn=[';']
-    
-    
+
+
         for z in Daten:
-    
+
             str1='&gt;&gt;'
             str2='<span class="bold">'
-    
+
             max="99999"
             evaID=str(z[0])
             writer.writerow((repr(z[2]).decode('String_Escape').replace("'",'').replace('u','',1) , str(z[0]).replace('"','')))
-    
+
             f = urllib.urlopen("http://mobile.bahn.de/bin/mobil/bhftafel.exe/dox?evaId="+evaID+"&bt=dep&max="+max+"&start=1&time=00.00&time_end=23.59&disableEquivs=yes")
     ##        print("http://mobile.bahn.de/bin/mobil/bhftafel.exe/dox?evaId="+evaID+"&bt=dep&max="+max+"&start=1&time=00.00&time_end=23.59&disableEquivs=yes")
             uhrzeit_falsch=[]
@@ -174,16 +174,16 @@ def main(parameters, messages):
             verkehrsmittel=[]
             ziel=[]
             bla=[]
-    
+
             uu=0
             for zeilen in f:
                 if uu==1:
                     ziel.append(zeilen)
                     uu=0
-    
+
                 if zeilen.find(str1)==0:
                     uu=1
-    
+
                 if zeilen.find(str2)==0:
                     bla.append(zeilen)
                     m = re.findall(r">[0-9][0-9]:[0-9][0-9]<",zeilen)
@@ -191,17 +191,17 @@ def main(parameters, messages):
                         uhrzeit_falsch.append(m)
                         bla.remove(zeilen)
             f.close()
-    
+
             for n in uhrzeit_falsch:
                 uhrzeit.append(repr(n).replace('>',"").replace('<',""))
-    
+
             for h in bla:
                 test=h.replace('<span class="bold">',"").replace('</span>',"").replace('\n',"")
                 if len(test)>2:
                     verkehrsmittel.append(test)
-    
+
             ziel = escape1(ziel)
-    
+
             gefunden=0
             i=0
             fahrzeug_array= []
@@ -210,106 +210,106 @@ def main(parameters, messages):
                 if (i==0):
                     fahrzeug.verkehrsmittel.append(str(verkehrsmittel[0]))
                     fahrzeug.ziel.append(str(ziel[0]).decode('utf-8'))
-    
+
                     fahrzeug.uhrzeit.append(uhrzeit[0])
                     fahrzeug_array.append(fahrzeug)
                     gefunden=1
-    
+
                 else:
                     for h in fahrzeug_array:
                         if(verkehrsmittel[i]==str(h.verkehrsmittel).replace("'","").replace("[","").replace("]","")) and (str(ziel[i]).decode('utf-8')==''.join(h.ziel)):
                             h.uhrzeit.append(uhrzeit[i])
                             gefunden=1
-    
+
                     if(gefunden==0):
                         fahrzeug = Verkehrsmittel()
                         fahrzeug.verkehrsmittel.append(verkehrsmittel[i])
                         fahrzeug.ziel.append(str(ziel[i]).decode('utf-8'))
                         fahrzeug.uhrzeit.append(uhrzeit[i])
                         fahrzeug_array.append(fahrzeug)
-    
+
                 i=i+1
                 gefunden=0
-    
+
             for a in fahrzeug_array:
                 ptime=""
                 for b in a.uhrzeit:
                     ptime+=str(b).replace('[','').replace(']','').replace("'",'').replace('"','')+str(trenn).replace('[','').replace(']','').replace("'",'')
-    
+
                 blib= list(str(a.ziel).decode('String_Escape').replace('[','').replace(']','').replace("'",'').replace('"','').replace("u",'',1))
                 bla2 = a.verkehrsmittel + trenn
                 bla2 = bla2 + blib
                 bla2 = bla2 + trenn +list(ptime)
-    
+
                 writer.writerow(bla2)
                 del ptime
-    
+
             del uhrzeit , uhrzeit_falsch,verkehrsmittel,bla,ziel,fahrzeug_array,  i ,fahrzeug.uhrzeit,fahrzeug.verkehrsmittel,fahrzeug.ziel
             writer.writerow('')
-    
+
         myfile.close()
         del writer,myfile
     #--------------------------------------------------------------------------------------------------
     # Ankunft
     def Ankunft(base_path,projektname,Daten):
-    
-        workspace_projekt_wertveraenderung = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Erreichbarkeit_Projekt_'+projektname+'.gdb')
-    
+
+        workspace_projekt_wertveraenderung = join(base_path,'3_Projekte',projektname,'FGDB_Erreichbarkeit.gdb')
+
         myfile = open(workspace_projekt_ergebnisse+"/Informationen_Ankunft.csv", "wb")
         writer = csv.writer(myfile,dialect='excel',delimiter=' ')
         trenn=[';']
-    
-    
+
+
         for z in Daten:
-    
+
             str1='&lt;&lt;'
             str2='<span class="bold">'
-    
+
             max="99999"
             evaID=str(z[0])
             writer.writerow((repr(z[2]).decode('String_Escape').replace("'",'').replace('u','',1) , str(z[0]).replace('"','')))
-    
+
             f = urllib.urlopen("http://mobile.bahn.de/bin/mobil/bhftafel.exe/dox?evaId="+evaID+"&bt=arr&max="+max+"&start=1&time=00.00&time_end=23.59&disableEquivs=yes")
             uhrzeit_falsch=[]
             uhrzeit=[]
             verkehrsmittel=[]
             ziel=[]
             bla=[]
-    
+
             uu=0
             for zeilen in f:
                 if uu==1:
                     ziel.append(zeilen)
                     uu=0
-    
+
                 if zeilen.find(str1)==0:
                     uu=1
-    
+
                 if zeilen.find(str2)==0:
                     bla.append(zeilen)
                     m = re.findall(r">[0-9][0-9]:[0-9][0-9]<",zeilen)
                     if len(m)>0:
                         uhrzeit_falsch.append(m)
                         bla.remove(zeilen)
-    
+
             f.close()
-    
+
             for n in uhrzeit_falsch:
                 uhrzeit.append(repr(n).replace('>',"").replace('<',""))
-    
+
             for h in bla:
                 test=h.replace('<span class="bold">',"").replace('</span>',"").replace('\n',"")
                 if len(test)>2:
                     verkehrsmittel.append(test)
-    
+
             ziel = escape1(ziel)
             gefunden=0
             i=0
             fahrzeug_array= []
             fahrzeug = Verkehrsmittel()
-    
+
             # Struktur Verkehrsmittel Ziel Uhrzeit Uhrzeit UhrzeitUhrzeitUhrzeit Uhrzeit
-    
+
             while(i<len(verkehrsmittel)):
                 if (i==0):
                     fahrzeug.verkehrsmittel.append(str(verkehrsmittel[0]))
@@ -319,14 +319,14 @@ def main(parameters, messages):
                     fahrzeug_array.append(fahrzeug)
                     gefunden=1
     ##                print str(fahrzeug.ziel).decode('String_Escape')
-    
+
                 else:
                     for h in fahrzeug_array:
-    
+
                         if(verkehrsmittel[i]==str(h.verkehrsmittel).replace("'","").replace("[","").replace("]","")) and (str(ziel[i]).decode('utf-8')==''.join(h.ziel)):
                             h.uhrzeit.append(uhrzeit[i])
                             gefunden=1
-    
+
                     if(gefunden==0):
                         fahrzeug = Verkehrsmittel()
                         fahrzeug.verkehrsmittel.append(verkehrsmittel[i])
@@ -335,75 +335,75 @@ def main(parameters, messages):
                         fahrzeug_array.append(fahrzeug)
                 i=i+1
                 gefunden=0
-    
+
             for a in fahrzeug_array:
                 ptime=""
                 for b in a.uhrzeit:
                     ptime+=str(b).replace('[','').replace(']','').replace("'",'').replace('"','')+str(trenn).replace('[','').replace(']','').replace("'",'')
-    
+
                 blib= list(str(a.ziel).decode('String_Escape').replace('[','').replace(']','').replace("'",'').replace('"','').replace("u",'',1))
                 bla2 = a.verkehrsmittel + trenn
                 bla2 = bla2 + blib
                 bla2 = bla2 + trenn +list(ptime)
-    
+
                 writer.writerow(bla2)
                 del ptime
-    
+
             del uhrzeit , uhrzeit_falsch,verkehrsmittel,bla,ziel,fahrzeug_array,  i ,fahrzeug.uhrzeit,fahrzeug.verkehrsmittel,fahrzeug.ziel
             writer.writerow('')
-    
-    
+
+
         myfile.close()
         del writer,myfile
     #-----------------------------------------------------------------------------------------------------------------------------------------------
     #Zeichne Barcode
     def zeichne(timeline,lines,halte):
-    
-        workspace_projekt_wertveraenderung = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Erreichbarkeit_Projekt_'+projektname+'.gdb')
-        workspace_projekt_ergebnisse = os.path.join(base_path,'3_Projekte',projektname, 'Ergebnisausgabe', 'Abbildungen')
+
+        workspace_projekt_wertveraenderung = join(base_path,'3_Projekte',projektname,'FGDB_Erreichbarkeit.gdb')
+        workspace_projekt_ergebnisse = join(base_path,'3_Projekte',projektname, 'Ergebnisausgabe', 'Abbildungen')
     ##    print halte
         halte= halte.replace("(",'').replace(")",'').replace(",",'').replace("/",'').replace(" ",'').replace(unichr(228),'ae').replace(unichr(246),'oe').replace(unichr(252),'ue').replace(unichr(223),'ss')
     ##    print halte
         fig=plt.figure()
-    
+
     ##    print len (timeline)
         ax=fig.add_subplot(611,axisbg='w')
-    
+
         p1=[]
-    
+
         Farben=["#E41a1c", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00", "#FFFF33", "#A65628", "#F781BF"] # Using color brewer color scheme: http://colorbrewer2.org/?type=qualitative&scheme=Set1&n=8
         for x, a in enumerate(timeline):
-    
+
                 Datenarray = a
                 N = len(Datenarray)
                 ind = np.arange(N)      # the x locations for the groups
                 width = 1               # the width of the bars: can also be len(x) sequence
                 p1.append(ax.bar(ind, Datenarray, width,linewidth=0 ,color=Farben[x],label=unicode(str(lines[x]).replace("'",'').replace('[','').replace(']','').decode('String_escape').decode('utf-8'))))
-    
+
         handles, labels = ax.get_legend_handles_labels()
-    
+
         fontP = FontProperties()
         fontP.set_size('small')
         ax.legend(handles[::-1], labels[::-1],loc='upper center', bbox_to_anchor=(0.5, -0.3), prop = fontP, fancybox=True, shadow=True, ncol=3)
-    
+
         ax.get_yaxis().set_visible(False)
         ax.set_xlim(0,N)
         ax.set_xticks([0, 24, 48, 72,96,120,144,168,192,216,240,264,288])
         ax.get_xaxis().set_major_formatter(FuncFormatter(lambda x, pos: (str(int(x)*5/60)+':'+str(str(0))+str(0) ) ))
-    
+
         fig.savefig(workspace_projekt_ergebnisse+"/"+halte+".png",pad_inches=1,dpi=464,facecolor='w', edgecolor='w', bbox_inches='tight')
-    
+
         plt.clf()
         fig.clf()
         plt.close()
         del fig, ax , p1
         gc.collect()
-    
-    
+
+
     #-----------------------------------------------------------------------------------------------------------------------------------------------
     #Eerstellen der Barcodes bzw vorher entscheidung welches Diagramm erstellt werden soll
     def erstellen_der_timelines(fahrzeug_array_b,Daten):
-    
+
         Kategorie1_Verkehrsmittel=["ALT","AST","BSV","BUS","BYB","BZB","CAT","DZ","EXB"
                                     ,"FAE","KAT","KD","KTB","LEO","LT","MBB","MEL","MSB"
                                     ,"OBU","PRE","RFB","SB","SCH","SDG","SOE","UBU","UEF"
@@ -425,28 +425,28 @@ def main(parameters, messages):
                                     ,"RHT","RJ","RR","RRI","RRT","S2","S84","SBB","SC","SP","TGD"
                                     ,"TGV","THA","TLG","TLK","U70","UEX","UUU","VX","X","X2","X70","ZR"
                                     ,"ZUG"]
-    
-    
+
+
         for welche, fahrzeug_array in enumerate( fahrzeug_array_b):
             if len(fahrzeug_array) == 0:
                 continue
             #verkehrstraeger
-    
+
             time5lines_verkehrstraeger=[]
             verkehr=[]
             nichtchecken=[]
-    
+
             for x, a in enumerate( fahrzeug_array):
                 if x not in  [ii for ii in nichtchecken] or x==0 :
                     time5line=[]
-    
+
                     for uu in range(288):
                         time5line.append(0)
                     wogefunden=[]
-    
-    
+
+
                     mittel=str(a.verkehrsmittel).split(' ')[0].replace('[','').replace(']','').replace("'",'')
-    
+
                     if len([s for s in Kategorie1_Verkehrsmittel if s.lower() in str(mittel).lower()])>0  :
                         mittel="Bus"
                     elif len([s for s in Kategorie2_Verkehrsmittel if s.lower() in str(mittel).lower()])>0 :
@@ -455,7 +455,7 @@ def main(parameters, messages):
                         mittel="U , S - Bahn"
                     elif len([s for s in Kategorie4_Verkehrsmittel if s.lower() in str(mittel).lower()])>0 :
                         mittel="Fernbahn"
-    
+
                     gfind=0
                     for y, b in enumerate( fahrzeug_array):
                         mittel2=str(b.verkehrsmittel).split(' ')[0].replace('[','').replace(']','').replace("'",'')
@@ -467,7 +467,7 @@ def main(parameters, messages):
                             mittel2="U , S - Bahn"
                         elif len([s for s in Kategorie4_Verkehrsmittel if s.lower() in str(mittel2).lower()])>0 :
                             mittel2="Fernbahn"
-    
+
                         if  mittel==mittel2 and x!=y:
                             drinn=0
                             for zz in verkehr:
@@ -490,28 +490,28 @@ def main(parameters, messages):
                             ptime=str(bl).replace('[','').replace(']','').replace("'",'').replace('"','')
                             split = ptime.split(':')
                             time5line[((int(split[0])*60)/5)+int(math.ceil(int(split[1])/5))]=1
-    
+
                     time5lines_verkehrstraeger.append(time5line)
-    
+
             time5lines_ziel=[]
             ziele=[]
             nichtchecken=[]
-    
+
             for x, a in enumerate( fahrzeug_array):
-    
+
                 if x not in  [ii for ii in nichtchecken] or x==0 :
                     time5line=[]
-    
+
                     for uu in range(288):
                         time5line.append(0)
                     wogefunden=[]
-    
-    
+
+
                     for y, b in enumerate( fahrzeug_array):
                         if a.ziel == b.ziel and x!=y:
                             wogefunden.append(y)
                             nichtchecken.append(y)
-    
+
                     ptime=""
                     for woo in wogefunden:
                         for bk in fahrzeug_array[woo].uhrzeit:
@@ -519,29 +519,29 @@ def main(parameters, messages):
                             split = ptime.split(':')
                             time5line[((int(split[0])*60)/5)+int(math.ceil(int(split[1])/5))]=1
                     for bl in a.uhrzeit:
-    
+
                             ptime=str(bl).replace('[','').replace(']','').replace("'",'').replace('"','')
                             split = ptime.split(':')
                             time5line[((int(split[0])*60)/5)+int(math.ceil(int(split[1])/5))]=1
                     ziele.append(str(a.ziel).replace('[','').replace(']','').replace("'",'').replace('"',''))
                     time5lines_ziel.append(time5line)
-    
+
             print "Ziel ", ziele
-    
+
             #Linie
-    
+
             time5lines_linie=[]
             lines=[]
             nichtchecken=[]
             for x, a in enumerate( fahrzeug_array):
                 if x not in  [ii for ii in nichtchecken] or x==0 :
                     time5line=[]
-    
+
                     for uu in range(288):
                         time5line.append(0)
                     wogefunden=[]
-    
-    
+
+
                     mittel=str(a.verkehrsmittel).replace('[','').replace(']','').replace("'",'')
                     if 'MEr' in mittel:
                         mittel='Fernzug'
@@ -561,7 +561,7 @@ def main(parameters, messages):
                         mittel='Fernzug'
                     elif 'D' in mittel:
                         mittel='Fernzug'
-    
+
                     gfind=0
                     for y, b in enumerate( fahrzeug_array):
                         mittel2=""
@@ -596,23 +596,23 @@ def main(parameters, messages):
                             wogefunden.append(y)
                             nichtchecken.append(y)
                             gfind=1
-    
+
                     if gfind==0:
                         lines.append(a.verkehrsmittel)
-    
+
                     ptime=""
                     for woo in wogefunden:
                         for bk in fahrzeug_array[woo].uhrzeit:
                             ptime=str(bk).replace('[','').replace(']','').replace("'",'').replace('"','')
                             split = ptime.split(':')
-    
+
                             time5line[((int(split[0])*60)/5)+int(math.ceil(int(split[1])/5))]=1
                     for bl in a.uhrzeit:
                         ptime=str(bl).replace('[','').replace(']','').replace("'",'').replace('"','')
                         split = ptime.split(':')
                         time5line[((int(split[0])*60)/5)+int(math.ceil(int(split[1])/5))]=1
                     time5lines_linie.append(time5line)
-        
+
             haeufigkeit=time5lines_linie[0].count(1)
             haufigstelinie=0
             print haeufigkeit
@@ -621,29 +621,29 @@ def main(parameters, messages):
                 if int(haeufigkeit)<int(haeufig.count(1)):
                     haeufigkeit=int(haeufig.count(1))
                     haufigstelinie=zahl
-    
-    
+
+
             time5lines_linie2=[]
             lines2=[]
-    
+
             time5lines_linie2.append(time5lines_linie[haufigstelinie])
             time5lines_linie.pop(haufigstelinie)
             lines2.append(lines[haufigstelinie])
             lines2.append("Bus")
-    
+
             uui=[]
             for k, aaaa in enumerate( time5lines_linie):
                 if k==0:
                     uui=aaaa
                 else:
                     uui= map(operator.add, uui, aaaa)
-    
+
             for zahle, einzel in enumerate( uui):
                 if einzel>1:
                     uui[zahle]=1
-    
+
             time5lines_linie2.append(uui)
-    
+
             if (len(verkehr)>1):
                 print "1. Ja"
                 print "Unterschiedliche Verkehrstrager"
@@ -664,12 +664,12 @@ def main(parameters, messages):
                 print "Alle Linien und die stärkste in anderer Farbe"
                 style = 4
                 zeichne(time5lines_linie2,lines2,Daten[welche][2])
-    
+
             name = Daten[welche][2].replace("(",'').replace(")",'').replace(",",'').replace("/",'').replace(" ",'').replace(unichr(228),'ae').replace(unichr(246),'oe').replace(unichr(252),'ue').replace(unichr(223),'ss')
             results.append([name, style, time.strftime("%x"), Daten[welche][2]])
-        
+
     # Variablen definieren
-    
+
     projektname = str(parameters[0].valueAsText)
     haltestellen = []
     p1 = parameters[1].valueAsText
@@ -681,28 +681,28 @@ def main(parameters, messages):
     p3 = parameters[3].valueAsText
     if p3 is not None and p3 != "":
         haltestellen.append(p3.split(" | ")[0])
-    
+
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_projekt = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-    workspace_erreichbarkeit = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Erreichbarkeit_Projekt_'+projektname+'.gdb')
-    workspace_projekt_ergebnisse = os.path.join(base_path,'3_Projekte',projektname, 'Ergebnisausgabe', 'Abbildungen')
+    workspace_projekt = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    workspace_erreichbarkeit = join(base_path,'3_Projekte',projektname,'FGDB_Erreichbarkeit.gdb')
+    workspace_projekt_ergebnisse = join(base_path,'3_Projekte',projektname, 'Ergebnisausgabe', 'Abbildungen')
     arcpy.env.workspace = workspace_projekt
     arcpy.env.overwriteOutput = True
-    
-    
+
+
     # Daten aus Skript 01 einlesen und in entsprechende Struktur bringen
     Daten = []
-    rows = arcpy.SearchCursor(os.path.join(workspace_erreichbarkeit,"OEPNV_Haltestellen"))
+    rows = arcpy.SearchCursor(join(workspace_erreichbarkeit,"OEPNV_Haltestellen"))
     i = 1
     for row in rows:
         Daten.append([row.IBNR,row.Distanz,row.Name,row.lon, row.lat, i])
         i+=1
     del i
     results = [] #Variable zum Sammeln und später dann Speichern der Zwischenergebnisse
-    
-    
+
+
     #Funktionen:
-    
+
     Abfahrt2(base_path,projektname,Daten)
     haltestellen = [Daten[0][2], Daten[1][2], Daten[2][2]]
     Daten_temp = []
@@ -715,15 +715,15 @@ def main(parameters, messages):
                 Daten_temp.append(Daten[b])
             b+=1
     del b
-    
+
     fahrzeug_array_b=Abfahrt(base_path, projektname, Daten_temp)
     erstellen_der_timelines(fahrzeug_array_b,Daten_temp)
-    
-    
-    
+
+
+
     #############################################################################################################
     # Schritt X - Datenexport in temporäre .csv zur späteren Abholung durch den Ergebnissammler
-    ausgabeordner = os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen')
+    ausgabeordner = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen')
     with open(ausgabeordner+"\Haltestellen.csv", 'wb') as csvfile:
         writer = csv.writer(csvfile)
         i = 0
@@ -732,5 +732,5 @@ def main(parameters, messages):
             writer.writerow([results[i][0].encode('latin1'),results[i][1],results[i][2], results[i][3].encode('latin1')])
             i +=1
         del writer, csvfile
-    
+
     print "done"

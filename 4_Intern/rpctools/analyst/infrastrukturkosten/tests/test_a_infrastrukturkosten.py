@@ -6,7 +6,7 @@ import kosten_lib
 import arcpy, csv, shutil, os
 
 
-PROJECT_FOLDER = os.path.join(os.getcwd().split("2_Tool")[0], "3_Projekte")
+PROJECT_FOLDER = join(os.getcwd().split("2_Tool")[0], "3_Projekte")
 TEST_TEMPLATE = 'Test_Template'
 PROJECT_TMP = '__unittest__'
 
@@ -19,9 +19,9 @@ def load_csv_params(csv_file, prepend=[]):
     with open(csv_file, 'r') as f:
         reader = csv.reader(f, delimiter=';')
         for row in reader:
-            params.append(row[1])    
+            params.append(row[1])
     return params
-            
+
 def to_arcpy_params(lst):
     arcpy_params = []
     for p in lst:
@@ -38,13 +38,13 @@ class TestAKosten(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         arcpy.AddErrorMessage = arcpy.AddError
-        
-        tmp_project_folder = os.path.join(PROJECT_FOLDER, PROJECT_TMP)
+
+        tmp_project_folder = join(PROJECT_FOLDER, PROJECT_TMP)
         if os.path.exists(tmp_project_folder):
             shutil.rmtree(tmp_project_folder)
         shutil.copytree(
-            os.path.join(PROJECT_FOLDER, TEST_TEMPLATE),
-            os.path.join(tmp_project_folder)
+            join(PROJECT_FOLDER, TEST_TEMPLATE),
+            join(tmp_project_folder)
         )
 
     def test1_kostenaufteilung(self):
@@ -63,10 +63,10 @@ class TestAKosten(unittest.TestCase):
     def test2_infrastrukturkosten(self):
         params = load_csv_params(params_kosten_csv, params_kosten)
         T5_Kostenmodell.main(to_arcpy_params(params), arcpy)
-        
+
     @classmethod
     def tearDownClass(cls):
-        tmp_project_folder = os.path.join(PROJECT_FOLDER, PROJECT_TMP)
+        tmp_project_folder = join(PROJECT_FOLDER, PROJECT_TMP)
         try:
             shutil.rmtree(tmp_project_folder)
         except WindowsError:

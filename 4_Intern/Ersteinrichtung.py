@@ -13,13 +13,15 @@
 # ---------------------------------------------------------------------------
 
 import os, sys
+import _rpcpath
 
 def install_packages(python_path):
 
     print("\n"+ "Verwendeter Python-Pfad: " + python_path + "\n")
 
     #Creating list with missing packages
-    used_packages = ['pip', 'setuptools', 'matplotlib', 'numpy', 'pyodbc', 'six', 'xlrd', 'xlsxwriter']
+    used_packages = ['pip', 'setuptools', 'matplotlib', 'numpy',
+                     'pyodbc', 'six', 'xlrd', 'xlsxwriter', 'pytest']
     missing = []
 
     for package in used_packages:
@@ -49,7 +51,7 @@ def install_packages(python_path):
 
     #Installing missing packages
     import pip
-    install_path = os.path.join(python_path, 'Lib', 'site-packages')
+    install_path = join(python_path, 'Lib', 'site-packages')
     print('Installationspad: ' + install_path + "\n")
 
     for package in missing:
@@ -59,6 +61,10 @@ def install_packages(python_path):
             print("Paket " + package + " wurde installiert." + "\n")
         except:
             print("Paket " + package + " konnte nicht installiert werden." + "\n")
+
+    # install rpcpackage from local directory
+    pip.main(['install', '--target', install_path, '--editable', '.',
+              '--upgrade'])
 
     print('Installation abgeschlossen.')
     raw_input()

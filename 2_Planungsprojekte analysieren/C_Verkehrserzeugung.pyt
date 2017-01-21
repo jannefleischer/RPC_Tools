@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import _rpcpath
 import contextlib
 import os
 import sys
@@ -7,11 +8,11 @@ import T1_Basisdaten_bearbeiten, T2_Routings_durchfuehren
 import T3_Verkehrsmengen_ermitteln
 import arcpy
 import imp
-BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+BASE_PATH = os.path.abspath(join(os.path.dirname(__file__),
                                          '..', '..'))
-LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
-project_lib = imp.load_source('project_lib', 
-                              os.path.join(LIB_PATH, 'project_lib.py'))
+LIB_PATH = join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib',
+                              join(LIB_PATH, 'project_lib.py'))
 
 # Export of toolbox F:\ggr Projekte\RPC_Tools\2_Tool\C_Verkehr\C_Verkehrserzeugung.tbx
 
@@ -30,37 +31,37 @@ class Routingsdurchfuehren(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
-            self.params[0].filter.list = list_projects 
+            self.params[0].filter.list = list_projects
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'2 Routings durchf\xfchren'
         self.canRunInBackground = False
         reload(T2_Routings_durchfuehren)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -81,9 +82,9 @@ class Routingsdurchfuehren(object):
 
         parameters = [param_1, param_2]
         validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()            
+        validator(parameters).initializeParameters()
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -96,7 +97,7 @@ class Routingsdurchfuehren(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         T2_Routings_durchfuehren.main(parameters, messages)
-            
+
 
 class VerkehrsmengenErmitteln(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\C_Verkehr\C_Verkehrserzeugung.tbx\VerkehrsmengenErmitteln"""
@@ -105,30 +106,30 @@ class VerkehrsmengenErmitteln(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
-            called when the tool is opened."""        
+            called when the tool is opened."""
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
             i=-1
-        
-            i+=1 ; self.params[0].filter.list = list_projects 
-        
+
+            i+=1 ; self.params[0].filter.list = list_projects
+
             heading = u"01 - Parameter für Wohnnutzungen".encode('CP1252')
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
-        
-        
+
+
             heading = u"02 - Parameter für Einzelhandel".encode('CP1252')
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
@@ -137,7 +138,7 @@ class VerkehrsmengenErmitteln(object):
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
-        
+
             heading = u"03 - Parameter für Gewerbebetriebe".encode('CP1252')
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
@@ -145,7 +146,7 @@ class VerkehrsmengenErmitteln(object):
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
-        
+
             heading = u"04 - Parameter für Schulen".encode('CP1252')
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
@@ -154,26 +155,26 @@ class VerkehrsmengenErmitteln(object):
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading
-        
-        
+
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'3 Verkehrsmengen ermitteln'
         self.canRunInBackground = False
         reload(T3_Verkehrsmengen_ermitteln)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -281,7 +282,7 @@ class VerkehrsmengenErmitteln(object):
         param_11.direction = 'Input'
         param_11.datatype = u'GPDouble'
         param_11.value = 1.1
-        
+
         # Versorgung_Besucher_Tag
         param_12 = arcpy.Parameter()
         param_12.name = u'Versorgung_Besucher_Tag'
@@ -423,17 +424,17 @@ class VerkehrsmengenErmitteln(object):
         param_26.direction = 'Input'
         param_26.datatype = u'GPDouble'
         param_26.value = 0.01
-    
-        parameters = [param_1, param_2, param_3, param_4, param_5, param_6, 
-                      param_7, param_8, param_9, param_10, param_11, param_12, 
-                      param_13, param_14, param_15, param_16, param_17, 
-                      param_18, param_19, param_20, param_21, param_22, 
+
+        parameters = [param_1, param_2, param_3, param_4, param_5, param_6,
+                      param_7, param_8, param_9, param_10, param_11, param_12,
+                      param_13, param_14, param_15, param_16, param_17,
+                      param_18, param_19, param_20, param_21, param_22,
                       param_23, param_24, param_25, param_26]
         validator = getattr(self, 'ToolValidator', None)
         validator(parameters).initializeParameters()
-    
+
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -446,7 +447,7 @@ class VerkehrsmengenErmitteln(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         T3_Verkehrsmengen_ermitteln.main(parameters, messages)
-            
+
 
 class Basisdatenbearbeiten(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\C_Verkehr\C_Verkehrserzeugung.tbx\Basisdatenbearbeiten"""
@@ -455,38 +456,38 @@ class Basisdatenbearbeiten(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
             self.params[0].filter.list = list_projects
-        
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'1 Basisdaten bearbeiten'
         self.canRunInBackground = False
         reload(T1_Basisdaten_bearbeiten)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -500,9 +501,9 @@ class Basisdatenbearbeiten(object):
         parameters = [param_1]
         validator = getattr(self, 'ToolValidator', None)
         validator(parameters).initializeParameters()
-    
+
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -515,4 +516,3 @@ class Basisdatenbearbeiten(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         T1_Basisdaten_bearbeiten.main(parameters, messages)
-            

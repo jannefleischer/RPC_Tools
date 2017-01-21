@@ -16,12 +16,12 @@ def recalcPopulation(projektname):
     import arcpy, os, imp, sys
 
     # load tempMDB Function
-    mdblibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
+    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
     mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
     #get Paths
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_projekt_definition = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
+    workspace_projekt_definition = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
 
     #WOHNEN - EINWOHNERBERECHNUNG
 
@@ -31,7 +31,7 @@ def recalcPopulation(projektname):
 
     # versuche, die EW-Tabellen zu loeschen, bevor sie neu erzeugt werden
     try:
-        arcpy.Delete_management(os.path.join(workspace_projekt_definition,'Einwohnerzahl'))
+        arcpy.Delete_management(join(workspace_projekt_definition,'Einwohnerzahl'))
     except:
         pass
 
@@ -82,9 +82,9 @@ def recalcPopulation(projektname):
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #delete einwohnerzahl-table and rename einwohner-kum
-    arcpy.Delete_management(os.path.join(workspace_projekt_definition,'temp_1'))
-    arcpy.Delete_management(os.path.join(workspace_projekt_definition,'Einwohnerzahl'))
+    arcpy.Delete_management(join(workspace_projekt_definition,'temp_1'))
+    arcpy.Delete_management(join(workspace_projekt_definition,'Einwohnerzahl'))
 
-    in_data =  os.path.join(workspace_projekt_definition,'Einwohner')
-    out_data = os.path.join(workspace_projekt_definition,'Einwohnerzahl')
+    in_data =  join(workspace_projekt_definition,'Einwohner')
+    out_data = join(workspace_projekt_definition,'Einwohnerzahl')
     arcpy.Rename_management(in_data, out_data)

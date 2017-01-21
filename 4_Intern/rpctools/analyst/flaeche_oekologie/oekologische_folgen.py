@@ -25,7 +25,7 @@ from xlsxwriter.utility import xl_rowcol_to_cell, xl_range
 import lib_oekologischeFolgen as lib_oeko
 
 def main(parameters, messages):
-    sheetlibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
+    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
     sl = imp.load_source('sheet_lib', sheetlibpath)
 
     #Parameter erstellen
@@ -43,7 +43,7 @@ def main(parameters, messages):
 
     wcd = os.getcwd()
     rootPfad = str(sys.path[0]).split("2_Tool")[0]
-    bodenbedeckungTabelle = os.path.join(rootPfad,"3_Projekte",projektName,"FGDB_Flaeche_und_Oekologie_Projekt_" + projektName + ".gdb","Bodenbedeckung")
+    bodenbedeckungTabelle = join(rootPfad,"3_Projekte",projektName,"FGDB_Flaeche_und_Oekologie_" + projektName + ".gdb","Bodenbedeckung")
 
     bedeckungstabelle = arcpy.SearchCursor(bodenbedeckungTabelle)
     NF_ueberbauteFlaechen = 0
@@ -212,7 +212,7 @@ def main(parameters, messages):
 
         wcd = os.getcwd()
         rootPfad = str(sys.path[0]).split("2_Tool")[0]
-        ergebnisTabelle = os.path.join(rootPfad,'3_Projekte',projektName,'FGDB_Flaeche_und_Oekologie_Projekt_'+projektName+'.gdb','Ergebnisse_oekologischeWertigkeit')
+        ergebnisTabelle = join(rootPfad,'3_Projekte',projektName,'FGDB_Flaeche_und_Oekologie.gdb','Ergebnisse_oekologischeWertigkeit')
         ueberschneidungBiotope = int(ueberschneidungBiotope)
         ueberschneidungFFHGebiete = int(ueberschneidungFFHGebiete)
         ueberschneidungNationalparke = int(ueberschneidungNationalparke)
@@ -287,16 +287,16 @@ def main(parameters, messages):
 
     # Pfade setzen
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_projekt_oekologie = os.path.join(base_path,'3_Projekte',projektName,'FGDB_Flaeche_und_Oekologie_Projekt_'+projektName+'.gdb')
-    tablepath_Bodenbedeckung = os.path.join(workspace_projekt_oekologie,'Bodenbedeckung')
-    tablepath_Integration = os.path.join(workspace_projekt_oekologie,'Ergebnisse_Integrationsgrad')
-    tablepath_oekWert = os.path.join(workspace_projekt_oekologie,'Ergebnisse_oekologischeWertigkeit')
-    tablepath_Wohnflaechendichte = os.path.join(workspace_projekt_oekologie,'Ergebnisse_Wohnflaechendichte')
-    grafikpath_erlauterungstext = os.path.join(base_path,'2_Tool','F_Flaeche_und_Oekologie','Erlauterungstexte')
+    workspace_projekt_oekologie = join(base_path,'3_Projekte',projektName,'FGDB_Flaeche_und_Oekologie.gdb')
+    tablepath_Bodenbedeckung = join(workspace_projekt_oekologie,'Bodenbedeckung')
+    tablepath_Integration = join(workspace_projekt_oekologie,'Ergebnisse_Integrationsgrad')
+    tablepath_oekWert = join(workspace_projekt_oekologie,'Ergebnisse_oekologischeWertigkeit')
+    tablepath_Wohnflaechendichte = join(workspace_projekt_oekologie,'Ergebnisse_Wohnflaechendichte')
+    grafikpath_erlauterungstext = join(base_path,'2_Tool','F_Flaeche_und_Oekologie','Erlauterungstexte')
 
-    logo = os.path.join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
-    ausgabeordner = os.path.join(base_path,'3_Projekte',projektName,'Ergebnisausgabe','Excel')
-    excelpfad = os.path.join(ausgabeordner,'F_Flaeche_und_Oekologie.xlsx')
+    logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+    ausgabeordner = join(base_path,'3_Projekte',projektName,'Ergebnisausgabe','Excel')
+    excelpfad = join(ausgabeordner,'F_Flaeche_und_Oekologie.xlsx')
 
     try:
         os.remove(excelpfad)
@@ -367,13 +367,13 @@ def main(parameters, messages):
     ########
     ## Erläuterungstexte einfügen
     # Pfade zu Grafiken herstellen
-    Text1 = os.path.join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie1.png')
-    Text2 = os.path.join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie2.png')
-    Text3 = os.path.join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie3.png')
-    Text4a = os.path.join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie4a.png')
-    Text4b = os.path.join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie4b.png')
-    Text5 = os.path.join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie5.png')
-    Text6 = os.path.join(grafikpath_erlauterungstext, 'Haftungsausschluss.png')
+    Text1 = join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie1.png')
+    Text2 = join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie2.png')
+    Text3 = join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie3.png')
+    Text4a = join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie4a.png')
+    Text4b = join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie4b.png')
+    Text5 = join(grafikpath_erlauterungstext, 'Methodik_FlaecheOekologie5.png')
+    Text6 = join(grafikpath_erlauterungstext, 'Haftungsausschluss.png')
 
     ###Grafiken einfügen
     ws2.insert_image(0, 0, Text1, {'x_scale': 0.32, 'y_scale': 0.32})

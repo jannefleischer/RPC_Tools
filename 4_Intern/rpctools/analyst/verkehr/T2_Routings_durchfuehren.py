@@ -27,7 +27,7 @@ from arcpy import env
 import verkehr_lib as v
 
 def main(parameters, messages):
-    mdblibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
+    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
     mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
     arcpy.env.overwriteOutput = True
@@ -42,38 +42,38 @@ def main(parameters, messages):
 
     # Workspaces
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    workspace_projekt = os.path.join(base_path,'3_Projekte',projektname)
-    workspace_projekt_definition = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-    workspace_projekt_verkehr = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Verkehr_'+projektname+'.gdb')
-    workspace_tool_verkehr = os.path.join(base_path,"2_Tool","C_Verkehr","Verkehr_Tool.gdb")
+    workspace_projekt = join(base_path,'3_Projekte',projektname)
+    workspace_projekt_definition = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    workspace_projekt_verkehr = join(base_path,'3_Projekte',projektname,'FGDB_Verkehr.gdb')
+    workspace_tool_verkehr = join(base_path,"2_Tool","C_Verkehr","Verkehr_Tool.gdb")
 
     # Layers and Tables
-    out_folder_path = os.path.join(workspace_projekt,"temp") # Pfad zur temporaeren mdb inkl.
-    temp_mdb_path = os.path.join(out_folder_path,"PGDB_Temp.mdb")
+    out_folder_path = join(workspace_projekt,"temp") # Pfad zur temporaeren mdb inkl.
+    temp_mdb_path = join(out_folder_path,"PGDB_Temp.mdb")
 
-    teilflaechen_plangebiet = os.path.join(workspace_projekt_definition,'Teilflaechen_Plangebiet')
-    teilflaechen_plangebiet_centroid = os.path.join(workspace_projekt_definition,'Teilflaechen_Plangebiet_Centroide')
-    siedlungszellen_centroid = os.path.join(workspace_projekt_verkehr,'Siedlungszellen_Centroide')
-    siedlungszellen_centroid_projektumfeld = os.path.join(workspace_projekt_verkehr,"L02_SZ_Umfeld")
+    teilflaechen_plangebiet = join(workspace_projekt_definition,'Teilflaechen_Plangebiet')
+    teilflaechen_plangebiet_centroid = join(workspace_projekt_definition,'Teilflaechen_Plangebiet_Centroide')
+    siedlungszellen_centroid = join(workspace_projekt_verkehr,'Siedlungszellen_Centroide')
+    siedlungszellen_centroid_projektumfeld = join(workspace_projekt_verkehr,"L02_SZ_Umfeld")
 
-    umfeldabgrenzung = os.path.join(workspace_projekt_verkehr,"L00_Umfeldabgrenzung")
-    uebergabepunkte = os.path.join(workspace_projekt_verkehr,"L01_Uebergabepunkte")
+    umfeldabgrenzung = join(workspace_projekt_verkehr,"L00_Umfeldabgrenzung")
+    uebergabepunkte = join(workspace_projekt_verkehr,"L01_Uebergabepunkte")
 
-    routen_sz = os.path.join(workspace_projekt_verkehr,"L03_Routen_SZ")
-    routen_tf = os.path.join(workspace_projekt_verkehr,"L03_Routen_TF")
+    routen_sz = join(workspace_projekt_verkehr,"L03_Routen_SZ")
+    routen_tf = join(workspace_projekt_verkehr,"L03_Routen_TF")
 
-    routen_geometrie_sz = os.path.join(workspace_projekt_verkehr,"L04_Routing_Geometrie_SZ")
-    routen_geometrie_tf = os.path.join(workspace_projekt_verkehr,"L04_Routing_Geometrie_TF")
+    routen_geometrie_sz = join(workspace_projekt_verkehr,"L04_Routing_Geometrie_SZ")
+    routen_geometrie_tf = join(workspace_projekt_verkehr,"L04_Routing_Geometrie_TF")
 
-    strassenabschnitte_sz = os.path.join(temp_mdb_path,"strassenabschnitte_sz")
-    strassenabschnitte_tf = os.path.join(temp_mdb_path,"strassenabschnitte_tf")
+    strassenabschnitte_sz = join(temp_mdb_path,"strassenabschnitte_sz")
+    strassenabschnitte_tf = join(temp_mdb_path,"strassenabschnitte_tf")
 
-    routen_ergebniskacheln = os.path.join(workspace_projekt_verkehr,"L05_Ergebniskacheln")
-    routen_ergebniskacheln_sz_join = os.path.join(workspace_projekt_verkehr,"L05_Ergebniskacheln_sz_join")
-    routen_ergebniskacheln_tf_join = os.path.join(workspace_projekt_verkehr,"L05_Ergebniskacheln_tf_join")
+    routen_ergebniskacheln = join(workspace_projekt_verkehr,"L05_Ergebniskacheln")
+    routen_ergebniskacheln_sz_join = join(workspace_projekt_verkehr,"L05_Ergebniskacheln_sz_join")
+    routen_ergebniskacheln_tf_join = join(workspace_projekt_verkehr,"L05_Ergebniskacheln_tf_join")
 
-    grid = os.path.join(workspace_projekt_verkehr,'Siedlungszellen')
-    grid_centroids = os.path.join(workspace_projekt_verkehr,'Siedlungszellen_Centroide')
+    grid = join(workspace_projekt_verkehr,'Siedlungszellen')
+    grid_centroids = join(workspace_projekt_verkehr,'Siedlungszellen_Centroide')
 
 
     #############################################################################################################

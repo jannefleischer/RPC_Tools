@@ -26,13 +26,13 @@ import verkehr_lib as v
 def main(parameters, messages):
     gc.collect()
 
-    sheetlibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
+    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
     sl = imp.load_source('sheet_lib', sheetlibpath)
 
-    mdblibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
+    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
     mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
-    poplibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','population_lib.py'))
+    poplibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','population_lib.py'))
     pop = imp.load_source('population_lib', poplibpath)
 
     arcpy.env.overwriteOutput = True
@@ -80,36 +80,36 @@ def main(parameters, messages):
 
     # Workspaces
     base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    workspace_projekt = os.path.join(base_path,'3_Projekte',projektname)
-    workspace_basisdaten = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
-    workspace_projekt_definition = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-    workspace_projekt_verkehr = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Verkehr_'+projektname+'.gdb')
+    workspace_projekt = join(base_path,'3_Projekte',projektname)
+    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+    workspace_projekt_definition = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    workspace_projekt_verkehr = join(base_path,'3_Projekte',projektname,'FGDB_Verkehr.gdb')
 
     # Layers and Tables
-    out_folder_path = os.path.join(workspace_projekt,"temp") # Pfad zur temporaeren mdb inkl.
-    temp_mdb_path = os.path.join(out_folder_path,"PGDB_Temp.mdb")
+    out_folder_path = join(workspace_projekt,"temp") # Pfad zur temporaeren mdb inkl.
+    temp_mdb_path = join(out_folder_path,"PGDB_Temp.mdb")
 
-    siedlungszellenlayer = os.path.join(workspace_projekt_verkehr,'Siedlungszellen')
-    siedlungszellenlayer_eingangsdaten = os.path.join(workspace_projekt_verkehr,'L12_SZ_Projektumfeld_Daten_Verkehrserzeugung')
-    siedlungszellenlayer_eingangsdaten_temp1 = os.path.join(workspace_projekt_verkehr,'Siedlungszellen_Eingangsdaten_temp1')
-    siedlungszellenlayer_eingangsdaten_temp2 = os.path.join(workspace_projekt_verkehr,'Siedlungszellen_Eingangsdaten_temp2')
+    siedlungszellenlayer = join(workspace_projekt_verkehr,'Siedlungszellen')
+    siedlungszellenlayer_eingangsdaten = join(workspace_projekt_verkehr,'L12_SZ_Projektumfeld_Daten_Verkehrserzeugung')
+    siedlungszellenlayer_eingangsdaten_temp1 = join(workspace_projekt_verkehr,'Siedlungszellen_Eingangsdaten_temp1')
+    siedlungszellenlayer_eingangsdaten_temp2 = join(workspace_projekt_verkehr,'Siedlungszellen_Eingangsdaten_temp2')
 
-    projektlayer_teilflaechen = os.path.join(workspace_projekt_definition,'Teilflaechen_Plangebiet')
-    projektlayer_eingangsdaten = os.path.join(workspace_projekt_verkehr,'L12_TF_Daten_Verkehrserzeugung')
-    projekt_bevoelkerungszahl = os.path.join(workspace_projekt_definition,'Einwohnerzahl')
+    projektlayer_teilflaechen = join(workspace_projekt_definition,'Teilflaechen_Plangebiet')
+    projektlayer_eingangsdaten = join(workspace_projekt_verkehr,'L12_TF_Daten_Verkehrserzeugung')
+    projekt_bevoelkerungszahl = join(workspace_projekt_definition,'Einwohnerzahl')
 
-    umfeldabgrenzung = os.path.join(workspace_projekt_verkehr,"L00_Umfeldabgrenzung")
-    bestand_arbeitsplaetze = os.path.join(workspace_projekt_verkehr,"L10_Bestand_Arbeitsplaetze")
-    bestand_einzelhandelsflaechen = os.path.join(workspace_projekt_verkehr,"L11_Bestand_Einzelhandelsflaechen")
-    bestand_schulen = os.path.join(workspace_projekt_verkehr,"L11_Bestand_Schulen")
+    umfeldabgrenzung = join(workspace_projekt_verkehr,"L00_Umfeldabgrenzung")
+    bestand_arbeitsplaetze = join(workspace_projekt_verkehr,"L10_Bestand_Arbeitsplaetze")
+    bestand_einzelhandelsflaechen = join(workspace_projekt_verkehr,"L11_Bestand_Einzelhandelsflaechen")
+    bestand_schulen = join(workspace_projekt_verkehr,"L11_Bestand_Schulen")
 
-    routen_sz = os.path.join(workspace_projekt_verkehr,"L03_Routen_SZ")
-    routen_tf = os.path.join(workspace_projekt_verkehr,"L03_Routen_TF")
+    routen_sz = join(workspace_projekt_verkehr,"L03_Routen_SZ")
+    routen_tf = join(workspace_projekt_verkehr,"L03_Routen_TF")
 
-    routen_ergebniskacheln = os.path.join(workspace_projekt_verkehr,"L05_Ergebniskacheln")
+    routen_ergebniskacheln = join(workspace_projekt_verkehr,"L05_Ergebniskacheln")
 
-    strassenabschnitte_sz = os.path.join(temp_mdb_path,"strassenabschnitte_sz")
-    strassenabschnitte_tf = os.path.join(temp_mdb_path,"strassenabschnitte_tf")
+    strassenabschnitte_sz = join(temp_mdb_path,"strassenabschnitte_sz")
+    strassenabschnitte_tf = join(temp_mdb_path,"strassenabschnitte_tf")
 
     #############################################################################################################
     #
@@ -195,7 +195,7 @@ def main(parameters, messages):
         arcpy.AddField_management(projektlayer_eingangsdaten, f, "Double", "", "", "")
 
     #Fuege Einwohnerzahl an
-    bevoelkerung_max_tf = os.path.join(workspace_projekt_definition,"Einwohnerzahl_max")
+    bevoelkerung_max_tf = join(workspace_projekt_definition,"Einwohnerzahl_max")
 
     rows = arcpy.SearchCursor(bevoelkerung_max_tf)
 
@@ -240,7 +240,7 @@ def main(parameters, messages):
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #Fuege Beschaeftigtenzahl an
-    beschaeftigte_max_tf = os.path.join(workspace_projekt_definition,"Gewerbe_Beschaeftigte_Max")
+    beschaeftigte_max_tf = join(workspace_projekt_definition,"Gewerbe_Beschaeftigte_Max")
 
     rows = arcpy.SearchCursor(beschaeftigte_max_tf)
 
@@ -286,7 +286,7 @@ def main(parameters, messages):
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     #Fuege Verkaufsflaeche an
-    verkaufsflaeche_max_tf = os.path.join(workspace_projekt_definition,"Versorgung_Verkaufsflaechen_Max")
+    verkaufsflaeche_max_tf = join(workspace_projekt_definition,"Versorgung_Verkaufsflaechen_Max")
 
     rows = arcpy.SearchCursor(verkaufsflaeche_max_tf)
 
@@ -481,12 +481,12 @@ def main(parameters, messages):
     ]
 
     #Berechne Feld Planfall
-    grid = os.path.join(workspace_projekt_verkehr,"L14_SZ_Grid_Verkehrsmenge")
+    grid = join(workspace_projekt_verkehr,"L14_SZ_Grid_Verkehrsmenge")
     arcpy.AddField_management(grid, "Traffic_Planfall", "Double", "", "", "")
     arcpy.CalculateField_management(grid, "Traffic_Planfall", "(!Traffic_Nullfall! or 0) + (!Traffic_Plangebiet! or 0)", "PYTHON", "")
 
     #Berechne Feld prozentuale Steigerung
-    grid = os.path.join(workspace_projekt_verkehr,"L14_SZ_Grid_Verkehrsmenge")
+    grid = join(workspace_projekt_verkehr,"L14_SZ_Grid_Verkehrsmenge")
     arcpy.AddField_management(grid, "Traffic_Steigerung", "Double", "", "", "")
     arcpy.CalculateField_management(grid, "Traffic_Steigerung", "(!Traffic_Planfall! or 0) / (!Traffic_Nullfall! or 0)", "PYTHON", "")
 
@@ -495,7 +495,7 @@ def main(parameters, messages):
     arcpy.MakeFeatureLayer_management(routen_ergebniskacheln, "L05_Ergebniskacheln_Layer", "", "", "OID OID VISIBLE NONE;Shape Shape VISIBLE NONE;Shape_Length Shape_Length VISIBLE NONE;Shape_Area Shape_Area VISIBLE NONE;GRID_ID GRID_ID VISIBLE NONE")
 
     # Process: Verbindung hinzufügen
-    grid_final = os.path.join(workspace_projekt_verkehr,"L15_Grid_Ergebnis")
+    grid_final = join(workspace_projekt_verkehr,"L15_Grid_Ergebnis")
     arcpy.AddJoin_management("L05_Ergebniskacheln_Layer", "GRID_ID", grid, "GRID_ID", "KEEP_ALL")
     arcpy.CopyFeatures_management("L05_Ergebniskacheln_Layer", grid_final)
 
@@ -506,10 +506,10 @@ def main(parameters, messages):
     print schrittmeldung
 
     #Checke Pfad der mxd_template und tausche diesen aus
-    mxd_template = arcpy.mapping.MapDocument(os.path.join(base_path, "2_Tool","C_Verkehr","Style","template.mxd"))
+    mxd_template = arcpy.mapping.MapDocument(join(base_path, "2_Tool","C_Verkehr","Style","template.mxd"))
     df = arcpy.mapping.ListDataFrames(mxd_template)[0]
     lyr = arcpy.mapping.ListLayers(mxd_template, "", df)[0]
-    templatepath = os.path.join(base_path,"2_Tool","C_Verkehr","Style","template.gdb")
+    templatepath = join(base_path,"2_Tool","C_Verkehr","Style","template.gdb")
 
     for lyr in arcpy.mapping.ListLayers(mxd_template):
         if lyr.name == "L15_Grid_Ergebnis":
@@ -517,15 +517,15 @@ def main(parameters, messages):
     mxd_template.save()
 
     #Kopiere Templatemxd
-    ausgabeordner = os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen')
-    mxdpfad = os.path.join(ausgabeordner,'Verkehr.mxd')
+    ausgabeordner = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen')
+    mxdpfad = join(ausgabeordner,'Verkehr.mxd')
     mxd_template.saveACopy(mxdpfad)
 
     #Ersetze Datenquelle
     verkehr_mxd = arcpy.mapping.MapDocument(mxdpfad)
 
-    templatepath = os.path.join(base_path,"2_Tool","C_Verkehr","Style","template.gdb")
-    resultpath = os.path.join(base_path,'3_Projekte',projektname,"FGDB_Verkehr_"+projektname+".gdb")
+    templatepath = join(base_path,"2_Tool","C_Verkehr","Style","template.gdb")
+    resultpath = join(base_path,'3_Projekte',projektname,"FGDB_Verkehr_"+projektname+".gdb")
 
     verkehr_mxd.findAndReplaceWorkspacePaths(templatepath, resultpath)
     verkehr_mxd.save()
@@ -542,7 +542,7 @@ def main(parameters, messages):
     verkehr_mxd.save()
 
     #Exportiere Ergebnis
-    arcpy.mapping.ExportToJPEG(verkehr_mxd, os.path.join(ausgabeordner, 'Verkehr.jpg'), "PAGE_LAYOUT",resolution=300)
+    arcpy.mapping.ExportToJPEG(verkehr_mxd, join(ausgabeordner, 'Verkehr.jpg'), "PAGE_LAYOUT",resolution=300)
 
     #############################################################################################################
     #Aufraeumen und ueberfluessige Variablen loeschen
@@ -550,8 +550,8 @@ def main(parameters, messages):
     messages.AddMessage(schrittmeldung)
     print schrittmeldung
 
-    routen_ergebniskacheln_sz_join = os.path.join(workspace_projekt_verkehr,"L05_Ergebniskacheln_sz_join")
-    routen_ergebniskacheln_tf_join = os.path.join(workspace_projekt_verkehr,"L05_Ergebniskacheln_tf_join")
+    routen_ergebniskacheln_sz_join = join(workspace_projekt_verkehr,"L05_Ergebniskacheln_sz_join")
+    routen_ergebniskacheln_tf_join = join(workspace_projekt_verkehr,"L05_Ergebniskacheln_tf_join")
     gewerbebeschaeftigtetemp = (workspace_projekt_definition,'Gewerbe_Beschaeftigte_temp')
 
     deletelist = [routen_ergebniskacheln_sz_join,routen_ergebniskacheln_tf_join,gewerbebeschaeftigtetemp]

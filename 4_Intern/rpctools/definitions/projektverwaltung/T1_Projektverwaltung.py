@@ -12,87 +12,147 @@
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 
-from os.path import abspath, dirname, join
-BASE_PATH = dirname(dirname(abspath(__file__)))
-sys.path.append(join(BASE_PATH, '4_Intern'))
-from rpctools.utils.project_lib import (PROJECT_FOLDER,
-                                        TEMPLATE_FOLDER,
-                                        PROJECT_TEMPLATE,
-                                        get_gdb,
-                                        get_table)
-import arcpy, os, shutil, sys, gc
+import sys
+from os.path import abspath, dirname, join, isdir
+from rpctools.utils.params import Tool
+import arcpy
 
-def main(parameters, messages):
-    # way to remove file-locks in arcgis
-    gc.collect()
+import os, shutil, gc
 
-    if parameters[0].value == "Neues Projekt anlegen":
 
-        arcpy.env.overwriteOutput = True
+class Projektverwaltung(Tool):
+
+    _dbname = 'FGDB_Definition_Projekt.gdb'
+
+    def run(self):
+        # way to remove file-locks in arcgis
+
+        if self.par.action.value == "Neues Projekt anlegen":
+            self.projekt_anlegen()
+
+        elif self.par.action.value == "Bestehendes Projekt kopieren":
+            self.projekt_kopieren()
+
+        else:
+            self.projekt_loeschen()
+
+    @property
+    def teilflaeche(self):
+        return self.folders.get_table('Teilflaechen_Plangebiet')
+
+    def projekt_loeschen(self):
+        projektName = self.par.name.value
+        # Mit dem Projektnamen zum neuen Projektpfad zusammenführen"
+        projektPfad = self.folders.PROJECT_PATH
+        self.mes.AddMessage("Suche Ordner: " + projektPfad)
+
+        # entferne alle aktuellen Layer aus dem TOC (Locks aufheben)
+        self.mes.AddMessage("Loese aktive Layer aus MXD \n")
+        mxd = arcpy.mapping.MapDocument("CURRENT")
+        for df in arcpy.mapping.ListDataFrames(mxd):
+            for lyr in arcpy.mapping.ListLayers(mxd, "", df):
+                arcpy.mapping.RemoveLayer(df, lyr)
+        del mxd
 
         try:
-        #get new Project input Data
-            projectName = parameters[2].value
-            flaeche = parameters[3].value
-            beginn_betrachtung = parameters[4].value
-            ende_betrachtung = parameters[5].value
 
-        #get the working directory and split it for the upper level path
-            #Pfad anlegen
-            mainPath = str(sys.path[0]).split("2_Tool")[0]
+            # Überprüfen, ob der Projektordner existiert
+            if(isdir(projektPfad)):
+                print("Projektordner gefunden")
+                self.mes.AddMessage("Projektordner gefunden \n")
+                shutil.rmtree(projektPfad)
+                print("Projektordner gelöscht")
+                self.mes.AddMessage("Projektordner gelöscht \n")
+            else:
+                print("Projektordner " + projektName + " nicht gefunden \n")
+                self.mes.AddMessage("Projektordner " + projektName + " nicht gefunden \n")
 
+            self.mes.AddMessage("*********************************************************************************")
+            self.mes.AddMessage("Das Projekt " + projektName + " wurde erfolgreich entfernt \n")
 
-        #copy template folder
-            templatePath = join(TEMPLATE_FOLDER, PROJECT_TEMPLATE)
-            projectPath = os.path.join(PROJECT_FOLDER, projectName)
+        except Exception as e:
+            print(e)
+            self.mes.AddMessage(e)
+        finally:
+            try:
+                del cursor, delcursor
+            except:
+                print("")
+
+    def projekt_kopieren(self):
+        try:
+            # get new Project Name as input
+            projectNameOld = self.par.existing_project.value
+            # allow the upload of a shapefile containg the projektgebiet
+            projectNameNew = self.par.name.value
+
+            # copy template folder
+            templatePath = self.folders.get_projectpath(projectNameOld)
+            projectPath = self.folders.PROJECT_PATH
+
             try:
                 shutil.copytree(templatePath, projectPath)
             except Exception as e:
-                messages.AddMessage(e)
-                print e
-                messages.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
-                messages.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
-                messages.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
+                self.mes.AddMessage(e)
+                self.mes.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
+                self.mes.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
+                self.mes.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
                 sys.exit()
-        ##rename copied files
-        #list all files in directory
-            files = os.listdir(projectPath)
-        #check if filenames contain "Template"
-            messages.AddMessage("Erstelle Kopien der Basisdaten: ")
-            print "Erstelle Kopien der Basisdaten: "
-            for file in files:
-                messages.AddMessage("    -" + file)
-                if "Template" in file:
-                    #split filename and add projectName as new filename
-                    newName = file.replace("Template",projectName)
-                    filePath = os.path.join(projectPath,file)
-                    newFilePath = os.path.join(projectPath,newName)
-                    os.rename(filePath,newFilePath)
-        #If shapefile was uploaded, add to gdb
+
+            # output information to user
+            print("Succesfully copied")
+            self.mes.AddMessage("Succesfully copied")
+            print("New Project registered at " + projectPath)
+            self.mes.AddMessage("New Project registered at " + projectPath)
+        except Exception as e:
+            self.mes.AddMessage(e, sys.exc_traceback)
+
+    def projekt_anlegen(self):
+        arcpy.env.overwriteOutput = True
+
+        try:
+            # get new Project input Data
+            projectName = self.par.name.value
+            flaeche = self.par.shapefile.value
+            beginn_betrachtung = self.par.begin.value
+            ende_betrachtung = self.par.ende.value
+
+            # copy template folder
+            try:
+                shutil.copytree(self.folders.TEMPLATE_PATH,
+                                self.folders.PROJECT_PATH)
+            except Exception as e:
+                self.mes.AddMessage(e)
+                print e
+                self.mes.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
+                self.mes.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
+                self.mes.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
+                sys.exit()
+
+            # If shapefile was uploaded, add to gdb
             if flaeche != "":
-                gdbPfad = get_gdb(projectName, 'FGDB_Definition_Projekt.gdb')
+                gdbPfad = self.folders.get_db('FGDB_Definition_Projekt.gdb')
                 arcpy.FeatureClassToGeodatabase_conversion(flaeche, gdbPfad)
 
                 dsc = arcpy.Describe(flaeche)
                 filename = dsc.baseName
-                filename = filename.replace(" ","_")
-                filename = filename.replace("-","_")
-                messages.AddMessage(filename)
+                filename = filename.replace(" ", "_")
+                filename = filename.replace("-", "_")
+                self.mes.AddMessage(filename)
 
                 arcpy.env.workspace = gdbPfad
                 fcs = arcpy.ListFeatureClasses()
-                fcsPfad = os.path.join(gdbPfad,filename)
+                fcsPfad = join(gdbPfad, filename)
                 try:
-                    arcpy.Rename_management(fcsPfad,"Teilflaechen_Plangebiet")
+                    arcpy.Rename_management(fcsPfad, "Teilflaechen_Plangebiet")
                 except:
-                    messages.AddMessage("Fehler: Umbenennung nicht erfolgreich")
+                    self.mes.AddMessage("Fehler: Umbenennung nicht erfolgreich")
                 fcs = arcpy.ListFeatureClasses()
 
+            # Prepare Shapefile for use in RPC
+            teilfaechen_plangebiet = self.teilflaeche
 
-        #   Prepare Shapefile for use in RPC
-            teilfaechen_plangebiet = os.path.join(gdbPfad,"Teilflaechen_Plangebiet")
-
-            #delete unused fields
+            # delete unused fields
             fieldObjList = arcpy.ListFields(teilfaechen_plangebiet)
             fieldNameList = []
             for field in fieldObjList:
@@ -101,65 +161,77 @@ def main(parameters, messages):
 
             arcpy.DeleteField_management(teilfaechen_plangebiet, fieldNameList)
 
-            #add needed fields
-            arcpy.AddField_management(teilfaechen_plangebiet,"Name","TEXT")
-            arcpy.AddField_management(teilfaechen_plangebiet,"Startjahr","LONG")
-            arcpy.AddField_management(teilfaechen_plangebiet,"Beginn_Nutzung","LONG")
-            arcpy.AddField_management(teilfaechen_plangebiet,"Aufsiedlungsdauer","LONG")
+            # add needed fields
+            arcpy.AddField_management(teilfaechen_plangebiet, "Name", "TEXT")
+            arcpy.AddField_management(teilfaechen_plangebiet, "Startjahr", "LONG")
+            arcpy.AddField_management(teilfaechen_plangebiet, "Beginn_Nutzung", "LONG")
+            arcpy.AddField_management(teilfaechen_plangebiet, "Aufsiedlungsdauer", "LONG")
             arcpy.AddField_management(teilfaechen_plangebiet, "Flaeche_ha", "DOUBLE", "", "", "", "", "", "")
-            arcpy.AddField_management(teilfaechen_plangebiet,"umfang_meter","FLOAT")
-            #arcpy.AddField_management(teilfaechen_plangebiet,"Bilanzsumme","FLOAT")
-
+            arcpy.AddField_management(teilfaechen_plangebiet, "umfang_meter", "FLOAT")
+            #arcpy.AddField_management(teilfaechen_plangebiet, "Bilanzsumme", "FLOAT")
 
             # Berechne ha der Teilflaechen
-            arcpy.CalculateField_management(teilfaechen_plangebiet, "Flaeche_ha", "!SHAPE.AREA@HECTARES!", "PYTHON_9.3", "")
+            arcpy.CalculateField_management(teilfaechen_plangebiet,
+                                            "Flaeche_ha",
+                                            "!SHAPE.AREA@HECTARES!",
+                                            "PYTHON_9.3", "")
 
             # Berechne Umfang der Flächen
-            arcpy.CalculateField_management(teilfaechen_plangebiet,"umfang_meter","!shape.length@METER!","PYTHON_9.3")
+            arcpy.CalculateField_management(teilfaechen_plangebiet, "umfang_meter", "!shape.length@METER!", "PYTHON_9.3")
 
-            #add year
+            # add year
             startjahr = int(beginn_betrachtung)
 
             cursor = arcpy.UpdateCursor(teilfaechen_plangebiet)
-            i= 1
+            i = 1
             for row in cursor:
                 row.setValue("Startjahr", startjahr)
                 row.setValue("Name", "Flaeche_"+str(i))
                 row.setValue("Aufsiedlungsdauer", 5)
                 #row.setValue("Bilanzsumme", 0)
                 cursor.updateRow(row)
-                i+= 1
+                i += 1
 
-        #add project-data to Projektrahmendaten
+            # add project-data to Projektrahmendaten
 
-            #Den AGS aus der Lage der projektfläche im Raum ermitteln
-            bkg = os.path.join(mainPath,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','bkg_gemeinden')
-            workspace_projekt_definition = os.path.join(mainPath,'3_Projekte',projectName,'FGDB_Definition_Projekt_'+projectName+'.gdb')
-            projektrahmendaten = os.path.join(workspace_projekt_definition,'Projektrahmendaten')
-            projektFlaeche = os.path.join(workspace_projekt_definition,'Teilflaechen_Plangebiet')
+            # Den AGS aus der Lage der projektfläche im Raum ermitteln
+            bkg = self.folders.get_base_table('FGBD_Basisdaten_deutschland.gdb',
+                                              'bkg_gemeinden')
+            workspace_projekt_definition = self.folders.get_db(
+                'FGDB_Definition_Projekt.gdb')
+            projektrahmendaten = join(workspace_projekt_definition,
+                                      'Projektrahmendaten')
+            projektFlaeche = join(workspace_projekt_definition,
+                                  'Teilflaechen_Plangebiet')
 
-            #ags aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird
-            #1. Feature Layer aus den bkg-daten erstellen
-            arcpy.MakeFeatureLayer_management(bkg,"bkg_lyr")
-            #2.Spatial Select wo Planfläche bkg_lyr intersected
-            arcpy.SelectLayerByLocation_management("bkg_lyr", "INTERSECT", projektFlaeche)
-            #Wenn Flaeche = 1, ags extrahieren
+            # ags aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird
+            # 1. Feature Layer aus den bkg-daten erstellen
+            arcpy.MakeFeatureLayer_management(bkg, "bkg_lyr")
+            # 2.Spatial Select wo Planfläche bkg_lyr intersected
+            arcpy.SelectLayerByLocation_management("bkg_lyr", "INTERSECT",
+                                                   projektFlaeche)
+            # Wenn Flaeche = 1, ags extrahieren
             n = arcpy.GetCount_management("bkg_lyr").getOutput(0)
-            if(int(n) > 1):
-                messages.AddMessage("Die Projektflaechen liegen innerhalb mehrerer Gemeinden, das Tool unterstuetzt zur Zeit keine interkommunalen Projekte.")
+            if(int(n) == 0):
+                self.mes.AddMessage("Die Projektflaechen liegen außerhalb der Gemeinden Deutschlands.")
+                ## TODO Dateien loeschen und Projektregistrierung loeschen
+                sys.exit()
+
+            elif(int(n) > 1):
+                self.mes.AddMessage("Die Projektflaechen liegen innerhalb mehrerer Gemeinden, das Tool unterstuetzt zur Zeit keine interkommunalen Projekte.")
                 ## TODO Dateien loeschen und Projektregistrierung loeschen
 
                 sys.exit()
-            if(int(n) == 1 ):
+            elif(int(n) == 1):
                 gemeindeCursor = arcpy.SearchCursor("bkg_lyr")
                 for gemeinde in gemeindeCursor:
                     ags = gemeinde.AGS
                     gen = gemeinde.GEN
 
-            #Setzen des Sonderkostenfaktors auf 1 =100% - Sonderkostenfaktor wird im Themenfeld Kosten durch nutzer eingegeben und in der Tabelle aktualisiert
+            # Setzen des Sonderkostenfaktors auf 1 =100% - Sonderkostenfaktor wird im Themenfeld Kosten durch nutzer eingegeben und in der Tabelle aktualisiert
             sonderkostenfaktor = 1
 
-            #loesche ggf. vorhandene zeilen in den rojektrahmendaten und fuege neue daten danach hinzu
+            # loesche ggf. vorhandene zeilen in den rojektrahmendaten und fuege neue daten danach hinzu
             arcpy.DeleteRows_management(projektrahmendaten)
 
             cursor = arcpy.InsertCursor(projektrahmendaten)
@@ -172,24 +244,26 @@ def main(parameters, messages):
             row.AGS = ags
             cursor.insertRow(row)
 
-            del cursor,row
+            del cursor, row
 
-        #Minimap erzeugen
+            # Minimap erzeugen
             schrittmeldung = 'Erzeuge Uebersichtskarte \n'
-            messages.AddMessage(schrittmeldung)
+            self.mes.AddMessage(schrittmeldung)
             print schrittmeldung
 
-            #Kopiere Template.mxd
-            mxd_template = arcpy.mapping.MapDocument(os.path.join(mainPath, "2_Tool","2_Projektverwaltung","Style_Minimap","template.mxd"))
-            ausgabeordner_img = os.path.join(mainPath,'3_Projekte',projectName,'Ergebnisausgabe','Abbildungen')
+            # Kopiere Template.mxd
+            template_folder = join(self.folders.MXDS, "Style_Minimap")
+            template = join(template_folder, "template.mxd")
+            mxd_template = arcpy.mapping.MapDocument(mxd)
+            ausgabeordner_img = join(self.folders.AUSGABE_PATH, 'Abbildungen')
             os.makedirs(ausgabeordner_img)
-            mxdpfad = os.path.join(ausgabeordner_img,'Definition_Projekt.mxd')
+            mxdpfad = join(ausgabeordner_img, 'Definition_Projekt.mxd')
             mxd_template.saveACopy(mxdpfad)
 
             # Ersetze Datenquelle
             minimap_mxd = arcpy.mapping.MapDocument(mxdpfad)
-            templatepath = os.path.join(mainPath,"2_Tool","2_Projektverwaltung","Style_Minimap","template.gdb")
-            resultpath = os.path.join(mainPath,'3_Projekte',projectName,'FGDB_Definition_Projekt_'+projectName+'.gdb')
+            templatepath = join(template_folder, "template.gdb")
+            resultpath = self.folders.get_db('FGDB_Definition_Projekt.gdb')
             minimap_mxd.findAndReplaceWorkspacePaths(templatepath, resultpath)
 
             # Setze Viewport neu
@@ -204,112 +278,20 @@ def main(parameters, messages):
             minimap_mxd.save()
             del mxd_template
 
-            #Exportiere Ergebnis
-            arcpy.mapping.ExportToJPEG(minimap_mxd, os.path.join(ausgabeordner_img, 'Minimap.jpg'), "PAGE_LAYOUT",resolution=150)
-            minimap = os.path.join(os.path.join(mainPath,'3_Projekte',projectName,'Ergebnisausgabe','Abbildungen', 'Minimap.jpg'))
+            # Exportiere Ergebnis
+            minimap = join(ausgabeordner_img, 'Minimap.jpg')
+            arcpy.mapping.ExportToJPEG(
+                minimap_mxd,
+                minimap,
+                "PAGE_LAYOUT",
+                resolution=150)
 
-        #output information to user
+        # output information to user
             print("Basisdaten erfolgreich kopiert")
-            messages.AddMessage("Basisdaten erfolgreich kopiert \n")
-            #print("Neues Projekt angelegt im Ordner " + projectPath)
-            messages.AddMessage("Neues Projekt angelegt im Ordner " + projectPath + '\n')
+            self.mes.AddMessage("Basisdaten erfolgreich kopiert \n")
+            # print("Neues Projekt angelegt im Ordner " + projectPath)
+            self.mes.AddMessage("Neues Projekt angelegt im Ordner " + projectPath + '\n')
         except Exception as e:
-            messages.AddMessage(e)
+            self.mes.AddMessage(e)
             print e
-
-
-
-    elif parameters[0].valueAsText == "Bestehendes Projekt kopieren":
-
-        try:
-        #get new Project Name as input
-            projectNameOld = parameters[1].valueAsText
-            #projectNameOld = "Bultweg_Sued_fiktiv"
-        #allow the upload of a shapefile containg the projektgebiet
-            projectNameNew = parameters[2].valueAsText
-            #projectNameNew = "test"
-        #get the working directory and split it for the upper level path
-            #Pfad anlegen
-            mainPath = str(sys.path[0]).split("2_Tool")[0]
-
-        #copy template folder
-            templatePath = os.path.join(mainPath,"3_Projekte",projectNameOld)
-            projectPath = os.path.join(mainPath,"3_Projekte",projectNameNew)
-
-            try:
-                shutil.copytree(templatePath, projectPath)
-            except Exception as e:
-                messages.AddMessage(e)
-                messages.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
-                messages.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
-                messages.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
-                sys.exit()
-        ##rename copied files
-        #list all files in directory
-            files = os.listdir(projectPath)
-        #check if filenames contain "Template"
-            for file in files:
-                messages.AddMessage(file)
-                if projectNameOld in file:
-                    #split filename and add projectName as new filename
-                    newName = file.replace(projectNameOld,projectNameNew)
-                    filePath = os.path.join(projectPath,file)
-                    newFilePath = os.path.join(projectPath,newName)
-
-                    os.rename(filePath,newFilePath)
-
-        #output information to user
-            print("Succesfully copied")
-            messages.AddMessage("Succesfully copied")
-            print("New Project registered at " + projectPath)
-            messages.AddMessage("New Project registered at " + projectPath)
-        except Exception as e:
-            messages.AddMessage(e)
-
-
-    else:
-
-        #Das zu löschende Projekt
-        projektName = parameters[1].valueAsText
-
-        #aktuelles Arbeitsverzeichnis bekommen
-        pfad = str(sys.path[0]).split("2_Tool")[0]
-
-        #Mit dem Projektnamen zum neuen Projektpfad zusammenführen"
-        projektePfad = os.path.join(pfad,'3_Projekte')
-        projektPfad = os.path.join(projektePfad,projektName)
-        messages.AddMessage("Suche Ordner: " + projektPfad)
-
-        #entferne alle aktuellen Layer aus dem TOC (Locks aufheben)
-        messages.AddMessage("Loese aktive Layer aus MXD \n")
-        mxd = arcpy.mapping.MapDocument("CURRENT")
-        for df in arcpy.mapping.ListDataFrames(mxd):
-            for lyr in arcpy.mapping.ListLayers(mxd, "", df):
-                arcpy.mapping.RemoveLayer(df, lyr)
-        del mxd
-
-        try:
-
-            #Überprüfen, ob der Projektordner existiert
-            if(os.path.isdir(projektPfad)):
-                print("Projektordner gefunden")
-                messages.AddMessage("Projektordner gefunden \n")
-                shutil.rmtree(projektPfad)
-                print("Projektordner gelöscht")
-                messages.AddMessage("Projektordner gelöscht \n")
-            else:
-                print("Projektordner "+ projektName + " nicht gefunden \n")
-                messages.AddMessage("Projektordner "+ projektName + " nicht gefunden \n")
-
-            messages.AddMessage("*********************************************************************************")
-            messages.AddMessage("Das Projekt " + projektName + " wurde erfolgreich entfernt \n")
-
-        except Exception as e:
-            print(e)
-            messages.AddMessage(e)
-        finally:
-            try:
-                del cursor, delcursor
-            except:
-                print""
 

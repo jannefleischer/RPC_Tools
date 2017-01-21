@@ -23,15 +23,15 @@ import xml.dom.minidom as minidom
 import unicodedata
 
 import arcpy
-BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+BASE_PATH = os.path.abspath(join(os.path.dirname(__file__),
                                          '..', '..'))
-LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
-url_lib = imp.load_source('url_lib', 
-                          os.path.join(LIB_PATH, 'url_lib.py'))
+LIB_PATH = join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+url_lib = imp.load_source('url_lib',
+                          join(LIB_PATH, 'url_lib.py'))
 
 def main(parameters, messages):
     gc.collect()
-    mdblibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
+    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
     mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
     def _callback(matches):
@@ -82,25 +82,25 @@ def main(parameters, messages):
     ##    Damit ich alle IDS und Points habe -> vereine derzeitige Standpunkte + neuen Markt
     ##    und loesche dann in Distanzmatrix die spalten
         try:
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Standortdaten_planfall"))
+            arcpy.Delete_management(join(workspace_projekt,"Standortdaten_planfall"))
         except:
             print "a"
             pass
         try:
-            arcpy.DeleteFeatures_management(os.path.join(workspace_projekt,"Standortdaten_planfall"))
+            arcpy.DeleteFeatures_management(join(workspace_projekt,"Standortdaten_planfall"))
         except:
             print "c"
             pass
         try:
-            arcpy.Copy_management(os.path.join(workspace_projekt,"Standortdaten"), os.path.join(workspace_projekt,"Standortdaten_planfall1"))
+            arcpy.Copy_management(join(workspace_projekt,"Standortdaten"), join(workspace_projekt,"Standortdaten_planfall1"))
         except:
             a="Fehler Standortdaten_planfall konnte nicht erstellt werden"
             messages.AddErrorMessage(a)
             print a
             exit(1)
 
-        cur_NeuerM_Search=os.path.join(workspace_projekt,"Neuer_Markt")
-        curIns_Standorteplan= os.path.join(workspace_projekt,"Standortdaten_planfall")
+        cur_NeuerM_Search=join(workspace_projekt,"Neuer_Markt")
+        curIns_Standorteplan= join(workspace_projekt,"Standortdaten_planfall")
 
         try:
             arcpy.Merge_management(["Standortdaten_planfall1",cur_NeuerM_Search],curIns_Standorteplan)
@@ -111,8 +111,8 @@ def main(parameters, messages):
 
         try:
             arcpy.DeleteField_management(curIns_Standorteplan,"EntfallenderMarktID")
-            arcpy.DeleteFeatures_management(os.path.join(workspace_projekt,"Standortdaten_planfall1"))
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Standortdaten_planfall1"))
+            arcpy.DeleteFeatures_management(join(workspace_projekt,"Standortdaten_planfall1"))
+            arcpy.Delete_management(join(workspace_projekt,"Standortdaten_planfall1"))
         except:
             pass
 
@@ -126,7 +126,7 @@ def main(parameters, messages):
     # erstelle siedlungszellen
     # loesche leere siedlungszellen
 
-        if arcpy.Exists(os.path.join(workspace_projekt,"Punktlayer_Bev"))==False:
+        if arcpy.Exists(join(workspace_projekt,"Punktlayer_Bev"))==False:
             b="PunktLayer fuer Bevoelkerungsprognose nicht vorhanden - Bitte widerholen Sie Schritt 1"
             print b
             messages.AddErrorMessage(b)
@@ -135,22 +135,22 @@ def main(parameters, messages):
         messages.AddMessage(schrittmeldung)
         print schrittmeldung
         #ist da
-        a=arcpy.Describe(os.path.join(workspace_projekt,"Punktlayer_Bev"))
+        a=arcpy.Describe(join(workspace_projekt,"Punktlayer_Bev"))
         erster = (str(a.extent.XMin)+" "+str(a.extent.YMin)).replace('.',',')
         zweiter = (str(a.extent.XMin)+" "+str(a.extent.YMin+10)).replace('.',',')
         dritter = (str(a.extent.XMax)+" "+str(a.extent.YMax)).replace('.',',')
         del a
         try:
-            arcpy.DeleteFeatures_management(os.path.join(workspace_projekt,"Siedlungszellen"))
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Siedlungszellen"))
+            arcpy.DeleteFeatures_management(join(workspace_projekt,"Siedlungszellen"))
+            arcpy.Delete_management(join(workspace_projekt,"Siedlungszellen"))
         except:
             print "nicht loeschbar"
             pass
         try:
             #Siedlungszahlendaten ersetzen durch Siedlungszellen
-            template_shape =os.path.join(workspace_projekt,"Punktlayer_Bev")
+            template_shape =join(workspace_projekt,"Punktlayer_Bev")
 
-            arcpy.CreateFishnet_management(os.path.join(workspace_projekt,"Siedlungszellen"), erster, zweiter, "250", "250", "0", "0", dritter, "NO_LABELS", os.path.join(workspace_projekt,"Punktlayer_Bev"), "POLYGON")
+            arcpy.CreateFishnet_management(join(workspace_projekt,"Siedlungszellen"), erster, zweiter, "250", "250", "0", "0", dritter, "NO_LABELS", join(workspace_projekt,"Punktlayer_Bev"), "POLYGON")
 
 #"539190,2846 5888257,9718" "539190,2846 5888267,9718" 250 250 0 0 "597767,9818 5928057,416"
             del template_shape
@@ -166,13 +166,13 @@ def main(parameters, messages):
         print schrittmeldung
 
         try:
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Siedlungszellen_verschnitten"))
+            arcpy.Delete_management(join(workspace_projekt,"Siedlungszellen_verschnitten"))
         except:
             pass
 
-        gemeinden = os.path.join(workspace_Basis,'bkg_gemeinden')
-        ausgabe = os.path.join(workspace_projekt,"Siedlungszellen_verschnitten")
-        grid = os.path.join(workspace_projekt,"Siedlungszellen")
+        gemeinden = join(workspace_Basis,'bkg_gemeinden')
+        ausgabe = join(workspace_projekt,"Siedlungszellen_verschnitten")
+        grid = join(workspace_projekt,"Siedlungszellen")
         Grid_Gemeinden_Layer = 'Grid_Gemeinden_Layer'
 
         inFeatures = [grid,gemeinden]
@@ -198,7 +198,7 @@ def main(parameters, messages):
         arcpy.CalculateField_management(grid, "SZ_ID", "!OBJECTID!", "PYTHON")
 
         try:
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Siedlungszellen_verschnitten"))
+            arcpy.Delete_management(join(workspace_projekt,"Siedlungszellen_verschnitten"))
         except:
             pass
 
@@ -206,13 +206,13 @@ def main(parameters, messages):
         #    ############################################################################################################################
 
         try:
-            arcpy.DeleteField_management(os.path.join(workspace_projekt,"Siedlungszellen"), "Join_Count")
+            arcpy.DeleteField_management(join(workspace_projekt,"Siedlungszellen"), "Join_Count")
         except:
             pass
-        punktlayer=os.path.join(workspace_projekt,"Punktlayer_Bev")
-        siedlungszellenlayer_join=os.path.join(workspace_projekt,"Siedlungszellen_join")
+        punktlayer=join(workspace_projekt,"Punktlayer_Bev")
+        siedlungszellenlayer_join=join(workspace_projekt,"Siedlungszellen_join")
         # Process: Raeumliche Verbindung
-        arcpy.SpatialJoin_analysis(os.path.join(workspace_projekt,"Siedlungszellen"), punktlayer, siedlungszellenlayer_join, "JOIN_ONE_TO_ONE", "KEEP_ALL", "GEN \"GEN\" true true false 50 Text 0 0 ,First,#,"+os.path.join(workspace_projekt,"Siedlungszellen")+",GEN,-1,-1;AGS \"AGS\" true true false 12 Text 0 0 ,First,#,"+os.path.join(workspace_projekt,"Siedlungszellen")+",AGS,-1,-1;EWZ \"EWZ\" true true false 8 Double 0 0 ,First,#,"+os.path.join(workspace_projekt,"Siedlungszellen")+",EWZ,-1,-1;SZ_ID \"SZ_ID\" true true true 4 Long 0 0 ,First,#,"+os.path.join(workspace_projekt,"Siedlungszellen")+",SZ_ID,-1,-1", "INTERSECT", "", "")
+        arcpy.SpatialJoin_analysis(join(workspace_projekt,"Siedlungszellen"), punktlayer, siedlungszellenlayer_join, "JOIN_ONE_TO_ONE", "KEEP_ALL", "GEN \"GEN\" true true false 50 Text 0 0 ,First,#,"+join(workspace_projekt,"Siedlungszellen")+",GEN,-1,-1;AGS \"AGS\" true true false 12 Text 0 0 ,First,#,"+join(workspace_projekt,"Siedlungszellen")+",AGS,-1,-1;EWZ \"EWZ\" true true false 8 Double 0 0 ,First,#,"+join(workspace_projekt,"Siedlungszellen")+",EWZ,-1,-1;SZ_ID \"SZ_ID\" true true true 4 Long 0 0 ,First,#,"+join(workspace_projekt,"Siedlungszellen")+",SZ_ID,-1,-1", "INTERSECT", "", "")
 
         # Nachricht
         messages.AddMessage("Punkte mit Rasterzelle verschnitten \n")
@@ -240,16 +240,16 @@ def main(parameters, messages):
         joinfeld = "AGS"
 
         jointable_name = str(siedlungszellenlayer_join)+"_stat"
-        jointable = os.path.join(workspace_projekt,jointable_name)
+        jointable = join(workspace_projekt,jointable_name)
 
-        Siedlungszellen_Join = os.path.join(workspace_projekt,"Siedlungszellen_join")
-        Siedlungszellen_Join_stat = os.path.join(workspace_projekt,"Siedlungszellen_join_stat")
+        Siedlungszellen_Join = join(workspace_projekt,"Siedlungszellen_join")
+        Siedlungszellen_Join_stat = join(workspace_projekt,"Siedlungszellen_join_stat")
 
         # Process: Feld verbinden
         arcpy.JoinField_management(Siedlungszellen_Join, joinField, jointable, joinField, "SUM_Join_Count")
 
         # Process: Features kopieren
-        arcpy.CopyFeatures_management(Siedlungszellen_Join, os.path.join(workspace_projekt,"Siedlungszellen"), "", "0", "0", "0")
+        arcpy.CopyFeatures_management(Siedlungszellen_Join, join(workspace_projekt,"Siedlungszellen"), "", "0", "0", "0")
 
         # Nachricht
         messages.AddMessage("Joincount je Gemeinde angefuegt \n")
@@ -259,7 +259,7 @@ def main(parameters, messages):
         # Anteile der Siedlungszellen an Gemeinde ermitteln
 
         # Process: Feld berechnen
-        arcpy.CalculateField_management(os.path.join(workspace_projekt,"Siedlungszellen"), "Anteil", "divide(!SUM_JOIN_Count!,!Join_Count!)", "PYTHON", "def divide(a,b):\\n    if a == 0:\\n        value = 0\\n    else:\\n        value = float(b)/float(a)\\n    return value\\n\\n\\n")
+        arcpy.CalculateField_management(join(workspace_projekt,"Siedlungszellen"), "Anteil", "divide(!SUM_JOIN_Count!,!Join_Count!)", "PYTHON", "def divide(a,b):\\n    if a == 0:\\n        value = 0\\n    else:\\n        value = float(b)/float(a)\\n    return value\\n\\n\\n")
 
         messages.AddMessage("Anteile ermittelt \n")
 
@@ -271,28 +271,28 @@ def main(parameters, messages):
 
         #Loesche Feld "SZ_Einwohner" (falls vorhanden)
         try:
-            arcpy.DeleteField_management(os.path.join(workspace_projekt,"Siedlungszellen"), "SZ_Einwohner")
+            arcpy.DeleteField_management(join(workspace_projekt,"Siedlungszellen"), "SZ_Einwohner")
         except:
             pass
 
         # Feld "SZ_Einwohner" erzeugen
-        arcpy.AddField_management(os.path.join(workspace_projekt,"Siedlungszellen"), "SZ_Einwohner", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", "")
+        arcpy.AddField_management(join(workspace_projekt,"Siedlungszellen"), "SZ_Einwohner", "DOUBLE", "", "", "", "", "NULLABLE", "NON_REQUIRED", "")
 
-        arcpy.CalculateField_management(os.path.join(workspace_projekt,"Siedlungszellen"), "SZ_Einwohner", "[Anteil] * [EWZ]", "VB", "")
+        arcpy.CalculateField_management(join(workspace_projekt,"Siedlungszellen"), "SZ_Einwohner", "[Anteil] * [EWZ]", "VB", "")
 
         del Siedlungszellen_Join,Siedlungszellen_Join_stat
         try:
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Siedlungszellen_join"))
+            arcpy.Delete_management(join(workspace_projekt,"Siedlungszellen_join"))
         except:
             pass
         try:
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Siedlungszellen_join_stat"))
+            arcpy.Delete_management(join(workspace_projekt,"Siedlungszellen_join_stat"))
         except:
             pass
         # ################################################################################
         #loesche leere Siedlungszellen
 
-        grid = os.path.join(workspace_projekt,"Siedlungszellen")
+        grid = join(workspace_projekt,"Siedlungszellen")
         Grid_Gemeinden_Layer = 'Grid_Gemeinden_Layer_1'
 
         expression=' "SZ_Einwohner" = 0 or  "SZ_Einwohner" > 1700 '
@@ -310,11 +310,11 @@ def main(parameters, messages):
 
         del Grid_Gemeinden_Layer
 
-        arcpy.Project_management(grid, os.path.join(workspace_projekt,"Siedlungszahlendaten"), "PROJCS['ETRS_1989_UTM_Zone_N32',GEOGCS['GCS_ETRS_1989',DATUM['D_ETRS_1989',SPHEROID['GRS_1980',6378137.0,298.257222101]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Transverse_Mercator'],PARAMETER['False_Easting',32500000.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',9.0],PARAMETER['Scale_Factor',0.9996],PARAMETER['Latitude_Of_Origin',0.0],UNIT['Meter',1.0]]", "'DHDN_To_WGS_1984_5x + DHDN_To_ETRS_1989_5'", "PROJCS['WGS_1984_UTM_Zone_32N',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Transverse_Mercator'],PARAMETER['False_Easting',500000.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',9.0],PARAMETER['Scale_Factor',0.9996],PARAMETER['Latitude_Of_Origin',0.0],UNIT['Meter',1.0]]")
+        arcpy.Project_management(grid, join(workspace_projekt,"Siedlungszahlendaten"), "PROJCS['ETRS_1989_UTM_Zone_N32',GEOGCS['GCS_ETRS_1989',DATUM['D_ETRS_1989',SPHEROID['GRS_1980',6378137.0,298.257222101]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Transverse_Mercator'],PARAMETER['False_Easting',32500000.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',9.0],PARAMETER['Scale_Factor',0.9996],PARAMETER['Latitude_Of_Origin',0.0],UNIT['Meter',1.0]]", "'DHDN_To_WGS_1984_5x + DHDN_To_ETRS_1989_5'", "PROJCS['WGS_1984_UTM_Zone_32N',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Transverse_Mercator'],PARAMETER['False_Easting',500000.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',9.0],PARAMETER['Scale_Factor',0.9996],PARAMETER['Latitude_Of_Origin',0.0],UNIT['Meter',1.0]]")
 
         try:
-            arcpy.DeleteFeatures_management(os.path.join(workspace_projekt,"Siedlungszellen"))
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Siedlungszellen"))
+            arcpy.DeleteFeatures_management(join(workspace_projekt,"Siedlungszellen"))
+            arcpy.Delete_management(join(workspace_projekt,"Siedlungszellen"))
         except:
             pass
 
@@ -322,14 +322,14 @@ def main(parameters, messages):
 
     def Distanzen_calc():
         try:
-            arcpy.DeleteFeatures_management(os.path.join(workspace_projekt,"Distanzen_Markt_Sied"))
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Distanzen_Markt_Sied"))
+            arcpy.DeleteFeatures_management(join(workspace_projekt,"Distanzen_Markt_Sied"))
+            arcpy.Delete_management(join(workspace_projekt,"Distanzen_Markt_Sied"))
         except:
             pass
 
         messages.AddMessage("Distanzberechnung mittels MS Access. Kann einige Minuten dauern...")
         #vorberechnungen fuer x und y der Rasterzellen
-        inFeatures = os.path.join(workspace_projekt,"Siedlungszahlendaten")
+        inFeatures = join(workspace_projekt,"Siedlungszahlendaten")
         fieldPrecision = 18
         fieldScale = 11
         # Expressions are calculated using the Shape Field's geometry property
@@ -350,7 +350,7 @@ def main(parameters, messages):
 
         del inFeatures
         #vorberechnungen fuer x und y der Rasterzellen
-        inFeatures = os.path.join(workspace_projekt,'Standortdaten_planfall')
+        inFeatures = join(workspace_projekt,'Standortdaten_planfall')
         fieldPrecision = 18
         fieldScale = 11
         # Expressions are calculated using the Shape Field's geometry property
@@ -396,7 +396,7 @@ def main(parameters, messages):
         #"ID_Markt" =30 AND "ID_Sied" =136818
         mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
-        cur_Update= arcpy.UpdateCursor(os.path.join(workspace_projekt,"Distanzen_Markt_Sied"))
+        cur_Update= arcpy.UpdateCursor(join(workspace_projekt,"Distanzen_Markt_Sied"))
 
         for row in cur_Update:
             if row.Distanz==0:
@@ -410,7 +410,7 @@ def main(parameters, messages):
         print schrittmeldung
 
     def daten_einladen():
-        cur_punktdistanz=arcpy.SearchCursor(os.path.join(workspace_projekt,"Distanzen_Markt_Sied"))
+        cur_punktdistanz=arcpy.SearchCursor(join(workspace_projekt,"Distanzen_Markt_Sied"))
 
 
         array_punktdistanz=[]
@@ -423,8 +423,8 @@ def main(parameters, messages):
 
     def vorsortieren(array_alles):
         messages.AddMessage("Erstellung der Distanzmatrix. Kann einige Minuten dauern...")
-        cur_siedlungszellen = arcpy.SearchCursor(os.path.join(workspace_projekt,"Siedlungszahlendaten"))
-        cur_standortdaten = arcpy.SearchCursor(os.path.join(workspace_projekt,"Standortdaten_planfall"))
+        cur_siedlungszellen = arcpy.SearchCursor(join(workspace_projekt,"Siedlungszahlendaten"))
+        cur_standortdaten = arcpy.SearchCursor(join(workspace_projekt,"Standortdaten_planfall"))
 
         array_sortiert=[]
         for eintrag in  array_alles:
@@ -479,12 +479,12 @@ def main(parameters, messages):
     def schreiben(array):
 
         try:
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Distanzmatrix"))
+            arcpy.Delete_management(join(workspace_projekt,"Distanzmatrix"))
         except:
             print "a"
             pass
         try:
-            arcpy.DeleteFeatures_management(os.path.join(workspace_projekt,"Distanzmatrix"))
+            arcpy.DeleteFeatures_management(join(workspace_projekt,"Distanzmatrix"))
         except:
             print "c"
             pass
@@ -497,20 +497,20 @@ def main(parameters, messages):
             exit(1)
 
         try:
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Distanzmatrix"),"Siedlungsid","LONG")
+            arcpy.AddField_management(join(workspace_projekt,"Distanzmatrix"),"Siedlungsid","LONG")
         except:
             pass
 
-        cur_Maerkte=arcpy.SearchCursor(os.path.join(workspace_projekt,"Standortdaten_planfall"))
+        cur_Maerkte=arcpy.SearchCursor(join(workspace_projekt,"Standortdaten_planfall"))
 
         for maerkte in cur_Maerkte:
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Distanzmatrix"),"ID_"+str(maerkte.Id),"FLOAT")
+            arcpy.AddField_management(join(workspace_projekt,"Distanzmatrix"),"ID_"+str(maerkte.Id),"FLOAT")
 
         del cur_Maerkte
 
 
 
-        cur_InsertMatrix= arcpy.InsertCursor(os.path.join(workspace_projekt,"Distanzmatrix"))
+        cur_InsertMatrix= arcpy.InsertCursor(join(workspace_projekt,"Distanzmatrix"))
         for einzelnezeilen in array:
 
             new_row_Matrix=cur_InsertMatrix.newRow()
@@ -533,13 +533,13 @@ def main(parameters, messages):
 
         del cur_InsertMatrix
 
-        fieldnamess = [f.name for f in arcpy.ListFields(os.path.join(workspace_projekt,"Distanzmatrix"))]
+        fieldnamess = [f.name for f in arcpy.ListFields(join(workspace_projekt,"Distanzmatrix"))]
         for spalten in fieldnamess[2:]:
-            arcpy.CalculateField_management(os.path.join(workspace_projekt,"Distanzmatrix"), spalten, "updateValue( !"+spalten+"! )", "PYTHON", "def updateValue(value):\\n if value is None:\\n    return 0\\n else:\\n  return value\\n")
+            arcpy.CalculateField_management(join(workspace_projekt,"Distanzmatrix"), spalten, "updateValue( !"+spalten+"! )", "PYTHON", "def updateValue(value):\\n if value is None:\\n    return 0\\n else:\\n  return value\\n")
 
     def loeschZuWeiteSiedlungsZel():
-        cur_Siedlungszahlendaten= arcpy.UpdateCursor(os.path.join(workspace_projekt,"Siedlungszahlendaten"))
-        cur_distanzmatrix = arcpy.SearchCursor(os.path.join(workspace_projekt,"Distanzmatrix"))
+        cur_Siedlungszahlendaten= arcpy.UpdateCursor(join(workspace_projekt,"Siedlungszahlendaten"))
+        cur_distanzmatrix = arcpy.SearchCursor(join(workspace_projekt,"Distanzmatrix"))
 
         counter=0
         for row_distanz in cur_distanzmatrix:
@@ -555,17 +555,17 @@ def main(parameters, messages):
         del cur_distanzmatrix,cur_Siedlungszahlendaten
     def erstelleDistanzmatrixen():
         try:
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Distanzmatrix_planfall"))
+            arcpy.Delete_management(join(workspace_projekt,"Distanzmatrix_planfall"))
         except:
             print "a"
             pass
         try:
-            arcpy.DeleteFeatures_management(os.path.join(workspace_projekt,"Distanzmatrix_planfall"))
+            arcpy.DeleteFeatures_management(join(workspace_projekt,"Distanzmatrix_planfall"))
         except:
             print "c"
             pass
         try:
-            arcpy.Copy_management(os.path.join(workspace_projekt,"Distanzmatrix"), os.path.join(workspace_projekt,"Distanzmatrix_planfall"))
+            arcpy.Copy_management(join(workspace_projekt,"Distanzmatrix"), join(workspace_projekt,"Distanzmatrix_planfall"))
         except:
             a="Fehler Distanzmatrix_planfall konnte nicht erstellt werden"
             messages.AddErrorMessage(a)
@@ -574,7 +574,7 @@ def main(parameters, messages):
 
         #Distanzmatrix beinhaltet momentan noch 600 und ggf 601 id
         try:
-            arcpy.DeleteField_management(os.path.join(workspace_projekt,"Distanzmatrix"), "ID_600")
+            arcpy.DeleteField_management(join(workspace_projekt,"Distanzmatrix"), "ID_600")
         except:
             a="Fehler Distanzmatrix, Spalte konnte nicht geloescht werden"
             messages.AddErrorMessage(a)
@@ -582,12 +582,12 @@ def main(parameters, messages):
             exit(1)
 
         try:
-            arcpy.DeleteField_management(os.path.join(workspace_projekt,"Distanzmatrix"), "ID_601")
+            arcpy.DeleteField_management(join(workspace_projekt,"Distanzmatrix"), "ID_601")
         except:
             pass
         #Nun sollte Distanzmatrix nur aus bestand bestehen
 
-        cur_NeuerMarkte = arcpy.SearchCursor(os.path.join(workspace_projekt,"Neuer_Markt"))
+        cur_NeuerMarkte = arcpy.SearchCursor(join(workspace_projekt,"Neuer_Markt"))
         nummerMarkt=[]
         for a in cur_NeuerMarkte:
 ##        try:
@@ -596,7 +596,7 @@ def main(parameters, messages):
 ##            messages.AddMessage( dropID)
 
             if dropID>-1:
-                arcpy.DeleteField_management(os.path.join(workspace_projekt,"Distanzmatrix_planfall"), "ID_"+str(dropID))
+                arcpy.DeleteField_management(join(workspace_projekt,"Distanzmatrix_planfall"), "ID_"+str(dropID))
                 nummerMarkt.append(int(dropID))
 ##        except:
 ##            dropID=-1
@@ -608,7 +608,7 @@ def main(parameters, messages):
 ##    messages.AddMessage(str(len(nummerMarkt)))
         if(len(nummerMarkt)>0):
             nummerMarkt=sorted(nummerMarkt)
-            cur_Check_StandPlan= arcpy.UpdateCursor(os.path.join(workspace_projekt,"Standortdaten_planfall"))
+            cur_Check_StandPlan= arcpy.UpdateCursor(join(workspace_projekt,"Standortdaten_planfall"))
             for a in cur_Check_StandPlan:
                 for b in nummerMarkt:
                     if a.Id==b:
@@ -619,12 +619,12 @@ def main(parameters, messages):
         del cur_NeuerMarkte
 
         try:
-            arcpy.DeleteFeatures_management(os.path.join(workspace_projekt,"Siedlungszahlendaten_planfall"))
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Siedlungszahlendaten_planfall"))
+            arcpy.DeleteFeatures_management(join(workspace_projekt,"Siedlungszahlendaten_planfall"))
+            arcpy.Delete_management(join(workspace_projekt,"Siedlungszahlendaten_planfall"))
         except:
             pass
         try:
-            arcpy.CopyFeatures_management(os.path.join(workspace_projekt,"Siedlungszahlendaten"),os.path.join(workspace_projekt,"Siedlungszahlendaten_planfall"))
+            arcpy.CopyFeatures_management(join(workspace_projekt,"Siedlungszahlendaten"),join(workspace_projekt,"Siedlungszahlendaten_planfall"))
         except:
             v="Error beim Erstellen von Siedlungszahlendaten_planfall"
             messages.AddErrorMessage(v)
@@ -674,8 +674,8 @@ def main(parameters, messages):
     #Pfade einrichten
     base_path = str(sys.path[0]).split("2_Tool")[0]
 
-    workspace_Basis = os.path.join(base_path, '1_Basisdaten', 'FGBD_Basisdaten_deutschland.gdb')
-    workspace_projekt = os.path.join(base_path, '3_Projekte', projektname,
+    workspace_Basis = join(base_path, '1_Basisdaten', 'FGBD_Basisdaten_deutschland.gdb')
+    workspace_projekt = join(base_path, '3_Projekte', projektname,
                                      'FGDB_Standortkonkurrenz_Supermaerkte_' + projektname + '.gdb')
 
 
@@ -720,8 +720,8 @@ def main(parameters, messages):
     ##messages.AddMessage(Strasse)
     ##messages.AddMessage(Ort)
 
-    location, errmsg = url_lib.get_location(Strasse, house, Ort, 
-                                            postcode)    
+    location, errmsg = url_lib.get_location(Strasse, house, Ort,
+                                            postcode)
     if location is None:
         messages.AddErrorMessage(errmsg)
         messages.AddMessage("Georeferenzierung derzeit nicht moeglich - "
@@ -730,7 +730,7 @@ def main(parameters, messages):
 
     lat = location[0]
     longi = location[1]
-    messages.AddMessage("Georeferenziert")    
+    messages.AddMessage("Georeferenziert")
     if radiobutton==False:
         messages.AddMessage("keinen weiteren Markt festgelegt.")
         try:
@@ -751,7 +751,7 @@ def main(parameters, messages):
 
         if NModerErw=="Erweiterung":
             messages.AddMessage("Erweiterung")
-            tablepath_maerkte = os.path.join(workspace_projekt,'Standortdaten')
+            tablepath_maerkte = join(workspace_projekt,'Standortdaten')
 
             rows_uebergabepunkte = arcpy.SearchCursor(tablepath_maerkte)
             list_uebergabepunkte=[]
@@ -864,7 +864,7 @@ def main(parameters, messages):
         boni=1
         if NModerErw=="Erweiterung":
             messages.AddMessage("Erweiterung")
-            tablepath_maerkte = os.path.join(workspace_projekt,'Standortdaten')
+            tablepath_maerkte = join(workspace_projekt,'Standortdaten')
 
             rows_uebergabepunkte = arcpy.SearchCursor(tablepath_maerkte)
             list_uebergabepunkte=[]
@@ -1001,14 +1001,14 @@ def main(parameters, messages):
             Ort=Ort.replace('Ä','Ae')
             Ort=Ort.replace('ß','ss')
 
-            location, errmsg = url_lib.get_location(Strasse, house, Ort, 
+            location, errmsg = url_lib.get_location(Strasse, house, Ort,
                                                     postcode)
-                
+
             if location is None:
                 messages.AddErrorMessage(errmsg)
                 cur_Standorte_temp.deleteRow(zeile)
                 continue
-            
+
             lat = location[0]
             longi = location[1]
 
@@ -1032,8 +1032,8 @@ def main(parameters, messages):
 
 
 
-    input_features = os.path.join(workspace_projekt,"Neuer_Markt_temp")
-    output_features_class = os.path.join(workspace_projekt,"Neuer_Markt")
+    input_features = join(workspace_projekt,"Neuer_Markt_temp")
+    output_features_class = join(workspace_projekt,"Neuer_Markt")
 
 
     out_coordinate_system=arcpy.SpatialReference('ETRS 1989 UTM Zone N32')
@@ -1041,7 +1041,7 @@ def main(parameters, messages):
     arcpy.Project_management(input_features, output_features_class, out_coordinate_system)
     ##messages.AddMessage(arcpy.GetMessages())
     del input_features,output_features_class,out_coordinate_system
-    arcpy.AlterAliasName(os.path.join(workspace_projekt,"Neuer_Markt"), 'Neuer_Markt')
+    arcpy.AlterAliasName(join(workspace_projekt,"Neuer_Markt"), 'Neuer_Markt')
     ##try:
     ##    if arcpy.Exists("Neuer_Markt_temp"):
     ##        arcpy.Delete_management("Neuer_Markt_temp")

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import _rpcpath
 import contextlib
 import os
 import sys
@@ -10,11 +11,11 @@ import T2_Hinzufuegen_neuen_Marktes
 import T3_Definition_Zentren
 import T4_Zentren_bearbeiten
 import T5_StandortkonkurrenzSupermaerkteTool
-BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+BASE_PATH = os.path.abspath(join(os.path.dirname(__file__),
                                          '..', '..'))
-LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
-project_lib = imp.load_source('project_lib', 
-                              os.path.join(LIB_PATH, 'project_lib.py'))
+LIB_PATH = join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib',
+                              join(LIB_PATH, 'project_lib.py'))
 # Export of toolbox F:\ggr Projekte\RPC_Tools\2_Tool\G_Standortkonkurrenz_Supermaerkte\G_Standortkonkurrenz_Supermaerkte.tbx
 
 class Toolbox(object):
@@ -30,20 +31,20 @@ class Hinzufuegen(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
             self.initializeParameters() # ruft InitializeParameters auf
-      
-      
+
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-        
+
             list_projects = project_lib.get_projects()
-            list_projects = sorted(list_projects)      
-        
+            list_projects = sorted(list_projects)
+
             i = 0
             self.params[i].filter.list = list_projects
             self.Projekt= i
@@ -54,9 +55,9 @@ class Hinzufuegen(object):
             i+=1
             self.discounter = i #
             i+=1
-        
+
             return
-  
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parmater
@@ -74,104 +75,104 @@ class Hinzufuegen(object):
                 self.params[self.abfrage ].enabled=0
                 self.params[self.discounter].enabled=0
                 self.params[self.abfrage ].parameterType="Optional"
-        
+
             if self.params[10].value == "Erweiterung":
-        
+
                 projectname = self.params[0].value
-        
-                tablepath_maerkte = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Standortdaten')
-        
+
+                tablepath_maerkte = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Standortdaten')
+
                 rows_uebergabepunkte = arcpy.SearchCursor(tablepath_maerkte)
                 list_uebergabepunkte=[]
                 for row in rows_uebergabepunkte :
                 ##               list_uebergabepunkte.append("ID: "+str( row.Id) + " | Name: " + repr(row.Name_postalisch))
                     list_uebergabepunkte.append( row.Betriebstyp+ " | "+row.Strasse +" | "+row.HNR + " | "+ row.Ort + " | "+str(row.VKFL_gesamt)+" qm")
                 # repr(row.Betriebstyp).replace('u','',1).replace("'",'')
-        
+
                 del tablepath_maerkte,rows_uebergabepunkte,row
                 list_uebergabepunkte=list(set(list_uebergabepunkte))
                 list_uebergabepunkte=sorted(list_uebergabepunkte)
                 self.params[11].filter.list = list_uebergabepunkte
                 self.params[11].parameterType="Required"
-        
+
             if self.params[12].value == True and not self.params[12].hasBeenValidated:
-        
+
                 self.params[12].enabled=0
                 self.params[13].value="Bitte warten..... Abspeichern"
                 tbx_path, tool_method = __file__.split('#')
                 toolname = tool_method.split('.')[0]
-        
+
                 projectname = self.params[0].value
-                tabelle_zentren =os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Neuer_Markt_temp')
+                tabelle_zentren =join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Neuer_Markt_temp')
                 try:
                     arcpy.DeleteRows_management(tabelle_zentren)
                 except:
                     pass
                 #alle alten weg nun wieder fuellen
-        
+
                 cur_Insert= arcpy.InsertCursor(tabelle_zentren)
-        
+
                 zeile=cur_Insert.newRow()
                 pnt = arcpy.CreateObject("Point")
-        
+
                 TypdesMarktes = self.params[self.neueHaltestellen].value
                 if TypdesMarktes=="Sonstige":
-        
+
                     TypdesMarktes=str(self.params[2].value)
                     self.params[13].value=str(self.params[2].value)+" "+str(len(self.params[2].value))
-        
+
                 if self.params[3].value==False:
                     discounter=0
                 else:
                     discounter=1
-        
+
                 Name_desMarktes="Unbenannt"
-        
+
                 if self.params[4].value==None:
                     self.params[13].value="Fehler keine Verkaufsfläche eingegeben!"
                     return
                 else:
                     VKFL=self.params[4].value
-        
+
                 if self.params[5].value==None:
                     self.params[13].value="Fehler keine Strasse eingegeben!"
                     return
                 else:
                     Strasse=self.params[5].value
-        
+
                 if self.params[6].value==None:
                     self.params[13].value="Fehler keine Hausnummer eingegeben!"
                     return
                 else:
                     Hausnummer=self.params[6].value
-        
+
                 if self.params[7].value==None:
                     self.params[13].value="Fehler keine Postleitzahl eingegeben!"
                     return
                 else:
                     PLZ=self.params[7].value
-        
+
                 if self.params[8].value==None:
                     self.params[13].value="Fehler kein Ort eingegeben!"
                     return
                 else:
                     Ort=self.params[8].value
-        
-        
+
+
                 if self.params[9].value==None:
         ##            self.params[13].value="Fehler keine Postleitzahl eingegeben!"
         ##            return
                     Ortsteil=" "
                 else:
                     Ortsteil=self.params[9].value
-        
+
                 if self.params[10].value==None:
                 #neuer markt?!
                     self.params[13].value="Fehler bitte angeben ob es sich um eine Erweiterung oder einen neuen Markt handelt!"
                 else:
                     if self.params[10].value=="Erweiterung":
-                        tablepath_maerkte = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Standortdaten')
-        
+                        tablepath_maerkte = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Standortdaten')
+
                         rows_uebergabepunkte = arcpy.SearchCursor(tablepath_maerkte)
                         list_uebergabepunkte=[]
                         Typpus = self.params[11].value.split(' | ')[0]
@@ -179,7 +180,7 @@ class Hinzufuegen(object):
                         hnr = self.params[11].value.split(' | ')[2]
                         ort = self.params[11].value.split(' | ')[3]
                         qm = int(self.params[11].value.split(' | ')[4].replace(' qm',''))
-        
+
                         qm_alt=0
                         fund =0
                         for row in rows_uebergabepunkte :
@@ -189,7 +190,7 @@ class Hinzufuegen(object):
                                 erweiterungsmarktid=row.Id
                                 ##rows_uebergabepunkte.deleteRow(row)
                                 break
-        
+
         ##                    messages.AddMessage(row.Betriebstyp==Typpus + " a  "+unicode(strasse)==unicode(row.Strasse) + "  a "+ hnr == row.HNR+ "  a "+ hnr == row.HNR + " a "+ unicode(ort) ==unicode( row.Ort)+  " a "+  qm == row.VKFL_gesamt)
         ##                    print row.Betriebstyp==Typpus + " a  "+unicode(strasse)==unicode(row.Strasse) + "  a "+ hnr == row.HNR+ "  a "+ hnr == row.HNR + " a "+ unicode(ort) ==unicode( row.Ort)+  " a "+  qm == row.VKFL_gesamt
                         del rows_uebergabepunkte,tablepath_maerkte,row
@@ -204,32 +205,32 @@ class Hinzufuegen(object):
                             for g in Discounter:
                                 if TypdesMarktes == g:
                                     found=1
-        
+
                             if found==1 or self.params[3].value==true:
                                 boni =1.47
                             else:
                                 boni=1
-        
-        
-        
-        
+
+
+
+
                     elif self.params[10].value=="Neuen Markt":
-        
+
                             boni=1
-        
+
                             self.params[3].value = false
                             self.params[10].value=""
                             self.params[11].value=""
-                            self.params[11].enabled=0    
-        
-        
+                            self.params[11].enabled=0
+
+
                 pnt.X=0
                 pnt.Y=0
                 lat=0
                 longi=0
                 a=0
-        
-        
+
+
                 zeile.setValue("Id",600)
                 zeile.setValue("Betriebstyp",str(TypdesMarktes))
                 zeile.setValue("Name_postalisch",str(Name_desMarktes))
@@ -246,9 +247,9 @@ class Hinzufuegen(object):
                 zeile.setValue("EntfallenderMarktID",int(erweiterungsmarktid))
                 zeile.shape = pnt
                 cur_Insert.insertRow(zeile)
-        
+
                 del cur_Insert
-            
+
                 self.params[2].value=""
                 self.params[3].value=False
                 self.params[4].value=""
@@ -258,20 +259,20 @@ class Hinzufuegen(object):
                 self.params[8].value=""
                 self.params[9].value=""
                 self.params[10].value=""
-                self.params[13].value="Letzten Markt eingeben und mit Ok die Toolboxeingabe beenden."  
-      
+                self.params[13].value="Letzten Markt eingeben und mit Ok die Toolboxeingabe beenden."
+
                 return
-        
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             if self.params[10].value == "Erweiterung":
                 self.params[11].parameterType="Required"
-        
+
             else:
                 self.params[11].parameterType="Optional"
             return
-    
+
     def __init__(self):
         self.label = u'2 Hinzuf\xfcgen eines neuen Marktes'
         self.canRunInBackground = False
@@ -393,8 +394,8 @@ class Hinzufuegen(object):
         param_14.datatype = u'Zeichenfolge'
         param_14.value = u'Zum Abspeichern eines zweiten Marktes Checkbox anklicken oder mit Ok einen Markt abspeichern und beenden'
 
-        parameters = [param_1, param_2, param_3, param_4, param_5, param_6, 
-                      param_7, param_8, param_9, param_10, param_11, param_12, 
+        parameters = [param_1, param_2, param_3, param_4, param_5, param_6,
+                      param_7, param_8, param_9, param_10, param_11, param_12,
                       param_13, param_14]
 
         validator = getattr(self, 'ToolValidator', None)
@@ -415,57 +416,57 @@ class Hinzufuegen(object):
         if validator:
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
-        T2_Hinzufuegen_neuen_Marktes.main(parameters, messages)      
-        
+        T2_Hinzufuegen_neuen_Marktes.main(parameters, messages)
+
 
 class MaerkteLaden(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\G_Standortkonkurrenz_Supermaerkte\G_Standortkonkurrenz_Supermaerkte.tbx\01Lebensmittelmaerkteeinladen"""
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
             list_projects = project_lib.get_projects()
-            list_projects = sorted(list_projects)        
-        
+            list_projects = sorted(list_projects)
+
             i = 0
             self.params[i].filter.list = list_projects
             self.Projekt= i
             i+=1
             self.Pfad = i # für template
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parmater
             has been changed."""
             i=-1
-            i+=1 
+            i+=1
             if self.params[i].altered and not self.params[i].hasBeenValidated:
                 projectname=self.params[0].value
-        
-                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Bestandsliste_Supermaerkte.xls"))==False:
-                        shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','G_Standortkonkurrenz_Supermaerkte','Template_Maerkte_Standorte.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Bestandsliste_Supermaerkte.xls"))
-        
-                
-                ##tablepath_siedlungszellen = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Siedlungszahlendaten')
-                tablepath_template_maerkte = os.path.join(BASE_PATH,'3_Projekte',projectname,'Bestandsliste_Supermaerkte.xls')
+
+                if os.path.isfile(join(BASE_PATH,'3_Projekte',projectname,"Bestandsliste_Supermaerkte.xls"))==False:
+                        shutil.copyfile(join(BASE_PATH,'2_Tool','G_Standortkonkurrenz_Supermaerkte','Template_Maerkte_Standorte.xls'),join(BASE_PATH,'3_Projekte',projectname,"Bestandsliste_Supermaerkte.xls"))
+
+
+                ##tablepath_siedlungszellen = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Siedlungszahlendaten')
+                tablepath_template_maerkte = join(BASE_PATH,'3_Projekte',projectname,'Bestandsliste_Supermaerkte.xls')
                 self.params[1].value=tablepath_template_maerkte
                 ##self.params[2].value=tablepath_siedlungszellen
-        
+
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'1 Lebensmittelm\xe4rkte und Punktlayer einladen'
         self.canRunInBackground = False
@@ -516,26 +517,26 @@ class MaerkteLaden(object):
         if validator:
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
-        T1_Lebensmittelmaerkte_einlesen.main(parameters, messages)      
-            
+        T1_Lebensmittelmaerkte_einlesen.main(parameters, messages)
+
 
 class Standortkonkurrenz(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\G_Standortkonkurrenz_Supermaerkte\G_Standortkonkurrenz_Supermaerkte.tbx\05StartendesStandortkonkurrenzSupermaerktetools"""
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-        
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             i = 0
             self.params[i].filter.list = list_projects
             self.Projekt= i
@@ -544,18 +545,18 @@ class Standortkonkurrenz(object):
             i+=1
             self.Siedlungsshp = i
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parmater
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'5 Starten_des_Standortkonkurrenz_Supermaerktetools'
         self.canRunInBackground = False
@@ -589,90 +590,90 @@ class Standortkonkurrenz(object):
         validator = getattr(self, 'ToolValidator', None)
         if validator:
             return validator(parameters).updateMessages()
-    def execute(self, parameters, messages):          
-        T5_StandortkonkurrenzSupermaerkteTool.main(parameters, messages)            
-            
+    def execute(self, parameters, messages):
+        T5_StandortkonkurrenzSupermaerkteTool.main(parameters, messages)
+
 
 class DefinitionZentren(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\G_Standortkonkurrenz_Supermaerkte\G_Standortkonkurrenz_Supermaerkte.tbx\03DefinitionZentren"""
     # -*- coding: utf-8 -*-
     #Diese Datei muss in der Toolbox als Validator für das Projekt löschen Skript eingefügt werden,
     #damit die vorhandenen Projekte in der DropdownListe angezeigt werden
-    
+
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
-            """Setup arcpy and the list of tool parameters."""      
+            """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             i=-1
             i+=1 ;
             #set project
             self.params[i].filter.list = list_projects
-        
+
             i+=1 ;
             #zentren
             i+=1 ;
             self.params[i].filter.list = []
-                
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             i=-1
             i+=1
-        
+
             list_uebergabepunkte =[]
-        
+
             self.params[4].value = "Zum Speichern bitte das Kästchen anklicken"
-        
+
             if (self.params[i].altered and not self.params[i].hasBeenValidated or self.params[1].altered and not self.params[1].hasBeenValidated ):
-        
+
                 projectname = self.params[0].value
-        
-                tablepath_maerkte = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Standortdaten')
-        
+
+                tablepath_maerkte = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Standortdaten')
+
                 rows_uebergabepunkte = arcpy.SearchCursor(tablepath_maerkte)
                 list_uebergabepunkte=[]
                 for row in rows_uebergabepunkte :
                 ##               list_uebergabepunkte.append("ID: "+str( row.Id) + " | Name: " + repr(row.Name_postalisch))
                     list_uebergabepunkte.append( str(row.Id) +" | "+ repr(row.Betriebstyp).replace('u','',1).replace("'",'')+ " | "+row.Strasse +" "+row.HNR + " "+ row.Ort + " | " + row.Ortsteil + " | "+ str(row.VKFL_gesamt) +" qm")
-        
+
                 del tablepath_maerkte,rows_uebergabepunkte
-        
-                tablepath_c_zentrenheck = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Zentren')
-        
+
+                tablepath_c_zentrenheck = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Zentren')
+
                 cur_loescher= arcpy.SearchCursor(tablepath_c_zentrenheck)
-        
+
                 for row_zent in cur_loescher:
                     for stelle,liste in enumerate( list_uebergabepunkte):
-        
+
                         if row_zent.Markt_1 == int( liste.split(' | ')[0]):
                             list_uebergabepunkte.pop(stelle)
-        
+
                 try:
                     del row_zent
                 except:
                     pass
-                del cur_loescher,tablepath_c_zentrenheck       
-        
+                del cur_loescher,tablepath_c_zentrenheck
+
                 self.params[2].filter.list = list_uebergabepunkte
-                
+
             if self.params[3].value == True and not self.params[3].hasBeenValidated:
                 if (self.params[2].value!=""):
         ##                try:
                     projectname = self.params[0].value
-                    tabelle_zentren =os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Zentren')
+                    tabelle_zentren =join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Zentren')
 
                     Zentrum = str(self.params[1].value)
                     Markt_1 = int(repr(self.params[2].value).split(' | ')[0].replace("u",'').replace("'",''))
@@ -694,7 +695,7 @@ class DefinitionZentren(object):
                     self.params[2].value = ""
 ##                    self.params[1].value = ""
 
-                    tablepath_maerkte = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Standortdaten')
+                    tablepath_maerkte = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Standortdaten')
 
                     rows_uebergabepunkte = arcpy.SearchCursor(tablepath_maerkte)
                     list_uebergabepunkte=[]
@@ -706,7 +707,7 @@ class DefinitionZentren(object):
 
 
 
-                    tablepath_c_zentrenheck = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Zentren')
+                    tablepath_c_zentrenheck = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Zentren')
 
                     cur_loescher= arcpy.SearchCursor(tablepath_c_zentrenheck)
 
@@ -722,22 +723,22 @@ class DefinitionZentren(object):
 
                     self.params[2].filter.list = list_uebergabepunkte
                     self.params[2].value = list_uebergabepunkte[0]
-        
+
         ##                except:
         ##                    self.params[2].value = ""
         ##                    self.params[3].value = False
         ##                    self.params[4].value ="ERROR - Fehler in der Eingabe "
         ##                    return
-        
+
                 else:
-        
+
                     self.params[2].value = ""
                     self.params[1].value = ""
                     self.params[3].value = False
                     self.params[4].value ="ERROR - Nichts eingegeben! "
                     return
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
@@ -808,45 +809,45 @@ class DefinitionZentren(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         T3_Definition_Zentren.main(parameters, messages)
-            
+
 
 class ZentrenBearbeiten(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\G_Standortkonkurrenz_Supermaerkte\G_Standortkonkurrenz_Supermaerkte.tbx\04Zentrenbearbeiten"""
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             i=-1
-        
+
             #set project
-            i+=1 
+            i+=1
             self.params[i].filter.list = list_projects
             self.params[3].enabled = 0
             self.params[3].value = "Bitte wählen Sie das Projekt aus"
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             i=-1
             i+=1
-        
+
             #nach Projektauswahl die Dropdownliste für die Flächennutzungen füllen
             if self.params[i].altered and not self.params[i].hasBeenValidated:
                 projectname = self.params[i].value
-        
-                tabelle_gebaeude = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Zentren')
+
+                tabelle_gebaeude = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Zentren')
                 rows_gebaeude = arcpy.SearchCursor(tabelle_gebaeude)
                 list_gebaeude = []
                 for row in rows_gebaeude :
@@ -862,38 +863,38 @@ class ZentrenBearbeiten(object):
                         del zen
                     except:
                         pass
-        
+
                     if gefunden==0:
                         list_gebaeude.append([(row.Zentren) + " | " + str( row.Markt_1 )] )
                 list_neu=[]
                 for a in list_gebaeude:
-        
+
                     print str(a).replace("[u'",'').replace(',','').replace("' '",'').replace("']",'')
                     list_neu.append(str(a).replace("[u'",'').replace(',','').replace("' '",'').replace("']",''))
-        
+
                 list_gebaeude= list_neu
                 list_gebaeude  = list(set(list_gebaeude))
-        
-        
+
+
                 del tabelle_gebaeude,rows_gebaeude
-        
-        
+
+
                 i+=1 ; self.params[i].filter.list = list_gebaeude
                 self.params[3].value = "Bitte wählen Sie das zu bearbeitende Zentrum aus"
             if self.params[1].altered and not self.params[1].hasBeenValidated:
                 self.params[3].value = "Um den ausgewählten Eintrag zu löschen, klicken Sie bitte auf Löschen"
-        
+
         #ausgewählte Vornutzung löschen
             if self.params[2].altered and not self.params[2].hasBeenValidated:
                 parameterString = self.params[1].value
                 zentrum = parameterString.split(" | ")[0]
                 markt1 = parameterString.split(" | ")[1]
-        
-        
+
+
                 self.params[3].value = zentrum + " "+markt1
-        
+
                 projectname = self.params[0].value
-                tabelle_gebaeude = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Zentren')
+                tabelle_gebaeude = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Zentren')
                 Update = arcpy.UpdateCursor(tabelle_gebaeude)
                 for row in Update:
                     if(str(row.Zentren) == str(zentrum)):
@@ -901,7 +902,7 @@ class ZentrenBearbeiten(object):
                         self.params[3].value = parameterString + " geloescht"
                         self.params[2].value = False
                 #Den Filter für die vorhandenen Vornutzungen neu erstellen und den angezeigten Wert auf den ersten Listenwert setzen
-                tabelle_gebaeude = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Zentren')
+                tabelle_gebaeude = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Zentren')
                 rows_gebaeude = arcpy.SearchCursor(tabelle_gebaeude)
                 list_gebaeude = []
                 for row in rows_gebaeude :
@@ -917,19 +918,19 @@ class ZentrenBearbeiten(object):
                         del zen
                     except:
                         pass
-        
+
                     if gefunden==0:
                         list_gebaeude.append([(row.Zentren) + " | " + str( row.Markt_1 )] )
                 list_neu=[]
                 for a in list_gebaeude:
-        
+
                     print str(a).replace("[u'",'').replace(',','').replace("' '",'').replace("']",'')
                     list_neu.append(str(a).replace("[u'",'').replace(',','').replace("' '",'').replace("']",''))
-        
+
                 list_gebaeude= list_neu
                 self.params[1].filter.list= list_gebaeude
         #        i+=1 ; self.params[1].filter.list = list_gebaeude
-        
+
                 #Liste nur füllen wenn noch Einträge vorhanden sind. Except leert die Liste
                 try:
                     self.params[1].value = list_gebaeude[0]
@@ -937,14 +938,14 @@ class ZentrenBearbeiten(object):
                     self.params[1].value = ""
                    #pass
                 self.params[3].value = "Bitte wählen Sie das zu bearbeitende Zentrum aus"
-        
+
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'4 Zentren bearbeiten'
         self.canRunInBackground = False
@@ -1005,5 +1006,4 @@ class ZentrenBearbeiten(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         T4_Zentren_bearbeiten.main(parameters, messages)
-            
-            
+

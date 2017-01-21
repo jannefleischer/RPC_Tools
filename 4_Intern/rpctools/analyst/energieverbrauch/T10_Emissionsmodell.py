@@ -23,14 +23,14 @@ import xlsxwriter
 
 def main(parameters, messages):
 
-    sheetlibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
-    sheetlibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
+    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
+    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
     sl = imp.load_source('sheet_lib', sheetlibpath)
 
-    mdblibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
+    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
     mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
-    poplibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','population_lib.py'))
+    poplibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','population_lib.py'))
     pop = imp.load_source('population_lib', poplibpath)
 
     gc.collect()
@@ -44,9 +44,9 @@ def main(parameters, messages):
     #Pfade einrichten
     base_path = str(sys.path[0]).split("2_Tool")[0]
 
-    workspace_projekt_definition = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-    workspace_projekt_emissionen = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Energie_und_Emissionen_'+projektname+'.gdb')
-    workspace_tool_emissionen = os.path.join(base_path,"2_Tool","E_Energieverbrauch","FGDB_Energieverbrauch_Tool.gdb")
+    workspace_projekt_definition = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    workspace_projekt_emissionen = join(base_path,'3_Projekte',projektname,'FGDB_Energie_und_Emissionen.gdb')
+    workspace_tool_emissionen = join(base_path,"2_Tool","E_Energieverbrauch","FGDB_Energieverbrauch_Tool.gdb")
 
     #############################################################################################################
     #
@@ -170,9 +170,9 @@ def main(parameters, messages):
     print schrittmeldung
 
     # Pfade setzen
-    logo = os.path.join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
-    ausgabeordner = os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
-    excelpfad = os.path.join(ausgabeordner,'Energieverbrauch.xlsx')
+    logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+    ausgabeordner = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
+    excelpfad = join(ausgabeordner,'Energieverbrauch.xlsx')
 
     try:
         os.remove(excelpfad)
@@ -227,7 +227,7 @@ def main(parameters, messages):
     ################################
     #Werteblatt 1 einfuegen
 
-    ausgabetabelle = os.path.join(workspace_projekt_emissionen,'T02RECH_02_Wohnen_Energie')
+    ausgabetabelle = join(workspace_projekt_emissionen,'T02RECH_02_Wohnen_Energie')
 
     #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
     rows = arcpy.SearchCursor(ausgabetabelle)
@@ -254,7 +254,7 @@ def main(parameters, messages):
     ################################
     #Werteblatt 2 einfuegen
 
-    ausgabetabelle = os.path.join(workspace_projekt_emissionen,'T02RECH_02_Wohnen_Heizung')
+    ausgabetabelle = join(workspace_projekt_emissionen,'T02RECH_02_Wohnen_Heizung')
 
     #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
     rows = arcpy.SearchCursor(ausgabetabelle)
@@ -281,7 +281,7 @@ def main(parameters, messages):
     ################################
     #Werteblatt 4 einfuegen
 
-    ausgabetabelle = os.path.join(workspace_projekt_emissionen,'T02RECH_03_Gewerbe_Ergebnis')
+    ausgabetabelle = join(workspace_projekt_emissionen,'T02RECH_03_Gewerbe_Ergebnis')
 
     #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
     rows = arcpy.SearchCursor(ausgabetabelle)
@@ -308,7 +308,7 @@ def main(parameters, messages):
     ################################
     #Werteblatt 5 einfuegen
 
-    ausgabetabelle = os.path.join(workspace_projekt_emissionen,'T02RECH_04_Versorgung_Ergebnis')
+    ausgabetabelle = join(workspace_projekt_emissionen,'T02RECH_04_Versorgung_Ergebnis')
 
     #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
     rows = arcpy.SearchCursor(ausgabetabelle)
@@ -375,12 +375,12 @@ def main(parameters, messages):
 
     ################################
     #Methodikblatt einfuegen
-    methodik_grafik = os.path.join(base_path,"2_Tool","E_Energieverbrauch","Erlaeuterungstexte","Methodik_Energieverbrauch.png")
+    methodik_grafik = join(base_path,"2_Tool","E_Energieverbrauch","Erlaeuterungstexte","Methodik_Energieverbrauch.png")
     ws8.insert_image('B2', methodik_grafik, {'x_scale': 0.32, 'y_scale': 0.32}) #Korrigiert Verzerrung die bei 1x1 auftritt
 
     ################################
     #Haftungsausschluss einfuegen
-    haftung_grafik = os.path.join(base_path,"2_Tool","E_Energieverbrauch","Erlaeuterungstexte","Haftungsausschluss.png")
+    haftung_grafik = join(base_path,"2_Tool","E_Energieverbrauch","Erlaeuterungstexte","Haftungsausschluss.png")
     ws9.insert_image('B2', haftung_grafik, {'x_scale': 0.32, 'y_scale': 0.32}) #Korrigiert Verzerrung die bei 1x1 auftritt
 
     ################################

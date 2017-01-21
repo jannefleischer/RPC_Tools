@@ -2,8 +2,8 @@
 # ---------------------------------------------------------------------------
 # REGIOPROJEKTCHECK
 # schutzwuerdigeBoedenTesten.py
-# 
-# Description: 
+#
+# Description:
 # PROJECT URL: http://www.regioprojektcheck.de
 #
 # Author:
@@ -23,12 +23,12 @@ def main(parameters, messages):
     #Pfade einrichten
     base_path = str(sys.path[0]).split("2_Tool")[0]
 
-    workspace_projekt = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-    workspace_tool = os.path.join(base_path,'2_Tool','F_Flaeche_und_Oekologie')
+    workspace_projekt = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    workspace_tool = join(base_path,'2_Tool','F_Flaeche_und_Oekologie')
 
-    pfadNiSa = os.path.join(workspace_tool,'bodenNiSa.lyr')
-    pfadNRW = os.path.join(workspace_tool,'bodenNRW.lyr')
-    pfadProjektflaeche = os.path.join(workspace_projekt,'Teilflaechen_Plangebiet')
+    pfadNiSa = join(workspace_tool,'bodenNiSa.lyr')
+    pfadNRW = join(workspace_tool,'bodenNRW.lyr')
+    pfadProjektflaeche = join(workspace_projekt,'Teilflaechen_Plangebiet')
 
     mxd = arcpy.mapping.MapDocument("CURRENT")
     df = arcpy.mapping.ListDataFrames(mxd)[0]

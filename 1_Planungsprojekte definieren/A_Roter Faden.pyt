@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import sys
-from os.path import abspath, dirname, join
-BASE_PATH = dirname(dirname(abspath(__file__)))
-sys.path.append(join(BASE_PATH, '4_Intern'))
+import _rpcpath
 
-from rpctools.utils.params import Params
-from rpctools.definitions.roter_faden import installation_pruefen
+from rpctools.utils.params import Tbx
+from rpctools.definitions.roter_faden.installation_pruefen import InstallationPruefen
 
 import arcpy
 
@@ -17,18 +14,20 @@ class Toolbox(object):
         self.alias = ''
         self.tools = [Ersteinrichtung]
 
-# Tool implementation code
 
-class Ersteinrichtung(object):
+class Ersteinrichtung(Tbx):
     """Tool checks if python modules are installed"""
 
-    def __init__(self):
-        self.label = u'Ersteinrichtung'
-        self.canRunInBackground = False
-        reload(installation_pruefen)
+    @property
+    def label(self):
+        return u'Ersteinrichtung'
+
+    @property
+    def Tool(self):
+        return InstallationPruefen
 
     def getParameterInfo(self):
-        params = Params()
+        params = self.par
 
         # Pfad_zur_Python_Installation_
         params.path = arcpy.Parameter()
@@ -37,7 +36,7 @@ class Ersteinrichtung(object):
         params.path.parameterType = 'Required'
         params.path.direction = 'Input'
         params.path.datatype = u'Zeichenfolge'
-        params.path.value = u'C:\\Python27-ArcGIS\\ArcGIS10.4'
+        params.path.value = folders.PYTHON_EXECUTABLE
         params.path.enabled = False
         params.path.value = sys.exec_prefix
 
@@ -120,9 +119,6 @@ class Ersteinrichtung(object):
 
         return params
 
-    def isLicensed(self):
-        return True
-
     def updateParameters(self, params):
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
@@ -177,10 +173,3 @@ class Ersteinrichtung(object):
         except ImportError, e:
             params.xlsxwriter.value = False
             pass
-
-        return
-
-
-    def execute(self, parameters, messages):
-        Installation_pruefen.main()
-

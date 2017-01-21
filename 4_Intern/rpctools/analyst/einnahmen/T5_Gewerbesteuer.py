@@ -31,9 +31,9 @@ import xlsxwriter
 
 def ags_samtgemeinde(ags_in):
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_basisdaten = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
 
-    VG250 = os.path.join(workspace_basisdaten,'VG250')
+    VG250 = join(workspace_basisdaten,'VG250')
     where = '"AGS"'+" ='"+ ags_in + "'"
 
     rows = arcpy.SearchCursor(VG250, where)
@@ -57,9 +57,9 @@ def ags_samtgemeinde(ags_in):
 
 def ags_regionalschluessel(ags_in):
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_basisdaten = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
 
-    VG250 = os.path.join(workspace_basisdaten,'VG250')
+    VG250 = join(workspace_basisdaten,'VG250')
     where = '"AGS"'+" ='"+ ags_in + "'"
     fields = "RS"
     rows = arcpy.da.SearchCursor(VG250, fields, where)
@@ -144,10 +144,10 @@ def getAnzAP(ags_input):
 #############################################################################################################
 
 def main(parameters, messages):
-    sheetlibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
+    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
     sl = imp.load_source('sheet_lib', sheetlibpath)
 
-    mdblibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
+    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
     mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
     gc.collect()
@@ -162,19 +162,19 @@ def main(parameters, messages):
     #Pfade einrichten
     base_path = str(sys.path[0]).split("2_Tool")[0]
 
-    workspace_basisdaten = os.path.join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
-    workspace_projekt_definition = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-    workspace_projekt_bevoelkerung = os.path.join(base_path,'3_Projekte',projektname,'FGDB_BevModellierung_'+projektname+'.gdb')
-    workspace_projekt_einnahmen = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Einnahmen_'+projektname+'.gdb')
-    workspace_tool_definition = os.path.join(base_path,"2_Tool","3_Art und Mass der Nutzung","FGDB_Definition_Projekt_Tool.gdb")
-    workspace_tool_einnahmen = os.path.join(base_path,"2_Tool","B_Einnahmen","FGDB_32_Einnahmen_Tool.gdb")
+    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+    workspace_projekt_definition = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    workspace_projekt_bevoelkerung = join(base_path,'3_Projekte',projektname,'FGDB_BevModellierung.gdb')
+    workspace_projekt_einnahmen = join(base_path,'3_Projekte',projektname,'FGDB_Einnahmen.gdb')
+    workspace_tool_definition = join(base_path,"2_Tool","3_Art und Mass der Nutzung","FGDB_Definition_Projekt_Tool.gdb")
+    workspace_tool_einnahmen = join(base_path,"2_Tool","B_Einnahmen","FGDB_32_Einnahmen_Tool.gdb")
 
-    Teilflaechen_Plangebiet_Centroide = os.path.join(workspace_projekt_definition, "Teilflaechen_Plangebiet_Centroide")
-    Teilflaechen_Plangebiet_CentroideGK3 = os.path.join(workspace_projekt_definition, "Teilflaechen_Plangebiet_CentroideGK3")
-    gemeindenWirkraumEW_Centroide = os.path.join(workspace_projekt_definition,"gemeindenWirkraumEW_Centroide")
-    gemeindenWirkraumAP_Centroide = os.path.join(workspace_projekt_definition,"gemeindenWirkraumAP_Centroide")
+    Teilflaechen_Plangebiet_Centroide = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_Centroide")
+    Teilflaechen_Plangebiet_CentroideGK3 = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_CentroideGK3")
+    gemeindenWirkraumEW_Centroide = join(workspace_projekt_definition,"gemeindenWirkraumEW_Centroide")
+    gemeindenWirkraumAP_Centroide = join(workspace_projekt_definition,"gemeindenWirkraumAP_Centroide")
 
-    input_table = os.path.join(workspace_projekt_bevoelkerung,'T02RECH_Input')
+    input_table = join(workspace_projekt_bevoelkerung,'T02RECH_Input')
 
     #############################################################################################################
     #
@@ -192,10 +192,10 @@ def main(parameters, messages):
     print schrittmeldung
 
 
-    GWST_01_Basisdaten = os.path.join(workspace_projekt_einnahmen,'GWST_01_Basisdaten')
+    GWST_01_Basisdaten = join(workspace_projekt_einnahmen,'GWST_01_Basisdaten')
     arcpy.TruncateTable_management(GWST_01_Basisdaten)
 
-    umlandtabelle = os.path.join(workspace_projekt_einnahmen, "AWU_WanderungsfaktorAP")
+    umlandtabelle = join(workspace_projekt_einnahmen, "AWU_WanderungsfaktorAP")
     fields = ["AGS", "AGS_VG", "AGS_Regenesis"]
     rows = arcpy.da.SearchCursor(umlandtabelle, fields)
     for row in rows:
@@ -295,7 +295,7 @@ def main(parameters, messages):
     mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
     # Ermittle Summe ueber Tabelle
-    GWST_02_GWSTproAP = os.path.join(workspace_projekt_einnahmen,'GWST_02_GWSTproAPRefZiel')
+    GWST_02_GWSTproAP = join(workspace_projekt_einnahmen,'GWST_02_GWSTproAPRefZiel')
 
     GWSTGrundbetragProAPReferenzZielort = 0
     rows = arcpy.SearchCursor(GWST_02_GWSTproAP)
@@ -430,10 +430,10 @@ def main(parameters, messages):
     print schrittmeldung
 
     # Pfade setzen
-    logo = os.path.join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
-    ausgabeordner = os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
+    logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+    ausgabeordner = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
     if not os.path.exists(ausgabeordner): os.makedirs(ausgabeordner)
-    excelpfad = os.path.join(ausgabeordner,'Einnahmen_Gewerbesteuer.xlsx')
+    excelpfad = join(ausgabeordner,'Einnahmen_Gewerbesteuer.xlsx')
 
     try:
         os.remove(excelpfad)
@@ -482,7 +482,7 @@ def main(parameters, messages):
     ################################
     #Werteblatt 1 einfuegen
 
-    ausgabetabelle = os.path.join(workspace_projekt_einnahmen,'GWST_06_Bilanz')
+    ausgabetabelle = join(workspace_projekt_einnahmen,'GWST_06_Bilanz')
 
     #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
     fieldnames = [f.name for f in arcpy.ListFields(ausgabetabelle)]
@@ -513,12 +513,12 @@ def main(parameters, messages):
 
     ################################
     #Methodikblatt einfuegen
-    methodik_grafik = os.path.join(base_path,"2_Tool","B_Einnahmen","Erlaeuterungstexte","Methodik_05_Gewerbesteuer.png")
+    methodik_grafik = join(base_path,"2_Tool","B_Einnahmen","Erlaeuterungstexte","Methodik_05_Gewerbesteuer.png")
     ws1.insert_image('B2', methodik_grafik, {'x_scale': 0.6, 'y_scale': 0.6}) #Korrigiert Verzerrung die bei 1x1 auftritt
 
     ################################
     #Haftungsausschluss einfuegen
-    haftung_grafik = os.path.join(base_path,"2_Tool","B_Einnahmen","Erlaeuterungstexte","Haftungsausschluss.png")
+    haftung_grafik = join(base_path,"2_Tool","B_Einnahmen","Erlaeuterungstexte","Haftungsausschluss.png")
     ws5.insert_image('B2', haftung_grafik, {'x_scale': 0.32, 'y_scale': 0.32}) #Korrigiert Verzerrung die bei 1x1 auftritt
 
     ################################
@@ -624,7 +624,7 @@ def main(parameters, messages):
     deleteList = []
 
     for e in deleteList:
-        f = os.path.join(workspace_projekt_definition,e)
+        f = join(workspace_projekt_definition,e)
         try:
             arcpy.Delete_management(f)
         except:

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import _rpcpath
 import contextlib
 import os
 import sys
@@ -9,18 +10,18 @@ import T1_Vorberechnungen, T2_Zentrale_Orte_OEPNV_Abfrage
 import T3_Erreichbarkeit_OEPNV, T4_Erreichbarkeit_Einrichtungen
 import T5_Ergebnissammler
 import imp
-BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+BASE_PATH = os.path.abspath(join(os.path.dirname(__file__),
                                          '..', '..'))
-LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
-project_lib = imp.load_source('project_lib', 
-                              os.path.join(LIB_PATH, 'project_lib.py'))
+LIB_PATH = join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib',
+                              join(LIB_PATH, 'project_lib.py'))
 
 # Export of toolbox F:\ggr Projekte\RPC_Tools\2_Tool\D_Erreichbarkeit\D_Erreichbarkeit.tbx
 class Toolbox(object):
     def __init__(self):
         self.label = u'11_Definition_Projekt_Tool'
         self.alias = ''
-        self.tools = [Vorberechnungen, ZentraleOrte_OEPNV, 
+        self.tools = [Vorberechnungen, ZentraleOrte_OEPNV,
                       Erreichbarkeit_OEPNV, ErgebnisAusgabe, Einrichtungen]
 
 # Tool implementation code
@@ -32,37 +33,37 @@ class Vorberechnungen(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-        
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
             self.params[0].filter.list = list_projects
-            return  
-        
+            return
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-    
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'1 Vorberechnungen'
         self.canRunInBackground = False
         reload(T1_Vorberechnungen)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -72,12 +73,12 @@ class Vorberechnungen(object):
         param_1.direction = 'Input'
         param_1.datatype = u'Zeichenfolge'
         param_1.filter.list = []
-    
+
         parameters = [param_1]
         validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()    
+        validator(parameters).initializeParameters()
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -89,8 +90,8 @@ class Vorberechnungen(object):
         if validator:
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
-        T1_Vorberechnungen.main(parameters, messages)            
-           
+        T1_Vorberechnungen.main(parameters, messages)
+
 
 class ZentraleOrte_OEPNV(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\D_Erreichbarkeit\D_Erreichbarkeit.tbx\02ZentraleOrteÖPNV"""
@@ -99,42 +100,42 @@ class ZentraleOrte_OEPNV(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-                
+
             #set project
             self.params[0].filter.list = list_projects
-        
+
             #set Orte
             self.params[1].filter.list = []
             self.params[2].filter.list = []
             self.params[3].filter.list = []
-        
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
-      
+
             #Projekt auswählen
             if self.params[0].altered and not self.params[0].hasBeenValidated:
                 projectname = self.params[0].value
                 self.params[1].value = ""
                 self.params[2].value = ""
                 self.params[3].value = ""
-                path_Orte = os.path.join(BASE_PATH,'3_Projekte',projectname,
-                                         'FGDB_Erreichbarkeit_Projekt_'+projectname+'.gdb',
+                path_Orte = join(BASE_PATH,'3_Projekte',projectname,
+                                         'FGDB_Erreichbarkeit.gdb',
                                          'Zentrale_Orte_75km')
-        
+
                 rows_Orte = arcpy.SearchCursor(path_Orte)
                 list_Ort1 = []
                 list_Ort2 = []
@@ -143,33 +144,33 @@ class ZentraleOrte_OEPNV(object):
                     list_Ort1.append(row.Name)
                     list_Ort2.append(row.Name)
                     list_Ort3.append(row.Name)
-        
+
                 list_Ort1 = sorted(list(set(list_Ort1)))
                 list_Ort2 = sorted(list(set(list_Ort2)))
                 list_Ort3 = sorted(list(set(list_Ort3)))
-        
+
                 self.params[1].filter.list = list_Ort1
                 self.params[2].filter.list = list_Ort2
                 self.params[3].filter.list = list_Ort3
-      
+
             #Orte auswählen
             if self.params[1].altered and not self.params[1].hasBeenValidated:
-        
+
                 projectname = self.params[0].value
                 Ort1 = self.params[1].value
-        
+
             if self.params[2].altered and not self.params[2].hasBeenValidated:
-        
+
                 projectname = self.params[0].value
                 Ort2 = self.params[2].value
-        
+
             if self.params[3].altered and not self.params[3].hasBeenValidated:
-        
+
                 projectname = self.params[0].value
                 Ort3 = self.params[3].value
-        
+
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
@@ -178,7 +179,7 @@ class ZentraleOrte_OEPNV(object):
         self.label = u'2 Erreichbarkeit Zentraler Orte (ÖPNV)'.encode('CP1252')
         self.canRunInBackground = False
         reload(T2_Zentrale_Orte_OEPNV_Abfrage)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -212,12 +213,12 @@ class ZentraleOrte_OEPNV(object):
         param_4.parameterType = 'Optional'
         param_4.direction = 'Input'
         param_4.datatype = u'Zeichenfolge'
-    
+
         parameters = [param_1, param_2, param_3, param_4]
         validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()        
+        validator(parameters).initializeParameters()
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -230,7 +231,7 @@ class ZentraleOrte_OEPNV(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         T2_Zentrale_Orte_OEPNV_Abfrage.main(parameters, messages)
-            
+
 
 class Erreichbarkeit_OEPNV(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\D_Erreichbarkeit\D_Erreichbarkeit.tbx\03ErreichbarkeitÖPNV"""
@@ -239,11 +240,11 @@ class Erreichbarkeit_OEPNV(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
-            self.params = parameters          
-      
+            self.params = parameters
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
@@ -251,27 +252,27 @@ class Erreichbarkeit_OEPNV(object):
             list_projects = sorted(list_projects)
             #set project
             self.params[0].filter.list = list_projects
-        
+
             #set Haltestellen
             self.params[1].filter.list = []
             self.params[2].filter.list = []
             self.params[3].filter.list = []
-        
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
-    
+
             #Projekt auswählen
             if self.params[0].altered and not self.params[0].hasBeenValidated:
                 projectname = self.params[0].value
                 self.params[1].value = ""
                 self.params[2].value = ""
                 self.params[3].value = ""
-                path_Halte = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Erreichbarkeit_Projekt_'+projectname+'.gdb','OEPNV_Haltestellen')
-        
+                path_Halte = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Erreichbarkeit.gdb','OEPNV_Haltestellen')
+
                 rows_Halte = arcpy.SearchCursor(path_Halte)
                 list_Halte1 = []
                 list_Halte2 = []
@@ -280,31 +281,31 @@ class Erreichbarkeit_OEPNV(object):
                     list_Halte1.append(row.Name + " | " + str(row.Distanz) + "m entfernt")
                     list_Halte2.append(row.Name + " | " + str(row.Distanz) + "m entfernt")
                     list_Halte3.append(row.Name + " | " + str(row.Distanz) + "m entfernt")
-        
+
                 list_Halte1 = sorted(list(set(list_Halte1)))
                 list_Halte2 = sorted(list(set(list_Halte2)))
                 list_Halte3 = sorted(list(set(list_Halte3)))
-        
+
                 self.params[1].filter.list = list_Halte1
                 self.params[2].filter.list = list_Halte2
                 self.params[3].filter.list = list_Halte3
-        
+
             #Haltestellen auswählen
             if self.params[1].altered and not self.params[1].hasBeenValidated:
-        
+
                 projectname = self.params[0].value
                 Halte1 = (self.params[1].value)
-        
+
             if self.params[2].altered and not self.params[2].hasBeenValidated:
-        
+
                 projectname = self.params[0].value
                 Halte2 = (self.params[2].value)
-        
+
             if self.params[3].altered and not self.params[3].hasBeenValidated:
-        
+
                 projectname = self.params[0].value
                 Halte3 = (self.params[3].value)
-        
+
             return
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
@@ -312,8 +313,8 @@ class Erreichbarkeit_OEPNV(object):
             return
     def __init__(self):
         self.label = u'3 Haltestellen und Linientaktung (\xd6PNV)'
-        self.canRunInBackground = False        
-        reload(T3_Erreichbarkeit_OEPNV)        
+        self.canRunInBackground = False
+        reload(T3_Erreichbarkeit_OEPNV)
 
     def getParameterInfo(self):
         # Projektname
@@ -348,12 +349,12 @@ class Erreichbarkeit_OEPNV(object):
         param_4.parameterType = 'Optional'
         param_4.direction = 'Input'
         param_4.datatype = u'Zeichenfolge'
-        
+
         parameters = [param_1, param_2, param_3, param_4]
         validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()        
+        validator(parameters).initializeParameters()
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -366,8 +367,8 @@ class Erreichbarkeit_OEPNV(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         T3_Erreichbarkeit_OEPNV.main(parameters, messages)
-            
-           
+
+
 
 class ErgebnisAusgabe(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\D_Erreichbarkeit\D_Erreichbarkeit.tbx\05ErgebnisAusgabe"""
@@ -376,37 +377,37 @@ class ErgebnisAusgabe(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             #set parameters
             self.params[0].filter.list = list_projects
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'5 Ergebnisse sammeln und exportieren'
         self.canRunInBackground = False
         reload(T5_Ergebnissammler)
-        
+
     def getParameterInfo(self):
         # Projektname
         param_1 = arcpy.Parameter()
@@ -416,12 +417,12 @@ class ErgebnisAusgabe(object):
         param_1.direction = 'Input'
         param_1.datatype = u'Zeichenfolge'
         param_1.filter.list = []
-        
+
         parameters = [param_1]
         validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()    
+        validator(parameters).initializeParameters()
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -434,25 +435,25 @@ class ErgebnisAusgabe(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         T5_Ergebnissammler.main(parameters, messages)
-         
+
 
 class Einrichtungen(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\D_Erreichbarkeit\D_Erreichbarkeit.tbx\04EinrichtungenEinrichtungen"""
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
             self.initializeParameters() # ruft InitializeParameters auf
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             i=-1
             i+=1 ;
             self.params[i].filter.list = list_projects
@@ -478,7 +479,7 @@ class Einrichtungen(object):
             i+=1
             self.Einzelhandel_feature=i
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parmater
@@ -490,32 +491,32 @@ class Einrichtungen(object):
             #Projekt
             if self.params[i].altered and not self.params[i].hasBeenValidated:
                 projectname=self.params[0].value
-        
+
                 #check ob alle 5 template excel datein vorhanden
-                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))==False:
-                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Kitas_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))
-                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Grundschulen.xls"))==False:
-                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Grundschulen_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Grundschulen.xls"))
-                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))==False:
-                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Einzelhandel_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))
-                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Apotheken.xls"))==False:
-                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Apotheken_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Apotheken.xls"))
-                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Aerzte.xls"))==False:
-                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Aerzte_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Aerzte.xls"))
-                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))==False:
-                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Krankenhaeuser_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))
-                if os.path.isfile(os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Sonstige.xls"))==False:
-                    shutil.copyfile(os.path.join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Sonstige_template.xls'),os.path.join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Sonstige.xls"))
-        
-        
-                tablepath_template_kitas =  os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Kindertagesstaetten.xls')
-                tablepath_template_grundschulen = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Grundschulen.xls')
-                tablepath_template_einzelhandel = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
-                tablepath_template_apotheken = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Apotheken.xls')
-                tablepath_template_aerzte = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Aerzte.xls')
-                tablepath_template_kh = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Krankenhaeuser.xls')
-                tablepath_template_sons = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Sonstige.xls')
-        
+                if os.path.isfile(join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))==False:
+                    shutil.copyfile(join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Kitas_template.xls'),join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))
+                if os.path.isfile(join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Grundschulen.xls"))==False:
+                    shutil.copyfile(join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Grundschulen_template.xls'),join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Grundschulen.xls"))
+                if os.path.isfile(join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))==False:
+                    shutil.copyfile(join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Einzelhandel_template.xls'),join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))
+                if os.path.isfile(join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Apotheken.xls"))==False:
+                    shutil.copyfile(join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Apotheken_template.xls'),join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Apotheken.xls"))
+                if os.path.isfile(join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Aerzte.xls"))==False:
+                    shutil.copyfile(join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Aerzte_template.xls'),join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Aerzte.xls"))
+                if os.path.isfile(join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))==False:
+                    shutil.copyfile(join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Krankenhaeuser_template.xls'),join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))
+                if os.path.isfile(join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Sonstige.xls"))==False:
+                    shutil.copyfile(join(BASE_PATH,'2_Tool','D_Erreichbarkeit','Einrichtungen_Sonstige_template.xls'),join(BASE_PATH,'3_Projekte',projectname,"Einrichtungen_Sonstige.xls"))
+
+
+                tablepath_template_kitas =  join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Kindertagesstaetten.xls')
+                tablepath_template_grundschulen = join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Grundschulen.xls')
+                tablepath_template_einzelhandel = join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
+                tablepath_template_apotheken = join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Apotheken.xls')
+                tablepath_template_aerzte = join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Aerzte.xls')
+                tablepath_template_kh = join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Krankenhaeuser.xls')
+                tablepath_template_sons = join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Sonstige.xls')
+
                 self.params[self.Kita].value=tablepath_template_kitas
                 self.params[self.Grundschulen].value=tablepath_template_grundschulen
                 self.params[self.Einzelhandel].value=tablepath_template_einzelhandel
@@ -523,7 +524,7 @@ class Einrichtungen(object):
                 self.params[self.Arzt].value=tablepath_template_aerzte
                 self.params[self.Krankenhaeuser].value=tablepath_template_kh
                 self.params[self.Sonstige].value=tablepath_template_sons
-        
+
             i+=1
             #Booleanabfrage
             if self.params[i].value==True:
@@ -535,11 +536,11 @@ class Einrichtungen(object):
                 self.params[self.Apotheken].enabled=0
                 self.params[self.Krankenhaeuser].enabled=0
                 self.params[self.Sonstige].enabled=0
-        
+
                 self.params[self.BooleanEinzel].enabled=0
                 self.params[self.Einzelhandel].enabled=0
                 self.params[self.Einzelhandel_feature].enabled=0
-        
+
             else:
                 self.params[self.Kita].enabled=1
                 self.params[self.Grundschulen].enabled=1
@@ -548,35 +549,35 @@ class Einrichtungen(object):
                 self.params[self.Apotheken].enabled=1
                 self.params[self.Krankenhaeuser].enabled=1
                 self.params[self.Sonstige].enabled=1
-        
-        
+
+
                 self.params[self.BooleanEinzel].enabled=1
-        
+
             if self.params[self.BooleanEinzel].value==True:
                 projectname=self.params[0].value
-                tablepath_einzelhandel = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projectname+'.gdb','Standortdaten')
+                tablepath_einzelhandel = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Standortdaten')
                 self.params[self.Einzelhandel_feature].value=tablepath_einzelhandel
                 self.params[self.Einzelhandel].enabled=0
                 self.params[self.Einzelhandel_feature].enabled=1
             elif self.params[self.Projekt].value!=None and self.params[self.Kita].enabled!=0:
                 projectname=self.params[0].value
-                tablepath_template_einzelhandel = os.path.join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
+                tablepath_template_einzelhandel = join(BASE_PATH,'3_Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
                 self.params[self.Einzelhandel].value=tablepath_template_einzelhandel
                 self.params[self.Einzelhandel].enabled=1
                 self.params[self.Einzelhandel_feature].enabled=0
-        
+
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'4 Laden von Einrichtungen'
         self.canRunInBackground = False
         reload(T4_Erreichbarkeit_Einrichtungen)
-        
+
     def getParameterInfo(self):
         # Projektnamen
         param_1 = arcpy.Parameter()
@@ -666,10 +667,10 @@ class Einrichtungen(object):
         param_11.direction = 'Input'
         param_11.datatype = u'Feature-Class'
 
-        parameters = [param_1, param_2, param_3, param_4, param_5, param_6, 
+        parameters = [param_1, param_2, param_3, param_4, param_5, param_6,
                       param_7, param_8, param_9, param_10, param_11]
         validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()    
+        validator(parameters).initializeParameters()
         return parameters
     def isLicensed(self):
         return True
@@ -683,13 +684,12 @@ class Einrichtungen(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         T4_Erreichbarkeit_Einrichtungen.main(parameters, messages)
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
+
+
+

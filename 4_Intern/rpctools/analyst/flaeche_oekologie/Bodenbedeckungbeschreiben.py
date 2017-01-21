@@ -21,8 +21,8 @@ def main(parameters, messages):
 
     #Projektname
     projekt = parameters[0].valueAsText
-    gdb = "FGDB_Flaeche_und_Oekologie_Projekt_" + projekt + ".gdb"
-    pfad_flaeche = os.path.join(rootPfad,'3_Projekte',projekt,gdb,"Bodenbedeckung")
+    gdb = "FGDB_Flaeche_und_Oekologie_" + projekt + ".gdb"
+    pfad_flaeche = join(rootPfad,'3_Projekte',projekt,gdb,"Bodenbedeckung")
     #Feldliste erstellen
     try:
         fields = arcpy.ListFields(pfad_flaeche)

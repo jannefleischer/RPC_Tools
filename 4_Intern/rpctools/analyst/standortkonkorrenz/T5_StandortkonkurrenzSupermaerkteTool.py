@@ -26,18 +26,18 @@ import xlsxwriter
 
 def main(parameters, messages):
     projektname = parameters[0].valueAsText
-    
+
     #Pfade einrichten
     base_path = str(sys.path[0]).split("2_Tool")[0]
     # import sheet_lib as sl
-    sheetlibpath = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
+    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
     sl = imp.load_source('sheet_lib', sheetlibpath)
 
-    workspace_basis_daten_wert=os.path.join(base_path,'2_Tool',"G_Standortkonkurrenz_Supermaerkte",'FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
-    workspace_texte_erlaeterung = os.path.join(base_path,'2_Tool','G_Standortkonkurrenz_Supermaerkte','Erlaeuterungstexte')
-    workspace_projekt = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-    workspace_wertveraederung = os.path.join(base_path,'3_Projekte',projektname,'FGDB_Standortkonkurrenz_Supermaerkte_'+projektname+'.gdb')
-    workspace_projekt_ergebnisse = os.path.join(base_path,'3_Projekte',projektname, 'Ergebnisausgabe', 'Abbildungen')
+    workspace_basis_daten_wert=join(base_path,'2_Tool',"G_Standortkonkurrenz_Supermaerkte",'FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
+    workspace_texte_erlaeterung = join(base_path,'2_Tool','G_Standortkonkurrenz_Supermaerkte','Erlaeuterungstexte')
+    workspace_projekt = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    workspace_wertveraederung = join(base_path,'3_Projekte',projektname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb')
+    workspace_projekt_ergebnisse = join(base_path,'3_Projekte',projektname, 'Ergebnisausgabe', 'Abbildungen')
 
     schrittmeldung = 'Datenexport in Excel-Datei  \n'
     messages.AddMessage(schrittmeldung)
@@ -48,29 +48,29 @@ def main(parameters, messages):
         arcpy.DeleteFeatures_management("Teilflaechen_Plangebiet")
     except:
         pass
-    arcpy.Copy_management(os.path.join(workspace_projekt,"Teilflaechen_Plangebiet"),os.path.join(workspace_wertveraederung,"Teilflaechen_Plangebiet"))
+    arcpy.Copy_management(join(workspace_projekt,"Teilflaechen_Plangebiet"),join(workspace_wertveraederung,"Teilflaechen_Plangebiet"))
 
-    mxd_template = arcpy.mapping.MapDocument(os.path.join(base_path, "2_Tool","G_Standortkonkurrenz_Supermaerkte","Template_Kartenerzeugung","34_KK_Bindung_Template.mxd"))
-    mxdpfad = os.path.join(workspace_projekt_ergebnisse,'34_KK_Bindung.mxd')
+    mxd_template = arcpy.mapping.MapDocument(join(base_path, "2_Tool","G_Standortkonkurrenz_Supermaerkte","Template_Kartenerzeugung","34_KK_Bindung_Template.mxd"))
+    mxdpfad = join(workspace_projekt_ergebnisse,'34_KK_Bindung.mxd')
     mxd_template.saveACopy(mxdpfad)
 
     # Ersetze Datenquelle
     Haltestellen_mxd = arcpy.mapping.MapDocument(mxdpfad)
-    templatepath = os.path.join(base_path,"2_Tool","G_Standortkonkurrenz_Supermaerkte","Template_Kartenerzeugung","template.gdb")
-    resultpath = os.path.join(base_path,"3_Projekte",projektname,"FGDB_Standortkonkurrenz_Supermaerkte_"+projektname+".gdb")
+    templatepath = join(base_path,"2_Tool","G_Standortkonkurrenz_Supermaerkte","Template_Kartenerzeugung","template.gdb")
+    resultpath = join(base_path,"3_Projekte",projektname,"FGDB_Standortkonkurrenz_Supermaerkte_"+projektname+".gdb")
     Haltestellen_mxd.findAndReplaceWorkspacePaths(templatepath, resultpath)
 
     #==================================================================================================================================================================================
     # Ersetze Datenquelle
     Haltestellen_mxd = arcpy.mapping.MapDocument(mxdpfad)
-    templatepath = os.path.join(base_path,"2_Tool","G_Standortkonkurrenz_Supermaerkte","Template_Kartenerzeugung","template.gdb")
-    resultpath = os.path.join(base_path,"3_Projekte",projektname,"FGDB_Standortkonkurrenz_Supermaerkte_"+projektname+".gdb")
+    templatepath = join(base_path,"2_Tool","G_Standortkonkurrenz_Supermaerkte","Template_Kartenerzeugung","template.gdb")
+    resultpath = join(base_path,"3_Projekte",projektname,"FGDB_Standortkonkurrenz_Supermaerkte_"+projektname+".gdb")
     Haltestellen_mxd.findAndReplaceWorkspacePaths(templatepath, resultpath)
     # Setze Viewport neu
     df = arcpy.mapping.ListDataFrames(Haltestellen_mxd)[0]
     gebietLayer = arcpy.mapping.ListLayers(Haltestellen_mxd, "Siedlungszahlendaten_planfall", df)[0]
 
-    arcpy.SelectLayerByLocation_management(gebietLayer, "WITHIN_A_DISTANCE", os.path.join(workspace_wertveraederung,"Neuer_Markt"), "1 Kilometers", "NEW_SELECTION")
+    arcpy.SelectLayerByLocation_management(gebietLayer, "WITHIN_A_DISTANCE", join(workspace_wertveraederung,"Neuer_Markt"), "1 Kilometers", "NEW_SELECTION")
     df.extent = gebietLayer.getSelectedExtent(False)
     arcpy.SelectLayerByAttribute_management(gebietLayer, "CLEAR_SELECTION")
     df.scale = df.scale * 2.5
@@ -80,7 +80,7 @@ def main(parameters, messages):
     del mxd_template , df,mxdpfad,templatepath,resultpath,gebietLayer
 
     #Exportiere Ergebnis
-    arcpy.mapping.ExportToJPEG(Haltestellen_mxd, os.path.join(workspace_projekt_ergebnisse, "34_KK_Bindung.jpg"), "PAGE_LAYOUT",resolution=300)
+    arcpy.mapping.ExportToJPEG(Haltestellen_mxd, join(workspace_projekt_ergebnisse, "34_KK_Bindung.jpg"), "PAGE_LAYOUT",resolution=300)
 
     schrittmeldung = 'Uebersichtskarte der KK-Bindung erstellt \n'
     messages.AddMessage(schrittmeldung)
@@ -89,14 +89,14 @@ def main(parameters, messages):
     del Haltestellen_mxd
 
     #==================================================================================================================================================================================
-    mxd_template = arcpy.mapping.MapDocument(os.path.join(base_path, "2_Tool","34_Standortkonkurrenz_Supermaerkte","34_Template_Kartenerzeugung","34_Bestand_Template.mxd"))
-    mxdpfad = os.path.join(workspace_projekt_ergebnisse,'34_Bestand.mxd')
+    mxd_template = arcpy.mapping.MapDocument(join(base_path, "2_Tool","34_Standortkonkurrenz_Supermaerkte","34_Template_Kartenerzeugung","34_Bestand_Template.mxd"))
+    mxdpfad = join(workspace_projekt_ergebnisse,'34_Bestand.mxd')
     mxd_template.saveACopy(mxdpfad)
 
     # Ersetze Datenquelle
     Haltestellen_mxd = arcpy.mapping.MapDocument(mxdpfad)
-    templatepath = os.path.join(base_path,"2_Tool","G_Standortkonkurrenz_Supermaerkte","Template_Kartenerzeugung","template.gdb")
-    resultpath = os.path.join(base_path,"3_Projekte",projektname,"FGDB_Standortkonkurrenz_Supermaerkte_"+projektname+".gdb")
+    templatepath = join(base_path,"2_Tool","G_Standortkonkurrenz_Supermaerkte","Template_Kartenerzeugung","template.gdb")
+    resultpath = join(base_path,"3_Projekte",projektname,"FGDB_Standortkonkurrenz_Supermaerkte_"+projektname+".gdb")
     Haltestellen_mxd.findAndReplaceWorkspacePaths(templatepath, resultpath)
     # Setze Viewport neu
     df = arcpy.mapping.ListDataFrames(Haltestellen_mxd)[0]
@@ -104,7 +104,7 @@ def main(parameters, messages):
 
     ##print gebietLayer
     ##arcpy.SelectLayerByAttribute_management(gebietLayer, "NEW_SELECTION", "\"OBJECTID\" > 0")
-    arcpy.SelectLayerByLocation_management(gebietLayer, "WITHIN_A_DISTANCE", os.path.join(workspace_wertveraederung,"Teilflaechen_Plangebiet"), "4 Kilometers", "NEW_SELECTION")
+    arcpy.SelectLayerByLocation_management(gebietLayer, "WITHIN_A_DISTANCE", join(workspace_wertveraederung,"Teilflaechen_Plangebiet"), "4 Kilometers", "NEW_SELECTION")
     df.extent = gebietLayer.getSelectedExtent(False)
     arcpy.SelectLayerByAttribute_management(gebietLayer, "CLEAR_SELECTION")
     df.scale = df.scale * 3.0
@@ -114,7 +114,7 @@ def main(parameters, messages):
     del mxd_template , df,mxdpfad,templatepath,resultpath,gebietLayer
 
     #Exportiere Ergebnis
-    arcpy.mapping.ExportToJPEG(Haltestellen_mxd, os.path.join(workspace_projekt_ergebnisse, "34_Bestandregion.jpg"), "PAGE_LAYOUT",resolution=300)
+    arcpy.mapping.ExportToJPEG(Haltestellen_mxd, join(workspace_projekt_ergebnisse, "34_Bestandregion.jpg"), "PAGE_LAYOUT",resolution=300)
 
     schrittmeldung = 'Uebersichtskarte der Bestandregion erstellt \n'
     messages.AddMessage(schrittmeldung)
@@ -126,9 +126,9 @@ def main(parameters, messages):
     # 1. Dokument einrichten
 
     # Pfade setzen
-    logo = os.path.join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
-    ausgabeordner = os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
-    excelpfad = os.path.join(ausgabeordner,'Standortkonkurrenz_Supermaerkte.xlsx')
+    logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+    ausgabeordner = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
+    excelpfad = join(ausgabeordner,'Standortkonkurrenz_Supermaerkte.xlsx')
 
     try:
         os.remove(excelpfad)
@@ -155,7 +155,7 @@ def main(parameters, messages):
         for y in range(0,200):
             ws2.write(x,y,"", background)
     # 2.Beschreibung des Wirkungsfeldes
-    image = os.path.join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz1.jpg')
+    image = join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz1.jpg')
     ws2.insert_image(0,0, image, {'x_scale': 0.32, 'y_scale': 0.32})
     del image
     #####################################################################################################################################
@@ -171,23 +171,23 @@ def main(parameters, messages):
 
     try:
         arcpy.DeleteFeatures_management("MP_RPC_Gebiet")
-        arcpy.Delete_management(os.path.join(workspace_wertveraederung,"MP_RPC_Gebiet"))
+        arcpy.Delete_management(join(workspace_wertveraederung,"MP_RPC_Gebiet"))
     except:
         pass
     try:
         # Local variables:
-        MP_RPC_Gebiet = os.path.join(workspace_wertveraederung,"MP_RPC_Gebiet")
-        Standortdaten_planfall = os.path.join(workspace_wertveraederung,"Standortdaten_planfall")
+        MP_RPC_Gebiet = join(workspace_wertveraederung,"MP_RPC_Gebiet")
+        Standortdaten_planfall = join(workspace_wertveraederung,"Standortdaten_planfall")
 
         # Process: Räumliche Verbindung
-        arcpy.SpatialJoin_analysis(os.path.join(workspace_projekt,"Teilflaechen_Plangebiet"), Standortdaten_planfall, MP_RPC_Gebiet, "JOIN_ONE_TO_MANY", "KEEP_COMMON", "Gemeindeklasse \"Gemeindeklasse\" true true false 4 Long 0 0 ,First,#,"+Standortdaten_planfall+",Gemeindeklasse,-1,-1", "CLOSEST", "", "")
+        arcpy.SpatialJoin_analysis(join(workspace_projekt,"Teilflaechen_Plangebiet"), Standortdaten_planfall, MP_RPC_Gebiet, "JOIN_ONE_TO_MANY", "KEEP_COMMON", "Gemeindeklasse \"Gemeindeklasse\" true true false 4 Long 0 0 ,First,#,"+Standortdaten_planfall+",Gemeindeklasse,-1,-1", "CLOSEST", "", "")
         del Standortdaten_planfall,MP_RPC_Gebiet
     except:
         messages.AddErrorMessage("Notwendige Datei konnte nicht kopiert werden.")
         exit(1)
 
 
-    cur_Centroid_RPC= arcpy.SearchCursor(os.path.join(workspace_wertveraederung,"MP_RPC_Gebiet"))
+    cur_Centroid_RPC= arcpy.SearchCursor(join(workspace_wertveraederung,"MP_RPC_Gebiet"))
     Gemeindeklasse=0
     for zeile in cur_Centroid_RPC:
         Gemeindeklasse=zeile.Gemeindeklasse
@@ -212,8 +212,8 @@ def main(parameters, messages):
         print "Fehler bei den Gemeindeklassen"
         exit(1)
 
-    cur_Expo_Funktion = arcpy.SearchCursor(os.path.join(workspace_basis_daten_wert,expofunktion))
-    ##    spaltennamen = [f.name for f in arcpy.ListFields(os.path.join(workspace_basis_daten_wert,expofunktion))]
+    cur_Expo_Funktion = arcpy.SearchCursor(join(workspace_basis_daten_wert,expofunktion))
+    ##    spaltennamen = [f.name for f in arcpy.ListFields(join(workspace_basis_daten_wert,expofunktion))]
     ##    spaltennamen=spaltennamen[1:]
     ##    for n, spalten in  enumerate( spaltennamen):
     ##        if n==0:
@@ -258,7 +258,7 @@ def main(parameters, messages):
         for y in range(0,200):
             ws4.write(x,y,"", background)
     # 2.Beschreibung des Wirkungsfeldes
-    image = os.path.join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz2.jpg')
+    image = join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz2.jpg')
     ws4.insert_image(0,0, image, {'x_scale': 0.32, 'y_scale': 0.32})
     del image
 
@@ -287,7 +287,7 @@ def main(parameters, messages):
     ws5.write(3, 7, "HNR".decode('utf-8'), bold)
     ws5.write(3, 8, "VKFL gesamt".decode('utf-8'), bold)
 
-    cur_Standorten = arcpy.SearchCursor(os.path.join(workspace_wertveraederung,"Standortdaten"))
+    cur_Standorten = arcpy.SearchCursor(join(workspace_wertveraederung,"Standortdaten"))
     for n, zeile in enumerate( cur_Standorten):
         ws5.write(n+4,1,zeile.Id)
         ws5.write(n+4,2,zeile.Betriebstyp)
@@ -299,7 +299,7 @@ def main(parameters, messages):
         ws5.write(n+4,8,zeile.VKFL_gesamt)
 
     ws5.write(3, 10, "Uebersichtskarte des Einzelhandels in der Region".decode('utf-8'), bold)
-    image = os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen', "34_Bestandregion.jpg")
+    image = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen', "34_Bestandregion.jpg")
     ws5.insert_image('K5', image, {'x_scale': 0.25, 'y_scale': 0.25})
     del image
 
@@ -313,7 +313,7 @@ def main(parameters, messages):
         for y in range(0,200):
             ws6.write(x,y,"", background)
     # 2.Beschreibung des Wirkungsfeldes
-    image = os.path.join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz3.jpg')
+    image = join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz3.jpg')
     ws6.insert_image(0,0, image, {'x_scale': 0.32, 'y_scale': 0.32})
     del image
 
@@ -327,7 +327,7 @@ def main(parameters, messages):
             ws7.write(x,y,"", background)
 
     ws7.write(2, 1, "Kaufkraftbindung durch den neuen bzw. erweiterten Markt".decode('utf-8'), bold)
-    image = os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen', "34_KK_Bindung.jpg")
+    image = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen', "34_KK_Bindung.jpg")
     ws7.insert_image('B4', image, {'x_scale': 0.25, 'y_scale': 0.25})
     del image
 
@@ -342,7 +342,7 @@ def main(parameters, messages):
 
     ws8.write(2, 1, "Umsatz des Planvorhabens".decode('utf-8'), bold)
 
-    cur_statistik=arcpy.SearchCursor(os.path.join(workspace_wertveraederung,"Statistik_planfall"))
+    cur_statistik=arcpy.SearchCursor(join(workspace_wertveraederung,"Statistik_planfall"))
     umsaetze=[]
     for zeile in cur_statistik:
         umsaetze.append(zeile.SUM_ID_600)
@@ -370,7 +370,7 @@ def main(parameters, messages):
         for y in range(0,200):
             ws9.write(x,y,"", background)
     # 2.Beschreibung des Wirkungsfeldes
-    image = os.path.join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz4.jpg')
+    image = join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz4.jpg')
     ws9.insert_image(0,0, image, {'x_scale': 0.32, 'y_scale': 0.32})
     del image
 
@@ -391,7 +391,7 @@ def main(parameters, messages):
     ws10.write(4, 3, "Umsatz Planfall (Mio)".decode('utf-8'), bold)
     ws10.write(4, 4, "Verlust in %".decode('utf-8'), bold)
     ws10.write(4, 5, "Verlust (absolut)".decode('utf-8'), bold)
-    cur_verlustrech_sear= arcpy.SearchCursor(os.path.join(workspace_wertveraederung,"Verlustrechnung"))
+    cur_verlustrech_sear= arcpy.SearchCursor(join(workspace_wertveraederung,"Verlustrechnung"))
     p=0
     for n, zeile in enumerate( cur_verlustrech_sear):
         if(" Zentrum" in zeile.GesamtGem):
@@ -412,7 +412,7 @@ def main(parameters, messages):
         for y in range(0,200):
             ws11.write(x,y,"", background)
     # 2.Beschreibung des Wirkungsfeldes
-    image = os.path.join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz5.jpg')
+    image = join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz5.jpg')
     ws11.insert_image(0,0, image, {'x_scale': 0.32, 'y_scale': 0.32})
     del image
 
@@ -433,7 +433,7 @@ def main(parameters, messages):
     ws12.write(4, 3, "Verkaufsflaechendichte Planfall".decode('utf-8'), bold)
     ws12.write(4, 4, "Delta Betrachtung".decode('utf-8'), bold)
 
-    cur_verlustrech_sear= arcpy.SearchCursor(os.path.join(workspace_wertveraederung,"Verkaufsflaeche"))
+    cur_verlustrech_sear= arcpy.SearchCursor(join(workspace_wertveraederung,"Verkaufsflaeche"))
 
     for n, zeile in enumerate( cur_verlustrech_sear):
         ws12.write(n+5,1,zeile.Kommune)
@@ -458,7 +458,7 @@ def main(parameters, messages):
     ws12_1.write(4, 3, "Einzelhandelzentralitaet Planfall".decode('utf-8'), bold)
     ws12_1.write(4, 4, "Delta Betrachtung".decode('utf-8'), bold)
 
-    cur_verlustrech_sear= arcpy.SearchCursor(os.path.join(workspace_wertveraederung,"Einzelhzentrali"))
+    cur_verlustrech_sear= arcpy.SearchCursor(join(workspace_wertveraederung,"Einzelhzentrali"))
 
     for n, zeile in enumerate( cur_verlustrech_sear):
         ws12_1.write(n+5,1,zeile.Kommune)
@@ -474,10 +474,10 @@ def main(parameters, messages):
     for x in range(0,200):
         for y in range(0,200):
             ws13.write(x,y,"", background)
-    image = os.path.join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz6a.jpg')
+    image = join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz6a.jpg')
     ws13.insert_image(0,0, image, {'x_scale': 0.32, 'y_scale': 0.32})
     del image
-    image = os.path.join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz6b.jpg')
+    image = join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz6b.jpg')
     ws13.insert_image(52,0, image, {'x_scale': 0.32, 'y_scale': 0.32})
     del image
 
@@ -488,7 +488,7 @@ def main(parameters, messages):
     for x in range(0,200):
         for y in range(0,200):
             ws14.write(x,y,"", background)
-    image = os.path.join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz7.jpg')
+    image = join(workspace_texte_erlaeterung, 'Methodik_Standortkonkurrenz7.jpg')
     ws14.insert_image(0,0, image, {'x_scale': 0.32, 'y_scale': 0.32})
     del image
 
@@ -512,12 +512,12 @@ def main(parameters, messages):
 
         Discounter=['Aktiv-Discount','diska','Netto(Edeka)','Netto','Lidl','Aldi','Penny','Norma','NP','treff 3000']
         try:
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_Standortdaten), "Betreibstyp_bzw_Anbeiter", "TEXT")
+            arcpy.AddField_management(join(workspace_projekt,shp_Standortdaten), "Betreibstyp_bzw_Anbeiter", "TEXT")
         except:
             print "error"
             exit(1)
             return
-        cur_Standortdaten=arcpy.UpdateCursor(os.path.join(workspace_projekt,shp_Standortdaten))
+        cur_Standortdaten=arcpy.UpdateCursor(join(workspace_projekt,shp_Standortdaten))
 
         for maerkte in cur_Standortdaten:
 
@@ -924,9 +924,9 @@ def main(parameters, messages):
     # Sascha bereden - brauche zuteilung aller maerkte zu den typen - sind kl. Nahversorger alle unter 400 m² sofern keine Discounter!
 
     def Einwohnerfinden(shp_Standortdaten):
-        pfad_standort= os.path.join(workspace_projekt,shp_Standortdaten)
-        pfad_bkg_gemeinden=os.path.join(workspace_Basis,"bkg_gemeinden")
-        Standortdaten_SpatialJoin = os.path.join(workspace_projekt,"Standortdaten_SpatialJoin")
+        pfad_standort= join(workspace_projekt,shp_Standortdaten)
+        pfad_bkg_gemeinden=join(workspace_Basis,"bkg_gemeinden")
+        Standortdaten_SpatialJoin = join(workspace_projekt,"Standortdaten_SpatialJoin")
 
         # Process: Räumliche Verbindung
         arcpy.SpatialJoin_analysis(pfad_standort, pfad_bkg_gemeinden, Standortdaten_SpatialJoin, "JOIN_ONE_TO_ONE", "KEEP_ALL", "Id \"Id\" true true false 4 Long 0 0 ,First,#,"+pfad_standort+",Id,-1,-1;Name_postalisch \"Name_postalisch\" true true false 255 Text 0 0 ,First,#,"+pfad_standort+",Name_postalisch,-1,-1;PLZ \"PLZ\" true true false 4 Long 0 0 ,First,#,"+pfad_standort+",PLZ,-1,-1;Ort \"Ort\" true true false 255 Text 0 0 ,First,#,"+pfad_standort+",Ort,-1,-1;Ortsteil \"Ortsteil\" true true false 255 Text 0 0 ,First,#,"+pfad_standort+",Ortsteil,-1,-1;Strasse \"Strasse\" true true false 255 Text 0 0 ,First,#,"+pfad_standort+",Strasse,-1,-1;HNR \"HNR\" true true false 255 Text 0 0 ,First,#,"+pfad_standort+",HNR,-1,-1;VKFL_Gesamt \"VKFL_Gesamt\" true true false 4 Long 0 0 ,First,#,"+pfad_standort+",VKFL_Gesamt,-1,-1;Euro_pro_quadratmeter_VKF \"Euro_pro_quadratmeter_VKF\" true true false 4 Long 0 0 ,First,#,"+pfad_standort+",Euro_pro_quadratmeter_VKF,-1,-1;Lon \"Lon\" true true false 4 Float 0 0 ,First,#,"+pfad_standort+",Lon,-1,-1;Lat \"Lat\" true true false 4 Float 0 0 ,First,#,"+pfad_standort+",Lat,-1,-1;Qualitaet \"Qualitaet\" true true false 4 Long 0 0 ,First,#,"+pfad_standort+",Qualitaet,-1,-1;Gemeindeklasse \"Gemeindeklasse\" true true false 4 Long 0 0 ,First,#,"+pfad_standort+",Gemeindeklasse,-1,-1;EW_Gemeindeverband \"EW_Gemeindeverband\" true true false 4 Long 0 0 ,First,#,"+pfad_standort+",EW_Gemeindeverband,-1,-1;Betriebstyp_Attraktivitaet \"Betriebstyp_Attraktivitaet\" true true false 255 Text 0 0 ,First,#,"+pfad_standort+",Betriebstyp_Attraktivitaet,-1,-1;Betriebstyp_Funktion \"Betriebstyp_Funktion\" true true false 255 Text 0 0 ,First,#,"+pfad_standort+",Betriebstyp_Funktion,-1,-1;Betriebstyp \"Betriebstyp\" true true false 150 Text 0 0 ,First,#,"+pfad_standort+",Betriebstyp,-1,-1;Bonifaktor \"Bonifaktor\" true true false 8 Double 0 0 ,First,#,"+pfad_standort+",Bonifaktor,-1,-1;Betreibstyp_bzw_Anbeiter \"Betreibstyp_bzw_Anbeiter\" true true false 255 Text 0 0 ,First,#,"+pfad_standort+",Betreibstyp_bzw_Anbeiter,-1,-1;Kaufkraft \"Kaufkraft\" true true false 8 Double 0 0 ,First,#,"+pfad_standort+",Kaufkraft,-1,-1;GEN \"GEN\" true true false 50 Text 0 0 ,First,#,"+pfad_bkg_gemeinden+",GEN,-1,-1;AGS \"AGS\" true true false 12 Text 0 0 ,First,#,"+pfad_bkg_gemeinden+",AGS,-1,-1;EWZ \"EWZ\" true true false 8 Double 0 0 ,First,#,"+pfad_bkg_gemeinden+",EWZ,-1,-1", "INTERSECT", "", "")
@@ -947,10 +947,10 @@ def main(parameters, messages):
         del pfad_bkg_gemeinden,pfad_standort,Standortdaten_SpatialJoin
 
     def verkaufsflaeche_zent():
-        cur_Standortdaten=arcpy.SearchCursor(os.path.join(workspace_projekt,"Standortdaten"))
+        cur_Standortdaten=arcpy.SearchCursor(join(workspace_projekt,"Standortdaten"))
         try:
             arcpy.Delete_management("Verkaufsflaeche")
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Verkaufsflaeche"))
+            arcpy.Delete_management(join(workspace_projekt,"Verkaufsflaeche"))
         except:
             pass
         try:
@@ -969,16 +969,16 @@ def main(parameters, messages):
 
 
         try:
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Verkaufsflaeche"),"Kommune","TEXT")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Verkaufsflaeche"),"AGS","TEXT")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Verkaufsflaeche"),"Verkaufsflazent","DOUBLE")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Verkaufsflaeche"),"Verkaufsflazentpla","DOUBLE")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Verkaufsflaeche"),"Delta","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Verkaufsflaeche"),"Kommune","TEXT")
+            arcpy.AddField_management(join(workspace_projekt,"Verkaufsflaeche"),"AGS","TEXT")
+            arcpy.AddField_management(join(workspace_projekt,"Verkaufsflaeche"),"Verkaufsflazent","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Verkaufsflaeche"),"Verkaufsflazentpla","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Verkaufsflaeche"),"Delta","DOUBLE")
         except:
             pass
 
 
-        cur_Search_Sied = arcpy.SearchCursor(os.path.join(workspace_projekt,"Siedlungszahlendaten"))
+        cur_Search_Sied = arcpy.SearchCursor(join(workspace_projekt,"Siedlungszahlendaten"))
 
         array_ags=[]
         for zellen in cur_Search_Sied:
@@ -1015,7 +1015,7 @@ def main(parameters, messages):
 
 
         ags_gemeinde_flaeche_einw=sorted(ags_gemeinde_flaeche_einw)
-        cur_Sear_GGEN= arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Gesamtgemeinden"))
+        cur_Sear_GGEN= arcpy.SearchCursor(join(workspace_Basis_Daten,"Gesamtgemeinden"))
 
         array_GGen=[]
         for speicher in cur_Sear_GGEN:
@@ -1060,7 +1060,7 @@ def main(parameters, messages):
 
         entg_ggen_umsatz=sorted(entg_ggen_umsatz)
 
-        cur_Ins_Verlust=arcpy.InsertCursor(os.path.join(workspace_projekt,"Verkaufsflaeche"))
+        cur_Ins_Verlust=arcpy.InsertCursor(join(workspace_projekt,"Verkaufsflaeche"))
 
         for bb in entg_ggen_umsatz:
             row= cur_Ins_Verlust.newRow()
@@ -1072,7 +1072,7 @@ def main(parameters, messages):
 
         del cur_Ins_Verlust,ags_gemeinde_flaeche_einw,cur_Standortdaten,array_standortda,array_ggen_umsatz,entg_ggen_umsatz
 
-        cur_Standortdaten=arcpy.SearchCursor(os.path.join(workspace_projekt,"Standortdaten_planfall"))
+        cur_Standortdaten=arcpy.SearchCursor(join(workspace_projekt,"Standortdaten_planfall"))
 
         array_standortda=[]
         for speicher in cur_Standortdaten:
@@ -1100,7 +1100,7 @@ def main(parameters, messages):
 
 
         ags_gemeinde_flaeche_einw=sorted(ags_gemeinde_flaeche_einw)
-        cur_Sear_GGEN= arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Gesamtgemeinden"))
+        cur_Sear_GGEN= arcpy.SearchCursor(join(workspace_Basis_Daten,"Gesamtgemeinden"))
 
         array_GGen=[]
         for speicher in cur_Sear_GGEN:
@@ -1147,7 +1147,7 @@ def main(parameters, messages):
 
         entg_ggen_umsatz=sorted(entg_ggen_umsatz)
 
-        cur_Up_Verlust=arcpy.UpdateCursor(os.path.join(workspace_projekt,"Verkaufsflaeche"))
+        cur_Up_Verlust=arcpy.UpdateCursor(join(workspace_projekt,"Verkaufsflaeche"))
         for updating in cur_Up_Verlust:
             findemich=0
             for arrayeintraege in entg_ggen_umsatz:
@@ -1157,7 +1157,7 @@ def main(parameters, messages):
                     updating.setValue("Verkaufsflazentpla",arrayeintraege[4])
                     cur_Up_Verlust.updateRow(updating)
             if findemich==0:
-                cur_Ins_Verlust=arcpy.InsertCursor(os.path.join(workspace_projekt,"Verkaufsflaeche"))
+                cur_Ins_Verlust=arcpy.InsertCursor(join(workspace_projekt,"Verkaufsflaeche"))
                 ruw= cur_Ins_Verlust.newRow()
                 ruw.setValue("Kommune","SG/Stadt "+arrayeintraege[1])
                 ruw.setValue("AGS",arrayeintraege[0])
@@ -1167,8 +1167,8 @@ def main(parameters, messages):
                 del cur_Ins_Verlust
 
         del ags_gemeinde_flaeche_einw,cur_Standortdaten,array_standortda,entg_ggen_umsatz
-        arcpy.CalculateField_management(os.path.join(workspace_projekt,"Verkaufsflaeche"), "Delta", "-!Verkaufsflazent!+!Verkaufsflazentpla!", "PYTHON", "")
-        cur_Check_Verk= arcpy.UpdateCursor(os.path.join(workspace_projekt,"Verkaufsflaeche"))
+        arcpy.CalculateField_management(join(workspace_projekt,"Verkaufsflaeche"), "Delta", "-!Verkaufsflazent!+!Verkaufsflazentpla!", "PYTHON", "")
+        cur_Check_Verk= arcpy.UpdateCursor(join(workspace_projekt,"Verkaufsflaeche"))
         for a in cur_Check_Verk:
             if a.Verkaufsflazent==0. and a.Verkaufsflazentpla ==0.:
                 cur_Check_Verk.deleteRow(a)
@@ -1181,13 +1181,13 @@ def main(parameters, messages):
 
         # Zusatzspalte mit Betriebstyp fuer Attraktivitaet
         try:
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_Standortdaten), "Betriebstyp_Attraktivitaet", "TEXT",250)
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_Standortdaten), "Gemeindeklasse", "LONG")
+            arcpy.AddField_management(join(workspace_projekt,shp_Standortdaten), "Betriebstyp_Attraktivitaet", "TEXT",250)
+            arcpy.AddField_management(join(workspace_projekt,shp_Standortdaten), "Gemeindeklasse", "LONG")
         except:
             pass
         #Cursor drauf
-        cur_Standortdaten=arcpy.UpdateCursor(os.path.join(workspace_projekt,shp_Standortdaten))
-        cur_Attraktivitaet_Info=arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Attraktivitaet_Info"))
+        cur_Standortdaten=arcpy.UpdateCursor(join(workspace_projekt,shp_Standortdaten))
+        cur_Attraktivitaet_Info=arcpy.SearchCursor(join(workspace_Basis_Daten,"Attraktivitaet_Info"))
 
         Discounter=['Aktiv-Discount','e aktiv','diska','Netto(Edeka)','Netto','Lidl','Aldi','Penny','Norma','NP','treff 3000']
 
@@ -1240,7 +1240,7 @@ def main(parameters, messages):
 
 
                 if [f for f in Discounter if str(row_standort.Betreibstyp_bzw_Anbeiter).lower() in f.lower() ] and [c for c in array_Attraktivitaet_Info if  str(row_standort.Betreibstyp_bzw_Anbeiter).lower() != c[0].lower()] and variable==0 :
-                    cur_IAttraktivitaet_Info=arcpy.InsertCursor(os.path.join(workspace_Basis_Daten,"Attraktivitaet_Info"))
+                    cur_IAttraktivitaet_Info=arcpy.InsertCursor(join(workspace_Basis_Daten,"Attraktivitaet_Info"))
                     row_cur_IAttraktivitaet_Info=cur_IAttraktivitaet_Info.newRow()
                     row_cur_IAttraktivitaet_Info.setValue("Typ",str(row_standort.Betreibstyp_bzw_Anbeiter))
                     row_cur_IAttraktivitaet_Info.setValue("ein_Markt_in_der_Naehe",1)
@@ -1284,7 +1284,7 @@ def main(parameters, messages):
                                 cur_Standortdaten.updateRow(row_standort)
                                 break
                         if vorhanden==0:
-                            cur_IAttraktivitaet_Info=arcpy.InsertCursor(os.path.join(workspace_Basis_Daten,"Attraktivitaet_Info"))
+                            cur_IAttraktivitaet_Info=arcpy.InsertCursor(join(workspace_Basis_Daten,"Attraktivitaet_Info"))
                             row_cur_IAttraktivitaet_Info=cur_IAttraktivitaet_Info.newRow()
                             row_cur_IAttraktivitaet_Info.setValue("Typ","kl. SM Marktkauf")
                             row_cur_IAttraktivitaet_Info.setValue("ein_Markt_in_der_Naehe",1)
@@ -1314,7 +1314,7 @@ def main(parameters, messages):
                                 break
 
                         if vorhanden==0:
-                            cur_IAttraktivitaet_Info=arcpy.InsertCursor(os.path.join(workspace_Basis_Daten,"Attraktivitaet_Info"))
+                            cur_IAttraktivitaet_Info=arcpy.InsertCursor(join(workspace_Basis_Daten,"Attraktivitaet_Info"))
                             row_cur_IAttraktivitaet_Info=cur_IAttraktivitaet_Info.newRow()
                             row_cur_IAttraktivitaet_Info.setValue("Typ","gr.mittl.SM-V-Markt-SBW Marktkauf")
                             row_cur_IAttraktivitaet_Info.setValue("ein_Markt_in_der_Naehe",1)
@@ -1374,7 +1374,7 @@ def main(parameters, messages):
             ##                            break
             ##
             ##                    if vorhanden==0:
-            ##                        cur_IAttraktivitaet_Info=arcpy.InsertCursor(os.path.join(workspace_Basis_Daten,"Attraktivitaet_Info"))
+            ##                        cur_IAttraktivitaet_Info=arcpy.InsertCursor(join(workspace_Basis_Daten,"Attraktivitaet_Info"))
             ##                        row_cur_IAttraktivitaet_Info=cur_IAttraktivitaet_Info.newRow()
             ##
             ##                        row_cur_IAttraktivitaet_Info.setValue("Typ","SBW "+ str(Name_Markt))
@@ -1408,7 +1408,7 @@ def main(parameters, messages):
                             break
 
                     if vorhanden==0:
-                        cur_IAttraktivitaet_Info=arcpy.InsertCursor(os.path.join(workspace_Basis_Daten,"Attraktivitaet_Info"))
+                        cur_IAttraktivitaet_Info=arcpy.InsertCursor(join(workspace_Basis_Daten,"Attraktivitaet_Info"))
                         row_cur_IAttraktivitaet_Info=cur_IAttraktivitaet_Info.newRow()
 
                         row_cur_IAttraktivitaet_Info.setValue("Typ","gr.mittl.SM-V-Markt-SBW "+ str(Name_Markt))
@@ -1446,7 +1446,7 @@ def main(parameters, messages):
                                 break
 
                         if vorhanden==0:
-                            cur_IAttraktivitaet_Info=arcpy.InsertCursor(os.path.join(workspace_Basis_Daten,"Attraktivitaet_Info"))
+                            cur_IAttraktivitaet_Info=arcpy.InsertCursor(join(workspace_Basis_Daten,"Attraktivitaet_Info"))
                             row_cur_IAttraktivitaet_Info=cur_IAttraktivitaet_Info.newRow()
 
                             row_cur_IAttraktivitaet_Info.setValue("Typ","kl. SM "+ str(Name_Markt))
@@ -1481,7 +1481,7 @@ def main(parameters, messages):
                                 break
 
                         if vorhanden==0:
-                            cur_IAttraktivitaet_Info=arcpy.InsertCursor(os.path.join(workspace_Basis_Daten,"Attraktivitaet_Info"))
+                            cur_IAttraktivitaet_Info=arcpy.InsertCursor(join(workspace_Basis_Daten,"Attraktivitaet_Info"))
                             row_cur_IAttraktivitaet_Info=cur_IAttraktivitaet_Info.newRow()
 
                             row_cur_IAttraktivitaet_Info.setValue("Typ","gr.mittl.SM-V-Markt-SBW "+ str(Name_Markt))
@@ -1516,7 +1516,7 @@ def main(parameters, messages):
                                 break
 
                         if vorhanden==0:
-                            cur_IAttraktivitaet_Info=arcpy.InsertCursor(os.path.join(workspace_Basis_Daten,"Attraktivitaet_Info"))
+                            cur_IAttraktivitaet_Info=arcpy.InsertCursor(join(workspace_Basis_Daten,"Attraktivitaet_Info"))
                             row_cur_IAttraktivitaet_Info=cur_IAttraktivitaet_Info.newRow()
 
                             row_cur_IAttraktivitaet_Info.setValue("Typ","gr.mittl.SM-V-Markt-SBW "+ str(Name_Markt))
@@ -1546,14 +1546,14 @@ def main(parameters, messages):
         try:
 
         # Zusatzspalte mit Betriebstyp fuer Attraktivitaet
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_Standortdaten), "Betriebstyp_Funktion", "TEXT",250)
+            arcpy.AddField_management(join(workspace_projekt,shp_Standortdaten), "Betriebstyp_Funktion", "TEXT",250)
         except:
             pass
         #Cursor drauf
-        cur_Standortdaten=arcpy.UpdateCursor(os.path.join(workspace_projekt,shp_Standortdaten))
+        cur_Standortdaten=arcpy.UpdateCursor(join(workspace_projekt,shp_Standortdaten))
 
 
-        cur_ueber100kEW=arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Ueber_100kEW"))
+        cur_ueber100kEW=arcpy.SearchCursor(join(workspace_Basis_Daten,"Ueber_100kEW"))
 
         Discounter=['Aktiv-Discount','e aktiv','diska','Netto(Edeka)','Netto','Lidl','Aldi','Penny','Norma','NP','treff 3000']
 
@@ -1663,7 +1663,7 @@ def main(parameters, messages):
         #ich muss aus ags gags machen
         # alle ags des gleichen werts zusammen + bev
         #ags den gags zuordnen und bev zusammen ermitteln
-        cur_Standort = arcpy.SearchCursor(os.path.join(workspace_projekt,shp_Standortdaten))
+        cur_Standort = arcpy.SearchCursor(join(workspace_projekt,shp_Standortdaten))
         array_standort_ags_bev_gags_gbev=[]
         for a in cur_Standort:
             if len(array_standort_ags_bev_gags_gbev)==0:
@@ -1683,7 +1683,7 @@ def main(parameters, messages):
         del a, cur_Standort
 
         ##print len(array_standort_ags_bev_gags_gbev) , array_standort_ags_bev_gags_gbev
-        cur_Sear_GGEN= arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Gesamtgemeinden"))
+        cur_Sear_GGEN= arcpy.SearchCursor(join(workspace_Basis_Daten,"Gesamtgemeinden"))
 
         array_ags_gags=[]
         for speicher in cur_Sear_GGEN:
@@ -1704,7 +1704,7 @@ def main(parameters, messages):
         # dann gags und bev addieren
         # das ergebniss dann mit array_ags_bev_gags_gbev verschneiden
 
-        cur_Kommune = arcpy.SearchCursor(os.path.join(workspace_Basis,"bkg_gemeinden"))
+        cur_Kommune = arcpy.SearchCursor(join(workspace_Basis,"bkg_gemeinden"))
         array_bkggem_ags_bev_gags=[]
         for uu in cur_Kommune:
             array_bkggem_ags_bev_gags.append([int(uu.AGS),int(uu.EWZ),0])
@@ -1750,13 +1750,13 @@ def main(parameters, messages):
 
         try:
 
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_Standortdaten),"GSAGS","LONG")
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_Standortdaten),"GSBEV","LONG")
+            arcpy.AddField_management(join(workspace_projekt,shp_Standortdaten),"GSAGS","LONG")
+            arcpy.AddField_management(join(workspace_projekt,shp_Standortdaten),"GSBEV","LONG")
         except:
             print "error im added"
             pass
 
-        cur_UP_Stand= arcpy.UpdateCursor(os.path.join(workspace_projekt,shp_Standortdaten))
+        cur_UP_Stand= arcpy.UpdateCursor(join(workspace_projekt,shp_Standortdaten))
 
         for p in cur_UP_Stand:
             for o in array_standort_ags_bev_gags_gbev:
@@ -1771,15 +1771,15 @@ def main(parameters, messages):
     def berechnung_siedlungsdaten(shp):
         #siedlung = Siedlungszahlendaten
         try:
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp), "Lebensmittel", "DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,shp), "Lebensmittel", "DOUBLE")
         except:
             messages.AddErrorMessage("Lebensmittel Spalte konnte nicht hinzugefuegt werden - Abbruch")
             exit(1)
 
 
-        cur_Siedlungszellendaten=arcpy.UpdateCursor(os.path.join(workspace_projekt,shp))
-        cur_Grundeinstellungen=arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Grundeinstellungen"))
-        cur_KK_Kennziffer_LM=arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"KK_Kennziffer_LM"))
+        cur_Siedlungszellendaten=arcpy.UpdateCursor(join(workspace_projekt,shp))
+        cur_Grundeinstellungen=arcpy.SearchCursor(join(workspace_Basis_Daten,"Grundeinstellungen"))
+        cur_KK_Kennziffer_LM=arcpy.SearchCursor(join(workspace_Basis_Daten,"KK_Kennziffer_LM"))
 
         array_cur_Grundeinstellungen=[]
         for werte in cur_Grundeinstellungen:
@@ -1828,7 +1828,7 @@ def main(parameters, messages):
         #shp_standortdaten=Standortdaten
 
         try:
-            arcpy.Delete_management(os.path.join(workspace_projekt,shp_KK_Anteile_Wahrsch))
+            arcpy.Delete_management(join(workspace_projekt,shp_KK_Anteile_Wahrsch))
         except:
             print "fehler beim löschen - "+shp_KK_Anteile_Wahrsch
         try:
@@ -1840,8 +1840,8 @@ def main(parameters, messages):
 
 
 
-        cur_Siedlungszellendaten=arcpy.SearchCursor(os.path.join(workspace_projekt,"Siedlungszahlendaten"))
-        cur_Standortdaten=arcpy.SearchCursor(os.path.join(workspace_projekt,shp_standortdaten))
+        cur_Siedlungszellendaten=arcpy.SearchCursor(join(workspace_projekt,"Siedlungszahlendaten"))
+        cur_Standortdaten=arcpy.SearchCursor(join(workspace_projekt,shp_standortdaten))
 
         #Neuer MarktID hier setzen
         neuerMarktID=600
@@ -1850,17 +1850,17 @@ def main(parameters, messages):
 
     ##    cur_gesamt =arcpy.SearchCursor(shp+"/gesamt")
         #100.000 EW und mehr
-        cur_Ueber_100kEW =arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Ueber_100kEW"))
+        cur_Ueber_100kEW =arcpy.SearchCursor(join(workspace_Basis_Daten,"Ueber_100kEW"))
         #50.000 bis 100.000 EW
-        cur_Zwischen_50k_100kEW =arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Zwischen_50k_100kEW"))
+        cur_Zwischen_50k_100kEW =arcpy.SearchCursor(join(workspace_Basis_Daten,"Zwischen_50k_100kEW"))
         #20.000 bis 50.000 EW
-        cur_Zwischen_20k_50kEW =arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Zwischen_20k_50kEW"))
+        cur_Zwischen_20k_50kEW =arcpy.SearchCursor(join(workspace_Basis_Daten,"Zwischen_20k_50kEW"))
         #10.000 bis 20.000 EW
-        cur_Zwischen_10k_20kEW =arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Zwischen_10k_20kEW"))
+        cur_Zwischen_10k_20kEW =arcpy.SearchCursor(join(workspace_Basis_Daten,"Zwischen_10k_20kEW"))
         #unter 10.000 EW
-        cur_Unter_10kEW =arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Unter_10kEW"))
+        cur_Unter_10kEW =arcpy.SearchCursor(join(workspace_Basis_Daten,"Unter_10kEW"))
 
-        cur_Distanzmatrix=arcpy.SearchCursor(os.path.join(workspace_projekt,shp_distanzmatrix))
+        cur_Distanzmatrix=arcpy.SearchCursor(join(workspace_projekt,shp_distanzmatrix))
 
 
     ##    array_gesamt=[]
@@ -1899,9 +1899,9 @@ def main(parameters, messages):
 
         del zeile,cur_Unter_10kEW
 
-        fieldnames = [f.name for f in arcpy.ListFields(os.path.join(workspace_projekt,shp_distanzmatrix))]
+        fieldnames = [f.name for f in arcpy.ListFields(join(workspace_projekt,shp_distanzmatrix))]
 
-        cur_KK_Anteile_Wahrsch=arcpy.InsertCursor(os.path.join(workspace_projekt,shp_KK_Anteile_Wahrsch))
+        cur_KK_Anteile_Wahrsch=arcpy.InsertCursor(join(workspace_projekt,shp_KK_Anteile_Wahrsch))
 
         array_Siedlungszellendaten=[]
         for zeile in cur_Siedlungszellendaten:
@@ -1998,10 +1998,10 @@ def main(parameters, messages):
         #shp_Standortdaten= Standortdaten
         #shp_Distanzmatrix_dichteste=Distanzmatrix_dichteste
 
-        cur_Distanzmatrix=arcpy.SearchCursor(os.path.join(workspace_projekt,shp_distanzmatrix))
-        cur_Standortdaten=arcpy.SearchCursor(os.path.join(workspace_projekt,shp_Standortdaten))
+        cur_Distanzmatrix=arcpy.SearchCursor(join(workspace_projekt,shp_distanzmatrix))
+        cur_Standortdaten=arcpy.SearchCursor(join(workspace_projekt,shp_Standortdaten))
 
-        fieldnamess = [f.name for f in arcpy.ListFields(os.path.join(workspace_projekt,shp_distanzmatrix))]
+        fieldnamess = [f.name for f in arcpy.ListFields(join(workspace_projekt,shp_distanzmatrix))]
 
         fieldnames= fieldnamess[2:]
     ##    print fieldnames
@@ -2046,17 +2046,17 @@ def main(parameters, messages):
 
 
         #Hinzufuegen SiedlungsId Spalte
-        arcpy.AddField_management(os.path.join(workspace_projekt,shp_Distanzmatrix_dichteste), fieldnamess[1], "LONG")
+        arcpy.AddField_management(join(workspace_projekt,shp_Distanzmatrix_dichteste), fieldnamess[1], "LONG")
 
 
         #Tabelle vorbereiten
         for eintrag_machen in array_betriebstyp_fieldid:
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_Distanzmatrix_dichteste), str(eintrag_machen[0]).replace('-','_').replace('(','_').replace(')','').replace(',','').replace('.','')+"_1", "DOUBLE")
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_Distanzmatrix_dichteste), str(eintrag_machen[0]).replace('-','_').replace('(','_').replace(')','').replace(',','').replace('.','')+"_2", "DOUBLE")
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_Distanzmatrix_dichteste), str(eintrag_machen[0]).replace('-','_').replace('(','_').replace(')','').replace(',','').replace('.','')+"_3", "DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,shp_Distanzmatrix_dichteste), str(eintrag_machen[0]).replace('-','_').replace('(','_').replace(')','').replace(',','').replace('.','')+"_1", "DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,shp_Distanzmatrix_dichteste), str(eintrag_machen[0]).replace('-','_').replace('(','_').replace(')','').replace(',','').replace('.','')+"_2", "DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,shp_Distanzmatrix_dichteste), str(eintrag_machen[0]).replace('-','_').replace('(','_').replace(')','').replace(',','').replace('.','')+"_3", "DOUBLE")
 
         #Cursor auf die Tabelle
-        cur_Distanzmatrix_dichteste=arcpy.InsertCursor(os.path.join(workspace_projekt,shp_Distanzmatrix_dichteste))
+        cur_Distanzmatrix_dichteste=arcpy.InsertCursor(join(workspace_projekt,shp_Distanzmatrix_dichteste))
 
         for zeile in cur_Distanzmatrix:
             array_betriebstyp_entfernung=[]
@@ -2145,11 +2145,11 @@ def main(parameters, messages):
 
         Maximaler_AbstandZwMK=1.000 # 2Km
 
-        cur_Standortdaten=arcpy.SearchCursor(os.path.join(workspace_projekt,shp_Standortdaten))
-        cur_Distanzmatrix_dichteste=arcpy.SearchCursor(os.path.join(workspace_projekt,shp_Distanzmatrix_dichteste))
-        cur_Attraktivitaet_Info=arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Attraktivitaet_Info"))
+        cur_Standortdaten=arcpy.SearchCursor(join(workspace_projekt,shp_Standortdaten))
+        cur_Distanzmatrix_dichteste=arcpy.SearchCursor(join(workspace_projekt,shp_Distanzmatrix_dichteste))
+        cur_Attraktivitaet_Info=arcpy.SearchCursor(join(workspace_Basis_Daten,"Attraktivitaet_Info"))
 
-        fieldnames_infotabelle=[f.name for f in arcpy.ListFields(os.path.join(workspace_Basis_Daten,"Attraktivitaet_Info"))]
+        fieldnames_infotabelle=[f.name for f in arcpy.ListFields(join(workspace_Basis_Daten,"Attraktivitaet_Info"))]
 
         try:
             arcpy.Delete_management(workspace_projekt+"\\"+shp_Distanzmatrix_dichteste_gewichtung)
@@ -2163,8 +2163,8 @@ def main(parameters, messages):
             pass
 
 
-        fieldnamess = [f.name for f in arcpy.ListFields(os.path.join(workspace_projekt,shp_Distanzmatrix_dichteste))]
-        cur_Distanzmatrix_dichteste_gewichtung=arcpy.InsertCursor(os.path.join(workspace_projekt,shp_Distanzmatrix_dichteste_gewichtung))
+        fieldnamess = [f.name for f in arcpy.ListFields(join(workspace_projekt,shp_Distanzmatrix_dichteste))]
+        cur_Distanzmatrix_dichteste_gewichtung=arcpy.InsertCursor(join(workspace_projekt,shp_Distanzmatrix_dichteste_gewichtung))
 
 
 
@@ -2326,27 +2326,27 @@ def main(parameters, messages):
         #shp_Verteilungsmasstab2
         #shp_ET_Kaufkraft
 
-        cur_Siedlungszellendaten=arcpy.UpdateCursor(os.path.join(workspace_projekt,shp_Siedlungszahlendaten))
+        cur_Siedlungszellendaten=arcpy.UpdateCursor(join(workspace_projekt,shp_Siedlungszahlendaten))
 
-        cur_Distanzmatrix_dichteste=arcpy.SearchCursor(os.path.join(workspace_projekt,shp_Distanzmatrix_dichteste))
-        cur_Distanzmatrix_dichteste_gewichtung=arcpy.SearchCursor(os.path.join(workspace_projekt,shp_shp_Distanzmatrix_dichteste_gewichtung))
+        cur_Distanzmatrix_dichteste=arcpy.SearchCursor(join(workspace_projekt,shp_Distanzmatrix_dichteste))
+        cur_Distanzmatrix_dichteste_gewichtung=arcpy.SearchCursor(join(workspace_projekt,shp_shp_Distanzmatrix_dichteste_gewichtung))
 
-        cur_Distanzmatrix=arcpy.SearchCursor(os.path.join(workspace_projekt,shp_Distanzmatrix))
-        cur_Standortdaten=arcpy.SearchCursor(os.path.join(workspace_projekt,shp_Standortdaten))
-        cur_KK_Anteile_Wahrsch=arcpy.SearchCursor(os.path.join(workspace_projekt,shp_KK_Anteile_Wahrsch))
-
-
+        cur_Distanzmatrix=arcpy.SearchCursor(join(workspace_projekt,shp_Distanzmatrix))
+        cur_Standortdaten=arcpy.SearchCursor(join(workspace_projekt,shp_Standortdaten))
+        cur_KK_Anteile_Wahrsch=arcpy.SearchCursor(join(workspace_projekt,shp_KK_Anteile_Wahrsch))
 
 
-        fieldnamess = [f.name for f in arcpy.ListFields(os.path.join(workspace_projekt,shp_Distanzmatrix))]
+
+
+        fieldnamess = [f.name for f in arcpy.ListFields(join(workspace_projekt,shp_Distanzmatrix))]
 
         fieldnames= fieldnamess[2:]
     ##    print fieldnames
     ##    print len (fieldnames)
         try:
-            arcpy.Delete_management(os.path.join(workspace_projekt,shp_Verteilungsmasstab1))
-            arcpy.Delete_management(os.path.join(workspace_projekt,shp_Verteilungsmasstab2))
-            arcpy.Delete_management(os.path.join(workspace_projekt,shp_ET_Kaufkraft))
+            arcpy.Delete_management(join(workspace_projekt,shp_Verteilungsmasstab1))
+            arcpy.Delete_management(join(workspace_projekt,shp_Verteilungsmasstab2))
+            arcpy.Delete_management(join(workspace_projekt,shp_ET_Kaufkraft))
         except:
             print "fehler beim löschen - Verteilung"
         try:
@@ -2362,9 +2362,9 @@ def main(parameters, messages):
 
 
         #curser drauf
-        cur_Verteilungsmasstab1=arcpy.InsertCursor(os.path.join(workspace_projekt,shp_Verteilungsmasstab1))
-        cur_Verteilungsmasstab2=arcpy.InsertCursor(os.path.join(workspace_projekt,shp_Verteilungsmasstab2))
-        cur_Kaufkraft_ET=arcpy.InsertCursor(os.path.join(workspace_projekt,shp_ET_Kaufkraft))
+        cur_Verteilungsmasstab1=arcpy.InsertCursor(join(workspace_projekt,shp_Verteilungsmasstab1))
+        cur_Verteilungsmasstab2=arcpy.InsertCursor(join(workspace_projekt,shp_Verteilungsmasstab2))
+        cur_Kaufkraft_ET=arcpy.InsertCursor(join(workspace_projekt,shp_ET_Kaufkraft))
 
 
         array_Siedlungszellendaten=[]
@@ -2548,11 +2548,11 @@ def main(parameters, messages):
 
 
         try:
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_Standortdaten), "Kaufkraft", "DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,shp_Standortdaten), "Kaufkraft", "DOUBLE")
         except:
             print "Unexpected error:", sys.exc_info()[0]
 
-        fieldnamess = [f.name for f in arcpy.ListFields(os.path.join(workspace_projekt,shp_ET_Kaufkraft))]
+        fieldnamess = [f.name for f in arcpy.ListFields(join(workspace_projekt,shp_ET_Kaufkraft))]
 
         try:
             arcpy.Delete_management(shp_Statistik)
@@ -2564,10 +2564,10 @@ def main(parameters, messages):
             g.append([str(spalten),"SUM"])
         arcpy.Statistics_analysis(workspace_projekt+shp_ET_Kaufkraft, workspace_projekt+shp_Statistik, g)
 
-        fieldname = [f.name for f in arcpy.ListFields(os.path.join(workspace_projekt,shp_Statistik))]
+        fieldname = [f.name for f in arcpy.ListFields(join(workspace_projekt,shp_Statistik))]
 
-        cur_Statistik= arcpy.SearchCursor(os.path.join(workspace_projekt,shp_Statistik))
-        cur_Standortdaten= arcpy.UpdateCursor(os.path.join(workspace_projekt,shp_Standortdaten))
+        cur_Statistik= arcpy.SearchCursor(join(workspace_projekt,shp_Statistik))
+        cur_Standortdaten= arcpy.UpdateCursor(join(workspace_projekt,shp_Standortdaten))
 
         for einezeile in cur_Statistik:
             for abc in fieldname[2:]:
@@ -2644,20 +2644,20 @@ def main(parameters, messages):
         #shp_siedlungszellendaten
         #shp_kaufkraft
         try:
-            arcpy.DeleteField_management(os.path.join(workspace_projekt,shp_siedlungszellendaten),"KK_Neu")
+            arcpy.DeleteField_management(join(workspace_projekt,shp_siedlungszellendaten),"KK_Neu")
         except:
             pass
 
         try:
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_siedlungszellendaten), "KK_Neu", "DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,shp_siedlungszellendaten), "KK_Neu", "DOUBLE")
 
 
         except:
             print"error"
             return
 
-        cur_Update_sied = arcpy.UpdateCursor(os.path.join(workspace_projekt,shp_siedlungszellendaten))
-        cur_Update_etkk=arcpy.UpdateCursor(os.path.join(workspace_projekt,shp_kaufkraft))
+        cur_Update_sied = arcpy.UpdateCursor(join(workspace_projekt,shp_siedlungszellendaten))
+        cur_Update_etkk=arcpy.UpdateCursor(join(workspace_projekt,shp_kaufkraft))
 
         for a in cur_Update_sied:
             for b in cur_Update_etkk:
@@ -2668,12 +2668,12 @@ def main(parameters, messages):
 
 
         try:
-            arcpy.DeleteField_management(os.path.join(workspace_projekt,shp_siedlungszellendaten),"KK_Neu_2")
+            arcpy.DeleteField_management(join(workspace_projekt,shp_siedlungszellendaten),"KK_Neu_2")
         except:
             pass
 
         try:
-            arcpy.AddField_management(os.path.join(workspace_projekt,shp_siedlungszellendaten), "KK_Neu_2", "DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,shp_siedlungszellendaten), "KK_Neu_2", "DOUBLE")
         except:
             print"error"
             return
@@ -2694,17 +2694,17 @@ def main(parameters, messages):
 
     def einzelhandelszentrali():
 
-        cur_Standortdaten=arcpy.SearchCursor(os.path.join(workspace_projekt,"Standortdaten"))
-        cur_Siedlungszellen=arcpy.SearchCursor(os.path.join(workspace_projekt,"Siedlungszahlendaten"))
+        cur_Standortdaten=arcpy.SearchCursor(join(workspace_projekt,"Standortdaten"))
+        cur_Siedlungszellen=arcpy.SearchCursor(join(workspace_projekt,"Siedlungszahlendaten"))
 
         try:
             arcpy.Delete_management("Einzelhzentrali")
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Einzelhzentrali"))
+            arcpy.Delete_management(join(workspace_projekt,"Einzelhzentrali"))
         except:
             pass
         try:
             arcpy.DeleteFeatures_management("Einzelhzentrali")
-            arcpy.DeleteFeatures_management(os.path.join(workspace_projekt,"Einzelhzentrali"))
+            arcpy.DeleteFeatures_management(join(workspace_projekt,"Einzelhzentrali"))
         except:
             pass
         try:
@@ -2713,17 +2713,17 @@ def main(parameters, messages):
             print"a) Fehler beim erstellen der Tabelle Einzelhzentrali"
             exit(1)
         try:
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Einzelhzentrali"),"Kommune","TEXT")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Einzelhzentrali"),"AGS","TEXT")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Einzelhzentrali"),"Umsatz_vorher","DOUBLE")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Einzelhzentrali"),"Umsatz_nachher","DOUBLE")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Einzelhzentrali"),"Einzelhzentra","DOUBLE")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Einzelhzentrali"),"Einzelhzentrapla","DOUBLE")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Einzelhzentrali"),"Delta","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Einzelhzentrali"),"Kommune","TEXT")
+            arcpy.AddField_management(join(workspace_projekt,"Einzelhzentrali"),"AGS","TEXT")
+            arcpy.AddField_management(join(workspace_projekt,"Einzelhzentrali"),"Umsatz_vorher","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Einzelhzentrali"),"Umsatz_nachher","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Einzelhzentrali"),"Einzelhzentra","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Einzelhzentrali"),"Einzelhzentrapla","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Einzelhzentrali"),"Delta","DOUBLE")
         except:
             pass
 
-        cur_Search_Sied = arcpy.SearchCursor(os.path.join(workspace_projekt,"Siedlungszahlendaten"))
+        cur_Search_Sied = arcpy.SearchCursor(join(workspace_projekt,"Siedlungszahlendaten"))
 
         array_ags=[]
         for zellen in cur_Search_Sied:
@@ -2770,7 +2770,7 @@ def main(parameters, messages):
                 ags_gemeinde_umsatz.append([int(zellen.AGS),zellen.GEN,0,zellen.Lebensmittel,0])
 
         ags_gemeinde_umsatz=sorted(ags_gemeinde_umsatz)
-        cur_Sear_GGEN= arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Gesamtgemeinden"))
+        cur_Sear_GGEN= arcpy.SearchCursor(join(workspace_Basis_Daten,"Gesamtgemeinden"))
 
         array_GGen=[]
         for speicher in cur_Sear_GGEN:
@@ -2834,7 +2834,7 @@ def main(parameters, messages):
 
         entg_ggen_umsatz=sorted(entg_ggen_umsatz)
 
-        cur_Ins_Verlust=arcpy.InsertCursor(os.path.join(workspace_projekt,"Einzelhzentrali"))
+        cur_Ins_Verlust=arcpy.InsertCursor(join(workspace_projekt,"Einzelhzentrali"))
 
         for bb in entg_ggen_umsatz:
             if bb[2]!=0 and bb[3]!=0 and bb[4]!=0:
@@ -2849,8 +2849,8 @@ def main(parameters, messages):
         del cur_Ins_Verlust,ags_gemeinde_umsatz,cur_Siedlungszellen,cur_Standortdaten, array_standortda,array_GGen,entg_ggen_umsatz,array_ggen_umsatz,auswahl,array_ggen_umsatz_Ori
 
 
-        cur_Standortdaten=arcpy.SearchCursor(os.path.join(workspace_projekt,"Standortdaten_planfall"))
-        cur_Siedlungszellen=arcpy.SearchCursor(os.path.join(workspace_projekt,"Siedlungszahlendaten_planfall"))
+        cur_Standortdaten=arcpy.SearchCursor(join(workspace_projekt,"Standortdaten_planfall"))
+        cur_Siedlungszellen=arcpy.SearchCursor(join(workspace_projekt,"Siedlungszahlendaten_planfall"))
 
 
         array_standortda=[]
@@ -2890,7 +2890,7 @@ def main(parameters, messages):
 
 
         ags_gemeinde_umsatz=sorted(ags_gemeinde_umsatz)
-        cur_Sear_GGEN= arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Gesamtgemeinden"))
+        cur_Sear_GGEN= arcpy.SearchCursor(join(workspace_Basis_Daten,"Gesamtgemeinden"))
 
         array_GGen=[]
         for speicher in cur_Sear_GGEN:
@@ -2953,7 +2953,7 @@ def main(parameters, messages):
                 berechnung[4]=0
 
         entg_ggen_umsatz=sorted(entg_ggen_umsatz)
-        cur_Up_Verlust=arcpy.UpdateCursor(os.path.join(workspace_projekt,"Einzelhzentrali"))
+        cur_Up_Verlust=arcpy.UpdateCursor(join(workspace_projekt,"Einzelhzentrali"))
         for updating in cur_Up_Verlust:
             findemich=0
             for arrayeintraege in entg_ggen_umsatz:
@@ -2963,7 +2963,7 @@ def main(parameters, messages):
                     updating.setValue("Einzelhzentrapla",arrayeintraege[4])
                     cur_Up_Verlust.updateRow(updating)
             if findemich==0 and arrayeintraege[2]!=0 and arrayeintraege[3]!=0 and arrayeintraege[4]!=0:
-                cur_Ins_Verlust=arcpy.InsertCursor(os.path.join(workspace_projekt,"Einzelhzentrali"))
+                cur_Ins_Verlust=arcpy.InsertCursor(join(workspace_projekt,"Einzelhzentrali"))
                 ruw= cur_Ins_Verlust.newRow()
                 ruw.setValue("Kommune","SG/Stadt "+ arrayeintraege[1])
                 ruw.setValue("AGS",arrayeintraege[0])
@@ -2975,9 +2975,9 @@ def main(parameters, messages):
                 del cur_Ins_Verlust
 
         del cur_Up_Verlust,ags_gemeinde_umsatz,cur_Siedlungszellen,cur_Standortdaten,array_GGen,entg_ggen_umsatz,array_ggen_umsatz
-        arcpy.CalculateField_management(os.path.join(workspace_projekt,"Einzelhzentrali"), "Delta", "-!Einzelhzentra!+!Einzelhzentrapla!", "PYTHON", "")
+        arcpy.CalculateField_management(join(workspace_projekt,"Einzelhzentrali"), "Delta", "-!Einzelhzentra!+!Einzelhzentrapla!", "PYTHON", "")
 
-        cur_Check_Einzel= arcpy.UpdateCursor(os.path.join(workspace_projekt,"Einzelhzentrali"))
+        cur_Check_Einzel= arcpy.UpdateCursor(join(workspace_projekt,"Einzelhzentrali"))
         for a in cur_Check_Einzel:
             if a.Umsatz_vorher==0. and a.Umsatz_nachher ==0.:
                 cur_Check_Einzel.deleteRow(a)
@@ -2990,16 +2990,16 @@ def main(parameters, messages):
     def verlustrechnung():
 
 
-        cur_Standortdaten=arcpy.UpdateCursor(os.path.join(workspace_projekt,"Standortdaten"))
+        cur_Standortdaten=arcpy.UpdateCursor(join(workspace_projekt,"Standortdaten"))
         try:
             arcpy.Delete_management("Verlustrechnung")
-            arcpy.Delete_management(os.path.join(workspace_projekt,"Verlustrechnung"))
+            arcpy.Delete_management(join(workspace_projekt,"Verlustrechnung"))
         except:
             pass
 
         try:
             arcpy.DeleteFeatures_management("Verlustrechnung")
-            arcpy.DeleteFeatures_management(os.path.join(workspace_projekt,"Verlustrechnung"))
+            arcpy.DeleteFeatures_management(join(workspace_projekt,"Verlustrechnung"))
         except:
             pass
         try:
@@ -3010,17 +3010,17 @@ def main(parameters, messages):
             print a
             exit(1)
         try:
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Verlustrechnung"),"GAGS","LONG")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Verlustrechnung"),"GesamtGem","TEXT")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Verlustrechnung"),"Umsatz_vorher","DOUBLE")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Verlustrechnung"),"Umsatz_nachher","DOUBLE")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Verlustrechnung"),"Differenz","DOUBLE")
-            arcpy.AddField_management(os.path.join(workspace_projekt,"Verlustrechnung"),"Differenz_Proz","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Verlustrechnung"),"GAGS","LONG")
+            arcpy.AddField_management(join(workspace_projekt,"Verlustrechnung"),"GesamtGem","TEXT")
+            arcpy.AddField_management(join(workspace_projekt,"Verlustrechnung"),"Umsatz_vorher","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Verlustrechnung"),"Umsatz_nachher","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Verlustrechnung"),"Differenz","DOUBLE")
+            arcpy.AddField_management(join(workspace_projekt,"Verlustrechnung"),"Differenz_Proz","DOUBLE")
         except:
             pass
 
-        cur_Ins_Verlust=arcpy.InsertCursor(os.path.join(workspace_projekt,"Verlustrechnung"))
-        cur_Search_Sied = arcpy.SearchCursor(os.path.join(workspace_projekt,"Siedlungszahlendaten"))
+        cur_Ins_Verlust=arcpy.InsertCursor(join(workspace_projekt,"Verlustrechnung"))
+        cur_Search_Sied = arcpy.SearchCursor(join(workspace_projekt,"Siedlungszahlendaten"))
 
         array_ags=[]
         for zellen in cur_Search_Sied:
@@ -3058,7 +3058,7 @@ def main(parameters, messages):
 
         #zur gesamtgemeinde hinzufuegen
 
-        cur_Sear_GGEN= arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Gesamtgemeinden"))
+        cur_Sear_GGEN= arcpy.SearchCursor(join(workspace_Basis_Daten,"Gesamtgemeinden"))
 
         array_GGen=[]
         for speicher in cur_Sear_GGEN:
@@ -3110,7 +3110,7 @@ def main(parameters, messages):
 
         del array_ggen_umsatz,entg_ggen_umsatz,array_GGen,array_standortda,cur_Ins_Verlust
         # ################################################################################################################
-        cur_Standortdaten=arcpy.UpdateCursor(os.path.join(workspace_projekt,"Standortdaten_planfall"))
+        cur_Standortdaten=arcpy.UpdateCursor(join(workspace_projekt,"Standortdaten_planfall"))
 
         array_standortda=[]
         for speicher in cur_Standortdaten:
@@ -3137,7 +3137,7 @@ def main(parameters, messages):
 
         #zur gesamtgemeinde hinzufuegen
 
-        cur_Sear_GGEN= arcpy.SearchCursor(os.path.join(workspace_Basis_Daten,"Gesamtgemeinden"))
+        cur_Sear_GGEN= arcpy.SearchCursor(join(workspace_Basis_Daten,"Gesamtgemeinden"))
 
         array_GGen=[]
         for speicher in cur_Sear_GGEN:
@@ -3177,7 +3177,7 @@ def main(parameters, messages):
 
         print "Planfall", entg_ggen_umsatz
         planfall_entg_ggen_umsatz=entg_ggen_umsatz
-        cur_UP_Verlust=arcpy.UpdateCursor(os.path.join(workspace_projekt,"Verlustrechnung"))
+        cur_UP_Verlust=arcpy.UpdateCursor(join(workspace_projekt,"Verlustrechnung"))
 
         for eintraege in cur_UP_Verlust:
             foundyou=0
@@ -3189,7 +3189,7 @@ def main(parameters, messages):
                     cur_UP_Verlust.updateRow(eintraege)
 
             if foundyou==0:
-                cur_Ins_Verlust=arcpy.InsertCursor(os.path.join(workspace_projekt,"Verlustrechnung"))
+                cur_Ins_Verlust=arcpy.InsertCursor(join(workspace_projekt,"Verlustrechnung"))
 
                 row= cur_Ins_Verlust.newRow()
                 row.setValue("GAGS",zack[0])
@@ -3204,8 +3204,8 @@ def main(parameters, messages):
 
 
     # ###################################################################################################################################
-        cur_Zentren= arcpy.SearchCursor(os.path.join(workspace_projekt,"Zentren"))
-        cur_Standortdaten=arcpy.UpdateCursor(os.path.join(workspace_projekt,"Standortdaten"))
+        cur_Zentren= arcpy.SearchCursor(join(workspace_projekt,"Zentren"))
+        cur_Standortdaten=arcpy.UpdateCursor(join(workspace_projekt,"Standortdaten"))
 
 
         array_standortda=[]
@@ -3260,7 +3260,7 @@ def main(parameters, messages):
                 if pfund==0:
                     final_zentren.append([x,tz[1],tz[2]])
 
-        cur_Ins_Verlust=arcpy.InsertCursor(os.path.join(workspace_projekt,"Verlustrechnung"))
+        cur_Ins_Verlust=arcpy.InsertCursor(join(workspace_projekt,"Verlustrechnung"))
         final_zentren=final_zentren+rest
         print final_zentren
 
@@ -3273,8 +3273,8 @@ def main(parameters, messages):
 
         del cur_Ins_Verlust,rest,final_zentren,array_zentren_ags_umsatz,nullfall_entg_ggen_umsatz
     # #############################################################################################
-        cur_Zentren= arcpy.SearchCursor(os.path.join(workspace_projekt,"Zentren"))
-        cur_Standortdaten=arcpy.UpdateCursor(os.path.join(workspace_projekt,"Standortdaten_planfall"))
+        cur_Zentren= arcpy.SearchCursor(join(workspace_projekt,"Zentren"))
+        cur_Standortdaten=arcpy.UpdateCursor(join(workspace_projekt,"Standortdaten_planfall"))
 
 
         array_standortda=[]
@@ -3332,7 +3332,7 @@ def main(parameters, messages):
         final_zentren=final_zentren+rest
         print final_zentren
 
-        cur_UP_Verlust=arcpy.UpdateCursor(os.path.join(workspace_projekt,"Verlustrechnung"))
+        cur_UP_Verlust=arcpy.UpdateCursor(join(workspace_projekt,"Verlustrechnung"))
 
         for eintraege in cur_UP_Verlust:
             for adden in final_zentren:
@@ -3344,8 +3344,8 @@ def main(parameters, messages):
         del rest,final_zentren,array_zentren_ags_umsatz,cur_UP_Verlust,planfall_entg_ggen_umsatz
 
 
-        arcpy.CalculateField_management(os.path.join(workspace_projekt,"Verlustrechnung"), "Differenz", "-!Umsatz_vorher!+!Umsatz_nachher!", "PYTHON", "")
-        arcpy.CalculateField_management(os.path.join(workspace_projekt,"Verlustrechnung"), "Differenz_Proz", "!Differenz!*100/!Umsatz_vorher!", "PYTHON", "")
+        arcpy.CalculateField_management(join(workspace_projekt,"Verlustrechnung"), "Differenz", "-!Umsatz_vorher!+!Umsatz_nachher!", "PYTHON", "")
+        arcpy.CalculateField_management(join(workspace_projekt,"Verlustrechnung"), "Differenz_Proz", "!Differenz!*100/!Umsatz_vorher!", "PYTHON", "")
 
     def Umsatz_dif():
 
@@ -3394,10 +3394,10 @@ def main(parameters, messages):
 
         del cur_ins,cur_Statistik,cur_Statistik_plan
 
-        fieldnames = [f.name for f in arcpy.ListFields(os.path.join(workspace_projekt,"Diff_Umsatz"))]
+        fieldnames = [f.name for f in arcpy.ListFields(join(workspace_projekt,"Diff_Umsatz"))]
         fieldnames=fieldnames[2:]
         loeschfield=[]
-        upd_cur_diif_um=arcpy.UpdateCursor(os.path.join(workspace_projekt,"Diff_Umsatz"))
+        upd_cur_diif_um=arcpy.UpdateCursor(join(workspace_projekt,"Diff_Umsatz"))
         for a in upd_cur_diif_um:
             for spaltenchecker in fieldnames:
         ##            print spaltenchecker, a.getValue(spaltenchecker)
@@ -3408,7 +3408,7 @@ def main(parameters, messages):
         del upd_cur_diif_um ,a
         for zz in loeschfield:
     ##        print zz
-            arcpy.DeleteField_management (os.path.join(workspace_projekt,"Diff_Umsatz"), str(zz))
+            arcpy.DeleteField_management (join(workspace_projekt,"Diff_Umsatz"), str(zz))
 
     gc.collect()
 
@@ -3417,21 +3417,21 @@ def main(parameters, messages):
     #Pfade einrichten
     base_path = str(sys.path[0]).split("2_Tool")[0]
 
-    workspace_Basis = os.path.join(base_path, '1_Basisdaten', 'FGBD_01_Basisdaten_deutschland.gdb')
-    workspace_Basis_Daten = os.path.join(base_path, '2_Tool', '34_Standortkonkurrenz_Supermaerkte','FGDB_34_Standortkonkurrenz_Supermaerkte_Tool.gdb')
-    workspace_projekt = os.path.join(base_path, '3_Projekte', projektname,
+    workspace_Basis = join(base_path, '1_Basisdaten', 'FGBD_01_Basisdaten_deutschland.gdb')
+    workspace_Basis_Daten = join(base_path, '2_Tool', '34_Standortkonkurrenz_Supermaerkte','FGDB_34_Standortkonkurrenz_Supermaerkte_Tool.gdb')
+    workspace_projekt = join(base_path, '3_Projekte', projektname,
                                      'FGDB_34_Standortkonkurrenz_Supermaerkte_' + projektname + '.gdb')
 
 
     arcpy.env.workspace=workspace_projekt
     arcpy.env.overwriteOutput = True
 
-    tablepath_neuer_markt = os.path.join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte_'+projektname+'.gdb','Neuer_Markt')
-    tablepath_siedlungszellen = os.path.join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte_'+projektname+'.gdb','Siedlungszahlendaten')
-    tablepath_standorte = os.path.join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte_'+projektname+'.gdb','Standortdaten')
-    tablepath_neuerMarkt = os.path.join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte_'+projektname+'.gdb','Neuer_Markt')
-    tablepath_zentren = os.path.join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte_'+projektname+'.gdb','Zentren')
-    tablepath_matrix = os.path.join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte_'+projektname+'.gdb','Distanzmatrix_planfall')
+    tablepath_neuer_markt = join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte.gdb','Neuer_Markt')
+    tablepath_siedlungszellen = join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte.gdb','Siedlungszahlendaten')
+    tablepath_standorte = join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte.gdb','Standortdaten')
+    tablepath_neuerMarkt = join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte.gdb','Neuer_Markt')
+    tablepath_zentren = join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte.gdb','Zentren')
+    tablepath_matrix = join(base_path,'3_Projekte',projektname,'FGDB_34_Standortkonkurrenz_Supermaerkte.gdb','Distanzmatrix_planfall')
 
     if arcpy.Exists(tablepath_siedlungszellen) and  arcpy.Exists(tablepath_standorte)and  arcpy.Exists(tablepath_neuerMarkt) and  arcpy.Exists(tablepath_zentren) and arcpy.Exists(tablepath_neuer_markt)and arcpy.Exists(tablepath_matrix):
         messages.AddMessage("Alle Daten vorhanden und bereit. Tool wird gestartet...")
@@ -3505,4 +3505,3 @@ def main(parameters, messages):
     ErgebnisExport(projektname)
 
     gc.collect()
-    

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import _rpcpath
 import contextlib
 import os
 import sys
@@ -8,11 +9,11 @@ import arcpy
 import bewertung_wohnflaechendichte, Bodenbedeckungbeschreiben
 import schutzwuerdigeBoedenTesten, oekologische_folgen
 import imp
-BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 
+BASE_PATH = os.path.abspath(join(os.path.dirname(__file__),
                                          '..', '..'))
-LIB_PATH = os.path.join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
-project_lib = imp.load_source('project_lib', 
-                              os.path.join(LIB_PATH, 'project_lib.py'))
+LIB_PATH = join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
+project_lib = imp.load_source('project_lib',
+                              join(LIB_PATH, 'project_lib.py'))
 
 class Toolbox(object):
     def __init__(self):
@@ -27,47 +28,47 @@ class wohnflaechendichte(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             i=-1
-        
+
             #set project
             i+=1 ; self.params[i].filter.list = list_projects
-        
+
             heading = u"Durchschnittliche überbaute Fläche nach Gebäudetyp".encode('CP1252')
             self.params[1].category = heading
             self.params[2].category = heading
             self.params[3].category = heading
             self.params[4].category = heading
-        
+
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'3 Bewertung der Wohnfl\xe4chendichte'
         self.canRunInBackground = False
         reload(bewertung_wohnflaechendichte)
-        
+
     def getParameterInfo(self):
         # Name_des_Projektes
         param_1 = arcpy.Parameter()
@@ -124,9 +125,9 @@ class wohnflaechendichte(object):
 
         parameters = [param_1, param_2, param_3, param_4, param_5]
         validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()    
+        validator(parameters).initializeParameters()
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -139,7 +140,7 @@ class wohnflaechendichte(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         bewertung_wohnflaechendichte.main(parameters, messages)
-            
+
 
 class BodenbedeckungPlanfall(object):
     """F:\ggr Projekte\RPC_Tools\2_Tool\F_Flaeche_und_Oekologie\F_Fläche und Ökologie.tbx\BodenbedeckungPlanfall"""
@@ -148,32 +149,32 @@ class BodenbedeckungPlanfall(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             list_teilflaechen = []
-        
+
             i=-1
-        
+
             #Filterliste fUer Bedeckungsarten
             bodenbedeckungListe =["Ueberbaute Flaechen","Asphalt, Beton","Platten","Kleinpflaster","Wassergebundene Decke, Rasengittersteine","Offener Boden, Acker","Rasen","Baeume, Straeucher","Stauden","Wiese","Natuerliche Wasserflaeche"]
             bodenbedeckungListe.sort()
             bodenbedeckungListe = list(set(bodenbedeckungListe))
             #set project
             i+=1 ; self.params[i].filter.list = list_projects
-        
+
             #set point
             i+=1 ; self.params[i].filter.list = list_teilflaechen
-        
+
             heading = "01_Bodenbedeckung"
             i+=1 ; self.params[i].category = heading
             self.params[i].filter.list = bodenbedeckungListe
@@ -181,12 +182,12 @@ class BodenbedeckungPlanfall(object):
             #i+=1 ; self.params[i].category = heading
             #self.params[i].filter.list = bodenbedeckungListe
             #i+=1 ; self.params[i].category = heading;self.params[i].enabled = 1
-        
+
             heading = "02_Speichern"
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading ;self.params[i].enabled = 0
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
@@ -194,22 +195,22 @@ class BodenbedeckungPlanfall(object):
         #Projekt auswaehlen
             i=-1
             i+=1
-        
+
             self.params[5].value = "Bitte waehlen Sie das Projekt aus"
-        
+
         #Wert i==0
             if self.params[i].altered and not self.params[i].hasBeenValidated:
                 projectname = self.params[i].value
-        
-                tablepath_teilflaechen = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
-        
+
+                tablepath_teilflaechen = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt.gdb','Teilflaechen_Plangebiet')
+
                 rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
                 list_teilflaechen = []
                 for row in rows_teilflaechen :
                     list_teilflaechen.append(row.Name)
                 list_teilflaechen = list(set(list_teilflaechen))
-        
-        
+
+
                 i+=1 ; self.params[i].filter.list = list_teilflaechen
                 self.params[5].value = "Bitte waehlen Sie die zu bearbeitende Teilflaeche aus"
         ###UeberprUefen ob Vornutzungsfelder vorhanden, ansonsten hinzufUegen
@@ -250,16 +251,16 @@ class BodenbedeckungPlanfall(object):
         ##            arcpy.AddField_management(tablepath_teilflaechen,"Anteil2","FLOAT")
         ##        if(anteil3Vorhanden==False):
         ##            arcpy.AddField_management(tablepath_teilflaechen,"Anteil3","FLOAT")
-        
-        
+
+
         #Teilflaeche auswaehlen
             i=1
             if self.params[i].altered and not self.params[i].hasBeenValidated:
-        
+
                 projectname = self.params[i-1].value
                 flaechenname = self.params[i].value
-        
-                tablepath_teilflaechen = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
+
+                tablepath_teilflaechen = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt.gdb','Teilflaechen_Plangebiet')
                 sql = "Name ='"+self.params[1].value +"'"
                 rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen,sql)
         ##        try:
@@ -287,7 +288,7 @@ class BodenbedeckungPlanfall(object):
         ##        i+=1 ; self.params[i].value = vornutzung3
         ##        i+=1 ; self.params[i].value = anteil3
                 self.params[5].value = "Zum Speichern bitte das Kaestchen anklicken"
-        
+
             if self.params[4].value == True and not self.params[4].hasBeenValidated:
                 #val = win32ui.MessageBox(r"Werte gespeichert, bitte den naechsten Punkt auswaehlen oder die Eingabe mit Klick auf 'OK' beenden","Werte gespeichert")
                 #sql = "Name ='"+self.params[1].value +"'"
@@ -318,26 +319,26 @@ class BodenbedeckungPlanfall(object):
                 #Projektname
                 projekt = self.params[0].value
                 gdb = "FGDB_Definition_Projekt_" + projekt + ".gdb"
-                pfad_flaeche = os.path.join(BASE_PATH,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
+                pfad_flaeche = join(BASE_PATH,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
         ##        try:
         ##            arcpy.AddField_management(pfad_flaeche,"area_hektares","FLOAT")
         ##        except:
         ##            messages.AddMessage("")
-        
+
         ##        arcpy.CalculateField_management(pfad_flaeche,"area_hektares","!shape.area@HECTARES!","PYTHON_9.3")
-        
+
                 sql = "Name = '"+ self.params[1].value +"'"
                 cursor = arcpy.SearchCursor(pfad_flaeche,sql)
                 for row in cursor:
                     teilflaeche = row.Flaeche_ha
-        
+
                 NF_Anteil = self.params[3].value
                 #PF_Anteil = self.params[5].value
                 NF_Absolut = teilflaeche * (float(NF_Anteil)/100)
                 #PF_Absolut = teilflaeche * (float(PF_Anteil)/100)
-        
+
                 projectname = self.params[0].value
-                tabelle_bodenbedeckung = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Flaeche_und_Oekologie_Projekt_'+projectname+'.gdb','Bodenbedeckung')
+                tabelle_bodenbedeckung = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Flaeche_und_Oekologie.gdb','Bodenbedeckung')
                 Insert = arcpy.InsertCursor(tabelle_bodenbedeckung)
                 row = Insert.newRow()
                 row.Teilflaeche = self.params[1].value
@@ -345,12 +346,12 @@ class BodenbedeckungPlanfall(object):
                 #row.setValue(PF_Spalte,PF_Absolut)
                 Insert.insertRow(row)
                 #Die gespeicherten Werte sind Hektar, berechnet durch den angegebeben Anteil
-        
+
                 self.params[5].value ="Die Eingaben fuer die Teilflaeche " + str(self.params[1].value) + " wurden gespeichert. Waehlen Sie die naechste Bodenbedeckung dieser Teilflaeche aus, waehlen Sie eine weitere Teilflaeche oder beenden Sie die Eingabe mit 'OK'"
                 self.params[4].value = False
-        
+
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
@@ -413,12 +414,12 @@ class BodenbedeckungPlanfall(object):
         param_6.parameterType = 'Required'
         param_6.direction = 'Input'
         param_6.datatype = u'Zeichenfolge'
-    
+
         parameters = [param_1, param_2, param_3, param_4, param_5, param_6]
         validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()    
+        validator(parameters).initializeParameters()
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -437,40 +438,40 @@ class Ueberschneidung(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-      
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-        
+
             i=-1
-        
+
             #set project
             i+=1 ; self.params[i].filter.list = list_projects
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
+
     def __init__(self):
         self.label = u'4 Auf \xdcberschneidungen testen'
         self.canRunInBackground = False
         reload(schutzwuerdigeBoedenTesten)
-        
+
     def getParameterInfo(self):
         # Projekt
         param_1 = arcpy.Parameter()
@@ -480,12 +481,12 @@ class Ueberschneidung(object):
         param_1.direction = 'Input'
         param_1.datatype = u'Zeichenfolge'
         param_1.filter.list = []
-    
+
         parameters = [param_1]
         validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()    
+        validator(parameters).initializeParameters()
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -506,30 +507,30 @@ class Vornutzungbeschreiben(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-      
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-        
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
             list_teilflaechen = []
             i=-1
-        
+
             #Filterliste fUer Bedeckungsarten
             bodenbedeckungListe =["Ueberbaute Flaechen","Asphalt, Beton","Platten","Kleinpflaster","Wassergebundene Decke, Rasengittersteine","Offener Boden, Acker","Rasen","Baeume, Straeucher","Stauden","Wiese","Natuerliche Wasserflaeche"]
             bodenbedeckungListe.sort()
             bodenbedeckungListe = list(set(bodenbedeckungListe))
             #set project
             i+=1 ; self.params[i].filter.list = list_projects
-        
+
             #set point
             i+=1 ; self.params[i].filter.list = list_teilflaechen
-        
+
             heading = "01_Bodenbedeckung"
             i+=1 ; self.params[i].category = heading
             self.params[i].filter.list = bodenbedeckungListe
@@ -537,35 +538,35 @@ class Vornutzungbeschreiben(object):
             #i+=1 ; self.params[i].category = heading
             #self.params[i].filter.list = bodenbedeckungListe
             #i+=1 ; self.params[i].category = heading;self.params[i].enabled = 1
-        
+
             heading = "02_Speichern"
             i+=1 ; self.params[i].category = heading
             i+=1 ; self.params[i].category = heading ;self.params[i].enabled = 0
             return
-      
+
         def updateParameters(self):
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
-            has been changed."""        
+            has been changed."""
         #Projekt auswaehlen
             i=-1
             i+=1
-        
+
             self.params[5].value = "Bitte waehlen Sie das Projekt aus"
-        
+
         #Wert i==0
             if self.params[i].altered and not self.params[i].hasBeenValidated:
                 projectname = self.params[i].value
-        
-                tablepath_teilflaechen = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
-        
+
+                tablepath_teilflaechen = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt.gdb','Teilflaechen_Plangebiet')
+
                 rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
                 list_teilflaechen = []
                 for row in rows_teilflaechen :
                     list_teilflaechen.append(row.Name)
                 list_teilflaechen = list(set(list_teilflaechen))
-        
-        
+
+
                 i+=1 ; self.params[i].filter.list = list_teilflaechen
                 self.params[5].value = "Bitte waehlen Sie die zu bearbeitende Teilflaeche aus"
         ###UeberprUefen ob Vornutzungsfelder vorhanden, ansonsten hinzufUegen
@@ -606,16 +607,16 @@ class Vornutzungbeschreiben(object):
         ##            arcpy.AddField_management(tablepath_teilflaechen,"Anteil2","FLOAT")
         ##        if(anteil3Vorhanden==False):
         ##            arcpy.AddField_management(tablepath_teilflaechen,"Anteil3","FLOAT")
-        
-        
+
+
         #Teilflaeche auswaehlen
             i=1
             if self.params[i].altered and not self.params[i].hasBeenValidated:
-        
+
                 projectname = self.params[i-1].value
                 flaechenname = self.params[i].value
-        
-                tablepath_teilflaechen = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt_'+projectname+'.gdb','Teilflaechen_Plangebiet')
+
+                tablepath_teilflaechen = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Definition_Projekt.gdb','Teilflaechen_Plangebiet')
                 sql = "Name ='"+self.params[1].value +"'"
                 rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen,sql)
         ##        try:
@@ -643,7 +644,7 @@ class Vornutzungbeschreiben(object):
         ##        i+=1 ; self.params[i].value = vornutzung3
         ##        i+=1 ; self.params[i].value = anteil3
                 self.params[5].value = "Zum Speichern bitte das Kaestchen anklicken"
-        
+
             if self.params[4].value == True and not self.params[4].hasBeenValidated:
                 #val = win32ui.MessageBox(r"Werte gespeichert, bitte den naechsten Punkt auswaehlen oder die Eingabe mit Klick auf 'OK' beenden","Werte gespeichert")
                 #sql = "Name ='"+self.params[1].value +"'"
@@ -674,20 +675,20 @@ class Vornutzungbeschreiben(object):
                 #Projektname
                 projekt = self.params[0].value
                 gdb = "FGDB_Definition_Projekt_" + projekt + ".gdb"
-                pfad_flaeche = os.path.join(BASE_PATH,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
-        
+                pfad_flaeche = join(BASE_PATH,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
+
                 sql = "Name = '"+ self.params[1].value +"'"
                 cursor = arcpy.SearchCursor(pfad_flaeche,sql)
                 for row in cursor:
                     teilflaeche = row.Flaeche_ha
-        
+
                 #NF_Anteil = self.params[3].value
                 PF_Anteil = self.params[3].value
                 #NF_Absolut = teilflaeche * (float(NF_Anteil)/100)
                 PF_Absolut = teilflaeche * (float(PF_Anteil)/100)
-        
+
                 projectname = self.params[0].value
-                tabelle_bodenbedeckung = os.path.join(BASE_PATH,'3_Projekte',projectname,'FGDB_Flaeche_und_Oekologie_Projekt_'+projectname+'.gdb','Bodenbedeckung')
+                tabelle_bodenbedeckung = join(BASE_PATH,'3_Projekte',projectname,'FGDB_Flaeche_und_Oekologie.gdb','Bodenbedeckung')
                 Insert = arcpy.InsertCursor(tabelle_bodenbedeckung)
                 row = Insert.newRow()
                 row.Teilflaeche = self.params[1].value
@@ -695,12 +696,12 @@ class Vornutzungbeschreiben(object):
                 row.setValue(PF_Spalte,PF_Absolut)
                 Insert.insertRow(row)
                 #Die gespeicherten Werte sind Hektar, berechnet durch den angegebeben Anteil
-        
+
                 self.params[5].value ="Die Eingaben fuer die Teilflaeche " + str(self.params[1].value) + " wurden gespeichert. Waehlen Sie die naechste Bodenbedeckung dieser Teilflaeche aus, waehlen Sie eine weitere Teilflaeche oder beenden Sie die Eingabe mit 'OK'"
                 self.params[4].value = False
-        
+
             return
-      
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
@@ -709,7 +710,7 @@ class Vornutzungbeschreiben(object):
         self.label = u'2 Bodenbedeckung Planfall beschreiben'
         self.canRunInBackground = False
         #reload(Bodenbedeckungbeschreiben)
-        
+
     def getParameterInfo(self):
         # Projekt
         param_1 = arcpy.Parameter()
@@ -766,9 +767,9 @@ class Vornutzungbeschreiben(object):
 
         parameters = [param_1, param_2, param_3, param_4, param_5, param_6]
         validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()    
+        validator(parameters).initializeParameters()
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -787,25 +788,25 @@ class OekologischeFolgen(object):
     class ToolValidator(object):
         """Class for validating a tool's parameter values and controlling
         the behavior of the tool's dialog."""
-    
+
         def __init__(self, parameters):
             """Setup arcpy and the list of tool parameters."""
             self.params = parameters
-    
+
         def initializeParameters(self):
             """Refine the properties of a tool's parameters.  This method is
             called when the tool is opened."""
-            
+
             list_projects = project_lib.get_projects()
             list_projects = sorted(list_projects)
-    
+
             i=-1
-    
+
             #set project
             i+=1 ; self.params[i].filter.list = list_projects
-    
+
             return
-    
+
         def updateParameters(self):
             i=0
     #        if self.params[i].altered and not self.params[i].hasBeenValidated:
@@ -818,57 +819,57 @@ class OekologischeFolgen(object):
     #            #Projektname
     #            projekt = self.params[i].value
     #            gdb = "FGDB_Definition_Projekt_" + projekt + ".gdb"
-    #            pfad_flaeche = os.path.join(base_path,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
-    
+    #            pfad_flaeche = join(base_path,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
+
     #            arcpy.AddField_management(pfad_flaeche,"area_hektares","FLOAT")
     #            arcpy.CalculateField_management(pfad_flaeche,"area_hektares","!shape.area@HECTARES!","PYTHON_9.3")
-    
+
     #            flaechengroesse = 0
     #            cursor = arcpy.SearchCursor(pfad_flaeche)
     #            for flaeche in cursor:
     #                flaechengroesse = flaechengroesse + flaeche.area_hektares
     #            flaechengroesse = str(flaechengroesse).replace(",",".")
     #            self.params[4].value = flaechengroesse
-    
+
             if self.params[i].altered and not self.params[i].hasBeenValidated:
                 #Projektname
                 projekt = self.params[i].value
                 gdb = "FGDB_Definition_Projekt_" + projekt + ".gdb"
-                pfad_umfang = os.path.join(BASE_PATH,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
-    
-    
+                pfad_umfang = join(BASE_PATH,'3_Projekte',projekt,gdb,"Teilflaechen_Plangebiet")
+
+
             #try:
                 #arcpy.CalculateField_management(pfad_umfang,"umfang_meter","!shape.length@METER!","PYTHON_9.3")
             #except:
-            #pass    
-    
+            #pass
+
                 flaechenumfang = 0
                 cursor = arcpy.SearchCursor(pfad_umfang)
                 for umfang in cursor:
                     flaechenumfang = flaechenumfang + umfang.umfang_meter
-    
+
                 flaechenumfang = round(flaechenumfang)
                 flaechenumfang = str(flaechenumfang)
                 self.params[3].value = flaechenumfang
-    
-    
-    
+
+
+
             """Modify the values and properties of parameters before internal
             validation is performed.  This method is called whenever a parameter
             has been changed."""
             return
-    
+
         def updateMessages(self):
             """Modify the messages created by internal validation for each tool
             parameter.  This method is called after internal validation."""
             return
-    
-    
+
+
     def __init__(self):
         self.label = u'5 \xd6kologische Folgen berechnen'
         self.canRunInBackground = False
         reload(oekologische_folgen)
-        
+
     def getParameterInfo(self):
         # Projekt_auswählen
         param_1 = arcpy.Parameter()
@@ -924,9 +925,9 @@ class OekologischeFolgen(object):
 
         parameters = [param_1, param_2, param_3, param_4, param_5, param_6]
         validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()    
+        validator(parameters).initializeParameters()
         return parameters
-    
+
     def isLicensed(self):
         return True
     def updateParameters(self, parameters):
@@ -939,4 +940,3 @@ class OekologischeFolgen(object):
             return validator(parameters).updateMessages()
     def execute(self, parameters, messages):
         oekologische_folgen.main(parameters, messages)
-            

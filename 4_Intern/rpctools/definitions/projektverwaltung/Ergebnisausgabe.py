@@ -2,7 +2,7 @@
 # ---------------------------------------------------------------------------
 # REGIOPROJEKTCHECK
 # Ergebnisausgabe.py
-# 
+#
 # Description: Export fact sheet for every RPC project
 # PROJECT URL: http://www.regioprojektcheck.de
 #
@@ -24,18 +24,18 @@ import xlsxwriter
 
 # Pfade setzen
 base_path = str(sys.path[0]).split("2_Tool")[0]
-workspace_factsheet = os.path.join(base_path,'3_Projekte',projektname,'FGDB_11_Definition_Projekt_'+projektname+'.gdb')
-tablepath_vor = os.path.join(workspace_factsheet,'Vornutzungen_Details_Prozent')
-tablepath_teil = os.path.join(workspace_factsheet,'Teilflaechen_Plangebiet')
-tablepath_neu  = os.path.join(workspace_factsheet,'Flaechenbilanz_Planung_gruppiert')
-tablepath_name = os.path.join(workspace_factsheet,'Projektrahmendaten')
-tablepath_zeit = os.path.join(workspace_factsheet,'Gebaeude_Details')
-tablepath_WE = os.path.join(workspace_factsheet,'Wohneinheiten_Details')
-tablepath_Gewerbe = os.path.join(workspace_factsheet,'Gewerbe_Beschaeftigte_Max')
-tablepath_EZH = os.path.join(workspace_factsheet,'Versorgung_Verkaufsflaechen_Max')
-logo = os.path.join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
-ausgabeordner = os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
-excelpfad = os.path.join(ausgabeordner,'11_Definition_Projekt.xlsx')
+workspace_factsheet = join(base_path,'3_Projekte',projektname,'FGDB_11_Definition_Projekt.gdb')
+tablepath_vor = join(workspace_factsheet,'Vornutzungen_Details_Prozent')
+tablepath_teil = join(workspace_factsheet,'Teilflaechen_Plangebiet')
+tablepath_neu  = join(workspace_factsheet,'Flaechenbilanz_Planung_gruppiert')
+tablepath_name = join(workspace_factsheet,'Projektrahmendaten')
+tablepath_zeit = join(workspace_factsheet,'Gebaeude_Details')
+tablepath_WE = join(workspace_factsheet,'Wohneinheiten_Details')
+tablepath_Gewerbe = join(workspace_factsheet,'Gewerbe_Beschaeftigte_Max')
+tablepath_EZH = join(workspace_factsheet,'Versorgung_Verkaufsflaechen_Max')
+logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+ausgabeordner = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
+excelpfad = join(ausgabeordner,'11_Definition_Projekt.xlsx')
 
 try:
     os.remove(excelpfad)
@@ -208,12 +208,12 @@ for n,i in enumerate(data_vor): # nur Werte >0 in die Tabelle schreiben um Label
 		ws2.write(n+1,2,data_vor[n], percent)
 for n,i in enumerate(data_neu):
 	if i > 0:
-		ws2.write(n+1,1,data_neu[n], percent)	
+		ws2.write(n+1,1,data_neu[n], percent)
 
 
-		
-######## 5. Diagramm Flächenbilanz erstellen ########		
-		
+
+######## 5. Diagramm Flächenbilanz erstellen ########
+
 # Chartobjekt erstellen, Diagramm formatieren
 chart = wb.add_chart({'type': 'bar', 'subtype': 'percent_stacked'})
 chart.set_size({'width': 1170, 'height': 300})
@@ -234,10 +234,10 @@ chart.set_x_axis({
 		'color': '#7f7f7f',
 	},
 	'major_gridlines': {
-		'visible': True, 
+		'visible': True,
 		'line': {
-			'width': 0.75, 
-			'dash_type': 'dash', 
+			'width': 0.75,
+			'dash_type': 'dash',
 			'color': '#bfbfbf',
 		}
 	}
@@ -269,10 +269,10 @@ ws2.hide()
 
 
 
-######## 6. Miniaturkarte und Logo einfügen ########	
+######## 6. Miniaturkarte und Logo einfügen ########
 
 # Karte in Excelmappe einfuegen
-minimap = os.path.join(os.path.join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen', '11_Minimap.jpg'))
+minimap = join(join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Abbildungen', '11_Minimap.jpg'))
 ws1.insert_image('L5', minimap, {'x_scale': 0.29, 'y_scale': 0.25}) #Korrigiert Verzerrung die bei 1x1 auftritt
 ws1.write(3, 11, 'ÜBERSICHTSKARTE'.decode('utf-8'), bold)
 

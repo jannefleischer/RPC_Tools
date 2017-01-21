@@ -21,38 +21,38 @@ import arcpy
 def main(parameters, messages):
     #Variablen definieren
     projektname = parameters[0].valueAsText
-    
+
     #aktueller Pfad
     rootPfad = str(sys.path[0]).split("2_Tool")[0]
-    #Pfad zur Ergebnistabelle    
-    
-    ergebnisTabelle = os.path.join(rootPfad,'3_Projekte',projektname,'FGDB_Flaeche_und_Oekologie_Projekt_'+projektname+'.gdb','Ergebnisse_oekologischeWertigkeit')
-    #ergebnisTabelle = rootPfad + "\\3_Projekte\\" + projektname + "\\FGDB_Flaeche_und_Oekologie_Projekt_" + projektname + ".gdb\\Ergebnisse_oekologischeWertigkeit"
-    
-    workspace_basis = os.path.join(rootPfad,"1_Basisdaten","FGBD_Basisdaten_deutschland.gdb")
+    #Pfad zur Ergebnistabelle
+
+    ergebnisTabelle = join(rootPfad,'3_Projekte',projektname,'FGDB_Flaeche_und_Oekologie.gdb','Ergebnisse_oekologischeWertigkeit')
+    #ergebnisTabelle = rootPfad + "\\3_Projekte\\" + projektname + "\\FGDB_Flaeche_und_Oekologie_" + projektname + ".gdb\\Ergebnisse_oekologischeWertigkeit"
+
+    workspace_basis = join(rootPfad,"1_Basisdaten","FGBD_Basisdaten_deutschland.gdb")
     #workspace_basis = rootPfad+'\\1_Basisdaten\\FGBD_Basisdaten_deutschland.gdb\\'
-    
-    workspace_projekt = os.path.join(rootPfad,'3_Projekte',projektname,'FGDB_Definition_Projekt_'+projektname+'.gdb')
-    #workspace_projekt = rootPfad+'\\3_Projekte\\'+projektname+'\\FGDB_Definition_Projekt_'+projektname+'.gdb\\'
-    
-    workspace_ergebnisse = os.path.join(rootPfad,'3_Projekte',projektname,'FGDB_Flaeche_und_Oekologie_Projekt_'+projektname+'.gdb')
-    #workspace_ergebnisse = rootPfad +'\\3_Projekte\\'+projektname+'\\FGDB_36_Flaeche_und_Oekologie_Projekt_'+projektname+'.gdb\\'
-    
+
+    workspace_projekt = join(rootPfad,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    #workspace_projekt = rootPfad+'\\3_Projekte\\'+projektname+'\\FGDB_Definition_Projekt.gdb\\'
+
+    workspace_ergebnisse = join(rootPfad,'3_Projekte',projektname,'FGDB_Flaeche_und_Oekologie.gdb')
+    #workspace_ergebnisse = rootPfad +'\\3_Projekte\\'+projektname+'\\FGDB_36_Flaeche_und_Oekologie.gdb\\'
+
     arcpy.env.overwriteOutput = True
     ##Daten für den Projektraum zusammenstellen
     #AGS aus den Grundlagendaten extrahieren
     #Wohnfläche und Nettobauland aus den Grundlagendaten extrahieren
     #Wohnflaeche gesamt berechenen
-    Wohneinheiten_Details = os.path.join(workspace_projekt, 'Wohneinheiten_Details')
+    Wohneinheiten_Details = join(workspace_projekt, 'Wohneinheiten_Details')
     wohnflaeche_gesamt = 0
     wohnflaecheTemp = 0
     efh = 0
     dh = 0
     rh = 0
     mfh = 0
-    
+
     cursor = arcpy.SearchCursor(Wohneinheiten_Details)
-    
+
     for row in cursor:
         if row.Gebaeudetyp == "Einfamilienhaus":
             efh += row.Anzahl_WE * float(parameters[1].valueAsText)
@@ -62,24 +62,24 @@ def main(parameters, messages):
             efh += row.Anzahl_WE * float(parameters[3].valueAsText)
         elif row.Gebaeudetyp == "Mehrfamilienhaus":
             efh += row.Anzahl_WE * float(parameters[4].valueAsText)
-    
+
     wohnflaeche_gesamt = efh + dh +rh + mfh
-    
+
     #Nettobaulang gesamt berechnen
-    #Flaechenbilanz_Planung = os.path.join(workspace_projekt,'Flaechenbilanz_Planung_gruppiert')
+    #Flaechenbilanz_Planung = join(workspace_projekt,'Flaechenbilanz_Planung_gruppiert')
     #nettobauland_gesamt = 0
     #sql = "Flaechennutzung_S1 = 'Nettobauland'"
     #cursor = arcpy.SearchCursor(Flaechenbilanz_Planung,sql)
-    
+
     #for row in cursor:
     #    print "Drin"
     #    nettobauland_temp = row.Flaeche_ha
     #    nettobauland_gesamt = nettobauland_gesamt + nettobauland_temp
     #Änderung: Gesamtprojektfläche anstelle von nettobauland verwenden
-    pfad_flaeche = os.path.join(workspace_projekt,"Teilflaechen_Plangebiet")
+    pfad_flaeche = join(workspace_projekt,"Teilflaechen_Plangebiet")
     arcpy.AddField_management(pfad_flaeche,"area_hektares","FLOAT")
     arcpy.CalculateField_management(pfad_flaeche,"area_hektares","!shape.area@HECTARES!","PYTHON_9.3")
-    
+
     flaechengroesse = 0
     cursor = arcpy.SearchCursor(pfad_flaeche)
     for flaeche in cursor:
@@ -108,7 +108,7 @@ def main(parameters, messages):
         ags = str(ags)
         ags = ags[0:5]
         print(ags)
-    
+
     #Mittelwerte der einzelnen Kreistypen berechnen
     #Zur schnelleren Bearbeitung wird Grundlagentabelle komplett in den Arbeitsspeicher geladen
     table1 = "in_memory//GrundlagenDE"
@@ -137,11 +137,11 @@ def main(parameters, messages):
         row.Mittelwert_Wohnflaechendichte = average
         cursor2.insertRow(row)
         i= i+1
-    
+
     ##Zusammenstellung der Vergleichswerte
     #Für das Projektgebiet
     projektWohnflaechenDichte = wohnflaeche_gesamt / nettobauland_gesamt
-    
+
     #Für den Kreis
     #Kreisdaten aus den Basisdaten Deutschland  anhand des AGS extrahieren
     fc = rootPfad + "\\2_Tool\\F_Flaeche_und_Oekologie\\FGDB_Flaeche_und_Oekologie_Tool.gdb\\GrundlagenDE"
@@ -154,17 +154,17 @@ def main(parameters, messages):
         kreisName = row.Kreis_kreisfreie_Stadt
     kreisWohnflaechendichte = wohnflaeche/freiflaeche
     #kreisWohnflaechendichte = 0.26
-    
+
     #Durchschnitt fuer den Kreistyp
     sql = "Kreistyp = " + str(kreistyp)
     cursor3 = arcpy.SearchCursor(kreise,sql)
     for row in cursor3:
         kreistypWohnflaechendichte = row.Mittelwert_Wohnflaechendichte
-    
+
     print("Wohnflaechendichte Projekt : " + str(projektWohnflaechenDichte))
     print("Wohnflaechendichte Kreis   : " + str(kreisWohnflaechendichte))
     print("Wohnflaechendichte Kreistyp: " + str(kreistypWohnflaechendichte))
-    
+
     ##Abweichungen berechnen und Graphiken erstellen
     #Abweichung Projektgebiet - Kreis
     abweichung = projektWohnflaechenDichte / kreisWohnflaechendichte -1
@@ -181,13 +181,13 @@ def main(parameters, messages):
     elif(abweichung <= -0.10):
         bewertung = 1
     print("Bewertung: "+str(bewertung))
-    
+
     #Ergebnisse in Ergebnisstabelle ablegen
     #table = workspace_ergebnisse + "Ergebnisse_Wohnflaechendichte"
-    table= os.path.join(workspace_ergebnisse,'Ergebnisse_Wohnflaechendichte')
+    table= join(workspace_ergebnisse,'Ergebnisse_Wohnflaechendichte')
     ergebnisse = arcpy.InsertCursor(table)
     row = ergebnisse.newRow()
-    
+
     row.Name = projektname
     row.Bewertung = bewertung
     row.WohnflaechendichteProjektraum = projektWohnflaechenDichte
@@ -199,8 +199,8 @@ def main(parameters, messages):
     row.abweichungVonKreis = abweichung
     ergebnisse.insertRow(row)
     #Daten in die temp-Tabelle zur Diagrammerstellung schreiben
-    table = os.path.join(workspace_ergebnisse,"temp")
-    #table= r'C:\Users\rieffel\Dropbox\RPC\00_Entwicklungsumgebung\3_Projekte\Duesseldorf\FGDB_36_Flaeche_und_Oekologie_Projekt_Duesseldorf.gdb\temp'
+    table = join(workspace_ergebnisse,"temp")
+    #table= r'C:\Users\rieffel\Dropbox\RPC\00_Entwicklungsumgebung\3_Projekte\Duesseldorf\FGDB_36_Flaeche_und_Oekologie_Duesseldorf.gdb\temp'
     #Temp-Tabelle leeren
     arcpy.DeleteRows_management(table)
     #Daten in die  Temp Tabelle schreiben
@@ -230,9 +230,9 @@ def main(parameters, messages):
     arcpy.MakeGraph_management("diagramm.tee", graph, "Diagramm")
     output = rootPfad + "\\3_Projekte\\"+projektname + "\\Ergebnisausgabe\\Abbildungen\\Bewertung_Wohnflaeachendichte.png"
     arcpy.SaveGraph_management("Diagramm", output, image_width=800, image_height=600)
-    
+
     #Image.open(output).show()
-    
-    
+
+
     del cursor,cursor2,cursor3, cursor4, table1,kreise, ergebnisse, table, temp, row1, table2
     gc.collect()
