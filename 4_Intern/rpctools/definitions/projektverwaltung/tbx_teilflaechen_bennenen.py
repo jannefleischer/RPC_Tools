@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
 from os.path import abspath, dirname, join
 
 from rpctools.utils.params import Tbx

@@ -28,291 +28,295 @@ import imp
 import arcpy
 import xlsxwriter
 
-def main(parameters, messages):
-
-    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
-    sl = imp.load_source('sheet_lib', sheetlibpath)
+from rpctools.utils.params import Tool
+import rpctools.utils.sheet_lib as sheet_lib
+import rpctools.utils.tempmdb_lib as tempmdb_lib
+import rpctools.utils.population_lib as population_lib
 
-    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
-    mdb = imp.load_source('tempmdb_lib', mdblibpath)
-
-    gc.collect()
-
-    arcpy.env.overwriteOutput = True
-
-    # Variablen definieren
-    projektname = parameters[0].value
-
-    #Pfade einrichten
-    base_path = str(sys.path[0]).split("2_Tool")[0]
-
-    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
-    workspace_projekt_definition = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
-    workspace_projekt_bevoelkerung = join(base_path,'3_Projekte',projektname,'FGDB_BevModellierung.gdb')
-    workspace_projekt_einnahmen = join(base_path,'3_Projekte',projektname,'FGDB_Einnahmen.gdb')
-    workspace_tool_definition = join(base_path,"2_Tool","3_Art und Mass der Nutzung","FGDB_Definition_Projekt_Tool.gdb")
-    workspace_tool_einnahmen = join(base_path,"2_Tool","B_Einnahmen","FGDB_Einnahmen_Tool.gdb")
-
-    Teilflaechen_Plangebiet_Centroide = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_Centroide")
-    Teilflaechen_Plangebiet_CentroideGK3 = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_CentroideGK3")
-    gemeindenWirkraumEW_Centroide = join(workspace_projekt_definition,"gemeindenWirkraumEW_Centroide")
-    gemeindenWirkraumAP_Centroide = join(workspace_projekt_definition,"gemeindenWirkraumAP_Centroide")
-
-    input_table = join(workspace_projekt_bevoelkerung,'T02RECH_Input')
-
-    #############################################################################################################
-    #
-    # Durchlauf Auswirkungen im Umland
-    #
-    #############################################################################################################
-    beginmeldung = 'Durchlauf Familienleistungsausgleich \n'
-    arcpy.AddMessage(beginmeldung)
-    print beginmeldung
 
-    #############################################################################################################
-    # Schritt 1
-    schrittmeldung = 'Ermittle Familienleistungsausgleich \n'
-    arcpy.AddMessage(schrittmeldung)
-    print schrittmeldung
-
-    # Erzeuge FLA_Zwischentabelle
-    eingangstabellen = [
-        (workspace_projekt_einnahmen,'EKST_06_Bilanz'),
-        (workspace_tool_einnahmen,'FLA_Landesfaktoren')
-    ]
-
-    ausgabetabelle = (workspace_projekt_einnahmen,'FLA_Zwischentabelle')
-
-    sql = """SELECT EKST_06_Bilanz.AGS, Left([AGS],2) AS AGS_Land, EKST_06_Bilanz.Betrachtungsjahr, EKST_06_Bilanz.Bilanz_EST_EUR AS EST_EUR INTO FLA_Zwischentabelle
-    FROM EKST_06_Bilanz;
-    """
-
-    mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
-
-    # Erzeuge FLA_Ergebnis
-    eingangstabellen = [
-        (workspace_projekt_einnahmen,'FLA_Zwischentabelle'),
-        (workspace_tool_einnahmen,'FLA_Landesfaktoren')
-    ]
-
-    ausgabetabelle = (workspace_projekt_einnahmen,'FLA_01_Ergebnis')
-
-    sql = """SELECT FLA_Zwischentabelle.AGS, FLA_Zwischentabelle.Betrachtungsjahr, [EST_EUR]*[FLA_Faktor] AS FLA_EURO INTO FLA_01_Ergebnis
-    FROM FLA_Landesfaktoren INNER JOIN FLA_Zwischentabelle ON FLA_Landesfaktoren.AGS_Land = FLA_Zwischentabelle.AGS_Land;
-    """
-
-    mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
-
-    #############################################################################################################
-    # Schritt 6 - Datenexport in Excel-Datei
-    schrittmeldung = 'Datenexport in Excel-Datei  \n'
-    arcpy.AddMessage(schrittmeldung)
-    print schrittmeldung
-
-    # Pfade setzen
-    logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
-    ausgabeordner = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
-    if not os.path.exists(ausgabeordner): os.makedirs(ausgabeordner)
-    excelpfad = join(ausgabeordner,'Einnahmen_Familienleistungsausgleich.xlsx')
-
-    try:
-        os.remove(excelpfad)
-    except:
-        pass
-
-    # Workbook und Tabellenblätter anlegen
-    wb = xlsxwriter.Workbook(excelpfad)
-    sl.infosheet(projektname, str("Familienleistungsausgleich").decode('utf-8'), wb)
-    ws1 = wb.add_worksheet('Methodik')
-    ws2 = wb.add_worksheet('Auswertungen')
-    ws3 = wb.add_worksheet('Grafiken')
-    ws4 = wb.add_worksheet('Rohdaten_FLA')
-    ws5 = wb.add_worksheet('Haftungsausschluss')
-
-    #Charts anlegen
-
-
-    #Styles anlegen
-    bold = wb.add_format({'bold': True})
-    bold.set_bg_color('white')
-    bold.set_border(0)
-
-    normal = wb.add_format()
-    normal.set_bg_color('white')
-    normal.set_border(0)
-
-    money = wb.add_format()
-    money.set_num_format('#,##0')
-    money.set_bg_color('white')
-    money.set_border(0)
-
-    #Hintergrund weiss faerben
-    format = wb.add_format()
-    format.set_bg_color('white')
-    format.set_border(0)
-
-    for x in range(0,400):
-        for y in range(0,400):
-            ws1.write(x,y,"", format)
-            ws2.write(x,y,"", format)
-            ws3.write(x,y,"", format)
-            ws4.write(x,y,"", format)
-            ws5.write(x,y,"", format)
-
-
-    ################################
-    #Werteblatt 1 einfuegen
-
-    ausgabetabelle = join(workspace_projekt_einnahmen,'FLA_01_Ergebnis')
-
-    #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
-
-    fieldnames = [f.name for f in arcpy.ListFields(ausgabetabelle)]
-    rows = arcpy.da.SearchCursor(ausgabetabelle, fieldnames)
-    j = 1
-    for row in rows:
-        i = 0
-        for fieldname in fieldnames:
-            wert = row[i]
-            ws4.write(j, i, wert)
-            i = i+1
-
-        j = j+1
-
-    #Felder als Header in Worksheet einfuegen
-    i = 0
-    for fieldname in fieldnames:
-        column_with = len(fieldname)+2
-        ws4.set_column(i, i, column_with)
-        ws4.write(0, i, fieldname, bold)
-        i = i+1
-
-    #Eurobetrag formatieren
-    ws4.set_column('A:A', 9,normal)
-    ws4.set_column('B:B', 9,normal)
-    ws4.set_column('C:C', 16,normal)
-    ws4.set_column('D:D', 18, money)
 
-    ################################
-    #Methodikblatt einfuegen
-    methodik_grafik = join(base_path,"2_Tool","B_Einnahmen","Erlaeuterungstexte","Methodik_03_Familienleistungsausgleich.png")
-    ws1.insert_image('B2', methodik_grafik, {'x_scale': 0.6, 'y_scale': 0.6}) #Korrigiert Verzerrung die bei 1x1 auftritt
-
-    ################################
-    #Haftungsausschluss einfuegen
-    haftung_grafik = join(base_path,"2_Tool","B_Einnahmen","Erlaeuterungstexte","Haftungsausschluss.png")
-    ws5.insert_image('B2', haftung_grafik, {'x_scale': 0.32, 'y_scale': 0.32}) #Korrigiert Verzerrung die bei 1x1 auftritt
-
-    ################################
-    #Auswertungen formatieren
-
-    #Ueberschrift
-    ws2.write(1,1,"Mehr- bzw. Mindereinnahmen im Zeitverlauf",bold)
+class Familienleistungsausgleich(Tool):
 
-    AGSListe = []
-    JahrListe = []
+    _dbname = 'FGDB_Einnahmen.gdb'
 
-    fields = "AGS"
-    rows = arcpy.da.SearchCursor(ausgabetabelle, fields)
-    for row in rows:
-        AGSListe.append(row[0])
+    def run(self):
+        parameters = self.par
 
-    fields = "Betrachtungsjahr"
-    rows = arcpy.da.SearchCursor(ausgabetabelle, fields)
-    for row in rows:
-        JahrListe.append(row[0])
+        arcpy.env.overwriteOutput = True
 
-    AGSListe = sorted(set(AGSListe))
-    JahrListe = sorted(set(JahrListe))
+        # Variablen definieren
+        projektname = parameters[0].value
 
-    print JahrListe
-    print AGSListe
+        #Pfade einrichten
+        base_path = str(sys.path[0]).split("2_Tool")[0]
 
-    #schreibe Jahre
-    i = 0
-    for j in JahrListe:
-        ws2.write(3,i+2,j,bold)
-        i+=1
+        workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+        workspace_projekt_definition = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+        workspace_projekt_bevoelkerung = join(base_path,'3_Projekte',projektname,'FGDB_BevModellierung.gdb')
+        workspace_projekt_einnahmen = join(base_path,'3_Projekte',projektname,'FGDB_Einnahmen.gdb')
+        workspace_tool_definition = join(base_path,"2_Tool","3_Art und Mass der Nutzung","FGDB_Definition_Projekt_Tool.gdb")
+        workspace_tool_einnahmen = join(base_path,"2_Tool","B_Einnahmen","FGDB_Einnahmen_Tool.gdb")
 
-    #schreibe AGS
-    i = 0
-    for a in AGSListe:
-        ws2.write(i+4,1,a,bold)
-        i+=1
+        Teilflaechen_Plangebiet_Centroide = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_Centroide")
+        Teilflaechen_Plangebiet_CentroideGK3 = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_CentroideGK3")
+        gemeindenWirkraumEW_Centroide = join(workspace_projekt_definition,"gemeindenWirkraumEW_Centroide")
+        gemeindenWirkraumAP_Centroide = join(workspace_projekt_definition,"gemeindenWirkraumAP_Centroide")
 
-    #schreibe Werte
-    i=0
-    f=0
-    alphabet = [
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    'aa','ab','ac','ad','ae','af','ag','ah','ai','aj','ak','al','am','an','ao','ap','aq','ar', 'as', 'at', 'au', 'av', 'aw', 'ax', 'ay', 'az'
-    ]
-    for j in JahrListe:
-        for a in AGSListe:
-            formula = "=SUMIFS(Rohdaten_FLA!$D:$D,Rohdaten_FLA!$B:$B,Auswertungen!B"+str(i+5)+",Rohdaten_FLA!$C:$C,Auswertungen!"+alphabet[f+2]+"4)"
-            ws2.write_formula(i+4, f+2, formula, money)
-            i+=1
-        i=0
-        f+=1
+        input_table = join(workspace_projekt_bevoelkerung,'T02RECH_Input')
 
+        #############################################################################################################
+        #
+        # Durchlauf Auswirkungen im Umland
+        #
+        #############################################################################################################
+        beginmeldung = 'Durchlauf Familienleistungsausgleich \n'
+        arcpy.AddMessage(beginmeldung)
+        print beginmeldung
 
-    #Schreibe AGS als Ueberschrift
-    ws2.write(3,1,"AGS",bold)
+        #############################################################################################################
+        # Schritt 1
+        schrittmeldung = 'Ermittle Familienleistungsausgleich \n'
+        arcpy.AddMessage(schrittmeldung)
+        print schrittmeldung
 
+        # Erzeuge FLA_Zwischentabelle
+        eingangstabellen = [
+            (workspace_projekt_einnahmen,'EKST_06_Bilanz'),
+            (workspace_tool_einnahmen,'FLA_Landesfaktoren')
+        ]
 
-    ################################
-    #Grafiken einfuegen
+        ausgabetabelle = (workspace_projekt_einnahmen,'FLA_Zwischentabelle')
 
-    print len(JahrListe)
-    print len(AGSListe)
+        sql = """SELECT EKST_06_Bilanz.AGS, Left([AGS],2) AS AGS_Land, EKST_06_Bilanz.Betrachtungsjahr, EKST_06_Bilanz.Bilanz_EST_EUR AS EST_EUR INTO FLA_Zwischentabelle
+        FROM EKST_06_Bilanz;
+        """
 
-    chart = wb.add_chart({'type': 'line', 'subtype': 'stacked'})
-    chart.set_style(40)
-    chart.set_size({'width': 800, 'height': 600})
-    chart.set_chartarea({'border': {'none': True},'fill': {'none': True}})
-    chart.set_legend({'position': 'bottom'})
-    chart.set_title({'name': 'Familienleistungsausgleich in Euro','name_font':  {'name': 'Tahoma', 'size': 9}})
+        mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
+        # Erzeuge FLA_Ergebnis
+        eingangstabellen = [
+            (workspace_projekt_einnahmen,'FLA_Zwischentabelle'),
+            (workspace_tool_einnahmen,'FLA_Landesfaktoren')
+        ]
 
-    i=0
+        ausgabetabelle = (workspace_projekt_einnahmen,'FLA_01_Ergebnis')
 
-    for ags in AGSListe:
+        sql = """SELECT FLA_Zwischentabelle.AGS, FLA_Zwischentabelle.Betrachtungsjahr, [EST_EUR]*[FLA_Faktor] AS FLA_EURO INTO FLA_01_Ergebnis
+        FROM FLA_Landesfaktoren INNER JOIN FLA_Zwischentabelle ON FLA_Landesfaktoren.AGS_Land = FLA_Zwischentabelle.AGS_Land;
+        """
 
-        i+=1
+        mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
-        chart.add_series({
-                'name': ['Auswertungen', 3+i, 1, 3+i, 1],
-                'categories': ['Auswertungen', 3, 2, 3, len(JahrListe)+1],
-                'values':     ['Auswertungen', 3+i, 2, 3+i, len(JahrListe)+1], # Format: Zeile, Spalte Anfang, Zeile , Spalte Ende
-            })
+        #############################################################################################################
+        # Schritt 6 - Datenexport in Excel-Datei
+        schrittmeldung = 'Datenexport in Excel-Datei  \n'
+        arcpy.AddMessage(schrittmeldung)
+        print schrittmeldung
 
-    ws3.insert_chart('B2', chart)
+        # Pfade setzen
+        logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+        ausgabeordner = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
+        if not os.path.exists(ausgabeordner): os.makedirs(ausgabeordner)
+        excelpfad = join(ausgabeordner,'Einnahmen_Familienleistungsausgleich.xlsx')
 
-
-    ################################
-    #Workbook speichern
-    try:
-        wb.close()
-    except Exception as r:
-        arcpy.AddMessage("Es liegt ein Fehler beim Speichern der Ausgabedatei vor. Ist diese ggf. noch geoeffnet?")
-        arcpy.AddMessage(r)
-
-
-    #############################################################################################################
-    # Schritt 4
-    schrittmeldung = 'temporaere Tabellen loeschen \n'
-    arcpy.AddMessage(schrittmeldung)
-    print schrittmeldung
-
-    deleteList = ['FLA_Zwischentabelle']
-
-    for e in deleteList:
-        f = join(workspace_projekt_einnahmen,e)
         try:
-            arcpy.Delete_management(f)
+            os.remove(excelpfad)
         except:
             pass
 
-    gc.collect()
-    print "fertig"
-    arcpy.AddMessage('03_Familienleistungsausgleich abgeschlossen')
+        # Workbook und Tabellenblätter anlegen
+        wb = xlsxwriter.Workbook(excelpfad)
+        sl.infosheet(projektname, str("Familienleistungsausgleich").decode('utf-8'), wb)
+        ws1 = wb.add_worksheet('Methodik')
+        ws2 = wb.add_worksheet('Auswertungen')
+        ws3 = wb.add_worksheet('Grafiken')
+        ws4 = wb.add_worksheet('Rohdaten_FLA')
+        ws5 = wb.add_worksheet('Haftungsausschluss')
+
+        #Charts anlegen
+
+
+        #Styles anlegen
+        bold = wb.add_format({'bold': True})
+        bold.set_bg_color('white')
+        bold.set_border(0)
+
+        normal = wb.add_format()
+        normal.set_bg_color('white')
+        normal.set_border(0)
+
+        money = wb.add_format()
+        money.set_num_format('#,##0')
+        money.set_bg_color('white')
+        money.set_border(0)
+
+        #Hintergrund weiss faerben
+        format = wb.add_format()
+        format.set_bg_color('white')
+        format.set_border(0)
+
+        for x in range(0,400):
+            for y in range(0,400):
+                ws1.write(x,y,"", format)
+                ws2.write(x,y,"", format)
+                ws3.write(x,y,"", format)
+                ws4.write(x,y,"", format)
+                ws5.write(x,y,"", format)
+
+
+        ################################
+        #Werteblatt 1 einfuegen
+
+        ausgabetabelle = join(workspace_projekt_einnahmen,'FLA_01_Ergebnis')
+
+        #Durch Ergebniszeilen iterieren und Werte in Excel einfuegen
+
+        fieldnames = [f.name for f in arcpy.ListFields(ausgabetabelle)]
+        rows = arcpy.da.SearchCursor(ausgabetabelle, fieldnames)
+        j = 1
+        for row in rows:
+            i = 0
+            for fieldname in fieldnames:
+                wert = row[i]
+                ws4.write(j, i, wert)
+                i = i+1
+
+            j = j+1
+
+        #Felder als Header in Worksheet einfuegen
+        i = 0
+        for fieldname in fieldnames:
+            column_with = len(fieldname)+2
+            ws4.set_column(i, i, column_with)
+            ws4.write(0, i, fieldname, bold)
+            i = i+1
+
+        #Eurobetrag formatieren
+        ws4.set_column('A:A', 9,normal)
+        ws4.set_column('B:B', 9,normal)
+        ws4.set_column('C:C', 16,normal)
+        ws4.set_column('D:D', 18, money)
+
+        ################################
+        #Methodikblatt einfuegen
+        methodik_grafik = join(base_path,"2_Tool","B_Einnahmen","Erlaeuterungstexte","Methodik_03_Familienleistungsausgleich.png")
+        ws1.insert_image('B2', methodik_grafik, {'x_scale': 0.6, 'y_scale': 0.6}) #Korrigiert Verzerrung die bei 1x1 auftritt
+
+        ################################
+        #Haftungsausschluss einfuegen
+        haftung_grafik = join(base_path,"2_Tool","B_Einnahmen","Erlaeuterungstexte","Haftungsausschluss.png")
+        ws5.insert_image('B2', haftung_grafik, {'x_scale': 0.32, 'y_scale': 0.32}) #Korrigiert Verzerrung die bei 1x1 auftritt
+
+        ################################
+        #Auswertungen formatieren
+
+        #Ueberschrift
+        ws2.write(1,1,"Mehr- bzw. Mindereinnahmen im Zeitverlauf",bold)
+
+        AGSListe = []
+        JahrListe = []
+
+        fields = "AGS"
+        rows = arcpy.da.SearchCursor(ausgabetabelle, fields)
+        for row in rows:
+            AGSListe.append(row[0])
+
+        fields = "Betrachtungsjahr"
+        rows = arcpy.da.SearchCursor(ausgabetabelle, fields)
+        for row in rows:
+            JahrListe.append(row[0])
+
+        AGSListe = sorted(set(AGSListe))
+        JahrListe = sorted(set(JahrListe))
+
+        print JahrListe
+        print AGSListe
+
+        #schreibe Jahre
+        i = 0
+        for j in JahrListe:
+            ws2.write(3,i+2,j,bold)
+            i+=1
+
+        #schreibe AGS
+        i = 0
+        for a in AGSListe:
+            ws2.write(i+4,1,a,bold)
+            i+=1
+
+        #schreibe Werte
+        i=0
+        f=0
+        alphabet = [
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+        'aa','ab','ac','ad','ae','af','ag','ah','ai','aj','ak','al','am','an','ao','ap','aq','ar', 'as', 'at', 'au', 'av', 'aw', 'ax', 'ay', 'az'
+        ]
+        for j in JahrListe:
+            for a in AGSListe:
+                formula = "=SUMIFS(Rohdaten_FLA!$D:$D,Rohdaten_FLA!$B:$B,Auswertungen!B"+str(i+5)+",Rohdaten_FLA!$C:$C,Auswertungen!"+alphabet[f+2]+"4)"
+                ws2.write_formula(i+4, f+2, formula, money)
+                i+=1
+            i=0
+            f+=1
+
+
+        #Schreibe AGS als Ueberschrift
+        ws2.write(3,1,"AGS",bold)
+
+
+        ################################
+        #Grafiken einfuegen
+
+        print len(JahrListe)
+        print len(AGSListe)
+
+        chart = wb.add_chart({'type': 'line', 'subtype': 'stacked'})
+        chart.set_style(40)
+        chart.set_size({'width': 800, 'height': 600})
+        chart.set_chartarea({'border': {'none': True},'fill': {'none': True}})
+        chart.set_legend({'position': 'bottom'})
+        chart.set_title({'name': 'Familienleistungsausgleich in Euro','name_font':  {'name': 'Tahoma', 'size': 9}})
+
+
+        i=0
+
+        for ags in AGSListe:
+
+            i+=1
+
+            chart.add_series({
+                    'name': ['Auswertungen', 3+i, 1, 3+i, 1],
+                    'categories': ['Auswertungen', 3, 2, 3, len(JahrListe)+1],
+                    'values':     ['Auswertungen', 3+i, 2, 3+i, len(JahrListe)+1], # Format: Zeile, Spalte Anfang, Zeile , Spalte Ende
+                })
+
+        ws3.insert_chart('B2', chart)
+
+
+        ################################
+        #Workbook speichern
+        try:
+            wb.close()
+        except Exception as r:
+            arcpy.AddMessage("Es liegt ein Fehler beim Speichern der Ausgabedatei vor. Ist diese ggf. noch geoeffnet?")
+            arcpy.AddMessage(r)
+
+
+        #############################################################################################################
+        # Schritt 4
+        schrittmeldung = 'temporaere Tabellen loeschen \n'
+        arcpy.AddMessage(schrittmeldung)
+        print schrittmeldung
+
+        deleteList = ['FLA_Zwischentabelle']
+
+        for e in deleteList:
+            f = join(workspace_projekt_einnahmen,e)
+            try:
+                arcpy.Delete_management(f)
+            except:
+                pass
+
+        gc.collect()
+        print "fertig"
+        arcpy.AddMessage('03_Familienleistungsausgleich abgeschlossen')

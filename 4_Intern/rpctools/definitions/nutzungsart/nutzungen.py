@@ -125,7 +125,10 @@ class Nutzungen(Tool):
             #tabelle "Wohneinheiten_Details" oeffnen und Werte fuer Miete_Eigentum. und Anzahl Wohneinheiten speichern
             tabelle_wohneinheiten_details = self.get_table('Wohneinheiten_Details')
 
-            Insert = arcpy.da.InsertCursor(tabelle_wohneinheiten_details, ['Gebaeudetyp','Teilflaeche_Plangebiet','Miete_Eigentum','EW_je_WE','Jahr','Anzahl_WE', 'Ant_Eigentuemer'])
+            Insert = arcpy.da.InsertCursor(
+                tabelle_wohneinheiten_details,
+                ['Gebaeudetyp','Teilflaeche_Plangebiet','Miete_Eigentum',
+                 'EW_je_WE','Jahr','Anzahl_WE', 'Ant_Eigentuemer'])
             row = ["","","","","","",""]
 
             #Ein- und Zweifamilienhäuser

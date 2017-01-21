@@ -105,8 +105,9 @@ class Tool(object):
         self.mes = Messages()
         self.folders = Folders(params=self.par)
 
-    def main(self, parameters, messages):
-        self.par._update_parameters(parameters)
+    def main(self, parameters=None, messages=None):
+        if parameters:
+            self.par._update_parameters(parameters)
         if messages:
             self.mes = messages
         gc.collect()
@@ -171,7 +172,7 @@ class Tbx(object):
     def _updateMessages(self, parameters):
         """"""
 
-    def execute(self, parameters, messages):
+    def execute(self, parameters=None, messages=None):
         """Run the tool with the parameters and messages from ArcGIS"""
         self.tool.main(parameters, messages)
 
