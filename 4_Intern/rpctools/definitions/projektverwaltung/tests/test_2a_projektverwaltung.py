@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+import sys
+import traceback
 
 from rpctools.definitions.projektverwaltung.tbx_projektverwaltung import TbxProjektVerwaltung
 from rpctools.utils.encoding import encode
@@ -27,7 +29,9 @@ def test_tbx_projektverwaltung():
     try:
         tb.execute(params, '')
     except SystemExit as e:
-        print(e)
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_exception(exc_type, exc_value, exc_traceback,
+                                  4, sys.stdout)
 
 
     params.action.value = encode("Bestehendes Projekt löschen")

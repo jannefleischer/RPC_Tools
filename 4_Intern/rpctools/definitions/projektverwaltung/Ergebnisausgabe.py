@@ -85,18 +85,18 @@ del rows
 rows = arcpy.SearchCursor(tablepath_vor)
 land_vor, brach_vor, laerm_vor, gewerbe_vor, erschlie_vor, sozial_vor, ezh_vor, wohnen_vor, gruen_vor, natur_vor, sonstige_vor = 0,0,0,0,0,0,0,0,0,0,0
 for row in rows:
-	typ = row.getValue("Vornutzungstyp")
-	wert = row.getValue("Prozent_der_Flaeche")
-	teil = row.getValue("Teilflaeche_Plangebiet")
-	multi = teilgebiete[teil] / gesamtflaeche_vor
-	if typ == 'Landwirtschaftlicher Betrieb' or typ == 'Ackerflaeche': land_vor = land_vor + (wert / 100 * multi)
-	if typ == 'Brachflaeche': brach_vor = brach_vor + (wert / 100 * multi)
-	if typ == 'Laermintensives Gewerbe' or typ == 'Normales Gewerbe' or typ == 'Wenig stoerendes Gewerbe': gewerbe_vor = gewerbe_vor + (wert / 100 * multi)
-	if typ == 'Soziale Infrastuktur': sozial_vor = sozial_vor + (wert / 100 * multi)
-	if typ == 'Einzelhandel': ezh_vor = ezh_vor + (wert / 100 * multi)
-	if typ == 'Wohnen': wohnen_vor = wohnen_vor + (wert / 100 * multi)
-	if typ == 'Oeffentliche Gruenflaeche': gruen_vor = gruen_vor + (wert / 100 * multi)
-	if typ == 'Wald' or typ == 'Wiese': natur_vor = natur_vor + (wert / 100 * multi)
+    typ = row.getValue("Vornutzungstyp")
+    wert = row.getValue("Prozent_der_Flaeche")
+    teil = row.getValue("Teilflaeche_Plangebiet")
+    multi = teilgebiete[teil] / gesamtflaeche_vor
+    if typ == 'Landwirtschaftlicher Betrieb' or typ == 'Ackerflaeche': land_vor = land_vor + (wert / 100 * multi)
+    if typ == 'Brachflaeche': brach_vor = brach_vor + (wert / 100 * multi)
+    if typ == 'Laermintensives Gewerbe' or typ == 'Normales Gewerbe' or typ == 'Wenig stoerendes Gewerbe': gewerbe_vor = gewerbe_vor + (wert / 100 * multi)
+    if typ == 'Soziale Infrastuktur': sozial_vor = sozial_vor + (wert / 100 * multi)
+    if typ == 'Einzelhandel': ezh_vor = ezh_vor + (wert / 100 * multi)
+    if typ == 'Wohnen': wohnen_vor = wohnen_vor + (wert / 100 * multi)
+    if typ == 'Oeffentliche Gruenflaeche': gruen_vor = gruen_vor + (wert / 100 * multi)
+    if typ == 'Wald' or typ == 'Wiese': natur_vor = natur_vor + (wert / 100 * multi)
 del rows
 
 # Flächenbilanz der neuen Nutzung ermitteln, für Balkendiagramm auf neue Kategorien umlegen
@@ -110,18 +110,18 @@ del rows
 
 rows = arcpy.SearchCursor(tablepath_neu)
 for row in rows:
-	typ = row.getValue("Flaechennutzung_S2")
-	wert = row.getValue("Flaeche_ha")
-	anteil = wert / gesamtflaeche_neu
-	if typ == 'Gewerbeflaeche (Industrie)': gewerbe_neu = gewerbe_neu + anteil
-	if typ == 'Laermschutzanlagen': laerm_neu = laerm_neu + anteil
-	if typ == 'Oeffentlich - Innere Erschliessung' or typ == 'Oeffentlich - Aeussere Erschliessung' or typ == 'Privat - Innere Erschliessung': erschlie_neu = erschlie_neu + anteil
-	if typ == 'Gemeinbedarfsflaeche' or typ == 'Spielplaetze': sozial_neu = sozial_neu + anteil
-	if typ == 'Gewerbeflaeche (Versorgung)': ezh_neu = ezh_neu + anteil
-	if typ == 'Nettowohnbauland': wohnen_neu = wohnen_neu + anteil
-	if typ == 'Allgemeine Gruenflaechen' or typ == 'Strassenbegleitgruen': gruen_neu = gruen_neu + anteil
-	if typ == 'Ausgleichs- und Ersatzflaechen': natur_neu = natur_neu + anteil
-	if typ == 'Sonstige Flaechen': sonstige_neu = sonstige_neu + anteil
+    typ = row.getValue("Flaechennutzung_S2")
+    wert = row.getValue("Flaeche_ha")
+    anteil = wert / gesamtflaeche_neu
+    if typ == 'Gewerbeflaeche (Industrie)': gewerbe_neu = gewerbe_neu + anteil
+    if typ == 'Laermschutzanlagen': laerm_neu = laerm_neu + anteil
+    if typ == 'Oeffentlich - Innere Erschliessung' or typ == 'Oeffentlich - Aeussere Erschliessung' or typ == 'Privat - Innere Erschliessung': erschlie_neu = erschlie_neu + anteil
+    if typ == 'Gemeinbedarfsflaeche' or typ == 'Spielplaetze': sozial_neu = sozial_neu + anteil
+    if typ == 'Gewerbeflaeche (Versorgung)': ezh_neu = ezh_neu + anteil
+    if typ == 'Nettowohnbauland': wohnen_neu = wohnen_neu + anteil
+    if typ == 'Allgemeine Gruenflaechen' or typ == 'Strassenbegleitgruen': gruen_neu = gruen_neu + anteil
+    if typ == 'Ausgleichs- und Ersatzflaechen': natur_neu = natur_neu + anteil
+    if typ == 'Sonstige Flaechen': sonstige_neu = sonstige_neu + anteil
 del rows
 
 # Gemeindename einesen
@@ -204,11 +204,11 @@ ws2.write(0,2,'Vornutzung')
 ws2.write(0,1,'Neue Nutzung')
 ws2.write_column('A2', category_names)
 for n,i in enumerate(data_vor): # nur Werte >0 in die Tabelle schreiben um Labels mit 0,0% zu vermeiden
-	if i > 0:
-		ws2.write(n+1,2,data_vor[n], percent)
+    if i > 0:
+        ws2.write(n+1,2,data_vor[n], percent)
 for n,i in enumerate(data_neu):
-	if i > 0:
-		ws2.write(n+1,1,data_neu[n], percent)
+    if i > 0:
+        ws2.write(n+1,1,data_neu[n], percent)
 
 
 
@@ -219,49 +219,49 @@ chart = wb.add_chart({'type': 'bar', 'subtype': 'percent_stacked'})
 chart.set_size({'width': 1170, 'height': 300})
 chart.set_chartarea({'border': {'none': True}})
 chart.set_title({
-	'name': 'FLÄCHENBILANZ'.decode('utf-8'),
-	'name_font': {
-		'size': 14
-	},
-	'layout': {
-		'x': 0.003,
-		'y': 0.05,
-	}
+    'name': 'FLÄCHENBILANZ'.decode('utf-8'),
+    'name_font': {
+        'size': 14
+        },
+    'layout': {
+        'x': 0.003,
+        'y': 0.05,
+    }
 })
 
 chart.set_x_axis({
-	'num_font': {
-		'color': '#7f7f7f',
-	},
-	'major_gridlines': {
-		'visible': True,
-		'line': {
-			'width': 0.75,
-			'dash_type': 'dash',
-			'color': '#bfbfbf',
-		}
-	}
+    'num_font': {
+        'color': '#7f7f7f',
+        },
+    'major_gridlines': {
+        'visible': True,
+        'line': {
+            'width': 0.75,
+            'dash_type': 'dash',
+            'color': '#bfbfbf',
+        }
+    }
 })
 
 chart.set_y_axis({
-	'num_font': {
-		'color': '#7f7f7f',
-	}
+    'num_font': {
+        'color': '#7f7f7f',
+    }
 })
 
 chart.set_legend({'position': 'bottom'})
 
 # Datenbezüge definieren
 for i in range(0, 10):
-	chart.add_series({
-		'name':         '=raw_data!$A$'+str(i+2)+'',
-		'categories':   '=raw_data!$B$1:$C$1',
-		'values':       '=raw_data!$B$'+str(i+2)+':$C$'+str(i+2)+'',
-		'fill': 		{'color': ''+category_colors[i]+''},
-		'num_font':     {'color': 'white'},
-		'data_labels': 	{'value':  True},
-		'gap':        40,
-	})
+    chart.add_series({
+        'name':         '=raw_data!$A$'+str(i+2)+'',
+        'categories':   '=raw_data!$B$1:$C$1',
+        'values':       '=raw_data!$B$'+str(i+2)+':$C$'+str(i+2)+'',
+        'fill': 		{'color': ''+category_colors[i]+''},
+        'num_font':     {'color': 'white'},
+        'data_labels': 	{'value':  True},
+        'gap':        40,
+    })
 ws1.insert_chart('B21', chart)
 
 # Datenblatt mit Rohdaten ausblenden
@@ -285,11 +285,11 @@ ws1.insert_image('B2', logo, {'x_scale': 1, 'y_scale': 0.93}) #Korrigiert Verzer
 
 # Workbook speichern, Fehler bei bereits geöffnetem Excel-Workbook abfangen
 try:
-	wb.close()
+    wb.close()
 except IOError:
-	schrittmeldung = 'Die Ergebnisstabelle konnte nicht gespreichert werden, da eine ältere Version der Datei momentan in Excel geöffnet ist. Bitte schließen Sie diese Tabelle und führen Sie den Arbeitsschritt erneut aus. \n'
-	arcpy.AddMessage(schrittmeldung)
-	print schrittmeldung
+    schrittmeldung = 'Die Ergebnisstabelle konnte nicht gespreichert werden, da eine ältere Version der Datei momentan in Excel geöffnet ist. Bitte schließen Sie diese Tabelle und führen Sie den Arbeitsschritt erneut aus. \n'
+    arcpy.AddMessage(schrittmeldung)
+    print schrittmeldung
 
 # Endmeldung
 schrittmeldung = 'Script abgeschlossen'

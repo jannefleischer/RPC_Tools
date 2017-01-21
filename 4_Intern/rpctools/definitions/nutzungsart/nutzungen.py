@@ -9,8 +9,6 @@ from xlsxwriter.utility import xl_rowcol_to_cell, xl_col_to_name
 import arcpy, os
 import gc
 from rpctools.utils.params import Tool
-import rpctools.utils.sheet_lib
-
 
 
 class Nutzungen(Tool):
@@ -24,7 +22,6 @@ class Nutzungen(Tool):
         projectname = parameters[0].valueAsText
         parameterString = parameters[1].valueAsText
 
-        base_path = str(sys.path[0]).split("2_Tool")[0]
         Teilflaeche_Plangebiet = parameterString.split(" | ")[0]
         tabelle_gebaude = self.get_table('Gebaeude_Details')
         tabelle_wohneinheiten_details = self.get_table('Wohneinheiten_Details')
@@ -55,7 +52,6 @@ class Nutzungen(Tool):
             for row in cursor:
                 if row[0] == Teilflaeche_Plangebiet:
                     cursor.deleteRow()
-
 
         with arcpy.da.UpdateCursor(tabelle_betriebsflaeche, 'teilflaeche') as cursor:
             for row in cursor:
@@ -219,8 +215,8 @@ class Nutzungen(Tool):
             shape_bkggemeiden=join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','bkg_gemeinden')
             workspace_Basis_Daten_Versor=join(base_path,'2_Tool',"G_Standortkonkurrenz_Supermaerkte",'FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
             workspace_Basis_Daten=join(base_path,'2_Tool',"3_Art und Mass der Nutzung",'FGDB_Definition_Projekt_Tool.gdb')
-            shape_teilflaeche = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb','Teilflaechen_Plangebiet')
-            workspace_definition= join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+            shape_teilflaeche = self.folders.get_table('Teilflaechen_Plangebiet')
+            workspace_definition= join(self.folders.get_projectpath(), 'FGDB_Definition_Projekt.gdb')
 
 
             # Process: Layer lagebezogen auswählen
@@ -429,10 +425,10 @@ class Nutzungen(Tool):
 
                 #Pfade anlegen
                 base_path = str(sys.path[0]).split("2_Tool")[0]
-                tabelle_flaechenbilanzgrundlage = join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_flaechenutzungsbilanz')
-                tabelle_flaechennutzung = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb','Flaechenbilanz_Planung_Prozent')
-                shape_teilflaeche = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb','Teilflaechen_Plangebiet')
-                flaechenbilanz = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb','Flaechenbilanz')
+                tabelle_flaechenbilanzgrundlage = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb','gewerbe_flaechenutzungsbilanz')
+                tabelle_flaechennutzung = self.folders.get_table('Flaechenbilanz_Planung_Prozent')
+                shape_teilflaeche = self.folders.get_table('Teilflaechen_Plangebiet')
+                flaechenbilanz = self.folders.get_table('Flaechenbilanz')
 
                 #Größe der Gewerbefläche auslesen
                 flaechenbilanz_cursor = arcpy.SearchCursor(flaechenbilanz)
@@ -522,8 +518,8 @@ class Nutzungen(Tool):
                 print schrittmeldung
 
                 # erstmal Pfade definieren
-                tabelle_BFG = join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_betriebsflaechengroesse')
-                tabelle_betriebsstruktur = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb','Gewerbe_Betriebsstruktur')
+                tabelle_BFG = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb','gewerbe_betriebsflaechengroesse')
+                tabelle_betriebsstruktur = self.folders.get_table('Gewerbe_Betriebsstruktur')
 
                 # dann zunächst die Betriebsanteile mit den definierten Parzellengrößen gewichten
                 rows_BFG = arcpy.SearchCursor(tabelle_BFG)
@@ -589,7 +585,7 @@ class Nutzungen(Tool):
                 Anz_Betr_SoDi = Flaeche_Betr_SoDi / (BFG_Betr_SoDi * BFGfaktor)
 
                 #Betriebsflaechen nach Branchen in Tabelle schreiben
-                tabelle_betriebsflaeche = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb','Gewerbe_Betriebsflaechen')
+                tabelle_betriebsflaeche = self.folders.get_table('Gewerbe_Betriebsflaechen')
                 tabelle_betriebsflaeche_Insert = arcpy.InsertCursor(tabelle_betriebsflaeche)
 
                 rowBFins = tabelle_betriebsflaeche_Insert.newRow()
@@ -612,7 +608,7 @@ class Nutzungen(Tool):
                 messages.AddMessage(schrittmeldung)
                 print schrittmeldung
 
-                tabelle_FKZ = join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_flaechenkennziffern')
+                tabelle_FKZ = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb','gewerbe_flaechenkennziffern')
                 rows_FKZ = arcpy.SearchCursor(tabelle_FKZ)
 
                 for row in rows_FKZ:
@@ -644,7 +640,7 @@ class Nutzungen(Tool):
 
                 #### Aufsiedlugnsdauer Betriebe
                 # zuletzt die Anzahl noch in die Ausgabetabelle schreiben und dabei mit der Aufsiedlungszeit verrechnen
-                tabelle_parameter_aufsiedlungsdauer = join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_aufsiedlungsdauer')
+                tabelle_parameter_aufsiedlungsdauer = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb','gewerbe_aufsiedlungsdauer')
                 tabelle_gewerbe_betriebsstruktur_Insert = arcpy.InsertCursor(tabelle_betriebsstruktur)
 
                 #für Branche C
@@ -907,10 +903,10 @@ class Nutzungen(Tool):
 
                 #### Aufsiedlugnsdauer Beschäftigte
                 # zuletzt die Anzahl noch in die Ausgabetabelle schreiben und dabei mit der Aufsiedlungszeit verrechnen
-                tabelle_parameter_aufsiedlungsdauer = join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_aufsiedlungsdauer')
-                tabelle_beschaeftigte = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb','Gewerbe_Beschaeftigte')
+                tabelle_parameter_aufsiedlungsdauer = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb','gewerbe_aufsiedlungsdauer')
+                tabelle_beschaeftigte = self.folders.get_table('Gewerbe_Beschaeftigte')
                 tabelle_beschaeftigte_insert = arcpy.InsertCursor(tabelle_beschaeftigte)
-                tabelle_projektrahmendaten = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb','Projektrahmendaten')
+                tabelle_projektrahmendaten = self.folders.get_table('Projektrahmendaten')
 
                 #Beschaeftigte Branche C / Besch_VerarbGew
                 anzahl_Besch_max = float(Besch_VerarbGew)
@@ -1190,8 +1186,8 @@ class Nutzungen(Tool):
                 messages.AddMessage(schrittmeldung)
                 print str(schrittmeldung)
 
-                tabelle_gebaeudegrundlagen = join(base_path,'2_Tool','3_Art und Mass der Nutzung','FGDB_Definition_Projekt_Tool.gdb','gewerbe_gebaeude')
-                tabelle_gebaeudedetails = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb','Gebaeude_Details')
+                tabelle_gebaeudegrundlagen = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb','gewerbe_gebaeude')
+                tabelle_gebaeudedetails = self.folders.get_table('Gebaeude_Details')
                 tabelle_gebaeudedetails_insert = arcpy.InsertCursor(tabelle_gebaeudedetails)
 
                 rows_GGF = arcpy.SearchCursor(tabelle_gebaeudegrundlagen)
@@ -1351,7 +1347,7 @@ class Nutzungen(Tool):
                 messages.AddMessage(schrittmeldung)
                 print str(schrittmeldung)
 
-                tabelle_teilflaeche = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb','Gewerbe_Teilflaechen')
+                tabelle_teilflaeche = self.folders.get_table('Gewerbe_Teilflaechen')
                 tabelle_teilflaeche_insert = arcpy.InsertCursor(tabelle_teilflaeche)
                 rowTF = tabelle_teilflaeche_insert.newRow()
 
@@ -1466,16 +1462,16 @@ class Nutzungen(Tool):
 
                 # Pfade setzen
                 base_path = str(sys.path[0]).split("2_Tool")[0]
-                workspace_projekt_gewerbe = join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+                workspace_projekt_gewerbe = join(self.folders.get_projectpath(), 'FGDB_Definition_Projekt.gdb')
                 tablepath_gewerbe = join(workspace_projekt_gewerbe,'Gewerbe_Teilflaechen')
                 tablepath_Beschaeftigte = join(workspace_projekt_gewerbe,'Gewerbe_Beschaeftigte')
                 tablepath_Flaechenbilanz = join(workspace_projekt_gewerbe,'Flaechenbilanz')
                 tablepath_Gebaeude = join(workspace_projekt_gewerbe,'Gebaeude_Details')
                 tablepath_Betriebe = join(workspace_projekt_gewerbe,'Gewerbe_Betriebsstruktur')
-                grafikpath_erlauterungstext = join(base_path,'2_Tool','3_Art und Mass der Nutzung','Erlauterungstexte')
+                grafikpath_erlauterungstext = self.folders.get_base_table(u'Erläuterungstexte')
 
-                logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
-                ausgabeordner = join(base_path,'3_Projekte',projektname,'Ergebnisausgabe','Excel')
+                logo = join(grafikpath_erlauterungstext, "logo_rpc.png")
+                ausgabeordner = join(self.folders.get_projectpath(), 'Ergebnisausgabe','Excel')
                 excelpfad = join(ausgabeordner,'11_Projektdefinition_Gewerbe.xlsx')
 
                 try:
@@ -2151,8 +2147,8 @@ class Nutzungen(Tool):
 
                 ######
                 #Gewerbe Beschaeftigte Art der beschaeftigung
-                if arcpy.Exists(join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb',"Gewerbe_Beschaeftigte_Zahlen")):
-                    path_beschaeftigte_Zahlen= join(base_path,'3_Projekte',projektname,'FGDB_Definition_Projekt.gdb',"Gewerbe_Beschaeftigte_Zahlen")
+                if arcpy.Exists(self.folders.get_table("Gewerbe_Beschaeftigte_Zahlen")):
+                    path_beschaeftigte_Zahlen= self.folders.get_table("Gewerbe_Beschaeftigte_Zahlen")
                     datenauslesen=[]
                     for uu in arcpy.SearchCursor(path_beschaeftigte_Zahlen):
                         datenauslesen.append(uu.Anzahl)
