@@ -21,7 +21,8 @@ def install_packages(python_path):
 
     #Creating list with missing packages
     used_packages = ['pip', 'setuptools', 'matplotlib', 'numpy',
-                     'pyodbc', 'six', 'xlrd', 'xlsxwriter', 'pytest']
+                     'pyodbc', 'six', 'xlrd', 'xlsxwriter', 'pytest',
+                     'sphinx', 'numpydoc']
     missing = []
 
     for package in used_packages:
