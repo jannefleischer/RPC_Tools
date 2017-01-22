@@ -69,10 +69,10 @@ class TbxTeilflaecheBenennen(Tbx):
 
             rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
             list_teilflaechen = []
-            for row in rows_teilflaechen :
+            for row in rows_teilflaechen:
                 list_teilflaechen.append('Nr. ' + str(row.OBJECTID) + " | "
-                                         + str(round(row.Flaeche_ha,2))
-                                         + " ha" + " | "+ row.NAME)
+                                         + str(round(row.Flaeche_ha, 2))
+                                         + " ha" + " | " + row.NAME)
 
             list_teilflaechen = list(set(list_teilflaechen))
             list_teilflaechen = sorted(list_teilflaechen)
@@ -88,15 +88,15 @@ class TbxTeilflaecheBenennen(Tbx):
 
             projectname = params.project.value
             flaechenname = params.teilflaeche.value
-            flaechenname_id = flaechenname.split('|')[0].replace('Nr.','').strip()
+            flaechenname_id = flaechenname.split('|')[0].replace('Nr.', '').strip()
 
-    def updateMessages(self, params):
+    def _updateMessages(self, params):
         """Modify the messages created by internal validation for each tool
         parameter.  This method is called after internal validation."""
 
 
         if params.project.value != None and params.name.value != None:
-            projectname= self.params[0].value
+            projectname = params[0].value
             tablepath_teilflaechen = self.tool.teilflaechen
             namen_cursor = arcpy.da.SearchCursor(tablepath_teilflaechen, "Name")
 

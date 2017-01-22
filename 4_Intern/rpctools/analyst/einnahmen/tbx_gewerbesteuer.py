@@ -8,7 +8,7 @@ from rpctools.analyst.einnahmen.T5_Gewerbesteuer import Gewerbesteuer
 
 
 class TbxGewerbesteuer(Tbx):
-    """Toolbox to name Teilflächen"""
+    """Toolbox Gewerbesteuer"""
 
     @property
     def label(self):

@@ -21,11 +21,11 @@ class TeilflaechenBenennen(Tool):
         flaechenname = self.par.teilflaeche.value
         alter_name = flaechenname.split('|')[2].strip()
         neuer_name = self.par.name.value
-        flaechenname_id = flaechenname.split('|')[0].replace('Nr.','').strip()
+        flaechenname_id = flaechenname.split('|')[0].replace('Nr.', '').strip()
 
         where = '"OBJECTID" = ' + flaechenname_id
 
-        rows = arcpy.UpdateCursor(self.teilflaechen,where)
+        rows = arcpy.UpdateCursor(self.teilflaechen, where)
         for row in rows:
             row.NAME = neuer_name  #self.par.name.valueAsText
             rows.updateRow(row)
@@ -61,7 +61,8 @@ class TeilflaechenBenennen(Tool):
             self.rename_flaeche(path_oekologie, tablename, attr,
                                 alter_name, neuer_name)
 
-    def rename_flaeche(self, path_definition, tablename,
+    @staticmethod
+    def rename_flaeche(path_definition, tablename,
                        attr, alter_name, neuer_name):
         table = join(path_definition, tablename)
         rows = arcpy.UpdateCursor(table)

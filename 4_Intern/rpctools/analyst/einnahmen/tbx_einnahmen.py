@@ -12,7 +12,7 @@ from rpctools.analyst.einnahmen.T7_KRU import KRU
 
 
 class _TbxEinnahmen(Tbx):
-    """Toolbox to name Teilflächen"""
+    """ Toolbox mit nur dem Parameter `name'"""
 
     def getParameterInfo(self):
         # Projektname
@@ -33,7 +33,7 @@ class _TbxEinnahmen(Tbx):
 
 
 class TbxEinkommenssteuer(_TbxEinnahmen):
-    """Toolbox to name Teilflächen"""
+    """Toolbox Einkommenssteuer"""
 
     @property
     def label(self):
@@ -45,6 +45,8 @@ class TbxEinkommenssteuer(_TbxEinnahmen):
 
 
 class TbxFamilienleistungsausgleich(_TbxEinnahmen):
+    """Toolbox Familienleistungsausgleich"""
+
     @property
     def label(self):
         return u'3 Familienleistungsausgleich'
@@ -55,6 +57,8 @@ class TbxFamilienleistungsausgleich(_TbxEinnahmen):
 
 
 class TbxKFA(_TbxEinnahmen):
+    """Toolbox Kommunaler Finanzausgleich"""
+
     @property
     def label(self):
         return u'6 Kommunaler Finanzausgleich'
@@ -65,6 +69,8 @@ class TbxKFA(_TbxEinnahmen):
 
 
 class TbxKRU(_TbxEinnahmen):
+    """Toolbox Kreisumlage"""
+
     @property
     def label(self):
         return u'7 Kreisumlage'

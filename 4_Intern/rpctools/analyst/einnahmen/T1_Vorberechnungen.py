@@ -618,7 +618,7 @@ def getAGS(projektname):
     return ags, ags_vg, ags_regenesis
 
 
-def getReGenesisAGS(self, ags_input, verbandsgemeinde, RS):
+def getReGenesisAGS(ags_input, verbandsgemeinde, RS):
     #Weiche nach Bundeslaendern und gemeinschaftsangehoerigen Gemeinden
     base_path = str(sys.path[0]).split("2_Tool")[0]
     workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')

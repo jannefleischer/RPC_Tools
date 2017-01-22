@@ -119,8 +119,8 @@ class Projektverwaltung(Tool):
 
             # copy template folder
             try:
-                shutil.copytree(self.folders.TEMPLATE_PATH,
-                                self.folders.PROJECT_PATH)
+                shutil.copytree(self.folders.TEMPLATE_FOLDER,
+                                self.folders.PROJECT_FOLDER)
             except Exception as e:
                 self.mes.AddMessage(e)
                 print e
@@ -294,4 +294,3 @@ class Projektverwaltung(Tool):
         except Exception as e:
             self.mes.AddMessage(e)
             print e
-

@@ -21,7 +21,5 @@ from rpctools.utils.params import Tool
 
 class InstallationPruefen(Tool):
     """"""
-    def main(self):
+    def run(self):
         """"""
-
-

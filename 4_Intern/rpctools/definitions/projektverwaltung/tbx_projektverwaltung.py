@@ -91,9 +91,7 @@ class TbxProjektVerwaltung(Tbx):
         params.shapefile.enabled = False
         params.begin.enabled = False
         params.end.enabled = False
-        params.existing_project.value = " "
         params.existing_project.filter.list = [" "]
-        params.name.value = " "
 
         return params
 
@@ -143,6 +141,4 @@ class TbxProjektVerwaltung(Tbx):
         # Ende des Betrachtungszeitraumes prüfen
         # und ggf. auf ein Jahr nach Beginn setzen
         if params.end.value <= params.begin.value:
-                params.end.value = params.begin.value + 1
-
-
+            params.end.value = params.begin.value + 1

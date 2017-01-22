@@ -35,8 +35,7 @@ class Flaechenbilanz(Tool):
     def flaechenbilanz(self):
         return self.folders.get_table('Flaechenbilanz')
 
-    def main(self):
-        gc.collect()
+    def run(self):
         arcpy.env.overwriteOutput = True
 
         #Pfade einrichten

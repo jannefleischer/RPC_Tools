@@ -18,13 +18,13 @@ class TbxFlaechenbilanz(Tbx):
         return encode(u'1 Flächenbilanz eingeben')
 
     @property
-    def tool(self):
+    def Tool(self):
         return Flaechenbilanz
 
     def getParameterInfo(self):
         # Projektname
         params = self.par
-        projekte = self.folders.get_projekte()
+        projekte = self.folders.get_projects()
         p = params.name = arcpy.Parameter()
         p.name = u'Projektname'
         p.displayName = u'Projektname'
@@ -236,10 +236,11 @@ class TbxFlaechenbilanz(Tbx):
         return params
 
     def eingaben_auslesen(self):
+        params = self.par
         projectname = params.name.value
         teilflaeche = params.teilflaeche.value
-        tablepath_teilflaechen = self.teilflaechen
-        tablepath_flaechenbilanz = self.flaechenbilanz
+        tablepath_teilflaechen = self.tool.teilflaechen
+        tablepath_flaechenbilanz = self.tool.flaechenbilanz
 
         # Oberkategorien
         queries_S1 = ((1, 'Erschliessungsflaeche'),
@@ -297,6 +298,7 @@ class TbxFlaechenbilanz(Tbx):
         return
 
     def sliderSummenKontrolle(self, listeSliderID, zielwertSlidersumme):
+        params = self.par
         istsumme = 0
         for s in listeSliderID:
             istsumme+=params[s].value
@@ -334,11 +336,11 @@ class TbxFlaechenbilanz(Tbx):
 
             if list_teilflaechen:
                 params.teilflaechen.value = list_teilflaechen[0]
-                self.eingaben_auslesen(params)
+                self.eingaben_auslesen()
 
         # bestehende Eingaben (falls vorhanden) übernehmen
         if params.teilflaechen.altered and not params.teilflaechen.hasBeenValidated:
-            self.eingaben_auslesen(params)
+            self.eingaben_auslesen()
 
         # Slider generieren
         i = 2

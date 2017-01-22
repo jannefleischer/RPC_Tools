@@ -23,13 +23,14 @@ class Nutzungen(Tool):
         parameterString = parameters[1].valueAsText
 
         Teilflaeche_Plangebiet = parameterString.split(" | ")[0]
-        tabelle_gebaude = self.get_table('Gebaeude_Details')
-        tabelle_wohneinheiten_details = self.get_table('Wohneinheiten_Details')
-        tabelle_verkaufsflaechen = self.get_table('Versorgung_Verkaufsflaechen')
-        tabelle_gewerbe = self.get_table('Gewerbe_Teilflaechen')
-        tabelle_betriebsflaeche = self.get_table('Gewerbe_Betriebsflaechen')
-        tabelle_betriebsstruktur = self.get_table('Gewerbe_Betriebsstruktur')
-        tabelle_gewerbeanteile = self.get_table('Gewerbe_Anteile')
+        folders = self.folders
+        tabelle_gebaude = folders.get_table('Gebaeude_Details')
+        tabelle_wohneinheiten_details = folders.get_table('Wohneinheiten_Details')
+        tabelle_verkaufsflaechen = folders.get_table('Versorgung_Verkaufsflaechen')
+        tabelle_gewerbe = folders.get_table('Gewerbe_Teilflaechen')
+        tabelle_betriebsflaeche = folders.get_table('Gewerbe_Betriebsflaechen')
+        tabelle_betriebsstruktur = folders.get_table('Gewerbe_Betriebsstruktur')
+        tabelle_gewerbeanteile = folders.get_table('Gewerbe_Anteile')
 
         #Alte Eingaben löschen
 
@@ -70,8 +71,8 @@ class Nutzungen(Tool):
 
         # WOHNGEBÄUDE
 
-        flaechenbilanz = self.get_table('Flaechenbilanz')
-        plangebiet = self.get_table('Teilflaechen_Plangebiet')
+        flaechenbilanz = folders.get_table('Flaechenbilanz')
+        plangebiet = selfolders.get_table('Teilflaechen_Plangebiet')
 
         cursor = arcpy.da.UpdateCursor(plangebiet, ['Name','Beginn_Nutzung','Aufsiedlungsdauer'])
         for row in cursor:
@@ -123,7 +124,7 @@ class Nutzungen(Tool):
             del row, Insert
 
             #tabelle "Wohneinheiten_Details" oeffnen und Werte fuer Miete_Eigentum. und Anzahl Wohneinheiten speichern
-            tabelle_wohneinheiten_details = self.get_table('Wohneinheiten_Details')
+            tabelle_wohneinheiten_details = folders.get_table('Wohneinheiten_Details')
 
             Insert = arcpy.da.InsertCursor(
                 tabelle_wohneinheiten_details,
@@ -653,7 +654,6 @@ class Nutzungen(Tool):
                 sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
 
                 tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer, sql)
-                parameter_jahr
 
                 row2 = tabelle_parameter_aufsiedlungsdauer_Search.next()
                 row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
@@ -1471,7 +1471,7 @@ class Nutzungen(Tool):
                 tablepath_Flaechenbilanz = join(workspace_projekt_gewerbe,'Flaechenbilanz')
                 tablepath_Gebaeude = join(workspace_projekt_gewerbe,'Gebaeude_Details')
                 tablepath_Betriebe = join(workspace_projekt_gewerbe,'Gewerbe_Betriebsstruktur')
-                grafikpath_erlauterungstext = self.folders.get_base_table(u'Erläuterungstexte')
+                grafikpath_erlauterungstext = self.folders.get_basedb(u'Erläuterungstexte')
 
                 logo = join(grafikpath_erlauterungstext, "logo_rpc.png")
                 ausgabeordner = join(self.folders.get_projectpath(), 'Ergebnisausgabe','Excel')
@@ -2181,7 +2181,7 @@ class Nutzungen(Tool):
 
         #EINZELHANDEL
         projectname = parameters[0].valueAsText
-        tabelle_gebaude = self.get_table('Gebaeude_Details')
+        tabelle_gebaude = folders.get_table('Gebaeude_Details')
         Insert = arcpy.InsertCursor(tabelle_gebaude)
         row = Insert.newRow()
         row.Teilflaeche_Plangebiet = parameters[1].valueAsText
@@ -2190,7 +2190,7 @@ class Nutzungen(Tool):
         del row, Insert
 
         #tabelle "Wohneinheiten_Details" oeffnen und Werte fuer Miete_Eigentum, Qualitastsstufe und Anzahl Wohneinheiten speichern
-        tabelle_wohneineheiten_details = self.get_table('Wohneinheiten_Details')
+        tabelle_wohneineheiten_details = folders.get_table('Wohneinheiten_Details')
         Insert = arcpy.InsertCursor(tabelle_wohneineheiten_details)
         row = Insert.newRow()
         row.Gebaeudetyp = "Einzelhandel"
@@ -2204,7 +2204,7 @@ class Nutzungen(Tool):
         del row, Insert
 
         #tabelle "Versorgung_Verkaufsflaechen" oeffnen und Werte  speichern
-        tabelle_Versorgung_Verkaufsflaechen = self.get_table('Versorgung_Verkaufsflaechen')
+        tabelle_Versorgung_Verkaufsflaechen = folders.get_table('Versorgung_Verkaufsflaechen')
         Insert = arcpy.InsertCursor(tabelle_Versorgung_Verkaufsflaechen)
         row = Insert.newRow()
         row.Teilflaeche_Plangebiet = parameters[1].valueAsText

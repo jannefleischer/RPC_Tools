@@ -20,7 +20,7 @@ class Folders(object):
     """"""
     def __init__(self, params=None):
         """class that returns path"""
-        self.BASE_PATH = abspath(join(dirname(__file__),'..', '..', '..'))
+        self.BASE_PATH = abspath(join(dirname(__file__), '..', '..', '..'))
         self._PROJECT_FOLDER = '3_Projekte'
         self._INTERN = '4_Intern'
         self._BASE_DBS = 'fgdbs'

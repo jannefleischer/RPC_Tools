@@ -34,71 +34,6 @@ import rpctools.utils.population_lib as population_lib
 class Einkommenssteuer(Tool):
 
     _dbname = 'FGDB_Einnahmen.gdb'
-    #############################################################################################################
-    #
-    # Funktionen
-    #
-    #############################################################################################################
-
-    def getRS(ags_in):
-        base_path = str(sys.path[0]).split("2_Tool")[0]
-        workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
-
-        VG250 = join(workspace_basisdaten,'VG250')
-        where = '"AGS"'+" ='"+ ags_in + "'"
-        fields = "RS"
-        rows = arcpy.da.SearchCursor(VG250, fields, where)
-
-        for row in rows:
-            regionalschluessel = row[0]
-
-        if regionalschluessel[2:] == "0000000000":
-            regionalschluessel = regionalschluessel[0:2]
-
-        return regionalschluessel
-
-    def getRS_VG(ags_in):
-        base_path = str(sys.path[0]).split("2_Tool")[0]
-        workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
-
-        VG250 = join(workspace_basisdaten,'VG250')
-        where = '"AGS"'+" ='"+ ags_in + "'"
-        fields = ["SN_L","SN_R","SN_K","SN_V1","SN_V2"]
-        rows = arcpy.da.SearchCursor(VG250, fields, where)
-
-        for row in rows:
-            regionalschluessel = row[0] + row[1] + row[2] + row[3] + row[4]
-
-        return regionalschluessel
-
-
-    def getAnteilEKS(ags_input,jahr):
-        query = "http://api.regenesis.pudo.org/cube/71231gj001/facts?cut=gemein.name:"+ags_input+"|jahr.text:"+str(jahr)
-
-        queryresult = urllib2.urlopen(query)
-        jsonContent = queryresult.read()
-        data = json.loads(jsonContent)
-
-        AnteilEKS = int(data[0][u'steu08'])
-        time.sleep(0.5)
-        return(AnteilEKS)
-
-
-    def getAnzHH(ags_input):
-        query = "https://ergebnisse.zensus2011.de/auswertungsdb/download?csv="+ags_input+"&tableId=GWZ_4_1_0&locale=DE"
-
-        queryresult = urllib2.urlopen(query).read()
-        time.sleep(1)
-        AnzHH = queryresult.split('Insgesamt;')[3].split(";")[0]
-
-        time.sleep(0.5)
-        return(AnzHH)
-
-    #############################################################################################################
-    #
-    # Beginne Hauptteil
-    #
-    #############################################################################################################
 
     def run(self):
         parameters = self.par
@@ -617,3 +552,58 @@ class Einkommenssteuer(Tool):
         gc.collect()
         print "fertig"
         arcpy.AddMessage('02_Einkommensteuer abgeschlossen')
+        
+        
+def getRS(ags_in):
+    base_path = str(sys.path[0]).split("2_Tool")[0]
+    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+
+    VG250 = join(workspace_basisdaten,'VG250')
+    where = '"AGS"'+" ='"+ ags_in + "'"
+    fields = "RS"
+    rows = arcpy.da.SearchCursor(VG250, fields, where)
+
+    for row in rows:
+        regionalschluessel = row[0]
+
+    if regionalschluessel[2:] == "0000000000":
+        regionalschluessel = regionalschluessel[0:2]
+
+    return regionalschluessel
+
+def getRS_VG(ags_in):
+    base_path = str(sys.path[0]).split("2_Tool")[0]
+    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+
+    VG250 = join(workspace_basisdaten,'VG250')
+    where = '"AGS"'+" ='"+ ags_in + "'"
+    fields = ["SN_L","SN_R","SN_K","SN_V1","SN_V2"]
+    rows = arcpy.da.SearchCursor(VG250, fields, where)
+
+    for row in rows:
+        regionalschluessel = row[0] + row[1] + row[2] + row[3] + row[4]
+
+    return regionalschluessel
+
+
+def getAnteilEKS(ags_input,jahr):
+    query = "http://api.regenesis.pudo.org/cube/71231gj001/facts?cut=gemein.name:"+ags_input+"|jahr.text:"+str(jahr)
+
+    queryresult = urllib2.urlopen(query)
+    jsonContent = queryresult.read()
+    data = json.loads(jsonContent)
+
+    AnteilEKS = int(data[0][u'steu08'])
+    time.sleep(0.5)
+    return(AnteilEKS)
+
+
+def getAnzHH(ags_input):
+    query = "https://ergebnisse.zensus2011.de/auswertungsdb/download?csv="+ags_input+"&tableId=GWZ_4_1_0&locale=DE"
+
+    queryresult = urllib2.urlopen(query).read()
+    time.sleep(1)
+    AnzHH = queryresult.split('Insgesamt;')[3].split(";")[0]
+
+    time.sleep(0.5)
+    return(AnzHH)

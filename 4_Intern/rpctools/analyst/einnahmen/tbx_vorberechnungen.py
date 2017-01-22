@@ -8,7 +8,7 @@ from rpctools.analyst.einnahmen.T1_Vorberechnungen import Vorberechnungen
 
 
 class TbxVorberechnungen(Tbx):
-    """Toolbox to name Teilflächen"""
+    """Toolbox Vorberechnungen für Einnahmen"""
 
     @property
     def label(self):
