@@ -14,6 +14,7 @@
 
 import os, sys
 import _rpcpath
+import subprocess
 
 def install_packages(python_path):
 
@@ -64,8 +65,13 @@ def install_packages(python_path):
             print("Paket " + package + " konnte nicht installiert werden." + "\n")
 
     # install rpcpackage from local directory
-    pip.main(['install', '--target', install_path, '--editable', '.',
-              '--upgrade'])
+    arcgis_python = join(python_path, 'python')
+    subprocess.call([arcgis_python, 'get-pip.py'] )
+    pip_arcgis = join(python_path, 'Scripts', 'pip')
+    subprocess.call([pip_arcgis, 'install', '--editable', '.', '--upgrade'] )
+    # --target und --editable geht nicht gemeinsam
+    #pip.main(['install', '--target', install_path, '--editable', '.',
+              #'--upgrade'])
 
     print('Installation abgeschlossen.')
     raw_input()
