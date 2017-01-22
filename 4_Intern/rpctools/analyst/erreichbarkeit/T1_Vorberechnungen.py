@@ -18,6 +18,8 @@ import sys
 import urllib
 import re
 import arcpy
+from os.path import join
+
 
 def main(parameters, messages):
     # Variablen definieren

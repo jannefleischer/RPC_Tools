@@ -12,12 +12,11 @@
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 
-def recalcPopulation(projektname):
-    import arcpy, os, imp, sys
 
-    # load tempMDB Function
-    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
-    mdb = imp.load_source('tempmdb_lib', mdblibpath)
+import rpctools.utils.tempmdb_lib as mdb
+import arcpy, os, imp, sys
+
+def recalcPopulation(projektname):
 
     #get Paths
     base_path = str(sys.path[0]).split("2_Tool")[0]

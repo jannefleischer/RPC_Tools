@@ -20,18 +20,13 @@ import sys
 import imp
 import arcpy
 import xlsxwriter
+from os.path import join
+
+import rpctools.utils.sheet_lib as sl
+import rpctools.utils.tempmdb_lib as mdb
+import rpctools.utils.population_lib as pop
 
 def main(parameters, messages):
-
-    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
-    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
-    sl = imp.load_source('sheet_lib', sheetlibpath)
-
-    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
-    mdb = imp.load_source('tempmdb_lib', mdblibpath)
-
-    poplibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','population_lib.py'))
-    pop = imp.load_source('population_lib', poplibpath)
 
     gc.collect()
 

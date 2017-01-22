@@ -28,7 +28,7 @@ import arcpy
 import xlsxwriter
 
 from rpctools.utils.params import Tool
-import rpctools.utils.sheet_lib as sheet_lib
+import rpctools.utils.sheet_lib as sl
 import rpctools.utils.tempmdb_lib as tempmdb_lib
 import rpctools.utils.population_lib as population_lib
 

@@ -18,23 +18,16 @@ import os
 import gc
 import sys
 import imp
+from os.path import join
+
+import rpctools.utils.tempmdb_lib as mdb
+import rpctools.utils.population_lib as pop
 
 import arcpy
 
-import verkehr_lib as v
+import rpctools.utils.verkehr_lib as v
 
 def main(parameters, messages):
-    gc.collect()
-
-    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
-    sl = imp.load_source('sheet_lib', sheetlibpath)
-
-    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
-    mdb = imp.load_source('tempmdb_lib', mdblibpath)
-
-    poplibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','population_lib.py'))
-    pop = imp.load_source('population_lib', poplibpath)
-
     arcpy.env.overwriteOutput = True
 
     # Variables

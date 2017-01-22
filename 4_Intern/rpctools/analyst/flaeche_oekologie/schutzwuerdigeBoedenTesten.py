@@ -16,6 +16,8 @@
 import os
 import sys
 import arcpy
+from os.path import join
+
 
 def main(parameters, messages):
     projektname = parameters[0].valueAsText

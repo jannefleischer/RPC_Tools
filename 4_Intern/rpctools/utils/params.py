@@ -24,8 +24,8 @@ class Params(object):
         param_dbname : str (optional)
             the name of the Default Database for the Tool
 
-        Example
-        -------
+        Examples
+        --------
         >>> params = Params()
         >>> params.param1 = 99
         >>> params.param2 = 42
@@ -170,17 +170,23 @@ class Tool(object):
 
 
 class Tbx(object):
+    """Base Class for a ArcGIS Toolbox"""
     __metaclass__ = ABCMeta
 
     @abstractproperty
     def Tool(self):
-        """"""
+        """
+        Returns the Toolclass
+        To be defined in the subclass
+        """
 
     @abstractproperty
     def label(self):
-        """"""
+        """
+        Returns the label as string
+        To be defined in the subclass
+        """
 
-    """Base Class for a ArcGIS Toolbox"""
     def __init__(self):
         # reload the tool's module
         reload(sys.modules[self.Tool.__module__])
@@ -227,4 +233,3 @@ class Tbx(object):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(verbose=True)
-

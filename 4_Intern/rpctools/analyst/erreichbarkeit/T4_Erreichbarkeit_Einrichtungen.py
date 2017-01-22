@@ -25,11 +25,13 @@ import math
 import arcpy
 import xlrd
 import imp
+from os.path import join
+
 BASE_PATH = os.path.abspath(join(os.path.dirname(__file__),
                                          '..', '..'))
 LIB_PATH = join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
-url_lib = imp.load_source('url_lib',
-                          join(LIB_PATH, 'url_lib.py'))
+import rpctools.utils.url_lib as url_lib
+
 
 
 #---------------------------------------------------------------------------------------

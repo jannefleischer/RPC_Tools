@@ -13,6 +13,8 @@
 # ---------------------------------------------------------------------------
 
 import arcpy, os, datetime, sys, gc
+from os.path import join
+
 
 def oekologischeFolgen(bedeckungNullfall, bedeckungPlanfall):
     try:

@@ -21,11 +21,12 @@ import datetime
 
 import arcpy
 import xlsxwriter
+from os.path import join
+
+import rpctools.utils.sheet_lib as sl
+
 
 def main(parameters, messages):
-    # import sheet_lib as sl
-    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
-    sl = imp.load_source('sheet_lib', sheetlibpath)
 
     projektname = str(parameters[0].valueAsText)
 

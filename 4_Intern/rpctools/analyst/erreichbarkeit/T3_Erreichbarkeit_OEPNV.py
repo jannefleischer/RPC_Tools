@@ -28,6 +28,8 @@ import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import  FuncFormatter
 import numpy as np
+from os.path import join
+
 
 def main(parameters, messages):
     #---------------------------------------------------------------------------------------

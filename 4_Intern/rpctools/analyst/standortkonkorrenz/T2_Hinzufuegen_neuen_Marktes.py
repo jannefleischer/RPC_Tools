@@ -21,18 +21,18 @@ import os
 import sys
 import xml.dom.minidom as minidom
 import unicodedata
+from os.path import join
 
 import arcpy
 BASE_PATH = os.path.abspath(join(os.path.dirname(__file__),
                                          '..', '..'))
-LIB_PATH = join(BASE_PATH, '2_Tool', '2_Projektverwaltung')
-url_lib = imp.load_source('url_lib',
-                          join(LIB_PATH, 'url_lib.py'))
+
+import rpctools.utils.url_lib as url_lib
+import rpctools.utils.tempmdb_lib as mdb
+
 
 def main(parameters, messages):
     gc.collect()
-    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
-    mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
     def _callback(matches):
         id = matches.group(1)

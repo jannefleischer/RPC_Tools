@@ -24,12 +24,10 @@ import imp
 import csv
 
 import arcpy
+from os.path import join
+
 
 def main(parameters, messages):
-    # import sheet_lib as sl
-    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
-    sl = imp.load_source('sheet_lib', sheetlibpath)
-
     arcpy.env.overwriteOutput = True
 
     projektname = str(parameters[0].valueAsText)

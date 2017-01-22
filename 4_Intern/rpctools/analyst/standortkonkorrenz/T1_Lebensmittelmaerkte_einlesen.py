@@ -23,6 +23,8 @@ import xml.dom.minidom as minidom
 
 import arcpy
 import xlrd
+from os.path import join
+
 
 def main(parameters, messages):
     gc.collect()

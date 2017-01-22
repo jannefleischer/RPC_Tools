@@ -20,16 +20,15 @@ import shutil
 import gc
 import sys
 import imp
+from os.path import join
+
 
 import arcpy
-from arcpy import env
 
-import verkehr_lib as v
+import rpctools.utils.verkehr_lib as v
+import rpctools.utils.tempmdb_lib as mdb
 
 def main(parameters, messages):
-    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
-    mdb = imp.load_source('tempmdb_lib', mdblibpath)
-
     arcpy.env.overwriteOutput = True
 
     # Variables

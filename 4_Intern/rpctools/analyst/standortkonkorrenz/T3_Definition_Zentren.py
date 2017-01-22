@@ -15,6 +15,8 @@
 
 import gc
 import os
+from os.path import join
+
 
 import arcpy
 def main(parameters, messages):

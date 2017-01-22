@@ -16,14 +16,13 @@
 # Import arcpy modules
 import arcpy, os, inspect, pyodbc, shutil, gc, sys, datetime, xlsxwriter, imp
 from xlsxwriter.utility import xl_rowcol_to_cell
+from os.path import join
+
+import rpctools.utils.sheet_lib as sl
+import rpctools.utils.tempmdb_lib as mdb
+
 
 def main(parameters, messages):
-
-    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
-    sl = imp.load_source('sheet_lib', sheetlibpath)
-
-    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
-    mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
     gc.collect()
 

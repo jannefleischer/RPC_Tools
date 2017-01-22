@@ -12,10 +12,11 @@
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 
-
+import rpctools.utils.tempmdb_lib as mdb
+from os.path import join
+import arcpy, os, sys, datetime, imp
 
 def infosheet(projektname, wirkungsfeld, wb):
-    import arcpy, os, sys, datetime, imp
 
     # Pfade setzen
     base_path = str(sys.path[0]).split("2_Tool")[0]
@@ -33,10 +34,6 @@ def infosheet(projektname, wirkungsfeld, wb):
     ####################################################################
     #erstelle Diverse Tabellen zur Erzeugung des Uebersichtsdatenblattes
     ####################################################################
-
-    #Importiere das Modul temp_mdb
-    mdblibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','tempmdb_lib.py'))
-    mdb = imp.load_source('tempmdb_lib', mdblibpath)
 
 
     #Tabelle "Teilflaechen_Flaechenbilanz_gruppiert" erzeugen, falls noch nicht vorhanden

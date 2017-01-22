@@ -25,7 +25,7 @@ import xlsxwriter
 
 
 from rpctools.utils.params import Tool
-import rpctools.utils.sheet_lib as sheet_lib
+import rpctools.utils.sheet_lib as sl
 import rpctools.utils.tempmdb_lib as tempmdb_lib
 import rpctools.utils.population_lib as population_lib
 
@@ -552,8 +552,8 @@ class Einkommenssteuer(Tool):
         gc.collect()
         print "fertig"
         arcpy.AddMessage('02_Einkommensteuer abgeschlossen')
-        
-        
+
+
 def getRS(ags_in):
     base_path = str(sys.path[0]).split("2_Tool")[0]
     workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')

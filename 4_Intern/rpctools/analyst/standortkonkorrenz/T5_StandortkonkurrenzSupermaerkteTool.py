@@ -22,6 +22,9 @@ import gc
 import os
 import arcpy
 import xlsxwriter
+from os.path import join
+
+import rpctools.utils.sheet_lib as sl
 
 
 def main(parameters, messages):
@@ -29,9 +32,6 @@ def main(parameters, messages):
 
     #Pfade einrichten
     base_path = str(sys.path[0]).split("2_Tool")[0]
-    # import sheet_lib as sl
-    sheetlibpath = os.path.abspath(join(os.path.dirname( __file__ ), '..', '2_Projektverwaltung','sheet_lib.py'))
-    sl = imp.load_source('sheet_lib', sheetlibpath)
 
     workspace_basis_daten_wert=join(base_path,'2_Tool',"G_Standortkonkurrenz_Supermaerkte",'FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
     workspace_texte_erlaeterung = join(base_path,'2_Tool','G_Standortkonkurrenz_Supermaerkte','Erlaeuterungstexte')

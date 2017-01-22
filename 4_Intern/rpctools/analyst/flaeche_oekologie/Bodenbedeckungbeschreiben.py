@@ -14,6 +14,8 @@
 import os
 import arcpy
 import sys
+from os.path import join
+
 
 def main(parameters, messages):
     wcd = os.getcwd()
