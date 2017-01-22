@@ -102,7 +102,7 @@
 
         <span class="k">return</span> <span class="n">params</span></div>
 
-    <span class="k">def</span> <span class="nf">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<div class="viewcode-block" id="TbxTeilflaecheBenennen._updateParameters"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.tbx_teilflaechen_bennenen.html#rpctools.definitions.projektverwaltung.tbx_teilflaechen_bennenen.TbxTeilflaecheBenennen._updateParameters">[docs]</a>    <span class="k">def</span> <span class="nf">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Modify the values and properties of parameters before internal</span>
 <span class="sd">        validation is performed.  This method is called whenever a parameter</span>
 <span class="sd">        has been changed.&quot;&quot;&quot;</span>
@@ -139,9 +139,9 @@
 
             <span class="n">projectname</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">project</span><span class="o">.</span><span class="n">value</span>
             <span class="n">flaechenname</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">teilflaeche</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">flaechenname_id</span> <span class="o">=</span> <span class="n">flaechenname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Nr.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">flaechenname_id</span> <span class="o">=</span> <span class="n">flaechenname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Nr.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">_updateMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<div class="viewcode-block" id="TbxTeilflaecheBenennen._updateMessages"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.tbx_teilflaechen_bennenen.html#rpctools.definitions.projektverwaltung.tbx_teilflaechen_bennenen.TbxTeilflaecheBenennen._updateMessages">[docs]</a>    <span class="k">def</span> <span class="nf">_updateMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Modify the messages created by internal validation for each tool</span>
 <span class="sd">        parameter.  This method is called after internal validation.&quot;&quot;&quot;</span>
 
@@ -155,7 +155,7 @@
 
             <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">namen_cursor</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-                    <span class="n">params</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">setErrorMessage</span><span class="p">(</span><span class="s2">&quot;Name wurde bereits vergeben.&quot;</span><span class="p">)</span></div>
+                    <span class="n">params</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">setErrorMessage</span><span class="p">(</span><span class="s2">&quot;Name wurde bereits vergeben.&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

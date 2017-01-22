@@ -26,7 +26,8 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="rpctools.utils.lib_gewerbemodell module" href="rpctools.utils.lib_gewerbemodell.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -38,7 +39,12 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">RPC</a> &#187;</li> 
+        <li class="right" >
+          <a href="rpctools.utils.lib_gewerbemodell.html" title="rpctools.utils.lib_gewerbemodell module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="rpctools.html" >rpctools package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="rpctools.utils.html" accesskey="U">rpctools.utils package</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -117,6 +123,31 @@
 </div>
 </dd></dl>
 
+<dl class="method">
+<dt id="rpctools.utils.params.Params._get_projectname">
+<code class="descname">_get_projectname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rpctools/utils/params.html#Params._get_projectname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rpctools.utils.params.Params._get_projectname" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the value for project name parameter if exists, else None</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>projectname</strong> : str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rpctools.utils.params.Params._set_validated">
+<code class="descname">_set_validated</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rpctools/utils/params.html#Params._set_validated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rpctools.utils.params.Params._set_validated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rpctools.utils.params.Params._update_parameters">
+<code class="descname">_update_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rpctools/utils/params.html#Params._update_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rpctools.utils.params.Params._update_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>update the parameter values with a list of parameters</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -167,6 +198,17 @@
 <dt id="rpctools.utils.params.Tbx.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rpctools/utils/params.html#Tbx.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rpctools.utils.params.Tbx.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="rpctools.utils.params.Tbx._updateMessages">
+<code class="descname">_updateMessages</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rpctools/utils/params.html#Tbx._updateMessages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rpctools.utils.params.Tbx._updateMessages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rpctools.utils.params.Tbx._updateParameters">
+<code class="descname">_updateParameters</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rpctools/utils/params.html#Tbx._updateParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rpctools.utils.params.Tbx._updateParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the Parameters if something changed</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.utils.params.Tbx.execute">
@@ -261,6 +303,17 @@ To be defined in the subclass</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="rpctools.utils.params.Tool._dbname">
+<code class="descname">_dbname</code><em class="property"> = None</em><a class="headerlink" href="#rpctools.utils.params.Tool._dbname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base Class for a ArcGIS Tool</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rpctools.utils.params.Tool._param_projectname">
+<code class="descname">_param_projectname</code><em class="property"> = 'name'</em><a class="headerlink" href="#rpctools.utils.params.Tool._param_projectname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="rpctools.utils.params.Tool.db">
 <code class="descname">db</code><a class="headerlink" href="#rpctools.utils.params.Tool.db" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -275,6 +328,9 @@ To be defined in the subclass</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="rpctools.utils.lib_gewerbemodell.html"
+                        title="previous chapter">rpctools.utils.lib_gewerbemodell module</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -305,7 +361,12 @@ To be defined in the subclass</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">RPC</a> &#187;</li> 
+        <li class="right" >
+          <a href="rpctools.utils.lib_gewerbemodell.html" title="rpctools.utils.lib_gewerbemodell module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="rpctools.html" >rpctools package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="rpctools.utils.html" >rpctools.utils package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

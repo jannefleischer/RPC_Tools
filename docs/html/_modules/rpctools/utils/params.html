@@ -160,7 +160,7 @@
         <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">pformat</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_update_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+<div class="viewcode-block" id="Params._update_parameters"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Params._update_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">_update_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;update the parameter values with a list of parameters&quot;&quot;&quot;</span>
         <span class="n">n_params_tbx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">n_params_tool</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
@@ -169,9 +169,9 @@
                                                          <span class="n">n_params_tool</span><span class="p">)</span>
         <span class="c1"># setze die Werte</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="p">):</span>
-            <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_projectname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Params._get_projectname"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Params._get_projectname">[docs]</a>    <span class="k">def</span> <span class="nf">_get_projectname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        return the value for project name parameter if exists, else None</span>
 
@@ -182,13 +182,13 @@
         <span class="n">param_projectname</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_projectname</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">param_projectname</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">param_projectname</span><span class="o">.</span><span class="n">value</span>
-        <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
-    <span class="k">def</span> <span class="nf">_set_validated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Params._set_validated"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Params._set_validated">[docs]</a>    <span class="k">def</span> <span class="nf">_set_validated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">):</span>
                 <span class="n">param</span><span class="o">.</span><span class="n">_altered</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="n">param</span><span class="o">.</span><span class="n">_validated</span> <span class="o">=</span> <span class="kc">True</span></div>
+                <span class="n">param</span><span class="o">.</span><span class="n">_validated</span> <span class="o">=</span> <span class="kc">True</span></div></div>
 
 
 <div class="viewcode-block" id="Tool"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tool">[docs]</a><span class="k">class</span> <span class="nc">Tool</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -265,16 +265,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">_set_validated</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Update the Parameters if something changed&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Tbx._updateParameters"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx._updateParameters">[docs]</a>    <span class="k">def</span> <span class="nf">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the Parameters if something changed&quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="Tbx.updateMessages"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx.updateMessages">[docs]</a>    <span class="k">def</span> <span class="nf">updateMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">_update_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_updateMessages</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_updateMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Tbx._updateMessages"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx._updateMessages">[docs]</a>    <span class="k">def</span> <span class="nf">_updateMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="Tbx.execute"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">messages</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run the tool with the parameters and messages from ArcGIS&quot;&quot;&quot;</span>

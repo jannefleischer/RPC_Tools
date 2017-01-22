@@ -62,10 +62,10 @@
 <span class="kn">from</span> <span class="nn">rpctools.analyst.einnahmen.T7_KRU</span> <span class="k">import</span> <span class="n">KRU</span>
 
 
-<span class="k">class</span> <span class="nc">_TbxEinnahmen</span><span class="p">(</span><span class="n">Tbx</span><span class="p">):</span>
+<div class="viewcode-block" id="_TbxEinnahmen"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.tbx_einnahmen.html#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen">[docs]</a><span class="k">class</span> <span class="nc">_TbxEinnahmen</span><span class="p">(</span><span class="n">Tbx</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Toolbox mit nur dem Parameter `name&#39;&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="_TbxEinnahmen.getParameterInfo"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.tbx_einnahmen.html#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.getParameterInfo">[docs]</a>    <span class="k">def</span> <span class="nf">getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Projektname</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
         <span class="n">projekte</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_projects</span><span class="p">()</span>
@@ -80,7 +80,7 @@
         <span class="k">if</span> <span class="n">projekte</span><span class="p">:</span>
             <span class="n">param_1</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">projekte</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">params</span>
+        <span class="k">return</span> <span class="n">params</span></div></div>
 
 
 <div class="viewcode-block" id="TbxEinkommenssteuer"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.tbx_einnahmen.html#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer">[docs]</a><span class="k">class</span> <span class="nc">TbxEinkommenssteuer</span><span class="p">(</span><span class="n">_TbxEinnahmen</span><span class="p">):</span>

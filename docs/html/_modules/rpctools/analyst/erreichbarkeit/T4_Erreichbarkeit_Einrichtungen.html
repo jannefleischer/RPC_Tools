@@ -87,12 +87,12 @@
 
 <span class="c1">#---------------------------------------------------------------------------------------</span>
 <span class="c1"># Unicode</span>
-<span class="k">def</span> <span class="nf">_callback</span><span class="p">(</span><span class="n">matches</span><span class="p">):</span>
+<div class="viewcode-block" id="_callback"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.erreichbarkeit.T4_Erreichbarkeit_Einrichtungen.html#rpctools.analyst.erreichbarkeit.T4_Erreichbarkeit_Einrichtungen._callback">[docs]</a><span class="k">def</span> <span class="nf">_callback</span><span class="p">(</span><span class="n">matches</span><span class="p">):</span>
     <span class="nb">id</span> <span class="o">=</span> <span class="n">matches</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">unichr</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
     <span class="k">except</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">id</span>
+        <span class="k">return</span> <span class="nb">id</span></div>
 
 <div class="viewcode-block" id="decode_unicode_references"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.erreichbarkeit.T4_Erreichbarkeit_Einrichtungen.html#rpctools.analyst.erreichbarkeit.T4_Erreichbarkeit_Einrichtungen.decode_unicode_references">[docs]</a><span class="k">def</span> <span class="nf">decode_unicode_references</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&amp;#(\d+)(;|(?=\s))&quot;</span><span class="p">,</span> <span class="n">_callback</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
