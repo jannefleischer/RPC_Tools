@@ -23,6 +23,47 @@ class Params(object):
             the name of the project_name-Parameter
         param_dbname : str (optional)
             the name of the Default Database for the Tool
+
+        Example
+        -------
+        >>> params = Params()
+        >>> params.param1 = 99
+        >>> params.param2 = 42
+        >>> params.param3 = 123
+
+        >>> params[0]
+        99
+        >>> params[1]
+        42
+        >>> params.param2
+        42
+        >>> params.param1
+        99
+        >>> params['param2']
+        42
+        >>> for param in params:
+        ...     print(param)
+        99
+        42
+        123
+        >>> del params.param1
+        >>> params.param1
+        Traceback (most recent call last):
+            ...
+        KeyError: 'param1'
+        >>> params[0]
+        42
+        >>> params[1]
+        123
+        >>> params[2]
+        Traceback (most recent call last):
+            ...
+        IndexError: list index out of range
+        >>> del params[0]
+        >>> params[0]
+        123
+        >>> params.param3
+        123
         """
         self._od = OrderedDict(*args, **kwargs)
         self._param_projectname = param_projectname
@@ -51,6 +92,12 @@ class Params(object):
             self._od.items()[i] = value
         except TypeError:
             self._od[i] = value
+
+    def __delitem__(self, i):
+        try:
+            del self._od[i]
+        except KeyError:
+            del self._od[self._od.keys()[i]]
 
     def __iter__(self):
         return self._od.itervalues()
@@ -175,4 +222,9 @@ class Tbx(object):
     def execute(self, parameters=None, messages=None):
         """Run the tool with the parameters and messages from ArcGIS"""
         self.tool.main(parameters, messages)
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod(verbose=True)
 
