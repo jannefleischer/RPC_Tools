@@ -1,0 +1,501 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.analyst.erreichbarkeit.T2_Zentrale_Orte_OEPNV_Abfrage &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.analyst.erreichbarkeit.T2_Zentrale_Orte_OEPNV_Abfrage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># 02_Zentrale_Orte_OEPNV_Abfrage.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description:</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># HCU Hamburg</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<span class="c1">#############################################################################################################</span>
+<span class="c1"># Import arcpy modules</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">imp</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.erreichbarkeit.T2_Zentrale_Orte_OEPNV_Abfrage.html#rpctools.analyst.erreichbarkeit.T2_Zentrale_Orte_OEPNV_Abfrage.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">messages</span><span class="p">):</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">projektname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span><span class="p">)</span>
+    <span class="n">orte</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+    <span class="k">if</span> <span class="n">p1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">p1</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">orte</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+    <span class="k">if</span> <span class="n">p2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">p2</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">orte</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p2</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+    <span class="n">p3</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+    <span class="k">if</span> <span class="n">p3</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">p3</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">orte</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p3</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+    <span class="c1">#Pfade einrichten</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">workspace_projekt_erreichbarkeit</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Erreichbarkeit.gdb&#39;</span><span class="p">)</span>
+    <span class="n">zentrale_orte</span> <span class="o">=</span> <span class="n">workspace_projekt_erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Zentrale_Orte_75km&quot;</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1"># Schritt 1 - Formatierungen für das Bahn-Routing</span>
+
+    <span class="k">def</span> <span class="nf">_callback</span><span class="p">(</span><span class="n">matches</span><span class="p">):</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">matches</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">unichr</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">id</span>
+
+    <span class="k">def</span> <span class="nf">decode_unicode_references</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&amp;#(\d+)(;|(?=\s))&quot;</span><span class="p">,</span> <span class="n">_callback</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="n">codes</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot; &quot;</span> <span class="p">:</span> <span class="s2">&quot;%20&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;!&quot;</span> <span class="p">:</span> <span class="s2">&quot;%21&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="p">:</span> <span class="s2">&quot;%22&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;#&quot;</span> <span class="p">:</span> <span class="s2">&quot;%23&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;$&quot;</span> <span class="p">:</span> <span class="s2">&quot;%24&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;%&quot;</span> <span class="p">:</span> <span class="s2">&quot;%25&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;&amp;&quot;</span> <span class="p">:</span> <span class="s2">&quot;%26&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;&#39;&quot;</span> <span class="p">:</span> <span class="s2">&quot;%27&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;(&quot;</span> <span class="p">:</span> <span class="s2">&quot;%28&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;)&quot;</span> <span class="p">:</span> <span class="s2">&quot;%29&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;*&quot;</span> <span class="p">:</span> <span class="s2">&quot;%2A&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;+&quot;</span> <span class="p">:</span> <span class="s2">&quot;%2B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;,&quot;</span> <span class="p">:</span> <span class="s2">&quot;%2C&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;-&quot;</span> <span class="p">:</span> <span class="s2">&quot;%2D&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%2E</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%2F</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;:&quot;</span> <span class="p">:</span> <span class="s2">&quot;%3A&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;;&quot;</span> <span class="p">:</span> <span class="s2">&quot;%3B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;&lt;&quot;</span> <span class="p">:</span> <span class="s2">&quot;%3C&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;=&quot;</span> <span class="p">:</span> <span class="s2">&quot;%3D&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;&gt;&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%3E</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;?&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%3F</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;@&quot;</span> <span class="p">:</span> <span class="s2">&quot;%40&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;[&quot;</span> <span class="p">:</span> <span class="s2">&quot;%5B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="p">:</span> <span class="s2">&quot;%5C&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;]&quot;</span> <span class="p">:</span> <span class="s2">&quot;%5D&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;^&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%5E</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;_&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%5F</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;`&quot;</span> <span class="p">:</span> <span class="s2">&quot;%60&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;{&quot;</span> <span class="p">:</span> <span class="s2">&quot;%7B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;|&quot;</span> <span class="p">:</span> <span class="s2">&quot;%7C&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;}&quot;</span> <span class="p">:</span> <span class="s2">&quot;%7D&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;~&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%7E</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot; &quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%7F</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;€&quot;</span> <span class="p">:</span> <span class="s2">&quot;%80&quot;</span><span class="p">,</span>
+    <span class="s2">&quot; &quot;</span> <span class="p">:</span> <span class="s2">&quot;%81&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;‚&quot;</span> <span class="p">:</span> <span class="s2">&quot;%82&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ƒ&quot;</span> <span class="p">:</span> <span class="s2">&quot;%83&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;„&quot;</span> <span class="p">:</span> <span class="s2">&quot;%84&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;…&quot;</span> <span class="p">:</span> <span class="s2">&quot;%85&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;†&quot;</span> <span class="p">:</span> <span class="s2">&quot;%86&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;‡&quot;</span> <span class="p">:</span> <span class="s2">&quot;%87&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ˆ&quot;</span> <span class="p">:</span> <span class="s2">&quot;%88&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;‰&quot;</span> <span class="p">:</span> <span class="s2">&quot;%89&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Š&quot;</span> <span class="p">:</span> <span class="s2">&quot;%8A&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;‹&quot;</span> <span class="p">:</span> <span class="s2">&quot;%8B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Œ&quot;</span> <span class="p">:</span> <span class="s2">&quot;%8C&quot;</span><span class="p">,</span>
+    <span class="s2">&quot; &quot;</span> <span class="p">:</span> <span class="s2">&quot;%8D&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ž&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%8E</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot; &quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%8F</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot; &quot;</span> <span class="p">:</span> <span class="s2">&quot;%90&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;‘&quot;</span> <span class="p">:</span> <span class="s2">&quot;%91&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;’&quot;</span> <span class="p">:</span> <span class="s2">&quot;%92&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;“&quot;</span> <span class="p">:</span> <span class="s2">&quot;%93&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;”&quot;</span> <span class="p">:</span> <span class="s2">&quot;%94&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;•&quot;</span> <span class="p">:</span> <span class="s2">&quot;%95&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;–&quot;</span> <span class="p">:</span> <span class="s2">&quot;%96&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;—&quot;</span> <span class="p">:</span> <span class="s2">&quot;%97&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;˜&quot;</span> <span class="p">:</span> <span class="s2">&quot;%98&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;™&quot;</span> <span class="p">:</span> <span class="s2">&quot;%99&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;š&quot;</span> <span class="p">:</span> <span class="s2">&quot;%9A&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;›&quot;</span> <span class="p">:</span> <span class="s2">&quot;%9B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;œ&quot;</span> <span class="p">:</span> <span class="s2">&quot;%9C&quot;</span><span class="p">,</span>
+    <span class="s2">&quot; &quot;</span> <span class="p">:</span> <span class="s2">&quot;%9D&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ž&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%9E</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ÿ&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%9F</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot; &quot;</span> <span class="p">:</span> <span class="s2">&quot;%A0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¡&quot;</span> <span class="p">:</span> <span class="s2">&quot;%A1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¢&quot;</span> <span class="p">:</span> <span class="s2">&quot;%A2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;£&quot;</span> <span class="p">:</span> <span class="s2">&quot;%A3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot; &quot;</span> <span class="p">:</span> <span class="s2">&quot;%A4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¥&quot;</span> <span class="p">:</span> <span class="s2">&quot;%A5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;|&quot;</span> <span class="p">:</span> <span class="s2">&quot;%A6&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;§&quot;</span> <span class="p">:</span> <span class="s2">&quot;%A7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¨&quot;</span> <span class="p">:</span> <span class="s2">&quot;%A8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;©&quot;</span> <span class="p">:</span> <span class="s2">&quot;%A9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ª&quot;</span> <span class="p">:</span> <span class="s2">&quot;%AA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;«&quot;</span> <span class="p">:</span> <span class="s2">&quot;%AB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¬&quot;</span> <span class="p">:</span> <span class="s2">&quot;%AC&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¯&quot;</span> <span class="p">:</span> <span class="s2">&quot;%AD&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;®&quot;</span> <span class="p">:</span> <span class="s2">&quot;%AE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¯&quot;</span> <span class="p">:</span> <span class="s2">&quot;%AF&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;°&quot;</span> <span class="p">:</span> <span class="s2">&quot;%B0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;±&quot;</span> <span class="p">:</span> <span class="s2">&quot;%B1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;²&quot;</span> <span class="p">:</span> <span class="s2">&quot;%B2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;³&quot;</span> <span class="p">:</span> <span class="s2">&quot;%B3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;´&quot;</span> <span class="p">:</span> <span class="s2">&quot;%B4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;µ&quot;</span> <span class="p">:</span> <span class="s2">&quot;%B5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¶&quot;</span> <span class="p">:</span> <span class="s2">&quot;%B6&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;·&quot;</span> <span class="p">:</span> <span class="s2">&quot;%B7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¸&quot;</span> <span class="p">:</span> <span class="s2">&quot;%B8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¹&quot;</span> <span class="p">:</span> <span class="s2">&quot;%B9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;º&quot;</span> <span class="p">:</span> <span class="s2">&quot;%BA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;»&quot;</span> <span class="p">:</span> <span class="s2">&quot;%BB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¼&quot;</span> <span class="p">:</span> <span class="s2">&quot;%BC&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;½&quot;</span> <span class="p">:</span> <span class="s2">&quot;%BD&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¾&quot;</span> <span class="p">:</span> <span class="s2">&quot;%BE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;¿&quot;</span> <span class="p">:</span> <span class="s2">&quot;%BF&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;À&quot;</span> <span class="p">:</span> <span class="s2">&quot;%C0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Á&quot;</span> <span class="p">:</span> <span class="s2">&quot;%C1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Â&quot;</span> <span class="p">:</span> <span class="s2">&quot;%C2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ã&quot;</span> <span class="p">:</span> <span class="s2">&quot;%C3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ä&quot;</span> <span class="p">:</span> <span class="s2">&quot;%C4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Å&quot;</span> <span class="p">:</span> <span class="s2">&quot;%C5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Æ&quot;</span> <span class="p">:</span> <span class="s2">&quot;%C6&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ç&quot;</span> <span class="p">:</span> <span class="s2">&quot;%C7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;È&quot;</span> <span class="p">:</span> <span class="s2">&quot;%C8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;É&quot;</span> <span class="p">:</span> <span class="s2">&quot;%C9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ê&quot;</span> <span class="p">:</span> <span class="s2">&quot;%CA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ë&quot;</span> <span class="p">:</span> <span class="s2">&quot;%CB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ì&quot;</span> <span class="p">:</span> <span class="s2">&quot;%CC&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Í&quot;</span> <span class="p">:</span> <span class="s2">&quot;%CD&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Î&quot;</span> <span class="p">:</span> <span class="s2">&quot;%CE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ï&quot;</span> <span class="p">:</span> <span class="s2">&quot;%CF&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ð&quot;</span> <span class="p">:</span> <span class="s2">&quot;%D0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ñ&quot;</span> <span class="p">:</span> <span class="s2">&quot;%D1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ò&quot;</span> <span class="p">:</span> <span class="s2">&quot;%D2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ó&quot;</span> <span class="p">:</span> <span class="s2">&quot;%D3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ô&quot;</span> <span class="p">:</span> <span class="s2">&quot;%D4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Õ&quot;</span> <span class="p">:</span> <span class="s2">&quot;%D5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ö&quot;</span> <span class="p">:</span> <span class="s2">&quot;%D6&quot;</span><span class="p">,</span>
+    <span class="s2">&quot; &quot;</span> <span class="p">:</span> <span class="s2">&quot;%20&quot;</span><span class="p">,</span> <span class="c1">#%D7</span>
+    <span class="s2">&quot;Ø&quot;</span> <span class="p">:</span> <span class="s2">&quot;%D8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ù&quot;</span> <span class="p">:</span> <span class="s2">&quot;%D9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ú&quot;</span> <span class="p">:</span> <span class="s2">&quot;%DA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Û&quot;</span> <span class="p">:</span> <span class="s2">&quot;%DB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ü&quot;</span> <span class="p">:</span> <span class="s2">&quot;%DC&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ý&quot;</span> <span class="p">:</span> <span class="s2">&quot;%DD&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Þ&quot;</span> <span class="p">:</span> <span class="s2">&quot;%DE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ß&quot;</span> <span class="p">:</span> <span class="s2">&quot;%DF&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;à&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;á&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;â&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ã&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ä&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;å&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;æ&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">6&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ç&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;è&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;é&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ê&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">A&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ë&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ì&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">C&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;í&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">D&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;î&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">E&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ï&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%E</span><span class="s2">F&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ð&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ñ&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ò&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ó&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ô&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;õ&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ö&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">6&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;÷&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ø&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ù&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ú&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">A&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;û&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ü&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">C&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ý&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">D&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;þ&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">E&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ÿ&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%F</span><span class="s2">F&quot;</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">urlencode</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="n">codes</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">text</span> <span class="ow">and</span> <span class="n">code</span> <span class="o">!=</span> <span class="s2">&quot;%&quot;</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">codes</span><span class="p">[</span><span class="n">code</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">text</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1"># Schritt 2 - Nächstgelegene Haltestelle identifizieren</span>
+
+    <span class="n">mittelpunkt</span> <span class="o">=</span> <span class="n">workspace_projekt_erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Mittelpunkt_RPC_Gebiet&quot;</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Describe</span><span class="p">(</span><span class="n">mittelpunkt</span><span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">mittelpunkt</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;Coordinate Systems\Geographic Coordinate Systems\World\WGS 1984.prj&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">feat</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">ShapeFieldName</span><span class="p">)</span>
+        <span class="n">pnt</span> <span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">getPart</span><span class="p">()</span>
+    <span class="k">del</span> <span class="n">rows</span><span class="p">,</span> <span class="n">row</span>
+
+    <span class="c1"># X und Y umformatieren für URL-Query</span>
+    <span class="n">x_start</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.6f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">pnt</span><span class="o">.</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">y_start</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%.6f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">pnt</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="c1">#str1 = &#39;&lt;div class=&quot;trow&quot;&gt;&#39;</span>
+    <span class="n">f</span><span class="o">=</span><span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s2">&quot;http://mobile.bahn.de/bin/mobil/query.exe/dox?ld=9627&amp;n=1&amp;rt=1&amp;use_realtime_filter=1&amp;performLocating=2&amp;tpl=stopsnear&amp;look_maxdist=2000&amp;look_stopclass=1023&amp;look_x=&quot;</span><span class="o">+</span><span class="n">x_start</span><span class="o">+</span><span class="s2">&quot;&amp;look_y=&quot;</span><span class="o">+</span><span class="n">y_start</span><span class="p">)</span>
+    <span class="c1">##print (&quot;http://mobile.bahn.de/bin/mobil/query.exe/dox?ld=9627&amp;n=1&amp;rt=1&amp;use_realtime_filter=1&amp;performLocating=2&amp;tpl=stopsnear&amp;look_maxdist=2000&amp;look_stopclass=1023&amp;look_x=&quot;+x_start+&quot;&amp;look_y=&quot;+y_start)</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">zeilen</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">found</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">zeilen</span> <span class="o">=</span> <span class="n">decode_unicode_references</span><span class="p">(</span><span class="n">zeilen</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;latin-1&#39;</span><span class="p">)</span>
+                <span class="n">starthaltestelle</span> <span class="o">=</span> <span class="n">zeilen</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;!&quot;&gt;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&lt;/a&gt;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="nb">print</span> <span class="n">starthaltestelle</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+    <span class="k">del</span> <span class="n">f</span>
+
+    <span class="k">if</span> <span class="n">starthaltestelle</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span><span class="o">!=-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">bahn_start</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">urlencode</span><span class="p">(</span><span class="n">starthaltestelle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span><span class="o">+</span><span class="n">urlencode</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;+&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">urlencode</span><span class="p">(</span><span class="n">starthaltestelle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">bahn_start</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">urlencode</span><span class="p">(</span><span class="n">starthaltestelle</span><span class="p">))</span><span class="o">+</span><span class="n">urlencode</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;+&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">urlencode</span><span class="p">(</span><span class="n">starthaltestelle</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span>
+
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Naechstgelegene Haltestelle identifiziert  </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1"># Schritt 3 - Routing-Abfrage</span>
+
+    <span class="c1"># Automatische Ermittlung des Datums für den nächsten Montag (Feiertage werden NICHT berücksichtigt!)</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+    <span class="n">nextmonday</span> <span class="o">=</span> <span class="n">today</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=-</span><span class="n">today</span><span class="o">.</span><span class="n">weekday</span><span class="p">(),</span> <span class="n">weeks</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">bahn_wochentag</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;Mo&#39;</span><span class="o">+</span><span class="n">urlencode</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;+&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nextmonday</span><span class="o">.</span><span class="n">day</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nextmonday</span><span class="o">.</span><span class="n">month</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nextmonday</span><span class="o">.</span><span class="n">year</span><span class="p">))</span>
+
+    <span class="c1"># Uhrzeit-Format um zwischen 7.00 und 18.00 stündlich zu routen</span>
+    <span class="n">bahn_uhrzeit</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">19</span><span class="p">):</span>
+        <span class="n">bahn_uhrzeit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;%3A00&quot;</span><span class="p">)</span>
+
+
+    <span class="c1"># Listen erstellen in die pro Ziel die jeweils minimalen Fahrtzeit + weitere Angaben geschrieben werden</span>
+    <span class="n">dauer_min</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">verkehrsmittel_min</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">abfahrt_min</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">umsteigen_min</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">routing</span><span class="p">(</span><span class="n">ziel</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Check ob Ziel eindeutig. Wenn nicht --&gt; erstes Suchergebnis aus drop-down Menü als Zielhalt übernehmen</span>
+            <span class="c1">##f=urllib.urlopen(&quot;http://reiseauskunft.bahn.de/bin/query.exe/dn?revia=yes&amp;existOptimizePrice=1&amp;country=DEU&amp;dbkanal_007=L01_S01_D001_KIN0001_qf-bahn_LZ003&amp;ignoreTypeCheck=yes&amp;S=&quot;+bahn_start+&quot;&amp;REQ0JourneyStopsSID=A%3D1%40O%3D&quot;+bahn_start+&quot;%40X%3D10252485%40Y%3D53520371%40U%3D80%40L%3D000694208%40B%3D1%40p%3D1367864842%40&amp;REQ0JourneyStopsS0A=7&amp;Z=&quot;+ziel+&quot;&amp;REQ0JourneyStopsZID=&amp;REQ0JourneyStopsZ0A=7&amp;trip-type=single&amp;date=&quot;+bahn_wochentag+&quot;&amp;time=&quot;+bahn_uhrzeit[0]+&quot;&amp;timesel=depart&amp;returnTimesel=depart&amp;optimize=0&amp;start=1&amp;qf.bahn.button.suchen=&quot;)</span>
+            <span class="n">f</span><span class="o">=</span><span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s2">&quot;http://reiseauskunft.bahn.de/bin/query.exe/dn?S=&quot;</span><span class="o">+</span><span class="n">bahn_start</span><span class="o">+</span><span class="s2">&quot;&amp;Z=&quot;</span><span class="o">+</span><span class="n">ziel</span><span class="o">+</span><span class="s2">&quot;%20Hbf&amp;date=&quot;</span><span class="o">+</span><span class="n">bahn_wochentag</span><span class="o">+</span><span class="s2">&quot;&amp;time=&quot;</span><span class="o">+</span><span class="n">bahn_uhrzeit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;&amp;start=1&quot;</span><span class="p">)</span>
+    <span class="c1">##        print (&quot;http://reiseauskunft.bahn.de/bin/query.exe/dn?S=&quot;+bahn_start+&quot;&amp;Z=&quot;+ziel+&quot;%20Hbf&amp;date=&quot;+bahn_wochentag+&quot;&amp;time=&quot;+bahn_uhrzeit[0]+&quot;&amp;start=1&quot;)</span>
+    <span class="c1">##        messages.AddMessage(&quot;http://reiseauskunft.bahn.de/bin/query.exe/dn?S=&quot;+bahn_start+&quot;&amp;Z=&quot;+ziel+&quot;%20Hbf&amp;date=&quot;+bahn_wochentag+&quot;&amp;time=&quot;+bahn_uhrzeit[0]+&quot;&amp;start=1&quot;)</span>
+            <span class="k">for</span> <span class="n">zeilen</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">fahrtziel</span> <span class="o">=</span> <span class="n">decode_unicode_references</span><span class="p">(</span><span class="n">zeilen</span><span class="p">)</span>
+                        <span class="n">fahrtziel</span> <span class="o">=</span> <span class="n">fahrtziel</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&lt;option value=&quot;S-6N1&quot;&gt;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&lt;/option&gt;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">ziel</span> <span class="o">=</span> <span class="n">fahrtziel</span>
+                        <span class="nb">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">fahrtziel</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; Fuer die URL-Query geaendert in &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ziel</span><span class="p">)</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">pass</span>
+
+            <span class="c1"># Eine query für jede Stunde</span>
+            <span class="n">dauer_list</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">abfahrt_list</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">umsteigen_list</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">verkehrsmittel_list</span><span class="o">=</span><span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">bahn_uhrzeit</span><span class="p">:</span>
+
+                <span class="c1">#f=urllib.urlopen(&quot;http://reiseauskunft.bahn.de/bin/query.exe/dn?revia=yes&amp;existOptimizePrice=1&amp;country=DEU&amp;dbkanal_007=L01_S01_D001_KIN0001_qf-bahn_LZ003&amp;ignoreTypeCheck=yes&amp;S=&quot;+bahn_start+&quot;&amp;REQ0JourneyStopsSID=A%3D1%40O%3D&quot;+bahn_start+&quot;%40X%3D10252485%40Y%3D53520371%40U%3D80%40L%3D000694208%40B%3D1%40p%3D1367864842%40&amp;REQ0JourneyStopsS0A=7&amp;Z=&quot;+ziel+&quot;&amp;REQ0JourneyStopsZID=&amp;REQ0JourneyStopsZ0A=7&amp;trip-type=single&amp;date=&quot;+bahn_wochentag+&quot;&amp;time=&quot;+i+&quot;&amp;timesel=depart&amp;returnTimesel=depart&amp;optimize=0&amp;start=1&amp;qf.bahn.button.suchen=&quot;)</span>
+                <span class="n">f</span><span class="o">=</span><span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s2">&quot;http://reiseauskunft.bahn.de/bin/query.exe/dn?S=&quot;</span><span class="o">+</span><span class="n">bahn_start</span><span class="o">+</span><span class="s2">&quot;&amp;Z=&quot;</span><span class="o">+</span><span class="n">ziel</span><span class="o">+</span><span class="s2">&quot;%20Hbf&amp;date=&quot;</span><span class="o">+</span><span class="n">bahn_wochentag</span><span class="o">+</span><span class="s2">&quot;&amp;time=&quot;</span><span class="o">+</span><span class="n">i</span><span class="o">+</span><span class="s2">&quot;&amp;start=1&quot;</span><span class="p">)</span>
+                <span class="nb">print</span> <span class="s2">&quot;http://reiseauskunft.bahn.de/bin/query.exe/dn?S=&quot;</span><span class="o">+</span><span class="n">bahn_start</span><span class="o">+</span><span class="s2">&quot;&amp;Z=&quot;</span><span class="o">+</span><span class="n">ziel</span><span class="o">+</span><span class="s2">&quot;%20Hbf&amp;date=&quot;</span><span class="o">+</span><span class="n">bahn_wochentag</span><span class="o">+</span><span class="s2">&quot;&amp;time=&quot;</span><span class="o">+</span><span class="n">i</span><span class="o">+</span><span class="s2">&quot;&amp;start=1&quot;</span>
+
+                <span class="n">str1</span><span class="o">=</span><span class="s1">&#39;&lt;td class=&quot;duration lastrow&quot; rowspan=&quot;2&quot;&gt;&#39;</span>
+                <span class="n">str2</span><span class="o">=</span><span class="s1">&#39;&lt;div class=&quot;resultDep&quot;&gt;&#39;</span>
+                <span class="n">str3</span><span class="o">=</span><span class="s1">&#39;&lt;td class=&quot;changes lastrow&quot; rowspan=&quot;2&quot;&gt;&#39;</span>
+                <span class="n">str4</span><span class="o">=</span><span class="s1">&#39;&lt;td class=&quot;products lastrow&quot; rowspan=&quot;2&quot;&gt;&#39;</span>
+
+                <span class="n">abfahrt</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+                <span class="n">dauer</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+                <span class="n">umsteigen</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+                <span class="n">verkehrsmittel</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+
+                <span class="n">uu</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">ii</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">aa</span><span class="o">=</span><span class="mi">0</span>
+
+                <span class="c1"># HTML-Schnipsel identifizieren</span>
+                <span class="k">for</span> <span class="n">zeilen</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">uu</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="n">abfahrt</span><span class="o">=</span><span class="n">decode_unicode_references</span><span class="p">(</span><span class="n">zeilen</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+                        <span class="n">abfahrt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">abfahrt</span><span class="p">)</span>
+                        <span class="n">uu</span><span class="o">=</span><span class="mi">0</span>
+                    <span class="k">if</span> <span class="n">zeilen</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">str2</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                        <span class="n">uu</span><span class="o">=</span><span class="mi">1</span>
+
+                    <span class="k">if</span> <span class="n">ii</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="n">dauer</span><span class="o">=</span><span class="n">decode_unicode_references</span><span class="p">(</span><span class="n">zeilen</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+                        <span class="n">dauer_minutes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">dauer</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">))))</span>
+                        <span class="n">dauer_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dauer_minutes</span><span class="p">)</span>
+                        <span class="n">ii</span><span class="o">=</span><span class="mi">0</span>
+                    <span class="k">if</span> <span class="n">zeilen</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">str1</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                        <span class="n">ii</span><span class="o">=</span><span class="mi">1</span>
+
+                    <span class="k">if</span> <span class="n">aa</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="n">verkehrsmittel</span><span class="o">=</span><span class="n">decode_unicode_references</span><span class="p">(</span><span class="n">zeilen</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+                        <span class="n">verkehrsmittel_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">verkehrsmittel</span><span class="p">)</span>
+                        <span class="n">aa</span><span class="o">=</span><span class="mi">0</span>
+                    <span class="k">if</span> <span class="n">zeilen</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">str4</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                        <span class="n">aa</span><span class="o">=</span><span class="mi">1</span>
+
+                    <span class="k">if</span> <span class="n">zeilen</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">str3</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                        <span class="n">umsteigen</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">r&quot;&gt;[0-9]&lt;&quot;</span><span class="p">,</span><span class="n">zeilen</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                        <span class="n">umsteigen_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">umsteigen</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">del</span> <span class="n">abfahrt</span><span class="p">,</span> <span class="n">dauer</span><span class="p">,</span> <span class="n">verkehrsmittel</span><span class="p">,</span> <span class="n">umsteigen</span>
+
+            <span class="c1"># Herausfinden, welche der abgefragten Verbindungen die schnellste ist. Wert übergeben</span>
+            <span class="n">dauer_min_local</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">dauer_list</span><span class="p">)</span>
+            <span class="n">i</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">matchcount</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># mehrere gleich schnelle Verbindungen --&gt; ersten Eintrag weiter verwenden</span>
+            <span class="k">for</span> <span class="n">dauer</span> <span class="ow">in</span> <span class="n">dauer_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dauer_min_local</span> <span class="o">==</span> <span class="n">dauer</span> <span class="ow">and</span> <span class="n">matchcount</span> <span class="o">&lt;</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">matchcount</span><span class="o">+=</span><span class="mi">1</span>
+                    <span class="n">dauer_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dauer_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">verkehrsmittel_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">verkehrsmittel_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">abfahrt_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">abfahrt_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">umsteigen_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">umsteigen_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="k">del</span> <span class="n">dauer_list</span><span class="p">,</span> <span class="n">verkehrsmittel_list</span><span class="p">,</span> <span class="n">abfahrt_list</span><span class="p">,</span> <span class="n">umsteigen_list</span><span class="p">,</span> <span class="n">dauer_min_local</span><span class="p">,</span> <span class="n">dauer_minutes</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">dauer_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">verkehrsmittel_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Fahrtzeit konnte nicht ermittelt werden&quot;</span><span class="p">)</span>
+            <span class="n">abfahrt_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">starthaltestelle</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;latin-1&#39;</span><span class="p">))</span>
+            <span class="n">umsteigen_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">i</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">ort</span> <span class="ow">in</span> <span class="n">orte</span><span class="p">:</span>
+        <span class="n">routing</span><span class="p">(</span><span class="n">ort</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">abfahrt_min</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ort</span><span class="p">,</span> <span class="n">dauer_min</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">umsteigen_min</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">verkehrsmittel_min</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Schnellste OEPNV-Verbindungen abgefragt </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1"># Schritt 4 - Datenexport in temporäre .csv zur späteren Abholung durch den Ergebnissammler</span>
+    <span class="n">ausgabeordner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Abbildungen&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">,</span><span class="s2">&quot;Zentrale_Orte_temp.csv&quot;</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+        <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">csvfile</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">ort</span> <span class="ow">in</span> <span class="n">orte</span><span class="p">:</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">abfahrt_min</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;latin1&#39;</span><span class="p">),</span> <span class="n">ort</span><span class="p">,</span> <span class="n">dauer_min</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">umsteigen_min</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">verkehrsmittel_min</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">del</span> <span class="n">writer</span><span class="p">,</span> <span class="n">csvfile</span>
+
+    <span class="c1"># Endmeldung</span>
+    <span class="nb">print</span> <span class="s1">&#39;Berechnung abgeschlossen </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s1">&#39;Berechnung abgeschlossen&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 22, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.definitions.nutzungsart.tbx_nutzungen &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.definitions.nutzungsart.tbx_nutzungen</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">rpctools.utils.params</span> <span class="k">import</span> <span class="n">Tbx</span>
+<span class="kn">from</span> <span class="nn">rpctools.utils.encoding</span> <span class="k">import</span> <span class="n">encode</span>
+<span class="kn">from</span> <span class="nn">rpctools.definitions.nutzungsart.nutzungen</span> <span class="k">import</span> <span class="n">Nutzungen</span>
+
+<div class="viewcode-block" id="TbxNutzungen"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_nutzungen.html#rpctools.definitions.nutzungsart.tbx_nutzungen.TbxNutzungen">[docs]</a><span class="k">class</span> <span class="nc">TbxNutzungen</span><span class="p">(</span><span class="n">Tbx</span><span class="p">):</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;2 Nutzungen eingeben&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Tool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Nutzungen</span>
+
+<div class="viewcode-block" id="TbxNutzungen.getParameterInfo"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_nutzungen.html#rpctools.definitions.nutzungsart.tbx_nutzungen.TbxNutzungen.getParameterInfo">[docs]</a>    <span class="k">def</span> <span class="nf">getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Projekt</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
+        <span class="n">projekte</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_projects</span><span class="p">()</span>
+
+        <span class="n">param_1</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Projekt&#39;</span>
+        <span class="n">param_1</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Projekt&#39;</span>
+        <span class="n">param_1</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_1</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_1</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
+        <span class="n">param_1</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">projekte</span>
+        <span class="k">if</span> <span class="n">projekte</span><span class="p">:</span>
+            <span class="n">param_1</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">projekte</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Teilfläche</span>
+        <span class="n">param_2</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_2</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Teilfl</span><span class="se">\xe4</span><span class="s1">che&#39;</span>
+        <span class="n">param_2</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Teilfl</span><span class="se">\xe4</span><span class="s1">che&#39;</span>
+        <span class="n">param_2</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_2</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_2</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
+        <span class="n">param_2</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;1) Aufsiedlungszeitraum&quot;</span>
+        <span class="c1"># Beginn_der_Aufsiedlung__Jahreszahl_</span>
+        <span class="n">param_3</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_3</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Beginn_der_Aufsiedlung__Jahreszahl_&#39;</span>
+        <span class="n">param_3</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Beginn der Aufsiedlung (Jahreszahl)&#39;</span>
+        <span class="n">param_3</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_3</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_3</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_3</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_3</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2050</span><span class="p">]</span>
+        <span class="n">param_3</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+        <span class="n">param_3</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_</span>
+        <span class="n">param_4</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_4</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_&#39;</span>
+        <span class="n">param_4</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Dauer der Aufsiedlung (Jahre, 1 = Aufsiedlung wird noch im Jahr des Aufsiedlungsbeginns abgeschlossen)&#39;</span>
+        <span class="n">param_4</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_4</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_4</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_4</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">param_4</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_4</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
+        <span class="n">param_4</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s2">u&quot;2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Anzahl_WE_in_Ein-_und_Zweifamilienhäusern</span>
+        <span class="n">param_5</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_5</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl_WE_in_Ein-_und_Zweifamilienh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
+        <span class="n">param_5</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl WE in Ein- und Zweifamilienh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
+        <span class="n">param_5</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_5</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_5</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_5</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">param_5</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_5</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+        <span class="n">param_5</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anzahl_WE_in_Doppelhäusern</span>
+        <span class="n">param_6</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_6</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl_WE_in_Doppelh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
+        <span class="n">param_6</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl WE in Doppelh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
+        <span class="n">param_6</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_6</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_6</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_6</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">param_6</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_6</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+        <span class="n">param_6</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anzahl_WE_in_Reihenhäusern</span>
+        <span class="n">param_7</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_7</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl_WE_in_Reihenh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
+        <span class="n">param_7</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl WE in Reihenh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
+        <span class="n">param_7</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_7</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_7</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_7</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">param_7</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_7</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+        <span class="n">param_7</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anzahl_WE_in_Mehrfamilienhäusern</span>
+        <span class="n">param_8</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_8</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl_WE_in_Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
+        <span class="n">param_8</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl WE in Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
+        <span class="n">param_8</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_8</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_8</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_8</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">param_8</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_8</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+        <span class="n">param_8</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;3) Wohnen - Anteile Eigentum und Miete&quot;</span>
+
+        <span class="c1"># Anteil_Eigentümernutzung_in_Ein-_und_Zweifamilienhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_</span>
+        <span class="n">param_9</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_9</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung_in_Ein-_und_Zweifamilienh</span><span class="se">\xe4</span><span class="s1">usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_&#39;</span>
+        <span class="n">param_9</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung in Ein- und Zweifamilienh</span><span class="se">\xe4</span><span class="s1">usern (in %, Rest der Wohnungen werden durch Mieter genutzt)&#39;</span>
+        <span class="n">param_9</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_9</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_9</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_9</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;90&#39;</span>
+        <span class="n">param_9</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_9</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_9</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anteil_Eigentümernutzung_in_Doppelhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_</span>
+        <span class="n">param_10</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_10</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung_in_Doppelh</span><span class="se">\xe4</span><span class="s1">usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_&#39;</span>
+        <span class="n">param_10</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung in Doppelh</span><span class="se">\xe4</span><span class="s1">usern (in %, Rest der Wohnungen werden durch Mieter genutzt)&#39;</span>
+        <span class="n">param_10</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_10</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_10</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_10</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;80&#39;</span>
+        <span class="n">param_10</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_10</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_10</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anteil_Eigentümernutzung_in_Reihenhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_</span>
+        <span class="n">param_11</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_11</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung_in_Reihenh</span><span class="se">\xe4</span><span class="s1">usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_&#39;</span>
+        <span class="n">param_11</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung in Reihenh</span><span class="se">\xe4</span><span class="s1">usern (in %, Rest der Wohnungen werden durch Mieter genutzt)&#39;</span>
+        <span class="n">param_11</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_11</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_11</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_11</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;70&#39;</span>
+        <span class="n">param_11</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_11</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_11</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anteil_Eigentümernutzung_in_Mehrfamilienhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_</span>
+        <span class="n">param_12</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_12</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung_in_Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_&#39;</span>
+        <span class="n">param_12</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung in Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern (in %, Rest der Wohnungen werden durch Mieter genutzt)&#39;</span>
+        <span class="n">param_12</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_12</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_12</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_12</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;20&#39;</span>
+        <span class="n">param_12</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_12</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_12</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;4) Wohnen - Einwohner pro Wohneinheit&quot;</span>
+
+        <span class="n">list_EwProWE</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">):</span>
+                <span class="n">list_EwProWE</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;,&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; Bewohner pro Wohneinheit&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Mittlere_Anzahl_Einwohner_pro_WE_in_Einfamilienhäusern__kurz_nach_dem_Bezug_</span>
+        <span class="n">param_13</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_13</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere_Anzahl_Einwohner_pro_WE_in_Einfamilienh</span><span class="se">\xe4</span><span class="s1">usern__kurz_nach_dem_Bezug_&#39;</span>
+        <span class="n">param_13</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere Anzahl Einwohner pro WE in Einfamilienh</span><span class="se">\xe4</span><span class="s1">usern (kurz nach dem Bezug)&#39;</span>
+        <span class="n">param_13</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_13</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_13</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
+        <span class="n">param_13</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;3,2 Bewohner pro Wohneinheit&#39;</span>
+        <span class="n">param_13</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">list_EwProWE</span>
+        <span class="n">param_13</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Mittlere_Anzahl_Einwohner_pro_WE_in_Doppelhäusern__kurz_nach_dem_Bezug_</span>
+        <span class="n">param_14</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_14</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere_Anzahl_Einwohner_pro_WE_in_Doppelh</span><span class="se">\xe4</span><span class="s1">usern__kurz_nach_dem_Bezug_&#39;</span>
+        <span class="n">param_14</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere Anzahl Einwohner pro WE in Doppelh</span><span class="se">\xe4</span><span class="s1">usern (kurz nach dem Bezug)&#39;</span>
+        <span class="n">param_14</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_14</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_14</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
+        <span class="n">param_14</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;3,0 Bewohner pro Wohneinheit&#39;</span>
+        <span class="n">param_14</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">list_EwProWE</span>
+        <span class="n">param_14</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Mittlere_Anzahl_Einwohner_pro_WE_in_Reihenhäusern__kurz_nach_dem_Bezug_</span>
+        <span class="n">param_15</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_15</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere_Anzahl_Einwohner_pro_WE_in_Reihenh</span><span class="se">\xe4</span><span class="s1">usern__kurz_nach_dem_Bezug_&#39;</span>
+        <span class="n">param_15</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere Anzahl Einwohner pro WE in Reihenh</span><span class="se">\xe4</span><span class="s1">usern (kurz nach dem Bezug)&#39;</span>
+        <span class="n">param_15</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_15</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_15</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
+        <span class="n">param_15</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;3,0 Bewohner pro Wohneinheit&#39;</span>
+        <span class="n">param_15</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">list_EwProWE</span>
+        <span class="n">param_15</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Mittlere_Anzahl_Einwohner_pro_WE_in_Mehrfamilienhäusern__kurz_nach_dem_Bezug_</span>
+        <span class="n">param_16</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_16</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere_Anzahl_Einwohner_pro_WE_in_Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern__kurz_nach_dem_Bezug_&#39;</span>
+        <span class="n">param_16</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere Anzahl Einwohner pro WE in Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern (kurz nach dem Bezug)&#39;</span>
+        <span class="n">param_16</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_16</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_16</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
+        <span class="n">param_16</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;2,1 Bewohner pro Wohneinheit&#39;</span>
+        <span class="n">param_16</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">list_EwProWE</span>
+        <span class="n">param_16</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;5) Wohnen - Zuzugsquote&quot;</span>
+
+        <span class="c1"># Wie_viel_Prozent_der_Bewohner_der_neuen_Wohnungen_werden_neu_in_die_Gemeinde_ziehen_</span>
+        <span class="n">param_17</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_17</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Wie_viel_Prozent_der_Bewohner_der_neuen_Wohnungen_werden_neu_in_die_Gemeinde_ziehen_&#39;</span>
+        <span class="n">param_17</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Wie viel Prozent der Bewohner der neuen Wohnungen werden neu in die Gemeinde ziehen?&#39;</span>
+        <span class="n">param_17</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_17</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_17</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_17</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;80&#39;</span>
+        <span class="n">param_17</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_17</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_17</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;6) Gewerbe - Gebietstyp und Brachenstruktur&quot;</span>
+
+        <span class="c1"># Gebietstyp_auswählen</span>
+        <span class="n">param_18</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_18</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Gebietstyp_ausw</span><span class="se">\xe4</span><span class="s1">hlen&#39;</span>
+        <span class="n">param_18</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Gebietstyp ausw</span><span class="se">\xe4</span><span class="s1">hlen&#39;</span>
+        <span class="n">param_18</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_18</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_18</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
+        <span class="n">param_18</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;&lt;kein Gewerbegebiet vorhanden&gt;&#39;</span>
+        <span class="n">param_18</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">u&#39;Industriegebiet&#39;</span><span class="p">,</span> <span class="s1">u&#39;Logistikgebiet&#39;</span><span class="p">,</span> <span class="s1">u&#39;Klassisches Gewerbegebiet&#39;</span><span class="p">,</span> <span class="s1">u&#39;Kleinteiliges Gewerbegebiet&#39;</span><span class="p">,</span> <span class="s1">u&#39;Hoeherwertiges Gewerbegebiet&#39;</span><span class="p">,</span> <span class="s1">u&#39;Technologiepark, Wissenschaftspark&#39;</span><span class="p">,</span> <span class="s1">u&#39;&lt;kein Gewerbegebiet vorhanden&gt;&#39;</span><span class="p">]</span>
+        <span class="n">param_18</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anteil_der_Arbeitsplätze_im_verarbeitenden_Gewerbe__in_Prozent_</span>
+        <span class="n">param_19</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_19</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_verarbeitenden_Gewerbe__in_Prozent_&#39;</span>
+        <span class="n">param_19</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im verarbeitenden Gewerbe (in Prozent)&#39;</span>
+        <span class="n">param_19</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_19</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_19</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_19</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;40&#39;</span>
+        <span class="n">param_19</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_19</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_19</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anteil_der_Arbeitsplätze_im_Baugewerbe__in_Prozent_</span>
+        <span class="n">param_20</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_20</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_Baugewerbe__in_Prozent_&#39;</span>
+        <span class="n">param_20</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im Baugewerbe (in Prozent)&#39;</span>
+        <span class="n">param_20</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_20</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_20</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_20</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;6&#39;</span>
+        <span class="n">param_20</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_20</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_20</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anteil_der_Arbeitsplätze_im_Handel__inkl__Kfz___in_Prozent_</span>
+        <span class="n">param_21</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_21</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_Handel__inkl__Kfz___in_Prozent_&#39;</span>
+        <span class="n">param_21</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im Handel (inkl. Kfz) (in Prozent)&#39;</span>
+        <span class="n">param_21</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_21</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_21</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_21</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;17&#39;</span>
+        <span class="n">param_21</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_21</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_21</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anteil_der_Arbeitsplätze_im_Verkehrs-_und_Lagereibereich___in_Prozent_</span>
+        <span class="n">param_22</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_22</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_Verkehrs-_und_Lagereibereich___in_Prozent_&#39;</span>
+        <span class="n">param_22</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im Verkehrs- und Lagereibereich  (in Prozent)&#39;</span>
+        <span class="n">param_22</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_22</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_22</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_22</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;10&#39;</span>
+        <span class="n">param_22</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_22</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_22</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anteil_der_Arbeitsplätze_im_Bereich_der_freiberuflichen__wissenschaftl__bzw__techn__Dienstleistungen__in_Prozent_</span>
+        <span class="n">param_23</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_23</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_Bereich_der_freiberuflichen__wissenschaftl__bzw__techn__Dienstleistungen__in_Prozent_&#39;</span>
+        <span class="n">param_23</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im Bereich der freiberuflichen, wissenschaftl. bzw. techn. Dienstleistungen (in Prozent)&#39;</span>
+        <span class="n">param_23</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_23</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_23</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_23</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;14&#39;</span>
+        <span class="n">param_23</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_23</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_23</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Anteil_der_Arbeitsplätze_im_Bereich_sonstiger_Diensteistungen</span>
+        <span class="n">param_24</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_24</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_Bereich_sonstiger_Diensteistungen&#39;</span>
+        <span class="n">param_24</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im Bereich sonstiger Diensteistungen&#39;</span>
+        <span class="n">param_24</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_24</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_24</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_24</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;13&#39;</span>
+        <span class="n">param_24</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_24</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_24</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;7) Gewerbe - Zuzugs- und Eigentumsquote&quot;</span>
+
+        <span class="c1"># Wie_viel_Prozent_der_Unternehmen_werden_neu_in_die_Gemeinde_ziehen_</span>
+        <span class="n">param_25</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_25</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Wie_viel_Prozent_der_Unternehmen_werden_neu_in_die_Gemeinde_ziehen_&#39;</span>
+        <span class="n">param_25</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Wie viel Prozent der Unternehmen werden neu in die Gemeinde ziehen?&#39;</span>
+        <span class="n">param_25</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_25</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_25</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_25</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;80&#39;</span>
+        <span class="n">param_25</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_25</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_25</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Welcher_Anteil_der_Gebäude_ist_voraussichtlich_im_Eigentum_der_Unternehmen_</span>
+        <span class="n">param_26</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_26</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s1">u&#39;Welcher_Anteil_der_Geb</span><span class="se">\xe4</span><span class="s1">ude_ist_voraussichtlich_im_Eigentum_der_Unternehmen_&#39;</span><span class="p">)</span>
+        <span class="n">param_26</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="n">encodeu</span><span class="p">(</span><span class="s1">&#39;Welcher Anteil der Geb</span><span class="se">\xe4</span><span class="s1">ude ist voraussichtlich im Eigentum der Unternehmen?&#39;</span><span class="p">)</span>
+        <span class="n">param_26</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_26</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_26</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_26</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;100&#39;</span>
+        <span class="n">param_26</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_26</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">param_26</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;8) Einzelhandel (nur Lebensmitteleinzelhandel)&quot;</span>
+
+        <span class="c1"># Verkaufsfläche__in_Quadratmetern_</span>
+        <span class="n">param_27</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_27</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s1">u&#39;Verkaufsfl</span><span class="se">\xe4</span><span class="s1">che__in_Quadratmetern_&#39;</span><span class="p">)</span>
+        <span class="n">param_27</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s1">u&#39;Verkaufsfl</span><span class="se">\xe4</span><span class="s1">che (in Quadratmetern)&#39;</span><span class="p">)</span>
+        <span class="n">param_27</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param_27</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param_27</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">param_27</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">param_27</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">param_27</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20000</span><span class="p">]</span>
+        <span class="n">param_27</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="n">parameters</span><span class="o">=</span> <span class="p">[</span><span class="n">param_1</span><span class="p">,</span> <span class="n">param_2</span><span class="p">,</span> <span class="n">param_3</span><span class="p">,</span> <span class="n">param_4</span><span class="p">,</span> <span class="n">param_5</span><span class="p">,</span> <span class="n">param_6</span><span class="p">,</span>
+                     <span class="n">param_7</span><span class="p">,</span> <span class="n">param_8</span><span class="p">,</span> <span class="n">param_9</span><span class="p">,</span> <span class="n">param_10</span><span class="p">,</span> <span class="n">param_11</span><span class="p">,</span> <span class="n">param_12</span><span class="p">,</span>
+                     <span class="n">param_13</span><span class="p">,</span> <span class="n">param_14</span><span class="p">,</span> <span class="n">param_15</span><span class="p">,</span> <span class="n">param_16</span><span class="p">,</span> <span class="n">param_17</span><span class="p">,</span>
+                     <span class="n">param_18</span><span class="p">,</span> <span class="n">param_19</span><span class="p">,</span> <span class="n">param_20</span><span class="p">,</span> <span class="n">param_21</span><span class="p">,</span> <span class="n">param_22</span><span class="p">,</span>
+                     <span class="n">param_23</span><span class="p">,</span> <span class="n">param_24</span><span class="p">,</span> <span class="n">param_25</span><span class="p">,</span> <span class="n">param_26</span><span class="p">,</span> <span class="n">param_27</span><span class="p">]</span>
+
+        <span class="c1"># set params until better names are provided</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="s1">&#39;param_&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">param</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateParameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">parameters</span></div>
+
+    <span class="k">def</span> <span class="nf">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Modify the values and properties of parameters before internal</span>
+<span class="sd">        validation is performed.  This method is called whenever a parameter</span>
+<span class="sd">        has been changed.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">eingaben_auslesen</span><span class="p">():</span>
+
+            <span class="n">projectname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">teilflaeche</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="n">tablepath_flaechenbilanz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">&#39;Wohneinheiten_Details&#39;</span><span class="p">)</span>
+            <span class="n">tabelle_gebaude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">&#39;Gebaeude_Details&#39;</span><span class="p">)</span>
+            <span class="n">tabelle_Versorgung_Verkaufsflaechen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">&#39;Versorgung_Verkaufsflaechen&#39;</span><span class="p">)</span>
+            <span class="n">flaechenbilanz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">&#39;Flaechenbilanz&#39;</span><span class="p">)</span>
+            <span class="n">plangebiet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">&#39;Teilflaechen_Plangebiet&#39;</span><span class="p">)</span>
+            <span class="n">tabelle_gewerbeanteile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">&#39;Gewerbe_Anteile&#39;</span><span class="p">)</span>
+
+            <span class="c1">#Startjahr und Aufsiedlungsdauer</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Beginn_Nutzung&#39;</span><span class="p">,</span> <span class="s1">&#39;Aufsiedlungsdauer&#39;</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Startjahr&#39;</span><span class="p">]</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">plangebiet</span><span class="p">,</span><span class="n">fields</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+            <span class="c1"># Wohnen - Anzahl Wohneinheiten nach Gebäudetypen</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Gebaeudetyp&#39;</span><span class="p">,</span> <span class="s1">&#39;Anzahl_Gebaeude&#39;</span><span class="p">,</span> <span class="s1">&#39;Teilflaeche_Plangebiet&#39;</span><span class="p">]</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tabelle_gebaude</span><span class="p">,</span><span class="n">fields</span><span class="p">)</span>
+
+            <span class="n">efh</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">zfh</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">rh</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">mfh</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Einfamilienhaus&quot;</span><span class="p">:</span>
+                    <span class="n">efh</span> <span class="o">+=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Zweifamilien- oder Doppelhaus&quot;</span><span class="p">:</span>
+                    <span class="n">zfh</span> <span class="o">+=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Reihenhaus&quot;</span><span class="p">:</span>
+                    <span class="n">rh</span> <span class="o">+=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Mehrfamilienhaus&quot;</span><span class="p">:</span>
+                    <span class="n">mfh</span> <span class="o">+=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">efh</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">zfh</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">rh</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">mfh</span>
+
+            <span class="c1">#Wohnen - Anteile Eigentum und Miete</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Gebaeudetyp&#39;</span><span class="p">,</span> <span class="s1">&#39;Ant_Eigentuemer&#39;</span><span class="p">,</span> <span class="s1">&#39;Teilflaeche_Plangebiet&#39;</span><span class="p">]</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_flaechenbilanz</span><span class="p">,</span><span class="n">fields</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Einfamilienhaus&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Zweifamilien- oder Doppelhaus&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Reihenhaus&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Mehrfamilienhaus&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1">#Wohnen - Einwohner pro Wohneinheit</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Gebaeudetyp&#39;</span><span class="p">,</span> <span class="s1">&#39;EW_je_WE&#39;</span><span class="p">,</span> <span class="s1">&#39;Teilflaeche_Plangebiet&#39;</span><span class="p">]</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_flaechenbilanz</span><span class="p">,</span><span class="n">fields</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Einfamilienhaus&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; Bewohner pro Wohneinheit&quot;</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Zweifamilien- oder Doppelhaus&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; Bewohner pro Wohneinheit&quot;</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Reihenhaus&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; Bewohner pro Wohneinheit&quot;</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Mehrfamilienhaus&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; Bewohner pro Wohneinheit&quot;</span>
+
+            <span class="c1">#Gewerbe</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tabelle_gewerbeanteile</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;teilflaeche&quot;</span><span class="p">,</span> <span class="s2">&quot;branche&quot;</span><span class="p">,</span> <span class="s2">&quot;Anteil_A&quot;</span><span class="p">,</span> <span class="s2">&quot;Anteil_B&quot;</span> <span class="p">,</span> <span class="s2">&quot;Anteil_C&quot;</span> <span class="p">,</span> <span class="s2">&quot;Anteil_D&quot;</span> <span class="p">,</span> <span class="s2">&quot;Anteil_E&quot;</span><span class="p">,</span> <span class="s2">&quot;Anteil_F&quot;</span><span class="p">,</span> <span class="s2">&quot;Anteil_Zuzug&quot;</span><span class="p">,</span> <span class="s2">&quot;Anteil_Eigentum&quot;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">17</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">21</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">22</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">23</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">24</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">25</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+
+
+            <span class="c1">#Einzelhandel (nur Lebensmitteleinzelhandel)</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Verkaufsflaeche&#39;</span><span class="p">,</span> <span class="s1">&#39;Teilflaeche_Plangebiet&#39;</span><span class="p">]</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tabelle_Versorgung_Verkaufsflaechen</span><span class="p">,</span><span class="n">fields</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">teilflaeche</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">26</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">return</span>
+
+        <span class="n">tbx_path</span> <span class="o">=</span> <span class="n">__file__</span>
+        <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">tbx_path</span><span class="p">)</span>
+        <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">base_path</span><span class="p">)</span>
+        <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">base_path</span><span class="p">)</span> <span class="c1"># erzeugt Pfad zum Ordner, in dem Script liegt</span>
+
+    <span class="c1"># Gebietstyp auswählen</span>
+        <span class="n">i</span><span class="o">=</span><span class="mi">17</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">altered</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">hasBeenValidated</span><span class="p">:</span>
+            <span class="n">gebtyp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">tablepath_gebietstyp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_base_table</span><span class="p">(</span><span class="s1">&#39;FGDB_Definition_Projekt_Tool.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;gewerbe_gebietstypen&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_base_table</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_gebietstyp</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">gebtyp</span> <span class="o">==</span> <span class="n">row</span><span class="o">.</span><span class="n">Gebietstyp</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Ant_VerarbGew</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Ant_BauGew</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Ant_HanKfZ</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Ant_VerLag</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Ant_FrWiTeDi</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Ant_SoDi</span>
+
+    <span class="c1"># Automatische Anpassung der Slider</span>
+        <span class="k">def</span> <span class="nf">sliderSummenKontrolle</span><span class="p">(</span><span class="n">listeSliderID</span><span class="p">,</span> <span class="n">zielwertSlidersumme</span><span class="p">):</span>
+            <span class="n">istsumme</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">listeSliderID</span><span class="p">:</span>
+                <span class="n">istsumme</span><span class="o">+=</span><span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="k">if</span> <span class="n">istsumme</span> <span class="o">&lt;&gt;</span> <span class="n">zielwertSlidersumme</span><span class="p">:</span>
+                <span class="n">abweichung</span> <span class="o">=</span> <span class="n">zielwertSlidersumme</span> <span class="o">-</span> <span class="n">istsumme</span>
+                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">listeSliderID</span><span class="p">):</span>
+                    <span class="n">alterWert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                    <span class="n">neuerWert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">abweichung</span>
+                    <span class="k">if</span> <span class="n">neuerWert</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">neuerWert</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">elif</span> <span class="n">neuerWert</span> <span class="o">&gt;</span> <span class="n">zielwertSlidersumme</span><span class="p">:</span>
+                        <span class="n">neuerWert</span> <span class="o">=</span> <span class="n">zielwertSlidersumme</span>
+                    <span class="n">abweichung</span> <span class="o">=</span> <span class="n">abweichung</span> <span class="o">+</span> <span class="n">alterWert</span> <span class="o">-</span> <span class="n">neuerWert</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">neuerWert</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Auswahl Teilfläche</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">altered</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">hasBeenValidated</span><span class="p">:</span>
+            <span class="n">projectname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="n">tablepath_teilflaechen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">&#39;Teilflaechen_Plangebiet&#39;</span><span class="p">)</span>
+            <span class="n">rows_teilflaechen</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_teilflaechen</span><span class="p">)</span>
+            <span class="n">list_teilflaechen</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows_teilflaechen</span> <span class="p">:</span>
+                <span class="n">list_teilflaechen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span>
+            <span class="n">list_teilflaechen</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">list_teilflaechen</span><span class="p">))</span>
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">list_teilflaechen</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_teilflaechen</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">list_teilflaechen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">eingaben_auslesen</span><span class="p">()</span>
+
+
+        <span class="c1"># bestehende Eingaben (falls vorhanden) übernehmen</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">altered</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">hasBeenValidated</span><span class="p">:</span>
+            <span class="n">eingaben_auslesen</span><span class="p">()</span>
+
+
+        <span class="c1"># Slider für Anteile an Arbeitsplätzen nach Gewerbetyp generieren</span>
+        <span class="n">listeSliderID</span> <span class="o">=</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span><span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">]</span>
+        <span class="n">zielwertSlidersumme</span> <span class="o">=</span> <span class="mi">100</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">listeSliderID</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">altered</span><span class="p">:</span>
+                <span class="n">sliderSummenKontrolle</span><span class="p">(</span><span class="n">listeSliderID</span><span class="p">,</span> <span class="n">zielwertSlidersumme</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_nutzungen.html#rpctools.definitions.nutzungsart.tbx_nutzungen.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">tbx</span> <span class="o">=</span> <span class="n">Toolbox</span><span class="p">()</span>
+    <span class="n">tool</span> <span class="o">=</span> <span class="n">Flaechenbilanz</span><span class="p">()</span>
+    <span class="n">tool</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">getParameterInfo</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">tool</span> <span class="o">=</span> <span class="n">Nutzungen</span><span class="p">()</span>
+    <span class="n">tool</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">getParameterInfo</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--debug&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+        <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 22, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

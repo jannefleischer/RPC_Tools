@@ -1,0 +1,388 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.definitions.projektverwaltung.T1_Projektverwaltung &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.definitions.projektverwaltung.T1_Projektverwaltung</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># projektVerwaltung.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description:</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># ILS gGmbH / HCU Hamburg / GGR Planung</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">isdir</span>
+<span class="kn">from</span> <span class="nn">rpctools.utils.params</span> <span class="k">import</span> <span class="n">Tool</span>
+<span class="kn">import</span> <span class="nn">arcpy</span>
+
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">shutil</span><span class="o">,</span> <span class="nn">gc</span>
+
+
+<div class="viewcode-block" id="Projektverwaltung"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.T1_Projektverwaltung.html#rpctools.definitions.projektverwaltung.T1_Projektverwaltung.Projektverwaltung">[docs]</a><span class="k">class</span> <span class="nc">Projektverwaltung</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+
+    <span class="n">_dbname</span> <span class="o">=</span> <span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span>
+
+<div class="viewcode-block" id="Projektverwaltung.run"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.T1_Projektverwaltung.html#rpctools.definitions.projektverwaltung.T1_Projektverwaltung.Projektverwaltung.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># way to remove file-locks in arcgis</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;Neues Projekt anlegen&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">projekt_anlegen</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;Bestehendes Projekt kopieren&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">projekt_kopieren</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">projekt_loeschen</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">teilflaeche</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">&#39;Teilflaechen_Plangebiet&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Projektverwaltung.projekt_loeschen"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.T1_Projektverwaltung.html#rpctools.definitions.projektverwaltung.T1_Projektverwaltung.Projektverwaltung.projekt_loeschen">[docs]</a>    <span class="k">def</span> <span class="nf">projekt_loeschen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">projektName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">value</span>
+        <span class="c1"># Mit dem Projektnamen zum neuen Projektpfad zusammenführen&quot;</span>
+        <span class="n">projektPfad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">PROJECT_PATH</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Suche Ordner: &quot;</span> <span class="o">+</span> <span class="n">projektPfad</span><span class="p">)</span>
+
+        <span class="c1"># entferne alle aktuellen Layer aus dem TOC (Locks aufheben)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Loese aktive Layer aus MXD </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">mxd</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="s2">&quot;CURRENT&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListDataFrames</span><span class="p">(</span><span class="n">mxd</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">lyr</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListLayers</span><span class="p">(</span><span class="n">mxd</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+                <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">RemoveLayer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">lyr</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">mxd</span>
+
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="c1"># Überprüfen, ob der Projektordner existiert</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">isdir</span><span class="p">(</span><span class="n">projektPfad</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Projektordner gefunden&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Projektordner gefunden </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">projektPfad</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Projektordner gelöscht&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Projektordner gelöscht </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Projektordner &quot;</span> <span class="o">+</span> <span class="n">projektName</span> <span class="o">+</span> <span class="s2">&quot; nicht gefunden </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Projektordner &quot;</span> <span class="o">+</span> <span class="n">projektName</span> <span class="o">+</span> <span class="s2">&quot; nicht gefunden </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;*********************************************************************************&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Das Projekt &quot;</span> <span class="o">+</span> <span class="n">projektName</span> <span class="o">+</span> <span class="s2">&quot; wurde erfolgreich entfernt </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">delcursor</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Projektverwaltung.projekt_kopieren"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.T1_Projektverwaltung.html#rpctools.definitions.projektverwaltung.T1_Projektverwaltung.Projektverwaltung.projekt_kopieren">[docs]</a>    <span class="k">def</span> <span class="nf">projekt_kopieren</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># get new Project Name as input</span>
+            <span class="n">projectNameOld</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">existing_project</span><span class="o">.</span><span class="n">value</span>
+            <span class="c1"># allow the upload of a shapefile containg the projektgebiet</span>
+            <span class="n">projectNameNew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="c1"># copy template folder</span>
+            <span class="n">templatePath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_projectpath</span><span class="p">(</span><span class="n">projectNameOld</span><span class="p">)</span>
+            <span class="n">projectPath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">PROJECT_PATH</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">templatePath</span><span class="p">,</span> <span class="n">projectPath</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Es ist ein Fehler beim Kopieren aufgetreten.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Es scheint bereits ein Projekt mit diesem Namen zu existieren&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Bitte geben Sie einen anderen Namen ein oder nutzen Sie die &#39;Projekt löschen&#39; Funktion in der Toolbox&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+            <span class="c1"># output information to user</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Succesfully copied&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Succesfully copied&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New Project registered at &quot;</span> <span class="o">+</span> <span class="n">projectPath</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;New Project registered at &quot;</span> <span class="o">+</span> <span class="n">projectPath</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_traceback</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Projektverwaltung.projekt_anlegen"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.T1_Projektverwaltung.html#rpctools.definitions.projektverwaltung.T1_Projektverwaltung.Projektverwaltung.projekt_anlegen">[docs]</a>    <span class="k">def</span> <span class="nf">projekt_anlegen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># get new Project input Data</span>
+            <span class="n">projectName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">flaeche</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">shapefile</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">beginn_betrachtung</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">begin</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">ende_betrachtung</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">ende</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="c1"># copy template folder</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">TEMPLATE_FOLDER</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">PROJECT_FOLDER</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="nb">print</span> <span class="n">e</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Es ist ein Fehler beim Kopieren aufgetreten.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Es scheint bereits ein Projekt mit diesem Namen zu existieren&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Bitte geben Sie einen anderen Namen ein oder nutzen Sie die &#39;Projekt löschen&#39; Funktion in der Toolbox&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+            <span class="c1"># If shapefile was uploaded, add to gdb</span>
+            <span class="k">if</span> <span class="n">flaeche</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">gdbPfad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_db</span><span class="p">(</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+                <span class="n">arcpy</span><span class="o">.</span><span class="n">FeatureClassToGeodatabase_conversion</span><span class="p">(</span><span class="n">flaeche</span><span class="p">,</span> <span class="n">gdbPfad</span><span class="p">)</span>
+
+                <span class="n">dsc</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Describe</span><span class="p">(</span><span class="n">flaeche</span><span class="p">)</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">dsc</span><span class="o">.</span><span class="n">baseName</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+                <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">workspace</span> <span class="o">=</span> <span class="n">gdbPfad</span>
+                <span class="n">fcs</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFeatureClasses</span><span class="p">()</span>
+                <span class="n">fcsPfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">gdbPfad</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">arcpy</span><span class="o">.</span><span class="n">Rename_management</span><span class="p">(</span><span class="n">fcsPfad</span><span class="p">,</span> <span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Fehler: Umbenennung nicht erfolgreich&quot;</span><span class="p">)</span>
+                <span class="n">fcs</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFeatureClasses</span><span class="p">()</span>
+
+            <span class="c1"># Prepare Shapefile for use in RPC</span>
+            <span class="n">teilfaechen_plangebiet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teilflaeche</span>
+
+            <span class="c1"># delete unused fields</span>
+            <span class="n">fieldObjList</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">teilfaechen_plangebiet</span><span class="p">)</span>
+            <span class="n">fieldNameList</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fieldObjList</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span><span class="o">.</span><span class="n">required</span><span class="p">:</span>
+                    <span class="n">fieldNameList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteField_management</span><span class="p">(</span><span class="n">teilfaechen_plangebiet</span><span class="p">,</span> <span class="n">fieldNameList</span><span class="p">)</span>
+
+            <span class="c1"># add needed fields</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">teilfaechen_plangebiet</span><span class="p">,</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">teilfaechen_plangebiet</span><span class="p">,</span> <span class="s2">&quot;Startjahr&quot;</span><span class="p">,</span> <span class="s2">&quot;LONG&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">teilfaechen_plangebiet</span><span class="p">,</span> <span class="s2">&quot;Beginn_Nutzung&quot;</span><span class="p">,</span> <span class="s2">&quot;LONG&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">teilfaechen_plangebiet</span><span class="p">,</span> <span class="s2">&quot;Aufsiedlungsdauer&quot;</span><span class="p">,</span> <span class="s2">&quot;LONG&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">teilfaechen_plangebiet</span><span class="p">,</span> <span class="s2">&quot;Flaeche_ha&quot;</span><span class="p">,</span> <span class="s2">&quot;DOUBLE&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">teilfaechen_plangebiet</span><span class="p">,</span> <span class="s2">&quot;umfang_meter&quot;</span><span class="p">,</span> <span class="s2">&quot;FLOAT&quot;</span><span class="p">)</span>
+            <span class="c1">#arcpy.AddField_management(teilfaechen_plangebiet, &quot;Bilanzsumme&quot;, &quot;FLOAT&quot;)</span>
+
+            <span class="c1"># Berechne ha der Teilflaechen</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">CalculateField_management</span><span class="p">(</span><span class="n">teilfaechen_plangebiet</span><span class="p">,</span>
+                                            <span class="s2">&quot;Flaeche_ha&quot;</span><span class="p">,</span>
+                                            <span class="s2">&quot;!SHAPE.AREA@HECTARES!&quot;</span><span class="p">,</span>
+                                            <span class="s2">&quot;PYTHON_9.3&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Berechne Umfang der Flächen</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">CalculateField_management</span><span class="p">(</span><span class="n">teilfaechen_plangebiet</span><span class="p">,</span> <span class="s2">&quot;umfang_meter&quot;</span><span class="p">,</span> <span class="s2">&quot;!shape.length@METER!&quot;</span><span class="p">,</span> <span class="s2">&quot;PYTHON_9.3&quot;</span><span class="p">)</span>
+
+            <span class="c1"># add year</span>
+            <span class="n">startjahr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">beginn_betrachtung</span><span class="p">)</span>
+
+            <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">teilfaechen_plangebiet</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;Startjahr&quot;</span><span class="p">,</span> <span class="n">startjahr</span><span class="p">)</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Flaeche_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;Aufsiedlungsdauer&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+                <span class="c1">#row.setValue(&quot;Bilanzsumme&quot;, 0)</span>
+                <span class="n">cursor</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># add project-data to Projektrahmendaten</span>
+
+            <span class="c1"># Den AGS aus der Lage der projektfläche im Raum ermitteln</span>
+            <span class="n">bkg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_base_table</span><span class="p">(</span><span class="s1">&#39;FGBD_Basisdaten_deutschland.gdb&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;bkg_gemeinden&#39;</span><span class="p">)</span>
+            <span class="n">workspace_projekt_definition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_db</span><span class="p">(</span>
+                <span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+            <span class="n">projektrahmendaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span>
+                                      <span class="s1">&#39;Projektrahmendaten&#39;</span><span class="p">)</span>
+            <span class="n">projektFlaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span>
+                                  <span class="s1">&#39;Teilflaechen_Plangebiet&#39;</span><span class="p">)</span>
+
+            <span class="c1"># ags aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird</span>
+            <span class="c1"># 1. Feature Layer aus den bkg-daten erstellen</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">bkg</span><span class="p">,</span> <span class="s2">&quot;bkg_lyr&quot;</span><span class="p">)</span>
+            <span class="c1"># 2.Spatial Select wo Planfläche bkg_lyr intersected</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByLocation_management</span><span class="p">(</span><span class="s2">&quot;bkg_lyr&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span>
+                                                   <span class="n">projektFlaeche</span><span class="p">)</span>
+            <span class="c1"># Wenn Flaeche = 1, ags extrahieren</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">GetCount_management</span><span class="p">(</span><span class="s2">&quot;bkg_lyr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">getOutput</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Die Projektflaechen liegen außerhalb der Gemeinden Deutschlands.&quot;</span><span class="p">)</span>
+                <span class="c1">## TODO Dateien loeschen und Projektregistrierung loeschen</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+            <span class="k">elif</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Die Projektflaechen liegen innerhalb mehrerer Gemeinden, das Tool unterstuetzt zur Zeit keine interkommunalen Projekte.&quot;</span><span class="p">)</span>
+                <span class="c1">## TODO Dateien loeschen und Projektregistrierung loeschen</span>
+
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+            <span class="k">elif</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">gemeindeCursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="s2">&quot;bkg_lyr&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">gemeinde</span> <span class="ow">in</span> <span class="n">gemeindeCursor</span><span class="p">:</span>
+                    <span class="n">ags</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">AGS</span>
+                    <span class="n">gen</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">GEN</span>
+
+            <span class="c1"># Setzen des Sonderkostenfaktors auf 1 =100% - Sonderkostenfaktor wird im Themenfeld Kosten durch nutzer eingegeben und in der Tabelle aktualisiert</span>
+            <span class="n">sonderkostenfaktor</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1"># loesche ggf. vorhandene zeilen in den rojektrahmendaten und fuege neue daten danach hinzu</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteRows_management</span><span class="p">(</span><span class="n">projektrahmendaten</span><span class="p">)</span>
+
+            <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">projektrahmendaten</span><span class="p">)</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">BEGINN_BETRACHTUNGSZEITRAUM</span> <span class="o">=</span> <span class="n">beginn_betrachtung</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">ENDE_BETRACHTUNGSZEITRAUM</span> <span class="o">=</span> <span class="n">ende_betrachtung</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">GEMEINDENAME</span> <span class="o">=</span> <span class="n">gen</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">PROJEKTSPEZIFISCHER_SONDERKOSTENFAKTOR</span> <span class="o">=</span> <span class="n">sonderkostenfaktor</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">PROJEKTNAME</span> <span class="o">=</span> <span class="n">projectName</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">AGS</span> <span class="o">=</span> <span class="n">ags</span>
+            <span class="n">cursor</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+            <span class="k">del</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">row</span>
+
+            <span class="c1"># Minimap erzeugen</span>
+            <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Erzeuge Uebersichtskarte </span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+            <span class="c1"># Kopiere Template.mxd</span>
+            <span class="n">template_folder</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">MXDS</span><span class="p">,</span> <span class="s2">&quot;Style_Minimap&quot;</span><span class="p">)</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">template_folder</span><span class="p">,</span> <span class="s2">&quot;template.mxd&quot;</span><span class="p">)</span>
+            <span class="n">mxd_template</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">mxd</span><span class="p">)</span>
+            <span class="n">ausgabeordner_img</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">AUSGABE_PATH</span><span class="p">,</span> <span class="s1">&#39;Abbildungen&#39;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">ausgabeordner_img</span><span class="p">)</span>
+            <span class="n">mxdpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner_img</span><span class="p">,</span> <span class="s1">&#39;Definition_Projekt.mxd&#39;</span><span class="p">)</span>
+            <span class="n">mxd_template</span><span class="o">.</span><span class="n">saveACopy</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+
+            <span class="c1"># Ersetze Datenquelle</span>
+            <span class="n">minimap_mxd</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+            <span class="n">templatepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">template_folder</span><span class="p">,</span> <span class="s2">&quot;template.gdb&quot;</span><span class="p">)</span>
+            <span class="n">resultpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_db</span><span class="p">(</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+            <span class="n">minimap_mxd</span><span class="o">.</span><span class="n">findAndReplaceWorkspacePaths</span><span class="p">(</span><span class="n">templatepath</span><span class="p">,</span> <span class="n">resultpath</span><span class="p">)</span>
+
+            <span class="c1"># Setze Viewport neu</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListDataFrames</span><span class="p">(</span><span class="n">minimap_mxd</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">gebietLayer</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListLayers</span><span class="p">(</span><span class="n">minimap_mxd</span><span class="p">,</span> <span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">,</span> <span class="n">df</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByAttribute_management</span><span class="p">(</span><span class="n">gebietLayer</span><span class="p">,</span> <span class="s2">&quot;NEW_SELECTION&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">OBJECTID</span><span class="se">\&quot;</span><span class="s2"> &gt; 0&quot;</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">extent</span> <span class="o">=</span> <span class="n">gebietLayer</span><span class="o">.</span><span class="n">getSelectedExtent</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByAttribute_management</span><span class="p">(</span><span class="n">gebietLayer</span><span class="p">,</span> <span class="s2">&quot;CLEAR_SELECTION&quot;</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">scale</span> <span class="o">*</span> <span class="mf">1.4</span>
+
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">RefreshActiveView</span><span class="p">()</span>
+            <span class="n">minimap_mxd</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">del</span> <span class="n">mxd_template</span>
+
+            <span class="c1"># Exportiere Ergebnis</span>
+            <span class="n">minimap</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner_img</span><span class="p">,</span> <span class="s1">&#39;Minimap.jpg&#39;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ExportToJPEG</span><span class="p">(</span>
+                <span class="n">minimap_mxd</span><span class="p">,</span>
+                <span class="n">minimap</span><span class="p">,</span>
+                <span class="s2">&quot;PAGE_LAYOUT&quot;</span><span class="p">,</span>
+                <span class="n">resolution</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+        <span class="c1"># output information to user</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Basisdaten erfolgreich kopiert&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Basisdaten erfolgreich kopiert </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># print(&quot;Neues Projekt angelegt im Ordner &quot; + projectPath)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Neues Projekt angelegt im Ordner &quot;</span> <span class="o">+</span> <span class="n">projectPath</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mes</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="n">e</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 22, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

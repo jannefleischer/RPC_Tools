@@ -1,0 +1,893 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># lib_oekologischeFolgen.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description:</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># ILS gGmbH</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="kn">import</span> <span class="nn">arcpy</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">datetime</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">gc</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
+
+
+<div class="viewcode-block" id="oekologischeFolgen"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen.html#rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen.oekologischeFolgen">[docs]</a><span class="k">def</span> <span class="nf">oekologischeFolgen</span><span class="p">(</span><span class="n">bedeckungNullfall</span><span class="p">,</span> <span class="n">bedeckungPlanfall</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;================================&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;================================&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Oekologische Bewertung berechnen:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Oekologische Bewertung berechnen:&quot;</span><span class="p">)</span>
+        <span class="c1">#bedeckungNullfall / bedeckungPLanfall: Eine PythonListe, welche die Bodenbedeckung in ha für die folgenden Kategorien angibt</span>
+        <span class="c1">#liste = [überbaute Flächen, Asphalt/Beton, Platten, Kleinpflaster, Wassergebundene Decke/Rasengittersteine, Offener Boden/ Acker, Rasen, Bäume/Sträucher,Stauden,Wiese,Natürliche Wasserfläche]</span>
+    <span class="c1">#####################################################################################################################</span>
+        <span class="c1">##Anteile der Bodenbedeckung berechnen</span>
+        <span class="c1">#Gesammtsumme für Nullfall und Planfall berechnen</span>
+        <span class="n">x</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">bedeckungNullfall</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="n">typ</span>
+    <span class="c1">##    print x</span>
+
+        <span class="n">y</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">bedeckungPlanfall</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">+</span><span class="n">typ</span>
+    <span class="c1">##    print y</span>
+
+        <span class="c1">#Anteile der Bodenbedeckung berechnen</span>
+        <span class="n">anteileNullfall</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">bedeckungNullfall</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">typ</span><span class="o">/</span><span class="n">x</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">anteileNullfall</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="c1">##    print anteileNullfall</span>
+
+        <span class="n">anteilePlanfall</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">bedeckungPlanfall</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">typ</span><span class="o">/</span><span class="n">y</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">anteilePlanfall</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+    <span class="c1">##    print anteilePlanfall</span>
+    <span class="c1">#####################################################################################################################</span>
+        <span class="c1">##ökologische Flächenleistungsparameter</span>
+        <span class="c1">#Keys:</span>
+        <span class="c1">#Überbaute Fläche = uF</span>
+        <span class="c1">#Asphalt / Beton = A</span>
+        <span class="c1">#Platten = P</span>
+        <span class="c1">#Kleinpflaster = kP</span>
+        <span class="c1">#wassergeb. Decke / Rasengittersteine = wD</span>
+        <span class="c1">#offener Boden / Acker = oB</span>
+        <span class="c1">#Rasen =R</span>
+        <span class="c1">#Bäume / Sträucher = B</span>
+        <span class="c1">#Stauden = ST</span>
+        <span class="c1">#Wiese = W</span>
+        <span class="c1">#natürliche Wasserflächen = nW</span>
+
+        <span class="c1">#Klima - Wärmespeicherung</span>
+        <span class="n">WS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">0.9</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1">#Klima - Staubbindevermögen</span>
+        <span class="n">SB</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1">#Boden - Schadstoffrückhaltung</span>
+        <span class="n">SR</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1">#Boden  - Porosität und Durchlässigkeit</span>
+        <span class="n">PD</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.6</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1">#Boden - Antropogene Bodenüberformung</span>
+        <span class="n">AB</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1">#Wasser - Oberflächenabfluss</span>
+        <span class="n">OA</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">0.6</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1">#Wasser - Grundwasserneubildung</span>
+        <span class="n">GN</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1">#Wasser - Regenwasserversickerung</span>
+        <span class="n">RV</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">0.9</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1">#FloraFauna - Biotopausbildungsvermögen</span>
+        <span class="n">BV</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.6</span><span class="p">,</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">0.9</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1">#####################################################################################################################</span>
+    <span class="c1">##Ökologische Flächenleistungen</span>
+    <span class="c1">#Ökowert Nullfall</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varWS</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varSB</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varSR</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varPD</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varAB</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varOA</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varGN</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varRV</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varBV</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">anteil</span> <span class="ow">in</span> <span class="n">anteileNullfall</span><span class="p">:</span>
+
+            <span class="n">a</span><span class="o">=</span><span class="n">anteil</span> <span class="o">*</span> <span class="n">WS</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varWS</span> <span class="o">=</span> <span class="n">varWS</span> <span class="o">+</span> <span class="n">a</span>
+
+            <span class="n">b</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">SB</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varSB</span> <span class="o">=</span> <span class="n">varSB</span> <span class="o">+</span> <span class="n">b</span>
+
+            <span class="n">c</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">SR</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varSR</span> <span class="o">=</span> <span class="n">varSR</span> <span class="o">+</span> <span class="n">c</span>
+
+            <span class="n">d</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">PD</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varPD</span> <span class="o">=</span> <span class="n">varPD</span> <span class="o">+</span> <span class="n">d</span>
+
+            <span class="n">e</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">AB</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varAB</span> <span class="o">=</span> <span class="n">varAB</span> <span class="o">+</span> <span class="n">e</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">OA</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varOA</span> <span class="o">=</span> <span class="n">varOA</span> <span class="o">+</span> <span class="n">f</span>
+
+            <span class="n">g</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">GN</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varGN</span> <span class="o">=</span> <span class="n">varGN</span> <span class="o">+</span> <span class="n">g</span>
+
+            <span class="n">h</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">RV</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varRV</span> <span class="o">=</span> <span class="n">varRV</span> <span class="o">+</span> <span class="n">h</span>
+
+            <span class="n">i</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">BV</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varBV</span> <span class="o">=</span> <span class="n">varBV</span> <span class="o">+</span> <span class="n">i</span>
+
+            <span class="n">it</span> <span class="o">=</span> <span class="n">it</span><span class="o">+</span><span class="mi">1</span>
+    <span class="c1">##    print varWS</span>
+    <span class="c1">##    print varSB</span>
+    <span class="c1">##    print varSR</span>
+    <span class="c1">##    print varPD</span>
+    <span class="c1">##    print varAB</span>
+    <span class="c1">##    print varOA</span>
+    <span class="c1">##    print varGN</span>
+    <span class="c1">##    print varRV</span>
+    <span class="c1">##    print varBV</span>
+
+        <span class="n">oekowertNullfall</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(((</span><span class="n">varWS</span> <span class="o">+</span> <span class="n">varSB</span> <span class="o">+</span> <span class="n">varSR</span> <span class="o">+</span> <span class="n">varPD</span> <span class="o">+</span> <span class="n">varAB</span> <span class="o">+</span> <span class="n">varOA</span> <span class="o">+</span> <span class="n">varGN</span> <span class="o">+</span> <span class="n">varRV</span> <span class="o">+</span> <span class="n">varBV</span><span class="p">)</span> <span class="o">/</span> <span class="mi">9</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1">#ÖkowertPlanfall</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varWS</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varSB</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varSR</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varPD</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varAB</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varOA</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varGN</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varRV</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">varBV</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">anteil</span> <span class="ow">in</span> <span class="n">anteilePlanfall</span><span class="p">:</span>
+
+            <span class="n">a</span><span class="o">=</span><span class="n">anteil</span> <span class="o">*</span> <span class="n">WS</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varWS</span> <span class="o">=</span> <span class="n">varWS</span> <span class="o">+</span> <span class="n">a</span>
+
+            <span class="n">b</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">SB</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varSB</span> <span class="o">=</span> <span class="n">varSB</span> <span class="o">+</span> <span class="n">b</span>
+
+            <span class="n">c</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">SR</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varSR</span> <span class="o">=</span> <span class="n">varSR</span> <span class="o">+</span> <span class="n">c</span>
+
+            <span class="n">d</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">PD</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varPD</span> <span class="o">=</span> <span class="n">varPD</span> <span class="o">+</span> <span class="n">d</span>
+
+            <span class="n">e</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">AB</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varAB</span> <span class="o">=</span> <span class="n">varAB</span> <span class="o">+</span> <span class="n">e</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">OA</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varOA</span> <span class="o">=</span> <span class="n">varOA</span> <span class="o">+</span> <span class="n">f</span>
+
+            <span class="n">g</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">GN</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varGN</span> <span class="o">=</span> <span class="n">varGN</span> <span class="o">+</span> <span class="n">g</span>
+
+            <span class="n">h</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">RV</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varRV</span> <span class="o">=</span> <span class="n">varRV</span> <span class="o">+</span> <span class="n">h</span>
+
+            <span class="n">i</span> <span class="o">=</span> <span class="n">anteil</span> <span class="o">*</span> <span class="n">BV</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">varBV</span> <span class="o">=</span> <span class="n">varBV</span> <span class="o">+</span> <span class="n">i</span>
+
+            <span class="n">it</span> <span class="o">=</span> <span class="n">it</span><span class="o">+</span><span class="mi">1</span>
+    <span class="c1">##    print varWS</span>
+    <span class="c1">##    print varSB</span>
+    <span class="c1">##    print varSR</span>
+    <span class="c1">##    print varPD</span>
+    <span class="c1">##    print varAB</span>
+    <span class="c1">##    print varOA</span>
+    <span class="c1">##    print varGN</span>
+    <span class="c1">##    print varRV</span>
+    <span class="c1">##    print varBV</span>
+
+        <span class="n">oekowertPlanfall</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(((</span><span class="n">varWS</span> <span class="o">+</span> <span class="n">varSB</span> <span class="o">+</span> <span class="n">varSR</span> <span class="o">+</span> <span class="n">varPD</span> <span class="o">+</span> <span class="n">varAB</span> <span class="o">+</span> <span class="n">varOA</span> <span class="o">+</span> <span class="n">varGN</span> <span class="o">+</span> <span class="n">varRV</span> <span class="o">+</span> <span class="n">varBV</span><span class="p">)</span> <span class="o">/</span> <span class="mi">9</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">oekowertNullfall</span><span class="o">&lt;</span><span class="mf">0.2</span><span class="p">):</span>
+            <span class="n">punktwertNullfall</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span><span class="p">(</span><span class="n">oekowertNullfall</span><span class="o">&gt;=</span><span class="mf">0.2</span> <span class="ow">and</span> <span class="n">oekowertNullfall</span><span class="o">&lt;</span><span class="mf">0.4</span><span class="p">):</span>
+            <span class="n">punktwertNullfall</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">elif</span><span class="p">(</span><span class="n">oekowertNullfall</span><span class="o">&gt;=</span><span class="mf">0.4</span> <span class="ow">and</span> <span class="n">oekowertNullfall</span><span class="o">&lt;</span><span class="mf">0.6</span><span class="p">):</span>
+            <span class="n">punktwertNullfall</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="k">elif</span><span class="p">(</span><span class="n">oekowertNullfall</span> <span class="o">&gt;=</span> <span class="mf">0.6</span> <span class="ow">and</span> <span class="n">oekowertNullfall</span><span class="o">&lt;</span><span class="mf">0.8</span><span class="p">):</span>
+            <span class="n">punktwertNullfall</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="k">elif</span><span class="p">(</span><span class="n">oekowertNullfall</span><span class="o">&gt;=</span><span class="mf">0.8</span><span class="p">):</span>
+            <span class="n">punktwertNullfall</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">punktwertNullfall</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">punktwertNullfallText</span> <span class="o">=</span> <span class="s2">&quot;Punktwert Nullfall=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">punktwertNullfall</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">punktwertNullfallText</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="n">punktwertNullfallText</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">oekowertPlanfall</span><span class="o">&lt;</span><span class="mf">0.2</span><span class="p">):</span>
+            <span class="n">punktwertPlanfall</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span><span class="p">(</span><span class="n">oekowertPlanfall</span><span class="o">&gt;=</span><span class="mf">0.2</span> <span class="ow">and</span> <span class="n">oekowertPlanfall</span><span class="o">&lt;</span><span class="mf">0.4</span><span class="p">):</span>
+            <span class="n">punktwertPlanfall</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">elif</span><span class="p">(</span><span class="n">oekowertPlanfall</span><span class="o">&gt;=</span><span class="mf">0.4</span> <span class="ow">and</span> <span class="n">oekowertPlanfall</span><span class="o">&lt;</span><span class="mf">0.6</span><span class="p">):</span>
+            <span class="n">punktwertPlanfall</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="k">elif</span><span class="p">(</span><span class="n">oekowertPlanfall</span> <span class="o">&gt;=</span> <span class="mf">0.6</span> <span class="ow">and</span> <span class="n">oekowertPlanfall</span><span class="o">&lt;</span><span class="mf">0.8</span><span class="p">):</span>
+            <span class="n">punktwertPlanfall</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="k">elif</span><span class="p">(</span><span class="n">oekowertPlanfall</span><span class="o">&gt;=</span><span class="mf">0.8</span><span class="p">):</span>
+            <span class="n">punktwertPlanfall</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">punktwertPlanfall</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">punktwertPlanfallText</span> <span class="o">=</span> <span class="s2">&quot;Punktwert Planfall=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">punktwertPlanfall</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">punktwertPlanfallText</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="n">punktwertPlanfallText</span><span class="p">)</span>
+    <span class="c1">#entsprechende Ergebnisse müssen via return zurück gegeben werden</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">punktwertNullfallText</span><span class="p">,</span><span class="n">punktwertPlanfallText</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">e</span></div>
+
+<div class="viewcode-block" id="oekologischeWertigkeit"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen.html#rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen.oekologischeWertigkeit">[docs]</a><span class="k">def</span> <span class="nf">oekologischeWertigkeit</span><span class="p">(</span><span class="n">projektName</span><span class="p">):</span>
+    <span class="c1">##In diesem Modul wir überprüft, ob die Planfläche sich mit verschiedenen, schützenswerten Naturgebieten überschneidet</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;========================&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Raeumliche Ueberschneidungen&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;========================&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Raeumliche Ueberschneidungen:&quot;</span><span class="p">)</span>
+        <span class="c1">#aktuelle Zeit</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">second</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">day</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">month</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+
+        <span class="c1">#aktueller Pfad</span>
+        <span class="c1">#wcd = sys.path[0].split(&quot;\\2_Tool&quot;)[0]</span>
+        <span class="n">wcd</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1">#wcd = sys.path[0]</span>
+        <span class="c1">#arcpy.AddMessage(wcd)</span>
+
+        <span class="c1">#wcd = os.getcwd()</span>
+        <span class="n">rootPfad</span> <span class="o">=</span> <span class="n">wcd</span>
+        <span class="c1">#rootPfad = rootPfad + &quot;\\00_Entwicklungsumgebung&quot;</span>
+        <span class="c1">#Pfad zur Ergebnistabelle</span>
+
+<span class="c1">##        ergebnisTabelle = rootPfad + &quot;\\3_Projekte\\&quot; + projektName + &quot;\\FGDB_36_Flaeche_und_Oekologie_&quot; + projektName + &quot;.gdb\\Ergebnisse_oekologischeWertigkeit&quot;</span>
+<span class="c1">##        #insert Cursor für die Ergebnistabelle erstellen</span>
+<span class="c1">##        ergebnisCursor = arcpy.InsertCursor(ergebnisTabelle)</span>
+<span class="c1">##        #eine neue Zeile für das Ergebnis dieses Durchlaufs anlegen</span>
+<span class="c1">##        ergebnisZeile = ergebnisCursor.newRow()</span>
+        <span class="c1">#Die Flächen des Plangebietes als Layer verfügbar machen</span>
+
+        <span class="n">flaechenPlangebiet</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s2">&quot;3_Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_&quot;</span><span class="o">+</span><span class="n">projektName</span><span class="o">+</span> <span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">flaechenPlangebiet</span><span class="p">,</span><span class="s2">&quot;flaechenPlangebiet_lyr&quot;</span><span class="p">)</span>
+        <span class="c1">#Aus der Featureclass eine Liste mit allen Schutzgebieten iterieren</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">workspace</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;F_Flaeche_und_Oekologie&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_Tool.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;NRW&quot;</span><span class="p">)</span>
+        <span class="c1">#print arcpy.env.workspace</span>
+        <span class="c1">#arcpy.AddMessage(arcpy.env.workspace)</span>
+        <span class="n">liste</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFeatureClasses</span><span class="p">()</span>
+        <span class="c1">#arcpy.AddMessage(liste)</span>
+        <span class="c1">#Printausgabe</span>
+        <span class="c1">#über diese Liste iterieren und auf Überschneidungen mit dem Plangebiet prüfen</span>
+        <span class="n">rueckgabe</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1">#print liste</span>
+        <span class="k">for</span> <span class="n">gebiet</span> <span class="ow">in</span> <span class="n">liste</span><span class="p">:</span>
+            <span class="c1">#Layer erstellen</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">gebiet</span><span class="p">,</span><span class="s2">&quot;schutzgebiet_lyr&quot;</span><span class="p">)</span>
+            <span class="c1">#Alle Flächen des BiotopeLayers auswählen, die sich mit den Plangebietsflächen überschneiden</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByLocation_management</span><span class="p">(</span><span class="s2">&quot;schutzgebiet_lyr&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="s2">&quot;flaechenPlangebiet_lyr&quot;</span><span class="p">)</span>
+            <span class="c1">#das Ergebnis durchzählen, wenn x&gt;0 gibt es Überschneidungen, ansonsten keine</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="s2">&quot;schutzgebiet_lyr&quot;</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
+            <span class="c1">#Printausgabe</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">gebiet</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">gebiet</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="c1">#In der Ergebnistabelle  wert für das spezifische Schutzgebiet auf &#39;1&#39; stellen</span>
+<span class="c1">##            if(x&gt;0):</span>
+<span class="c1">##                if(gebiet == &quot;Biotope&quot;):</span>
+<span class="c1">##                    ergebnisZeile.Biotope = 1</span>
+<span class="c1">##                if(gebiet == &quot;FFH_Gebiete&quot;):</span>
+<span class="c1">##                    ergebnisZeile.FFH_Gebiete = 1</span>
+<span class="c1">##                if(gebiet == &quot;Nationalparke&quot;):</span>
+<span class="c1">##                    ergebnisZeile.Nationalparke = 1</span>
+<span class="c1">##                if(gebiet == &quot;Naturschutzgebiete&quot;):</span>
+<span class="c1">##                    ergebnisZeile.Naturschutzgebiete = 1</span>
+<span class="c1">##                if(gebiet == &quot;Vogelschutzgebiete&quot;):</span>
+<span class="c1">##                    ergebnisZeile.Vogelschutzgebiete = 1</span>
+<span class="c1">##</span>
+<span class="c1">##            else:</span>
+<span class="c1">##                if(gebiet == &quot;Biotope&quot;):</span>
+<span class="c1">##                    ergebnisZeile.Biotope = 0</span>
+<span class="c1">##                if(gebiet == &quot;FFH_Gebiete&quot;):</span>
+<span class="c1">##                    ergebnisZeile.FFH_Gebiete = 0</span>
+<span class="c1">##                if(gebiet == &quot;Nationalparke&quot;):</span>
+<span class="c1">##                    ergebnisZeile.Nationalparke = 0</span>
+<span class="c1">##                if(gebiet == &quot;Naturschutzgebiete&quot;):</span>
+<span class="c1">##                    ergebnisZeile.Naturschutzgebiete = 0</span>
+<span class="c1">##                if(gebiet == &quot;Vogelschutzgebiete&quot;):</span>
+<span class="c1">##                    ergebnisZeile.Vogelschutzgebiete = 0</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">gebiet</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="n">rueckgabe</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="s2">&quot;schutzgebiet_lyr&quot;</span><span class="p">)</span>
+<span class="c1">##        ergebnisZeile.timestamp = timestamp</span>
+<span class="c1">##        ergebnisCursor.insertRow(ergebnisZeile)</span>
+        <span class="c1">#eine 1 steht inder Ergebnistabelle für Überschneidungen, eine 0 für keine Überschneidungen</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">liste</span><span class="p">,</span> <span class="n">gebiet</span><span class="p">,</span> <span class="c1">#ergebnisCursor</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sperren löschen fehlgeschlagen, bitte Programm neu starten&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rueckgabe</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="c1">#rueckgabe = (e)</span>
+        <span class="c1">#return rueckgabe</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">liste</span><span class="p">,</span> <span class="n">gebiet</span><span class="p">,</span><span class="c1"># ergebnisCursor</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IntegrationsGrad"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen.html#rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen.IntegrationsGrad">[docs]</a><span class="k">def</span> <span class="nf">IntegrationsGrad</span><span class="p">(</span><span class="n">GrenzeSiedlungskoerper</span><span class="p">,</span><span class="n">GrenzeGesamt</span><span class="p">):</span>
+    <span class="c1">#Länge der Grenze der Projektfläche zum bestehenden Siedlungskörper (in m)</span>
+    <span class="c1">#Länge der gesamten Grenze der Projektfläche (Umfang) (in m)</span>
+    <span class="n">integrationsgrad</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">GrenzeSiedlungskoerper</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">GrenzeGesamt</span><span class="p">)</span>
+    <span class="c1">#arcpy.AddMessage(integrationsgrad)</span>
+    <span class="k">if</span> <span class="n">integrationsgrad</span> <span class="o">&lt;</span> <span class="mf">0.25</span><span class="p">:</span>
+        <span class="n">bewertung</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">integrationsgrad</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+        <span class="n">bewertung</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="n">integrationsgrad</span> <span class="o">&lt;</span> <span class="mf">0.75</span><span class="p">:</span>
+        <span class="n">bewertung</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">elif</span> <span class="n">integrationsgrad</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">bewertung</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">elif</span> <span class="n">integrationsgrad</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">bewertung</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">bewertung</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">bewertungIntegration</span> <span class="o">=</span> <span class="n">bewertung</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">integrationsgrad</span><span class="p">,</span><span class="n">bewertung</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="uzvr"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen.html#rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen.uzvr">[docs]</a><span class="k">def</span> <span class="nf">uzvr</span><span class="p">(</span><span class="n">projektName</span><span class="p">,</span> <span class="n">Region</span><span class="p">):</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;========================&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Unzerschnittene verkehrsarme Raeume: Nullfall</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;========================&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unzerschnittene verkehrsarme Raeume: Nullfall</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1">#Pfad zu den Geodaten</span>
+         <span class="c1">#aktueller Pfad</span>
+        <span class="c1">#arcpy.AddMessage(sys.path[0])</span>
+        <span class="n">wcd</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1">#arcpy.AddMessage(wcd)</span>
+        <span class="c1">#Pfad zur Ergebnistabelle</span>
+        <span class="n">projektOrdner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">wcd</span><span class="p">,</span><span class="s2">&quot;3_Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_&quot;</span> <span class="o">+</span> <span class="n">projektName</span> <span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">)</span>
+        <span class="c1">#arcpy.AddMessage(projektOrdner)</span>
+        <span class="c1">#ergebnisTabelle = rootPfad + &quot;\\3_Projekte\\&quot; + projektName + &quot;\\FGDB_36_Flaeche_und_Oekologie_&quot; + projektName + &quot;.gdb\\Ergebnisse_oekologischeWertigkeit&quot;</span>
+        <span class="n">ergebnisTabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">projektOrdner</span><span class="p">,</span><span class="s2">&quot;Ergebnisse_oekologischeWertigkeit&quot;</span><span class="p">)</span>
+       <span class="c1"># arcpy.AddMessage(ergebnisTabelle)</span>
+        <span class="c1">#Pfad zu den Geodaten</span>
+        <span class="c1">#projektFlaeche = rootPfad + &quot;\\3_Projekte\\&quot; + projektName + &quot;\\FGDB_11_Definition_Projekt_&quot; + projektName + &quot;.gdb\\Teilflaechen_Plangebiet&quot;</span>
+        <span class="n">projektFlaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">wcd</span><span class="p">,</span><span class="s2">&quot;3_Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_&quot;</span> <span class="o">+</span> <span class="n">projektName</span><span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
+        <span class="c1">#arcpy.AddMessage(projektFlaeche)</span>
+        <span class="c1">#Pfad zu den UZVR</span>
+        <span class="c1">#uzvr =rootPfad + &quot;\\2_Tool\\36_Flaeche_und_Oekologie\\FGDB_36_Flaeche_und_Oekologie_Tool.gdb\\uzvr_de&quot;</span>
+
+        <span class="c1"># uzvr = join(wcd,&quot;3_Projekte&quot;,projektName,&quot;FGDB_36_Flaeche_und_Oekologie_&quot; + projektName +&quot;.gdb&quot;,&quot;uzvr_de&quot;)</span>
+        <span class="c1"># auskommentiert, da die uzvr jetzt zentral vorgehalten werden</span>
+
+        <span class="n">uzvr</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">wcd</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;F_Flaeche_und_Oekologie&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_Tool.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;uzvr_de&quot;</span><span class="p">)</span>
+
+        <span class="c1">#arcpy.AddMessage(uzvr)</span>
+        <span class="c1">#Nullfall</span>
+        <span class="c1">#alle UVZR auswählen, die durch die Planfläche tangiert werden</span>
+
+        <span class="c1">#1. Feature Layer aus den uzvr erstellen</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">uzvr</span><span class="p">,</span><span class="s2">&quot;uzvr_lyr&quot;</span><span class="p">)</span>
+        <span class="c1">#arcpy.AddMessage(&quot;2&quot;)</span>
+
+        <span class="c1">#2.Spatial Select wo Planfläche uzvr_lyr intersected</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;1. Prüfung auf Überschneidung und Auswahl der UZVR, die von dem Plangebiet geschnitten werden&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;1. Prüfung auf Überschneidung und Auswahl der UZVR, die von dem Plangebiet geschnitten werden&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByLocation_management</span><span class="p">(</span><span class="s2">&quot;uzvr_lyr&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="n">projektFlaeche</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Anzahl der Flaechen: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">arcpy</span><span class="o">.</span><span class="n">GetCount_management</span><span class="p">(</span><span class="s2">&quot;uzvr_lyr&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Anzahl der Flaechen: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">arcpy</span><span class="o">.</span><span class="n">GetCount_management</span><span class="p">(</span><span class="s2">&quot;uzvr_lyr&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1">#3.Feld hinzufügen &amp; Fläche berechnen (nur wenn Überschneidung mit UZVR)</span>
+        <span class="c1">#3a. Prüfung ob Überschneidung mit UZVR</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="s2">&quot;uzvr_lyr&quot;</span><span class="p">)</span>
+        <span class="n">CountUZVR</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">CountUZVR</span> <span class="o">=</span> <span class="n">CountUZVR</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="c1">#Printausgabe</span>
+            <span class="c1"># arcpy.AddMessage(&quot;Geschnittene UZVR: &quot; + CountUZVR + &quot;\n&quot;)</span>
+            <span class="c1"># print(&quot;Geschnittene UZVR: &quot; + CountUZVR)</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">CountUZVR</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">5</span>
+            <span class="n">begegnungswahrscheinlichkeit</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">begegnungswahrscheinlichkeit_clipped</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">groessteUZVR</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Keine UZVR betroffen&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Keine UZVR betroffen&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Flaechengroesse berechnen</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;2. Flaechengroesse berechnen</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="s2">&quot;uzvr_lyr&quot;</span><span class="p">,</span> <span class="s2">&quot;Flaeche_ha&quot;</span><span class="p">,</span><span class="s2">&quot;Float&quot;</span><span class="p">)</span>
+            <span class="n">expression</span> <span class="o">=</span>  <span class="s2">&quot;!shape.area@HECTARES!&quot;</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">CalculateField_management</span><span class="p">(</span><span class="s2">&quot;uzvr_lyr&quot;</span><span class="p">,</span><span class="s2">&quot;Flaeche_ha&quot;</span><span class="p">,</span><span class="n">expression</span><span class="p">,</span><span class="s2">&quot;PYTHON&quot;</span><span class="p">)</span>
+
+            <span class="c1">#4. Gesamtflaeche der betroffenen Flaechen ermitteln</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3. Gesamtflaeche der betroffenen Flaechen ermitteln&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;3. Gesamtflaeche der betroffenen Flaechen ermitteln&quot;</span><span class="p">)</span>
+            <span class="n">uzvr_betroffen</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="s2">&quot;uzvr_lyr&quot;</span><span class="p">)</span>
+            <span class="n">flaecheHA</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">groessteUZVR</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">flaeche</span> <span class="ow">in</span> <span class="n">uzvr_betroffen</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">flaeche</span> <span class="o">&gt;</span> <span class="n">groessteUZVR</span><span class="p">):</span>
+                    <span class="n">groessteUZVR</span> <span class="o">=</span> <span class="n">flaeche</span>
+                <span class="n">flaecheHA</span> <span class="o">=</span> <span class="n">flaecheHA</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">flaeche</span><span class="o">.</span><span class="n">Flaeche_ha</span><span class="p">)</span>
+            <span class="n">groUZVR</span> <span class="o">=</span> <span class="n">groessteUZVR</span><span class="o">.</span><span class="n">Flaeche_ha</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;groUZVR1: &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">groUZVR</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;groUZVR1: &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">groUZVR</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Groesste betroffene Teilflaeche: &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">groessteUZVR</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; ha&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Groesste betroffene Teilflaeche: &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">groessteUZVR</span><span class="o">.</span><span class="n">Flaeche_ha</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; ha&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gesamtflaeche: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">flaecheHA</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; ha</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Gesamtflaeche: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">flaecheHA</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; ha</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1">#5. Begegnungswahrscheinlichkeit berechnen</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;4. Begegnungswahrschinlichkeit berechnen&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;4. Begegnungswahrschinlichkeit berechnen&quot;</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">flaecheHA</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">begegnungswahrscheinlichkeit</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">begegnungswahrscheinlichkeit</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">gebiet</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="s2">&quot;uzvr_lyr&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">flaeche</span> <span class="ow">in</span> <span class="n">gebiet</span><span class="p">:</span>
+                    <span class="n">begegnungswahrscheinlichkeit</span> <span class="o">=</span> <span class="n">begegnungswahrscheinlichkeit</span> <span class="o">+</span> <span class="p">((</span><span class="n">flaeche</span><span class="o">.</span><span class="n">Flaeche_ha</span><span class="o">/</span><span class="n">flaecheHA</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">flaeche</span><span class="o">.</span><span class="n">Flaeche_ha</span><span class="o">/</span><span class="n">flaecheHA</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Begegnungswahrscheinlichkeit: &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">begegnungswahrscheinlichkeit</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Begegnungswahrscheinlichkeit: &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">begegnungswahrscheinlichkeit</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1">#6. Effektive Maschenweite berechnen</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;5. Effektive Maschenweite berechnen&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;5. Effektive Maschenweite berechnen&quot;</span><span class="p">)</span>
+            <span class="n">effektiveMaschenweite</span> <span class="o">=</span> <span class="n">begegnungswahrscheinlichkeit</span> <span class="o">*</span> <span class="n">flaecheHA</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Effektive Maschenweite: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">effektiveMaschenweite</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Effektive Maschenweite: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">effektiveMaschenweite</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+            <span class="c1">#Berechnungen Planfall1</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Unzerschnittene verkehrsarme Raeume: Planfall 1</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unzerschnittene verkehrsarme Raeume: Planfall 1</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1">#1. Genaue Verschneidung der betroffenen Gebiete und der Planflaeche</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;1. Genaue Verschneidung der betroffenen Gebiete und der Planflaeche</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;1. Genaue Verschneidung der betroffenen Gebiete und der Planflaeche</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">Clip_analysis</span><span class="p">(</span><span class="n">uzvr</span><span class="p">,</span> <span class="n">projektFlaeche</span><span class="p">,</span> <span class="s2">&quot;in_memory</span><span class="se">\\</span><span class="s2">uzvr_lyr_clipped&quot;</span><span class="p">)</span>
+
+            <span class="c1">#2. Groesse der genau verschnittenen Flaechen berechnen</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Groesse der genau verschnittenen Flaechen berechnen&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;2. Groesse der genau verschnittenen Flaechen berechnen&quot;</span><span class="p">)</span>
+            <span class="c1">#Feld neu berechnen</span>
+            <span class="n">expression</span> <span class="o">=</span>  <span class="s2">&quot;!shape.area@HECTARES!&quot;</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">CalculateField_management</span><span class="p">(</span><span class="s2">&quot;in_memory</span><span class="se">\\</span><span class="s2">uzvr_lyr_clipped&quot;</span><span class="p">,</span><span class="s2">&quot;Flaeche_ha&quot;</span><span class="p">,</span><span class="n">expression</span><span class="p">,</span><span class="s2">&quot;PYTHON&quot;</span><span class="p">)</span>
+            <span class="c1">#Flaechen aufsummieren</span>
+            <span class="n">uzvr_betroffen_clipped</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="s2">&quot;in_memory</span><span class="se">\\</span><span class="s2">uzvr_lyr_clipped&quot;</span><span class="p">)</span>
+            <span class="n">flaecheHA_clipped</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">flaeche</span> <span class="ow">in</span> <span class="n">uzvr_betroffen_clipped</span><span class="p">:</span>
+                <span class="n">flaecheHA_clipped</span> <span class="o">=</span> <span class="n">flaecheHA_clipped</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">flaeche</span><span class="o">.</span><span class="n">Flaeche_ha</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gesamtflaeche: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">flaecheHA_clipped</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; ha</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Gesamtflaeche: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">flaecheHA_clipped</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; ha</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1">#3. Begegnungswahrscheinlichkeit berechnen</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3. Begegnungswahrscheinlichkeit berechnen&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;3. Begegnungswahrscheinlichkeit berechnen&quot;</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">flaecheHA_clipped</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">begegnungswahrscheinlichkeit_clipped</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">begegnungswahrscheinlichkeit_clipped</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">gebiet</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="s2">&quot;in_memory</span><span class="se">\\</span><span class="s2">uzvr_lyr_clipped&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">flaeche</span> <span class="ow">in</span> <span class="n">gebiet</span><span class="p">:</span>
+                    <span class="n">begegnungswahrscheinlichkeit_clipped</span> <span class="o">=</span> <span class="n">begegnungswahrscheinlichkeit_clipped</span> <span class="o">+</span> <span class="p">((</span><span class="n">flaeche</span><span class="o">.</span><span class="n">Flaeche_ha</span><span class="o">/</span><span class="n">flaecheHA_clipped</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">flaeche</span><span class="o">.</span><span class="n">Flaeche_ha</span><span class="o">/</span><span class="n">flaecheHA_clipped</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Begegnungswahrscheinlichkeit: &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">begegnungswahrscheinlichkeit_clipped</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Begegnungswahrscheinlichkeit: &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">begegnungswahrscheinlichkeit_clipped</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1">#4. Effektive Maschenweite berechnen</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;4. Effektive Maschenweite berechnen&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;4. Effektive Maschenweite berechnen&quot;</span><span class="p">)</span>
+            <span class="n">effektiveMaschenweite_clipped</span> <span class="o">=</span> <span class="n">begegnungswahrscheinlichkeit_clipped</span> <span class="o">*</span> <span class="n">flaecheHA_clipped</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Effektive Maschenweite: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">effektiveMaschenweite_clipped</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Effektive Maschenweite: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">effektiveMaschenweite_clipped</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1">#Verteilung der UZVR in der Bewertungsebene (Region)</span>
+            <span class="c1"># groessteUZVR = str(groessteUZVR)</span>
+            <span class="c1"># groessteUZVR = groessteUZVR.replace(&quot;,&quot;,&quot;.&quot;)</span>
+            <span class="c1"># if (Region == &quot;Braunschweig-Salzgitter-Wolfenbuettel&quot;):</span>
+            <span class="c1">#     if (groessteUZVR &lt; 1):</span>
+            <span class="c1">#         bewertungUZVR = 5</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 1 and groessteUZVR &lt;= 4.90):</span>
+            <span class="c1">#         bewertungUZVR = 4</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 4.90 and groessteUZVR &lt;= 31.80):</span>
+            <span class="c1">#         bewertungUZVR = 3</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 31.80 and groessteUZVR &lt;= 269.32):</span>
+            <span class="c1">#         bewertungUZVR = 2</span>
+            <span class="c1">#     elif (groessteUZVR &gt; 269.32):</span>
+            <span class="c1">#         bewertungUZVR = 1</span>
+            <span class="c1">#</span>
+            <span class="c1"># #Werte müssen noch für Region ermittelt werden</span>
+            <span class="c1"># if (Region == &quot;In und um Duesseldorf&quot;):</span>
+            <span class="c1">#     if (groessteUZVR &lt; 1):</span>
+            <span class="c1">#         bewertungUZVR = 5</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 1 and groessteUZVR &lt;= 1.55):</span>
+            <span class="c1">#         bewertungUZVR = 4</span>
+            <span class="c1">#     elif (groessteUZVR &gt;=1.55 and groessteUZVR &lt;= 2.69):</span>
+            <span class="c1">#         bewertungUZVR = 3</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 2.69 and groessteUZVR &lt;= 5.09):</span>
+            <span class="c1">#         bewertungUZVR = 2</span>
+            <span class="c1">#     elif (groessteUZVR &gt; 5.09):</span>
+            <span class="c1">#         bewertungUZVR = 1</span>
+            <span class="c1">#</span>
+            <span class="c1"># if (Region == &quot;Kreis Euskirchen&quot;):</span>
+            <span class="c1">#     if (groessteUZVR &lt; 1):</span>
+            <span class="c1">#         bewertungUZVR = 5</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 1 and groessteUZVR &lt;= 5.67):</span>
+            <span class="c1">#         bewertungUZVR = 4</span>
+            <span class="c1">#     elif (groessteUZVR &gt;=5.67 and groessteUZVR &lt;= 307.30):</span>
+            <span class="c1">#         bewertungUZVR = 3</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 307.30 and groessteUZVR &lt;= 1594.22):</span>
+            <span class="c1">#         bewertungUZVR = 2</span>
+            <span class="c1">#     elif (groessteUZVR &gt; 1594.22):</span>
+            <span class="c1">#         bewertungUZVR = 1</span>
+            <span class="c1">#</span>
+            <span class="c1"># if (Region == &quot;Kreis Unna&quot;):</span>
+            <span class="c1">#     if (groessteUZVR &lt; 1):</span>
+            <span class="c1">#         bewertungUZVR = 5</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 1 and groessteUZVR &lt;= 8.59):</span>
+            <span class="c1">#         bewertungUZVR = 4</span>
+            <span class="c1">#     elif (groessteUZVR &gt;=8.59 and groessteUZVR &lt;= 34.56):</span>
+            <span class="c1">#         bewertungUZVR = 3</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 34.56 and groessteUZVR &lt;= 262.24):</span>
+            <span class="c1">#         bewertungUZVR = 2</span>
+            <span class="c1">#     elif (groessteUZVR &gt; 262.24):</span>
+            <span class="c1">#         bewertungUZVR = 1</span>
+            <span class="c1">#</span>
+            <span class="c1"># if (Region == &quot;Landkreis Harburg&quot;):</span>
+            <span class="c1">#     if (groessteUZVR &lt; 1):</span>
+            <span class="c1">#         bewertungUZVR = 5</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 1 and groessteUZVR &lt;= 5.79):</span>
+            <span class="c1">#         bewertungUZVR = 4</span>
+            <span class="c1">#     elif (groessteUZVR &gt;=5.79 and groessteUZVR &lt;= 54.77):</span>
+            <span class="c1">#         bewertungUZVR = 3</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 54.77 and groessteUZVR &lt;= 585.00):</span>
+            <span class="c1">#         bewertungUZVR = 2</span>
+            <span class="c1">#     elif (groessteUZVR &gt; 585.00):</span>
+            <span class="c1">#         bewertungUZVR = 1</span>
+            <span class="c1">#</span>
+            <span class="c1"># if (Region == &quot;Landkreis Wolfenbuettel&quot;):</span>
+            <span class="c1">#     if (groessteUZVR &lt; 1):</span>
+            <span class="c1">#         bewertungUZVR = 5</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 1 and groessteUZVR &lt;= 35.06):</span>
+            <span class="c1">#         bewertungUZVR = 4</span>
+            <span class="c1">#     elif (groessteUZVR &gt;=35.06 and groessteUZVR &lt;= 285.28):</span>
+            <span class="c1">#         bewertungUZVR = 3</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 285.28 and groessteUZVR &lt;= 637.15):</span>
+            <span class="c1">#         bewertungUZVR = 2</span>
+            <span class="c1">#     elif (groessteUZVR &gt; 637.15):</span>
+            <span class="c1">#         bewertungUZVR = 1</span>
+            <span class="c1">#</span>
+            <span class="c1"># if (Region == &quot;Rheinisch-Bergischer Kreis&quot;):</span>
+            <span class="c1">#     if (groessteUZVR &lt; 1):</span>
+            <span class="c1">#         bewertungUZVR = 5</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 1 and groessteUZVR &lt;= 9.59):</span>
+            <span class="c1">#         bewertungUZVR = 4</span>
+            <span class="c1">#     elif (groessteUZVR &gt;=9.59 and groessteUZVR &lt;= 107.75):</span>
+            <span class="c1">#         bewertungUZVR = 3</span>
+            <span class="c1">#     elif (groessteUZVR &gt;= 107.75 and groessteUZVR &lt;= 450.41):</span>
+            <span class="c1">#         bewertungUZVR = 2</span>
+            <span class="c1">#     elif (groessteUZVR &gt; 450.41):</span>
+            <span class="c1">#         bewertungUZVR = 1</span>
+
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">Region</span> <span class="o">==</span> <span class="s2">&quot;Braunschweig-Salzgitter-Wolfenbuettel&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">4.90</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mf">4.90</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">31.80</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mf">31.80</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">269.32</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;</span> <span class="mf">269.32</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1">#Werte müssen noch für Region ermittelt werden</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">Region</span> <span class="o">==</span> <span class="s2">&quot;In und um Duesseldorf&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">1.55</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span><span class="mf">1.55</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">2.69</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mf">2.69</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">5.09</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;</span> <span class="mf">5.09</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">Region</span> <span class="o">==</span> <span class="s2">&quot;Kreis Euskirchen&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">5.67</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span><span class="mf">5.67</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">307.30</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mf">307.30</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">1594.22</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;</span> <span class="mf">1594.22</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">Region</span> <span class="o">==</span> <span class="s2">&quot;Kreis Unna&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">8.59</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span><span class="mf">8.59</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">34.56</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mf">34.56</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">262.24</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;</span> <span class="mf">262.24</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">Region</span> <span class="o">==</span> <span class="s2">&quot;Landkreis Harburg&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">5.79</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span><span class="mf">5.79</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">54.77</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mf">54.77</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">585.00</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;</span> <span class="mf">585.00</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">Region</span> <span class="o">==</span> <span class="s2">&quot;Landkreis Wolfenbuettel&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">35.06</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span><span class="mf">35.06</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">285.28</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mf">285.28</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">637.15</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;</span> <span class="mf">637.15</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">Region</span> <span class="o">==</span> <span class="s2">&quot;Rheinisch-Bergischer Kreis&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">9.59</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span><span class="mf">9.59</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">107.75</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;=</span> <span class="mf">107.75</span> <span class="ow">and</span> <span class="n">groUZVR</span> <span class="o">&lt;=</span> <span class="mf">450.41</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">groUZVR</span> <span class="o">&gt;</span> <span class="mf">450.41</span><span class="p">):</span>
+                    <span class="n">bewertungUZVR</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1">#</span>
+            <span class="c1"># print(&quot;bewertungUZVR: &quot;+str(bewertungUZVR) + &quot;\n&quot;)</span>
+            <span class="c1"># arcpy.AddMessage(&quot;bewertungUZVR: &quot;+str(bewertungUZVR) + &quot;\n&quot;)</span>
+            <span class="c1"># print(&quot;begegnungswahrscheinlichkeit: &quot;+str(begegnungswahrscheinlichkeit) + &quot;\n&quot;)</span>
+            <span class="c1"># arcpy.AddMessage(&quot;begegnungswahrscheinlichkeit: &quot;+str(begegnungswahrscheinlichkeit) + &quot;\n&quot;)</span>
+            <span class="c1"># print(&quot;begegnungswahrscheinlichkeit_clipped: &quot;+str(begegnungswahrscheinlichkeit_clipped) + &quot;\n&quot;)</span>
+            <span class="c1"># arcpy.AddMessage(&quot;begegnungswahrscheinlichkeit_clipped: &quot;+str(begegnungswahrscheinlichkeit_clipped) + &quot;\n&quot;)</span>
+            <span class="c1"># print(&quot;groessteUZVR: &quot;+str(groessteUZVR) + &quot;\n&quot;)</span>
+            <span class="c1"># arcpy.AddMessage(&quot;groessteUZVR: &quot;+str(groessteUZVR) + &quot;\n&quot;)</span>
+            <span class="c1"># print(&quot;groUZVR2: &quot;+str(groUZVR) + &quot;\n&quot;)</span>
+            <span class="c1"># arcpy.AddMessage(&quot;groUZVR2: &quot;+str(groUZVR) + &quot;\n&quot;)</span>
+
+        <span class="n">rueckgabe</span> <span class="o">=</span> <span class="p">[</span><span class="n">bewertungUZVR</span><span class="p">,</span> <span class="n">begegnungswahrscheinlichkeit</span><span class="p">,</span><span class="n">begegnungswahrscheinlichkeit_clipped</span><span class="p">,</span><span class="n">groUZVR</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">rueckgabe</span>
+
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="n">e</span>
+    <span class="c1">#return bewertung</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">uzvr_betroffen</span><span class="p">,</span> <span class="n">uzvr_betroffen_clipped</span>
+        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="s2">&quot;in_memory</span><span class="se">\\</span><span class="s2">uzvr_lyr_clipped&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1">#Flaecheninanspruchname&#39;</span>
+
+<div class="viewcode-block" id="flaechenInanspruchname"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen.html#rpctools.analyst.flaeche_oekologie.lib_oekologischeFolgen.flaechenInanspruchname">[docs]</a><span class="k">def</span> <span class="nf">flaechenInanspruchname</span><span class="p">(</span><span class="n">integrationsgrad</span><span class="p">,</span><span class="n">typ</span><span class="p">):</span>
+    <span class="n">integrationsgrad</span> <span class="o">=</span> <span class="n">integrationsgrad</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+    <span class="n">integrationsgrad</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">integrationsgrad</span><span class="p">)</span>
+    <span class="c1">#arcpy.AddMessage(&quot;========================&quot;)</span>
+    <span class="c1">#arcpy.AddMessage(&quot;Bewertung der Flaecheninanspruchname\n&quot;)</span>
+    <span class="c1">#print(&quot;========================&quot;)</span>
+    <span class="c1">#print(&quot;Bewertung der Flaecheninanspruchname\n&quot;)</span>
+    <span class="c1">#neuinanspruchname = float (neuinanspruchname)</span>
+    <span class="c1">##Bewertung Quantitaet</span>
+    <span class="c1">#try:</span>
+    <span class="c1">#    if (neuinanspruchname == 0):</span>
+    <span class="c1">#        bewertungQuantitaet = 1</span>
+    <span class="c1">#    if ((12-neuinanspruchname) &lt;= 10 ):</span>
+    <span class="c1">#        bewertungQuantitaet = 0.5</span>
+    <span class="c1">#    if ((12-neuinanspruchname) &gt;= 10 ):</span>
+    <span class="c1">#        bewertungQuantitaet = 0</span>
+    <span class="c1">#    print(&quot;Bewertung der Flächenneuinanspruchname: &quot; + str(bewertungQuantitaet) + &quot;\n&quot;)</span>
+    <span class="c1">#    arcpy.AddMessage(&quot;Bewertung der Flächenneuinanspruchname: &quot; + str(bewertungQuantitaet)+ &quot;\n&quot;)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">bewertungQuantitaet</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">bewertungDichte</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1">##Bewertung Dichte</span>
+        <span class="c1">#wcd = os.getcwd()</span>
+        <span class="c1">#rootPfad = sys.path[0].split(&quot;2_&quot;)[0]</span>
+        <span class="c1">##Pfad zu den bkg Daten</span>
+        <span class="c1">#projektFlaeche = rootPfad + &quot;\\3_Projekte\\&quot; + projektName + &quot;\\FGDB_11_Definition_Projekt_&quot; + projektName + &quot;.gdb\\Teilflaechen_Plangebiet&quot;</span>
+        <span class="c1">#bkg = rootPfad + &quot;\\1_Basisdaten\\FGBD_01_Basisdaten_deutschland.gdb\\bkg_gemeinden&quot;</span>
+        <span class="c1">##Einwohnerzahl aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird</span>
+        <span class="c1">##1. Feature Layer aus den bkg-daten erstellen</span>
+        <span class="c1">#arcpy.MakeFeatureLayer_management(bkg,&quot;bkg_lyr&quot;)</span>
+        <span class="c1">##2.Spatial Select wo Planfläche bkg_lyr intersected</span>
+        <span class="c1">#arcpy.SelectLayerByLocation_management(&quot;bkg_lyr&quot;, &quot;INTERSECT&quot;, projektFlaeche)</span>
+        <span class="c1">##Wenn Flaeche = 1, EWZ extrahieren</span>
+        <span class="c1">#n = arcpy.GetCount_management(&quot;bkg_lyr&quot;).getOutput(0)</span>
+        <span class="c1">#if(int(n) ==1 ):</span>
+        <span class="c1">#    gemeindeCursor = arcpy.SearchCursor(&quot;bkg_lyr&quot;)</span>
+        <span class="c1">#    for gemeinde in gemeindeCursor:</span>
+        <span class="c1">#        ewz = gemeinde.EWZ</span>
+        <span class="c1">#if(int(n)&gt;=2):</span>
+        <span class="c1">#    print(&quot;Die Teilflaeche schneidet mehr als eine Gemeinde oder liegt ausserhalb Deutschlands.\n Bitte ueberpruefen Sie die raeumliche Auspraegung der Datei &#39;Teilfalechen_Plangebiet&#39; im Projektordner&quot;)</span>
+        <span class="c1">#    arcpy.AddMessage(&quot;Die Teilflaeche schneidet mehr als eine Gemeinde oder liegt ausserhalb Deutschlands.\n Bitte ueberpruefen Sie die raeumliche Auspraegung der Datei &#39;Teilfalechen_Plangebiet&#39; im Projektordner&quot;)</span>
+        <span class="c1">#    print(&quot;Anzahl der geschnittenen Gemeinden: &quot; + str(arcpy.GetCount_management(&quot;bkg_lyr&quot;)) + &quot;\n&quot;)</span>
+        <span class="c1">#    arcpy.AddMessage(&quot;Anzahl der Flaechen: &quot; + str(arcpy.GetCount_management(&quot;bkg_lyr&quot;)) + &quot;\n&quot;)</span>
+        <span class="c1">#    sys.exit(&quot;Die Teilflaeche schneidet mehr als eine Gemeinde oder liegt ausserhalb Deutschlands.\n Bitte ueberpruefen Sie die raeumliche Auspraegung der Datei &#39;Teilfalechen_Plangebiet&#39; im Projektordner&quot;)</span>
+        <span class="c1">#if(ewz&lt;=50000):</span>
+        <span class="c1">#    if(bebauungsdichte &lt;= 20):</span>
+        <span class="c1">#        bewertungDichte = 0</span>
+        <span class="c1">#    if(bebauungsdichte &gt;= 20 and bebauungsdichte &lt;23):</span>
+        <span class="c1">#        bewertungDichte = 0.3</span>
+        <span class="c1">#    if(bebauungsdichte &gt;= 23 and bebauungsdichte &lt; 26):</span>
+        <span class="c1">#        bewertungDichte = 0.6</span>
+        <span class="c1">#    if(bebauungsdichte &gt;= 26):</span>
+        <span class="c1">#        bewertungDichte = 1</span>
+        <span class="c1">#if(ewz &gt; 50000 and ewz &lt;= 100000):</span>
+        <span class="c1">#    if(bebauungsdichte &lt;= 27):</span>
+        <span class="c1">#        bewertungDichte = 0</span>
+        <span class="c1">#    if(bebauungsdichte &gt;= 27 and bebauungsdichte &lt;29):</span>
+        <span class="c1">#        bewertungDichte = 0.3</span>
+        <span class="c1">#    if(bebauungsdichte &gt;= 29 and bebauungsdichte &lt; 43):</span>
+        <span class="c1">#        bewertungDichte = 0.6</span>
+        <span class="c1">#    if(bebauungsdichte &gt;= 43):</span>
+        <span class="c1">#        bewertungDichte = 1</span>
+        <span class="c1">#if(ewz &gt; 100000):</span>
+        <span class="c1">#    if(bebauungsdichte &lt;= 35):</span>
+        <span class="c1">#        bewertungDichte = 0</span>
+        <span class="c1">#    if(bebauungsdichte &gt;= 35 and bebauungsdichte &lt;39):</span>
+        <span class="c1">#        bewertungDichte = 0.3</span>
+        <span class="c1">#    if(bebauungsdichte &gt;= 39 and bebauungsdichte &lt; 44):</span>
+        <span class="c1">#        bewertungDichte = 0.6</span>
+        <span class="c1">#    if(bebauungsdichte &gt;= 44):</span>
+        <span class="c1">#        bewertungDichte = 1</span>
+        <span class="c1">#print(&quot;Bewertung der Bebauungsdichte: &quot; + str(bewertungDichte) + &quot;\n&quot;)</span>
+        <span class="c1">#arcpy.AddMessage(&quot;Bewertung der Bebauungsdichte: &quot; + str(bewertungDichte)+ &quot;\n&quot;)</span>
+        <span class="c1">#arcpy.AddMessage(&quot;Integrationsgrad = &quot; + str(integrationsgrad))</span>
+        <span class="c1">#if (bauluecke == &quot;true&quot;):</span>
+        <span class="c1">#    integrationsgrad = 100</span>
+        <span class="c1">#bewertung Integrationsgrad (integrationsgrad wird vorher berechnet, als parameter mit zum skript uebergeben!)</span>
+
+        <span class="c1">## von Alex von hier kommentiert (29.9.)</span>
+        <span class="c1"># if(typ==&quot;Gewerbe&quot;):</span>
+        <span class="c1">#     if (integrationsgrad &lt;=50):</span>
+        <span class="c1">#         bewertungIntegration = (integrationsgrad*2/100)</span>
+        <span class="c1">#     else:</span>
+        <span class="c1">#         bewertungIntegration = 100</span>
+        <span class="c1"># if(typ==&quot;Wohnen&quot;):</span>
+        <span class="c1">#     bewertungIntegration = integrationsgrad/100</span>
+        <span class="c1"># if(typ==&quot;Einzelhandel&quot;):</span>
+        <span class="c1">#     bewertungIntegration = integrationsgrad/100</span>
+        <span class="c1">## von Alex bis hier kommentiert (29.9.)</span>
+
+        <span class="c1">#print(&quot;Bewertung des Integrationsgrades: &quot;+ str(bewertungIntegration)+&quot;\n&quot;)</span>
+        <span class="c1">#arcpy.AddMessage(&quot;Bewertung des Integrationsgrades: &quot;+ str(bewertungIntegration)+&quot;\n&quot;)</span>
+        <span class="n">rueckgabe</span> <span class="o">=</span> <span class="p">[</span><span class="n">bewertungQuantitaet</span><span class="p">,</span><span class="n">bewertungDichte</span><span class="p">,</span><span class="n">bewertungIntegration</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">rueckgabe</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">e</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 22, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

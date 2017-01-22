@@ -1,0 +1,550 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.analyst.einnahmen.T4_Grundsteuer &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.analyst.einnahmen.T4_Grundsteuer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># 02_Einkommensteuer.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description: Erstellung der Einkommensteuerberechnung</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># GGR Planung</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="c1">#############################################################################################################</span>
+<span class="c1">#</span>
+<span class="c1"># Beginne Hauptteil</span>
+<span class="c1">#</span>
+<span class="c1">#############################################################################################################</span>
+
+<span class="c1"># Import modules</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">imp</span>
+
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">import</span> <span class="nn">xlsxwriter</span>
+
+<span class="kn">from</span> <span class="nn">rpctools.utils.params</span> <span class="k">import</span> <span class="n">Tool</span>
+<span class="kn">import</span> <span class="nn">rpctools.utils.sheet_lib</span> <span class="k">as</span> <span class="nn">sl</span>
+<span class="kn">import</span> <span class="nn">rpctools.utils.tempmdb_lib</span> <span class="k">as</span> <span class="nn">tempmdb_lib</span>
+<span class="kn">import</span> <span class="nn">rpctools.utils.population_lib</span> <span class="k">as</span> <span class="nn">population_lib</span>
+
+
+
+<div class="viewcode-block" id="Grundsteuer"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T4_Grundsteuer.html#rpctools.analyst.einnahmen.T4_Grundsteuer.Grundsteuer">[docs]</a><span class="k">class</span> <span class="nc">Grundsteuer</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+
+    <span class="n">_dbname</span> <span class="o">=</span> <span class="s1">&#39;FGDB_Einnahmen.gdb&#39;</span>
+
+<div class="viewcode-block" id="Grundsteuer.run"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T4_Grundsteuer.html#rpctools.analyst.einnahmen.T4_Grundsteuer.Grundsteuer.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Variablen definieren</span>
+        <span class="n">projektname</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">gemeindegroessenklasse64</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">grundsteuerhebesatz</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="n">monatsrohmiete_EFH</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">monatsrohmiete_DHH</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">monatsrohmiete_RH</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">monatsrohmieteMFH</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">monatsrohmieteMFH_G</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">jahresrohmiete_garage</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">jahresrohmiete_carport</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1">#projektname = &quot;HCU_LKH_Bultweg&quot;</span>
+
+        <span class="c1">#Pfade einrichten</span>
+        <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">workspace_basisdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;1_Basisdaten&#39;</span><span class="p">,</span><span class="s1">&#39;FGBD_Basisdaten_deutschland.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_bevoelkerung</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_BevModellierung.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Einnahmen.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_tool_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;3_Art und Mass der Nutzung&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_Tool.gdb&quot;</span><span class="p">)</span>
+        <span class="n">workspace_tool_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;B_Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Einnahmen_Tool.gdb&quot;</span><span class="p">)</span>
+
+        <span class="n">Teilflaechen_Plangebiet_Centroide</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s2">&quot;Teilflaechen_Plangebiet_Centroide&quot;</span><span class="p">)</span>
+        <span class="n">Teilflaechen_Plangebiet_CentroideGK3</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s2">&quot;Teilflaechen_Plangebiet_CentroideGK3&quot;</span><span class="p">)</span>
+        <span class="n">gemeindenWirkraumEW_Centroide</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s2">&quot;gemeindenWirkraumEW_Centroide&quot;</span><span class="p">)</span>
+        <span class="n">gemeindenWirkraumAP_Centroide</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s2">&quot;gemeindenWirkraumAP_Centroide&quot;</span><span class="p">)</span>
+
+        <span class="n">input_table</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_bevoelkerung</span><span class="p">,</span><span class="s1">&#39;T02RECH_Input&#39;</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1">#</span>
+        <span class="c1"># Durchlauf Auswirkungen im Umland</span>
+        <span class="c1">#</span>
+        <span class="c1">#############################################################################################################</span>
+        <span class="n">beginmeldung</span> <span class="o">=</span> <span class="s1">&#39;Durchlauf Grundsteuer </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">beginmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">beginmeldung</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 1</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Einlesen Eingangstabellen</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1">#Einlesen der Tabellen</span>
+        <span class="c1">#Jahr I Gebäudetyp I Miete/Eigentum I Anzahl WE</span>
+        <span class="c1">#Gebäudetyp I Wohnfläche_m²_proWE I Anzahl_Garagen_proWE I Anzahl_Carports_proWE</span>
+
+        <span class="c1">#Pruefe, ob Tabellen aus EKS-Berechnung vorhanden sind</span>
+        <span class="n">EKST_03_WE_NBG</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;EKST_03_WE_NBG&#39;</span><span class="p">)</span>
+        <span class="n">rowcount</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">GetCount_management</span><span class="p">(</span><span class="n">EKST_03_WE_NBG</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rowcount</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Das Modul Einkommensteuer wurde noch nicht vollstaendig ausgefuehrt.</span><span class="se">\r</span><span class="s2">Die fuer das Modul Grundsteuer benoetigten Tabellen sind daher noch nicht vorhanden.&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+
+        <span class="n">EKST_03_WE_NBG</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;EKST_03_WE_NBG&#39;</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 2</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Ermittle Jahresrohmieten</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1">#Ubertrage Nutzereingaben in GRST_Rohmieten</span>
+
+
+        <span class="n">GRST_Rohmieten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Rohmieten&#39;</span><span class="p">)</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">TruncateTable_management</span><span class="p">(</span><span class="n">GRST_Rohmieten</span><span class="p">)</span>
+        <span class="n">in_cur</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">GRST_Rohmieten</span><span class="p">)</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">in_cur</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Gebaeudetyp</span> <span class="o">=</span> <span class="s1">&#39;Einfamilienhaus&#39;</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Rohmiete</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">monatsrohmiete_EFH</span><span class="p">)</span> <span class="o">*</span> <span class="mi">12</span>
+        <span class="n">in_cur</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="n">in_cur</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Gebaeudetyp</span> <span class="o">=</span> <span class="s1">&#39;Zweifamilien- oder Doppelhaus&#39;</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Rohmiete</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">monatsrohmiete_DHH</span><span class="p">)</span> <span class="o">*</span> <span class="mi">12</span>
+        <span class="n">in_cur</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="n">in_cur</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Gebaeudetyp</span> <span class="o">=</span> <span class="s1">&#39;Reihenhaus&#39;</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Rohmiete</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">monatsrohmiete_RH</span><span class="p">)</span> <span class="o">*</span> <span class="mi">12</span>
+        <span class="n">in_cur</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="n">in_cur</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Gebaeudetyp</span> <span class="o">=</span> <span class="s1">&#39;Mehrfamilienhaus&#39;</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Rohmiete</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">monatsrohmieteMFH</span><span class="p">)</span> <span class="o">*</span> <span class="mi">12</span>
+        <span class="n">in_cur</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="n">in_cur</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Gebaeudetyp</span> <span class="o">=</span> <span class="s1">&#39;Mehrfamilienhaus mit Gewerbeeinheiten&#39;</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Rohmiete</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">monatsrohmieteMFH</span><span class="p">)</span> <span class="o">*</span> <span class="mi">12</span>
+        <span class="n">in_cur</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="c1">##row = in_cur.newRow()</span>
+        <span class="c1">##row.Gebaeudetyp = &#39;Bürogebäude&#39;</span>
+        <span class="c1">##row.Jahresrohmiete = 0</span>
+        <span class="c1">##in_cur.insertRow(row)</span>
+        <span class="c1">##</span>
+        <span class="c1">##row = in_cur.newRow()</span>
+        <span class="c1">##row.Gebaeudetyp = &#39;Gewerbegebäude&#39;</span>
+        <span class="c1">##row.Jahresrohmiete = 0</span>
+        <span class="c1">##in_cur.insertRow(row)</span>
+        <span class="c1">##</span>
+        <span class="c1">##row = in_cur.newRow()</span>
+        <span class="c1">##row.Gebaeudetyp = &#39;Einzelhandelsgebäude&#39;</span>
+        <span class="c1">##row.Jahresrohmiete = 0</span>
+        <span class="c1">##in_cur.insertRow(row)</span>
+
+
+        <span class="c1"># erzeuge Tabelle Gebäudetyp I Jahresrohmiete = Wohnfläche * Monatsrohmiete *12 + Anzahl_Garagen * Jahresrohmiete_Garagen + Anzahl_Carports * Jahresrohmiete_Carports</span>
+
+        <span class="c1"># Fixe Tabelle Gebäudetyp I Gemeindegrößenklasse64 I Vervielfältiger (als double)</span>
+
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_tool_definition</span><span class="p">,</span><span class="s1">&#39;Gebaeudetyp&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;EKST_03_WE_NBG&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Rohmieten&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Jahresrohmiete&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT Gebaeudetyp.Gebaeudetyp, [Wohnfl_m2_pro_WE]*[Rohmiete]+[Garagen_pro_WE]*jahresrohmiete_garage+[Carport_pro_WE]*jahresrohmiete_carport AS Jahresrohmiete INTO GRST_Jahresrohmiete</span>
+<span class="s2">        FROM GRST_Rohmieten RIGHT JOIN Gebaeudetyp ON GRST_Rohmieten.Gebaeudetyp = Gebaeudetyp.Gebaeudetyp;&quot;&quot;&quot;</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;jahresrohmiete_garage&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">jahresrohmiete_garage</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;jahresrohmiete_carport&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">jahresrohmiete_carport</span><span class="p">))</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 3</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Einheitswert</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1"># erzeuge Tabelle Gebäudetyp I Einheitswert_bis38346_EUR I Einheitswert_ab38346_EUR</span>
+        <span class="c1"># Einheitswert = Jahresrohmiete (aus Nr. 2) * Vervielfältiger je Gebäudetyp</span>
+        <span class="c1"># Achtung! Ergebnisse BIS 38346 gehen komplett in diese Spalte. Liegt das Ergebnis darüber gehen 38346 in die Spalte und der Restbetrag in die Spalte Einheitswert_ab38346_EUR</span>
+        <span class="c1"># Beispiel: 90000 = 1 * 38346_EUR in Spalte Einheitswert_bis38346_EUR und 90000-38346 in Einheitswert_ab38346_EUR</span>
+
+        <span class="c1"># Fixe Tabelle Gebäudetyp I Steuermesszahl_bis38346_EUR I Steuermesszahl_ueber38346_EUR</span>
+
+        <span class="c1">#Erstelle temporaere Zwischentabelle</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_tool_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Vervielfaeltiger&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Jahresrohmiete&#39;</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Einheitswert_temp&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        SELECT GRST_Jahresrohmiete.Gebaeudetyp, [Jahresrohmiete]*[Vervielfaeltiger] AS Einheitswert INTO GRST_Einheitswert_temp</span>
+<span class="s2">        FROM GRST_Jahresrohmiete INNER JOIN GRST_Vervielfaeltiger ON GRST_Jahresrohmiete.Gebaeudetyp = GRST_Vervielfaeltiger.Gebaeudetyp</span>
+<span class="s2">        WHERE (((GRST_Vervielfaeltiger.Gemeindegroessenklasse64)=&#39;2000 bis 5000 EW&#39;))</span>
+<span class="s2">        GROUP BY GRST_Jahresrohmiete.Gebaeudetyp, [Jahresrohmiete]*[Vervielfaeltiger];</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;2000 bis 5000 EW&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">gemeindegroessenklasse64</span><span class="p">))</span>
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1">#Erstelle leere Tabelle GRST_Einheitswert</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Einheitswert_temp&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Einheitswert&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        SELECT GRST_Einheitswert_temp.Gebaeudetyp, Round([Einheitswert],0) AS Einheitswert_Summe, 1 AS Einheitswert_bis38346_EUR, 1 AS Einheitswert_ueber38346_EUR INTO GRST_Einheitswert</span>
+<span class="s2">        FROM GRST_Einheitswert_temp;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1">#Fuelle Werte in Einheitswerttabelle aus</span>
+
+        <span class="n">einheitswert</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Einheitswert&#39;</span><span class="p">)</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Einheitswert_Summe&quot;</span><span class="p">,</span> <span class="s2">&quot;Gebaeudetyp&quot;</span><span class="p">]</span>
+        <span class="n">rows1</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">einheitswert</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row1</span> <span class="ow">in</span> <span class="n">rows1</span><span class="p">:</span>
+            <span class="n">einheitswert_value</span> <span class="o">=</span> <span class="n">row1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">gebauedetyp</span> <span class="o">=</span> <span class="n">row1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">einheitswert_value</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">38346</span><span class="p">:</span>
+                <span class="n">Steuermesszahl_bis38346_EUR</span> <span class="o">=</span> <span class="n">einheitswert_value</span>
+                <span class="n">Steuermesszahl_ueber38346_EUR</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">einheitswert_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">38346</span><span class="p">:</span>
+                <span class="n">Steuermesszahl_bis38346_EUR</span> <span class="o">=</span> <span class="mi">38346</span>
+                <span class="n">Steuermesszahl_ueber38346_EUR</span> <span class="o">=</span> <span class="n">einheitswert_value</span> <span class="o">-</span> <span class="mi">38346</span>
+
+            <span class="n">where</span> <span class="o">=</span> <span class="s1">&#39;&quot;Gebaeudetyp&quot; = &#39;</span><span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="o">+</span><span class="n">gebauedetyp</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Einheitswert_bis38346_EUR&quot;</span><span class="p">,</span><span class="s2">&quot;Einheitswert_ueber38346_EUR&quot;</span><span class="p">]</span>
+            <span class="n">rows2</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">einheitswert</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">where</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row2</span> <span class="ow">in</span> <span class="n">rows2</span><span class="p">:</span>
+                <span class="n">row2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">Steuermesszahl_bis38346_EUR</span>
+                <span class="n">row2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">Steuermesszahl_ueber38346_EUR</span>
+                <span class="n">rows2</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row2</span><span class="p">)</span>
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 4</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Steuermessbetrag und Steuerschuld</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1">#erzeuge Tabelle Gebäudetyp I Steuerschuld_Jahr = (Einheitswert_bis38346_EUR * Steuermesszahl_bis38346_EUR + Einheitswert_ab38346_EUR * Steuermesszahl_ueber38346_EUR) * Hebesatz / 100</span>
+
+        <span class="c1">#Erstelle Tabelle Steuermessbetrag</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Einheitswert&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_tool_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Steuermesszahlen&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Steuermessbetrag&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT GRST_Einheitswert.Gebaeudetyp, ([Einheitswert_bis38346_EUR]*[Steuermesszahl_bis_38346_EUR]+[Einheitswert_ueber38346_EUR]*[Steuermesszahl_ab_38346_EUR])*HEBESATZ/100 AS Steuerschuld_pro_Jahr INTO GRST_Steuermessbetrag</span>
+<span class="s2">        FROM GRST_Einheitswert INNER JOIN GRST_Steuermesszahlen ON GRST_Einheitswert.Gebaeudetyp = GRST_Steuermesszahlen.Gebaeudetyp;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;HEBESATZ&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">grundsteuerhebesatz</span><span class="p">))</span>
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 5</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Grundsteuereinnahmen</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1"># erzeuge Tabelle Jahr I Grundsteuereinnahmen = (Anzahl_WE je Gebäudetyp aus Tabelle im Schrit 1 * Steuerschuld aus voriger Tabelle )</span>
+
+        <span class="c1">#Erstelle Tabelle GRST_Grundsteuereinnahmen_temp</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Steuermessbetrag&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;EKST_03_WE_NBG&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Grundsteuereinnahmen_temp&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT EKST_03_WE_NBG.Jahr, EKST_03_WE_NBG.Gebaeudetyp, Sum([Anzahl_WE]*[Steuerschuld_pro_Jahr]) AS GrStEinnahmen INTO GRST_Grundsteuereinnahmen_temp</span>
+<span class="s2">        FROM EKST_03_WE_NBG INNER JOIN GRST_Steuermessbetrag ON EKST_03_WE_NBG.Gebaeudetyp = GRST_Steuermessbetrag.Gebaeudetyp</span>
+<span class="s2">        GROUP BY EKST_03_WE_NBG.Jahr, EKST_03_WE_NBG.Gebaeudetyp</span>
+<span class="s2">        ORDER BY EKST_03_WE_NBG.Jahr;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+
+        <span class="c1">#Erstelle Tabelle GRST_Grundsteuereinnahmen</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Grundsteuereinnahmen_temp&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Grundsteuereinnahmen&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT GRST_Grundsteuereinnahmen_temp.Jahr, Sum(GRST_Grundsteuereinnahmen_temp.GrStEinnahmen) AS GrStEinnahmen INTO GRST_Grundsteuereinnahmen</span>
+<span class="s2">        FROM GRST_Grundsteuereinnahmen_temp</span>
+<span class="s2">        GROUP BY GRST_Grundsteuereinnahmen_temp.Jahr;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 6 - Datenexport in Excel-Datei</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Datenexport in Excel-Datei  </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1"># Pfade setzen</span>
+        <span class="n">logo</span> <span class="o">=</span> <span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span><span class="s2">&quot;1_Basisdaten&quot;</span><span class="p">,</span><span class="s2">&quot;logo_rpc.png&quot;</span><span class="p">)</span>
+        <span class="n">ausgabeordner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Excel&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">):</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">)</span>
+        <span class="n">excelpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">,</span><span class="s1">&#39;Einnahmen_Grundsteuer.xlsx&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">excelpfad</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># Workbook und Tabellenblätter anlegen</span>
+        <span class="n">wb</span> <span class="o">=</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="n">excelpfad</span><span class="p">)</span>
+        <span class="n">sl</span><span class="o">.</span><span class="n">infosheet</span><span class="p">(</span><span class="n">projektname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Grundsteuer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">wb</span><span class="p">)</span>
+        <span class="n">ws1</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik&#39;</span><span class="p">)</span>
+        <span class="n">ws3</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Grafiken&#39;</span><span class="p">)</span>
+        <span class="n">ws4</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Rohdaten_Grundsteuer&#39;</span><span class="p">)</span>
+        <span class="n">ws5</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Haftungsausschluss&#39;</span><span class="p">)</span>
+
+        <span class="c1">#Charts anlegen</span>
+
+
+        <span class="c1">#Styles anlegen</span>
+        <span class="n">bold</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+        <span class="n">bold</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+        <span class="n">bold</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">normal</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+        <span class="n">normal</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+        <span class="n">normal</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">money</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+        <span class="n">money</span><span class="o">.</span><span class="n">set_num_format</span><span class="p">(</span><span class="s1">&#39;#,##0&#39;</span><span class="p">)</span>
+        <span class="n">money</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+        <span class="n">money</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1">#Hintergrund weiss faerben</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+        <span class="nb">format</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+        <span class="nb">format</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">400</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">400</span><span class="p">):</span>
+                <span class="n">ws1</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+                <span class="n">ws3</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+                <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+
+        <span class="c1">################################</span>
+        <span class="c1">#Werteblatt 1 einfuegen</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Grundsteuereinnahmen&#39;</span><span class="p">)</span>
+
+        <span class="c1">#Durch Ergebniszeilen iterieren und Werte in Excel einfuegen</span>
+
+        <span class="n">fieldnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">ausgabetabelle</span><span class="p">)]</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">ausgabetabelle</span><span class="p">,</span> <span class="n">fieldnames</span><span class="p">)</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">:</span>
+                <span class="n">wert</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">wert</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+
+            <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span>
+
+        <span class="c1">#Felder als Header in Worksheet einfuegen</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">:</span>
+            <span class="n">column_with</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span>
+            <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">column_with</span><span class="p">)</span>
+            <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fieldname</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+
+        <span class="c1">#Eurobetrag formatieren</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;A:A&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;B:B&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;C:C&#39;</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="n">money</span><span class="p">)</span>
+
+        <span class="c1">################################</span>
+        <span class="c1">#Grafiken einfuegen</span>
+
+        <span class="n">chart</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_chart</span><span class="p">({</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;line&#39;</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;stacked&#39;</span><span class="p">})</span>
+        <span class="n">chart</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+        <span class="n">chart</span><span class="o">.</span><span class="n">set_size</span><span class="p">({</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">800</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">600</span><span class="p">})</span>
+        <span class="n">chart</span><span class="o">.</span><span class="n">set_chartarea</span><span class="p">({</span><span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span><span class="s1">&#39;fill&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}})</span>
+        <span class="n">chart</span><span class="o">.</span><span class="n">set_legend</span><span class="p">({</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="s1">&#39;bottom&#39;</span><span class="p">})</span>
+        <span class="n">chart</span><span class="o">.</span><span class="n">set_title</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Grundsteuer in Euro&#39;</span><span class="p">,</span><span class="s1">&#39;name_font&#39;</span><span class="p">:</span>  <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Tahoma&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">}})</span>
+
+
+        <span class="n">jahre</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">jahre</span> <span class="o">+=</span><span class="mi">1</span>
+
+        <span class="n">chart</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Grundsteuer&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Rohdaten_Grundsteuer&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">jahre</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                <span class="s1">&#39;values&#39;</span><span class="p">:</span>     <span class="p">[</span><span class="s1">&#39;Rohdaten_Grundsteuer&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">jahre</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="c1"># Format: Zeile, Spalte Anfang, Zeile , Spalte Ende</span>
+            <span class="p">})</span>
+
+        <span class="n">ws3</span><span class="o">.</span><span class="n">insert_chart</span><span class="p">(</span><span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="n">chart</span><span class="p">)</span>
+
+        <span class="c1">################################</span>
+        <span class="c1">#Methodikblatt einfuegen</span>
+        <span class="n">methodik_grafik</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;B_Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;Erlaeuterungstexte&quot;</span><span class="p">,</span><span class="s2">&quot;Methodik_04_Grundsteuer.png&quot;</span><span class="p">)</span>
+        <span class="n">ws1</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="n">methodik_grafik</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">})</span> <span class="c1">#Korrigiert Verzerrung die bei 1x1 auftritt</span>
+
+        <span class="c1">################################</span>
+        <span class="c1">#Haftungsausschluss einfuegen</span>
+        <span class="n">haftung_grafik</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;B_Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;Erlaeuterungstexte&quot;</span><span class="p">,</span><span class="s2">&quot;Haftungsausschluss.png&quot;</span><span class="p">)</span>
+        <span class="n">ws5</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="n">haftung_grafik</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span> <span class="c1">#Korrigiert Verzerrung die bei 1x1 auftritt</span>
+
+        <span class="c1">################################</span>
+        <span class="c1">#Workbook speichern</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">wb</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Es liegt ein Fehler beim Speichern der Ausgabedatei vor. Ist diese ggf. noch geoeffnet?&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 4</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Temporaere Tabellen loeschen </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">deleteList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GRST_Einheitswert_temp&#39;</span><span class="p">,</span> <span class="s1">&#39;GRST_Grundsteuereinnahmen_temp&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">deleteList</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="s2">&quot;fertig&quot;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s1">&#39;04_Grundsteuer abgeschlossen&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 22, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

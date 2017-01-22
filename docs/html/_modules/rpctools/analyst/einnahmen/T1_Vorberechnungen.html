@@ -1,0 +1,759 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.analyst.einnahmen.T1_Vorberechnungen &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.analyst.einnahmen.T1_Vorberechnungen</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># 01_Auswirkung_Umland.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description: Erstellung der regionalen Auswirkungsabschätzung für das zu untersuchende Projekt</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># GGR Planung</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+
+<span class="kn">import</span> <span class="nn">arcpy</span>
+
+<span class="kn">from</span> <span class="nn">rpctools.utils.params</span> <span class="k">import</span> <span class="n">Tool</span>
+
+<span class="kn">import</span> <span class="nn">rpctools.utils.tempmdb_lib</span> <span class="k">as</span> <span class="nn">mdb</span>
+<span class="kn">import</span> <span class="nn">rpctools.utils.population_lib</span> <span class="k">as</span> <span class="nn">pop</span>
+
+
+<div class="viewcode-block" id="Vorberechnungen"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T1_Vorberechnungen.html#rpctools.analyst.einnahmen.T1_Vorberechnungen.Vorberechnungen">[docs]</a><span class="k">class</span> <span class="nc">Vorberechnungen</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+
+    <span class="n">_dbname</span> <span class="o">=</span> <span class="s1">&#39;FGDB_Einnahmen.gdb&#39;</span>
+
+<div class="viewcode-block" id="Vorberechnungen.run"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T1_Vorberechnungen.html#rpctools.analyst.einnahmen.T1_Vorberechnungen.Vorberechnungen.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Variablen definieren</span>
+        <span class="n">projektname</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="n">nettoZuzugsQuote_EW</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">nettoZuzugsQuote_AP</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">einzugsbereich_EW</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">einzugsbereich_AP</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1"># Pfade einrichten</span>
+        <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">workspace_basisdaten</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_basedb</span><span class="p">(</span><span class="s1">&#39;FGBD_Basisdaten_deutschland.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_definition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_db</span><span class="p">(</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_einnahmen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_db</span><span class="p">(</span><span class="s1">&#39;FGDB_Einnahmen.gdb&#39;</span><span class="p">)</span>
+
+        <span class="n">Teilflaechen_Plangebiet_Centroide</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s2">&quot;Teilflaechen_Plangebiet_Centroide&quot;</span><span class="p">)</span>
+        <span class="n">Teilflaechen_Plangebiet_CentroideGK3</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s2">&quot;Teilflaechen_Plangebiet_CentroideGK3&quot;</span><span class="p">)</span>
+        <span class="n">gemeindenWirkraumEW_Centroide</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s2">&quot;gemeindenWirkraumEW_Centroide&quot;</span><span class="p">)</span>
+        <span class="n">gemeindenWirkraumAP_Centroide</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s2">&quot;gemeindenWirkraumAP_Centroide&quot;</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1">#</span>
+        <span class="c1"># Durchlauf Auswirkungen im Umland</span>
+        <span class="c1">#</span>
+        <span class="c1">#############################################################################################################</span>
+        <span class="n">beginmeldung</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Durchlauf Auswirkungen im Umland </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">beginmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">beginmeldung</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Einwohnerzahl erzeugen</span>
+        <span class="n">pop</span><span class="o">.</span><span class="n">recalcPopulation</span><span class="p">(</span><span class="n">projektname</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 1</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Ermittle AGS der Kommune </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">ags_eigen</span> <span class="o">=</span> <span class="n">getAGS</span><span class="p">(</span><span class="n">projektname</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ags_vg_eigen</span> <span class="o">=</span> <span class="n">getAGS</span><span class="p">(</span><span class="n">projektname</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ags_regenesis_eigen</span> <span class="o">=</span> <span class="n">getAGS</span><span class="p">(</span><span class="n">projektname</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 1</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Ermittle Kommunen im definierten Umkreis </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">inputGemeinden</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_basisdaten</span><span class="p">,</span> <span class="s1">&#39;bkg_gemeinden&#39;</span><span class="p">)</span>
+        <span class="n">gemeindenAuswirkungenAP</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span> <span class="s1">&#39;AWU_gemeindenWirkraumAP&#39;</span><span class="p">)</span>
+        <span class="n">gemeindenAuswirkungenEW</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span> <span class="s1">&#39;AWU_gemeindenWirkraumEW&#39;</span><span class="p">)</span>
+        <span class="n">projektflaechen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s1">&#39;Teilflaechen_Plangebiet&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Process: Layer lagebezogen auswählen</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">inputGemeinden</span><span class="p">,</span> <span class="s2">&quot;gemeinden_lyr&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">projektflaechen</span><span class="p">,</span> <span class="s2">&quot;projektflaechen_lyr&quot;</span><span class="p">)</span>
+
+        <span class="n">umkreis_km</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">einzugsbereich_EW</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; Kilometers&quot;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByLocation_management</span><span class="p">(</span><span class="s2">&quot;gemeinden_lyr&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="s2">&quot;projektflaechen_lyr&quot;</span><span class="p">,</span> <span class="n">umkreis_km</span><span class="p">,</span> <span class="s2">&quot;NEW_SELECTION&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">CopyFeatures_management</span><span class="p">(</span><span class="s2">&quot;gemeinden_lyr&quot;</span><span class="p">,</span> <span class="n">gemeindenAuswirkungenEW</span><span class="p">)</span>
+
+        <span class="c1"># Process: Layer lagebezogen auswählen</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">inputGemeinden</span><span class="p">,</span> <span class="s2">&quot;gemeinden_lyr&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">projektflaechen</span><span class="p">,</span> <span class="s2">&quot;projektflaechen_lyr&quot;</span><span class="p">)</span>
+
+        <span class="n">umkreis_km</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">einzugsbereich_AP</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; Kilometers&quot;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByLocation_management</span><span class="p">(</span><span class="s2">&quot;gemeinden_lyr&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="s2">&quot;projektflaechen_lyr&quot;</span><span class="p">,</span> <span class="n">umkreis_km</span><span class="p">,</span> <span class="s2">&quot;NEW_SELECTION&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">CopyFeatures_management</span><span class="p">(</span><span class="s2">&quot;gemeinden_lyr&quot;</span><span class="p">,</span> <span class="n">gemeindenAuswirkungenAP</span><span class="p">)</span>
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 2</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Punktlayer aus Planflaechen erzeugen </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1"># Create Centroid Layer</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteFeatures_management</span><span class="p">(</span><span class="n">Teilflaechen_Plangebiet_Centroide</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s1">&#39;Plangebiet Centroide nicht vorhanden, werden erstellt&#39;</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateFeatureclass_management</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s2">&quot;Teilflaechen_Plangebiet_Centroide&quot;</span><span class="p">,</span> <span class="s2">&quot;POINT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;DISABLED&quot;</span><span class="p">,</span> <span class="s2">&quot;DISABLED&quot;</span><span class="p">,</span> <span class="n">projektflaechen</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create search cursor</span>
+        <span class="n">polygon_rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">projektflaechen</span><span class="p">)</span>
+        <span class="n">shapeName</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Describe</span><span class="p">(</span><span class="n">projektflaechen</span><span class="p">)</span><span class="o">.</span><span class="n">shapeFieldName</span>
+
+        <span class="n">centroid_rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">Teilflaechen_Plangebiet_Centroide</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">polygon_row</span> <span class="ow">in</span> <span class="n">polygon_rows</span><span class="p">:</span>
+            <span class="n">feat</span> <span class="o">=</span> <span class="n">polygon_row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">shapeName</span><span class="p">)</span>
+
+            <span class="n">latValue</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">feat</span><span class="o">.</span><span class="n">trueCentroid</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">lonValue</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">feat</span><span class="o">.</span><span class="n">trueCentroid</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1">#print latValue, lonValue</span>
+
+            <span class="n">vertex</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateObject</span><span class="p">(</span><span class="s2">&quot;Point&quot;</span><span class="p">)</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">lonValue</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">latValue</span>
+
+            <span class="n">feature</span> <span class="o">=</span> <span class="n">centroid_rows</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">vertex</span>
+            <span class="n">centroid_rows</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+
+        <span class="k">del</span> <span class="n">centroid_rows</span>
+        <span class="k">del</span> <span class="n">polygon_row</span>
+        <span class="k">del</span> <span class="n">polygon_rows</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteFeatures_management</span><span class="p">(</span><span class="n">Teilflaechen_Plangebiet_CentroideGK3</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s1">&#39;Plangebiet CentroideGK3 nicht vorhanden, werden erstellt&#39;</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">Project_management</span><span class="p">(</span><span class="n">Teilflaechen_Plangebiet_Centroide</span><span class="p">,</span> <span class="n">Teilflaechen_Plangebiet_CentroideGK3</span><span class="p">,</span> <span class="s2">&quot;PROJCS[&#39;DHDN_3_Degree_Gauss_Zone_3&#39;,GEOGCS[&#39;GCS_Deutsches_Hauptdreiecksnetz&#39;,DATUM[&#39;D_Deutsches_Hauptdreiecksnetz&#39;,SPHEROID[&#39;Bessel_1841&#39;,6377397.155,299.1528128]],PRIMEM[&#39;Greenwich&#39;,0.0],UNIT[&#39;Degree&#39;,0.0174532925199433]],PROJECTION[&#39;Gauss_Kruger&#39;],PARAMETER[&#39;False_Easting&#39;,3500000.0],PARAMETER[&#39;False_Northing&#39;,0.0],PARAMETER[&#39;Central_Meridian&#39;,9.0],PARAMETER[&#39;Scale_Factor&#39;,1.0],PARAMETER[&#39;Latitude_Of_Origin&#39;,0.0],UNIT[&#39;Meter&#39;,1.0]]&quot;</span><span class="p">,</span> <span class="s2">&quot;DHDN_To_WGS_1984_5x&quot;</span><span class="p">,</span> <span class="s2">&quot;GEOGCS[&#39;GCS_WGS_1984&#39;,DATUM[&#39;D_WGS_1984&#39;,SPHEROID[&#39;WGS_1984&#39;,6378137.0,298.257223563]],PRIMEM[&#39;Greenwich&#39;,0.0],UNIT[&#39;Degree&#39;,0.0174532925199433]]&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddXY_management</span><span class="p">(</span><span class="n">Teilflaechen_Plangebiet_CentroideGK3</span><span class="p">)</span>
+
+        <span class="c1"># Mittelpunkt der Teilflaechen ermitteln</span>
+        <span class="n">mw_y</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">mw_x</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">polygon_rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">Teilflaechen_Plangebiet_CentroideGK3</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">polygon_row</span> <span class="ow">in</span> <span class="n">polygon_rows</span><span class="p">:</span>
+            <span class="n">mw_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">polygon_row</span><span class="o">.</span><span class="n">POINT_X</span><span class="p">)</span>
+            <span class="n">mw_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">polygon_row</span><span class="o">.</span><span class="n">POINT_Y</span><span class="p">)</span>
+
+        <span class="n">mw_x</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">mw_x</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">mw_x</span><span class="p">)</span>
+        <span class="n">mw_y</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">mw_y</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">mw_y</span><span class="p">)</span>
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 3</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Punktlayer aus Umkreiskommunen (EW) erzeugen </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1"># Process: Feature-Class erstellen</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteFeatures_management</span><span class="p">(</span><span class="n">gemeindenWirkraumEW_Centroide</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s1">&#39;Gemeinden-Wirkraum Centroide nicht vorhanden, werden erstellt&#39;</span>
+
+        <span class="n">gemeindenWirkraumEW</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span> <span class="s1">&#39;AWU_gemeindenWirkraumEW&#39;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateFeatureclass_management</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s2">&quot;gemeindenWirkraumEW_Centroide&quot;</span><span class="p">,</span> <span class="s2">&quot;POINT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;DISABLED&quot;</span><span class="p">,</span> <span class="s2">&quot;DISABLED&quot;</span><span class="p">,</span> <span class="n">gemeindenWirkraumEW</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Add new fields</span>
+        <span class="n">fieldName</span> <span class="o">=</span> <span class="s2">&quot;AGS&quot;</span>
+        <span class="n">fieldAlias</span> <span class="o">=</span> <span class="s2">&quot;AGS&quot;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumEW_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumEW_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">fieldAlias</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">)</span>
+
+        <span class="n">fieldName</span> <span class="o">=</span> <span class="s2">&quot;AGS_VG&quot;</span>
+        <span class="n">fieldAlias</span> <span class="o">=</span> <span class="s2">&quot;AGS_VG&quot;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumEW_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumEW_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">fieldAlias</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">)</span>
+
+        <span class="n">fieldName</span> <span class="o">=</span> <span class="s2">&quot;AGS_Regenesis&quot;</span>
+        <span class="n">fieldAlias</span> <span class="o">=</span> <span class="s2">&quot;AGS_Regenesis&quot;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumEW_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumEW_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">fieldAlias</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create search cursor</span>
+        <span class="n">polygon_rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">gemeindenWirkraumEW</span><span class="p">)</span>
+        <span class="n">shapeName</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Describe</span><span class="p">(</span><span class="n">gemeindenWirkraumEW</span><span class="p">)</span><span class="o">.</span><span class="n">shapeFieldName</span>
+
+        <span class="n">centroid_rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">gemeindenWirkraumEW_Centroide</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">polygon_row</span> <span class="ow">in</span> <span class="n">polygon_rows</span><span class="p">:</span>
+            <span class="n">feat</span> <span class="o">=</span> <span class="n">polygon_row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">shapeName</span><span class="p">)</span>
+            <span class="n">ags</span> <span class="o">=</span> <span class="n">polygon_row</span><span class="o">.</span><span class="n">AGS</span>
+            <span class="n">verbandsgemeinde</span> <span class="o">=</span> <span class="n">polygon_row</span><span class="o">.</span><span class="n">BEMERK</span>
+            <span class="n">RS</span> <span class="o">=</span> <span class="n">polygon_row</span><span class="o">.</span><span class="n">RS</span>
+
+            <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">getReGenesisAGS</span><span class="p">(</span><span class="n">ags</span><span class="p">,</span> <span class="n">verbandsgemeinde</span><span class="p">,</span> <span class="n">RS</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">getReGenesisAGS</span><span class="p">(</span><span class="n">ags</span><span class="p">,</span> <span class="n">verbandsgemeinde</span><span class="p">,</span> <span class="n">RS</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">ags_regenesis</span><span class="p">)</span>
+
+            <span class="n">latValue</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">feat</span><span class="o">.</span><span class="n">trueCentroid</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">lonValue</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">feat</span><span class="o">.</span><span class="n">trueCentroid</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1">#print latValue, lonValue</span>
+
+            <span class="n">vertex</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateObject</span><span class="p">(</span><span class="s2">&quot;Point&quot;</span><span class="p">)</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">lonValue</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">latValue</span>
+
+            <span class="n">feature</span> <span class="o">=</span> <span class="n">centroid_rows</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">vertex</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">AGS</span> <span class="o">=</span> <span class="n">ags</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">AGS_VG</span> <span class="o">=</span> <span class="n">ags_vg</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">AGS_Regenesis</span> <span class="o">=</span> <span class="n">ags_regenesis</span>
+            <span class="n">centroid_rows</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+
+        <span class="k">del</span> <span class="n">centroid_rows</span>
+        <span class="k">del</span> <span class="n">polygon_row</span>
+        <span class="k">del</span> <span class="n">polygon_rows</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddXY_management</span><span class="p">(</span><span class="n">gemeindenWirkraumEW_Centroide</span><span class="p">)</span>
+
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 4</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Punktlayer aus Umkreiskommunen (AP) erzeugen </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1"># Process: Feature-Class erstellen</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteFeatures_management</span><span class="p">(</span><span class="n">gemeindenWirkraumAP_Centroide</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s1">&#39;Gemeinden-Wirkraum Centroide nicht vorhanden, werden erstellt&#39;</span>
+
+        <span class="n">gemeindenWirkraumAP</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span> <span class="s1">&#39;AWU_gemeindenWirkraumAP&#39;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateFeatureclass_management</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s2">&quot;gemeindenWirkraumAP_Centroide&quot;</span><span class="p">,</span> <span class="s2">&quot;POINT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;DISABLED&quot;</span><span class="p">,</span> <span class="s2">&quot;DISABLED&quot;</span><span class="p">,</span> <span class="n">gemeindenWirkraumAP</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Add new fields</span>
+        <span class="n">fieldName</span> <span class="o">=</span> <span class="s2">&quot;AGS&quot;</span>
+        <span class="n">fieldAlias</span> <span class="o">=</span> <span class="s2">&quot;AGS&quot;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumAP_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumAP_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">fieldAlias</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">)</span>
+
+        <span class="n">fieldName</span> <span class="o">=</span> <span class="s2">&quot;AGS_VG&quot;</span>
+        <span class="n">fieldAlias</span> <span class="o">=</span> <span class="s2">&quot;AGS_VG&quot;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumAP_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumAP_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">fieldAlias</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">)</span>
+
+        <span class="n">fieldName</span> <span class="o">=</span> <span class="s2">&quot;AGS_Regenesis&quot;</span>
+        <span class="n">fieldAlias</span> <span class="o">=</span> <span class="s2">&quot;AGS_Regenesis&quot;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumAP_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">gemeindenWirkraumAP_Centroide</span><span class="p">,</span> <span class="n">fieldName</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">fieldAlias</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create search cursor</span>
+        <span class="n">polygon_rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">gemeindenWirkraumAP</span><span class="p">)</span>
+        <span class="n">shapeName</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Describe</span><span class="p">(</span><span class="n">gemeindenWirkraumAP</span><span class="p">)</span><span class="o">.</span><span class="n">shapeFieldName</span>
+
+        <span class="n">centroid_rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">gemeindenWirkraumAP_Centroide</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">polygon_row</span> <span class="ow">in</span> <span class="n">polygon_rows</span><span class="p">:</span>
+            <span class="n">feat</span> <span class="o">=</span> <span class="n">polygon_row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">shapeName</span><span class="p">)</span>
+            <span class="n">ags</span> <span class="o">=</span> <span class="n">polygon_row</span><span class="o">.</span><span class="n">AGS</span>
+            <span class="n">verbandsgemeinde</span> <span class="o">=</span> <span class="n">polygon_row</span><span class="o">.</span><span class="n">BEMERK</span>
+            <span class="n">RS</span> <span class="o">=</span> <span class="n">polygon_row</span><span class="o">.</span><span class="n">RS</span>
+
+            <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">getReGenesisAGS</span><span class="p">(</span><span class="n">ags</span><span class="p">,</span> <span class="n">verbandsgemeinde</span><span class="p">,</span> <span class="n">RS</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">getReGenesisAGS</span><span class="p">(</span><span class="n">ags</span><span class="p">,</span> <span class="n">verbandsgemeinde</span><span class="p">,</span> <span class="n">RS</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">ags_regenesis</span><span class="p">)</span>
+
+            <span class="n">latValue</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">feat</span><span class="o">.</span><span class="n">trueCentroid</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">lonValue</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">feat</span><span class="o">.</span><span class="n">trueCentroid</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1">#print latValue, lonValue</span>
+
+            <span class="n">vertex</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateObject</span><span class="p">(</span><span class="s2">&quot;Point&quot;</span><span class="p">)</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">lonValue</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">latValue</span>
+
+            <span class="n">feature</span> <span class="o">=</span> <span class="n">centroid_rows</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">vertex</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">AGS</span> <span class="o">=</span> <span class="n">ags</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">AGS_VG</span> <span class="o">=</span> <span class="n">ags_vg</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">AGS_Regenesis</span> <span class="o">=</span> <span class="n">ags_regenesis</span>
+            <span class="n">centroid_rows</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+
+        <span class="k">del</span> <span class="n">centroid_rows</span>
+        <span class="k">del</span> <span class="n">polygon_row</span>
+        <span class="k">del</span> <span class="n">polygon_rows</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddXY_management</span><span class="p">(</span><span class="n">gemeindenWirkraumAP_Centroide</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 4</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Erzeuge Entfernungstabelle Einwohner </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;gemeindenWirkraumEW_Centroide&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_gemeindenWirkraumEW&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_DistanzenEW&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT gemeindenWirkraumEW_Centroide.AGS, gemeindenWirkraumEW_Centroide.AGS_VG, gemeindenWirkraumEW_Centroide.AGS_Regenesis, (([POINT_X]-mw_x)^2+([point_Y]-mw_y)^2)^(1/2) AS distanz, AWU_gemeindenWirkraumEW.EWZ INTO AWU_DistanzenEW</span>
+<span class="s2">        FROM gemeindenWirkraumEW_Centroide INNER JOIN AWU_gemeindenWirkraumEW ON gemeindenWirkraumEW_Centroide.AGS = AWU_gemeindenWirkraumEW.AGS</span>
+<span class="s2">        WHERE (((gemeindenWirkraumEW_Centroide.AGS)&lt;&gt;&#39;AGSVALUE&#39;));</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;mw_x&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">mw_x</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;mw_y&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">mw_y</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;AGSVALUE&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">ags_eigen</span><span class="p">))</span>
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 3</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Erzeuge Entfernungstabelle Arbeitsplaetze </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;gemeindenWirkraumAP_Centroide&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_gemeindenWirkraumAP&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_DistanzenAP&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        SELECT gemeindenWirkraumAP_Centroide.AGS, gemeindenWirkraumAP_Centroide.AGS_VG, gemeindenWirkraumAP_Centroide.AGS_Regenesis, (([POINT_X]-mw_x)^2+([point_Y]-mw_y)^2)^(1/2) AS distanz, AWU_gemeindenWirkraumAP.EWZ INTO AWU_DistanzenAP</span>
+<span class="s2">        FROM gemeindenWirkraumAP_Centroide INNER JOIN AWU_gemeindenWirkraumAP ON gemeindenWirkraumAP_Centroide.AGS = AWU_gemeindenWirkraumAP.AGS</span>
+<span class="s2">        WHERE (((gemeindenWirkraumAP_Centroide.AGS)&lt;&gt;&#39;AGSVALUE&#39;));</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;mw_x&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">mw_x</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;mw_y&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">mw_y</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;AGSVALUE&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">ags_eigen</span><span class="p">))</span>
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 4</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Berechne EW-Anteile entsprechend der Einwohnerzahl </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1"># Maximale Distanz EW ermitteln</span>
+        <span class="n">maxlist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_DistanzenEW&#39;</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">maxlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">distanz</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">distEW_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxlist</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">distEW_max</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># EWgewichtet erzeugen</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_DistanzenEW&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_EWgewichtet&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT AWU_DistanzenEW.AGS, AWU_DistanzenEW.AGS_VG, AWU_DistanzenEW.AGS_Regenesis, AWU_DistanzenEW.distanz, AWU_DistanzenEW.EWZ, 1-[distanz]/distEW_max AS Faktor, (1-[distanz]/distEW_max)*[EWZ] AS AWU_EWgewichtet INTO AWU_EWgewichtet</span>
+<span class="s2">        FROM AWU_DistanzenEW;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;distEW_max&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">distEW_max</span><span class="p">))</span>
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1"># Summe EW ermitteln</span>
+        <span class="n">sumlist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_EWgewichtet&#39;</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">sumlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">AWU_EWgewichtet</span><span class="p">)</span>
+        <span class="n">sumEW</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sumlist</span><span class="p">)</span>
+
+        <span class="c1"># Erzeuge Wanderungsfaktor</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_EWgewichtet&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_WanderungsfaktorEW&#39;</span><span class="p">)</span>
+
+        <span class="n">nettoZuzugsQuote_EW</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">nettoZuzugsQuote_EW</span><span class="p">)</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT AWU_EWgewichtet.AGS, AWU_EWgewichtet.AGS_VG, AWU_EWgewichtet.AGS_Regenesis, ([AWU_EWgewichtet]/sumEW)*(nettoZuzugsQuote_EW) AS AWU_Wanderungsfaktor INTO AWU_WanderungsfaktorEW</span>
+<span class="s2">        FROM AWU_EWgewichtet;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;sumEW&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">sumEW</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;nettoZuzugsQuote_EW&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">nettoZuzugsQuote_EW</span><span class="p">))</span>
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1"># Ergaenze AGS der eigenen Kommune</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_WanderungsfaktorEW&#39;</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">rows</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">AGS</span> <span class="o">=</span> <span class="n">ags_eigen</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">AGS_VG</span> <span class="o">=</span> <span class="n">ags_vg_eigen</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">AGS_Regenesis</span> <span class="o">=</span> <span class="n">ags_regenesis_eigen</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">AWU_Wanderungsfaktor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">nettoZuzugsQuote_EW</span><span class="p">)</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 4</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Berechne AP-Anteile entsprechend der Arbeitsplatzverteilung </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1"># Maximale Distanz AP ermitteln</span>
+        <span class="n">maxlist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_DistanzenAP&#39;</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">maxlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">distanz</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">distAP_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxlist</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">distAP_max</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># EWgewichtet erzeugen</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_DistanzenAP&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_APgewichtet&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT AWU_DistanzenAP.AGS, AWU_DistanzenAP.AGS_VG, AWU_DistanzenAP.AGS_Regenesis, AWU_DistanzenAP.distanz, AWU_DistanzenAP.EWZ, 1-[distanz]/distAP_max AS Faktor, (1-[distanz]/distAP_max)*[EWZ] AS AWU_APgewichtet INTO AWU_APgewichtet</span>
+<span class="s2">        FROM AWU_DistanzenAP;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;distAP_max&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">distAP_max</span><span class="p">))</span>
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1"># Summe EW ermitteln</span>
+        <span class="n">sumlist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_APgewichtet&#39;</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">sumlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">AWU_APgewichtet</span><span class="p">)</span>
+        <span class="n">sumAP</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sumlist</span><span class="p">)</span>
+
+        <span class="c1"># Erzeuge Wanderungsfaktor</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_APgewichtet&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_WanderungsfaktorAP&#39;</span><span class="p">)</span>
+
+        <span class="n">nettoZuzugsQuote_AP</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">nettoZuzugsQuote_AP</span><span class="p">)</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT AWU_APgewichtet.AGS, AWU_APgewichtet.AGS_VG, AWU_APgewichtet.AGS_Regenesis, ([AWU_APgewichtet]/sumAP)*(nettoZuzugsQuote_AP) AS AWU_Wanderungsfaktor INTO AWU_WanderungsfaktorAP</span>
+<span class="s2">        FROM AWU_APgewichtet;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;sumAP&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">sumAP</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;nettoZuzugsQuote_AP&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">nettoZuzugsQuote_AP</span><span class="p">))</span>
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1"># Ergaenze AGS der eigenen Kommune</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_WanderungsfaktorAP&#39;</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">rows</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">AGS</span> <span class="o">=</span> <span class="n">ags_eigen</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">AGS_VG</span> <span class="o">=</span> <span class="n">ags_vg_eigen</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">AGS_Regenesis</span> <span class="o">=</span> <span class="n">ags_regenesis_eigen</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">AWU_Wanderungsfaktor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">nettoZuzugsQuote_AP</span><span class="p">)</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 4</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Verteilung der EW auf Gemeinden </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_WanderungsfaktorEW&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Einwohnerzahl&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_WanderungsergebnisEW&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT AWU_WanderungsfaktorEW.AGS, AWU_WanderungsfaktorEW.AGS_VG, AWU_WanderungsfaktorEW.AGS_Regenesis, Einwohnerzahl.Jahr, Sum([Einwohnerzahl]*[AWU_Wanderungsfaktor]) AS EW INTO AWU_WanderungsergebnisEW</span>
+<span class="s2">        FROM Einwohnerzahl, AWU_WanderungsfaktorEW</span>
+<span class="s2">        GROUP BY AWU_WanderungsfaktorEW.AGS, AWU_WanderungsfaktorEW.AGS_VG, AWU_WanderungsfaktorEW.AGS_Regenesis, Einwohnerzahl.Jahr</span>
+<span class="s2">        ORDER BY AWU_WanderungsfaktorEW.AGS, AWU_WanderungsfaktorEW.AGS_VG, AWU_WanderungsfaktorEW.AGS_Regenesis, Einwohnerzahl.Jahr;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 4</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Verteilung der AP auf Gemeinden </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_WanderungsfaktorAP&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Gewerbe_Beschaeftigte&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_WanderungsergebnisAP&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT AWU_WanderungsfaktorAP.AGS, AWU_WanderungsfaktorAP.AGS_VG, AWU_WanderungsfaktorAP.AGS_Regenesis, Gewerbe_Beschaeftigte.Jahr, Gewerbe_Beschaeftigte.Branche, Sum([Anzahl]*[AWU_Wanderungsfaktor]) AS AP INTO AWU_WanderungsergebnisAP</span>
+<span class="s2">        FROM Gewerbe_Beschaeftigte, AWU_WanderungsfaktorAP</span>
+<span class="s2">        GROUP BY AWU_WanderungsfaktorAP.AGS, AWU_WanderungsfaktorAP.AGS_VG, AWU_WanderungsfaktorAP.AGS_Regenesis, Gewerbe_Beschaeftigte.Jahr, Gewerbe_Beschaeftigte.Branche</span>
+<span class="s2">        ORDER BY AWU_WanderungsfaktorAP.AGS, AWU_WanderungsfaktorAP.AGS_VG, AWU_WanderungsfaktorAP.AGS_Regenesis, Gewerbe_Beschaeftigte.Jahr, Gewerbe_Beschaeftigte.Branche;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 4</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;temporaere Tabellen loeschen </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">deleteList_a</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gemeindenWirkraumAP&#39;</span><span class="p">,</span><span class="s1">&#39;gemeindenWirkraumEW&#39;</span><span class="p">,</span><span class="s1">&#39;gemeindenWirkraumAP_Centroide&#39;</span><span class="p">,</span><span class="s1">&#39;gemeindenWirkraumEW_Centroide&#39;</span><span class="p">,</span><span class="s1">&#39;Teilflaechen_Plangebiet_CentroideGK3&#39;</span><span class="p">]</span>
+        <span class="n">deleteList_b</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AWU_APgewichtet&#39;</span><span class="p">,</span><span class="s1">&#39;AWU_EWgewichtet&#39;</span><span class="p">,</span><span class="s1">&#39;AWU_DistanzenAP&#39;</span><span class="p">,</span><span class="s1">&#39;AWU_DistanzenEW&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">deleteList_a</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">deleteList_b</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="s2">&quot;fertig&quot;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s1">&#39;01_Auswirkung_Umland abgeschlossen&#39;</span><span class="p">)</span></div></div>
+
+<span class="c1">#############################################################################################################</span>
+<span class="c1">#</span>
+<span class="c1"># Funktionen</span>
+<span class="c1">#</span>
+<span class="c1">#############################################################################################################</span>
+
+<div class="viewcode-block" id="getAGS"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T1_Vorberechnungen.html#rpctools.analyst.einnahmen.T1_Vorberechnungen.getAGS">[docs]</a><span class="k">def</span> <span class="nf">getAGS</span><span class="p">(</span><span class="n">projektname</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">arcpy</span><span class="o">,</span><span class="nn">sys</span><span class="o">,</span><span class="nn">os</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">projektFlaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span> <span class="p">,</span><span class="s2">&quot;3_Projekte&quot;</span><span class="p">,</span>  <span class="n">projektname</span> <span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_&quot;</span> <span class="o">+</span> <span class="n">projektname</span> <span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
+    <span class="n">bkg_gemeinden</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span> <span class="n">base_path</span><span class="p">,</span> <span class="s2">&quot;1_Basisdaten&quot;</span><span class="p">,</span><span class="s2">&quot;FGBD_Basisdaten_deutschland.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;bkg_gemeinden&quot;</span><span class="p">)</span>
+    <span class="c1">#ags aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird</span>
+    <span class="c1">#1. Feature Layer aus den bkg-daten erstellen</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="s2">&quot;bkg_gemeinden_lyr&quot;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="s2">&quot;&quot;</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">bkg_gemeinden</span><span class="p">,</span><span class="s2">&quot;bkg_gemeinden_lyr&quot;</span><span class="p">)</span>
+    <span class="c1">#2.Spatial Select wo Planfläche vgm_lyr intersected</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByLocation_management</span><span class="p">(</span><span class="s2">&quot;bkg_gemeinden_lyr&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="n">projektFlaeche</span><span class="p">)</span>
+    <span class="c1">#Wenn Flaeche = 1, ags extrahieren</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">GetCount_management</span><span class="p">(</span><span class="s2">&quot;bkg_gemeinden_lyr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">getOutput</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">n</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">):</span>
+        <span class="n">gemeindeCursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="s2">&quot;bkg_gemeinden_lyr&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">gemeinde</span> <span class="ow">in</span> <span class="n">gemeindeCursor</span><span class="p">:</span>
+            <span class="n">verbandsgemeinde</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">BEMERK</span>
+            <span class="n">ags</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">AGS</span>
+            <span class="n">RS</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">RS</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Die Projektflaechen liegen innerhalb mehrerer Gemeinden, das Tool unterstuetzt zur Zeit keine interkommunalen Projekte.&quot;</span><span class="p">)</span>
+        <span class="c1">## TODO Dateien loeschen und Projektregistrierung loeschen)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+    <span class="c1">#Weiche nach Bundeslaendern und gemeinschaftsangehoerigen Gemeinden</span>
+    <span class="k">if</span> <span class="n">verbandsgemeinde</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;gem&quot;</span><span class="p">:</span>
+        <span class="n">ags_vg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">ags</span>
+
+    <span class="k">elif</span> <span class="n">ags</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;03&quot;</span><span class="p">:</span> <span class="c1">#Niedersachsen</span>
+        <span class="nb">print</span> <span class="s2">&quot;NS&quot;</span>
+        <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">RS</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">9</span><span class="p">:]</span>
+        <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">RS</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">ags_vg</span><span class="p">)</span>
+
+
+    <span class="k">elif</span> <span class="n">ags</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;07&quot;</span><span class="p">:</span> <span class="c1">#Rheinland-Pfalz</span>
+        <span class="nb">print</span> <span class="s2">&quot;RP&quot;</span>
+        <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">RS</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">9</span><span class="p">]</span>
+        <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">RS</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">ags_vg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ags</span><span class="p">,</span> <span class="n">ags_vg</span><span class="p">,</span> <span class="n">ags_regenesis</span></div>
+
+
+<div class="viewcode-block" id="getReGenesisAGS"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T1_Vorberechnungen.html#rpctools.analyst.einnahmen.T1_Vorberechnungen.getReGenesisAGS">[docs]</a><span class="k">def</span> <span class="nf">getReGenesisAGS</span><span class="p">(</span><span class="n">ags_input</span><span class="p">,</span> <span class="n">verbandsgemeinde</span><span class="p">,</span> <span class="n">RS</span><span class="p">):</span>
+    <span class="c1">#Weiche nach Bundeslaendern und gemeinschaftsangehoerigen Gemeinden</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">workspace_basisdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;1_Basisdaten&#39;</span><span class="p">,</span><span class="s1">&#39;FGBD_Basisdaten_deutschland.gdb&#39;</span><span class="p">)</span>
+    <span class="n">VG250</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_basisdaten</span><span class="p">,</span><span class="s1">&#39;VG250&#39;</span><span class="p">)</span>
+    <span class="n">where</span> <span class="o">=</span> <span class="s1">&#39;&quot;AGS&quot;&#39;</span><span class="o">+</span><span class="s2">&quot; =&#39;&quot;</span><span class="o">+</span> <span class="n">ags_input</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+
+    <span class="n">ags_vg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">ags_input</span>
+
+    <span class="c1">#Rheinland-Pfalz</span>
+    <span class="k">if</span> <span class="n">ags_input</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;07&quot;</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">verbandsgemeinde</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;kre&quot;</span><span class="p">:</span>
+            <span class="n">ags_vg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">ags_input</span>
+
+        <span class="k">elif</span> <span class="n">verbandsgemeinde</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;gem&quot;</span><span class="p">:</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">VG250</span><span class="p">,</span> <span class="n">where</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_L</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_R</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_K</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_V2</span>
+                <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">ags_vg</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">VG250</span><span class="p">,</span> <span class="n">where</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_L</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_R</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_K</span> <span class="o">+</span> <span class="s2">&quot;00&quot;</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_G</span>
+                <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">ags_vg</span>
+
+    <span class="c1">#Niedersachsen</span>
+    <span class="k">elif</span> <span class="n">ags_input</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;03&quot;</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">verbandsgemeinde</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;kre&quot;</span><span class="p">:</span>
+            <span class="n">ags_vg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">ags_input</span>
+
+        <span class="k">elif</span> <span class="n">verbandsgemeinde</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;gem&quot;</span><span class="p">:</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">VG250</span><span class="p">,</span> <span class="n">where</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">RS</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">9</span><span class="p">]</span>
+                <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">ags_vg</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ags_vg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">ags_input</span>
+
+    <span class="k">return</span> <span class="n">ags_input</span><span class="p">,</span> <span class="n">ags_vg</span><span class="p">,</span> <span class="n">ags_regenesis</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 22, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>
