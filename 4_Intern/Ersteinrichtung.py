@@ -13,7 +13,7 @@
 # ---------------------------------------------------------------------------
 
 import os, sys
-import _rpcpath
+from os.path import join
 import subprocess
 
 def install_packages(python_path):
