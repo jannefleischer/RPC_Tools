@@ -5,6 +5,13 @@ import contextlib
 import os
 import sys
 import argparse
+
+from rpctools.analyst.einnahmen import (tbx_vorberechnungen, tbx_einnahmen,
+                                        tbx_grundsteuer, tbx_gewerbesteuer)  
+reload(tbx_vorberechnungen)
+reload(tbx_einnahmen)
+reload(tbx_grundsteuer)
+reload(tbx_gewerbesteuer)
 from rpctools.analyst.einnahmen.tbx_vorberechnungen import TbxVorberechnungen
 from rpctools.analyst.einnahmen.tbx_einnahmen import (
     TbxEinkommenssteuer,
@@ -13,21 +20,20 @@ from rpctools.analyst.einnahmen.tbx_einnahmen import (
     TbxKRU)
 from rpctools.analyst.einnahmen.tbx_grundsteuer import TbxGrundsteuer
 from rpctools.analyst.einnahmen.tbx_gewerbesteuer import TbxGewerbesteuer
-from rpctools.utils import params
-reload(params)
+tools = [TbxVorberechnungen,
+         TbxEinkommenssteuer,
+         TbxFamilienleistungsausgleich,
+         TbxGrundsteuer,
+         TbxGewerbesteuer,
+         TbxKFA,
+         TbxKRU]
 
 
 class Toolbox(object):
     def __init__(self):
         self.label = u'32_Einnahmen'
         self.alias = ''
-        self.tools = [TbxVorberechnungen,
-                      TbxEinkommenssteuer,
-                      TbxFamilienleistungsausgleich,
-                      TbxGrundsteuer,
-                      TbxGewerbesteuer,
-                      TbxKFA,
-                      TbxKRU]
+        self.tools = tools
 
 
 def main():

@@ -34,3 +34,5 @@ if __name__ == '__main__':
     options = parser.parse_args()
     if options.debug:
         main()
+        # -*- coding: utf-8 -*-
+        

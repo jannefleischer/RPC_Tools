@@ -6,11 +6,19 @@ import sys
 from pprint import pformat
 from abc import ABCMeta, abstractmethod, abstractproperty
 from config import Folders
-reload(sys.modules[Folders.__module__])
+#reload(sys.modules[Folders.__module__])
 from arcpy import Parameter
 # from arcpy import Messages
 
 
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+    
+    
 class Params(object):
     """Parameter class like an ordered dict"""
 
@@ -180,6 +188,9 @@ class Tool(object):
 class Tbx(object):
     """Base Class for a ArcGIS Toolbox"""
     __metaclass__ = ABCMeta
+    __metaclass__ = Singleton
+    
+    _param_names=[]
 
     @abstractproperty
     def Tool(self):
@@ -207,7 +218,6 @@ class Tbx(object):
         # an instance of the tool
         self.tool = self.Tool(self.par)
         self.canRunInBackground = False
-        self.par = self._getParameterInfo()
 
     @abstractmethod
     def _getParameterInfo(self):

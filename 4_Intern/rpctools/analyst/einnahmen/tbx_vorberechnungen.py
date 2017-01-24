@@ -21,6 +21,7 @@ class TbxVorberechnungen(Tbx):
     def _getParameterInfo(self):
          
         par = self.par
+        projects = self.folders.get_projects()
         # Projektname
         par.name = arcpy.Parameter()
         par.name.name = u'Projektname'
@@ -28,7 +29,7 @@ class TbxVorberechnungen(Tbx):
         par.name.parameterType = 'Required'
         par.name.direction = 'Input'
         par.name.datatype = u'Zeichenfolge'
-        par.name.filter.list = []
+        par.name.filter.list = projects
 
         heading = "01 Nettozuzugsquoten (in %)"
 
@@ -83,3 +84,8 @@ class TbxVorberechnungen(Tbx):
         par.einzugsbereich_jobs.category = heading
 
         return par
+
+    def _updateParameters(self, params):
+         
+        projects = self.folders.get_projects()
+        params.name.filter.list = projects

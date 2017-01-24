@@ -12,9 +12,7 @@ from rpctools.utils.params import Params
 
 
 class TbxProjektVerwaltung(Tbx):
-    """Toolbox Projektverwaltung"""
-    
-    _param_projectname = 'name'
+    """Toolbox Projektverwaltung"""    
 
     @property
     def label(self):
