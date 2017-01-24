@@ -206,7 +206,6 @@ class Tbx(object):
         # an instance of the tool
         self.tool = self.Tool(self.par)
         self.canRunInBackground = False
-        self.xyt = []
         self.par = self._getParameterInfo()
 
     @abstractmethod

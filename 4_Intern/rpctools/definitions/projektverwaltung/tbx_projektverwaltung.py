@@ -95,10 +95,6 @@ class TbxProjektVerwaltung(Tbx):
         params.end.enabled = False
         params.existing_project.filter.list = [" "]
         
-        #return [params.existing_project, params.begin, params.name]
-        #raise Exception(self.par)
-        self.xyt.append('Hallo')
-
         return params
 
     def _updateParameters(self, params):
