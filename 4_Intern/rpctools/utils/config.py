@@ -21,10 +21,10 @@ class Folders(object):
     def __init__(self, params=None):
         """class that returns path"""
         self.BASE_PATH = abspath(join(dirname(__file__), '..', '..', '..'))
-        self._PROJECT_FOLDER = '3_Projekte'
+        self._PROJECT_BASE_PATH = '3_Projekte'
         self._INTERN = '4_Intern'
         self._BASE_DBS = 'fgdbs'
-        self._TEMPLATE_FOLDER = 'templates'
+        self._TEMPLATE_BASE_PATH = 'templates'
         self._TEMPLATE_FLAECHEN = 'projektflaechen_template.shp'
         self._PROJECT_TEMPLATE = 'Template'
         self._TEST_TEMPLATE = 'Test_Template'
@@ -58,42 +58,42 @@ class Folders(object):
 
     @property
     def MXDS(self):
-        return join(self.TEMPLATE_FOLDER, self._MXDS)
+        return join(self.TEMPLATE_BASE_PATH, self._MXDS)
 
     @property
     def TEXTE(self):
         return join(self.INTERN, self._TEXTE)
 
     @property
-    def PROJECT_FOLDER(self):
-        return join(self.BASE_PATH, self._PROJECT_FOLDER)
+    def PROJECT_BASE_PATH(self):
+        return join(self.BASE_PATH, self._PROJECT_BASE_PATH)
 
     @property
-    def TEMPLATE_FOLDER(self):
-        return join(self.BASE_PATH, self._INTERN, self._TEMPLATE_FOLDER)
+    def TEMPLATE_BASE_PATH(self):
+        return join(self.BASE_PATH, self._INTERN, self._TEMPLATE_BASE_PATH)
 
     @property
     def TEMPLATE_FLAECHEN(self):
-        return join(self.TEMPLATE_FOLDER, self._TEMPLATE_FLAECHEN)
+        return join(self.TEMPLATE_BASE_PATH, self._TEMPLATE_FLAECHEN)
 
     @property
     def PROJECT_TEMPLATE(self):
-        return join(self.TEMPLATE_FOLDER, self._PROJECT_TEMPLATE)
+        return join(self.TEMPLATE_BASE_PATH, self._PROJECT_TEMPLATE)
 
     @property
     def TEST_TEMPLATE(self):
-        return join(self.TEMPLATE_FOLDER, self._TEST_TEMPLATE)
+        return join(self.TEMPLATE_BASE_PATH, self._TEST_TEMPLATE)
 
     @property
     def TEST_TMP_PROJECT(self):
-        return join(self.PROJECT_FOLDER, self._TEST_TMP_PROJECT)
+        return join(self.PROJECT_BASE_PATH, self._TEST_TMP_PROJECT)
 
     def get_projects(self):
         '''
         returns all available projects inside the project folder
         (except the template and temp. projects which are not meant to be edited)
         '''
-        subfolders = [f for f in listdir(self.PROJECT_FOLDER)
+        subfolders = [f for f in listdir(self.PROJECT_BASE_PATH)
                       if isdir(self.get_projectpath(f))
                       and f not in [self._PROJECT_TEMPLATE,
                                     self._TEST_TEMPLATE,
@@ -116,7 +116,7 @@ class Folders(object):
             the full path of the Project folder
         """
         projectname = project or self.project
-        return join(self.PROJECT_FOLDER, projectname)
+        return join(self.PROJECT_BASE_PATH, projectname)
 
     @property
     def PROJECT_PATH(self):

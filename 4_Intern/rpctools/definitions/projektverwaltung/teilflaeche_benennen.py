@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-
 import arcpy
-
+import os
 
 from rpctools.utils.params import Tool
 
@@ -64,7 +63,7 @@ class TeilflaechenBenennen(Tool):
     @staticmethod
     def rename_flaeche(path_definition, tablename,
                        attr, alter_name, neuer_name):
-        table = join(path_definition, tablename)
+        table = os.path.join(path_definition, tablename)
         rows = arcpy.UpdateCursor(table)
         for row in rows:
             if getattr(row, attr) == alter_name:

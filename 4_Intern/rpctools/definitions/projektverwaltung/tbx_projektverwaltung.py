@@ -5,7 +5,6 @@ import sys
 import arcpy
 import datetime
 from rpctools.utils.params import Tbx
-reload(sys.modules[Tbx.__module__])
 from rpctools.utils.encoding import encode
 from rpctools.definitions.projektverwaltung.T1_Projektverwaltung import Projektverwaltung
 
@@ -14,6 +13,8 @@ from rpctools.utils.params import Params
 
 class TbxProjektVerwaltung(Tbx):
     """Toolbox Projektverwaltung"""
+    
+    _param_projectname = 'name'
 
     @property
     def label(self):

@@ -25,7 +25,6 @@ class Projektverwaltung(Tool):
     _dbname = 'FGDB_Definition_Projekt.gdb'
 
     def run(self):
-        # way to remove file-locks in arcgis
         
         arcpy.AddMessage(self.par.action.value)
 
@@ -111,10 +110,6 @@ class Projektverwaltung(Tool):
 
     def projekt_anlegen(self):
         arcpy.env.overwriteOutput = True
-        arcpy.AddMessage(self.folders)
-        
-        arcpy.AddMessage(self.folders.PROJECT_TEMPLATE)
-        arcpy.AddMessage(self.folders.PROJECT_PATH)
 
         # get new Project input Data
         projectName = self.par.name.value
@@ -300,3 +295,4 @@ class Projektverwaltung(Tool):
 
         arcpy.AddMessage("Neues Projekt angelegt im Ordner {}\n".format(
             self.folders.PROJECT_PATH))
+        

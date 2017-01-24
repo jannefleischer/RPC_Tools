@@ -13,6 +13,8 @@ from rpctools.analyst.einnahmen.tbx_einnahmen import (
     TbxKRU)
 from rpctools.analyst.einnahmen.tbx_grundsteuer import TbxGrundsteuer
 from rpctools.analyst.einnahmen.tbx_gewerbesteuer import TbxGewerbesteuer
+from rpctools.utils import params
+reload(params)
 
 
 class Toolbox(object):

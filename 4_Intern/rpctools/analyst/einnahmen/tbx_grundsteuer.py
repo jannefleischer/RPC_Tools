@@ -18,7 +18,7 @@ class TbxGrundsteuer(Tbx):
     def Tool(self):
         return Grundsteuer
 
-    def getParameterInfo(self):
+    def _getParameterInfo(self):
 
         params = self.par
         # Projektname

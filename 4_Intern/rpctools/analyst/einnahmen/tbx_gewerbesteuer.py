@@ -18,7 +18,7 @@ class TbxGewerbesteuer(Tbx):
     def Tool(self):
         return Gewerbesteuer
 
-    def getParameterInfo(self):
+    def _getParameterInfo(self):
 
         params = self.par
         # Projektname

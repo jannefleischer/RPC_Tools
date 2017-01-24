@@ -3,6 +3,7 @@
 import unittest
 from rpctools.definitions.projektverwaltung.T1_Projektverwaltung import Projektverwaltung
 from rpctools.definitions.projektverwaltung.tbx_projektverwaltung import TbxProjektVerwaltung
+from rpctools.definitions.projektverwaltung.tbx_teilflaechen_bennenen import TbxTeilflaecheBenennen
 from rpctools.definitions.projektverwaltung.teilflaeche_benennen import TeilflaechenBenennen
 
 import arcpy
@@ -10,55 +11,57 @@ import os, shutil, gc
 from os.path import join
 from time import gmtime, strftime
 
-PROJECT_FOLDER = join(os.getcwd().split("2_Tool")[0], "3_Projekte")
-PROJECT_TMP = '__unittest__'
-
-shp_template = join(PROJECT_FOLDER, "projektflaechen_template.shp")
-params_verwaltung = ['', PROJECT_TMP, PROJECT_TMP, shp_template, 2010, 2050]
-flaechenname = 'Nr. 1 | 50.77 ha | Flaeche_1'
-
-def to_arcpy_params(lst):
-    arcpy_params = []
-    for p in lst:
-        ap = arcpy.Parameter()
-        ap.value = p
-        arcpy_params.append(ap)
-    return arcpy_params
-
 class Test2Projektverwaltung(unittest.TestCase):
-    tbx=TbxProjektVerwaltung()
+    
+    tbx_proj = TbxProjektVerwaltung()
+    tbx_flaeche = TbxTeilflaecheBenennen()
+    
+    flaechenname = 'Nr. 1 | 50.77 ha | Flaeche_1'
+    test_name = '__unittest__'
 
     @classmethod
     def setUpClass(cls):
-        params=cls.tbx.par
-        params.begin.value=2010
-        params.end.value=2050
-        params.name.value='NeuerTestname'
-        params.shapefile.value = cls.tbx.folders.TEMPLATE_FLAECHEN
+        params_proj = cls.tbx_proj.par
+        params_proj.begin.value = 2010
+        params_proj.end.value = 2050
+        params_proj.name.value = cls.test_name
+        params_proj.existing_project.value = cls.test_name
+        shape = arcpy.Parameter()
+        shape.value = cls.tbx_proj.folders.TEMPLATE_FLAECHEN
+        params_proj.shapefile = shape
         
-        tmp_project_folder = cls.tbx.folders.PROJECT_PATH
+        params_flaeche = cls.tbx_flaeche.par     
+        params_flaeche.project.value = cls.test_name       
+        params_flaeche.teilflaeche.value = cls.flaechenname
+        params_flaeche.name.value = cls.flaechenname + ' neu'
+        
+        tmp_project_folder = cls.tbx_proj.folders.PROJECT_PATH
         if os.path.exists(tmp_project_folder):
-            shutil.rmtree(tmp_project_folder)
-
-        test_mxd = arcpy.mapping.MapDocument("test.mxd")
+            shutil.rmtree(tmp_project_folder)     
+                    
+        MapDocument = arcpy.mapping.MapDocument
         def mocked_doc(path):
-            return test_mxd
+            print(path)
+            if path == 'CURRENT':
+                return MapDocument(os.path.join(os.path.dirname(__file__),
+                                                "test.mxd"))
+            return MapDocument(path)
         arcpy.mapping.MapDocument = mocked_doc
 
     def test1_anlegen(self):
-        params = self.tbx.par
+        params = self.tbx_proj.par
         params.action.value = "Neues Projekt anlegen"
         Projektverwaltung(params).run()
-
-    def test2_teilflaeche_benennen(self):
-        params = [PROJECT_TMP, flaechenname + 'dfas', flaechenname + 'neu']
-        TeilflaechenBenennen(to_arcpy_params(params), arcpy).main()
+ 
+    def test2_teilflaeche_benennen(self):   
+        params = self.tbx_flaeche.par
+        TeilflaechenBenennen(params).run()
         gc.collect()
 
-    def test3_loeschen(self):
-        params = params_verwaltung
-        params[0] = "Bestehendes Projekt löschen"
-        Projektverwaltung(to_arcpy_params(params), arcpy).main()
+    def test3_loeschen(self):        
+        params = self.tbx_proj.par
+        params.action.value = "Bestehendes Projekt löschen"
+        Projektverwaltung(params).run()
 
 if __name__ == '__main__':
     unittest.main()

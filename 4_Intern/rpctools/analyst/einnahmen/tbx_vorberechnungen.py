@@ -18,8 +18,8 @@ class TbxVorberechnungen(Tbx):
     def Tool(self):
         return Vorberechnungen
 
-    def getParameterInfo(self):
-
+    def _getParameterInfo(self):
+         
         par = self.par
         # Projektname
         par.name = arcpy.Parameter()

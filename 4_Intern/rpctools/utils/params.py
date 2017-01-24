@@ -120,7 +120,7 @@ class Params(object):
         """update the parameter values with a list of parameters"""
         n_params_tbx = len(self)
         n_params_tool = len(parameters)
-        msg = '{} Parameter der Toolbox passen nicht zu den {} Parameters des Tools'
+        msg = '{} Parameter der Toolbox passen nicht zu den {} Parametern des Tools'
         assert n_params_tbx == n_params_tool, msg.format(n_params_tbx,
                                                          n_params_tool)
         # setze die Werte
@@ -197,7 +197,8 @@ class Tbx(object):
 
     def __init__(self):
         # reload the tool's module
-        reload(sys.modules[self.Tool.__module__])
+        #reload(sys.modules[self.Tool.__module__])
+        
         # the parameters
         self.par = Params(param_projectname=self.Tool._param_projectname,
                           dbname=self.Tool._dbname)
@@ -244,7 +245,6 @@ class Tbx(object):
 
     def execute(self, parameters=None, messages=None):
         """Run the tool with the parameters and messages from ArcGIS"""
-        reload(sys.modules[self.Tool.__module__])        
         self.tool.main(self.par, parameters, messages)
 
 

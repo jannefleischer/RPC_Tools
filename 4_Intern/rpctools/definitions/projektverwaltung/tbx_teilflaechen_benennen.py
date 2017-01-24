@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from os.path import abspath, dirname, join
+import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
@@ -9,6 +10,8 @@ from rpctools.definitions.projektverwaltung.teilflaeche_benennen import Teilflae
 
 class TbxTeilflaecheBenennen(Tbx):
     """Toolbox to name Teilflächen"""
+    
+    _param_projectname = 'project'
 
     @property
     def label(self):
@@ -18,11 +21,11 @@ class TbxTeilflaecheBenennen(Tbx):
     def Tool(self):
         return TeilflaechenBenennen
 
-    def getParameterInfo(self):
+    def _getParameterInfo(self):
         # Projekt
         params = self.par
 
-        projects = get_projects()
+        projects = self.folders.get_projects()
         params.project = arcpy.Parameter()
         params.project.name = u'Projekt'
         params.project.displayName = u'Projekt'
@@ -48,7 +51,7 @@ class TbxTeilflaecheBenennen(Tbx):
         params.name.parameterType = 'Required'
         params.name.direction = 'Input'
         params.name.datatype = u'GPString'
-        return [params.project, params.teilflaeche, params.name]
+        
         return params
 
     def _updateParameters(self, params):
