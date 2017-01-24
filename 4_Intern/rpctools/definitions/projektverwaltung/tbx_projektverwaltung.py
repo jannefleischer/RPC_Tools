@@ -5,8 +5,11 @@ import sys
 import arcpy
 import datetime
 from rpctools.utils.params import Tbx
+reload(sys.modules[Tbx.__module__])
 from rpctools.utils.encoding import encode
 from rpctools.definitions.projektverwaltung.T1_Projektverwaltung import Projektverwaltung
+
+from rpctools.utils.params import Params
 
 
 class TbxProjektVerwaltung(Tbx):
@@ -20,8 +23,7 @@ class TbxProjektVerwaltung(Tbx):
     def Tool(self):
         return Projektverwaltung
 
-    def getParameterInfo(self):
-
+    def _getParameterInfo(self):
         params = self.par
 
         # Was_möchten_Sie_tun_
@@ -92,6 +94,10 @@ class TbxProjektVerwaltung(Tbx):
         params.begin.enabled = False
         params.end.enabled = False
         params.existing_project.filter.list = [" "]
+        
+        #return [params.existing_project, params.begin, params.name]
+        #raise Exception(self.par)
+        self.xyt.append('Hallo')
 
         return params
 

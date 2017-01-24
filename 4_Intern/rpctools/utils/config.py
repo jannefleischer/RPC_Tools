@@ -58,7 +58,7 @@ class Folders(object):
 
     @property
     def MXDS(self):
-        return join(self.INTERN, self._MXDS)
+        return join(self.TEMPLATE_FOLDER, self._MXDS)
 
     @property
     def TEXTE(self):
@@ -204,3 +204,4 @@ class Folders(object):
         """
         dbname = basename(fgdb)
         table = join(self.get_basedb(dbname), table)
+        return table

@@ -48,7 +48,7 @@ class TbxTeilflaecheBenennen(Tbx):
         params.name.parameterType = 'Required'
         params.name.direction = 'Input'
         params.name.datatype = u'GPString'
-
+        return [params.project, params.teilflaeche, params.name]
         return params
 
     def _updateParameters(self, params):

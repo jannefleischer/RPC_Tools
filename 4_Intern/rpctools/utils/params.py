@@ -6,7 +6,9 @@ import sys
 from pprint import pformat
 from abc import ABCMeta, abstractmethod, abstractproperty
 from config import Folders
-from arcpy import Messages, Parameter
+reload(sys.modules[Folders.__module__])
+from arcpy import Parameter
+# from arcpy import Messages
 
 
 class Params(object):
@@ -31,6 +33,8 @@ class Params(object):
         >>> params.param2 = 42
         >>> params.param3 = 123
 
+        >>> len(params)
+        3
         >>> params[0]
         99
         >>> params[1]
@@ -70,7 +74,10 @@ class Params(object):
         self._dbname = dbname
 
     def __getattr__(self, name):
-        return self._od[name]
+        try:
+            return self._od[name]
+        except KeyError:
+            raise AttributeError('Attribute {} not found in Params-instance. Available attributes are {}'.format(name, self._od.keys()))
 
     def __setattr__(self, name, value):
         if name.startswith('_'):
@@ -149,10 +156,11 @@ class Tool(object):
     """Base Class for a ArcGIS Tool"""
     def __init__(self, params):
         self.par = params
-        self.mes = Messages()
+        self.mes = None # Messages()
         self.folders = Folders(params=self.par)
 
-    def main(self, parameters=None, messages=None):
+    def main(self, par, parameters=None, messages=None):
+        self.par = par
         if parameters:
             self.par._update_parameters(parameters)
         if messages:
@@ -197,13 +205,23 @@ class Tbx(object):
         self.folders = Folders(params=self.par)
         # an instance of the tool
         self.tool = self.Tool(self.par)
+        self.canRunInBackground = False
+        self.xyt = []
+        self.par = self._getParameterInfo()
 
     @abstractmethod
+    def _getParameterInfo(self):
+        """
+        Define the Parameters and return a list or Params()-instance with the
+        parameter
+        """
+        
     def getParameterInfo(self):
         """
         Define the Parameters and return a list or Params()-instance with the
         parameter
         """
+        return self._getParameterInfo()._od.values()
 
     def isLicensed(self):
         return True
@@ -227,7 +245,8 @@ class Tbx(object):
 
     def execute(self, parameters=None, messages=None):
         """Run the tool with the parameters and messages from ArcGIS"""
-        self.tool.main(parameters, messages)
+        reload(sys.modules[self.Tool.__module__])        
+        self.tool.main(self.par, parameters, messages)
 
 
 if __name__ == '__main__':

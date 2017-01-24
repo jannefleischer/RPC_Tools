@@ -51,8 +51,8 @@ setup.py
 ./rpctools/definitions/projektverwaltung/tbx_projektverwaltung.py
 ./rpctools/definitions/projektverwaltung/tbx_teilflaechen_bennenen.py
 ./rpctools/definitions/projektverwaltung/teilflaeche_benennen.py
+./rpctools/definitions/roter_faden/Installation_pruefen.py
 ./rpctools/definitions/roter_faden/__init__.py
-./rpctools/definitions/roter_faden/installation_pruefen.py
 ./rpctools/utils/__init__.py
 ./rpctools/utils/config.py
 ./rpctools/utils/encoding.py
