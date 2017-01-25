@@ -12,17 +12,51 @@ from rpctools.utils.params import Tool
 
 
 class Nutzungen(Tool):
-    _param_projectname = 'FGDB_Definition_Projekt.gdb'
+    _dbname = 'FGDB_Definition_Projekt.gdb'
 
     def run(self):
 
         parameters = self.par
         messages = self.mes
+        arcpy.AddMessage(messages.__class__)
 
-        projectname = parameters[0].valueAsText
-        parameterString = parameters[1].valueAsText
+        projectname = self.par.projectname.value
+        teilflaeche = self.par.teilflaeche.value
+        beginn_aufsiedlung = self.par.beginn_aufsiedlung.value
+        ### 1) Aufsiedlungszeitraum ###
+        dauer_aufsiedlung = self.par.dauer_aufsiedlung.value
+        ### 2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen ###
+        we_efh = self.par.we_efh.value
+        we_zfh = self.par.we_zfh.value
+        we_rh = self.par.we_rh.value
+        we_mfh = self.par.we_mfh.value
+        ### 3) Wohnen - Anteile Eigentum und Miete ###
+        ant_eigentum_efh = self.par.ant_eigentum_efh.value
+        ant_eigentum_zfh = self.par.ant_eigentum_zfh.value
+        ant_eigentum_rh = self.par.ant_eigentum_rh.value
+        ant_eigentum_mfh = self.par.ant_eigentum_mfh.value
+        ### 4) Wohnen - Einwohner pro Wohneinheit ###
+        ew_je_we_efh = self.par.ew_je_we_efh.value
+        ew_je_we_zfh = self.par.ew_je_we_zfh.value
+        ew_je_we_rh = self.par.ew_je_we_rh.value
+        ew_je_we_mfh = self.par.ew_je_we_mfh.value
+        ### 5) Wohnen - Zuzugsquote ###
+        zuzugsquote_ew = self.par.zuzugsquote_ew.value
+        ### 6) Gewerbe - Gebietstyp und Brachenstruktur ###
+        gebietstyp = self.par.gebietstyp.value
+        ant_jobs_verarb_gewerbe = self.par.ant_jobs_verarb_gewerbe.value
+        ant_jobs_baugewerbe = self.par.ant_jobs_baugewerbe.value
+        ant_jobs_handel = self.par.ant_jobs_handel.value
+        ant_jobs_logistik = self.par.ant_jobs_logistik.value
+        ant_jobs_freiwisstech = self.par.ant_jobs_freiwisstech.value
+        ant_jobs_sonst_dl = self.par.ant_jobs_sonst_dl.value
+        ### 7) Gewerbe - Zuzugs- und Eigentumsquote ###
+        zuzugsquote_gewerbe = self.par.zuzugsquote_gewerbe.value
+        ant_eigentum_gewerbe = self.par.ant_eigentum_gewerbe.value
+        ### 8) Einzelhandel (nur Lebensmitteleinzelhandel) ###
+        verkaufsflaeche = self.par.verkaufsflaeche.value        
 
-        Teilflaeche_Plangebiet = parameterString.split(" | ")[0]
+        Teilflaeche_Plangebiet = teilflaeche.split(" | ")[0]
         folders = self.folders
         tabelle_gebaude = folders.get_table('Gebaeude_Details')
         tabelle_wohneinheiten_details = folders.get_table('Wohneinheiten_Details')
@@ -72,52 +106,52 @@ class Nutzungen(Tool):
         # WOHNGEBÄUDE
 
         flaechenbilanz = folders.get_table('Flaechenbilanz')
-        plangebiet = selfolders.get_table('Teilflaechen_Plangebiet')
+        plangebiet = folders.get_table('Teilflaechen_Plangebiet')
 
         cursor = arcpy.da.UpdateCursor(plangebiet, ['Name','Beginn_Nutzung','Aufsiedlungsdauer'])
         for row in cursor:
-            if row[0] == parameters[1].valueAsText:
-                row[1] = parameters[2].valueAsText
-                row[2] = parameters[3].valueAsText
+            if row[0] == parameters[1].value:
+                row[1] = parameters[2].value
+                row[2] = parameters[3].value
                 cursor.updateRow(row)
 
-        for i in range(0,int(parameters[3].valueAsText)):
+        for i in range(0,int(parameters[3].value)):
 
-            jahr = int(parameters[2].valueAsText) + i
+            jahr = int(parameters[2].value) + i
 
             messages.AddMessage(jahr)
             Insert = arcpy.da.InsertCursor(tabelle_gebaude, ['Teilflaeche_Plangebiet','Gebaeudetyp','Anzahl_Gebaeude','Jahr'])
             row = ["","","",""]
 
             #Ein- und Zweifamilienhäuser
-            if int(parameters[4].valueAsText) >0:
-                row[0] = parameters[1].valueAsText
+            if int(parameters[4].value) >0:
+                row[0] = parameters[1].value
                 row[1] = "Einfamilienhaus"
-                row[2] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText)
+                row[2] = int(parameters[4].value) / int(parameters[3].value)
                 row[3] = jahr
                 Insert.insertRow(row)
 
             #Doppelhäuser
-            if int(parameters[5].valueAsText) >0:
-                row[0] = parameters[1].valueAsText
+            if int(parameters[5].value) >0:
+                row[0] = parameters[1].value
                 row[1] = "Zweifamilien- oder Doppelhaus"
-                row[2] =  int(parameters[5].valueAsText) / int(parameters[3].valueAsText)
+                row[2] =  int(parameters[5].value) / int(parameters[3].value)
                 row[3] = jahr
                 Insert.insertRow(row)
 
             #Reihenhäuser
-            if int(parameters[6].valueAsText) >0:
-                row[0] = parameters[1].valueAsText
+            if int(parameters[6].value) >0:
+                row[0] = parameters[1].value
                 row[1] = "Reihenhaus"
-                row[2] =  int(parameters[6].valueAsText) / int(parameters[3].valueAsText)
+                row[2] =  int(parameters[6].value) / int(parameters[3].value)
                 row[3] = jahr
                 Insert.insertRow(row)
 
             #Mehrfamilienhäuser
-            if int(parameters[7].valueAsText) >0:
-                row[0] = parameters[1].valueAsText
+            if int(parameters[7].value) >0:
+                row[0] = parameters[1].value
                 row[1] = "Mehrfamilienhaus"
-                row[2] =  int(parameters[7].valueAsText) / int(parameters[3].valueAsText)
+                row[2] =  int(parameters[7].value) / int(parameters[3].value)
                 row[3] = jahr
                 Insert.insertRow(row)
 
@@ -133,63 +167,63 @@ class Nutzungen(Tool):
             row = ["","","","","","",""]
 
             #Ein- und Zweifamilienhäuser
-            eigentum = int(parameters[8].valueAsText)
-            miete = 100 - int(parameters[8].valueAsText)
+            eigentum = int(parameters[8].value)
+            miete = 100 - int(parameters[8].value)
             nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
             for nutzungstyp in nutzungstypen:
                 row[0] = "Einfamilienhaus"
-                row[1] = parameters[1].valueAsText
+                row[1] = parameters[1].value
                 row[2] = nutzungstyp[1]
-                row[3] = float((parameters[12].valueAsText.split(" ")[0]).replace(",", "."))
+                row[3] = float((parameters[12].value.split(" ")[0]).replace(",", "."))
                 row[4] = jahr
-                row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
-                row[6] = parameters[8].valueAsText
+                row[5] = int(parameters[4].value) / int(parameters[3].value) * nutzungstyp[0] / 100
+                row[6] = parameters[8].value
                 Insert.insertRow(row)
 
             #Doppelhäuser
-            eigentum = int(parameters[9].valueAsText)
-            miete = 100 - int(parameters[9].valueAsText)
+            eigentum = int(parameters[9].value)
+            miete = 100 - int(parameters[9].value)
             nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
             for nutzungstyp in nutzungstypen:
                 row[0] = "Zweifamilien- oder Doppelhaus"
-                row[1] = parameters[1].valueAsText
+                row[1] = parameters[1].value
                 row[2] = nutzungstyp[1]
-                row[3] = float((parameters[12].valueAsText.split(" ")[0]).replace(",", "."))
+                row[3] = float((parameters[12].value.split(" ")[0]).replace(",", "."))
                 row[4] = jahr
-                row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
-                row[6] = parameters[9].valueAsText
+                row[5] = int(parameters[4].value) / int(parameters[3].value) * nutzungstyp[0] / 100
+                row[6] = parameters[9].value
                 Insert.insertRow(row)
 
             #Reihenhäuser
-            eigentum = int(parameters[10].valueAsText)
-            miete = 100 - int(parameters[10].valueAsText)
+            eigentum = int(parameters[10].value)
+            miete = 100 - int(parameters[10].value)
             nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
             for nutzungstyp in nutzungstypen:
                 row[0] = "Reihenhaus"
-                row[1] = parameters[1].valueAsText
+                row[1] = parameters[1].value
                 row[2] = nutzungstyp[1]
-                row[3] = float((parameters[12].valueAsText.split(" ")[0]).replace(",", "."))
+                row[3] = float((parameters[12].value.split(" ")[0]).replace(",", "."))
                 row[4] = jahr
-                row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
-                row[6] = parameters[10].valueAsText
+                row[5] = int(parameters[4].value) / int(parameters[3].value) * nutzungstyp[0] / 100
+                row[6] = parameters[10].value
                 Insert.insertRow(row)
 
             #RMehrfamilienhäuser
-            eigentum = int(parameters[11].valueAsText)
-            miete = 100 - int(parameters[11].valueAsText)
+            eigentum = int(parameters[11].value)
+            miete = 100 - int(parameters[11].value)
             nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
             for nutzungstyp in nutzungstypen:
                 row[0] = "Mehrfamilienhaus"
-                row[1] = parameters[1].valueAsText
+                row[1] = parameters[1].value
                 row[2] = nutzungstyp[1]
-                row[3] = float((parameters[12].valueAsText.split(" ")[0]).replace(",", "."))
+                row[3] = float((parameters[12].value.split(" ")[0]).replace(",", "."))
                 row[4] = jahr
-                row[5] = int(parameters[4].valueAsText) / int(parameters[3].valueAsText) * nutzungstyp[0] / 100
-                row[6] = parameters[11].valueAsText
+                row[5] = int(parameters[4].value) / int(parameters[3].value) * nutzungstyp[0] / 100
+                row[6] = parameters[11].value
                 Insert.insertRow(row)
 
         del row, Insert
@@ -199,16 +233,16 @@ class Nutzungen(Tool):
 
         Insert = arcpy.InsertCursor(tabelle_gewerbeanteile)
         row = Insert.newRow()
-        row.setValue("teilflaeche", parameters[1].valueAsText)
-        row.setValue("branche", parameters[17].valueAsText)
-        row.setValue("Anteil_A", parameters[18].valueAsText)
-        row.setValue("Anteil_B", parameters[19].valueAsText)
-        row.setValue("Anteil_C", parameters[20].valueAsText)
-        row.setValue("Anteil_D", parameters[21].valueAsText)
-        row.setValue("Anteil_E", parameters[22].valueAsText)
-        row.setValue("Anteil_F", parameters[23].valueAsText)
-        row.setValue("Anteil_Zuzug", parameters[24].valueAsText)
-        row.setValue("Anteil_Eigentum", parameters[25].valueAsText)
+        row.setValue("teilflaeche", parameters[1].value)
+        row.setValue("branche", parameters[17].value)
+        row.setValue("Anteil_A", parameters[18].value)
+        row.setValue("Anteil_B", parameters[19].value)
+        row.setValue("Anteil_C", parameters[20].value)
+        row.setValue("Anteil_D", parameters[21].value)
+        row.setValue("Anteil_E", parameters[22].value)
+        row.setValue("Anteil_F", parameters[23].value)
+        row.setValue("Anteil_Zuzug", parameters[24].value)
+        row.setValue("Anteil_Eigentum", parameters[25].value)
         Insert.insertRow(row)
         del row, Insert
 
@@ -388,23 +422,22 @@ class Nutzungen(Tool):
 
         schrittmeldung = 'Eingaben werden gelesen \n'
         messages.AddMessage(schrittmeldung)
-        print schrittmeldung
 
         #Parameter aus Tool auslesen
 
-        projektname = parameters[0].valueAsText
-        teilflaeche = parameters[1].valueAsText
-        startjahr = parameters[2].valueAsText
-        aufsiedlungsdauer = parameters[3].valueAsText
-        gebtyp = parameters[17].valueAsText
-        zuzugsquote = parameters[24].valueAsText
-        eigentumsquote = parameters[25].valueAsText
-        Ant_Betr_VerarbGew = parameters[18].valueAsText
-        Ant_Betr_BauGew = parameters[19].valueAsText
-        Ant_Betr_HanKfZ = parameters[20].valueAsText
-        Ant_Betr_VerLag = parameters[21].valueAsText
-        Ant_Betr_FrWiTeDi = parameters[22].valueAsText
-        Ant_Betr_SoDi = parameters[23].valueAsText
+        projektname = parameters[0].value
+        teilflaeche = parameters[1].value
+        startjahr = parameters[2].value
+        aufsiedlungsdauer = parameters[3].value
+        gebtyp = parameters[17].value
+        zuzugsquote = parameters[24].value
+        eigentumsquote = parameters[25].value
+        Ant_Betr_VerarbGew = parameters[18].value
+        Ant_Betr_BauGew = parameters[19].value
+        Ant_Betr_HanKfZ = parameters[20].value
+        Ant_Betr_VerLag = parameters[21].value
+        Ant_Betr_FrWiTeDi = parameters[22].value
+        Ant_Betr_SoDi = parameters[23].value
 
         if gebtyp != "<kein Gewerbegebiet vorhanden>":
 
@@ -519,7 +552,6 @@ class Nutzungen(Tool):
                 # Anzahl der Betriebe nach Branchen bestimmen
                 schrittmeldung = 'Branchenstrukturberechnung wird vorbereitet \n'
                 messages.AddMessage(schrittmeldung)
-                print schrittmeldung
 
                 # erstmal Pfade definieren
                 tabelle_BFG = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb','gewerbe_betriebsflaechengroesse')
@@ -554,7 +586,6 @@ class Nutzungen(Tool):
                 #daraus die Flächenanteile ermitteln
                 schrittmeldung = 'Gewerbeflaeche nach Branchen wird berechnet \n'
                 messages.AddMessage(schrittmeldung)
-                print schrittmeldung
 
                 gewerbebauland = float(s2_GewBauland)
                 Flaeche_Betr_VerarbGew = float(Flaeche_Betr_VerarbGew_temp) / float(Flaeche_Gesamt_Temp) * float(gewerbebauland)
@@ -567,7 +598,7 @@ class Nutzungen(Tool):
                 #und über die BFG wieder zur Anzahl der Betriebe
                 schrittmeldung = 'Betriebszahl nach Branchen wird berechnet \n'
                 messages.AddMessage(schrittmeldung)
-                print schrittmeldung
+
                 BFGfaktor = 1.00
                 if gebtyp == "Industriegebiet":
                     BFGfaktor = 1.50
@@ -610,7 +641,6 @@ class Nutzungen(Tool):
                 #und nun noch die Beschäftigten berechnen
                 schrittmeldung = 'Beschaeftigtenzahl nach Branchen wird berechnet \n'
                 messages.AddMessage(schrittmeldung)
-                print schrittmeldung
 
                 tabelle_FKZ = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb','gewerbe_flaechenkennziffern')
                 rows_FKZ = arcpy.SearchCursor(tabelle_FKZ)
@@ -640,7 +670,6 @@ class Nutzungen(Tool):
                 ### Aufsiedlugnsdauer einrechnen
                 schrittmeldung = 'Aufsiedlungsdauer wird auf Flaechen-, Betriebs- Beschaeftigtenstruktur umgelegt \n'
                 messages.AddMessage(schrittmeldung)
-                print schrittmeldung
 
                 #### Aufsiedlugnsdauer Betriebe
                 # zuletzt die Anzahl noch in die Ausgabetabelle schreiben und dabei mit der Aufsiedlungszeit verrechnen
@@ -1187,7 +1216,6 @@ class Nutzungen(Tool):
 
                 schrittmeldung = 'Gebaeudedaten werden berechnet \n'
                 messages.AddMessage(schrittmeldung)
-                print str(schrittmeldung)
 
                 tabelle_gebaeudegrundlagen = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb','gewerbe_gebaeude')
                 tabelle_gebaeudedetails = self.folders.get_table('Gebaeude_Details')
@@ -1348,7 +1376,6 @@ class Nutzungen(Tool):
 
                 schrittmeldung = 'Projektinformationen werden zusammengefasst und in Datenbank geschrieben \n'
                 messages.AddMessage(schrittmeldung)
-                print str(schrittmeldung)
 
                 tabelle_teilflaeche = self.folders.get_table('Gewerbe_Teilflaechen')
                 tabelle_teilflaeche_insert = arcpy.InsertCursor(tabelle_teilflaeche)
@@ -1442,15 +1469,6 @@ class Nutzungen(Tool):
                 beschaeftigte_gewerbe(projektname)
                 schrittmeldung = 'Die Berechnungen sind abgeschlossen  \n'
                 messages.AddMessage(schrittmeldung)
-                print str(schrittmeldung)
-
-
-
-
-
-
-
-
 
 
             ##########################################################################
@@ -1461,7 +1479,6 @@ class Nutzungen(Tool):
             ## Ergebnisausgabe
                 schrittmeldung = 'Die Ergebnisausgabe wird erzeugt. Dies kann wenige Minuten in Anspruch nehmen. \n'
                 messages.AddMessage(schrittmeldung)
-                print str(schrittmeldung)
 
                 # Pfade setzen
                 base_path = str(sys.path[0]).split("2_Tool")[0]
@@ -2180,11 +2197,11 @@ class Nutzungen(Tool):
 
 
         #EINZELHANDEL
-        projectname = parameters[0].valueAsText
+        projectname = parameters[0].value
         tabelle_gebaude = folders.get_table('Gebaeude_Details')
         Insert = arcpy.InsertCursor(tabelle_gebaude)
         row = Insert.newRow()
-        row.Teilflaeche_Plangebiet = parameters[1].valueAsText
+        row.Teilflaeche_Plangebiet = parameters[1].value
         row.Gebaeudetyp = "Einzelhandel"
         Insert.insertRow(row)
         del row, Insert
@@ -2195,7 +2212,7 @@ class Nutzungen(Tool):
         row = Insert.newRow()
         row.Gebaeudetyp = "Einzelhandel"
         row.Wohnflaeche_qm = 0
-        row.Teilflaeche_Plangebiet = parameters[1].valueAsText
+        row.Teilflaeche_Plangebiet = parameters[1].value
         row.Miete_Eigentum = 100
         row.Anzahl_WE = 0
         row.Jahr = jahr
@@ -2207,8 +2224,8 @@ class Nutzungen(Tool):
         tabelle_Versorgung_Verkaufsflaechen = folders.get_table('Versorgung_Verkaufsflaechen')
         Insert = arcpy.InsertCursor(tabelle_Versorgung_Verkaufsflaechen)
         row = Insert.newRow()
-        row.Teilflaeche_Plangebiet = parameters[1].valueAsText
-        row.Verkaufsflaeche = parameters[26].valueAsText
+        row.Teilflaeche_Plangebiet = parameters[1].value
+        row.Verkaufsflaeche = parameters[26].value
         Insert.insertRow(row)
         del row, Insert
         gc.collect()

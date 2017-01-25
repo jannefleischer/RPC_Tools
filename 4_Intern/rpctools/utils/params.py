@@ -7,8 +7,48 @@ from pprint import pformat
 from abc import ABCMeta, abstractmethod, abstractproperty
 from config import Folders
 #reload(sys.modules[Folders.__module__])
-from arcpy import Parameter
-# from arcpy import Messages
+import arcpy
+
+
+class Message(object):
+
+    def addMessage(self, message):
+        arcpy.AddMessage(message)
+        print(message)
+        
+    def addErrorMessage(self, message):
+        arcpy.AddError(message)
+        print(message)
+        
+    def addWarningMessage(self, message):
+        arcpy.AddWarning(message)
+        print(message)
+
+    def addIDMessage(self, message, message_ID, add_argument1=None, add_argument2=None):
+        arcpy.AddIDMessage(message, message_ID, add_argument1=add_argument1, add_argument2=add_argument2)
+        print(message)
+
+    def addGPMessages(self):
+        arcpy.AddMessage()
+
+    def AddMessage(self, message):
+        arcpy.AddMessage(message)
+        print(message)
+        
+    def AddErrorMessage(self, message):
+        arcpy.AddError(message)
+        print(message)
+        
+    def AddWarningMessage(self, message):
+        arcpy.AddWarning(message)
+        print(message)
+
+    def AddIDMessage(self, message, message_ID, add_argument1=None, add_argument2=None):
+        arcpy.AddIDMessage(message, message_ID, add_argument1=add_argument1, add_argument2=add_argument2)
+        print(message)
+
+    def AddGPMessages(self):
+        arcpy.AddMessage()
 
 
 class Singleton(type):
@@ -148,23 +188,17 @@ class Params(object):
             return param_projectname.value
         return None
 
-    def _set_validated(self):
-        for param in self:
-            if isinstance(param, Parameter):
-                param._altered = False
-                param._validated = True
-
 
 class Tool(object):
     __metaclass__ = ABCMeta
 
-    _param_projectname = 'name'
+    _param_projectname = 'projectname'
     _dbname = None
 
     """Base Class for a ArcGIS Tool"""
     def __init__(self, params):
         self.par = params
-        self.mes = None # Messages()
+        self.mes = Message()
         self.folders = Folders(params=self.par)
 
     def main(self, par, parameters=None, messages=None):
@@ -190,8 +224,6 @@ class Tbx(object):
     __metaclass__ = ABCMeta
     __metaclass__ = Singleton
     
-    _param_names=[]
-
     @abstractproperty
     def Tool(self):
         """
@@ -240,7 +272,6 @@ class Tbx(object):
         """Update the Parameters if something changed"""
         self.par._update_parameters(parameters)
         self._updateParameters(self.par)
-        self.par._set_validated()
 
     def _updateParameters(self, params):
         """Update the Parameters if something changed"""
@@ -255,8 +286,28 @@ class Tbx(object):
 
     def execute(self, parameters=None, messages=None):
         """Run the tool with the parameters and messages from ArcGIS"""
-        self.tool.main(self.par, parameters, messages)
-
+        self.tool.main(self.par, parameters, messages)      
+        
+    def print_test_parameters(self):
+        self._getParameterInfo()
+        category = None
+        for k, v in self.par._od.iteritems():            
+            if v.category and v.category != category:
+                category = v.category
+                print(u'### {} ###'.format(v.category))
+            value = v.value
+            if isinstance(value, (str, unicode)):
+                value = u"'{}'".format(value)
+            print (u'params.{k}.value = {v}'.format(v=value, k=k))
+            
+    def print_default_parameters(self):
+        self._getParameterInfo()
+        category = None
+        for k, v in self.par._od.iteritems():            
+            if v.category and v.category != category:
+                category = v.category
+                print(u'### {} ###'.format(v.category))
+            print (u'{k} = self.par.{k}.value'.format(k=k)) 
 
 if __name__ == '__main__':
     import doctest

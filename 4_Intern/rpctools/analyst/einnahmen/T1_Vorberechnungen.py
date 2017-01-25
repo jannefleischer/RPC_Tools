@@ -33,13 +33,14 @@ class Vorberechnungen(Tool):
         arcpy.env.overwriteOutput = True
 
         # Variablen definieren
-        projektname = parameters[0].value
-
-        nettoZuzugsQuote_EW = parameters[1].value
-        nettoZuzugsQuote_AP = parameters[2].value
-        einzugsbereich_EW = parameters[3].value
-        einzugsbereich_AP = parameters[4].value
-
+       
+        projektname = self.par.name.value
+        ### 01 Nettozuzugsquoten (in %) ###
+        nettoZuzugsQuote_EW = self.par.nettozuzugquote_ew.value
+        nettoZuzugsQuote_AP = self.par.nettozuzugquote_jobs.value
+        ### 02 Einzugsbereich (in km) ###
+        einzugsbereich_EW = self.par.einzugsbereich_ew.value
+        einzugsbereich_AP = self.par.einzugsbereich_jobs.value
         # Pfade einrichten
         base_path = str(sys.path[0]).split("2_Tool")[0]
 

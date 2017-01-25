@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import arcpy
 from os.path import abspath, dirname, join
-BASE_PATH = dirname(dirname(abspath(__file__)))
-sys.path.append(join(BASE_PATH, '4_Intern'))
+import datetime
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.definitions.nutzungsart.flaechen_bilanz import Flaechenbilanz
+from rpctools.definitions.nutzungsart.flaechenbilanz import Flaechenbilanz
 
 
 class TbxFlaechenbilanz(Tbx):
@@ -21,11 +21,11 @@ class TbxFlaechenbilanz(Tbx):
     def Tool(self):
         return Flaechenbilanz
 
-    def getParameterInfo(self):
+    def _getParameterInfo(self):
         # Projektname
         params = self.par
         projekte = self.folders.get_projects()
-        p = params.name = arcpy.Parameter()
+        p = params.projectname = arcpy.Parameter()
         p.name = u'Projektname'
         p.displayName = u'Projektname'
         p.parameterType = 'Required'
@@ -42,7 +42,7 @@ class TbxFlaechenbilanz(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'Zeichenfolge'
-        params.name.filter.list = []
+        p.filter.list = []
 
         # Startjahr
         p = params.startjahr = arcpy.Parameter()
@@ -231,8 +231,6 @@ class TbxFlaechenbilanz(Tbx):
         p.filter.list = [0, 100]
         p.category = heading
 
-        self.updateParameters(params)
-
         return params
 
     def eingaben_auslesen(self):
@@ -323,8 +321,8 @@ class TbxFlaechenbilanz(Tbx):
 
         # Auswahl Teilfläche
         if params.name.altered and not params.name.hasBeenValidated:
-            projectname = params.name.value
-            self.folders.project = projectname
+            #projectname = params.name.value
+            #self.folders.project = projectname
 
             tablepath_teilflaechen = self.tool.teilflaechen
             rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
@@ -332,14 +330,14 @@ class TbxFlaechenbilanz(Tbx):
             for row in rows_teilflaechen :
                 list_teilflaechen.append(row.Name)
             list_teilflaechen = sorted(set(list_teilflaechen))
-            params.teilflaechen.filter.list = list_teilflaechen
+            params.teilflaeche.filter.list = list_teilflaechen
 
             if list_teilflaechen:
-                params.teilflaechen.value = list_teilflaechen[0]
+                params.teilflaeche.value = list_teilflaechen[0]
                 self.eingaben_auslesen()
 
         # bestehende Eingaben (falls vorhanden) übernehmen
-        if params.teilflaechen.altered and not params.teilflaechen.hasBeenValidated:
+        if params.teilflaeche.altered and not params.teilflaeche.hasBeenValidated:
             self.eingaben_auslesen()
 
         # Slider generieren

@@ -735,8 +735,8 @@ class KostenaufteilungsregelnVerwalten(object):
             return validator(parameters).updateMessages()
 
     def execute(self, parameters, messages):
-        action = parameters[0].valueAsText
-        name = parameters[1].valueAsText
+        action = parameters[0].value
+        name = parameters[1].value
 
         gemeinden = parameters[2].value/100.
         kreis = parameters[3].value/100.

@@ -15,9 +15,6 @@
 
 import sys
 from os.path import abspath, dirname, join, isdir
-BASE_PATH = dirname(dirname(abspath(__file__)))
-sys.path.append(join(BASE_PATH, '4_Intern'))
-from rpctools.utils.project_lib import (Folders)
 from rpctools.utils.params import Tool
 # Import arcpy modules
 import arcpy, os
@@ -37,7 +34,29 @@ class Flaechenbilanz(Tool):
 
     def run(self):
         arcpy.env.overwriteOutput = True
-
+    
+        #projektname = self.par.name.value
+        teilflaeche = self.par.teilflaeche.value
+        startjahr = self.par.startjahr.value
+        ### 01_Generelle Flächenaufteilung ###
+        ant_verkehrsfl = self.par.ant_verkehrsfl.value
+        ant_gruenfl = self.par.ant_gruenfl.value
+        ant_sonstige_fl = self.par.ant_sonstige_fl.value
+        ant_nettobauland = self.par.ant_nettobauland.value
+        ### 02_Aufteilung Nettobauland ###
+        ant_gewerbefl = self.par.ant_gewerbefl.value
+        ant_nettowohnbauland = self.par.ant_nettowohnbauland.value
+        ### 03_Aufteilung Verkehrsfläche ###
+        laermschutz = self.par.laermschutz.value
+        privatwege = self.par.privatwege.value
+        auessere_erschl = self.par.auessere_erschl.value
+        innere_erschl = self.par.innere_erschl.value
+        ### 04_Aufteilung Grünfläche ###
+        spielplatz = self.par.spielplatz.value
+        strassenbegleitgruen = self.par.strassenbegleitgruen.value
+        ausgleich_ersatz = self.par.ausgleich_ersatz.value
+        allg_gruen = self.par.allg_gruen.value
+        
         #Pfade einrichten
         teilflaechen = self.teilflaechen
         flaechenbilanz = self.flaechenbilanz
@@ -66,12 +85,10 @@ class Flaechenbilanz(Tool):
                   'Flaeche_ha']
         cursor = arcpy.da.InsertCursor(flaechenbilanz, fields)
 
-        teilflaeche = self.par.teilflaeche.value
-        startjahr = self.par.startjahr.value
+
 
         # Nettobauland
-        ant_nettobauland = self.par.ant_nettobauland.value
-        nettobauland = flaeche * nettobauland / 100.
+        nettobauland = flaeche * ant_nettobauland / 100.
 
         ant = self.par.ant_nettowohnbauland.value
         cursor.insertRow((
@@ -80,98 +97,89 @@ class Flaechenbilanz(Tool):
             'Nettobauland',
             'Nettowohnbauland',
             ant_nettobauland,
-            ant,
-            nettobauland * ant / 100.))
+            ant_nettowohnbauland,
+            nettobauland * ant_nettowohnbauland / 100.))
 
-        ant = self.par.ant_gewerbefl.value
         cursor.insertRow((
             teilflaeche,
             startjahr,
             'Nettobauland',
             'Gewerbeflaeche',
             ant_nettobauland,
-            ant,
-            nettobauland * ant / 100.))
+            ant_gewerbefl,
+            nettobauland * ant_gewerbefl / 100.))
 
         # Verkehrsfläche
-        ant_verkehrsflaeche = self.par.ant_verkehrsflaeche.value
-        verkehrsflaeche = flaeche * ant_verkehrsflaeche / 100.
+        verkehrsflaeche = flaeche * ant_verkehrsfl / 100.
 
-        ant = self.par.laermschutz.value
         cursor.insertRow((teilflaeche,
                           startjahr,
                           'Erschliessungsflaeche',
                           'Laermschutzanlagen',
-                          ant_verkehrsflaeche,
-                          ant,
-                          verkehrsflaeche * ant / 100.))
-        ant = self.par.privatwege.value
+                          ant_verkehrsfl,
+                          laermschutz,
+                          verkehrsflaeche * laermschutz / 100.))
+
         cursor.insertRow((teilflaeche,
                           startjahr,
                           'Erschliessungsflaeche',
                           'Privat - Innere Erschliessung',
-                          ant_verkehrsflaeche,
-                          ant,
-                          verkehrsflaeche * ant / 100.))
-        ant = self.par.auessere_erschl.value
+                          ant_verkehrsfl,
+                          privatwege,
+                          verkehrsflaeche * privatwege / 100.))
+
         cursor.insertRow((teilflaeche,
                           startjahr,
                           'Erschliessungsflaeche',
                           'Oeffentlich - Aeussere Erschliessung',
-                          ant_verkehrsflaeche,
-                          ant,
-                          verkehrsflaeche * ant / 100.))
-        ant = self.par.innere_erschl.value
+                          ant_verkehrsfl,
+                          auessere_erschl,
+                          verkehrsflaeche * auessere_erschl / 100.))
+
         cursor.insertRow((teilflaeche,
                           startjahr,
                           'Erschliessungsflaeche',
                           'Oeffentlich - Innere Erschliessung',
-                          ant_verkehrsflaeche,
-                          ant,
-                          verkehrsflaeche * ant / 100.))
+                          ant_verkehrsfl,
+                          innere_erschl,
+                          verkehrsflaeche * innere_erschl / 100.))
 
         # Grünfläche
-        ant_gruenfl = self.par.ant_gruenfl.value
         gruenflaeche = flaeche * ant_gruenfl / 100.
 
-        ant = self.par.spielplatz.value
         cursor.insertRow((teilflaeche,
                           startjahr,
                           'Gruenflaeche',
                           'Spielplaetze',
                           ant_gruenfl,
-                          ant,
-                          gruenflaeche * ant / 100.))
+                          spielplatz,
+                          gruenflaeche * spielplatz / 100.))
 
-        ant = self.par.strassenbegleitgruen.value
         cursor.insertRow((teilflaeche,
                           startjahr,
                           'Gruenflaeche',
                           'Strassenbegleitgruen',
                           ant_gruenfl,
-                          ant,
-                          gruenflaeche * ant / 100.))
+                          strassenbegleitgruen,
+                          gruenflaeche * strassenbegleitgruen / 100.))
 
-        ant = self.par.ausgleich_ersatz.value
         cursor.insertRow((teilflaeche,
                           startjahr,
                           'Gruenflaeche',
                           'Ausgleichs- und Ersatzflaechen',
                           ant_gruenfl,
-                          ant,
-                          gruenflaeche * ant / 100.))
+                          ausgleich_ersatz,
+                          gruenflaeche * ausgleich_ersatz / 100.))
 
-        ant = self.par.allg_gruen.value
         cursor.insertRow((teilflaeche,
                           startjahr,
                           'Gruenflaeche',
                           'Allgemeine Gruenflaechen',
                           ant_gruenfl,
-                          ant,
-                          gruenflaeche * ant / 100.))
+                          allg_gruen,
+                          gruenflaeche * allg_gruen / 100.))
 
         # Sonstige Flächen
-        ant_sonstige_fl = self.par.ant_sonstige_fl.value
         sonstige_fl = flaeche * ant_sonstige_fl / 100.
 
         cursor.insertRow((teilflaeche,

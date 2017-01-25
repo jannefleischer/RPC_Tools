@@ -1,26 +1,24 @@
 # -*- coding: utf-8 -*-
 
-from rpctools.definitions.projektverwaltung.T1_Projektverwaltung import Projektverwaltung
 from rpctools.definitions.projektverwaltung.tbx_projektverwaltung import TbxProjektVerwaltung
 from rpctools.definitions.projektverwaltung.tbx_teilflaechen_bennenen import TbxTeilflaecheBenennen
+from rpctools.definitions.projektverwaltung.T1_Projektverwaltung import Projektverwaltung
 from rpctools.definitions.projektverwaltung.teilflaeche_benennen import TeilflaechenBenennen
 
-from test_lib import mocked_map_document, test_name,  remove_project_dir
-import os, shutil, gc
-from os.path import join
-from time import gmtime, strftime
+from test_lib import mocked_map_document, test_name, remove_project_dir
+import gc
 import pytest
 
 ### get the toolboxes with their parameters ###
 
-@pytest.fixture
-def tbx_verwaltung(scope='module'):
+@pytest.fixture(scope='module')
+def tbx_verwaltung():
     tbx = TbxProjektVerwaltung()
     tbx._getParameterInfo()
     return tbx
 
-@pytest.fixture
-def tbx_flaeche(scope='module'):
+@pytest.fixture(scope='module')
+def tbx_flaeche():
     tbx = TbxTeilflaecheBenennen()
     tbx._getParameterInfo()    
     return tbx
@@ -68,5 +66,5 @@ def test3_loeschen(params_verwaltung, mocked_map_document):
     Projektverwaltung(params_verwaltung).run()
 
 if __name__ == '__main__':
-    pytest.main()
+    pytest.main([__file__])
 

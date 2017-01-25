@@ -22,6 +22,7 @@ import os, shutil, gc
 
 class Projektverwaltung(Tool):
 
+    _param_projectname = 'name'
     _dbname = 'FGDB_Definition_Projekt.gdb'
 
     def run(self):

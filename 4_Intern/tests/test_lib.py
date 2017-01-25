@@ -5,7 +5,7 @@ import pytest
 import os
 import shutil
 
-from rpctools.utils.config import _TEST_TMP_PROJECT, TEST_TEMPLATE
+from rpctools.utils.config import TEST_TMP_PROJECT
 
 @pytest.fixture(scope='session')
 def mocked_map_document():
@@ -19,17 +19,20 @@ def mocked_map_document():
     arcpy.mapping.MapDocument = mocked_doc
     return arcpy
     
-@pytest.fixture
+@pytest.fixture(scope='module')
 def test_name():
     # common test-name (not shown in toolbox)
     return TEST_TMP_PROJECT
-
-@pytest.fixture
-def test_template_name():
-    # name of test-template (not shown in toolbox)
-    return TEST_TEMPLATE
 
 def remove_project_dir(toolbox):
     project_dir = toolbox.folders.PROJECT_PATH
     if os.path.exists(project_dir):
         shutil.rmtree(project_dir)
+
+def setup_template_dir(toolbox):
+    print('setup')
+    remove_project_dir(toolbox)
+    shutil.copytree(
+        os.path.join(toolbox.folders.TEST_TEMPLATE),
+        os.path.join(toolbox.folders.PROJECT_PATH)
+    )

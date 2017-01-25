@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import sys
+
 from os.path import abspath, dirname, join
 import numpy as np
+import arcpy
+import datetime
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
@@ -18,33 +21,33 @@ class TbxNutzungen(Tbx):
     def Tool(self):
         return Nutzungen
 
-    def getParameterInfo(self):
+    def _getParameterInfo(self):
         # Projekt
         params = self.par
         projekte = self.folders.get_projects()
 
-        param_1 = arcpy.Parameter()
-        param_1.name = u'Projekt'
-        param_1.displayName = u'Projekt'
-        param_1.parameterType = 'Required'
-        param_1.direction = 'Input'
-        param_1.datatype = u'Zeichenfolge'
-        param_1.filter.list = projekte
+        param = params.projectname = arcpy.Parameter()
+        param.name = u'Projekt'
+        param.displayName = u'Projekt'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Zeichenfolge'
+        param.filter.list = projekte
         if projekte:
-            param_1.value = projekte[0]
+            param.value = projekte[0]
 
         # Teilfläche
-        param_2 = arcpy.Parameter()
-        param_2.name = u'Teilfl\xe4che'
-        param_2.displayName = u'Teilfl\xe4che'
-        param_2.parameterType = 'Required'
-        param_2.direction = 'Input'
-        param_2.datatype = u'Zeichenfolge'
-        param_2.filter.list = []
+        param = params.teilflaeche = arcpy.Parameter()
+        param.name = u'Teilfl\xe4che'
+        param.displayName = u'Teilfl\xe4che'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Zeichenfolge'
+        param.filter.list = []
 
         heading = "1) Aufsiedlungszeitraum"
         # Beginn_der_Aufsiedlung__Jahreszahl_
-        param_3 = arcpy.Parameter()
+        param_3 = params.beginn_aufsiedlung = arcpy.Parameter()
         param_3.name = u'Beginn_der_Aufsiedlung__Jahreszahl_'
         param_3.displayName = u'Beginn der Aufsiedlung (Jahreszahl)'
         param_3.parameterType = 'Required'
@@ -56,7 +59,7 @@ class TbxNutzungen(Tbx):
         param_3.value = datetime.datetime.now().year + 1
 
         # Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_
-        param_4 = arcpy.Parameter()
+        param_4 = params.dauer_aufsiedlung = arcpy.Parameter()
         param_4.name = u'Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_'
         param_4.displayName = u'Dauer der Aufsiedlung (Jahre, 1 = Aufsiedlung wird noch im Jahr des Aufsiedlungsbeginns abgeschlossen)'
         param_4.parameterType = 'Required'
@@ -71,9 +74,9 @@ class TbxNutzungen(Tbx):
         heading = encode(u"2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen")
 
         # Anzahl_WE_in_Ein-_und_Zweifamilienhäusern
-        param_5 = arcpy.Parameter()
-        param_5.name = u'Anzahl_WE_in_Ein-_und_Zweifamilienh\xe4usern'
-        param_5.displayName = u'Anzahl WE in Ein- und Zweifamilienh\xe4usern'
+        param_5 = params.we_efh = arcpy.Parameter()
+        param_5.name = u'Anzahl_WE_in_Einfamilienh\xe4usern'
+        param_5.displayName = u'Anzahl WE in Einfamilienh\xe4usern'
         param_5.parameterType = 'Required'
         param_5.direction = 'Input'
         param_5.datatype = u'Long'
@@ -83,7 +86,7 @@ class TbxNutzungen(Tbx):
         param_5.category = heading
 
         # Anzahl_WE_in_Doppelhäusern
-        param_6 = arcpy.Parameter()
+        param_6 = params.we_zfh = arcpy.Parameter()
         param_6.name = u'Anzahl_WE_in_Doppelh\xe4usern'
         param_6.displayName = u'Anzahl WE in Doppelh\xe4usern'
         param_6.parameterType = 'Required'
@@ -95,7 +98,7 @@ class TbxNutzungen(Tbx):
         param_6.category = heading
 
         # Anzahl_WE_in_Reihenhäusern
-        param_7 = arcpy.Parameter()
+        param_7 = params.we_rh = arcpy.Parameter()
         param_7.name = u'Anzahl_WE_in_Reihenh\xe4usern'
         param_7.displayName = u'Anzahl WE in Reihenh\xe4usern'
         param_7.parameterType = 'Required'
@@ -107,7 +110,7 @@ class TbxNutzungen(Tbx):
         param_7.category = heading
 
         # Anzahl_WE_in_Mehrfamilienhäusern
-        param_8 = arcpy.Parameter()
+        param_8 = params.we_mfh = arcpy.Parameter()
         param_8.name = u'Anzahl_WE_in_Mehrfamilienh\xe4usern'
         param_8.displayName = u'Anzahl WE in Mehrfamilienh\xe4usern'
         param_8.parameterType = 'Required'
@@ -122,9 +125,9 @@ class TbxNutzungen(Tbx):
         heading = "3) Wohnen - Anteile Eigentum und Miete"
 
         # Anteil_Eigentümernutzung_in_Ein-_und_Zweifamilienhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_
-        param_9 = arcpy.Parameter()
-        param_9.name = u'Anteil_Eigent\xfcmernutzung_in_Ein-_und_Zweifamilienh\xe4usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_'
-        param_9.displayName = u'Anteil Eigent\xfcmernutzung in Ein- und Zweifamilienh\xe4usern (in %, Rest der Wohnungen werden durch Mieter genutzt)'
+        param_9 = params.ant_eigentum_efh = arcpy.Parameter()
+        param_9.name = u'Anteil_Eigent\xfcmernutzung_in_Einfamilienh\xe4usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_'
+        param_9.displayName = u'Anteil Eigent\xfcmernutzung in Einfamilienh\xe4usern (in %, Rest der Wohnungen werden durch Mieter genutzt)'
         param_9.parameterType = 'Required'
         param_9.direction = 'Input'
         param_9.datatype = u'Long'
@@ -134,7 +137,7 @@ class TbxNutzungen(Tbx):
         param_9.category = heading
 
         # Anteil_Eigentümernutzung_in_Doppelhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_
-        param_10 = arcpy.Parameter()
+        param_10 = params.ant_eigentum_zfh = arcpy.Parameter()
         param_10.name = u'Anteil_Eigent\xfcmernutzung_in_Doppelh\xe4usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_'
         param_10.displayName = u'Anteil Eigent\xfcmernutzung in Doppelh\xe4usern (in %, Rest der Wohnungen werden durch Mieter genutzt)'
         param_10.parameterType = 'Required'
@@ -146,7 +149,7 @@ class TbxNutzungen(Tbx):
         param_10.category = heading
 
         # Anteil_Eigentümernutzung_in_Reihenhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_
-        param_11 = arcpy.Parameter()
+        param_11 = params.ant_eigentum_rh = arcpy.Parameter()
         param_11.name = u'Anteil_Eigent\xfcmernutzung_in_Reihenh\xe4usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_'
         param_11.displayName = u'Anteil Eigent\xfcmernutzung in Reihenh\xe4usern (in %, Rest der Wohnungen werden durch Mieter genutzt)'
         param_11.parameterType = 'Required'
@@ -158,7 +161,7 @@ class TbxNutzungen(Tbx):
         param_11.category = heading
 
         # Anteil_Eigentümernutzung_in_Mehrfamilienhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_
-        param_12 = arcpy.Parameter()
+        param_12 = params.ant_eigentum_mfh = arcpy.Parameter()
         param_12.name = u'Anteil_Eigent\xfcmernutzung_in_Mehrfamilienh\xe4usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_'
         param_12.displayName = u'Anteil Eigent\xfcmernutzung in Mehrfamilienh\xe4usern (in %, Rest der Wohnungen werden durch Mieter genutzt)'
         param_12.parameterType = 'Required'
@@ -178,7 +181,7 @@ class TbxNutzungen(Tbx):
                 list_EwProWE.append(str(i)+","+str(j)+" Bewohner pro Wohneinheit")
 
         # Mittlere_Anzahl_Einwohner_pro_WE_in_Einfamilienhäusern__kurz_nach_dem_Bezug_
-        param_13 = arcpy.Parameter()
+        param_13 = params.ew_je_we_efh = arcpy.Parameter()
         param_13.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Einfamilienh\xe4usern__kurz_nach_dem_Bezug_'
         param_13.displayName = u'Mittlere Anzahl Einwohner pro WE in Einfamilienh\xe4usern (kurz nach dem Bezug)'
         param_13.parameterType = 'Required'
@@ -189,7 +192,7 @@ class TbxNutzungen(Tbx):
         param_13.category = heading
 
         # Mittlere_Anzahl_Einwohner_pro_WE_in_Doppelhäusern__kurz_nach_dem_Bezug_
-        param_14 = arcpy.Parameter()
+        param_14 = params.ew_je_we_zfh = arcpy.Parameter()
         param_14.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Doppelh\xe4usern__kurz_nach_dem_Bezug_'
         param_14.displayName = u'Mittlere Anzahl Einwohner pro WE in Doppelh\xe4usern (kurz nach dem Bezug)'
         param_14.parameterType = 'Required'
@@ -200,7 +203,7 @@ class TbxNutzungen(Tbx):
         param_14.category = heading
 
         # Mittlere_Anzahl_Einwohner_pro_WE_in_Reihenhäusern__kurz_nach_dem_Bezug_
-        param_15 = arcpy.Parameter()
+        param_15 = params.ew_je_we_rh = arcpy.Parameter()
         param_15.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Reihenh\xe4usern__kurz_nach_dem_Bezug_'
         param_15.displayName = u'Mittlere Anzahl Einwohner pro WE in Reihenh\xe4usern (kurz nach dem Bezug)'
         param_15.parameterType = 'Required'
@@ -211,7 +214,7 @@ class TbxNutzungen(Tbx):
         param_15.category = heading
 
         # Mittlere_Anzahl_Einwohner_pro_WE_in_Mehrfamilienhäusern__kurz_nach_dem_Bezug_
-        param_16 = arcpy.Parameter()
+        param_16 = params.ew_je_we_mfh = arcpy.Parameter()
         param_16.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Mehrfamilienh\xe4usern__kurz_nach_dem_Bezug_'
         param_16.displayName = u'Mittlere Anzahl Einwohner pro WE in Mehrfamilienh\xe4usern (kurz nach dem Bezug)'
         param_16.parameterType = 'Required'
@@ -225,7 +228,7 @@ class TbxNutzungen(Tbx):
         heading = "5) Wohnen - Zuzugsquote"
 
         # Wie_viel_Prozent_der_Bewohner_der_neuen_Wohnungen_werden_neu_in_die_Gemeinde_ziehen_
-        param_17 = arcpy.Parameter()
+        param_17 = params.zuzugsquote_ew = arcpy.Parameter()
         param_17.name = u'Wie_viel_Prozent_der_Bewohner_der_neuen_Wohnungen_werden_neu_in_die_Gemeinde_ziehen_'
         param_17.displayName = u'Wie viel Prozent der Bewohner der neuen Wohnungen werden neu in die Gemeinde ziehen?'
         param_17.parameterType = 'Required'
@@ -240,7 +243,7 @@ class TbxNutzungen(Tbx):
         heading = "6) Gewerbe - Gebietstyp und Brachenstruktur"
 
         # Gebietstyp_auswählen
-        param_18 = arcpy.Parameter()
+        param_18 = params.gebietstyp = arcpy.Parameter()
         param_18.name = u'Gebietstyp_ausw\xe4hlen'
         param_18.displayName = u'Gebietstyp ausw\xe4hlen'
         param_18.parameterType = 'Required'
@@ -251,7 +254,7 @@ class TbxNutzungen(Tbx):
         param_18.category = heading
 
         # Anteil_der_Arbeitsplätze_im_verarbeitenden_Gewerbe__in_Prozent_
-        param_19 = arcpy.Parameter()
+        param_19 = params.ant_jobs_verarb_gewerbe = arcpy.Parameter()
         param_19.name = u'Anteil_der_Arbeitspl\xe4tze_im_verarbeitenden_Gewerbe__in_Prozent_'
         param_19.displayName = u'Anteil der Arbeitspl\xe4tze im verarbeitenden Gewerbe (in Prozent)'
         param_19.parameterType = 'Required'
@@ -263,7 +266,7 @@ class TbxNutzungen(Tbx):
         param_19.category = heading
 
         # Anteil_der_Arbeitsplätze_im_Baugewerbe__in_Prozent_
-        param_20 = arcpy.Parameter()
+        param_20 = params.ant_jobs_baugewerbe = arcpy.Parameter()
         param_20.name = u'Anteil_der_Arbeitspl\xe4tze_im_Baugewerbe__in_Prozent_'
         param_20.displayName = u'Anteil der Arbeitspl\xe4tze im Baugewerbe (in Prozent)'
         param_20.parameterType = 'Required'
@@ -275,7 +278,7 @@ class TbxNutzungen(Tbx):
         param_20.category = heading
 
         # Anteil_der_Arbeitsplätze_im_Handel__inkl__Kfz___in_Prozent_
-        param_21 = arcpy.Parameter()
+        param_21 = params.ant_jobs_handel = arcpy.Parameter()
         param_21.name = u'Anteil_der_Arbeitspl\xe4tze_im_Handel__inkl__Kfz___in_Prozent_'
         param_21.displayName = u'Anteil der Arbeitspl\xe4tze im Handel (inkl. Kfz) (in Prozent)'
         param_21.parameterType = 'Required'
@@ -287,7 +290,7 @@ class TbxNutzungen(Tbx):
         param_21.category = heading
 
         # Anteil_der_Arbeitsplätze_im_Verkehrs-_und_Lagereibereich___in_Prozent_
-        param_22 = arcpy.Parameter()
+        param_22 = params.ant_jobs_logistik = arcpy.Parameter()
         param_22.name = u'Anteil_der_Arbeitspl\xe4tze_im_Verkehrs-_und_Lagereibereich___in_Prozent_'
         param_22.displayName = u'Anteil der Arbeitspl\xe4tze im Verkehrs- und Lagereibereich  (in Prozent)'
         param_22.parameterType = 'Required'
@@ -299,7 +302,7 @@ class TbxNutzungen(Tbx):
         param_22.category = heading
 
         # Anteil_der_Arbeitsplätze_im_Bereich_der_freiberuflichen__wissenschaftl__bzw__techn__Dienstleistungen__in_Prozent_
-        param_23 = arcpy.Parameter()
+        param_23 = params.ant_jobs_freiwisstech = arcpy.Parameter()
         param_23.name = u'Anteil_der_Arbeitspl\xe4tze_im_Bereich_der_freiberuflichen__wissenschaftl__bzw__techn__Dienstleistungen__in_Prozent_'
         param_23.displayName = u'Anteil der Arbeitspl\xe4tze im Bereich der freiberuflichen, wissenschaftl. bzw. techn. Dienstleistungen (in Prozent)'
         param_23.parameterType = 'Required'
@@ -311,7 +314,7 @@ class TbxNutzungen(Tbx):
         param_23.category = heading
 
         # Anteil_der_Arbeitsplätze_im_Bereich_sonstiger_Diensteistungen
-        param_24 = arcpy.Parameter()
+        param_24 = params.ant_jobs_sonst_dl = arcpy.Parameter()
         param_24.name = u'Anteil_der_Arbeitspl\xe4tze_im_Bereich_sonstiger_Diensteistungen'
         param_24.displayName = u'Anteil der Arbeitspl\xe4tze im Bereich sonstiger Diensteistungen'
         param_24.parameterType = 'Required'
@@ -326,7 +329,7 @@ class TbxNutzungen(Tbx):
         heading = "7) Gewerbe - Zuzugs- und Eigentumsquote"
 
         # Wie_viel_Prozent_der_Unternehmen_werden_neu_in_die_Gemeinde_ziehen_
-        param_25 = arcpy.Parameter()
+        param_25 = params.zuzugsquote_gewerbe = arcpy.Parameter()
         param_25.name = u'Wie_viel_Prozent_der_Unternehmen_werden_neu_in_die_Gemeinde_ziehen_'
         param_25.displayName = u'Wie viel Prozent der Unternehmen werden neu in die Gemeinde ziehen?'
         param_25.parameterType = 'Required'
@@ -338,9 +341,9 @@ class TbxNutzungen(Tbx):
         param_25.category = heading
 
         # Welcher_Anteil_der_Gebäude_ist_voraussichtlich_im_Eigentum_der_Unternehmen_
-        param_26 = arcpy.Parameter()
+        param_26 = params.ant_eigentum_gewerbe = arcpy.Parameter()
         param_26.name = encode(u'Welcher_Anteil_der_Geb\xe4ude_ist_voraussichtlich_im_Eigentum_der_Unternehmen_')
-        param_26.displayName = encodeu('Welcher Anteil der Geb\xe4ude ist voraussichtlich im Eigentum der Unternehmen?')
+        param_26.displayName = encode(u'Welcher Anteil der Geb\xe4ude ist voraussichtlich im Eigentum der Unternehmen?')
         param_26.parameterType = 'Required'
         param_26.direction = 'Input'
         param_26.datatype = u'Long'
@@ -352,7 +355,7 @@ class TbxNutzungen(Tbx):
         heading = "8) Einzelhandel (nur Lebensmitteleinzelhandel)"
 
         # Verkaufsfläche__in_Quadratmetern_
-        param_27 = arcpy.Parameter()
+        param_27 = params.verkaufsflaeche = arcpy.Parameter()
         param_27.name = encode(u'Verkaufsfl\xe4che__in_Quadratmetern_')
         param_27.displayName = encode(u'Verkaufsfl\xe4che (in Quadratmetern)')
         param_27.parameterType = 'Required'
@@ -363,19 +366,7 @@ class TbxNutzungen(Tbx):
         param_27.filter.list = [0, 20000]
         param_27.category = heading
 
-        parameters= [param_1, param_2, param_3, param_4, param_5, param_6,
-                     param_7, param_8, param_9, param_10, param_11, param_12,
-                     param_13, param_14, param_15, param_16, param_17,
-                     param_18, param_19, param_20, param_21, param_22,
-                     param_23, param_24, param_25, param_26, param_27]
-
-        # set params until better names are provided
-        for i, param in enumerate(parameters):
-            self.par['param_'.format(i+1)] = param
-
-        self.updateParameters(parameters)
-
-        return parameters
+        return params
 
     def _updateParameters(self, params):
         """Modify the values and properties of parameters before internal
@@ -384,8 +375,8 @@ class TbxNutzungen(Tbx):
 
         def eingaben_auslesen():
 
-            projectname = self.par[0].value
-            teilflaeche = self.par[1].value
+            projectname = self.par.projectname.value
+            teilflaeche = self.par.teilflaeche.value
 
             tablepath_flaechenbilanz = self.folders.get_table('Wohneinheiten_Details')
             tabelle_gebaude = self.folders.get_table('Gebaeude_Details')
@@ -479,10 +470,6 @@ class TbxNutzungen(Tbx):
 
             return
 
-        tbx_path = __file__
-        base_path = os.path.dirname(tbx_path)
-        base_path = os.path.dirname(base_path)
-        base_path = os.path.dirname(base_path) # erzeugt Pfad zum Ordner, in dem Script liegt
 
     # Gebietstyp auswählen
         i=17
@@ -553,18 +540,3 @@ class TbxNutzungen(Tbx):
                 sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
 
         return
-
-
-def main():
-    tbx = Toolbox()
-    tool = Flaechenbilanz()
-    tool.execute(tool.getParameterInfo(), None)
-    tool = Nutzungen()
-    tool.execute(tool.getParameterInfo(), None)
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--debug', action="store_true")
-    options = parser.parse_args()
-    if options.debug:
-        main()

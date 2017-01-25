@@ -11,8 +11,6 @@ from rpctools.definitions.projektverwaltung.teilflaeche_benennen import Teilflae
 class TbxTeilflaecheBenennen(Tbx):
     """Toolbox to name Teilflächen"""
     
-    _param_projectname = 'project'
-
     @property
     def label(self):
         return u'2 Teilflaechen verwalten'

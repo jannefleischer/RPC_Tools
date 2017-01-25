@@ -15,7 +15,6 @@ from os import listdir
 from os.path import join, isdir, abspath, dirname, basename
 
 TEST_TMP_PROJECT = '__unittest__'
-TEST_TEMPLATE = 'Test_Template'
 
 ########################################################################
 class Folders(object):
@@ -29,7 +28,7 @@ class Folders(object):
         self._TEMPLATE_BASE_PATH = 'templates'
         self._TEMPLATE_FLAECHEN = 'projektflaechen_template.shp'
         self._PROJECT_TEMPLATE = 'Template'
-        self._TEST_TEMPLATE = TEST_TEMPLATE
+        self._TEST_TEMPLATE = 'Test_Template'
         self._TEST_TMP_PROJECT = TEST_TMP_PROJECT
         self._AUSGABE_PATH = 'Ergebnisausgabe'
         self._TEXTE = 'texte'
@@ -93,15 +92,11 @@ class Folders(object):
     def get_projects(self):
         '''
         returns all available projects inside the project folder
-        (except the template and temp. projects which are not meant to be edited)
+        (except the temp. projects which are not meant to be edited)
         '''
         subfolders = [f for f in listdir(self.PROJECT_BASE_PATH)
                       if isdir(self.get_projectpath(f))
-                      and f not in [self._PROJECT_TEMPLATE,
-                                    self._TEST_TEMPLATE,
-                                    self._TEST_TMP_PROJECT
-                                    ]
-                      ]
+                      and f != self._TEST_TMP_PROJECT]
         return sorted(subfolders)
 
     def get_projectpath(self, project=None):
