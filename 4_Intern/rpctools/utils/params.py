@@ -62,7 +62,7 @@ class Params(object):
         >>> params.param1
         Traceback (most recent call last):
             ...
-        KeyError: 'param1'
+        AttributeError: Attribute param1 not found in Params-instance. Available attributes are ['param2', 'param3']
         >>> params[0]
         42
         >>> params[1]

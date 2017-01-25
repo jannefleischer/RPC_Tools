@@ -14,6 +14,8 @@
 from os import listdir
 from os.path import join, isdir, abspath, dirname, basename
 
+TEST_TMP_PROJECT = '__unittest__'
+TEST_TEMPLATE = 'Test_Template'
 
 ########################################################################
 class Folders(object):
@@ -27,8 +29,8 @@ class Folders(object):
         self._TEMPLATE_BASE_PATH = 'templates'
         self._TEMPLATE_FLAECHEN = 'projektflaechen_template.shp'
         self._PROJECT_TEMPLATE = 'Template'
-        self._TEST_TEMPLATE = 'Test_Template'
-        self._TEST_TMP_PROJECT = '__unittest__'
+        self._TEST_TEMPLATE = TEST_TEMPLATE
+        self._TEST_TMP_PROJECT = TEST_TMP_PROJECT
         self._AUSGABE_PATH = 'Ergebnisausgabe'
         self._TEXTE = 'texte'
         self._MXDS = 'mxds'
