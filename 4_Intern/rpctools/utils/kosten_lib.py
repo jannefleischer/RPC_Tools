@@ -17,13 +17,11 @@
 # Allgemeine Funktionen
 #
 
-import sys, os, arcpy
+import sys, arcpy
+from os.path import join
 
-def kostenregel_anlegen(name,gemeinden,kreis,private):
-    # Create Paths
-    base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    kosten_tool = join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
-    kostenaufteilungsregel_tabelle = join(kosten_tool,'T01DEF_Kostenaufteilungsregeln')
+def kostenregel_anlegen(name, gemeinden, kreis, private,
+                        kostenaufteilungsregel_tabelle):
 
     #gemeinden
     rows = arcpy.InsertCursor(kostenaufteilungsregel_tabelle)
@@ -61,11 +59,8 @@ def kostenregel_anlegen(name,gemeinden,kreis,private):
     del rows
 
 
-def kostenregel_bearbeiten(name,gemeinden,kreis,private):
-    # Create Paths
-    base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    kosten_tool = join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
-    kostenaufteilungsregel_tabelle = join(kosten_tool,'T01DEF_Kostenaufteilungsregeln')
+def kostenregel_bearbeiten(name,gemeinden,kreis,private,
+                           kostenaufteilungsregel_tabelle):
 
     # Step 1 - delete rule
     rows = arcpy.UpdateCursor(kostenaufteilungsregel_tabelle)
@@ -110,14 +105,8 @@ def kostenregel_bearbeiten(name,gemeinden,kreis,private):
     #
     del row, rows
 
-def kostenregel_loeschen(name):
-    # Create Paths
-    base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    kosten_tool = join(base_path,'2_Tool',"A_Infrastrukturkosten","FGDB_Kosten_Tool.gdb")
-    kostenaufteilungsregel_tabelle = join(kosten_tool,'T01DEF_Kostenaufteilungsregeln')
-
+def kostenregel_loeschen(name, kostenaufteilungsregel_tabelle):
     rows = arcpy.UpdateCursor(kostenaufteilungsregel_tabelle)
-
     for row in rows:
         # Delete all rows that have a roads type of 4
         if row.Kostenregelname == name:

@@ -12,16 +12,17 @@
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 
+import arcpy
+import pyodbc
+import shutil
+import gc
+import os
+import sys
+from os.path import join
 
 def temp_mdb(eingangstabellen,sql,ausgabetabelle):
     # funktionsweise: kopiere tabellen aus einer gegebenen liste in eine temporäre PGDB, fuere sql-code auf diesen tabellen aus und kopiere das ergebnis zurueck
 
-    import arcpy
-    import pyodbc
-    import shutil
-    import gc
-    import os
-    import sys
 
     arcpy.env.overwriteOutput = True
 

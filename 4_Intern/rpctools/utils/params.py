@@ -15,11 +15,11 @@ class Message(object):
     def addMessage(self, message):
         arcpy.AddMessage(message)
         print(message)
-        
+
     def addErrorMessage(self, message):
         arcpy.AddError(message)
         print(message)
-        
+
     def addWarningMessage(self, message):
         arcpy.AddWarning(message)
         print(message)
@@ -34,11 +34,11 @@ class Message(object):
     def AddMessage(self, message):
         arcpy.AddMessage(message)
         print(message)
-        
+
     def AddErrorMessage(self, message):
         arcpy.AddError(message)
         print(message)
-        
+
     def AddWarningMessage(self, message):
         arcpy.AddWarning(message)
         print(message)
@@ -57,8 +57,8 @@ class Singleton(type):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
-    
-    
+
+
 class Params(object):
     """Parameter class like an ordered dict"""
 
@@ -116,6 +116,12 @@ class Params(object):
         123
         >>> params.param3
         123
+        >>> params.param4 = 444
+        >>> params.param5 = 555
+        >>> params[:2]
+        [123, 444]
+        >>> params[1:3]
+        [444, 555]
         """
         self._od = OrderedDict(*args, **kwargs)
         self._param_projectname = param_projectname
@@ -159,6 +165,9 @@ class Params(object):
 
     def __len__(self):
         return len(self._od)
+
+    def __getslice__(self, start, stop):
+        return self._od.values().__getslice__(start, stop)
 
     def __repr__(self):
         ret = self._od.items()
@@ -223,7 +232,7 @@ class Tbx(object):
     """Base Class for a ArcGIS Toolbox"""
     __metaclass__ = ABCMeta
     __metaclass__ = Singleton
-    
+
     @abstractproperty
     def Tool(self):
         """
@@ -240,8 +249,8 @@ class Tbx(object):
 
     def __init__(self):
         # reload the tool's module
-        #reload(sys.modules[self.Tool.__module__])
-        
+        reload(sys.modules[self.Tool.__module__])
+
         # the parameters
         self.par = Params(param_projectname=self.Tool._param_projectname,
                           dbname=self.Tool._dbname)
@@ -257,7 +266,7 @@ class Tbx(object):
         Define the Parameters and return a list or Params()-instance with the
         parameter
         """
-        
+
     def getParameterInfo(self):
         """
         Define the Parameters and return a list or Params()-instance with the
@@ -286,12 +295,13 @@ class Tbx(object):
 
     def execute(self, parameters=None, messages=None):
         """Run the tool with the parameters and messages from ArcGIS"""
-        self.tool.main(self.par, parameters, messages)      
-        
+        self.tool.main(self.par, parameters, messages)
+
     def print_test_parameters(self):
-        self._getParameterInfo()
+        params = self._getParameterInfo()
+        self._updateParameters(params)
         category = None
-        for k, v in self.par._od.iteritems():            
+        for k, v in self.par._od.iteritems():
             if v.category and v.category != category:
                 category = v.category
                 print(u'### {} ###'.format(v.category))
@@ -299,15 +309,15 @@ class Tbx(object):
             if isinstance(value, (str, unicode)):
                 value = u"'{}'".format(value)
             print (u'params.{k}.value = {v}'.format(v=value, k=k))
-            
-    def print_default_parameters(self):
-        self._getParameterInfo()
+
+    def print_tool_parameters(self):
+        params = self._getParameterInfo()
         category = None
-        for k, v in self.par._od.iteritems():            
+        for k, v in self.par._od.iteritems():
             if v.category and v.category != category:
                 category = v.category
                 print(u'### {} ###'.format(v.category))
-            print (u'{k} = self.par.{k}.value'.format(k=k)) 
+            print (u'{k} = self.par.{k}.value'.format(k=k))
 
 if __name__ == '__main__':
     import doctest

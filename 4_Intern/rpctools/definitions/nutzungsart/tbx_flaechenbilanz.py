@@ -235,7 +235,7 @@ class TbxFlaechenbilanz(Tbx):
 
     def eingaben_auslesen(self):
         params = self.par
-        projectname = params.name.value
+        projectname = params.projectname.value
         teilflaeche = params.teilflaeche.value
         tablepath_teilflaechen = self.tool.teilflaechen
         tablepath_flaechenbilanz = self.tool.flaechenbilanz
@@ -320,7 +320,7 @@ class TbxFlaechenbilanz(Tbx):
         has been changed."""
 
         # Auswahl Teilfläche
-        if params.name.altered and not params.name.hasBeenValidated:
+        if params.projectname.altered and not params.projectname.hasBeenValidated:
             #projectname = params.name.value
             #self.folders.project = projectname
 

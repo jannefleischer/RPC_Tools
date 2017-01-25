@@ -18,7 +18,6 @@ class Nutzungen(Tool):
 
         parameters = self.par
         messages = self.mes
-        arcpy.AddMessage(messages.__class__)
 
         projectname = self.par.projectname.value
         teilflaeche = self.par.teilflaeche.value

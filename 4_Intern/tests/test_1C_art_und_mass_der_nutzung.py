@@ -29,6 +29,8 @@ def tbx_nutzungen(test_name):
     tbx.par.projectname.value = test_name
     return tbx
 
+### copy the test template to the test project (if passed as test argument) ###
+
 @pytest.fixture(scope='module')
 def setup_template(tbx_bilanz):
     setup_template_dir(tbx_bilanz)
@@ -40,12 +42,11 @@ def flaechenname():
     return 'Flaeche_1'
 
 @pytest.fixture
-def params_bilanz(tbx_bilanz, flaechenname, test_name):
+def params_bilanz(tbx_bilanz, flaechenname):
     params = tbx_bilanz.par
-    params.teilflaeche.value = flaechenname    
-    params.projectname.value = test_name
+    params.teilflaeche.value = flaechenname
     params.startjahr.value = 2017
-    
+
     ### 01_Generelle Flächenaufteilung ###
     params.ant_verkehrsfl.value = 10
     params.ant_gruenfl.value = 10
@@ -64,16 +65,15 @@ def params_bilanz(tbx_bilanz, flaechenname, test_name):
     params.strassenbegleitgruen.value = 10
     params.ausgleich_ersatz.value = 10
     params.allg_gruen.value = 70
-    
+
     return params
 
 @pytest.fixture
-def params_nutzungen(tbx_nutzungen, flaechenname, test_name):
+def params_nutzungen(tbx_nutzungen, flaechenname):
     params = tbx_nutzungen.par
-    params.teilflaeche.value = flaechenname   
-    params.projectname.value = test_name
+    params.teilflaeche.value = flaechenname
     params.beginn_aufsiedlung.value = 2017
-    
+
     ### 1) Aufsiedlungszeitraum ###
     params.dauer_aufsiedlung.value = 5
     ### 2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen ###
@@ -105,18 +105,18 @@ def params_nutzungen(tbx_nutzungen, flaechenname, test_name):
     params.zuzugsquote_gewerbe.value = 80
     params.ant_eigentum_gewerbe.value = 100
     ### 8) Einzelhandel (nur Lebensmitteleinzelhandel) ###
-    params.verkaufsflaeche.value = 2000    
-    
+    params.verkaufsflaeche.value = 2000
+
     return params
-    
-### Tests (with the above defined parameter-functions as arguments) ### 
-    
+
+### Tests (with the above defined parameter-functions as arguments) ###
+
 def test_bilanz(tbx_bilanz, params_bilanz, setup_template):
     Flaechenbilanz(params_bilanz).run()
-    
+
 def test_nutzung(tbx_nutzungen, params_nutzungen, setup_template):
     Nutzungen(params_nutzungen).run()
 
 if __name__ == '__main__':
-    pytest.main([__file__, '-v', '--setup-show'])
+    pytest.main([__file__, '-v'])
 
