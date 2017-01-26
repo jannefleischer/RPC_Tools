@@ -65,6 +65,7 @@
 <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">listdir</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">basename</span>
 
+<span class="n">TEST_TMP_PROJECT</span> <span class="o">=</span> <span class="s1">&#39;__unittest__&#39;</span>
 
 <span class="c1">########################################################################</span>
 <div class="viewcode-block" id="Folders"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.config.html#rpctools.utils.config.Folders">[docs]</a><span class="k">class</span> <span class="nc">Folders</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -72,14 +73,14 @@
 <div class="viewcode-block" id="Folders.__init__"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.config.html#rpctools.utils.config.Folders.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;class that returns path&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">BASE_PATH</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_PROJECT_FOLDER</span> <span class="o">=</span> <span class="s1">&#39;3_Projekte&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_PROJECT_BASE_PATH</span> <span class="o">=</span> <span class="s1">&#39;3_Projekte&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_INTERN</span> <span class="o">=</span> <span class="s1">&#39;4_Intern&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_BASE_DBS</span> <span class="o">=</span> <span class="s1">&#39;fgdbs&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_TEMPLATE_FOLDER</span> <span class="o">=</span> <span class="s1">&#39;templates&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_TEMPLATE_BASE_PATH</span> <span class="o">=</span> <span class="s1">&#39;templates&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_TEMPLATE_FLAECHEN</span> <span class="o">=</span> <span class="s1">&#39;projektflaechen_template.shp&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_PROJECT_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;Template&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_TEST_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;Test_Template&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_TEST_TMP_PROJECT</span> <span class="o">=</span> <span class="s1">&#39;__unittest__&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_TEST_TMP_PROJECT</span> <span class="o">=</span> <span class="n">TEST_TMP_PROJECT</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_AUSGABE_PATH</span> <span class="o">=</span> <span class="s1">&#39;Ergebnisausgabe&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_TEXTE</span> <span class="o">=</span> <span class="s1">&#39;texte&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_MXDS</span> <span class="o">=</span> <span class="s1">&#39;mxds&#39;</span>
@@ -109,48 +110,44 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">MXDS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">INTERN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MXDS</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_BASE_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MXDS</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">TEXTE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">INTERN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TEXTE</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">PROJECT_FOLDER</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BASE_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PROJECT_FOLDER</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">PROJECT_BASE_PATH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BASE_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PROJECT_BASE_PATH</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">TEMPLATE_FOLDER</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BASE_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_INTERN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TEMPLATE_FOLDER</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">TEMPLATE_BASE_PATH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BASE_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_INTERN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TEMPLATE_BASE_PATH</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">TEMPLATE_FLAECHEN</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_FOLDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TEMPLATE_FLAECHEN</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_BASE_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TEMPLATE_FLAECHEN</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">PROJECT_TEMPLATE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_FOLDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PROJECT_TEMPLATE</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_BASE_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PROJECT_TEMPLATE</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">TEST_TEMPLATE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_FOLDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TEST_TEMPLATE</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_BASE_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TEST_TEMPLATE</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">TEST_TMP_PROJECT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT_FOLDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TEST_TMP_PROJECT</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT_BASE_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TEST_TMP_PROJECT</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Folders.get_projects"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.config.html#rpctools.utils.config.Folders.get_projects">[docs]</a>    <span class="k">def</span> <span class="nf">get_projects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        returns all available projects inside the project folder</span>
-<span class="sd">        (except the template and temp. projects which are not meant to be edited)</span>
+<span class="sd">        (except the temp. projects which are not meant to be edited)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">subfolders</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT_FOLDER</span><span class="p">)</span>
+        <span class="n">subfolders</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT_BASE_PATH</span><span class="p">)</span>
                       <span class="k">if</span> <span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_projectpath</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
-                      <span class="ow">and</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_PROJECT_TEMPLATE</span><span class="p">,</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">_TEST_TEMPLATE</span><span class="p">,</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">_TEST_TMP_PROJECT</span>
-                                    <span class="p">]</span>
-                      <span class="p">]</span>
+                      <span class="ow">and</span> <span class="n">f</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TEST_TMP_PROJECT</span><span class="p">]</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">subfolders</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Folders.get_projectpath"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.config.html#rpctools.utils.config.Folders.get_projectpath">[docs]</a>    <span class="k">def</span> <span class="nf">get_projectpath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -167,7 +164,7 @@
 <span class="sd">            the full path of the Project folder</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">projectname</span> <span class="o">=</span> <span class="n">project</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">project</span>
-        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT_FOLDER</span><span class="p">,</span> <span class="n">projectname</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECT_BASE_PATH</span><span class="p">,</span> <span class="n">projectname</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">PROJECT_PATH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -254,7 +251,8 @@
 <span class="sd">            the full path to the table in the Base FileGeodatabase</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dbname</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="n">fgdb</span><span class="p">)</span>
-        <span class="n">table</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_basedb</span><span class="p">(</span><span class="n">dbname</span><span class="p">),</span> <span class="n">table</span><span class="p">)</span></div></div>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_basedb</span><span class="p">(</span><span class="n">dbname</span><span class="p">),</span> <span class="n">table</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">table</span></div></div>
 </pre></div>
 
           </div>
@@ -291,7 +289,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, GGR, ILS.
-      Last updated on Jan 22, 2017.
+      Last updated on Jan 26, 2017.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>

@@ -83,16 +83,22 @@
 <td>Run the tool with the parameters and messages from ArcGIS</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.getParameterInfo" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.getParameterInfo"><code class="xref py py-obj docutils literal"><span class="pre">getParameterInfo</span></code></a>()</td>
-<td></td>
+<td>Define the Parameters and return a list or Params()-instance with the</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.isLicensed" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.isLicensed"><code class="xref py py-obj docutils literal"><span class="pre">isLicensed</span></code></a>()</td>
-<td></td>
+<td>If toolbox is licenced</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.print_test_parameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.print_test_parameters"><code class="xref py py-obj docutils literal"><span class="pre">print_test_parameters</span></code></a>()</td>
+<td>Print the parameters to use in tests</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.print_tool_parameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.print_tool_parameters"><code class="xref py py-obj docutils literal"><span class="pre">print_tool_parameters</span></code></a>()</td>
+<td>Print the parameters to use in a Tool</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.updateMessages" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.updateMessages"><code class="xref py py-obj docutils literal"><span class="pre">updateMessages</span></code></a>(parameters)</td>
-<td></td>
+<td>The updateMessages-method called by ArcGIS</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.updateParameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.updateParameters"><code class="xref py py-obj docutils literal"><span class="pre">updateParameters</span></code></a>(parameters)</td>
-<td>Update the Parameters if something changed</td>
+<td>The updateParameters-method called by ArcGIS</td>
 </tr>
 </tbody>
 </table>
@@ -102,41 +108,108 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer._getParameterInfo">
+<code class="descname">_getParameterInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer._getParameterInfo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer._updateMessages">
 <code class="descname">_updateMessages</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer._updateMessages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to define in the subclass</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer._updateParameters">
 <code class="descname">_updateParameters</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer._updateParameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the Parameters if something changed</p>
+<p>To define in the subclass</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.execute">
 <code class="descname">execute</code><span class="sig-paren">(</span><em>parameters=None</em>, <em>messages=None</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the tool with the parameters and messages from ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parameters</strong> : list of ArcGIS-Parameters</p>
+<p class="last"><strong>messages</strong> : the message-object of ArcGIS</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.getParameterInfo">
 <code class="descname">getParameterInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.getParameterInfo" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Define the Parameters and return a list or Params()-instance with the
+parameter</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.isLicensed">
 <code class="descname">isLicensed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.isLicensed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>If toolbox is licenced</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.print_test_parameters">
+<code class="descname">print_test_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.print_test_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the parameters to use in tests</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tbx</span><span class="o">.</span><span class="n">print_test_parameters</span><span class="p">()</span>
+<span class="go">### Category 1 ###</span>
+<span class="go">params.param_1.value = 123</span>
+<span class="go">params.param_2.value = 456</span>
+<span class="go">### Category 2 ###</span>
+<span class="go">params.param_3.value = &#39;DefaultString&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.print_tool_parameters">
+<code class="descname">print_tool_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.print_tool_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the parameters to use in a Tool</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tbx</span><span class="o">.</span><span class="n">print_tool_parameters</span><span class="p">()</span>
+<span class="go">### Category 1 ###</span>
+<span class="go">param_1 = params.param_1.value</span>
+<span class="go">param_2 = params.param_2.value</span>
+<span class="go">### Category 2 ###</span>
+<span class="go">param_3 = params.param_3.value</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.updateMessages">
 <code class="descname">updateMessages</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.updateMessages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The updateMessages-method called by ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> : list of ArcGIS-Parameters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.updateParameters">
 <code class="descname">updateParameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxEinkommenssteuer.updateParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the Parameters if something changed</p>
+<dd><p>The updateParameters-method called by ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> : list of ArcGIS-Parameters</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -182,16 +255,22 @@
 <td>Run the tool with the parameters and messages from ArcGIS</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.getParameterInfo" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.getParameterInfo"><code class="xref py py-obj docutils literal"><span class="pre">getParameterInfo</span></code></a>()</td>
-<td></td>
+<td>Define the Parameters and return a list or Params()-instance with the</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.isLicensed" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.isLicensed"><code class="xref py py-obj docutils literal"><span class="pre">isLicensed</span></code></a>()</td>
-<td></td>
+<td>If toolbox is licenced</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.print_test_parameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.print_test_parameters"><code class="xref py py-obj docutils literal"><span class="pre">print_test_parameters</span></code></a>()</td>
+<td>Print the parameters to use in tests</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.print_tool_parameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.print_tool_parameters"><code class="xref py py-obj docutils literal"><span class="pre">print_tool_parameters</span></code></a>()</td>
+<td>Print the parameters to use in a Tool</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.updateMessages" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.updateMessages"><code class="xref py py-obj docutils literal"><span class="pre">updateMessages</span></code></a>(parameters)</td>
-<td></td>
+<td>The updateMessages-method called by ArcGIS</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.updateParameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.updateParameters"><code class="xref py py-obj docutils literal"><span class="pre">updateParameters</span></code></a>(parameters)</td>
-<td>Update the Parameters if something changed</td>
+<td>The updateParameters-method called by ArcGIS</td>
 </tr>
 </tbody>
 </table>
@@ -201,41 +280,108 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich._getParameterInfo">
+<code class="descname">_getParameterInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich._getParameterInfo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich._updateMessages">
 <code class="descname">_updateMessages</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich._updateMessages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to define in the subclass</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich._updateParameters">
 <code class="descname">_updateParameters</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich._updateParameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the Parameters if something changed</p>
+<p>To define in the subclass</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.execute">
 <code class="descname">execute</code><span class="sig-paren">(</span><em>parameters=None</em>, <em>messages=None</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the tool with the parameters and messages from ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parameters</strong> : list of ArcGIS-Parameters</p>
+<p class="last"><strong>messages</strong> : the message-object of ArcGIS</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.getParameterInfo">
 <code class="descname">getParameterInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.getParameterInfo" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Define the Parameters and return a list or Params()-instance with the
+parameter</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.isLicensed">
 <code class="descname">isLicensed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.isLicensed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>If toolbox is licenced</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.print_test_parameters">
+<code class="descname">print_test_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.print_test_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the parameters to use in tests</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tbx</span><span class="o">.</span><span class="n">print_test_parameters</span><span class="p">()</span>
+<span class="go">### Category 1 ###</span>
+<span class="go">params.param_1.value = 123</span>
+<span class="go">params.param_2.value = 456</span>
+<span class="go">### Category 2 ###</span>
+<span class="go">params.param_3.value = &#39;DefaultString&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.print_tool_parameters">
+<code class="descname">print_tool_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.print_tool_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the parameters to use in a Tool</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tbx</span><span class="o">.</span><span class="n">print_tool_parameters</span><span class="p">()</span>
+<span class="go">### Category 1 ###</span>
+<span class="go">param_1 = params.param_1.value</span>
+<span class="go">param_2 = params.param_2.value</span>
+<span class="go">### Category 2 ###</span>
+<span class="go">param_3 = params.param_3.value</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.updateMessages">
 <code class="descname">updateMessages</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.updateMessages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The updateMessages-method called by ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> : list of ArcGIS-Parameters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.updateParameters">
 <code class="descname">updateParameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxFamilienleistungsausgleich.updateParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the Parameters if something changed</p>
+<dd><p>The updateParameters-method called by ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> : list of ArcGIS-Parameters</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -281,16 +427,22 @@
 <td>Run the tool with the parameters and messages from ArcGIS</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.getParameterInfo" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.getParameterInfo"><code class="xref py py-obj docutils literal"><span class="pre">getParameterInfo</span></code></a>()</td>
-<td></td>
+<td>Define the Parameters and return a list or Params()-instance with the</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.isLicensed" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.isLicensed"><code class="xref py py-obj docutils literal"><span class="pre">isLicensed</span></code></a>()</td>
-<td></td>
+<td>If toolbox is licenced</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.print_test_parameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.print_test_parameters"><code class="xref py py-obj docutils literal"><span class="pre">print_test_parameters</span></code></a>()</td>
+<td>Print the parameters to use in tests</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.print_tool_parameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.print_tool_parameters"><code class="xref py py-obj docutils literal"><span class="pre">print_tool_parameters</span></code></a>()</td>
+<td>Print the parameters to use in a Tool</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.updateMessages" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.updateMessages"><code class="xref py py-obj docutils literal"><span class="pre">updateMessages</span></code></a>(parameters)</td>
-<td></td>
+<td>The updateMessages-method called by ArcGIS</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.updateParameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.updateParameters"><code class="xref py py-obj docutils literal"><span class="pre">updateParameters</span></code></a>(parameters)</td>
-<td>Update the Parameters if something changed</td>
+<td>The updateParameters-method called by ArcGIS</td>
 </tr>
 </tbody>
 </table>
@@ -300,41 +452,108 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA._getParameterInfo">
+<code class="descname">_getParameterInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA._getParameterInfo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA._updateMessages">
 <code class="descname">_updateMessages</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA._updateMessages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to define in the subclass</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA._updateParameters">
 <code class="descname">_updateParameters</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA._updateParameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the Parameters if something changed</p>
+<p>To define in the subclass</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.execute">
 <code class="descname">execute</code><span class="sig-paren">(</span><em>parameters=None</em>, <em>messages=None</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the tool with the parameters and messages from ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parameters</strong> : list of ArcGIS-Parameters</p>
+<p class="last"><strong>messages</strong> : the message-object of ArcGIS</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.getParameterInfo">
 <code class="descname">getParameterInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.getParameterInfo" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Define the Parameters and return a list or Params()-instance with the
+parameter</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.isLicensed">
 <code class="descname">isLicensed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.isLicensed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>If toolbox is licenced</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.print_test_parameters">
+<code class="descname">print_test_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.print_test_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the parameters to use in tests</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tbx</span><span class="o">.</span><span class="n">print_test_parameters</span><span class="p">()</span>
+<span class="go">### Category 1 ###</span>
+<span class="go">params.param_1.value = 123</span>
+<span class="go">params.param_2.value = 456</span>
+<span class="go">### Category 2 ###</span>
+<span class="go">params.param_3.value = &#39;DefaultString&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.print_tool_parameters">
+<code class="descname">print_tool_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.print_tool_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the parameters to use in a Tool</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tbx</span><span class="o">.</span><span class="n">print_tool_parameters</span><span class="p">()</span>
+<span class="go">### Category 1 ###</span>
+<span class="go">param_1 = params.param_1.value</span>
+<span class="go">param_2 = params.param_2.value</span>
+<span class="go">### Category 2 ###</span>
+<span class="go">param_3 = params.param_3.value</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.updateMessages">
 <code class="descname">updateMessages</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.updateMessages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The updateMessages-method called by ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> : list of ArcGIS-Parameters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.updateParameters">
 <code class="descname">updateParameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKFA.updateParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the Parameters if something changed</p>
+<dd><p>The updateParameters-method called by ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> : list of ArcGIS-Parameters</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -380,16 +599,22 @@
 <td>Run the tool with the parameters and messages from ArcGIS</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.getParameterInfo" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.getParameterInfo"><code class="xref py py-obj docutils literal"><span class="pre">getParameterInfo</span></code></a>()</td>
-<td></td>
+<td>Define the Parameters and return a list or Params()-instance with the</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.isLicensed" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.isLicensed"><code class="xref py py-obj docutils literal"><span class="pre">isLicensed</span></code></a>()</td>
-<td></td>
+<td>If toolbox is licenced</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.print_test_parameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.print_test_parameters"><code class="xref py py-obj docutils literal"><span class="pre">print_test_parameters</span></code></a>()</td>
+<td>Print the parameters to use in tests</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.print_tool_parameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.print_tool_parameters"><code class="xref py py-obj docutils literal"><span class="pre">print_tool_parameters</span></code></a>()</td>
+<td>Print the parameters to use in a Tool</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.updateMessages" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.updateMessages"><code class="xref py py-obj docutils literal"><span class="pre">updateMessages</span></code></a>(parameters)</td>
-<td></td>
+<td>The updateMessages-method called by ArcGIS</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.updateParameters" title="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.updateParameters"><code class="xref py py-obj docutils literal"><span class="pre">updateParameters</span></code></a>(parameters)</td>
-<td>Update the Parameters if something changed</td>
+<td>The updateParameters-method called by ArcGIS</td>
 </tr>
 </tbody>
 </table>
@@ -399,41 +624,108 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU._getParameterInfo">
+<code class="descname">_getParameterInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU._getParameterInfo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU._updateMessages">
 <code class="descname">_updateMessages</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU._updateMessages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to define in the subclass</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU._updateParameters">
 <code class="descname">_updateParameters</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU._updateParameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the Parameters if something changed</p>
+<p>To define in the subclass</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.execute">
 <code class="descname">execute</code><span class="sig-paren">(</span><em>parameters=None</em>, <em>messages=None</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the tool with the parameters and messages from ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parameters</strong> : list of ArcGIS-Parameters</p>
+<p class="last"><strong>messages</strong> : the message-object of ArcGIS</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.getParameterInfo">
 <code class="descname">getParameterInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.getParameterInfo" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Define the Parameters and return a list or Params()-instance with the
+parameter</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.isLicensed">
 <code class="descname">isLicensed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.isLicensed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>If toolbox is licenced</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.print_test_parameters">
+<code class="descname">print_test_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.print_test_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the parameters to use in tests</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tbx</span><span class="o">.</span><span class="n">print_test_parameters</span><span class="p">()</span>
+<span class="go">### Category 1 ###</span>
+<span class="go">params.param_1.value = 123</span>
+<span class="go">params.param_2.value = 456</span>
+<span class="go">### Category 2 ###</span>
+<span class="go">params.param_3.value = &#39;DefaultString&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.print_tool_parameters">
+<code class="descname">print_tool_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.print_tool_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the parameters to use in a Tool</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tbx</span><span class="o">.</span><span class="n">print_tool_parameters</span><span class="p">()</span>
+<span class="go">### Category 1 ###</span>
+<span class="go">param_1 = params.param_1.value</span>
+<span class="go">param_2 = params.param_2.value</span>
+<span class="go">### Category 2 ###</span>
+<span class="go">param_3 = params.param_3.value</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.updateMessages">
 <code class="descname">updateMessages</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.updateMessages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The updateMessages-method called by ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> : list of ArcGIS-Parameters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.updateParameters">
 <code class="descname">updateParameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen.TbxKRU.updateParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the Parameters if something changed</p>
+<dd><p>The updateParameters-method called by ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> : list of ArcGIS-Parameters</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -452,7 +744,7 @@
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen">
 <em class="property">class </em><code class="descclassname">rpctools.analyst.einnahmen.tbx_einnahmen.</code><code class="descname">_TbxEinnahmen</code><a class="reference internal" href="../_modules/rpctools/analyst/einnahmen/tbx_einnahmen.html#_TbxEinnahmen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="rpctools.utils.params.html#rpctools.utils.params.Tbx" title="rpctools.utils.params.Tbx"><code class="xref py py-class docutils literal"><span class="pre">rpctools.utils.params.Tbx</span></code></a></p>
-<p>Toolbox mit nur dem Parameter <a href="#id1"><span class="problematic" id="id2">`</span></a>name&#8217;</p>
+<p>Toolbox mit nur dem Parameter <em>name</em></p>
 <p class="rubric">Attributes</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -479,16 +771,22 @@
 <td>Run the tool with the parameters and messages from ArcGIS</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.getParameterInfo" title="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.getParameterInfo"><code class="xref py py-obj docutils literal"><span class="pre">getParameterInfo</span></code></a>()</td>
-<td></td>
+<td>Define the Parameters and return a list or Params()-instance with the</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.isLicensed" title="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.isLicensed"><code class="xref py py-obj docutils literal"><span class="pre">isLicensed</span></code></a>()</td>
-<td></td>
+<td>If toolbox is licenced</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.print_test_parameters" title="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.print_test_parameters"><code class="xref py py-obj docutils literal"><span class="pre">print_test_parameters</span></code></a>()</td>
+<td>Print the parameters to use in tests</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.print_tool_parameters" title="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.print_tool_parameters"><code class="xref py py-obj docutils literal"><span class="pre">print_tool_parameters</span></code></a>()</td>
+<td>Print the parameters to use in a Tool</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.updateMessages" title="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.updateMessages"><code class="xref py py-obj docutils literal"><span class="pre">updateMessages</span></code></a>(parameters)</td>
-<td></td>
+<td>The updateMessages-method called by ArcGIS</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.updateParameters" title="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.updateParameters"><code class="xref py py-obj docutils literal"><span class="pre">updateParameters</span></code></a>(parameters)</td>
-<td>Update the Parameters if something changed</td>
+<td>The updateParameters-method called by ArcGIS</td>
 </tr>
 </tbody>
 </table>
@@ -498,41 +796,108 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen._getParameterInfo">
+<code class="descname">_getParameterInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rpctools/analyst/einnahmen/tbx_einnahmen.html#_TbxEinnahmen._getParameterInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen._getParameterInfo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen._updateMessages">
 <code class="descname">_updateMessages</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen._updateMessages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to define in the subclass</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen._updateParameters">
 <code class="descname">_updateParameters</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen._updateParameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the Parameters if something changed</p>
+<p>To define in the subclass</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.execute">
 <code class="descname">execute</code><span class="sig-paren">(</span><em>parameters=None</em>, <em>messages=None</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the tool with the parameters and messages from ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parameters</strong> : list of ArcGIS-Parameters</p>
+<p class="last"><strong>messages</strong> : the message-object of ArcGIS</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.getParameterInfo">
-<code class="descname">getParameterInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rpctools/analyst/einnahmen/tbx_einnahmen.html#_TbxEinnahmen.getParameterInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.getParameterInfo" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">getParameterInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.getParameterInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the Parameters and return a list or Params()-instance with the
+parameter</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.isLicensed">
 <code class="descname">isLicensed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.isLicensed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>If toolbox is licenced</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.print_test_parameters">
+<code class="descname">print_test_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.print_test_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the parameters to use in tests</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tbx</span><span class="o">.</span><span class="n">print_test_parameters</span><span class="p">()</span>
+<span class="go">### Category 1 ###</span>
+<span class="go">params.param_1.value = 123</span>
+<span class="go">params.param_2.value = 456</span>
+<span class="go">### Category 2 ###</span>
+<span class="go">params.param_3.value = &#39;DefaultString&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.print_tool_parameters">
+<code class="descname">print_tool_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.print_tool_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the parameters to use in a Tool</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tbx</span><span class="o">.</span><span class="n">print_tool_parameters</span><span class="p">()</span>
+<span class="go">### Category 1 ###</span>
+<span class="go">param_1 = params.param_1.value</span>
+<span class="go">param_2 = params.param_2.value</span>
+<span class="go">### Category 2 ###</span>
+<span class="go">param_3 = params.param_3.value</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.updateMessages">
 <code class="descname">updateMessages</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.updateMessages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The updateMessages-method called by ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> : list of ArcGIS-Parameters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.updateParameters">
 <code class="descname">updateParameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#rpctools.analyst.einnahmen.tbx_einnahmen._TbxEinnahmen.updateParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the Parameters if something changed</p>
+<dd><p>The updateParameters-method called by ArcGIS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> : list of ArcGIS-Parameters</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -597,7 +962,7 @@ To be defined in the subclass</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, GGR, ILS.
-      Last updated on Jan 22, 2017.
+      Last updated on Jan 26, 2017.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>

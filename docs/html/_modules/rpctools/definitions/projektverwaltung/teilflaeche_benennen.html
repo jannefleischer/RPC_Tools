@@ -51,9 +51,8 @@
   <h1>Source code for rpctools.definitions.projektverwaltung.teilflaeche_benennen</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 
-
 <span class="kn">import</span> <span class="nn">arcpy</span>
-
+<span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">rpctools.utils.params</span> <span class="k">import</span> <span class="n">Tool</span>
 
@@ -115,7 +114,7 @@
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="TeilflaechenBenennen.rename_flaeche"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.teilflaeche_benennen.html#rpctools.definitions.projektverwaltung.teilflaeche_benennen.TeilflaechenBenennen.rename_flaeche">[docs]</a>    <span class="k">def</span> <span class="nf">rename_flaeche</span><span class="p">(</span><span class="n">path_definition</span><span class="p">,</span> <span class="n">tablename</span><span class="p">,</span>
                        <span class="n">attr</span><span class="p">,</span> <span class="n">alter_name</span><span class="p">,</span> <span class="n">neuer_name</span><span class="p">):</span>
-        <span class="n">table</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">path_definition</span><span class="p">,</span> <span class="n">tablename</span><span class="p">)</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_definition</span><span class="p">,</span> <span class="n">tablename</span><span class="p">)</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">==</span> <span class="n">alter_name</span><span class="p">:</span>
@@ -157,7 +156,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, GGR, ILS.
-      Last updated on Jan 22, 2017.
+      Last updated on Jan 26, 2017.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>

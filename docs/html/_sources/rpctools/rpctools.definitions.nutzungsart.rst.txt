@@ -6,9 +6,9 @@ Submodules
 
 .. toctree::
 
-   rpctools.definitions.nutzungsart.flaechen_bilanz
+   rpctools.definitions.nutzungsart.flaechenbilanz
    rpctools.definitions.nutzungsart.nutzungen
-   rpctools.definitions.nutzungsart.tbx_flaechen_bilanz
+   rpctools.definitions.nutzungsart.tbx_flaechenbilanz
    rpctools.definitions.nutzungsart.tbx_nutzungen
 
 Module contents

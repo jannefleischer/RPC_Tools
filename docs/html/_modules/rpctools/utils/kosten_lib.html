@@ -68,13 +68,11 @@
 <span class="c1"># Allgemeine Funktionen</span>
 <span class="c1">#</span>
 
-<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">arcpy</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">arcpy</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
 
-<div class="viewcode-block" id="kostenregel_anlegen"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.kosten_lib.html#rpctools.utils.kosten_lib.kostenregel_anlegen">[docs]</a><span class="k">def</span> <span class="nf">kostenregel_anlegen</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">gemeinden</span><span class="p">,</span><span class="n">kreis</span><span class="p">,</span><span class="n">private</span><span class="p">):</span>
-    <span class="c1"># Create Paths</span>
-    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># Pfad zum Basisverzeichnis RPC</span>
-    <span class="n">kosten_tool</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s2">&quot;A_Infrastrukturkosten&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Kosten_Tool.gdb&quot;</span><span class="p">)</span>
-    <span class="n">kostenaufteilungsregel_tabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">kosten_tool</span><span class="p">,</span><span class="s1">&#39;T01DEF_Kostenaufteilungsregeln&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="kostenregel_anlegen"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.kosten_lib.html#rpctools.utils.kosten_lib.kostenregel_anlegen">[docs]</a><span class="k">def</span> <span class="nf">kostenregel_anlegen</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">gemeinden</span><span class="p">,</span> <span class="n">kreis</span><span class="p">,</span> <span class="n">private</span><span class="p">,</span>
+                        <span class="n">kostenaufteilungsregel_tabelle</span><span class="p">):</span>
 
     <span class="c1">#gemeinden</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">kostenaufteilungsregel_tabelle</span><span class="p">)</span>
@@ -112,11 +110,8 @@
     <span class="k">del</span> <span class="n">rows</span></div>
 
 
-<div class="viewcode-block" id="kostenregel_bearbeiten"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.kosten_lib.html#rpctools.utils.kosten_lib.kostenregel_bearbeiten">[docs]</a><span class="k">def</span> <span class="nf">kostenregel_bearbeiten</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">gemeinden</span><span class="p">,</span><span class="n">kreis</span><span class="p">,</span><span class="n">private</span><span class="p">):</span>
-    <span class="c1"># Create Paths</span>
-    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># Pfad zum Basisverzeichnis RPC</span>
-    <span class="n">kosten_tool</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s2">&quot;A_Infrastrukturkosten&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Kosten_Tool.gdb&quot;</span><span class="p">)</span>
-    <span class="n">kostenaufteilungsregel_tabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">kosten_tool</span><span class="p">,</span><span class="s1">&#39;T01DEF_Kostenaufteilungsregeln&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="kostenregel_bearbeiten"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.kosten_lib.html#rpctools.utils.kosten_lib.kostenregel_bearbeiten">[docs]</a><span class="k">def</span> <span class="nf">kostenregel_bearbeiten</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">gemeinden</span><span class="p">,</span><span class="n">kreis</span><span class="p">,</span><span class="n">private</span><span class="p">,</span>
+                           <span class="n">kostenaufteilungsregel_tabelle</span><span class="p">):</span>
 
     <span class="c1"># Step 1 - delete rule</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">kostenaufteilungsregel_tabelle</span><span class="p">)</span>
@@ -161,14 +156,8 @@
     <span class="c1">#</span>
     <span class="k">del</span> <span class="n">row</span><span class="p">,</span> <span class="n">rows</span></div>
 
-<div class="viewcode-block" id="kostenregel_loeschen"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.kosten_lib.html#rpctools.utils.kosten_lib.kostenregel_loeschen">[docs]</a><span class="k">def</span> <span class="nf">kostenregel_loeschen</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="c1"># Create Paths</span>
-    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># Pfad zum Basisverzeichnis RPC</span>
-    <span class="n">kosten_tool</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s2">&quot;A_Infrastrukturkosten&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Kosten_Tool.gdb&quot;</span><span class="p">)</span>
-    <span class="n">kostenaufteilungsregel_tabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">kosten_tool</span><span class="p">,</span><span class="s1">&#39;T01DEF_Kostenaufteilungsregeln&#39;</span><span class="p">)</span>
-
+<div class="viewcode-block" id="kostenregel_loeschen"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.kosten_lib.html#rpctools.utils.kosten_lib.kostenregel_loeschen">[docs]</a><span class="k">def</span> <span class="nf">kostenregel_loeschen</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">kostenaufteilungsregel_tabelle</span><span class="p">):</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">kostenaufteilungsregel_tabelle</span><span class="p">)</span>
-
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
         <span class="c1"># Delete all rows that have a roads type of 4</span>
         <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">Kostenregelname</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
@@ -209,7 +198,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, GGR, ILS.
-      Last updated on Jan 22, 2017.
+      Last updated on Jan 26, 2017.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>

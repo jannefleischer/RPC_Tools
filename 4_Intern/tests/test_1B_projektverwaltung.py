@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from rpctools.definitions.projektverwaltung.tbx_projektverwaltung import TbxProjektVerwaltung
-from rpctools.definitions.projektverwaltung.tbx_teilflaechen_bennenen import TbxTeilflaecheBenennen
+from rpctools.definitions.projektverwaltung.tbx_teilflaechen_benennen import TbxTeilflaecheBenennen
 from rpctools.definitions.projektverwaltung.T1_Projektverwaltung import Projektverwaltung
 from rpctools.definitions.projektverwaltung.teilflaeche_benennen import TeilflaechenBenennen
 
@@ -20,7 +20,7 @@ def tbx_verwaltung():
 @pytest.fixture(scope='module')
 def tbx_flaeche():
     tbx = TbxTeilflaecheBenennen()
-    tbx._getParameterInfo()    
+    tbx.getParameterInfo()
     return tbx
 
 ### setup the parameters used in the tests ###
@@ -38,7 +38,7 @@ def params_verwaltung(tbx_verwaltung, test_name):
     params.existing_project.value = test_name
     params.shapefile.value = tbx_verwaltung.folders.TEMPLATE_FLAECHEN
     return params
-    
+
 @pytest.fixture
 def params_flaeche(tbx_flaeche, test_name, flaechenname):
     params = tbx_flaeche.par
@@ -47,8 +47,8 @@ def params_flaeche(tbx_flaeche, test_name, flaechenname):
     params.name.value = 'flaeche test neu'
     return params
 
-### ordered Tests (with the above defined parameter-functions as arguments) ### 
-    
+### ordered Tests (with the above defined parameter-functions as arguments) ###
+
 @pytest.mark.order1
 def test1_anlegen(tbx_verwaltung, params_verwaltung):
     remove_project_dir(tbx_verwaltung)
@@ -56,12 +56,12 @@ def test1_anlegen(tbx_verwaltung, params_verwaltung):
     Projektverwaltung(params_verwaltung).run()
 
 @pytest.mark.order2
-def test2_teilflaeche_benennen(params_flaeche):   
+def test2_teilflaeche_benennen(params_flaeche):
     TeilflaechenBenennen(params_flaeche).run()
     gc.collect()
 
 @pytest.mark.order3
-def test3_loeschen(params_verwaltung, mocked_map_document):        
+def test3_loeschen(params_verwaltung, mocked_map_document):
     params_verwaltung.action.value = "Bestehendes Projekt löschen"
     Projektverwaltung(params_verwaltung).run()
 

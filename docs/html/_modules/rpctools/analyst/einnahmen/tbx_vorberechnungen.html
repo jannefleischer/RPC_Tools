@@ -69,9 +69,10 @@
     <span class="k">def</span> <span class="nf">Tool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Vorberechnungen</span>
 
-<div class="viewcode-block" id="TbxVorberechnungen.getParameterInfo"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.tbx_vorberechnungen.html#rpctools.analyst.einnahmen.tbx_vorberechnungen.TbxVorberechnungen.getParameterInfo">[docs]</a>    <span class="k">def</span> <span class="nf">getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
+<div class="viewcode-block" id="TbxVorberechnungen._getParameterInfo"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.tbx_vorberechnungen.html#rpctools.analyst.einnahmen.tbx_vorberechnungen.TbxVorberechnungen._getParameterInfo">[docs]</a>    <span class="k">def</span> <span class="nf">_getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         
         <span class="n">par</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
+        <span class="n">projects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_projects</span><span class="p">()</span>
         <span class="c1"># Projektname</span>
         <span class="n">par</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Projektname&#39;</span>
@@ -79,7 +80,7 @@
         <span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
         <span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
         <span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
-        <span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">projects</span>
 
         <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;01 Nettozuzugsquoten (in %)&quot;</span>
 
@@ -133,7 +134,12 @@
         <span class="n">par</span><span class="o">.</span><span class="n">einzugsbereich_jobs</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
         <span class="n">par</span><span class="o">.</span><span class="n">einzugsbereich_jobs</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
-        <span class="k">return</span> <span class="n">par</span></div></div>
+        <span class="k">return</span> <span class="n">par</span></div>
+
+<div class="viewcode-block" id="TbxVorberechnungen._updateParameters"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.tbx_vorberechnungen.html#rpctools.analyst.einnahmen.tbx_vorberechnungen.TbxVorberechnungen._updateParameters">[docs]</a>    <span class="k">def</span> <span class="nf">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+         
+        <span class="n">projects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_projects</span><span class="p">()</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">projects</span></div></div>
 </pre></div>
 
           </div>
@@ -170,7 +176,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, GGR, ILS.
-      Last updated on Jan 22, 2017.
+      Last updated on Jan 26, 2017.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>

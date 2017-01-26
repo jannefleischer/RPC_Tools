@@ -167,3 +167,18 @@ class Messages(object):
     def addGPMessages(self):
         pass
 
+
+def AddMessage(message):
+    print(message)
+
+
+def AddWarning(message):
+    print(message)
+
+
+def AddError(message):
+    print(message)
+
+
+def AddIDMessage(message, message_ID, add_argument1=None, add_argument2=None):
+    print(message)

@@ -52,8 +52,11 @@
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
+
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">join</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
 
 <span class="kn">from</span> <span class="nn">rpctools.utils.params</span> <span class="k">import</span> <span class="n">Tbx</span>
 <span class="kn">from</span> <span class="nn">rpctools.utils.encoding</span> <span class="k">import</span> <span class="n">encode</span>
@@ -69,33 +72,33 @@
     <span class="k">def</span> <span class="nf">Tool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Nutzungen</span>
 
-<div class="viewcode-block" id="TbxNutzungen.getParameterInfo"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_nutzungen.html#rpctools.definitions.nutzungsart.tbx_nutzungen.TbxNutzungen.getParameterInfo">[docs]</a>    <span class="k">def</span> <span class="nf">getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TbxNutzungen._getParameterInfo"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_nutzungen.html#rpctools.definitions.nutzungsart.tbx_nutzungen.TbxNutzungen._getParameterInfo">[docs]</a>    <span class="k">def</span> <span class="nf">_getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Projekt</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
         <span class="n">projekte</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_projects</span><span class="p">()</span>
 
-        <span class="n">param_1</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
-        <span class="n">param_1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Projekt&#39;</span>
-        <span class="n">param_1</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Projekt&#39;</span>
-        <span class="n">param_1</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
-        <span class="n">param_1</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
-        <span class="n">param_1</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
-        <span class="n">param_1</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">projekte</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">projectname</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Projekt&#39;</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Projekt&#39;</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">projekte</span>
         <span class="k">if</span> <span class="n">projekte</span><span class="p">:</span>
-            <span class="n">param_1</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">projekte</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">param</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">projekte</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Teilfläche</span>
-        <span class="n">param_2</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
-        <span class="n">param_2</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Teilfl</span><span class="se">\xe4</span><span class="s1">che&#39;</span>
-        <span class="n">param_2</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Teilfl</span><span class="se">\xe4</span><span class="s1">che&#39;</span>
-        <span class="n">param_2</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
-        <span class="n">param_2</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
-        <span class="n">param_2</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
-        <span class="n">param_2</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">teilflaeche</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Teilfl</span><span class="se">\xe4</span><span class="s1">che&#39;</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Teilfl</span><span class="se">\xe4</span><span class="s1">che&#39;</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;1) Aufsiedlungszeitraum&quot;</span>
         <span class="c1"># Beginn_der_Aufsiedlung__Jahreszahl_</span>
-        <span class="n">param_3</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_3</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">beginn_aufsiedlung</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_3</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Beginn_der_Aufsiedlung__Jahreszahl_&#39;</span>
         <span class="n">param_3</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Beginn der Aufsiedlung (Jahreszahl)&#39;</span>
         <span class="n">param_3</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -107,7 +110,7 @@
         <span class="n">param_3</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span> <span class="o">+</span> <span class="mi">1</span>
 
         <span class="c1"># Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_</span>
-        <span class="n">param_4</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_4</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">dauer_aufsiedlung</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_4</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_&#39;</span>
         <span class="n">param_4</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Dauer der Aufsiedlung (Jahre, 1 = Aufsiedlung wird noch im Jahr des Aufsiedlungsbeginns abgeschlossen)&#39;</span>
         <span class="n">param_4</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -122,9 +125,9 @@
         <span class="n">heading</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s2">u&quot;2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen&quot;</span><span class="p">)</span>
 
         <span class="c1"># Anzahl_WE_in_Ein-_und_Zweifamilienhäusern</span>
-        <span class="n">param_5</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
-        <span class="n">param_5</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl_WE_in_Ein-_und_Zweifamilienh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
-        <span class="n">param_5</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl WE in Ein- und Zweifamilienh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
+        <span class="n">param_5</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">we_efh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_5</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl_WE_in_Einfamilienh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
+        <span class="n">param_5</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl WE in Einfamilienh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
         <span class="n">param_5</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
         <span class="n">param_5</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
         <span class="n">param_5</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
@@ -134,7 +137,7 @@
         <span class="n">param_5</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anzahl_WE_in_Doppelhäusern</span>
-        <span class="n">param_6</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_6</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">we_zfh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_6</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl_WE_in_Doppelh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
         <span class="n">param_6</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl WE in Doppelh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
         <span class="n">param_6</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -146,7 +149,7 @@
         <span class="n">param_6</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anzahl_WE_in_Reihenhäusern</span>
-        <span class="n">param_7</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_7</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">we_rh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_7</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl_WE_in_Reihenh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
         <span class="n">param_7</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl WE in Reihenh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
         <span class="n">param_7</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -158,7 +161,7 @@
         <span class="n">param_7</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anzahl_WE_in_Mehrfamilienhäusern</span>
-        <span class="n">param_8</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_8</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">we_mfh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_8</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl_WE_in_Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
         <span class="n">param_8</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anzahl WE in Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern&#39;</span>
         <span class="n">param_8</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -173,9 +176,9 @@
         <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;3) Wohnen - Anteile Eigentum und Miete&quot;</span>
 
         <span class="c1"># Anteil_Eigentümernutzung_in_Ein-_und_Zweifamilienhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_</span>
-        <span class="n">param_9</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
-        <span class="n">param_9</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung_in_Ein-_und_Zweifamilienh</span><span class="se">\xe4</span><span class="s1">usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_&#39;</span>
-        <span class="n">param_9</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung in Ein- und Zweifamilienh</span><span class="se">\xe4</span><span class="s1">usern (in %, Rest der Wohnungen werden durch Mieter genutzt)&#39;</span>
+        <span class="n">param_9</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_eigentum_efh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_9</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung_in_Einfamilienh</span><span class="se">\xe4</span><span class="s1">usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_&#39;</span>
+        <span class="n">param_9</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung in Einfamilienh</span><span class="se">\xe4</span><span class="s1">usern (in %, Rest der Wohnungen werden durch Mieter genutzt)&#39;</span>
         <span class="n">param_9</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
         <span class="n">param_9</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
         <span class="n">param_9</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
@@ -185,7 +188,7 @@
         <span class="n">param_9</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anteil_Eigentümernutzung_in_Doppelhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_</span>
-        <span class="n">param_10</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_10</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_eigentum_zfh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_10</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung_in_Doppelh</span><span class="se">\xe4</span><span class="s1">usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_&#39;</span>
         <span class="n">param_10</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung in Doppelh</span><span class="se">\xe4</span><span class="s1">usern (in %, Rest der Wohnungen werden durch Mieter genutzt)&#39;</span>
         <span class="n">param_10</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -197,7 +200,7 @@
         <span class="n">param_10</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anteil_Eigentümernutzung_in_Reihenhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_</span>
-        <span class="n">param_11</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_11</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_eigentum_rh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_11</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung_in_Reihenh</span><span class="se">\xe4</span><span class="s1">usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_&#39;</span>
         <span class="n">param_11</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung in Reihenh</span><span class="se">\xe4</span><span class="s1">usern (in %, Rest der Wohnungen werden durch Mieter genutzt)&#39;</span>
         <span class="n">param_11</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -209,7 +212,7 @@
         <span class="n">param_11</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anteil_Eigentümernutzung_in_Mehrfamilienhäusern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_</span>
-        <span class="n">param_12</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_12</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_eigentum_mfh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_12</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung_in_Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern__in____Rest_der_Wohnungen_werden_durch_Mieter_genutzt_&#39;</span>
         <span class="n">param_12</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil Eigent</span><span class="se">\xfc</span><span class="s1">mernutzung in Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern (in %, Rest der Wohnungen werden durch Mieter genutzt)&#39;</span>
         <span class="n">param_12</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -229,7 +232,7 @@
                 <span class="n">list_EwProWE</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;,&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; Bewohner pro Wohneinheit&quot;</span><span class="p">)</span>
 
         <span class="c1"># Mittlere_Anzahl_Einwohner_pro_WE_in_Einfamilienhäusern__kurz_nach_dem_Bezug_</span>
-        <span class="n">param_13</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_13</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ew_je_we_efh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_13</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere_Anzahl_Einwohner_pro_WE_in_Einfamilienh</span><span class="se">\xe4</span><span class="s1">usern__kurz_nach_dem_Bezug_&#39;</span>
         <span class="n">param_13</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere Anzahl Einwohner pro WE in Einfamilienh</span><span class="se">\xe4</span><span class="s1">usern (kurz nach dem Bezug)&#39;</span>
         <span class="n">param_13</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -240,7 +243,7 @@
         <span class="n">param_13</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Mittlere_Anzahl_Einwohner_pro_WE_in_Doppelhäusern__kurz_nach_dem_Bezug_</span>
-        <span class="n">param_14</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_14</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ew_je_we_zfh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_14</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere_Anzahl_Einwohner_pro_WE_in_Doppelh</span><span class="se">\xe4</span><span class="s1">usern__kurz_nach_dem_Bezug_&#39;</span>
         <span class="n">param_14</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere Anzahl Einwohner pro WE in Doppelh</span><span class="se">\xe4</span><span class="s1">usern (kurz nach dem Bezug)&#39;</span>
         <span class="n">param_14</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -251,7 +254,7 @@
         <span class="n">param_14</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Mittlere_Anzahl_Einwohner_pro_WE_in_Reihenhäusern__kurz_nach_dem_Bezug_</span>
-        <span class="n">param_15</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_15</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ew_je_we_rh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_15</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere_Anzahl_Einwohner_pro_WE_in_Reihenh</span><span class="se">\xe4</span><span class="s1">usern__kurz_nach_dem_Bezug_&#39;</span>
         <span class="n">param_15</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere Anzahl Einwohner pro WE in Reihenh</span><span class="se">\xe4</span><span class="s1">usern (kurz nach dem Bezug)&#39;</span>
         <span class="n">param_15</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -262,7 +265,7 @@
         <span class="n">param_15</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Mittlere_Anzahl_Einwohner_pro_WE_in_Mehrfamilienhäusern__kurz_nach_dem_Bezug_</span>
-        <span class="n">param_16</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_16</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ew_je_we_mfh</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_16</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere_Anzahl_Einwohner_pro_WE_in_Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern__kurz_nach_dem_Bezug_&#39;</span>
         <span class="n">param_16</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Mittlere Anzahl Einwohner pro WE in Mehrfamilienh</span><span class="se">\xe4</span><span class="s1">usern (kurz nach dem Bezug)&#39;</span>
         <span class="n">param_16</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -276,7 +279,7 @@
         <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;5) Wohnen - Zuzugsquote&quot;</span>
 
         <span class="c1"># Wie_viel_Prozent_der_Bewohner_der_neuen_Wohnungen_werden_neu_in_die_Gemeinde_ziehen_</span>
-        <span class="n">param_17</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_17</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">zuzugsquote_ew</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_17</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Wie_viel_Prozent_der_Bewohner_der_neuen_Wohnungen_werden_neu_in_die_Gemeinde_ziehen_&#39;</span>
         <span class="n">param_17</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Wie viel Prozent der Bewohner der neuen Wohnungen werden neu in die Gemeinde ziehen?&#39;</span>
         <span class="n">param_17</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -291,7 +294,7 @@
         <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;6) Gewerbe - Gebietstyp und Brachenstruktur&quot;</span>
 
         <span class="c1"># Gebietstyp_auswählen</span>
-        <span class="n">param_18</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_18</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">gebietstyp</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_18</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Gebietstyp_ausw</span><span class="se">\xe4</span><span class="s1">hlen&#39;</span>
         <span class="n">param_18</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Gebietstyp ausw</span><span class="se">\xe4</span><span class="s1">hlen&#39;</span>
         <span class="n">param_18</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -302,7 +305,7 @@
         <span class="n">param_18</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anteil_der_Arbeitsplätze_im_verarbeitenden_Gewerbe__in_Prozent_</span>
-        <span class="n">param_19</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_19</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_jobs_verarb_gewerbe</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_19</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_verarbeitenden_Gewerbe__in_Prozent_&#39;</span>
         <span class="n">param_19</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im verarbeitenden Gewerbe (in Prozent)&#39;</span>
         <span class="n">param_19</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -314,7 +317,7 @@
         <span class="n">param_19</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anteil_der_Arbeitsplätze_im_Baugewerbe__in_Prozent_</span>
-        <span class="n">param_20</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_20</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_jobs_baugewerbe</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_20</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_Baugewerbe__in_Prozent_&#39;</span>
         <span class="n">param_20</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im Baugewerbe (in Prozent)&#39;</span>
         <span class="n">param_20</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -326,7 +329,7 @@
         <span class="n">param_20</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anteil_der_Arbeitsplätze_im_Handel__inkl__Kfz___in_Prozent_</span>
-        <span class="n">param_21</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_21</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_jobs_handel</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_21</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_Handel__inkl__Kfz___in_Prozent_&#39;</span>
         <span class="n">param_21</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im Handel (inkl. Kfz) (in Prozent)&#39;</span>
         <span class="n">param_21</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -338,7 +341,7 @@
         <span class="n">param_21</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anteil_der_Arbeitsplätze_im_Verkehrs-_und_Lagereibereich___in_Prozent_</span>
-        <span class="n">param_22</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_22</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_jobs_logistik</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_22</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_Verkehrs-_und_Lagereibereich___in_Prozent_&#39;</span>
         <span class="n">param_22</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im Verkehrs- und Lagereibereich  (in Prozent)&#39;</span>
         <span class="n">param_22</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -350,7 +353,7 @@
         <span class="n">param_22</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anteil_der_Arbeitsplätze_im_Bereich_der_freiberuflichen__wissenschaftl__bzw__techn__Dienstleistungen__in_Prozent_</span>
-        <span class="n">param_23</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_23</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_jobs_freiwisstech</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_23</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_Bereich_der_freiberuflichen__wissenschaftl__bzw__techn__Dienstleistungen__in_Prozent_&#39;</span>
         <span class="n">param_23</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im Bereich der freiberuflichen, wissenschaftl. bzw. techn. Dienstleistungen (in Prozent)&#39;</span>
         <span class="n">param_23</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -362,7 +365,7 @@
         <span class="n">param_23</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Anteil_der_Arbeitsplätze_im_Bereich_sonstiger_Diensteistungen</span>
-        <span class="n">param_24</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_24</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_jobs_sonst_dl</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_24</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Anteil_der_Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze_im_Bereich_sonstiger_Diensteistungen&#39;</span>
         <span class="n">param_24</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Anteil der Arbeitspl</span><span class="se">\xe4</span><span class="s1">tze im Bereich sonstiger Diensteistungen&#39;</span>
         <span class="n">param_24</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -377,7 +380,7 @@
         <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;7) Gewerbe - Zuzugs- und Eigentumsquote&quot;</span>
 
         <span class="c1"># Wie_viel_Prozent_der_Unternehmen_werden_neu_in_die_Gemeinde_ziehen_</span>
-        <span class="n">param_25</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_25</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">zuzugsquote_gewerbe</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_25</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Wie_viel_Prozent_der_Unternehmen_werden_neu_in_die_Gemeinde_ziehen_&#39;</span>
         <span class="n">param_25</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Wie viel Prozent der Unternehmen werden neu in die Gemeinde ziehen?&#39;</span>
         <span class="n">param_25</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -389,9 +392,9 @@
         <span class="n">param_25</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
         <span class="c1"># Welcher_Anteil_der_Gebäude_ist_voraussichtlich_im_Eigentum_der_Unternehmen_</span>
-        <span class="n">param_26</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_26</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_eigentum_gewerbe</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_26</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s1">u&#39;Welcher_Anteil_der_Geb</span><span class="se">\xe4</span><span class="s1">ude_ist_voraussichtlich_im_Eigentum_der_Unternehmen_&#39;</span><span class="p">)</span>
-        <span class="n">param_26</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="n">encodeu</span><span class="p">(</span><span class="s1">&#39;Welcher Anteil der Geb</span><span class="se">\xe4</span><span class="s1">ude ist voraussichtlich im Eigentum der Unternehmen?&#39;</span><span class="p">)</span>
+        <span class="n">param_26</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s1">u&#39;Welcher Anteil der Geb</span><span class="se">\xe4</span><span class="s1">ude ist voraussichtlich im Eigentum der Unternehmen?&#39;</span><span class="p">)</span>
         <span class="n">param_26</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
         <span class="n">param_26</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
         <span class="n">param_26</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
@@ -403,7 +406,7 @@
         <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;8) Einzelhandel (nur Lebensmitteleinzelhandel)&quot;</span>
 
         <span class="c1"># Verkaufsfläche__in_Quadratmetern_</span>
-        <span class="n">param_27</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">param_27</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">verkaufsflaeche</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
         <span class="n">param_27</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s1">u&#39;Verkaufsfl</span><span class="se">\xe4</span><span class="s1">che__in_Quadratmetern_&#39;</span><span class="p">)</span>
         <span class="n">param_27</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s1">u&#39;Verkaufsfl</span><span class="se">\xe4</span><span class="s1">che (in Quadratmetern)&#39;</span><span class="p">)</span>
         <span class="n">param_27</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
@@ -414,19 +417,7 @@
         <span class="n">param_27</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20000</span><span class="p">]</span>
         <span class="n">param_27</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
 
-        <span class="n">parameters</span><span class="o">=</span> <span class="p">[</span><span class="n">param_1</span><span class="p">,</span> <span class="n">param_2</span><span class="p">,</span> <span class="n">param_3</span><span class="p">,</span> <span class="n">param_4</span><span class="p">,</span> <span class="n">param_5</span><span class="p">,</span> <span class="n">param_6</span><span class="p">,</span>
-                     <span class="n">param_7</span><span class="p">,</span> <span class="n">param_8</span><span class="p">,</span> <span class="n">param_9</span><span class="p">,</span> <span class="n">param_10</span><span class="p">,</span> <span class="n">param_11</span><span class="p">,</span> <span class="n">param_12</span><span class="p">,</span>
-                     <span class="n">param_13</span><span class="p">,</span> <span class="n">param_14</span><span class="p">,</span> <span class="n">param_15</span><span class="p">,</span> <span class="n">param_16</span><span class="p">,</span> <span class="n">param_17</span><span class="p">,</span>
-                     <span class="n">param_18</span><span class="p">,</span> <span class="n">param_19</span><span class="p">,</span> <span class="n">param_20</span><span class="p">,</span> <span class="n">param_21</span><span class="p">,</span> <span class="n">param_22</span><span class="p">,</span>
-                     <span class="n">param_23</span><span class="p">,</span> <span class="n">param_24</span><span class="p">,</span> <span class="n">param_25</span><span class="p">,</span> <span class="n">param_26</span><span class="p">,</span> <span class="n">param_27</span><span class="p">]</span>
-
-        <span class="c1"># set params until better names are provided</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="s1">&#39;param_&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">param</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">updateParameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">parameters</span></div>
+        <span class="k">return</span> <span class="n">params</span></div>
 
 <div class="viewcode-block" id="TbxNutzungen._updateParameters"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_nutzungen.html#rpctools.definitions.nutzungsart.tbx_nutzungen.TbxNutzungen._updateParameters">[docs]</a>    <span class="k">def</span> <span class="nf">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Modify the values and properties of parameters before internal</span>
@@ -435,8 +426,8 @@
 
         <span class="k">def</span> <span class="nf">eingaben_auslesen</span><span class="p">():</span>
 
-            <span class="n">projectname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">teilflaeche</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">projectname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">projectname</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">teilflaeche</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">teilflaeche</span><span class="o">.</span><span class="n">value</span>
 
             <span class="n">tablepath_flaechenbilanz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">&#39;Wohneinheiten_Details&#39;</span><span class="p">)</span>
             <span class="n">tabelle_gebaude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">&#39;Gebaeude_Details&#39;</span><span class="p">)</span>
@@ -530,10 +521,6 @@
 
             <span class="k">return</span>
 
-        <span class="n">tbx_path</span> <span class="o">=</span> <span class="n">__file__</span>
-        <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">tbx_path</span><span class="p">)</span>
-        <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">base_path</span><span class="p">)</span>
-        <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">base_path</span><span class="p">)</span> <span class="c1"># erzeugt Pfad zum Ordner, in dem Script liegt</span>
 
     <span class="c1"># Gebietstyp auswählen</span>
         <span class="n">i</span><span class="o">=</span><span class="mi">17</span>
@@ -604,21 +591,6 @@
                 <span class="n">sliderSummenKontrolle</span><span class="p">(</span><span class="n">listeSliderID</span><span class="p">,</span> <span class="n">zielwertSlidersumme</span><span class="p">)</span>
 
         <span class="k">return</span></div></div>
-
-
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_nutzungen.html#rpctools.definitions.nutzungsart.tbx_nutzungen.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">tbx</span> <span class="o">=</span> <span class="n">Toolbox</span><span class="p">()</span>
-    <span class="n">tool</span> <span class="o">=</span> <span class="n">Flaechenbilanz</span><span class="p">()</span>
-    <span class="n">tool</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">getParameterInfo</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="n">tool</span> <span class="o">=</span> <span class="n">Nutzungen</span><span class="p">()</span>
-    <span class="n">tool</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">getParameterInfo</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span></div>
-
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--debug&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
-    <span class="n">options</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
-        <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
           </div>
@@ -655,7 +627,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, GGR, ILS.
-      Last updated on Jan 22, 2017.
+      Last updated on Jan 26, 2017.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>

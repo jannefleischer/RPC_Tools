@@ -6,7 +6,9 @@ Submodules
 
 .. toctree::
 
-   rpctools.analyst.infrastrukturkosten.T5_Kostenmodell
+   rpctools.analyst.infrastrukturkosten.kostenmodell
+   rpctools.analyst.infrastrukturkosten.tbx_aufteilungsregeln
+   rpctools.analyst.infrastrukturkosten.tbx_kostenermittlung
 
 Module contents
 ---------------

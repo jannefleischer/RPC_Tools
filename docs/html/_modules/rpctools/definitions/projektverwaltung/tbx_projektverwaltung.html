@@ -59,6 +59,8 @@
 <span class="kn">from</span> <span class="nn">rpctools.utils.encoding</span> <span class="k">import</span> <span class="n">encode</span>
 <span class="kn">from</span> <span class="nn">rpctools.definitions.projektverwaltung.T1_Projektverwaltung</span> <span class="k">import</span> <span class="n">Projektverwaltung</span>
 
+<span class="kn">from</span> <span class="nn">rpctools.utils.params</span> <span class="k">import</span> <span class="n">Params</span>
+
 
 <div class="viewcode-block" id="TbxProjektVerwaltung"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.tbx_projektverwaltung.html#rpctools.definitions.projektverwaltung.tbx_projektverwaltung.TbxProjektVerwaltung">[docs]</a><span class="k">class</span> <span class="nc">TbxProjektVerwaltung</span><span class="p">(</span><span class="n">Tbx</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Toolbox Projektverwaltung&quot;&quot;&quot;</span>
@@ -71,8 +73,7 @@
     <span class="k">def</span> <span class="nf">Tool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Projektverwaltung</span>
 
-<div class="viewcode-block" id="TbxProjektVerwaltung.getParameterInfo"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.tbx_projektverwaltung.html#rpctools.definitions.projektverwaltung.tbx_projektverwaltung.TbxProjektVerwaltung.getParameterInfo">[docs]</a>    <span class="k">def</span> <span class="nf">getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
+<div class="viewcode-block" id="TbxProjektVerwaltung._getParameterInfo"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.tbx_projektverwaltung.html#rpctools.definitions.projektverwaltung.tbx_projektverwaltung.TbxProjektVerwaltung._getParameterInfo">[docs]</a>    <span class="k">def</span> <span class="nf">_getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
 
         <span class="c1"># Was_möchten_Sie_tun_</span>
@@ -143,7 +144,7 @@
         <span class="n">params</span><span class="o">.</span><span class="n">begin</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">params</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">params</span><span class="o">.</span><span class="n">existing_project</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot; &quot;</span><span class="p">]</span>
-
+        
         <span class="k">return</span> <span class="n">params</span></div>
 
 <div class="viewcode-block" id="TbxProjektVerwaltung._updateParameters"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.projektverwaltung.tbx_projektverwaltung.html#rpctools.definitions.projektverwaltung.tbx_projektverwaltung.TbxProjektVerwaltung._updateParameters">[docs]</a>    <span class="k">def</span> <span class="nf">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
@@ -229,7 +230,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, GGR, ILS.
-      Last updated on Jan 22, 2017.
+      Last updated on Jan 26, 2017.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>

@@ -24,8 +24,10 @@ class Message(object):
         arcpy.AddWarning(message)
         print(message)
 
-    def addIDMessage(self, message, message_ID, add_argument1=None, add_argument2=None):
-        arcpy.AddIDMessage(message, message_ID, add_argument1=add_argument1, add_argument2=add_argument2)
+    def addIDMessage(self, message, message_ID,
+                     add_argument1=None, add_argument2=None):
+        arcpy.AddIDMessage(message, message_ID,
+                           add_argument1=add_argument1, add_argument2=add_argument2)
         print(message)
 
     def addGPMessages(self):
@@ -43,8 +45,11 @@ class Message(object):
         arcpy.AddWarning(message)
         print(message)
 
-    def AddIDMessage(self, message, message_ID, add_argument1=None, add_argument2=None):
-        arcpy.AddIDMessage(message, message_ID, add_argument1=add_argument1, add_argument2=add_argument2)
+    def AddIDMessage(self, message, message_ID,
+                     add_argument1=None, add_argument2=None):
+        arcpy.AddIDMessage(message, message_ID,
+                           add_argument1=add_argument1,
+                           add_argument2=add_argument2)
         print(message)
 
     def AddGPMessages(self):
@@ -64,7 +69,7 @@ class Params(object):
 
     def __init__(self,
                  param_projectname='name',
-                 dbname=None,
+                 dbname='',
                  *args, **kwargs):
         """
         Parameters
@@ -186,7 +191,7 @@ class Params(object):
 
     def _get_projectname(self):
         """
-        return the value for project name parameter if exists, else None
+        return the value for project name parameter if exists, else empty string
 
         Returns
         -------
@@ -195,22 +200,50 @@ class Params(object):
         param_projectname = getattr(self, self._param_projectname, None)
         if param_projectname:
             return param_projectname.value
-        return None
+        return ''
 
 
 class Tool(object):
+    """
+    Base Class for a ArcGIS Tool
+
+    Attributes
+    ----------
+    folders : Folders object
+        gives access to relative paths
+
+    mes : Message object
+        for sending messages to ArcGIS
+    """
     __metaclass__ = ABCMeta
 
     _param_projectname = 'projectname'
+    """The parameter that holds the projectname"""
     _dbname = None
+    """the name of the default database of the tool"""
 
-    """Base Class for a ArcGIS Tool"""
     def __init__(self, params):
+        """
+        Parameters
+        ----------
+        params : Params object
+        """
         self.par = params
         self.mes = Message()
         self.folders = Folders(params=self.par)
 
     def main(self, par, parameters=None, messages=None):
+        """
+        The main method
+
+        Parameters
+        ----------
+        par : the Params-object
+
+        parameters : the list of parameters sent by ArcGIS
+
+        messages : the messages-object sent by ArcGIS
+        """
         self.par = par
         if parameters:
             self.par._update_parameters(parameters)
@@ -221,6 +254,7 @@ class Tool(object):
 
     @property
     def db(self):
+        """ The full path to the default Database of the tool"""
         return self.folders.get_db()
 
     @abstractmethod
@@ -237,6 +271,7 @@ class Tbx(object):
     def Tool(self):
         """
         Returns the Toolclass
+
         To be defined in the subclass
         """
 
@@ -244,6 +279,7 @@ class Tbx(object):
     def label(self):
         """
         Returns the label as string
+
         To be defined in the subclass
         """
 
@@ -272,32 +308,74 @@ class Tbx(object):
         Define the Parameters and return a list or Params()-instance with the
         parameter
         """
-        return self._getParameterInfo()._od.values()
+        params = self._getParameterInfo()._od.values()
+        # set the parameters as real attributes to self.par
+        for p in self.par._od:
+            self.par.__dict__[p] = self.par[p]
+        return params
 
     def isLicensed(self):
+        """If toolbox is licenced"""
         return True
 
     def updateParameters(self, parameters):
-        """Update the Parameters if something changed"""
+        """
+        The updateParameters-method called by ArcGIS
+
+        Parameters
+        ----------
+        parameters : list of ArcGIS-Parameters
+        """
         self.par._update_parameters(parameters)
         self._updateParameters(self.par)
 
     def _updateParameters(self, params):
-        """Update the Parameters if something changed"""
+        """
+        Update the Parameters if something changed
+
+        To define in the subclass
+        """
 
     def updateMessages(self, parameters):
-        """"""
+        """
+        The updateMessages-method called by ArcGIS
+
+        Parameters
+        ----------
+        parameters : list of ArcGIS-Parameters
+        """
         self.par._update_parameters(parameters)
         self._updateMessages(parameters)
 
     def _updateMessages(self, parameters):
-        """"""
+        """ to define in the subclass """
 
     def execute(self, parameters=None, messages=None):
-        """Run the tool with the parameters and messages from ArcGIS"""
+        """
+        Run the tool with the parameters and messages from ArcGIS
+
+        Parameters
+        ----------
+        parameters : list of ArcGIS-Parameters
+
+        messages : the message-object of ArcGIS
+
+        """
         self.tool.main(self.par, parameters, messages)
 
     def print_test_parameters(self):
+        """
+        Print the parameters to use in tests
+
+        Examples
+        --------
+        >>> tbx.print_test_parameters()
+        ### Category 1 ###
+        params.param_1.value = 123
+        params.param_2.value = 456
+        ### Category 2 ###
+        params.param_3.value = 'DefaultString'
+        """
         params = self._getParameterInfo()
         self._updateParameters(params)
         category = None
@@ -311,6 +389,18 @@ class Tbx(object):
             print (u'params.{k}.value = {v}'.format(v=value, k=k))
 
     def print_tool_parameters(self):
+        """
+        Print the parameters to use in a Tool
+
+        Examples
+        --------
+        >>> tbx.print_tool_parameters()
+        ### Category 1 ###
+        param_1 = params.param_1.value
+        param_2 = params.param_2.value
+        ### Category 2 ###
+        param_3 = params.param_3.value
+        """
         params = self._getParameterInfo()
         category = None
         for k, v in self.par._od.iteritems():

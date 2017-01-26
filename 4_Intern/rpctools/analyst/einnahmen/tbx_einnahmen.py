@@ -12,7 +12,9 @@ from rpctools.analyst.einnahmen.T7_KRU import KRU
 
 
 class _TbxEinnahmen(Tbx):
-    """ Toolbox mit nur dem Parameter `name'"""
+    """
+    Toolbox mit nur dem Parameter *name*
+    """
 
     def _getParameterInfo(self):
         # Projektname

@@ -44,6 +44,8 @@ source_suffix = '.rst'
 # The master toctree document.
 master_doc = 'index'
 
+#numpydoc_show_class_members = False
+
 # General information about the project.
 project = u'RPC'
 copyright = u'2017, GGR, ILS'

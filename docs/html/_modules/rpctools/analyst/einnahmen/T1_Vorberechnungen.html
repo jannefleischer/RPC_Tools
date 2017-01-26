@@ -84,13 +84,14 @@
         <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="c1"># Variablen definieren</span>
-        <span class="n">projektname</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-
-        <span class="n">nettoZuzugsQuote_EW</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">nettoZuzugsQuote_AP</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">einzugsbereich_EW</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">einzugsbereich_AP</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-
+       
+        <span class="n">projektname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">value</span>
+        <span class="c1">### 01 Nettozuzugsquoten (in %) ###</span>
+        <span class="n">nettoZuzugsQuote_EW</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">nettozuzugquote_ew</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">nettoZuzugsQuote_AP</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">nettozuzugquote_jobs</span><span class="o">.</span><span class="n">value</span>
+        <span class="c1">### 02 Einzugsbereich (in km) ###</span>
+        <span class="n">einzugsbereich_EW</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">einzugsbereich_ew</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">einzugsbereich_AP</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">einzugsbereich_jobs</span><span class="o">.</span><span class="n">value</span>
         <span class="c1"># Pfade einrichten</span>
         <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -752,7 +753,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, GGR, ILS.
-      Last updated on Jan 22, 2017.
+      Last updated on Jan 26, 2017.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>

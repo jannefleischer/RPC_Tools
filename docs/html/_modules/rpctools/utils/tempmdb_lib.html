@@ -63,16 +63,17 @@
 <span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
 
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">import</span> <span class="nn">pyodbc</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
 
 <div class="viewcode-block" id="temp_mdb"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.tempmdb_lib.html#rpctools.utils.tempmdb_lib.temp_mdb">[docs]</a><span class="k">def</span> <span class="nf">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">):</span>
     <span class="c1"># funktionsweise: kopiere tabellen aus einer gegebenen liste in eine temporäre PGDB, fuere sql-code auf diesen tabellen aus und kopiere das ergebnis zurueck</span>
 
-    <span class="kn">import</span> <span class="nn">arcpy</span>
-    <span class="kn">import</span> <span class="nn">pyodbc</span>
-    <span class="kn">import</span> <span class="nn">shutil</span>
-    <span class="kn">import</span> <span class="nn">gc</span>
-    <span class="kn">import</span> <span class="nn">os</span>
-    <span class="kn">import</span> <span class="nn">sys</span>
 
     <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -166,7 +167,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, GGR, ILS.
-      Last updated on Jan 22, 2017.
+      Last updated on Jan 26, 2017.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>

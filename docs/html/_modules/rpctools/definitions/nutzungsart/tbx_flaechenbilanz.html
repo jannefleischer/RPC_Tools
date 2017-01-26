@@ -1,0 +1,476 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.definitions.nutzungsart.tbx_flaechenbilanz &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.definitions.nutzungsart.tbx_flaechenbilanz</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="kn">from</span> <span class="nn">rpctools.utils.params</span> <span class="k">import</span> <span class="n">Tbx</span>
+<span class="kn">from</span> <span class="nn">rpctools.utils.encoding</span> <span class="k">import</span> <span class="n">encode</span>
+<span class="kn">from</span> <span class="nn">rpctools.definitions.nutzungsart.flaechenbilanz</span> <span class="k">import</span> <span class="n">Flaechenbilanz</span>
+
+
+<div class="viewcode-block" id="TbxFlaechenbilanz"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_flaechenbilanz.html#rpctools.definitions.nutzungsart.tbx_flaechenbilanz.TbxFlaechenbilanz">[docs]</a><span class="k">class</span> <span class="nc">TbxFlaechenbilanz</span><span class="p">(</span><span class="n">Tbx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Toolbox zur Flächenbilanz&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">encode</span><span class="p">(</span><span class="s1">u&#39;1 Flächenbilanz eingeben&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Tool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Flaechenbilanz</span>
+
+<div class="viewcode-block" id="TbxFlaechenbilanz._getParameterInfo"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_flaechenbilanz.html#rpctools.definitions.nutzungsart.tbx_flaechenbilanz.TbxFlaechenbilanz._getParameterInfo">[docs]</a>    <span class="k">def</span> <span class="nf">_getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Projektname</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
+        <span class="n">projekte</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_projects</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">projectname</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Projektname&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Projektname&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">projekte</span>
+        <span class="k">if</span> <span class="n">projekte</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">projekte</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Teilfläche</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">teilflaeche</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Teilfl</span><span class="se">\xe4</span><span class="s1">che&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Teilfl</span><span class="se">\xe4</span><span class="s1">che&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Zeichenfolge&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Startjahr</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">startjahr</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Startjahr&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Startjahr&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2050</span><span class="p">]</span>
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s2">&quot;01_Generelle Flächenaufteilung&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Verkehrsfläche____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_verkehrsfl</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Verkehrsfl</span><span class="se">\xe4</span><span class="s1">che____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Verkehrsfl</span><span class="se">\xe4</span><span class="s1">che (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Grünfläche____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_gruenfl</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Gr</span><span class="se">\xfc</span><span class="s1">nfl</span><span class="se">\xe4</span><span class="s1">che____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Gr</span><span class="se">\xfc</span><span class="s1">nfl</span><span class="se">\xe4</span><span class="s1">che (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Sonstige_Flächen____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_sonstige_fl</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Sonstige_Fl</span><span class="se">\xe4</span><span class="s1">chen____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Sonstige Fl</span><span class="se">\xe4</span><span class="s1">chen (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Nettobauland____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_nettobauland</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Nettobauland____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Nettobauland (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;100&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="s2">&quot;02_Aufteilung Nettobauland&quot;</span>
+
+        <span class="c1"># Gewerbeflaeche____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_gewerbefl</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Gewerbeflaeche____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Gewerbeflaeche (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Nettowohnbauland____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ant_nettowohnbauland</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Nettowohnbauland____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Nettowohnbauland (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;100&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s2">&quot;03_Aufteilung Verkehrsfläche&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Flächen_für_Lärmschutz____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">laermschutz</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Fl</span><span class="se">\xe4</span><span class="s1">chen_f</span><span class="se">\xfc</span><span class="s1">r_L</span><span class="se">\xe4</span><span class="s1">rmschutz____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Fl</span><span class="se">\xe4</span><span class="s1">chen f</span><span class="se">\xfc</span><span class="s1">r L</span><span class="se">\xe4</span><span class="s1">rmschutz (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Privatwege____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">privatwege</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Privatwege____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Privatwege (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Äußere_Erschließung____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">auessere_erschl</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;</span><span class="se">\xc4</span><span class="s1">u</span><span class="se">\xdf</span><span class="s1">ere_Erschlie</span><span class="se">\xdf</span><span class="s1">ung____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;</span><span class="se">\xc4</span><span class="s1">u</span><span class="se">\xdf</span><span class="s1">ere Erschlie</span><span class="se">\xdf</span><span class="s1">ung (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Innere_Erschließung____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">innere_erschl</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Innere_Erschlie</span><span class="se">\xdf</span><span class="s1">ung____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Innere Erschlie</span><span class="se">\xdf</span><span class="s1">ung (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;100&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="n">heading</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="s2">&quot;04_Aufteilung Grünfläche&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Spielplatzfläche____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">spielplatz</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Spielplatzfl</span><span class="se">\xe4</span><span class="s1">che____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Spielplatzfl</span><span class="se">\xe4</span><span class="s1">che (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Straßenbegleitgrün____</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">strassenbegleitgruen</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Stra</span><span class="se">\xdf</span><span class="s1">enbegleitgr</span><span class="se">\xfc</span><span class="s1">n____&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Stra</span><span class="se">\xdf</span><span class="s1">enbegleitgr</span><span class="se">\xfc</span><span class="s1">n (%)&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Ausgleichs-_und_Ersatzflächen</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ausgleich_ersatz</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Ausgleichs-_und_Ersatzfl</span><span class="se">\xe4</span><span class="s1">chen&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Ausgleichs- und Ersatzfl</span><span class="se">\xe4</span><span class="s1">chen&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;0&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="c1"># Allgemeine_Grünflächen</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">allg_gruen</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Parameter</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">u&#39;Allgemeine_Gr</span><span class="se">\xfc</span><span class="s1">nfl</span><span class="se">\xe4</span><span class="s1">chen&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">displayName</span> <span class="o">=</span> <span class="s1">u&#39;Allgemeine Gr</span><span class="se">\xfc</span><span class="s1">nfl</span><span class="se">\xe4</span><span class="s1">chen&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">parameterType</span> <span class="o">=</span> <span class="s1">&#39;Required&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;Input&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="s1">u&#39;Long&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">u&#39;100&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Range&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">heading</span>
+
+        <span class="k">return</span> <span class="n">params</span></div>
+
+<div class="viewcode-block" id="TbxFlaechenbilanz.eingaben_auslesen"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_flaechenbilanz.html#rpctools.definitions.nutzungsart.tbx_flaechenbilanz.TbxFlaechenbilanz.eingaben_auslesen">[docs]</a>    <span class="k">def</span> <span class="nf">eingaben_auslesen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
+        <span class="n">projectname</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">projectname</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">teilflaeche</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">teilflaeche</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">tablepath_teilflaechen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">teilflaechen</span>
+        <span class="n">tablepath_flaechenbilanz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">flaechenbilanz</span>
+
+        <span class="c1"># Oberkategorien</span>
+        <span class="n">queries_S1</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Erschliessungsflaeche&#39;</span><span class="p">),</span>
+                      <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Gruenflaeche&#39;</span><span class="p">),</span>
+                      <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Sonstige Flaechen&#39;</span><span class="p">),</span>
+                      <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;Nettobauland&#39;</span><span class="p">))</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Teilflaeche_Plangebiet&#39;</span><span class="p">,</span> <span class="s1">&#39;Flaechennutzung_S1&#39;</span><span class="p">,</span> <span class="s1">&#39;Anteil_S1&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">queries_S1</span><span class="p">:</span>
+            <span class="n">where_clause</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&quot;Teilflaeche_Plangebiet&quot; =&#39;&quot;&quot;&quot;</span><span class="o">+</span><span class="n">teilflaeche</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="s1">&#39; AND &quot;Flaechennutzung_S1&quot; = &#39;</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">query</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_flaechenbilanz</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">where_clause</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+
+        <span class="c1"># Nettobauland</span>
+        <span class="n">queries_S2</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Gewerbeflaeche&#39;</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span><span class="s1">&#39;Nettowohnbauland&#39;</span><span class="p">))</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Teilflaeche_Plangebiet&#39;</span><span class="p">,</span><span class="s1">&#39;Flaechennutzung_S2&#39;</span><span class="p">,</span><span class="s1">&#39;Anteil_S2&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">queries_S2</span><span class="p">:</span>
+            <span class="n">where_clause</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&quot;Teilflaeche_Plangebiet&quot; =&#39;&quot;&quot;&quot;</span><span class="o">+</span><span class="n">teilflaeche</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="s1">&#39; AND &quot;Flaechennutzung_S2&quot; = &#39;</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">query</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_flaechenbilanz</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">where_clause</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+
+        <span class="c1"># Verkehr</span>
+        <span class="n">queries_S2</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Laermschutzanlagen&#39;</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span><span class="s1">&#39;Privat - Innere Erschliessung&#39;</span><span class="p">),(</span><span class="mi">3</span><span class="p">,</span><span class="s1">&#39;Oeffentlich - Aeussere Erschliessung&#39;</span><span class="p">),(</span><span class="mi">4</span><span class="p">,</span><span class="s1">&#39;Oeffentlich - Innere Erschliessung&#39;</span><span class="p">))</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Teilflaeche_Plangebiet&#39;</span><span class="p">,</span><span class="s1">&#39;Flaechennutzung_S2&#39;</span><span class="p">,</span><span class="s1">&#39;Anteil_S2&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">queries_S2</span><span class="p">:</span>
+            <span class="n">where_clause</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&quot;Teilflaeche_Plangebiet&quot; =&#39;&quot;&quot;&quot;</span><span class="o">+</span><span class="n">teilflaeche</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="s1">&#39; AND &quot;Flaechennutzung_S2&quot; = &#39;</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">query</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_flaechenbilanz</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">where_clause</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="c1"># Gruenflaechen</span>
+        <span class="n">queries_S2</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Spielplaetze&#39;</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span><span class="s1">&#39;Strassenbegleitgruen&#39;</span><span class="p">),(</span><span class="mi">3</span><span class="p">,</span><span class="s1">&#39;Ausgleichs- und Ersatzflaechen&#39;</span><span class="p">),(</span><span class="mi">4</span><span class="p">,</span><span class="s1">&#39;Allgemeine Gruenflaechen&#39;</span><span class="p">))</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Teilflaeche_Plangebiet&#39;</span><span class="p">,</span><span class="s1">&#39;Flaechennutzung_S2&#39;</span><span class="p">,</span><span class="s1">&#39;Anteil_S2&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">queries_S2</span><span class="p">:</span>
+            <span class="n">where_clause</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&quot;Teilflaeche_Plangebiet&quot; =&#39;&quot;&quot;&quot;</span><span class="o">+</span><span class="n">teilflaeche</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="s1">&#39; AND &quot;Flaechennutzung_S2&quot; = &#39;</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">query</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_flaechenbilanz</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">where_clause</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="TbxFlaechenbilanz.sliderSummenKontrolle"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_flaechenbilanz.html#rpctools.definitions.nutzungsart.tbx_flaechenbilanz.TbxFlaechenbilanz.sliderSummenKontrolle">[docs]</a>    <span class="k">def</span> <span class="nf">sliderSummenKontrolle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listeSliderID</span><span class="p">,</span> <span class="n">zielwertSlidersumme</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
+        <span class="n">istsumme</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">listeSliderID</span><span class="p">:</span>
+            <span class="n">istsumme</span><span class="o">+=</span><span class="n">params</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">if</span> <span class="n">istsumme</span> <span class="o">&lt;&gt;</span> <span class="n">zielwertSlidersumme</span><span class="p">:</span>
+            <span class="n">abweichung</span> <span class="o">=</span> <span class="n">zielwertSlidersumme</span> <span class="o">-</span> <span class="n">istsumme</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">listeSliderID</span><span class="p">):</span>
+                <span class="n">alterWert</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">neuerWert</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">abweichung</span>
+                <span class="k">if</span> <span class="n">neuerWert</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">neuerWert</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">elif</span> <span class="n">neuerWert</span> <span class="o">&gt;</span> <span class="n">zielwertSlidersumme</span><span class="p">:</span>
+                    <span class="n">neuerWert</span> <span class="o">=</span> <span class="n">zielwertSlidersumme</span>
+                <span class="n">abweichung</span> <span class="o">=</span> <span class="n">abweichung</span> <span class="o">+</span> <span class="n">alterWert</span> <span class="o">-</span> <span class="n">neuerWert</span>
+                <span class="n">params</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">neuerWert</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="TbxFlaechenbilanz._updateParameters"><a class="viewcode-back" href="../../../../rpctools/rpctools.definitions.nutzungsart.tbx_flaechenbilanz.html#rpctools.definitions.nutzungsart.tbx_flaechenbilanz.TbxFlaechenbilanz._updateParameters">[docs]</a>    <span class="k">def</span> <span class="nf">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Modify the values and properties of parameters before internal</span>
+<span class="sd">        validation is performed.  This method is called whenever a parameter</span>
+<span class="sd">        has been changed.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Auswahl Teilfläche</span>
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">projectname</span><span class="o">.</span><span class="n">altered</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">params</span><span class="o">.</span><span class="n">projectname</span><span class="o">.</span><span class="n">hasBeenValidated</span><span class="p">:</span>
+            <span class="c1">#projectname = params.name.value</span>
+            <span class="c1">#self.folders.project = projectname</span>
+
+            <span class="n">tablepath_teilflaechen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">teilflaechen</span>
+            <span class="n">rows_teilflaechen</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_teilflaechen</span><span class="p">)</span>
+            <span class="n">list_teilflaechen</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows_teilflaechen</span> <span class="p">:</span>
+                <span class="n">list_teilflaechen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span>
+            <span class="n">list_teilflaechen</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">list_teilflaechen</span><span class="p">))</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">teilflaeche</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="n">list_teilflaechen</span>
+
+            <span class="k">if</span> <span class="n">list_teilflaechen</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">teilflaeche</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">list_teilflaechen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">eingaben_auslesen</span><span class="p">()</span>
+
+        <span class="c1"># bestehende Eingaben (falls vorhanden) übernehmen</span>
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">teilflaeche</span><span class="o">.</span><span class="n">altered</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">params</span><span class="o">.</span><span class="n">teilflaeche</span><span class="o">.</span><span class="n">hasBeenValidated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eingaben_auslesen</span><span class="p">()</span>
+
+        <span class="c1"># Slider generieren</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="c1"># Oberkategorien</span>
+        <span class="n">listeSliderID</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ant_verkehrsfl&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;ant_gruenfl&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;ant_sonstige_fl&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;ant_nettobauland&#39;</span><span class="p">]</span>
+        <span class="n">zielwertSlidersumme</span> <span class="o">=</span> <span class="mi">100</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">listeSliderID</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">altered</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sliderSummenKontrolle</span><span class="p">(</span><span class="n">listeSliderID</span><span class="p">,</span> <span class="n">zielwertSlidersumme</span><span class="p">)</span>
+
+        <span class="c1"># Nettobauland</span>
+        <span class="n">listeSliderID</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ant_gewerbefl&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;ant_nettowohnbauland&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">listeSliderID</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">altered</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sliderSummenKontrolle</span><span class="p">(</span><span class="n">listeSliderID</span><span class="p">,</span> <span class="n">zielwertSlidersumme</span><span class="p">)</span>
+
+
+        <span class="c1"># Verkehr</span>
+        <span class="n">listeSliderID</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;laermschutz&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;privatwege&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;auessere_erschl&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;innere_erschl&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">listeSliderID</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">altered</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sliderSummenKontrolle</span><span class="p">(</span><span class="n">listeSliderID</span><span class="p">,</span> <span class="n">zielwertSlidersumme</span><span class="p">)</span>
+
+        <span class="c1"># Grünfläche</span>
+        <span class="n">listeSliderID</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;spielplatz&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;strassenbegleitgruen&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;ausgleich_ersatz&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;allg_gruen&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">listeSliderID</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">altered</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sliderSummenKontrolle</span><span class="p">(</span><span class="n">listeSliderID</span><span class="p">,</span> <span class="n">zielwertSlidersumme</span><span class="p">)</span></div></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 26, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

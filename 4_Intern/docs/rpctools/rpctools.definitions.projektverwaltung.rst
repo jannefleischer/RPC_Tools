@@ -9,7 +9,7 @@ Submodules
    rpctools.definitions.projektverwaltung.Ergebnisausgabe
    rpctools.definitions.projektverwaltung.T1_Projektverwaltung
    rpctools.definitions.projektverwaltung.tbx_projektverwaltung
-   rpctools.definitions.projektverwaltung.tbx_teilflaechen_bennenen
+   rpctools.definitions.projektverwaltung.tbx_teilflaechen_benennen
    rpctools.definitions.projektverwaltung.teilflaeche_benennen
 
 Module contents
