@@ -3,57 +3,68 @@
 from collections import OrderedDict
 import gc
 import sys
+import os
 from pprint import pformat
 from abc import ABCMeta, abstractmethod, abstractproperty
-from config import Folders
+from rpctools.utils.config import Folders
 #reload(sys.modules[Folders.__module__])
 import arcpy
 
 
 class Message(object):
 
-    def addMessage(self, message):
+    @staticmethod
+    def addMessage(message):
         arcpy.AddMessage(message)
         print(message)
 
-    def addErrorMessage(self, message):
+    @staticmethod
+    def addErrorMessage(message):
         arcpy.AddError(message)
         print(message)
 
-    def addWarningMessage(self, message):
+    @staticmethod
+    def addWarningMessage(message):
         arcpy.AddWarning(message)
         print(message)
 
-    def addIDMessage(self, message, message_ID,
+    @staticmethod
+    def addIDMessage(message, message_ID,
                      add_argument1=None, add_argument2=None):
         arcpy.AddIDMessage(message, message_ID,
                            add_argument1=add_argument1, add_argument2=add_argument2)
         print(message)
 
-    def addGPMessages(self):
-        arcpy.AddMessage()
+    @staticmethod
+    def addGPMessages():
+        arcpy.AddMessage('')
 
-    def AddMessage(self, message):
+    @staticmethod
+    def AddMessage(message):
         arcpy.AddMessage(message)
         print(message)
 
-    def AddErrorMessage(self, message):
+    @staticmethod
+    def AddErrorMessage(message):
         arcpy.AddError(message)
         print(message)
 
-    def AddWarningMessage(self, message):
+    @staticmethod
+    def AddWarningMessage(message):
         arcpy.AddWarning(message)
         print(message)
 
-    def AddIDMessage(self, message, message_ID,
+    @staticmethod
+    def AddIDMessage(message, message_ID,
                      add_argument1=None, add_argument2=None):
         arcpy.AddIDMessage(message, message_ID,
                            add_argument1=add_argument1,
                            add_argument2=add_argument2)
         print(message)
 
-    def AddGPMessages(self):
-        arcpy.AddMessage()
+    @staticmethod
+    def AddGPMessages():
+        arcpy.AddMessage('')
 
 
 class Singleton(type):
@@ -369,7 +380,7 @@ class Tbx(object):
 
         Examples
         --------
-        >>> tbx.print_test_parameters()
+        >> tbx.print_test_parameters()
         ### Category 1 ###
         params.param_1.value = 123
         params.param_2.value = 456
@@ -394,7 +405,7 @@ class Tbx(object):
 
         Examples
         --------
-        >>> tbx.print_tool_parameters()
+        >> tbx.print_tool_parameters()
         ### Category 1 ###
         param_1 = params.param_1.value
         param_2 = params.param_2.value
@@ -408,6 +419,29 @@ class Tbx(object):
                 category = v.category
                 print(u'### {} ###'.format(v.category))
             print (u'{k} = self.par.{k}.value'.format(k=k))
+
+
+    def rename_params_in_tool(self):
+        """
+        rename parameters[n] into params.param_xyz in the Tools's module
+        and save under new name tool_OLDNAME.py
+        """
+        module = sys.modules[self.Tool.__module__]
+        path = module.__file__.rstrip('co')
+        with open(path, 'r') as original_file:
+            src = original_file.read()
+
+        stub = 'parameters[{}].value'
+        self._getParameterInfo()
+        for i, key in enumerate(self.par._od):
+            src = src.replace(stub.format(i), key)
+
+        new_basename = 'tool_{}'.format(os.path.basename(path))
+        new_fn = os.path.join(os.path.dirname(path), new_basename)
+
+        with open(new_fn, 'w') as new_file:
+            new_file.write(src)
+
 
 if __name__ == '__main__':
     import doctest
