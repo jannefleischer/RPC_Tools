@@ -80,7 +80,7 @@
 
 <span class="n">BASE_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span>
                                          <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">))</span>
-<span class="n">LIB_PATH</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">BASE_PATH</span><span class="p">,</span> <span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span> <span class="s1">&#39;2_Projektverwaltung&#39;</span><span class="p">)</span>
+<span class="n">LIB_PATH</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">BASE_PATH</span><span class="p">,</span> <span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span> <span class="s1">&#39;Projektverwaltung&#39;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">rpctools.utils.url_lib</span> <span class="k">as</span> <span class="nn">url_lib</span>
 
 
@@ -235,7 +235,7 @@
     <span class="k">def</span> <span class="nf">Selektierung_Einrichtungen</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span><span class="n">lon</span><span class="p">):</span>
 
         <span class="c1">#zupruefendenEinrichtungen.append([rows.Kategorie,str(decode_unicode_references(rows.Schulname).encode(&quot;utf-8&quot;)),str(decode_unicode_references(rows.Strasse).encode(&quot;utf-8&quot;)),rows.PLZ,rows.ORT,rows.Lat,rows.Lon])</span>
-        <span class="c1">#Muss geändert werden - dynamische Shapefiles</span>
+        <span class="c1">#Muss ge??ndert werden - dynamische Shapefiles</span>
         <span class="n">cur_Einrichtungen_Schulen</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;/Einrichtungen_Grundschule&quot;</span><span class="p">)</span>
         <span class="n">cur_Einrichtungen_Kita</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;/Einrichtungen_Kita&quot;</span><span class="p">)</span>
         <span class="n">cur_Einrichtungen_Apotheke</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;/Einrichtungen_Apotheke&quot;</span><span class="p">)</span>
@@ -295,7 +295,7 @@
     <span class="c1">##        arcpy.Delete_management(workspace_Erreichbarkeit+ &quot;\Erreichbarkeit_Pkw&quot;)</span>
     <span class="c1">##    except:</span>
     <span class="c1">##        pass</span>
-    <span class="c1">##    #alte gelöscht</span>
+    <span class="c1">##    #alte gel??scht</span>
 
     <span class="c1">##    #Ergebnistabelle vorbereiten -&gt; rohling vorhanden 30min</span>
     <span class="c1">##    arcpy.AddField_management(workspace_Erreichbarkeit+&quot;/Einrichtungen30&quot;, &quot;Name&quot;, &quot;TEXT&quot;,250)</span>
@@ -417,7 +417,7 @@
         <span class="c1">##            messages.AddMessage(werte)</span>
 
                         <span class="k">if</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">werte</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span><span class="o">==</span><span class="mi">00</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">werte</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span><span class="o">&lt;</span><span class="mi">30</span> <span class="ow">and</span> <span class="n">c</span><span class="o">==</span><span class="mi">0</span><span class="p">):</span>
-                            <span class="c1">#zufuß &lt;=10</span>
+                            <span class="c1">#zufu?? &lt;=10</span>
 
 <span class="c1">##                            messages.AddMessage(werte[0])</span>
 
@@ -552,8 +552,8 @@
 
                     <span class="n">cur</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">gdb</span><span class="p">)</span>
                 <span class="k">except</span><span class="p">:</span>
-                    <span class="n">messages</span><span class="o">.</span><span class="n">AddErrorMessage</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Die Datei &quot;</span><span class="si">{}</span><span class="s1">&quot; ist momentan geöffnet und kann nicht durch das Tool bearbeitet werden.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pfad</span><span class="p">))</span>
-                    <span class="n">messages</span><span class="o">.</span><span class="n">AddErrorMessage</span><span class="p">(</span><span class="s2">&quot;Bitte schließen Sie die Datei und führen Sie diese Tool erneut aus.&quot;</span><span class="p">)</span>
+                    <span class="n">messages</span><span class="o">.</span><span class="n">AddErrorMessage</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Die Datei &quot;</span><span class="si">{}</span><span class="s1">&quot; ist momentan ge??ffnet und kann nicht durch das Tool bearbeitet werden.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pfad</span><span class="p">))</span>
+                    <span class="n">messages</span><span class="o">.</span><span class="n">AddErrorMessage</span><span class="p">(</span><span class="s2">&quot;Bitte schlie??en Sie die Datei und f??hren Sie diese Tool erneut aus.&quot;</span><span class="p">)</span>
                     <span class="n">messages</span><span class="o">.</span><span class="n">AddErrorMessage</span><span class="p">(</span><span class="s2">&quot;Abbruch&quot;</span><span class="p">)</span>
                     <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -587,7 +587,7 @@
 
                         <span class="k">except</span><span class="p">:</span>
                             <span class="n">row</span><span class="o">.</span><span class="n">Kategorie</span><span class="o">=</span><span class="s2">&quot;Sonstige&quot;</span>
-        <span class="c1">##                    messages.AddErrorMessage(&quot;Dateneingabe unvollständig - Postleitzahl fehlt&quot;)</span>
+        <span class="c1">##                    messages.AddErrorMessage(&quot;Dateneingabe unvollst??ndig - Postleitzahl fehlt&quot;)</span>
         <span class="c1">##                    exit(1)</span>
                             <span class="k">pass</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -600,7 +600,7 @@
                         <span class="n">row</span><span class="o">.</span><span class="n">PLZ</span><span class="o">=</span><span class="n">worksheet</span><span class="o">.</span><span class="n">cell_value</span><span class="p">(</span><span class="n">curr_row</span><span class="p">,</span> <span class="n">curr_cell</span><span class="p">)</span>
                         <span class="n">Postleitzahl</span><span class="o">=</span><span class="n">worksheet</span><span class="o">.</span><span class="n">cell_value</span><span class="p">(</span><span class="n">curr_row</span><span class="p">,</span> <span class="n">curr_cell</span><span class="p">)</span>
                     <span class="k">except</span><span class="p">:</span>
-    <span class="c1">##                    messages.AddErrorMessage(&quot;Dateneingabe unvollständig - Postleitzahl fehlt&quot;)</span>
+    <span class="c1">##                    messages.AddErrorMessage(&quot;Dateneingabe unvollst??ndig - Postleitzahl fehlt&quot;)</span>
     <span class="c1">##                    exit(1)</span>
                         <span class="k">pass</span>
 
@@ -610,7 +610,7 @@
                         <span class="n">row</span><span class="o">.</span><span class="n">Ort</span><span class="o">=</span><span class="n">worksheet</span><span class="o">.</span><span class="n">cell_value</span><span class="p">(</span><span class="n">curr_row</span><span class="p">,</span> <span class="n">curr_cell</span><span class="p">)</span>
                         <span class="n">Ort</span><span class="o">=</span><span class="n">worksheet</span><span class="o">.</span><span class="n">cell_value</span><span class="p">(</span><span class="n">curr_row</span><span class="p">,</span> <span class="n">curr_cell</span><span class="p">)</span>
                     <span class="k">except</span><span class="p">:</span>
-    <span class="c1">##                    messages.AddErrorMessage(&quot;Dateneingabe unvollständig - Ort fehlt&quot;)</span>
+    <span class="c1">##                    messages.AddErrorMessage(&quot;Dateneingabe unvollst??ndig - Ort fehlt&quot;)</span>
     <span class="c1">##                    exit(1)</span>
                         <span class="k">pass</span>
 
@@ -628,7 +628,7 @@
                         <span class="n">row</span><span class="o">.</span><span class="n">Strasse</span><span class="o">=</span><span class="n">worksheet</span><span class="o">.</span><span class="n">cell_value</span><span class="p">(</span><span class="n">curr_row</span><span class="p">,</span> <span class="n">curr_cell</span><span class="p">)</span>
                         <span class="n">Strasse</span><span class="o">=</span><span class="n">worksheet</span><span class="o">.</span><span class="n">cell_value</span><span class="p">(</span><span class="n">curr_row</span><span class="p">,</span> <span class="n">curr_cell</span><span class="p">)</span>
                     <span class="k">except</span><span class="p">:</span>
-    <span class="c1">##                    messages.AddErrorMessage(&quot;Dateneingabe unvollständig - Strasse fehlt&quot;)</span>
+    <span class="c1">##                    messages.AddErrorMessage(&quot;Dateneingabe unvollst??ndig - Strasse fehlt&quot;)</span>
     <span class="c1">##                    exit(1)</span>
                         <span class="k">pass</span>
 
@@ -780,13 +780,13 @@
     <span class="c1">#Pfade einrichten</span>
     <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="n">workspace_definitionen</span><span class="o">=</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span> <span class="n">projektname</span><span class="p">,</span>
+    <span class="n">workspace_definitionen</span><span class="o">=</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span> <span class="n">projektname</span><span class="p">,</span>
                                      <span class="s1">&#39;FGDB_Definition_Projekt_&#39;</span> <span class="o">+</span> <span class="n">projektname</span> <span class="o">+</span> <span class="s1">&#39;.gdb&#39;</span><span class="p">)</span>
-    <span class="n">workspace_wertveraenderung</span><span class="o">=</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span> <span class="n">projektname</span><span class="p">,</span>
+    <span class="n">workspace_wertveraenderung</span><span class="o">=</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span> <span class="n">projektname</span><span class="p">,</span>
                                      <span class="s1">&#39;FGDB_Standortkonkurrenz_Supermaerkte_&#39;</span> <span class="o">+</span> <span class="n">projektname</span> <span class="o">+</span> <span class="s1">&#39;.gdb&#39;</span><span class="p">)</span>
-    <span class="n">workspace_Erreichbarkeit</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span> <span class="n">projektname</span><span class="p">,</span>
+    <span class="n">workspace_Erreichbarkeit</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span> <span class="n">projektname</span><span class="p">,</span>
                                      <span class="s1">&#39;FGDB_Erreichbarkeit_&#39;</span> <span class="o">+</span> <span class="n">projektname</span> <span class="o">+</span> <span class="s1">&#39;.gdb&#39;</span><span class="p">)</span>
-    <span class="n">workspace_projekt</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span> <span class="n">projektname</span><span class="p">)</span>
+    <span class="n">workspace_projekt</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span> <span class="n">projektname</span><span class="p">)</span>
 
     <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">workspace</span><span class="o">=</span><span class="n">workspace_Erreichbarkeit</span>
     <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
@@ -837,7 +837,7 @@
             <span class="n">Erreichbarkeit</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span><span class="n">lon</span><span class="p">,</span><span class="n">auswahl</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Keine Einrichtungen liegen in der direkten Umgebung zum RPC Gebiet &quot;</span><span class="p">)</span>
-            <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;oder keine Einrichtungen wurden dem RPC Projekt hinzugefügt.&quot;</span><span class="p">)</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;oder keine Einrichtungen wurden dem RPC Projekt hinzugef??gt.&quot;</span><span class="p">)</span>
 
 
     <span class="k">else</span><span class="p">:</span>
@@ -857,7 +857,7 @@
                 <span class="n">sp</span><span class="o">=</span><span class="n">desc</span><span class="o">.</span><span class="n">spatialReference</span>
         <span class="c1">##        spatial_reference = arcpy.SpatialReference(join(workspace_definitionen,&quot;Teilflaechen_Plangebiet&quot;))</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateFeatureclass_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span> <span class="s2">&quot;Einrichtungen_Kita&quot;</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">has_m</span><span class="p">,</span> <span class="n">has_z</span><span class="p">,</span> <span class="n">sp</span><span class="p">)</span>
-                <span class="c1">#Füge Spalten ein</span>
+                <span class="c1">#F??ge Spalten ein</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Kita&quot;</span><span class="p">,</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Kita&quot;</span><span class="p">,</span> <span class="s2">&quot;Kategorie&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Kita&quot;</span><span class="p">,</span> <span class="s2">&quot;Strasse&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
@@ -886,7 +886,7 @@
                 <span class="n">desc</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">Describe</span><span class="p">(</span><span class="n">workspace_definitionen</span><span class="o">+</span><span class="s2">&quot;\Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
                 <span class="n">sp</span><span class="o">=</span><span class="n">desc</span><span class="o">.</span><span class="n">spatialReference</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateFeatureclass_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span> <span class="s2">&quot;Einrichtungen_Grundschule&quot;</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">has_m</span><span class="p">,</span> <span class="n">has_z</span><span class="p">,</span> <span class="n">sp</span><span class="p">)</span>
-                <span class="c1">#Füge Spalten ein</span>
+                <span class="c1">#F??ge Spalten ein</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Grundschule&quot;</span><span class="p">,</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Grundschule&quot;</span><span class="p">,</span> <span class="s2">&quot;Kategorie&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Grundschule&quot;</span><span class="p">,</span> <span class="s2">&quot;Strasse&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
@@ -916,7 +916,7 @@
                 <span class="n">desc</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">Describe</span><span class="p">(</span><span class="n">workspace_definitionen</span><span class="o">+</span><span class="s2">&quot;\Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
                 <span class="n">sp</span><span class="o">=</span><span class="n">desc</span><span class="o">.</span><span class="n">spatialReference</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateFeatureclass_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span> <span class="s2">&quot;Einrichtungen_Allgemeinmediziner&quot;</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">has_m</span><span class="p">,</span> <span class="n">has_z</span><span class="p">,</span> <span class="n">sp</span><span class="p">)</span>
-                <span class="c1">#Füge Spalten ein</span>
+                <span class="c1">#F??ge Spalten ein</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Allgemeinmediziner&quot;</span><span class="p">,</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Allgemeinmediziner&quot;</span><span class="p">,</span> <span class="s2">&quot;Kategorie&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Allgemeinmediziner&quot;</span><span class="p">,</span> <span class="s2">&quot;Strasse&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
@@ -945,7 +945,7 @@
                 <span class="n">desc</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">Describe</span><span class="p">(</span><span class="n">workspace_definitionen</span><span class="o">+</span><span class="s2">&quot;\Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
                 <span class="n">sp</span><span class="o">=</span><span class="n">desc</span><span class="o">.</span><span class="n">spatialReference</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateFeatureclass_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span> <span class="s2">&quot;Einrichtungen_Apotheke&quot;</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">has_m</span><span class="p">,</span> <span class="n">has_z</span><span class="p">,</span> <span class="n">sp</span><span class="p">)</span>
-                <span class="c1">#Füge Spalten ein</span>
+                <span class="c1">#F??ge Spalten ein</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Apotheke&quot;</span><span class="p">,</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Apotheke&quot;</span><span class="p">,</span> <span class="s2">&quot;Kategorie&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="o">+</span><span class="s2">&quot;\Einrichtungen_Apotheke&quot;</span><span class="p">,</span> <span class="s2">&quot;Strasse&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
@@ -975,7 +975,7 @@
                 <span class="n">desc</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">Describe</span><span class="p">(</span><span class="n">workspace_definitionen</span><span class="o">+</span><span class="s2">&quot;\Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
                 <span class="n">sp</span><span class="o">=</span><span class="n">desc</span><span class="o">.</span><span class="n">spatialReference</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateFeatureclass_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span> <span class="s2">&quot;Einrichtungen_Krankenhaeuser&quot;</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">has_m</span><span class="p">,</span> <span class="n">has_z</span><span class="p">,</span> <span class="n">sp</span><span class="p">)</span>
-                <span class="c1">#Füge Spalten ein</span>
+                <span class="c1">#F??ge Spalten ein</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span><span class="s2">&quot;Einrichtungen_Krankenhaeuser&quot;</span><span class="p">),</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span><span class="s2">&quot;Einrichtungen_Krankenhaeuser&quot;</span><span class="p">),</span> <span class="s2">&quot;Kategorie&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span><span class="s2">&quot;Einrichtungen_Krankenhaeuser&quot;</span><span class="p">),</span> <span class="s2">&quot;Strasse&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
@@ -1006,7 +1006,7 @@
                 <span class="n">desc</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">Describe</span><span class="p">(</span><span class="n">workspace_definitionen</span><span class="o">+</span><span class="s2">&quot;\Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
                 <span class="n">sp</span><span class="o">=</span><span class="n">desc</span><span class="o">.</span><span class="n">spatialReference</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">CreateFeatureclass_management</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span> <span class="s2">&quot;Einrichtungen_Sonstige&quot;</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">has_m</span><span class="p">,</span> <span class="n">has_z</span><span class="p">,</span> <span class="n">sp</span><span class="p">)</span>
-                <span class="c1">#Füge Spalten ein</span>
+                <span class="c1">#F??ge Spalten ein</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span><span class="s2">&quot;Einrichtungen_Sonstige&quot;</span><span class="p">),</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span><span class="s2">&quot;Einrichtungen_Sonstige&quot;</span><span class="p">),</span> <span class="s2">&quot;Kategorie&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
                 <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_Erreichbarkeit</span><span class="p">,</span><span class="s2">&quot;Einrichtungen_Sonstige&quot;</span><span class="p">),</span> <span class="s2">&quot;Strasse&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>

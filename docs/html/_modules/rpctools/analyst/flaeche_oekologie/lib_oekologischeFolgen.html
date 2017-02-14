@@ -301,17 +301,17 @@
         <span class="c1">#rootPfad = rootPfad + &quot;\\00_Entwicklungsumgebung&quot;</span>
         <span class="c1">#Pfad zur Ergebnistabelle</span>
 
-<span class="c1">##        ergebnisTabelle = rootPfad + &quot;\\3_Projekte\\&quot; + projektName + &quot;\\FGDB_36_Flaeche_und_Oekologie_&quot; + projektName + &quot;.gdb\\Ergebnisse_oekologischeWertigkeit&quot;</span>
+<span class="c1">##        ergebnisTabelle = rootPfad + &quot;\\3 Benutzerdefinierte Projekte\\&quot; + projektName + &quot;\\FGDB_36_Flaeche_und_Oekologie_&quot; + projektName + &quot;.gdb\\Ergebnisse_oekologischeWertigkeit&quot;</span>
 <span class="c1">##        #insert Cursor für die Ergebnistabelle erstellen</span>
 <span class="c1">##        ergebnisCursor = arcpy.InsertCursor(ergebnisTabelle)</span>
 <span class="c1">##        #eine neue Zeile für das Ergebnis dieses Durchlaufs anlegen</span>
 <span class="c1">##        ergebnisZeile = ergebnisCursor.newRow()</span>
         <span class="c1">#Die Flächen des Plangebietes als Layer verfügbar machen</span>
 
-        <span class="n">flaechenPlangebiet</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s2">&quot;3_Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_&quot;</span><span class="o">+</span><span class="n">projektName</span><span class="o">+</span> <span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
+        <span class="n">flaechenPlangebiet</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_&quot;</span><span class="o">+</span><span class="n">projektName</span><span class="o">+</span> <span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
         <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">flaechenPlangebiet</span><span class="p">,</span><span class="s2">&quot;flaechenPlangebiet_lyr&quot;</span><span class="p">)</span>
         <span class="c1">#Aus der Featureclass eine Liste mit allen Schutzgebieten iterieren</span>
-        <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">workspace</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;F_Flaeche_und_Oekologie&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_Tool.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;NRW&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">workspace</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Flaeche_und_Oekologie&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_Tool.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;NRW&quot;</span><span class="p">)</span>
         <span class="c1">#print arcpy.env.workspace</span>
         <span class="c1">#arcpy.AddMessage(arcpy.env.workspace)</span>
         <span class="n">liste</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFeatureClasses</span><span class="p">()</span>
@@ -413,22 +413,22 @@
         <span class="n">wcd</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1">#arcpy.AddMessage(wcd)</span>
         <span class="c1">#Pfad zur Ergebnistabelle</span>
-        <span class="n">projektOrdner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">wcd</span><span class="p">,</span><span class="s2">&quot;3_Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_&quot;</span> <span class="o">+</span> <span class="n">projektName</span> <span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">)</span>
+        <span class="n">projektOrdner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">wcd</span><span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_&quot;</span> <span class="o">+</span> <span class="n">projektName</span> <span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">)</span>
         <span class="c1">#arcpy.AddMessage(projektOrdner)</span>
-        <span class="c1">#ergebnisTabelle = rootPfad + &quot;\\3_Projekte\\&quot; + projektName + &quot;\\FGDB_36_Flaeche_und_Oekologie_&quot; + projektName + &quot;.gdb\\Ergebnisse_oekologischeWertigkeit&quot;</span>
+        <span class="c1">#ergebnisTabelle = rootPfad + &quot;\\3 Benutzerdefinierte Projekte\\&quot; + projektName + &quot;\\FGDB_36_Flaeche_und_Oekologie_&quot; + projektName + &quot;.gdb\\Ergebnisse_oekologischeWertigkeit&quot;</span>
         <span class="n">ergebnisTabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">projektOrdner</span><span class="p">,</span><span class="s2">&quot;Ergebnisse_oekologischeWertigkeit&quot;</span><span class="p">)</span>
        <span class="c1"># arcpy.AddMessage(ergebnisTabelle)</span>
         <span class="c1">#Pfad zu den Geodaten</span>
-        <span class="c1">#projektFlaeche = rootPfad + &quot;\\3_Projekte\\&quot; + projektName + &quot;\\FGDB_11_Definition_Projekt_&quot; + projektName + &quot;.gdb\\Teilflaechen_Plangebiet&quot;</span>
-        <span class="n">projektFlaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">wcd</span><span class="p">,</span><span class="s2">&quot;3_Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_&quot;</span> <span class="o">+</span> <span class="n">projektName</span><span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
+        <span class="c1">#projektFlaeche = rootPfad + &quot;\\3 Benutzerdefinierte Projekte\\&quot; + projektName + &quot;\\FGDB_11_Definition_Projekt_&quot; + projektName + &quot;.gdb\\Teilflaechen_Plangebiet&quot;</span>
+        <span class="n">projektFlaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">wcd</span><span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_&quot;</span> <span class="o">+</span> <span class="n">projektName</span><span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
         <span class="c1">#arcpy.AddMessage(projektFlaeche)</span>
         <span class="c1">#Pfad zu den UZVR</span>
         <span class="c1">#uzvr =rootPfad + &quot;\\2_Tool\\36_Flaeche_und_Oekologie\\FGDB_36_Flaeche_und_Oekologie_Tool.gdb\\uzvr_de&quot;</span>
 
-        <span class="c1"># uzvr = join(wcd,&quot;3_Projekte&quot;,projektName,&quot;FGDB_36_Flaeche_und_Oekologie_&quot; + projektName +&quot;.gdb&quot;,&quot;uzvr_de&quot;)</span>
+        <span class="c1"># uzvr = join(wcd,&quot;3 Benutzerdefinierte Projekte&quot;,projektName,&quot;FGDB_36_Flaeche_und_Oekologie_&quot; + projektName +&quot;.gdb&quot;,&quot;uzvr_de&quot;)</span>
         <span class="c1"># auskommentiert, da die uzvr jetzt zentral vorgehalten werden</span>
 
-        <span class="n">uzvr</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">wcd</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;F_Flaeche_und_Oekologie&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_Tool.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;uzvr_de&quot;</span><span class="p">)</span>
+        <span class="n">uzvr</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">wcd</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Flaeche_und_Oekologie&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_Tool.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;uzvr_de&quot;</span><span class="p">)</span>
 
         <span class="c1">#arcpy.AddMessage(uzvr)</span>
         <span class="c1">#Nullfall</span>
@@ -778,7 +778,7 @@
         <span class="c1">#wcd = os.getcwd()</span>
         <span class="c1">#rootPfad = sys.path[0].split(&quot;2_&quot;)[0]</span>
         <span class="c1">##Pfad zu den bkg Daten</span>
-        <span class="c1">#projektFlaeche = rootPfad + &quot;\\3_Projekte\\&quot; + projektName + &quot;\\FGDB_11_Definition_Projekt_&quot; + projektName + &quot;.gdb\\Teilflaechen_Plangebiet&quot;</span>
+        <span class="c1">#projektFlaeche = rootPfad + &quot;\\3 Benutzerdefinierte Projekte\\&quot; + projektName + &quot;\\FGDB_11_Definition_Projekt_&quot; + projektName + &quot;.gdb\\Teilflaechen_Plangebiet&quot;</span>
         <span class="c1">#bkg = rootPfad + &quot;\\1_Basisdaten\\FGBD_01_Basisdaten_deutschland.gdb\\bkg_gemeinden&quot;</span>
         <span class="c1">##Einwohnerzahl aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird</span>
         <span class="c1">##1. Feature Layer aus den bkg-daten erstellen</span>

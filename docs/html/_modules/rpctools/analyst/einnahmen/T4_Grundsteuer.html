@@ -87,7 +87,7 @@
 
 <div class="viewcode-block" id="Grundsteuer"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T4_Grundsteuer.html#rpctools.analyst.einnahmen.T4_Grundsteuer.Grundsteuer">[docs]</a><span class="k">class</span> <span class="nc">Grundsteuer</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
 
-    <span class="n">_dbname</span> <span class="o">=</span> <span class="s1">&#39;FGDB_Einnahmen.gdb&#39;</span>
+    <span class="n">_dbname</span> <span class="o">=</span> <span class="s1">&#39;FGDEinnahmen.gdb&#39;</span>
 
 <div class="viewcode-block" id="Grundsteuer.run"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T4_Grundsteuer.html#rpctools.analyst.einnahmen.T4_Grundsteuer.Grundsteuer.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
@@ -113,11 +113,11 @@
         <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">workspace_basisdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;1_Basisdaten&#39;</span><span class="p">,</span><span class="s1">&#39;FGBD_Basisdaten_deutschland.gdb&#39;</span><span class="p">)</span>
-        <span class="n">workspace_projekt_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
-        <span class="n">workspace_projekt_bevoelkerung</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_BevModellierung.gdb&#39;</span><span class="p">)</span>
-        <span class="n">workspace_projekt_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Einnahmen.gdb&#39;</span><span class="p">)</span>
-        <span class="n">workspace_tool_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;3_Art und Mass der Nutzung&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_Tool.gdb&quot;</span><span class="p">)</span>
-        <span class="n">workspace_tool_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;B_Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Einnahmen_Tool.gdb&quot;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_bevoelkerung</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_BevModellierung.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDEinnahmen.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_tool_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Art und Mass der Nutzung&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_Tool.gdb&quot;</span><span class="p">)</span>
+        <span class="n">workspace_tool_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;FGDEinnahmen_Tool.gdb&quot;</span><span class="p">)</span>
 
         <span class="n">Teilflaechen_Plangebiet_Centroide</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s2">&quot;Teilflaechen_Plangebiet_Centroide&quot;</span><span class="p">)</span>
         <span class="n">Teilflaechen_Plangebiet_CentroideGK3</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s2">&quot;Teilflaechen_Plangebiet_CentroideGK3&quot;</span><span class="p">)</span>
@@ -142,8 +142,8 @@
         <span class="nb">print</span> <span class="n">schrittmeldung</span>
 
         <span class="c1">#Einlesen der Tabellen</span>
-        <span class="c1">#Jahr I Gebäudetyp I Miete/Eigentum I Anzahl WE</span>
-        <span class="c1">#Gebäudetyp I Wohnfläche_m²_proWE I Anzahl_Garagen_proWE I Anzahl_Carports_proWE</span>
+        <span class="c1">#Jahr I Geb??udetyp I Miete/Eigentum I Anzahl WE</span>
+        <span class="c1">#Geb??udetyp I Wohnfl??che_m??_proWE I Anzahl_Garagen_proWE I Anzahl_Carports_proWE</span>
 
         <span class="c1">#Pruefe, ob Tabellen aus EKS-Berechnung vorhanden sind</span>
         <span class="n">EKST_03_WE_NBG</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;EKST_03_WE_NBG&#39;</span><span class="p">)</span>
@@ -194,24 +194,24 @@
         <span class="n">in_cur</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
         <span class="c1">##row = in_cur.newRow()</span>
-        <span class="c1">##row.Gebaeudetyp = &#39;Bürogebäude&#39;</span>
+        <span class="c1">##row.Gebaeudetyp = &#39;B??rogeb??ude&#39;</span>
         <span class="c1">##row.Jahresrohmiete = 0</span>
         <span class="c1">##in_cur.insertRow(row)</span>
         <span class="c1">##</span>
         <span class="c1">##row = in_cur.newRow()</span>
-        <span class="c1">##row.Gebaeudetyp = &#39;Gewerbegebäude&#39;</span>
+        <span class="c1">##row.Gebaeudetyp = &#39;Gewerbegeb??ude&#39;</span>
         <span class="c1">##row.Jahresrohmiete = 0</span>
         <span class="c1">##in_cur.insertRow(row)</span>
         <span class="c1">##</span>
         <span class="c1">##row = in_cur.newRow()</span>
-        <span class="c1">##row.Gebaeudetyp = &#39;Einzelhandelsgebäude&#39;</span>
+        <span class="c1">##row.Gebaeudetyp = &#39;Einzelhandelsgeb??ude&#39;</span>
         <span class="c1">##row.Jahresrohmiete = 0</span>
         <span class="c1">##in_cur.insertRow(row)</span>
 
 
-        <span class="c1"># erzeuge Tabelle Gebäudetyp I Jahresrohmiete = Wohnfläche * Monatsrohmiete *12 + Anzahl_Garagen * Jahresrohmiete_Garagen + Anzahl_Carports * Jahresrohmiete_Carports</span>
+        <span class="c1"># erzeuge Tabelle Geb??udetyp I Jahresrohmiete = Wohnfl??che * Monatsrohmiete *12 + Anzahl_Garagen * Jahresrohmiete_Garagen + Anzahl_Carports * Jahresrohmiete_Carports</span>
 
-        <span class="c1"># Fixe Tabelle Gebäudetyp I Gemeindegrößenklasse64 I Vervielfältiger (als double)</span>
+        <span class="c1"># Fixe Tabelle Geb??udetyp I Gemeindegr????enklasse64 I Vervielf??ltiger (als double)</span>
 
         <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span><span class="n">workspace_tool_definition</span><span class="p">,</span><span class="s1">&#39;Gebaeudetyp&#39;</span><span class="p">),</span>
@@ -234,12 +234,12 @@
         <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
         <span class="nb">print</span> <span class="n">schrittmeldung</span>
 
-        <span class="c1"># erzeuge Tabelle Gebäudetyp I Einheitswert_bis38346_EUR I Einheitswert_ab38346_EUR</span>
-        <span class="c1"># Einheitswert = Jahresrohmiete (aus Nr. 2) * Vervielfältiger je Gebäudetyp</span>
-        <span class="c1"># Achtung! Ergebnisse BIS 38346 gehen komplett in diese Spalte. Liegt das Ergebnis darüber gehen 38346 in die Spalte und der Restbetrag in die Spalte Einheitswert_ab38346_EUR</span>
+        <span class="c1"># erzeuge Tabelle Geb??udetyp I Einheitswert_bis38346_EUR I Einheitswert_ab38346_EUR</span>
+        <span class="c1"># Einheitswert = Jahresrohmiete (aus Nr. 2) * Vervielf??ltiger je Geb??udetyp</span>
+        <span class="c1"># Achtung! Ergebnisse BIS 38346 gehen komplett in diese Spalte. Liegt das Ergebnis dar??ber gehen 38346 in die Spalte und der Restbetrag in die Spalte Einheitswert_ab38346_EUR</span>
         <span class="c1"># Beispiel: 90000 = 1 * 38346_EUR in Spalte Einheitswert_bis38346_EUR und 90000-38346 in Einheitswert_ab38346_EUR</span>
 
-        <span class="c1"># Fixe Tabelle Gebäudetyp I Steuermesszahl_bis38346_EUR I Steuermesszahl_ueber38346_EUR</span>
+        <span class="c1"># Fixe Tabelle Geb??udetyp I Steuermesszahl_bis38346_EUR I Steuermesszahl_ueber38346_EUR</span>
 
         <span class="c1">#Erstelle temporaere Zwischentabelle</span>
         <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
@@ -305,7 +305,7 @@
         <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
         <span class="nb">print</span> <span class="n">schrittmeldung</span>
 
-        <span class="c1">#erzeuge Tabelle Gebäudetyp I Steuerschuld_Jahr = (Einheitswert_bis38346_EUR * Steuermesszahl_bis38346_EUR + Einheitswert_ab38346_EUR * Steuermesszahl_ueber38346_EUR) * Hebesatz / 100</span>
+        <span class="c1">#erzeuge Tabelle Geb??udetyp I Steuerschuld_Jahr = (Einheitswert_bis38346_EUR * Steuermesszahl_bis38346_EUR + Einheitswert_ab38346_EUR * Steuermesszahl_ueber38346_EUR) * Hebesatz / 100</span>
 
         <span class="c1">#Erstelle Tabelle Steuermessbetrag</span>
         <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
@@ -328,7 +328,7 @@
         <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
         <span class="nb">print</span> <span class="n">schrittmeldung</span>
 
-        <span class="c1"># erzeuge Tabelle Jahr I Grundsteuereinnahmen = (Anzahl_WE je Gebäudetyp aus Tabelle im Schrit 1 * Steuerschuld aus voriger Tabelle )</span>
+        <span class="c1"># erzeuge Tabelle Jahr I Grundsteuereinnahmen = (Anzahl_WE je Geb??udetyp aus Tabelle im Schrit 1 * Steuerschuld aus voriger Tabelle )</span>
 
         <span class="c1">#Erstelle Tabelle GRST_Grundsteuereinnahmen_temp</span>
         <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
@@ -369,7 +369,7 @@
 
         <span class="c1"># Pfade setzen</span>
         <span class="n">logo</span> <span class="o">=</span> <span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span><span class="s2">&quot;1_Basisdaten&quot;</span><span class="p">,</span><span class="s2">&quot;logo_rpc.png&quot;</span><span class="p">)</span>
-        <span class="n">ausgabeordner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Excel&#39;</span><span class="p">)</span>
+        <span class="n">ausgabeordner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Excel&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">):</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">)</span>
         <span class="n">excelpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">,</span><span class="s1">&#39;Einnahmen_Grundsteuer.xlsx&#39;</span><span class="p">)</span>
 
@@ -378,7 +378,7 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
-        <span class="c1"># Workbook und Tabellenblätter anlegen</span>
+        <span class="c1"># Workbook und Tabellenbl??tter anlegen</span>
         <span class="n">wb</span> <span class="o">=</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="n">excelpfad</span><span class="p">)</span>
         <span class="n">sl</span><span class="o">.</span><span class="n">infosheet</span><span class="p">(</span><span class="n">projektname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Grundsteuer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">wb</span><span class="p">)</span>
         <span class="n">ws1</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik&#39;</span><span class="p">)</span>
@@ -473,12 +473,12 @@
 
         <span class="c1">################################</span>
         <span class="c1">#Methodikblatt einfuegen</span>
-        <span class="n">methodik_grafik</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;B_Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;Erlaeuterungstexte&quot;</span><span class="p">,</span><span class="s2">&quot;Methodik_04_Grundsteuer.png&quot;</span><span class="p">)</span>
+        <span class="n">methodik_grafik</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;Erlaeuterungstexte&quot;</span><span class="p">,</span><span class="s2">&quot;Methodik_04_Grundsteuer.png&quot;</span><span class="p">)</span>
         <span class="n">ws1</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="n">methodik_grafik</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">})</span> <span class="c1">#Korrigiert Verzerrung die bei 1x1 auftritt</span>
 
         <span class="c1">################################</span>
         <span class="c1">#Haftungsausschluss einfuegen</span>
-        <span class="n">haftung_grafik</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;B_Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;Erlaeuterungstexte&quot;</span><span class="p">,</span><span class="s2">&quot;Haftungsausschluss.png&quot;</span><span class="p">)</span>
+        <span class="n">haftung_grafik</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;Erlaeuterungstexte&quot;</span><span class="p">,</span><span class="s2">&quot;Haftungsausschluss.png&quot;</span><span class="p">)</span>
         <span class="n">ws5</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="n">haftung_grafik</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span> <span class="c1">#Korrigiert Verzerrung die bei 1x1 auftritt</span>
 
         <span class="c1">################################</span>

@@ -1,6 +1,6 @@
 *.wpu
 *.wpr
-3_Projekte/
+3 Benutzerdefinierte Projekte/
 *.pyc
 *.lock
 PGDB_temp.mdb

@@ -93,7 +93,7 @@
 
     <span class="n">wcd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
     <span class="n">rootPfad</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">bodenbedeckungTabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s2">&quot;3_Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_&quot;</span> <span class="o">+</span> <span class="n">projektName</span> <span class="o">+</span> <span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Bodenbedeckung&quot;</span><span class="p">)</span>
+    <span class="n">bodenbedeckungTabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_&quot;</span> <span class="o">+</span> <span class="n">projektName</span> <span class="o">+</span> <span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Bodenbedeckung&quot;</span><span class="p">)</span>
 
     <span class="n">bedeckungstabelle</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">bodenbedeckungTabelle</span><span class="p">)</span>
     <span class="n">NF_ueberbauteFlaechen</span> <span class="o">=</span> <span class="mi">0</span>
@@ -208,7 +208,7 @@
         <span class="c1"># print(&quot;groessterUZVR: &quot;+str(groessterUZVR) + &quot;\n&quot;)</span>
         <span class="c1"># messages.AddMessage(&quot;groessterUZVR: &quot;+str(groessterUZVR) + &quot;\n&quot;)</span>
 
-        <span class="c1">#2b - Regionale Effekte - Kaltluftströmungen</span>
+        <span class="c1">#2b - Regionale Effekte - Kaltluftstr??mungen</span>
         <span class="c1">#Integration von KLAMM21</span>
 
         <span class="c1">#3a. Einordnung der Region Schutzstatus Biotope &amp; Boden</span>
@@ -241,7 +241,7 @@
             <span class="n">schutzStatusBoden</span> <span class="o">=</span> <span class="mi">0</span>
 
 
-        <span class="c1">#3b - Einordnung in die Region - Flächeninanspruchname</span>
+        <span class="c1">#3b - Einordnung in die Region - Fl??cheninanspruchname</span>
         <span class="c1">#Vorraussetzung: Integrationsgrad berechnen:</span>
         <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Integration bewerten  </span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
@@ -262,7 +262,7 @@
 
         <span class="n">wcd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
         <span class="n">rootPfad</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">ergebnisTabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s1">&#39;FGDB_Flaeche_und_Oekologie.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;Ergebnisse_oekologischeWertigkeit&#39;</span><span class="p">)</span>
+        <span class="n">ergebnisTabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s1">&#39;FGDB_Flaeche_und_Oekologie.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;Ergebnisse_oekologischeWertigkeit&#39;</span><span class="p">)</span>
         <span class="n">ueberschneidungBiotope</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ueberschneidungBiotope</span><span class="p">)</span>
         <span class="n">ueberschneidungFFHGebiete</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ueberschneidungFFHGebiete</span><span class="p">)</span>
         <span class="n">ueberschneidungNationalparke</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ueberschneidungNationalparke</span><span class="p">)</span>
@@ -282,9 +282,9 @@
         <span class="c1">#aktuelle Zeit</span>
         <span class="n">time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
         <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">second</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">day</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">month</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
-        <span class="c1">#insert Cursor für die Ergebnistabelle erstellen</span>
+        <span class="c1">#insert Cursor f??r die Ergebnistabelle erstellen</span>
         <span class="n">ergebnisCursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">ergebnisTabelle</span><span class="p">)</span>
-        <span class="c1">#eine neue Zeile für das Ergebnis dieses Durchlaufs anlegen</span>
+        <span class="c1">#eine neue Zeile f??r das Ergebnis dieses Durchlaufs anlegen</span>
         <span class="n">ergebnisZeile</span> <span class="o">=</span> <span class="n">ergebnisCursor</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
         <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">pwNull</span> <span class="o">=</span> <span class="n">punktwertNullfall</span>
         <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">pwPlan</span> <span class="o">=</span> <span class="n">punktwertPlanfall</span>
@@ -303,7 +303,7 @@
         <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">bewertung_Integra</span> <span class="o">=</span> <span class="n">bewertungIntegration</span>
         <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">timestamp</span>
         <span class="n">ergebnisCursor</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">ergebnisZeile</span><span class="p">)</span>
-        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Schutzwürdige Böden betroffen? = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">schutzBoden</span><span class="p">))</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Schutzw??rdige B??den betroffen? = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">schutzBoden</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ergebnisse gespeichert&quot;</span><span class="p">)</span>
         <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Ergebnisse gespeichert&quot;</span><span class="p">)</span>
         <span class="k">del</span> <span class="n">ergebnisCursor</span>
@@ -337,23 +337,23 @@
 
     <span class="c1"># Pfade setzen</span>
     <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">workspace_projekt_oekologie</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s1">&#39;FGDB_Flaeche_und_Oekologie.gdb&#39;</span><span class="p">)</span>
+    <span class="n">workspace_projekt_oekologie</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s1">&#39;FGDB_Flaeche_und_Oekologie.gdb&#39;</span><span class="p">)</span>
     <span class="n">tablepath_Bodenbedeckung</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_oekologie</span><span class="p">,</span><span class="s1">&#39;Bodenbedeckung&#39;</span><span class="p">)</span>
     <span class="n">tablepath_Integration</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_oekologie</span><span class="p">,</span><span class="s1">&#39;Ergebnisse_Integrationsgrad&#39;</span><span class="p">)</span>
     <span class="n">tablepath_oekWert</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_oekologie</span><span class="p">,</span><span class="s1">&#39;Ergebnisse_oekologischeWertigkeit&#39;</span><span class="p">)</span>
     <span class="n">tablepath_Wohnflaechendichte</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_oekologie</span><span class="p">,</span><span class="s1">&#39;Ergebnisse_Wohnflaechendichte&#39;</span><span class="p">)</span>
-    <span class="n">grafikpath_erlauterungstext</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;F_Flaeche_und_Oekologie&#39;</span><span class="p">,</span><span class="s1">&#39;Erlauterungstexte&#39;</span><span class="p">)</span>
+    <span class="n">grafikpath_erlauterungstext</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;Flaeche_und_Oekologie&#39;</span><span class="p">,</span><span class="s1">&#39;Erlauterungstexte&#39;</span><span class="p">)</span>
 
     <span class="n">logo</span> <span class="o">=</span> <span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span><span class="s2">&quot;1_Basisdaten&quot;</span><span class="p">,</span><span class="s2">&quot;logo_rpc.png&quot;</span><span class="p">)</span>
-    <span class="n">ausgabeordner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Excel&#39;</span><span class="p">)</span>
-    <span class="n">excelpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">,</span><span class="s1">&#39;F_Flaeche_und_Oekologie.xlsx&#39;</span><span class="p">)</span>
+    <span class="n">ausgabeordner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Excel&#39;</span><span class="p">)</span>
+    <span class="n">excelpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">,</span><span class="s1">&#39;Flaeche_und_Oekologie.xlsx&#39;</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">excelpfad</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
         <span class="k">pass</span>
 
-    <span class="c1"># Workbook und Tabellenblätter anlegen</span>
+    <span class="c1"># Workbook und Tabellenbl??tter anlegen</span>
     <span class="n">wb</span> <span class="o">=</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="n">excelpfad</span><span class="p">)</span>
     <span class="n">sl</span><span class="o">.</span><span class="n">infosheet</span><span class="p">(</span><span class="n">projektName</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Projektrahmendaten&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">wb</span><span class="p">)</span>
     <span class="n">ws2</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik_Uebersicht&#39;</span><span class="p">)</span>
@@ -415,7 +415,7 @@
 
 
     <span class="c1">########</span>
-    <span class="c1">## Erläuterungstexte einfügen</span>
+    <span class="c1">## Erl??uterungstexte einf??gen</span>
     <span class="c1"># Pfade zu Grafiken herstellen</span>
     <span class="n">Text1</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">grafikpath_erlauterungstext</span><span class="p">,</span> <span class="s1">&#39;Methodik_FlaecheOekologie1.png&#39;</span><span class="p">)</span>
     <span class="n">Text2</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">grafikpath_erlauterungstext</span><span class="p">,</span> <span class="s1">&#39;Methodik_FlaecheOekologie2.png&#39;</span><span class="p">)</span>
@@ -425,7 +425,7 @@
     <span class="n">Text5</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">grafikpath_erlauterungstext</span><span class="p">,</span> <span class="s1">&#39;Methodik_FlaecheOekologie5.png&#39;</span><span class="p">)</span>
     <span class="n">Text6</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">grafikpath_erlauterungstext</span><span class="p">,</span> <span class="s1">&#39;Haftungsausschluss.png&#39;</span><span class="p">)</span>
 
-    <span class="c1">###Grafiken einfügen</span>
+    <span class="c1">###Grafiken einf??gen</span>
     <span class="n">ws2</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
     <span class="n">ws2</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text6</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
     <span class="n">ws3</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text2</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
@@ -438,7 +438,7 @@
     <span class="c1">########</span>
     <span class="c1">###### Tabellenblatt 4: Rohdaten einladen</span>
     <span class="c1">## Teil 1: Bodenbedeckung</span>
-    <span class="c1">#Teil 1a Bezeichnungen Bodenbedeckung einfügen</span>
+    <span class="c1">#Teil 1a Bezeichnungen Bodenbedeckung einf??gen</span>
     <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Rohadtentabelle&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
     <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span>
@@ -452,7 +452,7 @@
         <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
 
 
-    <span class="c1"># Teil 1b Werte Bodenbedeckung einfügen</span>
+    <span class="c1"># Teil 1b Werte Bodenbedeckung einf??gen</span>
 
     <span class="c1">#Durch Ergebniszeilen iterieren und Werte in Excel einfuegen</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_Bodenbedeckung</span><span class="p">)</span>
@@ -476,14 +476,14 @@
         <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">BBedYend</span> <span class="o">=</span> <span class="n">j</span>
 
-    <span class="c1"># Teil 2: Ökologische Wertigkeit</span>
+    <span class="c1"># Teil 2: ??kologische Wertigkeit</span>
     <span class="c1">#Durch Ergebniszeilen iterieren und Werte in Excel einfuegen</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_oekWert</span><span class="p">)</span>
 
     <span class="c1">#Feldnamen auslesen</span>
     <span class="n">fieldnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">tablepath_oekWert</span><span class="p">)]</span>
 
-    <span class="c1">#Teil 2a: Bezeichnungen ökologische Wertigkeit einfügen</span>
+    <span class="c1">#Teil 2a: Bezeichnungen ??kologische Wertigkeit einf??gen</span>
     <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">3</span>
     <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Oekologische Wertigkeit&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
@@ -494,7 +494,7 @@
         <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fieldname</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
 
-    <span class="c1">#Teil 2b: Ergebnisse ökologische Wertigkeit auslesen</span>
+    <span class="c1">#Teil 2b: Ergebnisse ??kologische Wertigkeit auslesen</span>
     <span class="n">wert</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
@@ -509,14 +509,14 @@
         <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">OekWertZeile</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span>
 
-    <span class="c1"># Teil 3: Wohnflächendichte</span>
+    <span class="c1"># Teil 3: Wohnfl??chendichte</span>
     <span class="c1"># Durch Ergebniszeilen iterieren und Werte in Excel einfuegen</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_Wohnflaechendichte</span><span class="p">)</span>
 
     <span class="c1"># Feldnamen auslesen</span>
     <span class="n">fieldnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">tablepath_Wohnflaechendichte</span><span class="p">)]</span>
 
-    <span class="c1">#Teil 2a: Bezeichnungen Wohnflächendichte einfügen</span>
+    <span class="c1">#Teil 2a: Bezeichnungen Wohnfl??chendichte einf??gen</span>
     <span class="k">if</span> <span class="n">flaechentyp</span> <span class="o">==</span> <span class="s2">&quot;Wohnen&quot;</span><span class="p">:</span>
         <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">3</span>
         <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Wohnflaechendichte&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
@@ -529,7 +529,7 @@
             <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fieldname</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
             <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
 
-        <span class="c1"># Teil 2b: Ergebnisse Wohnflächendichte auslesen</span>
+        <span class="c1"># Teil 2b: Ergebnisse Wohnfl??chendichte auslesen</span>
         <span class="n">wert</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
@@ -640,7 +640,7 @@
     <span class="n">j</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="c1"># Schleife für Nullfall und Planfall in Hektar</span>
+    <span class="c1"># Schleife f??r Nullfall und Planfall in Hektar</span>
     <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">:</span>
         <span class="n">BBedRange</span> <span class="o">=</span> <span class="n">xl_range</span><span class="p">(</span><span class="n">BBedYstart</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">BBedYend</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
         <span class="n">formulastring</span> <span class="o">=</span> <span class="s1">&#39;=SUM(Rohdaten!&#39;</span><span class="o">+</span><span class="n">BBedRange</span><span class="o">+</span><span class="s1">&#39;)&#39;</span>
@@ -656,7 +656,7 @@
         <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
 
-    <span class="c1"># Schleife für Nullfall und Planfall in Prozent</span>
+    <span class="c1"># Schleife f??r Nullfall und Planfall in Prozent</span>
     <span class="n">formatProz</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
     <span class="n">formatProz</span><span class="o">.</span><span class="n">set_num_format</span><span class="p">(</span><span class="mh">0x09</span><span class="p">)</span>
     <span class="n">formatProz</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
@@ -758,8 +758,8 @@
         <span class="n">ws9</span><span class="o">.</span><span class="n">insert_chart</span><span class="p">(</span><span class="s1">&#39;A23&#39;</span><span class="p">,</span> <span class="n">chart_wohnflaeche</span><span class="p">)</span>
 
 
-    <span class="c1">## Tabellenblatt 7: Übersicht regionale Effekte</span>
-    <span class="c1"># Teil 1 Beschriftungen einfügen</span>
+    <span class="c1">## Tabellenblatt 7: ??bersicht regionale Effekte</span>
+    <span class="c1"># Teil 1 Beschriftungen einf??gen</span>
     <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Uebersicht regionale Effekte&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
@@ -820,11 +820,11 @@
     <span class="n">ws7</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">5</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringUZVR</span><span class="p">,</span><span class="n">formatDez</span><span class="p">)</span>
     <span class="n">ws7</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">6</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringUZVRbew</span><span class="p">)</span>
 
-    <span class="c1">#ToDo: Hier sollten nach Möglichkeit noch eine Karte mit den UZVR und ggf. auch die Klassengrößen eingefügt werden</span>
+    <span class="c1">#ToDo: Hier sollten nach M??glichkeit noch eine Karte mit den UZVR und ggf. auch die Klassengr????en eingef??gt werden</span>
 
     <span class="c1">########</span>
-    <span class="c1">## Tabellenblatt 9: Übersicht Einordnung in Region</span>
-    <span class="c1">## Teil 1 Beschriftungen einfügen</span>
+    <span class="c1">## Tabellenblatt 9: ??bersicht Einordnung in Region</span>
+    <span class="c1">## Teil 1 Beschriftungen einf??gen</span>
     <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Uebersicht Einordnung in Region&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>

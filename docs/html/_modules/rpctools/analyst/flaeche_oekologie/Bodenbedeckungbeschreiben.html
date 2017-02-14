@@ -75,7 +75,7 @@
     <span class="c1">#Projektname</span>
     <span class="n">projekt</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
     <span class="n">gdb</span> <span class="o">=</span> <span class="s2">&quot;FGDB_Flaeche_und_Oekologie_&quot;</span> <span class="o">+</span> <span class="n">projekt</span> <span class="o">+</span> <span class="s2">&quot;.gdb&quot;</span>
-    <span class="n">pfad_flaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s1">&#39;3_Projekte&#39;</span><span class="p">,</span><span class="n">projekt</span><span class="p">,</span><span class="n">gdb</span><span class="p">,</span><span class="s2">&quot;Bodenbedeckung&quot;</span><span class="p">)</span>
+    <span class="n">pfad_flaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projekt</span><span class="p">,</span><span class="n">gdb</span><span class="p">,</span><span class="s2">&quot;Bodenbedeckung&quot;</span><span class="p">)</span>
     <span class="c1">#Feldliste erstellen</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">fields</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">pfad_flaeche</span><span class="p">)</span>
