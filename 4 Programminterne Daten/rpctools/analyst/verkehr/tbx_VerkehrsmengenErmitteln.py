@@ -20,13 +20,11 @@ class TbxVerkehrsmengenErmitteln(Tbx):
 
     def _getParameterInfo(self):
 
-    	list_projects = project_lib.get_projects()
-        list_projects = sorted(list_projects)
+        params = self.par
+        projekte = self.folders.get_projects()
 
         #set parameters
-        i=-1
-
-        i+=1 ; self.params[0].filter.list = list_projects
+        i=0
 
         heading = u"01 - Parameter f�r Wohnnutzungen".encode('CP1252')
         i+=1 ; self.params[i].category = heading
@@ -63,14 +61,16 @@ class TbxVerkehrsmengenErmitteln(Tbx):
         i+=1 ; self.params[i].category = heading
 
 
-        # Projektname
-        param_1 = arcpy.Parameter()
-        param_1.name = u'Projektname'
-        param_1.displayName = u'Projektname'
+        # Projekt_auswählen
+        param_1 = params.projectname = arcpy.Parameter()
+        param_1.name = u'Projekt_ausw\xe4hlen'
+        param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = language('string')
-        param_1.filter.list = []
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
         # Wohnen_Wege_EW
         param_2 = arcpy.Parameter()
@@ -312,15 +312,7 @@ class TbxVerkehrsmengenErmitteln(Tbx):
         param_26.datatype = u'GPDouble'
         param_26.value = 0.01
 
-        parameters = [param_1, param_2, param_3, param_4, param_5, param_6,
-                      param_7, param_8, param_9, param_10, param_11, param_12,
-                      param_13, param_14, param_15, param_16, param_17,
-                      param_18, param_19, param_20, param_21, param_22,
-                      param_23, param_24, param_25, param_26]
-        validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()
-
-        return parameters
+        return params
 
     def _updateParameters(self, params):
 		return

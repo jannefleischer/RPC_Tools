@@ -117,7 +117,7 @@ class TbxEinrichtungen(Tbx):
         # Einzelhandelstandorte_aus_34_Versorgung_�bernehmen
         param_9 = arcpy.Parameter()
         param_9.name = u'Einzelhandelstandorte_aus_34_Versorgung_\xfcbernehmen'
-        param_9.displayName = u'Einzelhandelstandorte aus Toolbox "Standardversorgung" �bernehmen'.encode('CP1252')
+        param_9.displayName = u'Einzelhandelstandorte aus Toolbox "Standardversorgung" \xfcbernehmen'.encode('CP1252')
         param_9.parameterType = 'Optional'
         param_9.direction = 'Input'
         param_9.datatype = language('boolean')
@@ -136,14 +136,9 @@ class TbxEinrichtungen(Tbx):
         param_11.displayName = u'Einzelhandelstandorte aus Toolbox "Standardversorgung"'
         param_11.parameterType = 'Optional'
         param_11.direction = 'Input'
-        param_11.datatype = u'Feature-Class'
+        param_11.datatype = language(u'feature class')
 
-        parameters = [param_1, param_2, param_3, param_4, param_5, param_6,
-                      param_7, param_8, param_9, param_10, param_11]
-        validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()
-
-        return parameters
+        return params
 
 
     def _updateParameters(self, params):

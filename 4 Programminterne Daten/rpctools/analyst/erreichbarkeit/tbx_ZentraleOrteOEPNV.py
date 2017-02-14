@@ -20,25 +20,24 @@ class TbxZentraleOrteOEPNV(Tbx):
 
     def _getParameterInfo(self):
 
-    	list_projects = project_lib.get_projects()
-    	list_projects = sorted(list_projects)
-
-    	#set project
-    	self.params[0].filter.list = list_projects
+        params = self.par
+        projekte = self.folders.get_projects()
 
     	#set Orte
     	self.params[1].filter.list = []
     	self.params[2].filter.list = []
     	self.params[3].filter.list = []
 
-        # Projektname
-        param_1 = arcpy.Parameter()
-        param_1.name = u'Projektname'
-        param_1.displayName = u'Projektname'
+        # Projekt_auswählen
+        param_1 = params.projectname = arcpy.Parameter()
+        param_1.name = u'Projekt_ausw\xe4hlen'
+        param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = language('string')
-        param_1.filter.list = []
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
         # Ziel_1
         param_2 = arcpy.Parameter()
@@ -64,10 +63,7 @@ class TbxZentraleOrteOEPNV(Tbx):
         param_4.direction = 'Input'
         param_4.datatype = language('string')
 
-        parameters = [param_1, param_2, param_3, param_4]
-        validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()
-        return parameters
+        return params
 
 
     def _updateParameters(self, params):

@@ -20,27 +20,21 @@ class TbxUeberschneidung(Tbx):
 
     def _getParameterInfo(self):
 
-    	list_projects = project_lib.get_projects()
-    	list_projects = sorted(list_projects)
+        params = self.par
+        projekte = self.folders.get_projects()
 
-    	i=-1
-
-    	#set project
-    	i+=1 ; self.params[i].filter.list = list_projects
-
-        # Projekt
-        param_1 = arcpy.Parameter()
-        param_1.name = u'Projekt'
-        param_1.displayName = u'Projekt'
+        # Projekt_auswählen
+        param_1 = params.projectname = arcpy.Parameter()
+        param_1.name = u'Projekt_ausw\xe4hlen'
+        param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = language('string')
-        param_1.filter.list = []
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
-        parameters = [param_1]
-        validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()
-        return parameters
+        return params
 
 
     def _updateParameters(self, params):

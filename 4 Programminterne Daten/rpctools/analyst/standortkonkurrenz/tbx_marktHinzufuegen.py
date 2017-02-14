@@ -20,11 +20,10 @@ class TbxMarktHinzufuegen(Tbx):
 
     def _getParameterInfo(self):
 
-    	list_projects = project_lib.get_projects()
-    	list_projects = sorted(list_projects)
+        params = self.par
+        projekte = self.folders.get_projects()
 
     	i = 0
-    	self.params[i].filter.list = list_projects
     	self.Projekt= i
     	i+=1
     	self.neueHaltestellen = i # Neue Haltestellen
@@ -34,14 +33,16 @@ class TbxMarktHinzufuegen(Tbx):
     	self.discounter = i #
     	i+=1
 
-        # Projektauswahl
-        param_1 = arcpy.Parameter()
-        param_1.name = u'Projektauswahl'
-        param_1.displayName = u'Projektauswahl'
+        # Projekt_auswählen
+        param_1 = params.projectname = arcpy.Parameter()
+        param_1.name = u'Projekt_ausw\xe4hlen'
+        param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = language('string')
-        param_1.filter.list = []
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
         # Anbieter_des_Marktes
         param_2 = arcpy.Parameter()
@@ -150,17 +151,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_14.datatype = language('string')
         param_14.value = u'Zum Abspeichern eines zweiten Marktes Checkbox anklicken oder mit Ok einen Markt abspeichern und beenden'
 
-        parameters = [param_1, param_2, param_3, param_4, param_5, param_6,
-                      param_7, param_8, param_9, param_10, param_11, param_12,
-                      param_13, param_14]
-
-        validator = getattr(self, 'ToolValidator', None)
-        if validator:
-            validator(parameters).initializeParameters()
-
-        self.updateParameters(parameters)
-
-        return parameters
+        return params
 
 
 

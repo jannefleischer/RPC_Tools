@@ -20,25 +20,25 @@ class TbxZentrenBearbeitenn(Tbx):
 
     def _getParameterInfo(self):
 
-    	list_projects = project_lib.get_projects()
-    	list_projects = sorted(list_projects)
+        params = self.par
+        projekte = self.folders.get_projects()
 
-    	i=-1
+    	i=0
 
-    	#set project
-    	i+=1
-    	self.params[i].filter.list = list_projects
+
     	self.params[3].enabled = 0
     	self.params[3].value = "Bitte w�hlen Sie das Projekt aus"
 
-        # Projektauswahl
-        param_1 = arcpy.Parameter()
-        param_1.name = u'Projektauswahl'
-        param_1.displayName = u'Projektauswahl'
+        # Projekt_auswählen
+        param_1 = params.projectname = arcpy.Parameter()
+        param_1.name = u'Projekt_ausw\xe4hlen'
+        param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = language('string')
-        param_1.filter.list = []
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
         # Eingegebene_Zentren
         param_2 = arcpy.Parameter()
@@ -65,16 +65,7 @@ class TbxZentrenBearbeitenn(Tbx):
         param_4.datatype = language('string')
         param_4.value = u'Bitte w\xe4hlen Sie das Projekt aus'
 
-        parameters = [param_1, param_2, param_3, param_4]
-
-        validator = getattr(self, 'ToolValidator', None)
-        if validator:
-            validator(parameters).initializeParameters()
-
-        self.updateParameters(parameters)
-
-
-        return parameters
+        return params
 
 
     def _updateParameters(self, params):

@@ -39,3 +39,9 @@ def language(datatype):
             return u'Datei'
         else:
             return u'File'
+
+    if datatype == 'feature class':
+        if language == 'de_DE':
+            return u'Feature-Class'
+        else:
+            return u'Feature class'

@@ -20,8 +20,8 @@ class TbxBodenbedeckungPlanfall(Tbx):
 
     def _getParameterInfo(self):
 
-    	list_projects = project_lib.get_projects()
-    	list_projects = sorted(list_projects)
+        params = self.par
+        projekte = self.folders.get_projects()
 
     	list_teilflaechen = []
 
@@ -32,7 +32,7 @@ class TbxBodenbedeckungPlanfall(Tbx):
     	bodenbedeckungListe.sort()
     	bodenbedeckungListe = list(set(bodenbedeckungListe))
     	#set project
-    	i+=1 ; self.params[i].filter.list = list_projects
+    	i+=1
 
     	#set point
     	i+=1 ; self.params[i].filter.list = list_teilflaechen
@@ -49,14 +49,16 @@ class TbxBodenbedeckungPlanfall(Tbx):
     	i+=1 ; self.params[i].category = heading
     	i+=1 ; self.params[i].category = heading ;self.params[i].enabled = 0
 
-        # Projekt
-        param_1 = arcpy.Parameter()
-        param_1.name = u'Projekt'
-        param_1.displayName = u'Projekt'
+        # Projekt_auswählen
+        param_1 = params.projectname = arcpy.Parameter()
+        param_1.name = u'Projekt_ausw\xe4hlen'
+        param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = language('string')
-        param_1.filter.list = []
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
         # Teilfl�che
         param_2 = arcpy.Parameter()
@@ -103,10 +105,7 @@ class TbxBodenbedeckungPlanfall(Tbx):
         param_6.direction = 'Input'
         param_6.datatype = language('string')
 
-        parameters = [param_1, param_2, param_3, param_4, param_5, param_6]
-        validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()
-        return parameters
+        return params
 
     def _updateParameters(self, params):
 

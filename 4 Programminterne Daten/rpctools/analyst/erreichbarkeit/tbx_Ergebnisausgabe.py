@@ -20,25 +20,22 @@ class TbxErgebnisausgabe(Tbx):
 
     def _getParameterInfo(self):
 
-    	list_projects = project_lib.get_projects()
-    	list_projects = sorted(list_projects)
+        params = self.par
+    	projekte = self.folders.get_projects()
 
-    	#set parameters
-    	self.params[0].filter.list = list_projects
 
-        # Projektname
-        param_1 = arcpy.Parameter()
-        param_1.name = u'Projektname'
-        param_1.displayName = u'Projektname'
+        # Projekt_auswählen
+        param_1 = params.projectname = arcpy.Parameter()
+        param_1.name = u'Projekt_ausw\xe4hlen'
+        param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = language('string')
-        param_1.filter.list = []
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
-        parameters = [param_1]
-        validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()
-        return parameters
+        return params
 
     def _updateParameters(self, params):
 		return

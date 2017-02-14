@@ -20,13 +20,10 @@ class Tbxwohnflaechendichte(Tbx):
 
     def _getParameterInfo(self):
 
-        list_projects = project_lib.get_projects()
-        list_projects = sorted(list_projects)
+        params = self.par
+        projekte = self.folders.get_projects()
 
-        i=-1
-
-        #set project
-        i+=1 ; self.params[i].filter.list = list_projects
+        i=0
 
         heading = u"Durchschnittliche �berbaute Fl�che nach Geb�udetyp".encode('CP1252')
         self.params[1].category = heading
@@ -34,14 +31,16 @@ class Tbxwohnflaechendichte(Tbx):
         self.params[3].category = heading
         self.params[4].category = heading
 
-        # Name_des_Projektes
-        param_1 = arcpy.Parameter()
-        param_1.name = u'Name_des_Projektes'
-        param_1.displayName = u'Name des Projektes'
+        # Projekt_auswählen
+        param_1 = params.projectname = arcpy.Parameter()
+        param_1.name = u'Projekt_ausw\xe4hlen'
+        param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = language('string')
-        param_1.filter.list = []
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
         # Durchschnittliche_�berbaute_Fl�che_je_Wohneinheit_in_Ein-_und_Zweifamilienh�usern__qm_
         param_2 = arcpy.Parameter()
@@ -87,10 +86,7 @@ class Tbxwohnflaechendichte(Tbx):
         param_5.filter.type = 'Range'
         param_5.filter.list = [0, 100]
 
-        parameters = [param_1, param_2, param_3, param_4, param_5]
-        validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()
-        return parameters
+        return params
 
     def _updateParameters(self, params):
 		return

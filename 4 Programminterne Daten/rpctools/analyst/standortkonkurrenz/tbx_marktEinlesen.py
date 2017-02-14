@@ -20,23 +20,23 @@ class TbxMarktEinlesen(Tbx):
 
     def _getParameterInfo(self):
 
-    	list_projects = project_lib.get_projects()
-    	list_projects = sorted(list_projects)
+        params = self.par
+        projekte = self.folders.get_projects()
 
-    	i = 0
-    	self.params[i].filter.list = list_projects
     	self.Projekt= i
-    	i+=1
+    	i=1
     	self.Pfad = i # f�r template
 
-        # Projektauswahl
-        param_1 = arcpy.Parameter()
-        param_1.name = u'Projektauswahl'
-        param_1.displayName = u'Projektauswahl'
+        # Projekt_auswählen
+        param_1 = params.projectname = arcpy.Parameter()
+        param_1.name = u'Projekt_ausw\xe4hlen'
+        param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = language('string')
-        param_1.filter.list = []
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
         # Bestandsliste_Superm�rkte
         param_2 = arcpy.Parameter()
@@ -52,18 +52,9 @@ class TbxMarktEinlesen(Tbx):
         param_3.displayName = u'Punktfeature f\xfcr Bev\xf6lkerungsmodellierung'
         param_3.parameterType = 'Required'
         param_3.direction = 'Input'
-        param_3.datatype = u'Feature-Class'
+        param_3.datatype = language(u'feature class')
 
-        parameters = [param_1, param_2, param_3]
-
-        validator = getattr(self, 'ToolValidator', None)
-        if validator:
-            validator(parameters).initializeParameters()
-
-        self.updateParameters(parameters)
-
-        return parameters
-
+        return params
 
     def _updateParameters(self, params):
 

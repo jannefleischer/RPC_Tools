@@ -20,23 +20,20 @@ class TbxOekologischeFolgen(Tbx):
 
     def _getParameterInfo(self):
 
-    	list_projects = project_lib.get_projects()
-    	list_projects = sorted(list_projects)
-
-    	i=-1
-
-    	#set project
-    	i+=1 ; self.params[i].filter.list = list_projects
+        params = self.par
+        projekte = self.folders.get_projects()
 
 
-        # Projekt_ausw�hlen
-        param_1 = arcpy.Parameter()
+        # Projekt_auswählen
+        param_1 = params.projectname = arcpy.Parameter()
         param_1.name = u'Projekt_ausw\xe4hlen'
         param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = language('string')
-        param_1.filter.list = []
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
         # Region_ausw�hlen
         param_2 = arcpy.Parameter()
@@ -81,10 +78,7 @@ class TbxOekologischeFolgen(Tbx):
         param_6.datatype = language('string')
         param_6.filter.list = [u'Ja', u'Nein']
 
-        parameters = [param_1, param_2, param_3, param_4, param_5, param_6]
-        validator = getattr(self, 'ToolValidator', None)
-        validator(parameters).initializeParameters()
-        return parameters
+        return params
 
 
 
