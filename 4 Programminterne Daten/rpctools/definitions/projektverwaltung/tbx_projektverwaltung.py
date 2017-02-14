@@ -17,7 +17,7 @@ class TbxProjektVerwaltung(Tbx):
 
     @property
     def label(self):
-        return u'Projekte verwalten'
+        return u'Schritt 1: Projekte verwalten'
 
     @property
     def Tool(self):
@@ -27,61 +27,61 @@ class TbxProjektVerwaltung(Tbx):
         params = self.par
 
         # Was_möchten_Sie_tun_
-        params_1 = params.act = arcpy.Parameter()
-        params_1.name = encode('Was_möchten_Sie_tun_')
-        params_1.displayName = encode('Was möchten Sie tun?')
-        params_1.parameterType = 'Required'
-        params_1.direction = 'Input'
-        params_1.datatype = language('string')
-        params_1.filter.list = ['Neues Projekt anlegen',
+        p = params.action = arcpy.Parameter()
+        p.name = encode('Was_möchten_Sie_tun_')
+        p.displayName = encode('Was möchten Sie tun?')
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = language('string')
+        p.filter.list = ['Neues Projekt anlegen',
                                      'Bestehendes Projekt kopieren',
                                      encode('Bestehendes Projekt löschen')]
 
         projects = self.folders.get_projects()
 
         # Bestehendes_Projekt_auswählen
-        params.existing_project = arcpy.Parameter()
-        params.existing_project.name = encode('Bestehendes_Projekt_auswählen')
-        params.existing_project.displayName = encode('Bestehendes Projekt auswählen')
-        params.existing_project.parameterType = 'Required'
-        params.existing_project.direction = 'Input'
-        params.existing_project.datatype = language('string')
-        params.existing_project.value = u' '
-        params.existing_project.filter.list = projects
+        p = params.existing_project = arcpy.Parameter()
+        p.name = encode('Bestehendes_Projekt_auswählen')
+        p.displayName = encode('Bestehendes Projekt auswählen')
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = language('string')
+        p.value = u' '
+        p.filter.list = projects
 
         # Name_des_neuen_Projektes
-        params.name = arcpy.Parameter()
-        params.name.name = u'Name_des_neuen_Projektes'
-        params.name.displayName = u'Name des neuen Projektes'
-        params.name.parameterType = 'Required'
-        params.name.direction = 'Input'
-        params.name.datatype = language('string')
-        params.name.value = u' '
+        p = params.name = arcpy.Parameter()
+        p.name = u'Name_des_neuen_Projektes'
+        p.displayName = u'Name des neuen Projektes'
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = language('string')
+        p.value = u' '
 
         # Shapefile_des_Plangebiets____shp_
-        params.shapefile = arcpy.Parameter()
-        params.shapefile.name = u'Shapefile_des_Plangebiets____shp_'
-        params.shapefile.displayName = u'Shapefile des Plangebiets (*.shp)'
-        params.shapefile.parameterType = 'Required'
-        params.shapefile.direction = 'Input'
-        params.shapefile.datatype = u'Shapefile'
-        params.shapefile.value = self.folders.TEMPLATE_FLAECHEN
+        p = params.shapefile = arcpy.Parameter()
+        p.name = u'Shapefile_des_Plangebiets____shp_'
+        p.displayName = u'Shapefile des Plangebiets (*.shp)'
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'Shapefile'
+        p.value = self.folders.TEMPLATE_FLAECHEN
 
         # Beginn_des_Betrachtungszeitraumes
-        params.begin = arcpy.Parameter()
-        params.begin.name = u'Beginn_des_Betrachtungszeitraumes'
-        params.begin.displayName = u'Beginn des Betrachtungszeitraumes'
-        params.begin.parameterType = 'Required'
-        params.begin.direction = 'Input'
-        params.begin.datatype = u'Long'
+        p = params.begin = arcpy.Parameter()
+        p.name = u'Beginn_des_Betrachtungszeitraumes'
+        p.displayName = u'Beginn des Betrachtungszeitraumes'
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'Long'
 
         # Ende_des_Betrachtungszeitraumes
-        params.end = arcpy.Parameter()
-        params.end.name = u'Ende_des_Betrachtungszeitraumes'
-        params.end.displayName = u'Ende des Betrachtungszeitraumes'
-        params.end.parameterType = 'Required'
-        params.end.direction = 'Input'
-        params.end.datatype = u'Long'
+        p = params.end = arcpy.Parameter()
+        p.name = u'Ende_des_Betrachtungszeitraumes'
+        p.displayName = u'Ende des Betrachtungszeitraumes'
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'Long'
 
         #Beginn des Betrachtungszeitraumes auf aktuelles Jahr setzen
         params.begin.value = datetime.datetime.now().year
