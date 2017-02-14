@@ -20,19 +20,19 @@ class TbxMarktHinzufuegen(Tbx):
 
     def _getParameterInfo(self):
 
-		list_projects = project_lib.get_projects()
-		list_projects = sorted(list_projects)
+    	list_projects = project_lib.get_projects()
+    	list_projects = sorted(list_projects)
 
-		i = 0
-		self.params[i].filter.list = list_projects
-		self.Projekt= i
-		i+=1
-		self.neueHaltestellen = i # Neue Haltestellen
-		i+=1
-		self.abfrage = i #
-		i+=1
-		self.discounter = i #
-		i+=1
+    	i = 0
+    	self.params[i].filter.list = list_projects
+    	self.Projekt= i
+    	i+=1
+    	self.neueHaltestellen = i # Neue Haltestellen
+    	i+=1
+    	self.abfrage = i #
+    	i+=1
+    	self.discounter = i #
+    	i+=1
 
         # Projektauswahl
         param_1 = arcpy.Parameter()

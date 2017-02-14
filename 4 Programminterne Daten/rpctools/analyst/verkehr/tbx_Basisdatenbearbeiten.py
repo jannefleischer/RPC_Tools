@@ -20,13 +20,13 @@ class TbxBasisdatenbearbeiten(Tbx):
 
     def _getParameterInfo(self):
 
-		list_projects = project_lib.get_projects()
+    	list_projects = project_lib.get_projects()
         list_projects = sorted(list_projects)
 
         #set parameters
         self.params[0].filter.list = list_projects
 
-		# Projektname
+    	# Projektname
         param_1 = arcpy.Parameter()
         param_1.name = u'Projektname'
         param_1.displayName = u'Projektname'
@@ -43,6 +43,4 @@ class TbxBasisdatenbearbeiten(Tbx):
 
 
     def _updateParameters(self, params):
-		return
-
-
+    	return

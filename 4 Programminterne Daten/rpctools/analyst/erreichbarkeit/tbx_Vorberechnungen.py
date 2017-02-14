@@ -20,11 +20,11 @@ class TbxVorberechnungen(Tbx):
 
     def _getParameterInfo(self):
 
-		list_projects = project_lib.get_projects()
-		list_projects = sorted(list_projects)
+    	list_projects = project_lib.get_projects()
+    	list_projects = sorted(list_projects)
 
-		#set parameters
-		self.params[0].filter.list = list_projects
+    	#set parameters
+    	self.params[0].filter.list = list_projects
 
         # Projektname
         param_1 = arcpy.Parameter()

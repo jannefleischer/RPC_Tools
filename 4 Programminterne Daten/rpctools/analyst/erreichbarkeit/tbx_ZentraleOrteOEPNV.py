@@ -20,16 +20,16 @@ class TbxZentraleOrteOEPNV(Tbx):
 
     def _getParameterInfo(self):
 
-		list_projects = project_lib.get_projects()
-		list_projects = sorted(list_projects)
+    	list_projects = project_lib.get_projects()
+    	list_projects = sorted(list_projects)
 
-		#set project
-		self.params[0].filter.list = list_projects
+    	#set project
+    	self.params[0].filter.list = list_projects
 
-		#set Orte
-		self.params[1].filter.list = []
-		self.params[2].filter.list = []
-		self.params[3].filter.list = []
+    	#set Orte
+    	self.params[1].filter.list = []
+    	self.params[2].filter.list = []
+    	self.params[3].filter.list = []
 
         # Projektname
         param_1 = arcpy.Parameter()

@@ -26,6 +26,7 @@ import arcpy
 import xlrd
 import imp
 from os.path import join
+from rpctools.utils.params import Tool
 
 BASE_PATH = os.path.abspath(join(os.path.dirname(__file__),
                                          '..', '..'))
@@ -39,136 +40,136 @@ import rpctools.utils.url_lib as url_lib
 
 class Einrichtungen(Tool):
 
-	def _callback(matches):
-		id = matches.group(1)
-		try:
-			return unichr(int(id))
-		except:
-			return id
+    def _callback(matches):
+    	id = matches.group(1)
+    	try:
+    		return unichr(int(id))
+    	except:
+    		return id
 
-	def decode_unicode_references(data):
-		return re.sub("&#(\d+)(;|(?=\s))", _callback, data)
+    def decode_unicode_references(data):
+    	return re.sub("&#(\d+)(;|(?=\s))", _callback, data)
 
     def run(self):
         messages = self.mes
         parameters = self.par
 
-		def Koordinaten_derMittelp(workspace_definitionen):
-			messages.AddMessage("Mittelpunkt des RPC Gebiets erstellen")
-			try:
-				arcpy.Delete_management(workspace_Erreichbarkeit+ "\Mittelpunkt_RPC_Gebiet")
-			except:
-				print "Mittelpunkte konnten nicht geloescht werden"
+    	def Koordinaten_derMittelp(workspace_definitionen):
+    		messages.AddMessage("Mittelpunkt des RPC Gebiets erstellen")
+    		try:
+    			arcpy.Delete_management(workspace_Erreichbarkeit+ "\Mittelpunkt_RPC_Gebiet")
+    		except:
+    			print "Mittelpunkte konnten nicht geloescht werden"
 
-			try:
-				arcpy.Delete_management(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet")
-			except:
-				print "Error im Loeschen der Teilflaechen_Plangebiet"
+    		try:
+    			arcpy.Delete_management(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet")
+    		except:
+    			print "Error im Loeschen der Teilflaechen_Plangebiet"
 
-			try:
-				arcpy.Delete_management(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved")
-			except:
-				print "Error im Loeschen der Dissolve"
+    		try:
+    			arcpy.Delete_management(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved")
+    		except:
+    			print "Error im Loeschen der Dissolve"
 
-			if int(arcpy.GetCount_management(workspace_definitionen+"\Teilflaechen_Plangebiet").getOutput(0))>1:
-				try:
-					arcpy.Dissolve_management(workspace_definitionen+"\Teilflaechen_Plangebiet", workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved")
-				#Featur to Point nicht verwendbar weil Info Lizens
-			##    arcpy.FeatureToPoint_management(workspace_Erreichbarkeit+"\Flaeche_Plangebiet_dissolved",workspace_Erreichbarkeit+ "\Mittelpunkt_RPC_Gebiet", "CENTROID")
-					fieldName1 = "xCentroid"
-					fieldName2 = "yCentroid"
-					# Expressions are calculated using the Shape Field's geometry property
-					expression1 = "float(!SHAPE.CENTROID!.split()[0].replace(',','.'))"
-					expression2 = "float(!SHAPE.CENTROID!.split()[1].replace(',','.'))"
+    		if int(arcpy.GetCount_management(workspace_definitionen+"\Teilflaechen_Plangebiet").getOutput(0))>1:
+    			try:
+    				arcpy.Dissolve_management(workspace_definitionen+"\Teilflaechen_Plangebiet", workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved")
+    			#Featur to Point nicht verwendbar weil Info Lizens
+    		##    arcpy.FeatureToPoint_management(workspace_Erreichbarkeit+"\Flaeche_Plangebiet_dissolved",workspace_Erreichbarkeit+ "\Mittelpunkt_RPC_Gebiet", "CENTROID")
+    				fieldName1 = "xCentroid"
+    				fieldName2 = "yCentroid"
+    				# Expressions are calculated using the Shape Field's geometry property
+    				expression1 = "float(!SHAPE.CENTROID!.split()[0].replace(',','.'))"
+    				expression2 = "float(!SHAPE.CENTROID!.split()[1].replace(',','.'))"
 
-					# Execute AddField
-					arcpy.AddField_management(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved", fieldName1, "DOUBLE")
-					arcpy.AddField_management(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved", fieldName2, "DOUBLE")
+    				# Execute AddField
+    				arcpy.AddField_management(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved", fieldName1, "DOUBLE")
+    				arcpy.AddField_management(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved", fieldName2, "DOUBLE")
 
-					# Execute CalculateField
-					arcpy.CalculateField_management(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved", fieldName1, expression1,"PYTHON")
-					arcpy.CalculateField_management(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved", fieldName2, expression2,"PYTHON")
+    				# Execute CalculateField
+    				arcpy.CalculateField_management(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved", fieldName1, expression1,"PYTHON")
+    				arcpy.CalculateField_management(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved", fieldName2, expression2,"PYTHON")
 
-					arcpy.CreateFeatureclass_management(workspace_Erreichbarkeit,"Mittelpunkt_RPC_Gebiet","POINT",workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved","","","Coordinate Systems\Geographic Coordinate Systems\World\WGS 1984.prj")
+    				arcpy.CreateFeatureclass_management(workspace_Erreichbarkeit,"Mittelpunkt_RPC_Gebiet","POINT",workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved","","","Coordinate Systems\Geographic Coordinate Systems\World\WGS 1984.prj")
 
-					for a in arcpy.SearchCursor(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved"):
+    				for a in arcpy.SearchCursor(workspace_Erreichbarkeit+ "\Flaeche_Plangebiet_dissolved"):
 
-						print float(a.xCentroid),float( a.yCentroid)
-						xy=arcpy.Point(a.xCentroid, a.yCentroid)
-
-
-					# Open an InsertCursor and insert the new geometry
-					#
-					c = arcpy.InsertCursor(workspace_Erreichbarkeit+ "\Mittelpunkt_RPC_Gebiet", ["SHAPE@XY"])
-					newRow = c.newRow()
-					newRow.shape = xy
-					c.insertRow(newRow)
-
-					# Delete cursor object
-					#
-					del c,xy,newRow
-
-				except:
-					messages.AddErrorMessage("Fehler beim Erstellen des Mittelpunktes")
-					exit(1)
+    					print float(a.xCentroid),float( a.yCentroid)
+    					xy=arcpy.Point(a.xCentroid, a.yCentroid)
 
 
-			else:
-				try:
-					arcpy.CopyFeatures_management(workspace_definitionen+"\Teilflaechen_Plangebiet", workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet")
-					fieldName1 = "xCentroid"
-					fieldName2 = "yCentroid"
-					# Expressions are calculated using the Shape Field's geometry property
-					expression1 = "float(!SHAPE.CENTROID!.split()[0].replace(',','.'))"
-					expression2 = "float(!SHAPE.CENTROID!.split()[1].replace(',','.'))"
+    				# Open an InsertCursor and insert the new geometry
+    				#
+    				c = arcpy.InsertCursor(workspace_Erreichbarkeit+ "\Mittelpunkt_RPC_Gebiet", ["SHAPE@XY"])
+    				newRow = c.newRow()
+    				newRow.shape = xy
+    				c.insertRow(newRow)
 
-					# Execute AddField
-					arcpy.AddField_management(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet", fieldName1, "DOUBLE")
-					arcpy.AddField_management(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet", fieldName2, "DOUBLE")
+    				# Delete cursor object
+    				#
+    				del c,xy,newRow
 
-					# Execute CalculateField
-					arcpy.CalculateField_management(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet", fieldName1, expression1,"PYTHON")
-					arcpy.CalculateField_management(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet", fieldName2, expression2,"PYTHON")
-
-					# Creating a spatial reference object
-			##        spatial_reference = arcpy.SpatialReference(join(workspace_Erreichbarkeit+ "/Teilflaechen_Plangebiet"))
-					arcpy.CreateFeatureclass_management(workspace_Erreichbarkeit,"Mittelpunkt_RPC_Gebiet","POINT",workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet","","","Coordinate Systems\Geographic Coordinate Systems\World\WGS 1984.prj")
-
-					for a in arcpy.SearchCursor(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet"):
-
-						print float(a.xCentroid),float( a.yCentroid)
-						xy=arcpy.Point(a.xCentroid, a.yCentroid)
+    			except:
+    				messages.AddErrorMessage("Fehler beim Erstellen des Mittelpunktes")
+    				exit(1)
 
 
-					# Open an InsertCursor and insert the new geometry
-					#
-					c = arcpy.InsertCursor(workspace_Erreichbarkeit+ "\Mittelpunkt_RPC_Gebiet", ["SHAPE@XY"])
-					newRow = c.newRow()
-					newRow.shape = xy
-					c.insertRow(newRow)
+    		else:
+    			try:
+    				arcpy.CopyFeatures_management(workspace_definitionen+"\Teilflaechen_Plangebiet", workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet")
+    				fieldName1 = "xCentroid"
+    				fieldName2 = "yCentroid"
+    				# Expressions are calculated using the Shape Field's geometry property
+    				expression1 = "float(!SHAPE.CENTROID!.split()[0].replace(',','.'))"
+    				expression2 = "float(!SHAPE.CENTROID!.split()[1].replace(',','.'))"
 
-					# Delete cursor object
-					#
-					del c,xy,newRow
-				except:
-					messages.AddErrorMessage("Fehler beim Erstellen des Mittelpunktes")
-					exit(1)
+    				# Execute AddField
+    				arcpy.AddField_management(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet", fieldName1, "DOUBLE")
+    				arcpy.AddField_management(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet", fieldName2, "DOUBLE")
+
+    				# Execute CalculateField
+    				arcpy.CalculateField_management(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet", fieldName1, expression1,"PYTHON")
+    				arcpy.CalculateField_management(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet", fieldName2, expression2,"PYTHON")
+
+    				# Creating a spatial reference object
+    		##        spatial_reference = arcpy.SpatialReference(join(workspace_Erreichbarkeit+ "/Teilflaechen_Plangebiet"))
+    				arcpy.CreateFeatureclass_management(workspace_Erreichbarkeit,"Mittelpunkt_RPC_Gebiet","POINT",workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet","","","Coordinate Systems\Geographic Coordinate Systems\World\WGS 1984.prj")
+
+    				for a in arcpy.SearchCursor(workspace_Erreichbarkeit+ "\Teilflaechen_Plangebiet"):
+
+    					print float(a.xCentroid),float( a.yCentroid)
+    					xy=arcpy.Point(a.xCentroid, a.yCentroid)
 
 
-			arcpy.AddXY_management(workspace_Erreichbarkeit+ "\Mittelpunkt_RPC_Gebiet")
+    				# Open an InsertCursor and insert the new geometry
+    				#
+    				c = arcpy.InsertCursor(workspace_Erreichbarkeit+ "\Mittelpunkt_RPC_Gebiet", ["SHAPE@XY"])
+    				newRow = c.newRow()
+    				newRow.shape = xy
+    				c.insertRow(newRow)
 
-			cur_Mittelpunkt = arcpy.SearchCursor(workspace_Erreichbarkeit+"\Mittelpunkt_RPC_Gebiet")
-			for eineabfrage in cur_Mittelpunkt:
-				Mittelpunkte_x=eineabfrage.getValue("POINT_X")
-				Mittelpunkte_y=eineabfrage.getValue("POINT_Y")
-
-			del cur_Mittelpunkt
-
-		##    print Mittelpunkte_x,Mittelpunkte_y
+    				# Delete cursor object
+    				#
+    				del c,xy,newRow
+    			except:
+    				messages.AddErrorMessage("Fehler beim Erstellen des Mittelpunktes")
+    				exit(1)
 
 
+    		arcpy.AddXY_management(workspace_Erreichbarkeit+ "\Mittelpunkt_RPC_Gebiet")
 
-			return Mittelpunkte_x,Mittelpunkte_y
+    		cur_Mittelpunkt = arcpy.SearchCursor(workspace_Erreichbarkeit+"\Mittelpunkt_RPC_Gebiet")
+    		for eineabfrage in cur_Mittelpunkt:
+    			Mittelpunkte_x=eineabfrage.getValue("POINT_X")
+    			Mittelpunkte_y=eineabfrage.getValue("POINT_Y")
+
+    		del cur_Mittelpunkt
+
+    	##    print Mittelpunkte_x,Mittelpunkte_y
+
+
+
+    		return Mittelpunkte_x,Mittelpunkte_y
 
 
 

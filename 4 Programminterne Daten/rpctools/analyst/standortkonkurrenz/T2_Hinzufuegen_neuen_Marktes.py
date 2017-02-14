@@ -22,7 +22,7 @@ import sys
 import xml.dom.minidom as minidom
 import unicodedata
 from os.path import join
-
+from rpctools.utils.params import Tool
 import arcpy
 BASE_PATH = os.path.abspath(join(os.path.dirname(__file__),
                                          '..', '..'))
@@ -36,52 +36,53 @@ class MarktHinzufuegen(Tool):
     def run(self):
         messages = self.mes
         parameters = self.par
-		gc.collect()
+    	gc.collect()
 
-		def _callback(matches):
-			id = matches.group(1)
-			try:
-				return unichr(int(id))
-			except:
-				return id
+    	def _callback(matches):
+    		id = matches.group(1)
+    		try:
+    			return unichr(int(id))
+    		except:
+    			return id
 
-		def decode_unicode_references(data):
-			return re.sub("&#(\d+)(;|(?=\s))", _callback, data)
-
-
-		def strip_accents(text):
-			return ''.join(c for c in unicodedata.normalize('NFKD', text) if unicodedata.category(c) != 'Mn')
-
-		def _knoten_auslesen(knoten):
-			return eval("('%s')" % (knoten.firstChild.data.strip()))
-
-		def gibmirxy(url):
-			f=urllib.urlopen(url)
-			dom = minidom.parse(f)
-			gefunden=0
-			for eintrag in dom.firstChild.childNodes:
-
-				if eintrag.nodeName == "results":
-					for knoten in eintrag.childNodes:
-						if knoten.nodeName == 'Result':
-
-							for knotena in knoten.childNodes:
-								if knotena.nodeName == "latitude":
-									latitude = _knoten_auslesen(knotena)
-								elif knotena.nodeName == "longitude":
-									longitude = _knoten_auslesen(knotena)
-								elif knotena.nodeName == "quality":
-									quality = _knoten_auslesen(knotena)
-									gefunden=1
-
-	##                         print url
-								break
+    	def decode_unicode_references(data):
+    		return re.sub("&#(\d+)(;|(?=\s))", _callback, data)
 
 
-			f.close()
-			if gefunden==0:
-				return 0, 0,0
-			return  latitude,longitude,quality
+    	def strip_accents(text):
+    		return ''.join(c for c in unicodedata.normalize('NFKD', text) if unicodedata.category(c) != 'Mn')
+
+    	def _knoten_auslesen(knoten):
+    		return eval("('%s')" % (knoten.firstChild.data.strip()))
+
+    	def gibmirxy(url):
+    		f=urllib.urlopen(url)
+    		dom = minidom.parse(f)
+    		gefunden=0
+    		for eintrag in dom.firstChild.childNodes:
+
+    			if eintrag.nodeName == "results":
+    				for knoten in eintrag.childNodes:
+    					if knoten.nodeName == 'Result':
+
+    						for knotena in knoten.childNodes:
+    							if knotena.nodeName == "latitude":
+    								latitude = _knoten_auslesen(knotena)
+    							elif knotena.nodeName == "longitude":
+    								longitude = _knoten_auslesen(knotena)
+    							elif knotena.nodeName == "quality":
+    								quality = _knoten_auslesen(knotena)
+    								gefunden=1
+
+    ##                         print url
+    							break
+
+
+    		f.close()
+    		if gefunden==0:
+    			return 0, 0,0
+    		return  latitude,longitude,quality
+
 		def Standorte_vorbereiten():
 		##    Damit ich alle IDS und Points habe -> vereine derzeitige Standpunkte + neuen Markt
 		##    und loesche dann in Distanzmatrix die spalten

@@ -20,41 +20,43 @@ class TbxEinrichtungen(Tbx):
 
     def _getParameterInfo(self):
 
-		list_projects = project_lib.get_projects()
-		list_projects = sorted(list_projects)
+        params = self.par
+    	projekte = self.folders.get_projects()
 
-		i=-1
-		i+=1 ;
-		self.params[i].filter.list = list_projects
-		self.Projekt= i
-		i+=1
-		self.Bereitsvorhandene=i
-		i+=1
-		self.Kita=i
-		i+=1
-		self.Grundschulen=i
-		i+=1
-		self.Arzt=i
-		i+=1
-		self.Apotheken=i
-		i+=1
-		self.Krankenhaeuser=i
-		i+=1
-		self.Sonstige=i
-		i+=1
-		self.BooleanEinzel=i
-		i+=1
-		self.Einzelhandel=i
-		i+=1
-		self.Einzelhandel_feature=i
+    	i=-1
+    	i+=1 ;
+    	self.Projekt= i
+    	i+=1
+    	self.Bereitsvorhandene=i
+    	i+=1
+    	self.Kita=i
+    	i+=1
+    	self.Grundschulen=i
+    	i+=1
+    	self.Arzt=i
+    	i+=1
+    	self.Apotheken=i
+    	i+=1
+    	self.Krankenhaeuser=i
+    	i+=1
+    	self.Sonstige=i
+    	i+=1
+    	self.BooleanEinzel=i
+    	i+=1
+    	self.Einzelhandel=i
+    	i+=1
+    	self.Einzelhandel_feature=i
 
-        # Projektnamen
-        param_1 = arcpy.Parameter()
-        param_1.name = u'Projektnamen'
-        param_1.displayName = u'Projektname'
+        # Projekt_auswählen
+        param_1 = params.projectname = arcpy.Parameter()
+        param_1.name = u'Projekt_ausw\xe4hlen'
+        param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = language('string')
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
         # Bereits_eingeladene_Einrichtung_f�r_das_Projekt_verwenden
         param_2 = arcpy.Parameter()
@@ -70,7 +72,7 @@ class TbxEinrichtungen(Tbx):
         param_3.displayName = u'Kita'
         param_3.parameterType = 'Required'
         param_3.direction = 'Input'
-        param_3.datatype = u'Datei'
+        param_3.datatype = language(u'file')
 
         # Grundschulen
         param_4 = arcpy.Parameter()
@@ -78,7 +80,7 @@ class TbxEinrichtungen(Tbx):
         param_4.displayName = u'Grundschulen'
         param_4.parameterType = 'Required'
         param_4.direction = 'Input'
-        param_4.datatype = u'Datei'
+        param_4.datatype = language(u'file')
 
         # Allgemein_Mediziner
         param_5 = arcpy.Parameter()
@@ -86,7 +88,7 @@ class TbxEinrichtungen(Tbx):
         param_5.displayName = u'Allgemein Mediziner'
         param_5.parameterType = 'Required'
         param_5.direction = 'Input'
-        param_5.datatype = u'Datei'
+        param_5.datatype = language(u'file')
 
         # Apotheken
         param_6 = arcpy.Parameter()
@@ -94,7 +96,7 @@ class TbxEinrichtungen(Tbx):
         param_6.displayName = u'Apotheken'
         param_6.parameterType = 'Required'
         param_6.direction = 'Input'
-        param_6.datatype = u'Datei'
+        param_6.datatype = language(u'file')
 
         # Krankenh�user
         param_7 = arcpy.Parameter()
@@ -102,7 +104,7 @@ class TbxEinrichtungen(Tbx):
         param_7.displayName = u'Krankenh\xe4user'
         param_7.parameterType = 'Required'
         param_7.direction = 'Input'
-        param_7.datatype = u'Datei'
+        param_7.datatype = language(u'file')
 
         # Sonstige
         param_8 = arcpy.Parameter()
@@ -110,7 +112,7 @@ class TbxEinrichtungen(Tbx):
         param_8.displayName = u'Sonstige'
         param_8.parameterType = 'Required'
         param_8.direction = 'Input'
-        param_8.datatype = u'Datei'
+        param_8.datatype = language(u'file')
 
         # Einzelhandelstandorte_aus_34_Versorgung_�bernehmen
         param_9 = arcpy.Parameter()
@@ -126,7 +128,7 @@ class TbxEinrichtungen(Tbx):
         param_10.displayName = u'Einzelhandelstandorte'
         param_10.parameterType = 'Required'
         param_10.direction = 'Input'
-        param_10.datatype = u'Datei'
+        param_10.datatype = language(u'file')
 
         # Einzelhandelstandorte_aus_Toolbox_34_Versorgung
         param_11 = arcpy.Parameter()

@@ -20,16 +20,16 @@ class TbxStandortkonkurrenz(Tbx):
 
     def _getParameterInfo(self):
 
-		list_projects = project_lib.get_projects()
-		list_projects = sorted(list_projects)
+    	list_projects = project_lib.get_projects()
+    	list_projects = sorted(list_projects)
 
-		i = 0
-		self.params[i].filter.list = list_projects
-		self.Projekt= i
-		i+=1
-		self.Maerkteshp = i
-		i+=1
-		self.Siedlungsshp = i
+    	i = 0
+    	self.params[i].filter.list = list_projects
+    	self.Projekt= i
+    	i+=1
+    	self.Maerkteshp = i
+    	i+=1
+    	self.Siedlungsshp = i
 
         # Projektauswahl
         param_1 = arcpy.Parameter()

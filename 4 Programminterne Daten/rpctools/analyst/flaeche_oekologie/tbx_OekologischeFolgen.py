@@ -20,13 +20,13 @@ class TbxOekologischeFolgen(Tbx):
 
     def _getParameterInfo(self):
 
-		list_projects = project_lib.get_projects()
-		list_projects = sorted(list_projects)
+    	list_projects = project_lib.get_projects()
+    	list_projects = sorted(list_projects)
 
-		i=-1
+    	i=-1
 
-		#set project
-		i+=1 ; self.params[i].filter.list = list_projects
+    	#set project
+    	i+=1 ; self.params[i].filter.list = list_projects
 
 
         # Projekt_ausw�hlen

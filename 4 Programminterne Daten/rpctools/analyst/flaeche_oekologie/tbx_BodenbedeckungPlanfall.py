@@ -20,34 +20,34 @@ class TbxBodenbedeckungPlanfall(Tbx):
 
     def _getParameterInfo(self):
 
-		list_projects = project_lib.get_projects()
-		list_projects = sorted(list_projects)
+    	list_projects = project_lib.get_projects()
+    	list_projects = sorted(list_projects)
 
-		list_teilflaechen = []
+    	list_teilflaechen = []
 
-		i=-1
+    	i=-1
 
-		#Filterliste fUer Bedeckungsarten
-		bodenbedeckungListe =["Ueberbaute Flaechen","Asphalt, Beton","Platten","Kleinpflaster","Wassergebundene Decke, Rasengittersteine","Offener Boden, Acker","Rasen","Baeume, Straeucher","Stauden","Wiese","Natuerliche Wasserflaeche"]
-		bodenbedeckungListe.sort()
-		bodenbedeckungListe = list(set(bodenbedeckungListe))
-		#set project
-		i+=1 ; self.params[i].filter.list = list_projects
+    	#Filterliste fUer Bedeckungsarten
+    	bodenbedeckungListe =["Ueberbaute Flaechen","Asphalt, Beton","Platten","Kleinpflaster","Wassergebundene Decke, Rasengittersteine","Offener Boden, Acker","Rasen","Baeume, Straeucher","Stauden","Wiese","Natuerliche Wasserflaeche"]
+    	bodenbedeckungListe.sort()
+    	bodenbedeckungListe = list(set(bodenbedeckungListe))
+    	#set project
+    	i+=1 ; self.params[i].filter.list = list_projects
 
-		#set point
-		i+=1 ; self.params[i].filter.list = list_teilflaechen
+    	#set point
+    	i+=1 ; self.params[i].filter.list = list_teilflaechen
 
-		heading = "01_Bodenbedeckung"
-		i+=1 ; self.params[i].category = heading
-		self.params[i].filter.list = bodenbedeckungListe
-		i+=1 ; self.params[i].category = heading
-		#i+=1 ; self.params[i].category = heading
-		#self.params[i].filter.list = bodenbedeckungListe
-		#i+=1 ; self.params[i].category = heading;self.params[i].enabled = 1
+    	heading = "01_Bodenbedeckung"
+    	i+=1 ; self.params[i].category = heading
+    	self.params[i].filter.list = bodenbedeckungListe
+    	i+=1 ; self.params[i].category = heading
+    	#i+=1 ; self.params[i].category = heading
+    	#self.params[i].filter.list = bodenbedeckungListe
+    	#i+=1 ; self.params[i].category = heading;self.params[i].enabled = 1
 
-		heading = "02_Speichern"
-		i+=1 ; self.params[i].category = heading
-		i+=1 ; self.params[i].category = heading ;self.params[i].enabled = 0
+    	heading = "02_Speichern"
+    	i+=1 ; self.params[i].category = heading
+    	i+=1 ; self.params[i].category = heading ;self.params[i].enabled = 0
 
         # Projekt
         param_1 = arcpy.Parameter()

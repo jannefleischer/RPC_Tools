@@ -20,14 +20,14 @@ class TbxMarktEinlesen(Tbx):
 
     def _getParameterInfo(self):
 
-		list_projects = project_lib.get_projects()
-		list_projects = sorted(list_projects)
+    	list_projects = project_lib.get_projects()
+    	list_projects = sorted(list_projects)
 
-		i = 0
-		self.params[i].filter.list = list_projects
-		self.Projekt= i
-		i+=1
-		self.Pfad = i # f�r template
+    	i = 0
+    	self.params[i].filter.list = list_projects
+    	self.Projekt= i
+    	i+=1
+    	self.Pfad = i # f�r template
 
         # Projektauswahl
         param_1 = arcpy.Parameter()
@@ -44,7 +44,7 @@ class TbxMarktEinlesen(Tbx):
         param_2.displayName = u'Bestandsliste Superm\xe4rkte'
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
-        param_2.datatype = u'Datei'
+        param_2.datatype = language(u'file')
 
         # Punktfeature_f�r_Bev�lkerungsmodellierung
         param_3 = arcpy.Parameter()

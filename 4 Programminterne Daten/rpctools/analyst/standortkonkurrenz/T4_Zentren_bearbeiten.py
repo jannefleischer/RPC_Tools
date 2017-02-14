@@ -11,10 +11,10 @@
 #
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
-
+from rpctools.utils.params import Tool
 class ZentrenBearbeiten(Tool):
 
     def run(self):
         messages = self.mes
         parameters = self.par
-		pass
+    	pass

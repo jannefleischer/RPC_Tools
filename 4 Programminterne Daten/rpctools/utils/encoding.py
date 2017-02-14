@@ -28,12 +28,14 @@ def language(datatype):
         else:
             return u'String'
 
-
     if datatype == 'boolean':
         if language == 'de_DE':
             return u'Boolesch'
         else:
             return u'Boolean'
-        if datatype == 'Zeichenfolge':
-            return 'String'
 
+    if datatype == 'file':
+        if language == 'de_DE':
+            return u'Datei'
+        else:
+            return u'File'

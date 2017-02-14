@@ -20,18 +20,18 @@ class TbxDefinitionZentren(Tbx):
 
     def _getParameterInfo(self):
 
-		list_projects = project_lib.get_projects()
-		list_projects = sorted(list_projects)
+    	list_projects = project_lib.get_projects()
+    	list_projects = sorted(list_projects)
 
-		i=-1
-		i+=1 ;
-		#set project
-		self.params[i].filter.list = list_projects
+    	i=-1
+    	i+=1 ;
+    	#set project
+    	self.params[i].filter.list = list_projects
 
-		i+=1 ;
-		#zentren
-		i+=1 ;
-		self.params[i].filter.list = []
+    	i+=1 ;
+    	#zentren
+    	i+=1 ;
+    	self.params[i].filter.list = []
 
         # Projektauswahl
         param_1 = arcpy.Parameter()

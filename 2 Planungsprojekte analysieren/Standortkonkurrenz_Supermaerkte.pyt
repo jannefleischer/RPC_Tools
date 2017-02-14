@@ -4,8 +4,8 @@ from rpctools.analyst.standortkonkurrenz import tbx_definitionZentren
 reload(tbx_definitionZentren)
 from rpctools.analyst.standortkonkurrenz import tbx_marktEinlesen
 reload(tbx_marktEinlesen)
-from rpctools.analyst.standortkonkurrenz import 
-reload()
+from rpctools.analyst.standortkonkurrenz import tbx_marktHinzufuegen
+reload(tbx_marktHinzufuegen)
 from rpctools.analyst.standortkonkurrenz import tbx_standortkonkurrenz
 reload(tbx_standortkonkurrenz)
 from rpctools.analyst.standortkonkurrenz import tbx_zentrenBearbeiten
