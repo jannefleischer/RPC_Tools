@@ -27,13 +27,13 @@ class TbxProjektVerwaltung(Tbx):
         params = self.par
 
         # Was_möchten_Sie_tun_
-        params.action = arcpy.Parameter()
-        params.action.name = encode('Was_möchten_Sie_tun_')
-        params.action.displayName = encode('Was möchten Sie tun?')
-        params.action.parameterType = 'Required'
-        params.action.direction = 'Input'
-        params.action.datatype = language('string')
-        params.action.filter.list = ['Neues Projekt anlegen',
+        params_1 = params.act = arcpy.Parameter()
+        params_1.name = encode('Was_möchten_Sie_tun_')
+        params_1.displayName = encode('Was möchten Sie tun?')
+        params_1.parameterType = 'Required'
+        params_1.direction = 'Input'
+        params_1.datatype = language('string')
+        params_1.filter.list = ['Neues Projekt anlegen',
                                      'Bestehendes Projekt kopieren',
                                      encode('Bestehendes Projekt löschen')]
 
