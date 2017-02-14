@@ -59,7 +59,7 @@ class TbxEinrichtungen(Tbx):
             param_1.value = projekte[0]
 
         # Bereits_eingeladene_Einrichtung_f�r_das_Projekt_verwenden
-        param_2 = arcpy.Parameter()
+        param_2 = params.projectname = arcpy.Parameter()
         param_2.name = u'Bereits_eingeladene_Einrichtung_f\xfcr_das_Projekt_verwenden'
         param_2.displayName = u'Bereits geladene Einrichtung f\xfcr das Projekt verwenden'
         param_2.parameterType = 'Optional'
@@ -67,7 +67,7 @@ class TbxEinrichtungen(Tbx):
         param_2.datatype = language('boolean')
 
         # Kita
-        param_3 = arcpy.Parameter()
+        param_3 = params.kita = arcpy.Parameter()
         param_3.name = u'Kita'
         param_3.displayName = u'Kita'
         param_3.parameterType = 'Required'
@@ -75,7 +75,7 @@ class TbxEinrichtungen(Tbx):
         param_3.datatype = language(u'file')
 
         # Grundschulen
-        param_4 = arcpy.Parameter()
+        param_4 = params.grundschule = arcpy.Parameter()
         param_4.name = u'Grundschulen'
         param_4.displayName = u'Grundschulen'
         param_4.parameterType = 'Required'
@@ -83,7 +83,7 @@ class TbxEinrichtungen(Tbx):
         param_4.datatype = language(u'file')
 
         # Allgemein_Mediziner
-        param_5 = arcpy.Parameter()
+        param_5 = params.arzt = arcpy.Parameter()
         param_5.name = u'Allgemein_Mediziner'
         param_5.displayName = u'Allgemein Mediziner'
         param_5.parameterType = 'Required'
@@ -91,7 +91,7 @@ class TbxEinrichtungen(Tbx):
         param_5.datatype = language(u'file')
 
         # Apotheken
-        param_6 = arcpy.Parameter()
+        param_6 = params.apotheke = arcpy.Parameter()
         param_6.name = u'Apotheken'
         param_6.displayName = u'Apotheken'
         param_6.parameterType = 'Required'
@@ -99,7 +99,7 @@ class TbxEinrichtungen(Tbx):
         param_6.datatype = language(u'file')
 
         # Krankenh�user
-        param_7 = arcpy.Parameter()
+        param_7 = params.krankenhaus = arcpy.Parameter()
         param_7.name = u'Krankenh\xe4user'
         param_7.displayName = u'Krankenh\xe4user'
         param_7.parameterType = 'Required'
@@ -107,7 +107,7 @@ class TbxEinrichtungen(Tbx):
         param_7.datatype = language(u'file')
 
         # Sonstige
-        param_8 = arcpy.Parameter()
+        param_8 = params.sonstige = arcpy.Parameter()
         param_8.name = u'Sonstige'
         param_8.displayName = u'Sonstige'
         param_8.parameterType = 'Required'
@@ -115,7 +115,7 @@ class TbxEinrichtungen(Tbx):
         param_8.datatype = language(u'file')
 
         # Einzelhandelstandorte_aus_34_Versorgung_�bernehmen
-        param_9 = arcpy.Parameter()
+        param_9 = params.ehs1 = arcpy.Parameter()
         param_9.name = u'Einzelhandelstandorte_aus_34_Versorgung_\xfcbernehmen'
         param_9.displayName = u'Einzelhandelstandorte aus Toolbox "Standardversorgung" \xfcbernehmen'.encode('CP1252')
         param_9.parameterType = 'Optional'
@@ -123,7 +123,7 @@ class TbxEinrichtungen(Tbx):
         param_9.datatype = language('boolean')
 
         # Einzelhandelstandorte
-        param_10 = arcpy.Parameter()
+        param_10 = params.ehs2 = arcpy.Parameter()
         param_10.name = u'Einzelhandelstandorte'
         param_10.displayName = u'Einzelhandelstandorte'
         param_10.parameterType = 'Required'
@@ -131,7 +131,7 @@ class TbxEinrichtungen(Tbx):
         param_10.datatype = language(u'file')
 
         # Einzelhandelstandorte_aus_Toolbox_34_Versorgung
-        param_11 = arcpy.Parameter()
+        param_11 = params.ehs3 = arcpy.Parameter()
         param_11.name = u'Einzelhandelstandorte_aus_Toolbox_34_Versorgung'
         param_11.displayName = u'Einzelhandelstandorte aus Toolbox "Standardversorgung"'
         param_11.parameterType = 'Optional'

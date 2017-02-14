@@ -45,7 +45,7 @@ class TbxMarktHinzufuegen(Tbx):
             param_1.value = projekte[0]
 
         # Anbieter_des_Marktes
-        param_2 = arcpy.Parameter()
+        param_2 = params.Anbieter = arcpy.Parameter()
         param_2.name = u'Anbieter_des_Marktes'
         param_2.displayName = u'Anbieter des Marktes'
         param_2.parameterType = 'Required'
@@ -54,7 +54,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_2.filter.list = [u'Aktiv-Discount', u'Aldi', u'Alnatura', u'basic', u'biocompany', u'Biomarkt', u'Coma', u'Combi', u'denns', u'diska', u'Edeka', u'famila', u'globus', u'HIT', u'Jibi', u'K + K (Klaas & Kock)', u'Kaufland', u'Konsum-Leipzig', u'Lidl', u'Markant', u'Marktkauf', u'Migros', u'Mix-Markt', u'nahkauf', u'Netto', u'Netto(Edeka)', u'Norma', u'NP', u'Penny', u'Perfetto (Karstadt)', u'Plaza', u'Real', u'Rewe', u'Sky', u'Sonstige', u'Tegut', u'Toom', u'treff 3000', u'vitalia', u'viv', u'V-Markt', u'Wasgau', u'WEZ']
 
         # Neuer_Anbieter__bei_Auswahl_von_Sonstige_
-        param_3 = arcpy.Parameter()
+        param_3 = params.Sonstige = arcpy.Parameter()
         param_3.name = u'Neuer_Anbieter__bei_Auswahl_von_Sonstige_'
         param_3.displayName = u'Neuer Anbieter (bei Auswahl von Sonstige)'
         param_3.parameterType = 'Optional'
@@ -62,7 +62,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_3.datatype = language('string')
 
         # Ja__es_handelt_sich_um_einen_Discounter
-        param_4 = arcpy.Parameter()
+        param_4 = params.Discounter = arcpy.Parameter()
         param_4.name = u'Ja__es_handelt_sich_um_einen_Discounter'
         param_4.displayName = u'Ja, es handelt sich um einen Discounter'
         param_4.parameterType = 'Optional'
@@ -70,7 +70,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_4.datatype = language('boolean')
 
         # Verkaufsfl�che_gesamt__m2_
-        param_5 = arcpy.Parameter()
+        param_5 = params.Flaeche = arcpy.Parameter()
         param_5.name = u'Verkaufsfl\xe4che_gesamt__m2_'
         param_5.displayName = u'Verkaufsfl\xe4che gesamt (m2)'
         param_5.parameterType = 'Required'
@@ -78,7 +78,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_5.datatype = language('string')
 
         # Stra�e
-        param_6 = arcpy.Parameter()
+        param_6 = params.Strasse = arcpy.Parameter()
         param_6.name = u'Stra\xdfe'
         param_6.displayName = u'Stra\xdfe'
         param_6.parameterType = 'Required'
@@ -86,7 +86,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_6.datatype = language('string')
 
         # Hausnummer
-        param_7 = arcpy.Parameter()
+        param_7 = params.Hausnummer = arcpy.Parameter()
         param_7.name = u'Hausnummer'
         param_7.displayName = u'Hausnummer'
         param_7.parameterType = 'Required'
@@ -94,7 +94,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_7.datatype = language('string')
 
         # Postleitzahl
-        param_8 = arcpy.Parameter()
+        param_8 = params.PLZ = arcpy.Parameter()
         param_8.name = u'Postleitzahl'
         param_8.displayName = u'Postleitzahl'
         param_8.parameterType = 'Required'
@@ -102,7 +102,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_8.datatype = language('string')
 
         # Ort
-        param_9 = arcpy.Parameter()
+        param_9 = params.Ort = arcpy.Parameter()
         param_9.name = u'Ort'
         param_9.displayName = u'Ort'
         param_9.parameterType = 'Required'
@@ -110,7 +110,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_9.datatype = language('string')
 
         # Ortsteil
-        param_10 = arcpy.Parameter()
+        param_10 = params.Ortsteil = arcpy.Parameter()
         param_10.name = u'Ortsteil'
         param_10.displayName = u'Ortsteil'
         param_10.parameterType = 'Optional'
@@ -118,7 +118,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_10.datatype = language('string')
 
         # Handelt_es_sich_bei_dem_neuen_Markt_um_eine_Erweiterung_oder_einen_neuen_Markt_
-        param_11 = arcpy.Parameter()
+        param_11 = params.Erweiterung = arcpy.Parameter()
         param_11.name = u'Handelt_es_sich_bei_dem_neuen_Markt_um_eine_Erweiterung_oder_einen_neuen_Markt_'
         param_11.displayName = u'Handelt es sich bei dem neuen Markt um eine Erweiterung oder einen neuen Markt?'
         param_11.parameterType = 'Required'
@@ -127,7 +127,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_11.filter.list = [u'Erweiterung', u'Neuen Markt']
 
         # Markterweiterung_wurde_ausgew�hlt__Welcher_Markt_soll_erweitert_werden_
-        param_12 = arcpy.Parameter()
+        param_12 = params.MarktErweiterung = arcpy.Parameter()
         param_12.name = u'Markterweiterung_wurde_ausgew\xe4hlt__Welcher_Markt_soll_erweitert_werden_'
         param_12.displayName = u'Markterweiterung wurde ausgew\xe4hlt. Welcher Markt soll erweitert werden?'
         param_12.parameterType = 'Optional'
@@ -135,7 +135,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_12.datatype = language('string')
 
         # Einen_zus�tzlichen_Markt_definieren
-        param_13 = arcpy.Parameter()
+        param_13 = params.weitererMarkt = arcpy.Parameter()
         param_13.name = u'Einen_zus\xe4tzlichen_Markt_definieren'
         param_13.displayName = u'Einen zus\xe4tzlichen Markt definieren'
         param_13.parameterType = 'Optional'
@@ -143,7 +143,7 @@ class TbxMarktHinzufuegen(Tbx):
         param_13.datatype = language('boolean')
 
         # Status
-        param_14 = arcpy.Parameter()
+        param_14 = params.status = arcpy.Parameter()
         param_14.name = u'Status'
         param_14.displayName = u'Status'
         param_14.parameterType = 'Optional'

@@ -35,7 +35,7 @@ class TbxRoutingsdurchfuehren(Tbx):
             param_1.value = projekte[0]
 
         # MapQuest_Key
-        param_2 = arcpy.Parameter()
+        param_2 = params.mapkey = arcpy.Parameter()
         param_2.name = u'MapQuest_Key'
         param_2.displayName = u'MapQuest Key'
         param_2.parameterType = 'Required'

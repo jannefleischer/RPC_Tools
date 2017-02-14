@@ -26,7 +26,7 @@ class TbxVerkehrsmengenErmitteln(Tbx):
         #set parameters
         i=0
 
-        heading = u"01 - Parameter f�r Wohnnutzungen".encode('CP1252')
+        heading = u"01 - Parameter für Wohnnutzungen".encode('CP1252')
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
         i+=1 ; self.params[i].category = heading
