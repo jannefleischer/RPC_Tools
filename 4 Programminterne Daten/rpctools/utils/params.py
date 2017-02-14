@@ -320,9 +320,6 @@ class Tbx(object):
         parameter
         """
         params = self._getParameterInfo()._od.values()
-        # set the parameters as real attributes to self.par
-        for p in self.par._od:
-            self.par.__dict__[p] = self.par[p]
         return params
 
     def isLicensed(self):
@@ -356,7 +353,7 @@ class Tbx(object):
         parameters : list of ArcGIS-Parameters
         """
         self.par._update_parameters(parameters)
-        self._updateMessages(parameters)
+        self._updateMessages(self.par)
 
     def _updateMessages(self, parameters):
         """ to define in the subclass """
