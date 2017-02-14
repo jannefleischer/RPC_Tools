@@ -24,25 +24,25 @@ def language(datatype):
     #language = str(windll.GetUserDefaultUILanguage())
 
     if datatype == 'string':
-        if language == 'de_DE':
+        if mylanguage == 'de_DE':
             return u'Zeichenfolge'
         else:
             return u'String'
 
     if datatype == 'boolean':
-        if language == 'de_DE':
+        if mylanguage == 'de_DE':
             return u'Boolesch'
         else:
             return u'Boolean'
 
     if datatype == 'file':
-        if language == 'de_DE':
+        if mylanguage == 'de_DE':
             return u'Datei'
         else:
             return u'File'
 
     if datatype == 'feature class':
-        if language == 'de_DE':
+        if mylanguage == 'de_DE':
             return u'Feature-Class'
         else:
             return u'Feature class'
