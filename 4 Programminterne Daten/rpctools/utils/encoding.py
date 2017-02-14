@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from rpctools.utils.config_language import mylanguage
 
 def encode(text):
     """encode text to CP1252"""
@@ -17,10 +18,10 @@ def encode(text):
 
 def language(datatype):
 
-    import ctypes
-    import locale
-    windll = ctypes.windll.kernel32
-    language = str(windll.GetUserDefaultUILanguage())
+    #import ctypes
+    #import locale
+    #windll = ctypes.windll.kernel32
+    #language = str(windll.GetUserDefaultUILanguage())
 
     if datatype == 'string':
         if language == 'de_DE':
