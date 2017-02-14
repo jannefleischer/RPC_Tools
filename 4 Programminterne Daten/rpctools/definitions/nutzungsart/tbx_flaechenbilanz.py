@@ -9,7 +9,6 @@ from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 from rpctools.utils.encoding import language
 from rpctools.definitions.nutzungsart.flaechenbilanz import Flaechenbilanz
-import rpctools.wingdbstub
 
 
 class TbxFlaechenbilanz(Tbx):

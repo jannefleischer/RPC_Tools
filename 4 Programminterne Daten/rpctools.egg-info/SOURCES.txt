@@ -76,7 +76,6 @@ setup.py
 ./rpctools/utils/config.py
 ./rpctools/utils/encoding.py
 ./rpctools/utils/kosten_lib.py
-./rpctools/utils/language.py
 ./rpctools/utils/lib_gewerbemodell.py
 ./rpctools/utils/params.py
 ./rpctools/utils/population_lib.py
@@ -167,7 +166,6 @@ rpctools/utils/__init__.py
 rpctools/utils/config.py
 rpctools/utils/encoding.py
 rpctools/utils/kosten_lib.py
-rpctools/utils/language.py
 rpctools/utils/lib_gewerbemodell.py
 rpctools/utils/params.py
 rpctools/utils/population_lib.py

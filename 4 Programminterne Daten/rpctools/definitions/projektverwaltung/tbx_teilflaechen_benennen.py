@@ -25,31 +25,31 @@ class TbxTeilflaecheBenennen(Tbx):
         params = self.par
 
         projects = self.folders.get_projects()
-        params.project = arcpy.Parameter()
-        params.project.name = u'Projekt'
-        params.project.displayName = u'Projekt'
-        params.project.parameterType = 'Required'
-        params.project.direction = 'Input'
-        params.project.datatype = language('string')
-        params.project.value = u' '
-        params.project.filter.list = projects
+        p = params.project = arcpy.Parameter()
+        p.name = u'Projekt'
+        p.displayName = u'Projekt'
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'GPString'
+        p.filter.list = projects
+        p.value = p.filter.list[0]
 
         # Teilfläche
-        params.teilflaeche = arcpy.Parameter()
-        params.teilflaeche.name = encode(u'Teilfläche')
-        params.teilflaeche.displayName = encode(u'Teilfläche')
-        params.teilflaeche.parameterType = 'Required'
-        params.teilflaeche.direction = 'Input'
-        params.teilflaeche.datatype = u'GPString'
-        params.teilflaeche.filter.list = []
+        p = params.teilflaeche = arcpy.Parameter()
+        p.name = encode(u'Teilfläche')
+        p.displayName = encode(u'Teilfläche')
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'GPString'
+        p.filter.list = []
 
         # Name
-        params.name = arcpy.Parameter()
-        params.name.name = u'Name'
-        params.name.displayName = u'Name'
-        params.name.parameterType = 'Required'
-        params.name.direction = 'Input'
-        params.name.datatype = u'GPString'
+        p = params.name = arcpy.Parameter()
+        p.name = u'Name'
+        p.displayName = u'Name'
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'GPString'
 
         return params
 
@@ -81,7 +81,7 @@ class TbxTeilflaecheBenennen(Tbx):
 
             params.teilflaeche.filter.list = list_teilflaechen
 
-            if list_teilflaeche:
+            if list_teilflaechen:
                 params.teilflaeche.value = list_teilflaechen[0]
 
 
@@ -107,3 +107,13 @@ class TbxTeilflaecheBenennen(Tbx):
             for row in namen_cursor:
                 if params.name.value == row[0]:
                     params.name.setErrorMessage("Name wurde bereits vergeben.")
+
+
+if __name__ == '__main__':
+    t = TbxTeilflaecheBenennen()
+    params = t.getParameterInfo()
+    t.print_test_parameters()
+    t.print_tool_parameters()
+    t.updateParameters(params)
+    t.updateMessages(params)
+    t.print_test_parameters()
