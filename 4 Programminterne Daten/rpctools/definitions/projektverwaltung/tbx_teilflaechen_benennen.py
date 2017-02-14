@@ -14,7 +14,7 @@ class TbxTeilflaecheBenennen(Tbx):
 
     @property
     def label(self):
-        return u'Teilflaechen verwalten'
+        return u'Schritt 2: Teilflaechen verwalten'
 
     @property
     def Tool(self):

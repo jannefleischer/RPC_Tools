@@ -9,6 +9,7 @@ from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 from rpctools.utils.encoding import language
 from rpctools.definitions.nutzungsart.flaechenbilanz import Flaechenbilanz
+import rpctools.wingdbstub
 
 
 class TbxFlaechenbilanz(Tbx):
@@ -16,7 +17,7 @@ class TbxFlaechenbilanz(Tbx):
 
     @property
     def label(self):
-        return encode(u'Flächenbilanz eingeben')
+        return encode(u'Schritt 3: Flächenbilanz eingeben')
 
     @property
     def Tool(self):

@@ -16,7 +16,7 @@ class TbxNutzungen(Tbx):
 
     @property
     def label(self):
-        return 'Nutzungen eingeben'
+        return 'Schritt 4: Nutzungen eingeben'
 
     @property
     def Tool(self):
