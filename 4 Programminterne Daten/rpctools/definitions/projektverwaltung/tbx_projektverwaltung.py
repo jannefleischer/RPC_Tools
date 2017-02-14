@@ -9,8 +9,6 @@ from rpctools.utils.encoding import encode
 from rpctools.utils.encoding import language
 from rpctools.definitions.projektverwaltung.T1_Projektverwaltung import Projektverwaltung
 
-from rpctools.utils.params import Params
-
 
 class TbxProjektVerwaltung(Tbx):
     """Toolbox Projektverwaltung"""
@@ -76,6 +74,7 @@ class TbxProjektVerwaltung(Tbx):
         p.datatype = u'Long'
         p.filter.type = 'Range'
         p.filter.list = [2010, 2050]
+        p.value = datetime.datetime.now().year
 
         # Ende_des_Betrachtungszeitraumes
         p = params.end = arcpy.Parameter()
@@ -86,10 +85,8 @@ class TbxProjektVerwaltung(Tbx):
         p.datatype = u'Long'
         p.filter.type = 'Range'
         p.filter.list = [2010, 2050]
+        p.value = 2050
 
-        #Beginn des Betrachtungszeitraumes auf aktuelles Jahr setzen
-        params.begin.value = datetime.datetime.now().year
-        params.end.value = 2050
 
         #Eingaben zu Beginn deaktiviere/füllen
         params.existing_project.enabled = False
