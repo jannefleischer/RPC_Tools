@@ -74,6 +74,8 @@ class TbxProjektVerwaltung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'Long'
+        p.filter.type = 'Range'
+        p.filter.list = [2010, 2050]
 
         # Ende_des_Betrachtungszeitraumes
         p = params.end = arcpy.Parameter()
@@ -82,6 +84,8 @@ class TbxProjektVerwaltung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'Long'
+        p.filter.type = 'Range'
+        p.filter.list = [2010, 2050]
 
         #Beginn des Betrachtungszeitraumes auf aktuelles Jahr setzen
         params.begin.value = datetime.datetime.now().year
