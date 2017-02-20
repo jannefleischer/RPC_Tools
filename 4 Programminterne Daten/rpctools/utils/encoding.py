@@ -23,8 +23,8 @@ def language(datatype):
     #windll = ctypes.windll.kernel32
     #language = str(windll.GetUserDefaultUILanguage())
 
-    if datatype == 'language('feature class')':
+    if datatype == 'feature class':
         if mylanguage == 'de_DE':
             return u'Feature-Class'
         else:
-            return u'language('feature class')'
+            return u'feature class'
