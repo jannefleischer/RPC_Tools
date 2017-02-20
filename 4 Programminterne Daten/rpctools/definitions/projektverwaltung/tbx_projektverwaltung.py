@@ -43,7 +43,6 @@ class TbxProjektVerwaltung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'GPString'
-        p.value = u' '
         p.filter.list = projects
 
         # Name_des_neuen_Projektes

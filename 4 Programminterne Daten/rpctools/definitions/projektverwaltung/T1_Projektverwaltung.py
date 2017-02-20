@@ -26,7 +26,7 @@ class Projektverwaltung(Tool):
     _dbname = 'FGDB_Definition_Projekt.gdb'
 
     def run(self):
-        
+
         arcpy.AddMessage(self.par.action.value)
 
         if self.par.action.value == "Neues Projekt anlegen":
@@ -43,9 +43,10 @@ class Projektverwaltung(Tool):
         return self.folders.get_table('Teilflaechen_Plangebiet')
 
     def projekt_loeschen(self):
-        projektName = self.par.name.value
+        projektName = self.par.existing_project.value
+        arcpy.AddMessage("Projektname: " + projektName)
         # Mit dem Projektnamen zum neuen Projektpfad zusammenführen"
-        projektPfad = self.folders.PROJECT_PATH
+        projektPfad = self.folders.get_projectpath(projektName)
         arcpy.AddMessage("Suche Ordner: " + projektPfad)
 
         # entferne alle aktuellen Layer aus dem TOC (Locks aufheben)
@@ -204,7 +205,7 @@ class Projektverwaltung(Tool):
                                   'Projektrahmendaten')
         projektFlaeche = join(workspace_projekt_definition,
                               'Teilflaechen_Plangebiet')
-        
+
         arcpy.AddMessage(bkg)
 
         # ags aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird
@@ -296,4 +297,4 @@ class Projektverwaltung(Tool):
 
         arcpy.AddMessage("Neues Projekt angelegt im Ordner {}\n".format(
             self.folders.PROJECT_PATH))
-        
+
