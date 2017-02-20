@@ -48,7 +48,7 @@ class ZentraleOrteOEPNV(Tool):
     		orte.append(p3.replace('(','').replace('-','').replace(')','').encode('utf-8'))
 
     	#Pfade einrichten
-    	base_path = str(sys.path[0]).split("2_Tool")[0]
+    	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
     	workspace_projekt_erreichbarkeit = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Erreichbarkeit.gdb')
     	zentrale_orte = workspace_projekt_erreichbarkeit+"\Zentrale_Orte_75km"

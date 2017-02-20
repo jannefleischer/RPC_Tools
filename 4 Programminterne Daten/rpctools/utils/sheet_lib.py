@@ -19,8 +19,8 @@ import arcpy, os, sys, datetime, imp
 def infosheet(projektname, wirkungsfeld, wb):
 
     # Pfade setzen
-    base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_factsheet = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    workspace_factsheet = join(base_path,'3 Benutzerdefinierte Projekte', projektname,"FGDB_Definition_Projekt.gdb")
     tablepath_vor = join(workspace_factsheet,'Vornutzungen_Details_Prozent')
     tablepath_teil = join(workspace_factsheet,'Teilflaechen_Plangebiet')
     tablepath_neu  = join(workspace_factsheet,'Flaechenbilanz_gruppiert')
@@ -29,7 +29,7 @@ def infosheet(projektname, wirkungsfeld, wb):
     tablepath_WE = join(workspace_factsheet,'Wohneinheiten_Details')
     tablepath_Gewerbe = join(workspace_factsheet,'Gewerbe_Beschaeftigte')
     tablepath_EZH = join(workspace_factsheet,'Versorgung_Verkaufsflaechen_Max')
-    logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+    logo = join((str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]),"1_Basisdaten","logo_rpc.png")
 
     ####################################################################
     #erstelle Diverse Tabellen zur Erzeugung des Uebersichtsdatenblattes

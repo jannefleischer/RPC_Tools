@@ -290,7 +290,7 @@
     <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">schrittmeldung</span>
 
-    <span class="c1"># First, make a layer from the feature class</span>
+    <span class="c1"># First, make a layer from the language('feature class')</span>
     <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">siedlungszellen_centroid</span><span class="p">,</span> <span class="s2">&quot;sz_centroid_lyr&quot;</span><span class="p">)</span>
 
     <span class="c1"># Process: Layer lagebezogen auswählen</span>
@@ -673,7 +673,7 @@
 
     <span class="n">oppositeCoorner</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">extent</span><span class="o">.</span><span class="n">XMax</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">extent</span><span class="o">.</span><span class="n">YMax</span><span class="p">)</span>
 
-    <span class="c1"># Create a point label feature class</span>
+    <span class="c1"># Create a point label language('feature class')</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="s1">&#39;false&#39;</span>
 
     <span class="c1"># Extent is set by origin and opposite corner - no need to use a template fc</span>

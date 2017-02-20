@@ -23,20 +23,20 @@ import os
 import gc
 import sys
 import imp
-
+from os.path import join, isdir, abspath, dirname, basename
 import arcpy
 import xlsxwriter
 
 from rpctools.utils.params import Tool
 import rpctools.utils.sheet_lib as sl
-import rpctools.utils.tempmdb_lib as tempmdb_lib
+import rpctools.utils.tempmdb_lib as mdb
 import rpctools.utils.population_lib as population_lib
 
 
 
 class Grundsteuer(Tool):
 
-    _dbname = 'FGDEinnahmen.gdb'
+    _dbname = 'FGDB_Einnahmen.gdb'
 
     def run(self):
         parameters = self.par
@@ -44,29 +44,28 @@ class Grundsteuer(Tool):
         arcpy.env.overwriteOutput = True
 
         # Variablen definieren
-        projektname = parameters[0].value
-        gemeindegroessenklasse64 = parameters[1].value
-        grundsteuerhebesatz = parameters[2].value
+        projektname = self.par.name.value
+        gemeindegroessenklasse64 = self.par.ggk_1964.value
+        grundsteuerhebesatz = self.par.hebesatz.value
 
-        monatsrohmiete_EFH = parameters[3].value
-        monatsrohmiete_DHH = parameters[4].value
-        monatsrohmiete_RH = parameters[5].value
-        monatsrohmieteMFH = parameters[6].value
-        monatsrohmieteMFH_G = parameters[6].value
-        jahresrohmiete_garage = parameters[7].value
-        jahresrohmiete_carport = parameters[8].value
+        monatsrohmiete_EFH = self.par.efh_rohmiete.value
+        monatsrohmiete_DHH = self.par.zfh_rohmiete.value
+        monatsrohmiete_RH = self.par.rh_rohmiete.value
+        monatsrohmieteMFH = self.par.mfh_rohmiete.value
+        jahresrohmiete_garage = self.par.garagen_jahresrohmiete.value
+        jahresrohmiete_carport = self.par.carports_jahresrohmiete.value
 
         #projektname = "HCU_LKH_Bultweg"
 
         #Pfade einrichten
-        base_path = str(sys.path[0]).split("2_Tool")[0]
+        base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
-        workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
-        workspace_projekt_definition = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
-        workspace_projekt_bevoelkerung = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_BevModellierung.gdb')
-        workspace_projekt_einnahmen = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDEinnahmen.gdb')
-        workspace_tool_definition = join(base_path,"2_Tool","Art und Mass der Nutzung","FGDB_Definition_Projekt_Tool.gdb")
-        workspace_tool_einnahmen = join(base_path,"2_Tool","Einnahmen","FGDEinnahmen_Tool.gdb")
+        workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
+        workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+        workspace_projekt_bevoelkerung = self.folders.get_db('FGDB_BevModellierung.gdb', projektname)
+        workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
+        workspace_tool_definition = self.folders.get_basedb('FGDB_Definition_Projekt_Tool.gdb')
+        workspace_tool_einnahmen = self.folders.get_basedb('FGDB_Einnahmen_Tool.gdb')
 
         Teilflaechen_Plangebiet_Centroide = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_Centroide")
         Teilflaechen_Plangebiet_CentroideGK3 = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_CentroideGK3")
@@ -317,7 +316,7 @@ class Grundsteuer(Tool):
         print schrittmeldung
 
         # Pfade setzen
-        logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+        logo = join((str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]),"1_Basisdaten","logo_rpc.png")
         ausgabeordner = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'Ergebnisausgabe','Excel')
         if not os.path.exists(ausgabeordner): os.makedirs(ausgabeordner)
         excelpfad = join(ausgabeordner,'Einnahmen_Grundsteuer.xlsx')

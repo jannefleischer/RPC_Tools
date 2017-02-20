@@ -5,14 +5,15 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.erreichbarkeit.T3_Erreichbarkeit_OEPNV import ErreichbarkeitOEPNV
 
 class TbxErreichbarkeitOEPNV(Tbx):
 
     @property
     def label(self):
-        return encode(u'Erreichbarkeit von OEPNV ermitteln')
+        return encode(u'Schritt 4: Erreichbarkeit von OEPNV ermitteln')
 
     @property
     def Tool(self):
@@ -23,10 +24,6 @@ class TbxErreichbarkeitOEPNV(Tbx):
         params = self.par
         projekte = self.folders.get_projects()
 
-    	#set Haltestellen
-    	self.params[1].filter.list = []
-    	self.params[2].filter.list = []
-    	self.params[3].filter.list = []
 
         # Projekt_auswählen
         param_1 = params.projectname = arcpy.Parameter()
@@ -34,34 +31,39 @@ class TbxErreichbarkeitOEPNV(Tbx):
         param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = projekte
         if projekte:
             param_1.value = projekte[0]
 
         # Haltestelle1
-        param_2 = arcpy.Parameter()
+        param_2 = params.haltestelle1 = arcpy.Parameter()
         param_2.name = u'Haltestelle1'
         param_2.displayName = u'Haltestelle1'
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
-        param_2.datatype = language('string')
+        param_2.datatype = u'GPString'
+        param_2.filter.list = []
+
 
         # Haltestelle2
-        param_3 = arcpy.Parameter()
+        param_3 = params.haltestelle2  = arcpy.Parameter()
         param_3.name = u'Haltestelle2'
         param_3.displayName = u'Haltestelle2'
         param_3.parameterType = 'Optional'
         param_3.direction = 'Input'
-        param_3.datatype = language('string')
+        param_3.datatype = u'GPString'
+        param_3.filter.list = []
 
         # Haltestelle3
-        param_4 = arcpy.Parameter()
+        param_4 = params.haltestelle3  = arcpy.Parameter()
         param_4.name = u'Haltestelle3'
         param_4.displayName = u'Haltestelle3'
         param_4.parameterType = 'Optional'
         param_4.direction = 'Input'
-        param_4.datatype = language('string')
+        param_4.datatype = u'GPString'
+        param_4.filter.list = []
 
         return params
 

@@ -117,7 +117,7 @@ class MarktEinlesen(Tool):
     				gdb=workspace_projekt+"\Standorte_temp"
 
     				cur = arcpy.InsertCursor(gdb)
-    				messages.AddMessage("Schreiben der Exceleintraege in die Feature Class.")
+    				messages.AddMessage("Schreiben der Exceleintraege in die Feature CLass.")
     			else:
     		##            try:
 
@@ -130,7 +130,7 @@ class MarktEinlesen(Tool):
     				row.Id=counter
 
     				if (counter%50)==0:
-    					messages.AddMessage(str(counter)+" Eintraege in die Feature Class geschrieben.")
+    					messages.AddMessage(str(counter)+" Eintraege in die Feature CLass geschrieben.")
 
     				cur= arcpy.InsertCursor(gdb)
 
@@ -448,7 +448,7 @@ class MarktEinlesen(Tool):
     	pfadderExcel = parameters[1].valueAsText
     	pfadPunktlayer = parameters[2].valueAsText
     	#Pfade einrichten
-    	base_path = str(sys.path[0]).split("2_Tool")[0]
+    	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
     	workspace_projekt = join(base_path, '3 Benutzerdefinierte Projekte', projektname,
     									 'FGDB_Standortkonkurrenz_Supermaerkte_' + projektname + '.gdb')

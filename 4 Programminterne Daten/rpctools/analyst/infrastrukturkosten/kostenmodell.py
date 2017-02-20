@@ -550,7 +550,7 @@ class Kostenmodell(Tool):
         tablepath = join(workspace_projekt_kosten,'T05KAM_01_Kostenaufteilung')
         infrastrukturpath = join(workspace_projekt_kosten,'MEG_Mengenermittlung')
 
-        logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+        logo = join((str(sys.path[0]).split("4 Programminterne Daten")[0]),"fgdbs",'Erläuterungstexte',"logo_rpc.png")
 
 
         projectpath = self.folders.get_projectpath()

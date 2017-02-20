@@ -125,7 +125,7 @@
     <span class="c1"># Workspaces</span>
     <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># Pfad zum Basisverzeichnis RPC</span>
     <span class="n">workspace_projekt</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">)</span>
-    <span class="n">workspace_basisdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;1_Basisdaten&#39;</span><span class="p">,</span><span class="s1">&#39;FGBD_Basisdaten_deutschland.gdb&#39;</span><span class="p">)</span>
+    <span class="n">workspace_basisdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;1_Basisdaten&#39;</span><span class="p">,</span><span class="s1">&#39;FGDB_Basisdaten_deutschland.gdb&#39;</span><span class="p">)</span>
     <span class="n">workspace_projekt_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
     <span class="n">workspace_projekt_verkehr</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Verkehr.gdb&#39;</span><span class="p">)</span>
 
@@ -164,10 +164,10 @@
     <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">beginmeldung</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">beginmeldung</span>
 
-    <span class="c1"># First, make a layer from the feature class</span>
+    <span class="c1"># First, make a layer from the language('feature class')</span>
     <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">siedlungszellenlayer</span><span class="p">,</span> <span class="s2">&quot;siedlungszellenlayer_lyr&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Then add a selection to the layer based on location to features in another feature class</span>
+    <span class="c1"># Then add a selection to the layer based on location to features in another language('feature class')</span>
     <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByLocation_management</span> <span class="p">(</span><span class="s2">&quot;siedlungszellenlayer_lyr&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="n">umfeldabgrenzung</span><span class="p">)</span>
 
     <span class="n">arcpy</span><span class="o">.</span><span class="n">CopyFeatures_management</span><span class="p">(</span><span class="s2">&quot;siedlungszellenlayer_lyr&quot;</span><span class="p">,</span> <span class="n">siedlungszellenlayer_eingangsdaten</span><span class="p">)</span>

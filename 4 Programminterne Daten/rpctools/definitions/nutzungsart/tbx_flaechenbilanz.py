@@ -7,7 +7,8 @@ import datetime
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.definitions.nutzungsart.flaechenbilanz import Flaechenbilanz
 
 
@@ -31,7 +32,7 @@ class TbxFlaechenbilanz(Tbx):
         p.displayName = u'Projektname'
         p.parameterType = 'Required'
         p.direction = 'Input'
-        p.datatype = language('string')
+        p.datatype = 'GPString'
         p.filter.list = projekte
         if projekte:
             p.value = projekte[0]
@@ -42,7 +43,7 @@ class TbxFlaechenbilanz(Tbx):
         p.displayName = u'Teilfl\xe4che'
         p.parameterType = 'Required'
         p.direction = 'Input'
-        p.datatype = language('string')
+        p.datatype = 'GPString'
         p.filter.list = []
 
         # Startjahr

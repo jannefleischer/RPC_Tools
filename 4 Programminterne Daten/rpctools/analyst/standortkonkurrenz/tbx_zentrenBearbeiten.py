@@ -5,14 +5,15 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.standortkonkurrenz.T4_Zentren_bearbeiten import ZentrenBearbeiten
 
 class TbxZentrenBearbeitenn(Tbx):
 
     @property
     def label(self):
-        return encode(u'Zentren bearbeiten')
+        return encode(u'Schritt 4: Zentren bearbeiten')
 
     @property
     def Tool(self):
@@ -23,19 +24,14 @@ class TbxZentrenBearbeitenn(Tbx):
         params = self.par
         projekte = self.folders.get_projects()
 
-    	i=0
-
-
-    	self.params[3].enabled = 0
-    	self.params[3].value = "Bitte w�hlen Sie das Projekt aus"
-
         # Projekt_auswählen
         param_1 = params.projectname = arcpy.Parameter()
         param_1.name = u'Projekt_ausw\xe4hlen'
         param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = projekte
         if projekte:
             param_1.value = projekte[0]
@@ -46,7 +42,8 @@ class TbxZentrenBearbeitenn(Tbx):
         param_2.displayName = u'Eingegebene Zentren'
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
-        param_2.datatype = language('string')
+        param_2.datatype = u'GPString'
+
 
         # L�schen
         param_3 = arcpy.Parameter()
@@ -54,7 +51,8 @@ class TbxZentrenBearbeitenn(Tbx):
         param_3.displayName = u'L\xf6schen'
         param_3.parameterType = 'Required'
         param_3.direction = 'Input'
-        param_3.datatype = language('boolean')
+        param_3.datatype = u'GPBoolean'
+
 
         # Status
         param_4 = arcpy.Parameter()
@@ -62,7 +60,8 @@ class TbxZentrenBearbeitenn(Tbx):
         param_4.displayName = u'Status'
         param_4.parameterType = 'Required'
         param_4.direction = 'Input'
-        param_4.datatype = language('string')
+        param_4.datatype = u'GPString'
+
         param_4.value = u'Bitte w\xe4hlen Sie das Projekt aus'
 
         return params

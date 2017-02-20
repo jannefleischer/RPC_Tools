@@ -196,7 +196,7 @@ class Projektverwaltung(Tool):
         # add project-data to Projektrahmendaten
 
         # Den AGS aus der Lage der projektfläche im Raum ermitteln
-        bkg = self.folders.get_base_table('FGBD_Basisdaten_deutschland.gdb',
+        bkg = self.folders.get_base_table('FGDB_Basisdaten_deutschland.gdb',
                                           'bkg_gemeinden')
         workspace_projekt_definition = self.folders.get_db(
             'FGDB_Definition_Projekt.gdb')

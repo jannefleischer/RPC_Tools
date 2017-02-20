@@ -5,14 +5,15 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.standortkonkurrenz.T2_Hinzufuegen_neuen_Marktes import MarktHinzufuegen
 
 class TbxMarktHinzufuegen(Tbx):
 
     @property
     def label(self):
-        return encode(u'Neuen Markt hinzufügen')
+        return encode(u'Schritt 2: Neuen Markt hinzufügen')
 
     @property
     def Tool(self):
@@ -39,7 +40,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = projekte
         if projekte:
             param_1.value = projekte[0]
@@ -50,7 +52,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_2.displayName = u'Anbieter des Marktes'
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
-        param_2.datatype = language('string')
+        param_2.datatype = u'GPString'
+
         param_2.filter.list = [u'Aktiv-Discount', u'Aldi', u'Alnatura', u'basic', u'biocompany', u'Biomarkt', u'Coma', u'Combi', u'denns', u'diska', u'Edeka', u'famila', u'globus', u'HIT', u'Jibi', u'K + K (Klaas & Kock)', u'Kaufland', u'Konsum-Leipzig', u'Lidl', u'Markant', u'Marktkauf', u'Migros', u'Mix-Markt', u'nahkauf', u'Netto', u'Netto(Edeka)', u'Norma', u'NP', u'Penny', u'Perfetto (Karstadt)', u'Plaza', u'Real', u'Rewe', u'Sky', u'Sonstige', u'Tegut', u'Toom', u'treff 3000', u'vitalia', u'viv', u'V-Markt', u'Wasgau', u'WEZ']
 
         # Neuer_Anbieter__bei_Auswahl_von_Sonstige_
@@ -59,7 +62,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_3.displayName = u'Neuer Anbieter (bei Auswahl von Sonstige)'
         param_3.parameterType = 'Optional'
         param_3.direction = 'Input'
-        param_3.datatype = language('string')
+        param_3.datatype = u'GPString'
+
 
         # Ja__es_handelt_sich_um_einen_Discounter
         param_4 = params.Discounter = arcpy.Parameter()
@@ -67,7 +71,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_4.displayName = u'Ja, es handelt sich um einen Discounter'
         param_4.parameterType = 'Optional'
         param_4.direction = 'Input'
-        param_4.datatype = language('boolean')
+        param_4.datatype = u'GPBoolean'
+
 
         # Verkaufsfl�che_gesamt__m2_
         param_5 = params.Flaeche = arcpy.Parameter()
@@ -75,7 +80,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_5.displayName = u'Verkaufsfl\xe4che gesamt (m2)'
         param_5.parameterType = 'Required'
         param_5.direction = 'Input'
-        param_5.datatype = language('string')
+        param_5.datatype = u'GPString'
+
 
         # Stra�e
         param_6 = params.Strasse = arcpy.Parameter()
@@ -83,7 +89,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_6.displayName = u'Stra\xdfe'
         param_6.parameterType = 'Required'
         param_6.direction = 'Input'
-        param_6.datatype = language('string')
+        param_6.datatype = u'GPString'
+
 
         # Hausnummer
         param_7 = params.Hausnummer = arcpy.Parameter()
@@ -91,7 +98,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_7.displayName = u'Hausnummer'
         param_7.parameterType = 'Required'
         param_7.direction = 'Input'
-        param_7.datatype = language('string')
+        param_7.datatype = u'GPString'
+
 
         # Postleitzahl
         param_8 = params.PLZ = arcpy.Parameter()
@@ -99,7 +107,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_8.displayName = u'Postleitzahl'
         param_8.parameterType = 'Required'
         param_8.direction = 'Input'
-        param_8.datatype = language('string')
+        param_8.datatype = u'GPString'
+
 
         # Ort
         param_9 = params.Ort = arcpy.Parameter()
@@ -107,7 +116,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_9.displayName = u'Ort'
         param_9.parameterType = 'Required'
         param_9.direction = 'Input'
-        param_9.datatype = language('string')
+        param_9.datatype = u'GPString'
+
 
         # Ortsteil
         param_10 = params.Ortsteil = arcpy.Parameter()
@@ -115,7 +125,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_10.displayName = u'Ortsteil'
         param_10.parameterType = 'Optional'
         param_10.direction = 'Input'
-        param_10.datatype = language('string')
+        param_10.datatype = u'GPString'
+
 
         # Handelt_es_sich_bei_dem_neuen_Markt_um_eine_Erweiterung_oder_einen_neuen_Markt_
         param_11 = params.Erweiterung = arcpy.Parameter()
@@ -123,7 +134,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_11.displayName = u'Handelt es sich bei dem neuen Markt um eine Erweiterung oder einen neuen Markt?'
         param_11.parameterType = 'Required'
         param_11.direction = 'Input'
-        param_11.datatype = language('string')
+        param_11.datatype = u'GPString'
+
         param_11.filter.list = [u'Erweiterung', u'Neuen Markt']
 
         # Markterweiterung_wurde_ausgew�hlt__Welcher_Markt_soll_erweitert_werden_
@@ -132,7 +144,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_12.displayName = u'Markterweiterung wurde ausgew\xe4hlt. Welcher Markt soll erweitert werden?'
         param_12.parameterType = 'Optional'
         param_12.direction = 'Input'
-        param_12.datatype = language('string')
+        param_12.datatype = u'GPString'
+
 
         # Einen_zus�tzlichen_Markt_definieren
         param_13 = params.weitererMarkt = arcpy.Parameter()
@@ -140,7 +153,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_13.displayName = u'Einen zus\xe4tzlichen Markt definieren'
         param_13.parameterType = 'Optional'
         param_13.direction = 'Input'
-        param_13.datatype = language('boolean')
+        param_13.datatype = u'GPBoolean'
+
 
         # Status
         param_14 = params.status = arcpy.Parameter()
@@ -148,7 +162,8 @@ class TbxMarktHinzufuegen(Tbx):
         param_14.displayName = u'Status'
         param_14.parameterType = 'Optional'
         param_14.direction = 'Input'
-        param_14.datatype = language('string')
+        param_14.datatype = u'GPString'
+
         param_14.value = u'Zum Abspeichern eines zweiten Marktes Checkbox anklicken oder mit Ok einen Markt abspeichern und beenden'
 
         return params

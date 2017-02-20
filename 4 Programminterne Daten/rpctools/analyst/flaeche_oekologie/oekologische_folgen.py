@@ -46,7 +46,7 @@ class OekologischeFolgen(Tool):
     	print schrittmeldung
 
     	wcd = os.getcwd()
-    	rootPfad = str(sys.path[0]).split("2_Tool")[0]
+    	rootPfad = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
     	bodenbedeckungTabelle = join(rootPfad,"3 Benutzerdefinierte Projekte",projektName,"FGDB_Flaeche_und_Oekologie_" + projektName + ".gdb","Bodenbedeckung")
 
     	bedeckungstabelle = arcpy.SearchCursor(bodenbedeckungTabelle)
@@ -215,7 +215,7 @@ class OekologischeFolgen(Tool):
     		print schrittmeldung
 
     		wcd = os.getcwd()
-    		rootPfad = str(sys.path[0]).split("2_Tool")[0]
+    		rootPfad = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
     		ergebnisTabelle = join(rootPfad,'3 Benutzerdefinierte Projekte',projektName,'FGDB_Flaeche_und_Oekologie.gdb','Ergebnisse_oekologischeWertigkeit')
     		ueberschneidungBiotope = int(ueberschneidungBiotope)
     		ueberschneidungFFHGebiete = int(ueberschneidungFFHGebiete)
@@ -290,7 +290,7 @@ class OekologischeFolgen(Tool):
     	print schrittmeldung
 
     	# Pfade setzen
-    	base_path = str(sys.path[0]).split("2_Tool")[0]
+    	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
     	workspace_projekt_oekologie = join(base_path,'3 Benutzerdefinierte Projekte',projektName,'FGDB_Flaeche_und_Oekologie.gdb')
     	tablepath_Bodenbedeckung = join(workspace_projekt_oekologie,'Bodenbedeckung')
     	tablepath_Integration = join(workspace_projekt_oekologie,'Ergebnisse_Integrationsgrad')
@@ -298,7 +298,7 @@ class OekologischeFolgen(Tool):
     	tablepath_Wohnflaechendichte = join(workspace_projekt_oekologie,'Ergebnisse_Wohnflaechendichte')
     	grafikpath_erlauterungstext = join(base_path,'2_Tool','Flaeche_und_Oekologie','Erlauterungstexte')
 
-    	logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+    	logo = join((str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]),"1_Basisdaten","logo_rpc.png")
     	ausgabeordner = join(base_path,'3 Benutzerdefinierte Projekte',projektName,'Ergebnisausgabe','Excel')
     	excelpfad = join(ausgabeordner,'Flaeche_und_Oekologie.xlsx')
 

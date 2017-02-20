@@ -164,7 +164,7 @@
                 <span class="n">gdb</span><span class="o">=</span><span class="n">workspace_projekt</span><span class="o">+</span><span class="s2">&quot;\Standorte_temp&quot;</span>
 
                 <span class="n">cur</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">gdb</span><span class="p">)</span>
-                <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Schreiben der Exceleintraege in die Feature Class.&quot;</span><span class="p">)</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Schreiben der Exceleintraege in die language('feature class').&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
         <span class="c1">##            try:</span>
 
@@ -177,7 +177,7 @@
                 <span class="n">row</span><span class="o">.</span><span class="n">Id</span><span class="o">=</span><span class="n">counter</span>
 
                 <span class="k">if</span> <span class="p">(</span><span class="n">counter</span><span class="o">%</span><span class="mi">50</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-                    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; Eintraege in die Feature Class geschrieben.&quot;</span><span class="p">)</span>
+                    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; Eintraege in die language('feature class') geschrieben.&quot;</span><span class="p">)</span>
 
                 <span class="n">cur</span><span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">gdb</span><span class="p">)</span>
 

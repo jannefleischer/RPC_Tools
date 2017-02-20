@@ -5,14 +5,15 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.erreichbarkeit.T4_Erreichbarkeit_Einrichtungen import Einrichtungen
 
 class TbxEinrichtungen(Tbx):
 
     @property
     def label(self):
-        return encode(u'Einrichtungen einlesen')
+        return encode(u'Schritt 2: Einrichtungen einlesen')
 
     @property
     def Tool(self):
@@ -53,7 +54,8 @@ class TbxEinrichtungen(Tbx):
         param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = projekte
         if projekte:
             param_1.value = projekte[0]
@@ -64,7 +66,8 @@ class TbxEinrichtungen(Tbx):
         param_2.displayName = u'Bereits geladene Einrichtung f\xfcr das Projekt verwenden'
         param_2.parameterType = 'Optional'
         param_2.direction = 'Input'
-        param_2.datatype = language('boolean')
+        param_2.datatype = u'GPBoolean'
+
 
         # Kita
         param_3 = params.kita = arcpy.Parameter()
@@ -72,7 +75,8 @@ class TbxEinrichtungen(Tbx):
         param_3.displayName = u'Kita'
         param_3.parameterType = 'Required'
         param_3.direction = 'Input'
-        param_3.datatype = language(u'file')
+        param_3.datatype = u'GPDataFile'
+
 
         # Grundschulen
         param_4 = params.grundschule = arcpy.Parameter()
@@ -80,7 +84,8 @@ class TbxEinrichtungen(Tbx):
         param_4.displayName = u'Grundschulen'
         param_4.parameterType = 'Required'
         param_4.direction = 'Input'
-        param_4.datatype = language(u'file')
+        param_4.datatype = u'GPDataFile'
+
 
         # Allgemein_Mediziner
         param_5 = params.arzt = arcpy.Parameter()
@@ -88,7 +93,8 @@ class TbxEinrichtungen(Tbx):
         param_5.displayName = u'Allgemein Mediziner'
         param_5.parameterType = 'Required'
         param_5.direction = 'Input'
-        param_5.datatype = language(u'file')
+        param_5.datatype = u'GPDataFile'
+
 
         # Apotheken
         param_6 = params.apotheke = arcpy.Parameter()
@@ -96,7 +102,8 @@ class TbxEinrichtungen(Tbx):
         param_6.displayName = u'Apotheken'
         param_6.parameterType = 'Required'
         param_6.direction = 'Input'
-        param_6.datatype = language(u'file')
+        param_6.datatype = u'GPDataFile'
+
 
         # Krankenh�user
         param_7 = params.krankenhaus = arcpy.Parameter()
@@ -104,7 +111,8 @@ class TbxEinrichtungen(Tbx):
         param_7.displayName = u'Krankenh\xe4user'
         param_7.parameterType = 'Required'
         param_7.direction = 'Input'
-        param_7.datatype = language(u'file')
+        param_7.datatype = u'GPDataFile'
+
 
         # Sonstige
         param_8 = params.sonstige = arcpy.Parameter()
@@ -112,7 +120,8 @@ class TbxEinrichtungen(Tbx):
         param_8.displayName = u'Sonstige'
         param_8.parameterType = 'Required'
         param_8.direction = 'Input'
-        param_8.datatype = language(u'file')
+        param_8.datatype = u'GPDataFile'
+
 
         # Einzelhandelstandorte_aus_34_Versorgung_�bernehmen
         param_9 = params.ehs1 = arcpy.Parameter()
@@ -120,7 +129,8 @@ class TbxEinrichtungen(Tbx):
         param_9.displayName = u'Einzelhandelstandorte aus Toolbox "Standardversorgung" \xfcbernehmen'.encode('CP1252')
         param_9.parameterType = 'Optional'
         param_9.direction = 'Input'
-        param_9.datatype = language('boolean')
+        param_9.datatype = u'GPBoolean'
+
 
         # Einzelhandelstandorte
         param_10 = params.ehs2 = arcpy.Parameter()
@@ -128,7 +138,8 @@ class TbxEinrichtungen(Tbx):
         param_10.displayName = u'Einzelhandelstandorte'
         param_10.parameterType = 'Required'
         param_10.direction = 'Input'
-        param_10.datatype = language(u'file')
+        param_10.datatype = u'GPDataFile'
+
 
         # Einzelhandelstandorte_aus_Toolbox_34_Versorgung
         param_11 = params.ehs3 = arcpy.Parameter()
@@ -136,7 +147,8 @@ class TbxEinrichtungen(Tbx):
         param_11.displayName = u'Einzelhandelstandorte aus Toolbox "Standardversorgung"'
         param_11.parameterType = 'Optional'
         param_11.direction = 'Input'
-        param_11.datatype = language(u'feature class')
+        param_11.datatype = language('feature class')
+
 
         return params
 

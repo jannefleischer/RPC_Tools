@@ -22,8 +22,11 @@ import json
 import time
 import arcpy
 import xlsxwriter
+from os.path import join, isdir, abspath, dirname, basename
 
+import inspect, pyodbc, shutil, gc, sys, xlsxwriter, imp, urllib2
 
+from rpctools.utils.params import Message as messages
 from rpctools.utils.params import Tool
 import rpctools.utils.sheet_lib as sl
 import rpctools.utils.tempmdb_lib as tempmdb_lib
@@ -33,7 +36,7 @@ import rpctools.utils.population_lib as population_lib
 
 class Einkommenssteuer(Tool):
 
-    _dbname = 'FGDEinnahmen.gdb'
+    _dbname = 'FGDB_Einnahmen.gdb'
 
     def run(self):
         parameters = self.par
@@ -41,17 +44,17 @@ class Einkommenssteuer(Tool):
         arcpy.env.overwriteOutput = True
 
         # Variablen definieren
-        projektname = parameters[0].value
+        projektname = self.par.name.value
 
         #Pfade einrichten
-        base_path = str(sys.path[0]).split("2_Tool")[0]
+        base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
-        workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
-        workspace_projekt_definition = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
-        workspace_projekt_bevoelkerung = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_BevModellierung.gdb')
-        workspace_projekt_einnahmen = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDEinnahmen.gdb')
-        workspace_tool_definition = join(base_path,"2_Tool","Art und Mass der Nutzung","FGDB_Definition_Projekt_Tool.gdb")
-        workspace_tool_einnahmen = join(base_path,"2_Tool","Einnahmen","FGDEinnahmen_Tool.gdb")
+        workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
+        workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+        workspace_projekt_bevoelkerung = self.folders.get_db('FGDB_BevModellierung.gdb', projektname)
+        workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
+        workspace_tool_definition = self.folders.get_basedb('FGDB_Definition_Projekt_Tool.gdb')
+        workspace_tool_einnahmen = self.folders.get_basedb('FGDB_Einnahmen_Tool.gdb')
 
         Teilflaechen_Plangebiet_Centroide = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_Centroide")
         Teilflaechen_Plangebiet_CentroideGK3 = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_CentroideGK3")
@@ -170,7 +173,7 @@ class Einkommenssteuer(Tool):
         FROM EKST_01_Basisdaten INNER JOIN AWU_WanderungsfaktorEW ON EKST_01_Basisdaten.AGS = AWU_WanderungsfaktorEW.AGS;
         """
 
-        mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
+        tempmdb_lib.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
         # Ermittle Summe ueber Tabelle
         EKST_02_ESTproHH = join(workspace_projekt_einnahmen,'EKST_02_ESTproHHRefZiel')
@@ -198,7 +201,7 @@ class Einkommenssteuer(Tool):
         FROM EKST_01_Basisdaten;
         """
 
-        mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
+        tempmdb_lib.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
         #############################################################################################################
         # Schritt Erzeuge Wohneinheitenuebersicht
@@ -280,7 +283,7 @@ class Einkommenssteuer(Tool):
 
         sql = sql.replace("EStProHHReferenzZielort",str(EStProHHReferenzZielort)).replace("AAAA",ags).replace("EndeBetrachtungszeitraum",str(ende))
 
-        mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
+        tempmdb_lib.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
 
         #############################################################################################################
@@ -309,7 +312,7 @@ class Einkommenssteuer(Tool):
         """
 
         sql = sql.replace("EndeBetrachtungszeitraum",str(ende))
-        mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
+        tempmdb_lib.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
         # INSERT EKST_05_Verlust
         eingangstabellen = [
@@ -326,7 +329,7 @@ class Einkommenssteuer(Tool):
         FROM EKST_05_Verlust;
         """
 
-        mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
+        tempmdb_lib.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
 
         #############################################################################################################
@@ -347,7 +350,7 @@ class Einkommenssteuer(Tool):
         GROUP BY EKST_04_Zuwachs.AGS, EKST_04_Zuwachs.Betrachtungsjahr;
         """
 
-        mdb.temp_mdb(eingangstabellen,sql,ausgabetabelle)
+        tempmdb_lib.temp_mdb(eingangstabellen,sql,ausgabetabelle)
 
 
         #############################################################################################################
@@ -357,7 +360,7 @@ class Einkommenssteuer(Tool):
         print schrittmeldung
 
         # Pfade setzen
-        logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+        logo = join((str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]),"1_Basisdaten","logo_rpc.png")
         ausgabeordner = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'Ergebnisausgabe','Excel')
         if not os.path.exists(ausgabeordner): os.makedirs(ausgabeordner)
         excelpfad = join(ausgabeordner,'Einnahmen_Einkommensteuer.xlsx')
@@ -555,8 +558,8 @@ class Einkommenssteuer(Tool):
 
 
 def getRS(ags_in):
-    base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
 
     VG250 = join(workspace_basisdaten,'VG250')
     where = '"AGS"'+" ='"+ ags_in + "'"
@@ -572,8 +575,8 @@ def getRS(ags_in):
     return regionalschluessel
 
 def getRS_VG(ags_in):
-    base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
 
     VG250 = join(workspace_basisdaten,'VG250')
     where = '"AGS"'+" ='"+ ags_in + "'"

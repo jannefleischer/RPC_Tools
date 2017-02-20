@@ -5,14 +5,15 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.verkehr.T2_Routings_durchfuehren import Routingsdurchfuehren
 
 class TbxRoutingsdurchfuehren(Tbx):
 
     @property
     def label(self):
-        return encode(u'Routings durchführen')
+        return encode(u'Schritt 2: Routings durchführen')
 
     @property
     def Tool(self):
@@ -29,7 +30,8 @@ class TbxRoutingsdurchfuehren(Tbx):
         param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = projekte
         if projekte:
             param_1.value = projekte[0]
@@ -40,7 +42,8 @@ class TbxRoutingsdurchfuehren(Tbx):
         param_2.displayName = u'MapQuest Key'
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
-        param_2.datatype = language('string')
+        param_2.datatype = u'GPString'
+
 
         return params
 

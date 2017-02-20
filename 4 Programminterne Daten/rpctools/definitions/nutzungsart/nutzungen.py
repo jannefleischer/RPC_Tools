@@ -53,7 +53,7 @@ class Nutzungen(Tool):
         zuzugsquote_gewerbe = self.par.zuzugsquote_gewerbe.value
         ant_eigentum_gewerbe = self.par.ant_eigentum_gewerbe.value
         ### 8) Einzelhandel (nur Lebensmitteleinzelhandel) ###
-        verkaufsflaeche = self.par.verkaufsflaeche.value        
+        verkaufsflaeche = self.par.verkaufsflaeche.value
 
         Teilflaeche_Plangebiet = teilflaeche.split(" | ")[0]
         folders = self.folders
@@ -248,8 +248,8 @@ class Nutzungen(Tool):
         def beschaeftigte_gewerbe(projektname):
 
             #Pfade anlegen
-            base_path = str(sys.path[0]).split("2_Tool")[0]
-            shape_bkggemeiden=join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb','bkg_gemeinden')
+            base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+            shape_bkggemeiden=join(base_path,'1_Basisdaten','FGDB_Basisdaten_deutschland.gdb','bkg_gemeinden')
             workspace_Basis_Daten_Versor=join(base_path,'2_Tool',"Standortkonkurrenz_Supermaerkte",'FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
             workspace_Basis_Daten=join(base_path,'2_Tool',"Art und Mass der Nutzung",'FGDB_Definition_Projekt_Tool.gdb')
             shape_teilflaeche = self.folders.get_table('Teilflaechen_Plangebiet')
@@ -261,7 +261,7 @@ class Nutzungen(Tool):
             arcpy.SelectLayerByLocation_management('bkg_gemeinden_lyr', "CONTAINS",shape_teilflaeche , "", "NEW_SELECTION")
 
 
-            # If features matched criterias write them to a new feature class
+            # If features matched criterias write them to a new Feature CLass
             matchcount = int(arcpy.GetCount_management('bkg_gemeinden_lyr').getOutput(0))
             if matchcount == 0:
                 b='Zuordnung zu einer Gemeinde unmoeglich - Kontaktieren Sie den Programmierer.'
@@ -460,7 +460,7 @@ class Nutzungen(Tool):
                 #Flaechenbilanz berechnen
 
                 #Pfade anlegen
-                base_path = str(sys.path[0]).split("2_Tool")[0]
+                base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
                 tabelle_flaechenbilanzgrundlage = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb','gewerbe_flaechenutzungsbilanz')
                 tabelle_flaechennutzung = self.folders.get_table('Flaechenbilanz_Planung_Prozent')
                 shape_teilflaeche = self.folders.get_table('Teilflaechen_Plangebiet')
@@ -1480,7 +1480,7 @@ class Nutzungen(Tool):
                 messages.AddMessage(schrittmeldung)
 
                 # Pfade setzen
-                base_path = str(sys.path[0]).split("2_Tool")[0]
+                base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
                 workspace_projekt_gewerbe = join(self.folders.get_projectpath(), 'FGDB_Definition_Projekt.gdb')
                 tablepath_gewerbe = join(workspace_projekt_gewerbe,'Gewerbe_Teilflaechen')
                 tablepath_Beschaeftigte = join(workspace_projekt_gewerbe,'Gewerbe_Beschaeftigte')

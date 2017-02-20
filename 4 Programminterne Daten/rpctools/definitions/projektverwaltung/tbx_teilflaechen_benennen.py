@@ -5,7 +5,6 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
 from rpctools.definitions.projektverwaltung.teilflaeche_benennen import TeilflaechenBenennen
 
 
@@ -23,14 +22,13 @@ class TbxTeilflaecheBenennen(Tbx):
     def _getParameterInfo(self):
         # Projekt
         params = self.par
-
-        projects = self.folders.get_projects()
         p = params.project = arcpy.Parameter()
         p.name = u'Projekt'
         p.displayName = u'Projekt'
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
+        projects = self.folders.get_projects()
         p.filter.list = projects
         p.value = p.filter.list[0]
 

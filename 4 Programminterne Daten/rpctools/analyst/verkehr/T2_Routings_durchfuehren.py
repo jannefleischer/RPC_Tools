@@ -39,17 +39,17 @@ class Routingsdurchfuehren(Tool):
     	# Variables
     	i=-1
 
-    	i+=1 ; projektname = parameters[i].valueAsText
-    	i+=1 ; mapquest_key = parameters[i].valueAsText
+    	i+=1 ; projektname = self.par.projectname.value
+    	i+=1 ; mapquest_key =self.par.mapkey.value
 
     	#projektname = "Bultweg-Sued_02_verdichtet_mit_Versorger"
 
     	# Workspaces
-    	base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
+    	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0] # Pfad zum Basisverzeichnis RPC
     	workspace_projekt = join(base_path,'3 Benutzerdefinierte Projekte',projektname)
-    	workspace_projekt_definition = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
-    	workspace_projekt_verkehr = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Verkehr.gdb')
-    	workspace_tool_verkehr = join(base_path,"2_Tool","Verkehr","Verkehr_Tool.gdb")
+    	workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+    	workspace_projekt_verkehr = self.folders.get_db('FGDB_Verkehr.gdb')
+    	workspace_tool_verkehr = join(base_path,'4 Programminterne Daten','fgdbs',"Verkehr_Tool.gdb")
 
     	# Layers and Tables
     	out_folder_path = join(workspace_projekt,"temp") # Pfad zur temporaeren mdb inkl.
@@ -244,7 +244,7 @@ class Routingsdurchfuehren(Tool):
     	messages.AddMessage(schrittmeldung)
     	print schrittmeldung
 
-    	# First, make a layer from the feature class
+    	# First, make a layer from the Feature CLass
     	arcpy.MakeFeatureLayer_management(siedlungszellen_centroid, "sz_centroid_lyr")
 
     	# Process: Layer lagebezogen auswählen
@@ -627,7 +627,7 @@ class Routingsdurchfuehren(Tool):
 
     	oppositeCoorner = str(extent.XMax)+" "+str(extent.YMax)
 
-    	# Create a point label feature class
+    	# Create a point label Feature Class
     	labels = 'false'
 
     	# Extent is set by origin and opposite corner - no need to use a template fc

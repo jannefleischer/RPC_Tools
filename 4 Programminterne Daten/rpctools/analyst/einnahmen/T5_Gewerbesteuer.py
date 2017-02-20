@@ -19,10 +19,10 @@ import sys
 import imp
 import urllib2
 import json
-
+from os.path import join, isdir, abspath, dirname, basename
 import arcpy
 import xlsxwriter
-
+from rpctools.utils.params import Message as messages
 from rpctools.utils.params import Tool
 import rpctools.utils.sheet_lib as sl
 import rpctools.utils.tempmdb_lib as mdb
@@ -30,7 +30,7 @@ import rpctools.utils.tempmdb_lib as mdb
 
 class Gewerbesteuer(Tool):
 
-    _dbname = 'FGDEinnahmen.gdb'
+    _dbname = 'FGDB_Einnahmen.gdb'
 
     def run(self):
         parameters = self.par
@@ -39,19 +39,19 @@ class Gewerbesteuer(Tool):
         arcpy.env.overwriteOutput = True
 
         # Variablen definieren
-        projektname = parameters[0].value
-        hebesatzProjektkommune = parameters[1].value
+        projektname = self.par.name.value
+        hebesatzProjektkommune = self.par.hebesatz.value
         #projektname = "HCU_LKH_Bultweg"
 
         #Pfade einrichten
-        base_path = str(sys.path[0]).split("2_Tool")[0]
+        base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
-        workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
-        workspace_projekt_definition = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
-        workspace_projekt_bevoelkerung = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_BevModellierung.gdb')
-        workspace_projekt_einnahmen = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDEinnahmen.gdb')
-        workspace_tool_definition = join(base_path,"2_Tool","Art und Mass der Nutzung","FGDB_Definition_Projekt_Tool.gdb")
-        workspace_tool_einnahmen = join(base_path,"2_Tool","Einnahmen","FGDB_32_Einnahmen_Tool.gdb")
+        workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
+        workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+        workspace_projekt_bevoelkerung = self.folders.get_db('FGDB_BevModellierung.gdb', projektname)
+        workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
+        workspace_tool_definition = self.folders.get_basedb('FGDB_Definition_Projekt_Tool.gdb')
+        workspace_tool_einnahmen = self.folders.get_basedb('FGDB_Einnahmen_Tool.gdb')
 
         Teilflaechen_Plangebiet_Centroide = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_Centroide")
         Teilflaechen_Plangebiet_CentroideGK3 = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_CentroideGK3")
@@ -66,13 +66,13 @@ class Gewerbesteuer(Tool):
         #
         #############################################################################################################
         beginmeldung = 'Durchlauf Gewerbesteuer \n'
-        messages.AddMessage(beginmeldung)
+        arcpy.AddMessage(beginmeldung)
         print beginmeldung
 
         #############################################################################################################
         # Schritt 1
         schrittmeldung = 'Ermittle Gewerbesteuer und Anzahl Arbeitsplaetze \n'
-        messages.AddMessage(schrittmeldung)
+        arcpy.AddMessage(schrittmeldung)
         print schrittmeldung
 
 
@@ -87,7 +87,7 @@ class Gewerbesteuer(Tool):
             ags_vg = row[1]
             ags_regenesis = row[2]
 
-            messages.AddMessage(ags_regenesis)
+            arcpy.AddMessage(ags_regenesis)
 
             try:
                 i = 0
@@ -113,8 +113,8 @@ class Gewerbesteuer(Tool):
                 except Exception as r:
                     message = "\n Die zur Abfrage der Gewerbesteuer notwendige Webseite 'http://api.regenesis.pudo.org/' liefert derzeit keine Werte zurueck. Die Berechnung wird daher unterbrochen. Bitte probieren Sie es spaeter noch einmal. \n"
                     print message
-                    messages.AddMessage(message)
-                    messages.AddMessage(r)
+                    arcpy.AddMessage(message)
+                    arcpy.AddMessage(r)
                     sys.exit()
 
                 i = 0
@@ -141,7 +141,7 @@ class Gewerbesteuer(Tool):
 
                 except Exception as r:
                     AnzAP = 1
-                    messages.AddMessage(r)
+                    arcpy.AddMessage(r)
 
                 rows_insert = arcpy.InsertCursor(GWST_01_Basisdaten)
                 row_in = rows_insert.newRow()
@@ -156,7 +156,7 @@ class Gewerbesteuer(Tool):
                 messages.AddMessage(message)
                 sys.exit()
 
-        messages.AddMessage("\n")
+        arcpy.AddMessage("\n")
 
         #############################################################################################################
         # Schritt 1
@@ -314,7 +314,7 @@ class Gewerbesteuer(Tool):
         print schrittmeldung
 
         # Pfade setzen
-        logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+        logo = join((str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]),"1_Basisdaten","logo_rpc.png")
         ausgabeordner = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'Ergebnisausgabe','Excel')
         if not os.path.exists(ausgabeordner): os.makedirs(ausgabeordner)
         excelpfad = join(ausgabeordner,'Einnahmen_Gewerbesteuer.xlsx')
@@ -516,7 +516,7 @@ class Gewerbesteuer(Tool):
 
         gc.collect()
         print "fertig"
-        messages.AddMessage('05_Gewerbesteuer abgeschlossen')
+        Message.AddMessage('05_Gewerbesteuer abgeschlossen')
 
 
 #############################################################################################################
@@ -526,8 +526,8 @@ class Gewerbesteuer(Tool):
 #############################################################################################################
 
 def ags_samtgemeinde(ags_in):
-    base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
 
     VG250 = join(workspace_basisdaten,'VG250')
     where = '"AGS"'+" ='"+ ags_in + "'"
@@ -552,8 +552,8 @@ def ags_samtgemeinde(ags_in):
 
 
 def ags_regionalschluessel(ags_in):
-    base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
 
     VG250 = join(workspace_basisdaten,'VG250')
     where = '"AGS"'+" ='"+ ags_in + "'"

@@ -25,7 +25,7 @@ def main(projektname):
     ######## 1. Einrichten: Pfade setzen, Excel-Arbeitsmappe erstellen, Styles anlegen etc. ########
 
     # Pfade setzen
-    base_path = str(sys.path[0]).split("2_Tool")[0]
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
     workspace_factsheet = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_11_Definition_Projekt.gdb')
     tablepath_vor = join(workspace_factsheet,'Vornutzungen_Details_Prozent')
     tablepath_teil = join(workspace_factsheet,'Teilflaechen_Plangebiet')
@@ -35,7 +35,7 @@ def main(projektname):
     tablepath_WE = join(workspace_factsheet,'Wohneinheiten_Details')
     tablepath_Gewerbe = join(workspace_factsheet,'Gewerbe_Beschaeftigte_Max')
     tablepath_EZH = join(workspace_factsheet,'Versorgung_Verkaufsflaechen_Max')
-    logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+    logo = join((str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]),"1_Basisdaten","logo_rpc.png")
     ausgabeordner = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'Ergebnisausgabe','Excel')
     excelpfad = join(ausgabeordner,'11_Definition_Projekt.xlsx')
 

@@ -30,14 +30,14 @@ class BewertungWohnflaechendichte(Tool):
     	projektname = parameters[0].valueAsText
 
     	#aktueller Pfad
-    	rootPfad = str(sys.path[0]).split("2_Tool")[0]
+    	rootPfad = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
     	#Pfad zur Ergebnistabelle
 
     	ergebnisTabelle = join(rootPfad,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Flaeche_und_Oekologie.gdb','Ergebnisse_oekologischeWertigkeit')
     	#ergebnisTabelle = rootPfad + "\\3 Benutzerdefinierte Projekte\\" + projektname + "\\FGDB_Flaeche_und_Oekologie_" + projektname + ".gdb\\Ergebnisse_oekologischeWertigkeit"
 
-    	workspace_basis = join(rootPfad,"1_Basisdaten","FGBD_Basisdaten_deutschland.gdb")
-    	#workspace_basis = rootPfad+'\\1_Basisdaten\\FGBD_Basisdaten_deutschland.gdb\\'
+    	workspace_basis = join(rootPfad,"1_Basisdaten","FGDB_Basisdaten_deutschland.gdb")
+    	#workspace_basis = rootPfad+'\\1_Basisdaten\\FGDB_Basisdaten_deutschland.gdb\\'
 
     	workspace_projekt = join(rootPfad,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
     	#workspace_projekt = rootPfad+'\\3 Benutzerdefinierte Projekte\\'+projektname+'\\FGDB_Definition_Projekt.gdb\\'
@@ -97,7 +97,7 @@ class BewertungWohnflaechendichte(Tool):
     	nettobauland_gesamt = float(nettobauland_gesamt)
     	#Den AGS aus der Lage der projektfläche im Raum ermitteln
     	projektFlaeche = rootPfad + "\\3 Benutzerdefinierte Projekte\\" + projektname + "\\FGDB_Definition_Projekt_" + projektname + ".gdb\\Teilflaechen_Plangebiet"
-    	bkg = rootPfad + "\\1_Basisdaten\\FGBD_Basisdaten_deutschland.gdb\\bkg_gemeinden"
+    	bkg = rootPfad + "\\1_Basisdaten\\FGDB_Basisdaten_deutschland.gdb\\bkg_gemeinden"
     	#ags aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird
     	#1. Feature Layer aus den bkg-daten erstellen
     	arcpy.MakeFeatureLayer_management(bkg,"bkg_lyr")

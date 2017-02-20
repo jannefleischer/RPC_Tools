@@ -3,7 +3,8 @@ import arcpy
 from rpctools.utils.params import Tbx
 from rpctools.utils.params import Tool
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.utils import kosten_lib as kosten
 reload(kosten)
 
@@ -38,7 +39,7 @@ class Kostenregeln(Tool):
 class TbxKostenaufteilungsregeln(Tbx):
     @property
     def label(self):
-        return encode(u'Kostenaufteilungsregeln verwalten')
+        return encode(u'Schritt 1: Kostenaufteilungsregeln verwalten')
 
     @property
     def Tool(self):
@@ -54,7 +55,8 @@ class TbxKostenaufteilungsregeln(Tbx):
         param_1.displayName = u'Was wollen Sie tun?'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = ACTIONS
         param_1.value = ACTIONS[0]
 
@@ -64,7 +66,8 @@ class TbxKostenaufteilungsregeln(Tbx):
         param_2.displayName = u'Regelnahme'
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
-        param_2.datatype = language('string')
+        param_2.datatype = u'GPString'
+
 
         # Kostenübernahme_Gemeinde_____
         param_3 = params.gemeinden = arcpy.Parameter()

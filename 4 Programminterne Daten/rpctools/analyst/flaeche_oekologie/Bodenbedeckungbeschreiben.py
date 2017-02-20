@@ -24,7 +24,7 @@ class BodenbedeckungVornutzung(Tool):
         parameters = self.par
 
     	wcd = os.getcwd()
-    	rootPfad = str(sys.path[0]).split("2_Tool")[0]
+    	rootPfad = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
     	#Projektname
     	projekt = parameters[0].valueAsText
@@ -56,7 +56,7 @@ class BodenbedeckungPlanfall(Tool):
         parameters = self.par
 
     	wcd = os.getcwd()
-    	rootPfad = str(sys.path[0]).split("2_Tool")[0]
+    	rootPfad = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
     	#Projektname
     	projekt = parameters[0].valueAsText

@@ -5,14 +5,15 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.standortkonkurrenz.T1_Lebensmittelmaerkte_einlesen import MarktEinlesen
 
 class TbxMarktEinlesen(Tbx):
 
     @property
     def label(self):
-        return encode(u'Märkte einlesen')
+        return encode(u'Schritt 1: Märkte einlesen')
 
     @property
     def Tool(self):
@@ -23,17 +24,14 @@ class TbxMarktEinlesen(Tbx):
         params = self.par
         projekte = self.folders.get_projects()
 
-    	self.Projekt= i
-    	i=1
-    	self.Pfad = i # f�r template
-
         # Projekt_auswählen
         param_1 = params.projectname = arcpy.Parameter()
         param_1.name = u'Projekt_ausw\xe4hlen'
         param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = projekte
         if projekte:
             param_1.value = projekte[0]
@@ -44,7 +42,8 @@ class TbxMarktEinlesen(Tbx):
         param_2.displayName = u'Bestandsliste Superm\xe4rkte'
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
-        param_2.datatype = language(u'file')
+        param_2.datatype = u'GPDataFile'
+
 
         # Punktfeature_f�r_Bev�lkerungsmodellierung
         param_3 = arcpy.Parameter()
@@ -52,7 +51,8 @@ class TbxMarktEinlesen(Tbx):
         param_3.displayName = u'Punktfeature f\xfcr Bev\xf6lkerungsmodellierung'
         param_3.parameterType = 'Required'
         param_3.direction = 'Input'
-        param_3.datatype = language(u'feature class')
+        param_3.datatype = language('feature class')
+
 
         return params
 

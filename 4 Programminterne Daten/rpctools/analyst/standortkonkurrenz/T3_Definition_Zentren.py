@@ -26,7 +26,7 @@ class DefinitionZentren(Tool):
         parameters = self.par
     	gc.collect()
     	projektname=parameters[0].valueAsText
-    	base_path = str(sys.path[0]).split("2_Tool")[0]
+    	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
     	workspace_projekt = join(base_path, '3 Benutzerdefinierte Projekte', projektname,'FGDB_Standortkonkurrenz_Supermaerkte_' + projektname + '.gdb')
 

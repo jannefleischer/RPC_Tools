@@ -5,14 +5,15 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.standortkonkurrenz.T5_StandortkonkurrenzSupermaerkteTool import Standortkonkurrenz
 
 class TbxStandortkonkurrenz(Tbx):
 
     @property
     def label(self):
-        return encode(u'Standortkonkurrenz berechnen')
+        return encode(u'Schritt 5: Standortkonkurrenz berechnen')
 
     @property
     def Tool(self):
@@ -36,7 +37,8 @@ class TbxStandortkonkurrenz(Tbx):
         param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = projekte
         if projekte:
             param_1.value = projekte[0]

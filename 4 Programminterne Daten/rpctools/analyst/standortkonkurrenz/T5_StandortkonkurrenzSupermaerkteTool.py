@@ -35,11 +35,11 @@ class Standortkonkurrenz(Tool):
     	projektname = parameters[0].valueAsText
 
     	#Pfade einrichten
-    	base_path = str(sys.path[0]).split("2_Tool")[0]
+    	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
     	workspace_basis_daten_wert=join(base_path,'2_Tool',"Standortkonkurrenz_Supermaerkte",'FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
     	workspace_texte_erlaeterung = join(base_path,'2_Tool','Standortkonkurrenz_Supermaerkte','Erlaeuterungstexte')
-    	workspace_projekt = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    	workspace_projekt = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
     	workspace_wertveraederung = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb')
     	workspace_projekt_ergebnisse = join(base_path,'3 Benutzerdefinierte Projekte',projektname, 'Ergebnisausgabe', 'Abbildungen')
 
@@ -130,7 +130,7 @@ class Standortkonkurrenz(Tool):
     	# 1. Dokument einrichten
 
     	# Pfade setzen
-    	logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+    	logo = join((str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]),"1_Basisdaten","logo_rpc.png")
     	ausgabeordner = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'Ergebnisausgabe','Excel')
     	excelpfad = join(ausgabeordner,'Standortkonkurrenz_Supermaerkte.xlsx')
 
@@ -3419,9 +3419,9 @@ class Standortkonkurrenz(Tool):
     	projektname = parameters[0].valueAsText
 
     	#Pfade einrichten
-    	base_path = str(sys.path[0]).split("2_Tool")[0]
+    	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
-    	workspace_Basis = join(base_path, '1_Basisdaten', 'FGBD_01_Basisdaten_deutschland.gdb')
+    	workspace_Basis = join(base_path, '1_Basisdaten', 'FGDB_01_Basisdaten_deutschland.gdb')
     	workspace_Basis_Daten = join(base_path, '2_Tool', '34_Standortkonkurrenz_Supermaerkte','FGDB_34_Standortkonkurrenz_Supermaerkte_Tool.gdb')
     	workspace_projekt = join(base_path, '3 Benutzerdefinierte Projekte', projektname,
     									 'FGDB_34_Standortkonkurrenz_Supermaerkte_' + projektname + '.gdb')

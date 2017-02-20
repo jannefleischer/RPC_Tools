@@ -4,7 +4,8 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.einnahmen.T4_Grundsteuer import Grundsteuer
 
 
@@ -13,7 +14,7 @@ class TbxGrundsteuer(Tbx):
 
     @property
     def label(self):
-        return u'Grundsteuer'
+        return u'Schritt 4: Grundsteuer'
 
     @property
     def Tool(self):
@@ -22,14 +23,17 @@ class TbxGrundsteuer(Tbx):
     def _getParameterInfo(self):
 
         params = self.par
+        projekte = self.folders.get_projects()
         # Projektname
         param_1 = params.name = arcpy.Parameter()
         param_1.name = u'Projektname'
         param_1.displayName = u'Projektname'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
-        param_1.filter.list = []
+        param_1.datatype = u'GPString'
+        param_1.filter.list = projekte
+        if projekte:
+            param_1.value = projekte[0]
 
         # Gemeindegrössenklasse_1964
         param_2 = params.ggk_1964 = arcpy.Parameter()
@@ -37,7 +41,8 @@ class TbxGrundsteuer(Tbx):
         param_2.displayName = encode(u'Gemeindegrößenklasse 1964')
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
-        param_2.datatype = language('string')
+        param_2.datatype = u'GPString'
+
         param_2.filter.list = [u'unter 2000 EW',
                                u'2000 bis 5000 EW',
                                u'5000 bis 10000 EW',

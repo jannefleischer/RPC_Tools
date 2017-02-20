@@ -33,14 +33,12 @@ class Basisdatenbearbeiten(Tool):
 
         #Pfade einrichten
 
-        i=-1
+        projektname = self.par.projectname.value
 
-        i+=1 ; projektname = parameters[i].valueAsText
-
-        base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-        workspace_projekt_definition =  join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
-        workspace_projekt_verkehr = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Verkehr.gdb')
-        directory_tool_verkehr = join(base_path,"2_Tool","Verkehr")
+        base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0] # Pfad zum Basisverzeichnis RPC
+        workspace_projekt_definition =  self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+        workspace_projekt_verkehr = self.folders.get_db('FGDB_Verkehr.gdb')
+        directory_tool_verkehr = join(base_path,'4 Programminterne Daten','rpctools', 'analyst', 'verkehr')
 
         #Abgeleitete Variablen
         Teilflaechen_Plangebiet = join(workspace_projekt_definition, 'Teilflaechen_Plangebiet')
@@ -51,7 +49,7 @@ class Basisdatenbearbeiten(Tool):
         gridWGS84 = join(workspace_projekt_verkehr, 'Siedlungszellen')
         grid_bound = join(workspace_projekt_verkehr, 'Gridbound')
 
-        zensusRaster = join(base_path, '1_Basisdaten','ZensusGrid','Zensus2011GridWGS84_int.tif')
+        zensusRaster = join(base_path, '4 Programminterne Daten','fgdbs','ZensusGrid','Zensus2011GridWGS84_int.tif')
         clippedRaster = join(base_path, '3 Benutzerdefinierte Projekte', projektname,'clippedZensus100mGrid.tif')
 
         #ggf vorhandene Layer loeschen

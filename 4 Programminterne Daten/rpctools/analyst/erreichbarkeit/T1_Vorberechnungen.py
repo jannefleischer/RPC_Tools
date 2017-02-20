@@ -30,9 +30,9 @@ class Vorberechnungen(Tool):
     	# Variablen definieren
     	projektname = parameters[0].valueAsText
 
-    	base_path = str(sys.path[0]).split("2_Tool")[0]
-    	workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
-    	workspace_projekt = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    	workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
+    	workspace_projekt = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
     	workspace_erreichbarkeit = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Erreichbarkeit.gdb')
     	workspace_projekt_ergebnisse = join(base_path,'3 Benutzerdefinierte Projekte',projektname, 'Ergebnisausgabe', 'Abbildungen')
     	arcpy.env.workspace = workspace_projekt

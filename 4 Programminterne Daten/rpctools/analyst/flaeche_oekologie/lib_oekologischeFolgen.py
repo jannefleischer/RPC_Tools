@@ -241,7 +241,7 @@ def oekologischeWertigkeit(projektName):
 
         #aktueller Pfad
         #wcd = sys.path[0].split("\\2_Tool")[0]
-        wcd = str(sys.path[0]).split("2_Tool")[0]
+        wcd = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
         #wcd = sys.path[0]
         #arcpy.AddMessage(wcd)
 
@@ -728,7 +728,7 @@ def flaechenInanspruchname(integrationsgrad,typ):
         #rootPfad = sys.path[0].split("2_")[0]
         ##Pfad zu den bkg Daten
         #projektFlaeche = rootPfad + "\\3 Benutzerdefinierte Projekte\\" + projektName + "\\FGDB_11_Definition_Projekt_" + projektName + ".gdb\\Teilflaechen_Plangebiet"
-        #bkg = rootPfad + "\\1_Basisdaten\\FGBD_01_Basisdaten_deutschland.gdb\\bkg_gemeinden"
+        #bkg = rootPfad + "\\1_Basisdaten\\FGDB_01_Basisdaten_deutschland.gdb\\bkg_gemeinden"
         ##Einwohnerzahl aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird
         ##1. Feature Layer aus den bkg-daten erstellen
         #arcpy.MakeFeatureLayer_management(bkg,"bkg_lyr")

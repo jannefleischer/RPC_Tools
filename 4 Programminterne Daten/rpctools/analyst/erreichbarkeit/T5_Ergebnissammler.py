@@ -35,8 +35,8 @@ class Ergebnisausgabe(Tool):
     	projektname = str(parameters[0].valueAsText)
 
 
-    	base_path = str(sys.path[0]).split("2_Tool")[0]
-    	workspace_projekt = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    	workspace_projekt = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
     	workspace_texte_erlaeterung = join(base_path,'2_Tool','Erreichbarkeit','Erlaeuterungstexte')
     	workspace_projekt_ergebnisse = join(base_path,'3 Benutzerdefinierte Projekte',projektname, 'Ergebnisausgabe', 'Abbildungen')
     	workspace_wertveraenderung = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb')
@@ -175,7 +175,7 @@ class Ergebnisausgabe(Tool):
     	# 1. Dokument einrichten
 
     	# Pfade setzen
-    	logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+    	logo = join((str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]),"1_Basisdaten","logo_rpc.png")
     	ausgabeordner = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'Ergebnisausgabe','Excel')
     	excelpfad = join(ausgabeordner,'37_Erreichbarkeit.xlsx')
 

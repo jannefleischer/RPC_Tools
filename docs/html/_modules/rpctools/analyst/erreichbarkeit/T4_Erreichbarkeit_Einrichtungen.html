@@ -519,7 +519,7 @@
 
     <span class="k">def</span> <span class="nf">xlsladen_undStandorteerstellen</span><span class="p">(</span><span class="n">pfad</span><span class="p">,</span><span class="n">Dateinamen</span><span class="p">):</span>
 
-        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Kopieren der Excelinhalte in die Feature Class &quot;</span><span class="o">+</span><span class="n">Dateinamen</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Kopieren der Excelinhalte in die language('feature class') &quot;</span><span class="o">+</span><span class="n">Dateinamen</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
     <span class="c1">##    messages.AddMessage(pfad)</span>
         <span class="n">workbook</span> <span class="o">=</span> <span class="n">xlrd</span><span class="o">.</span><span class="n">open_workbook</span><span class="p">(</span><span class="n">pfad</span><span class="p">)</span>
         <span class="n">worksheet</span> <span class="o">=</span> <span class="n">workbook</span><span class="o">.</span><span class="n">sheet_by_name</span><span class="p">(</span><span class="s1">&#39;Tabelle1&#39;</span><span class="p">)</span>
@@ -564,7 +564,7 @@
 
                     <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="c1">##                messages.AddMessage(&quot;Schreiben der Zeile &quot;+str(counter)+&quot; in die Feature Class. &quot;+Dateinamen.replace(&#39;\\&#39;,&#39;&#39;))</span>
+    <span class="c1">##                messages.AddMessage(&quot;Schreiben der Zeile &quot;+str(counter)+&quot; in die language('feature class'). &quot;+Dateinamen.replace(&#39;\\&#39;,&#39;&#39;))</span>
                     <span class="n">cur</span><span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">gdb</span><span class="p">)</span>
 
 
@@ -841,7 +841,7 @@
 
 
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Feature Classes werden angelegt.&quot;</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;language('feature class')es werden angelegt.&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Exists</span><span class="p">(</span><span class="s2">&quot;\Einrichtungen_Kita&quot;</span><span class="p">):</span>
                 <span class="c1">#leere es</span>

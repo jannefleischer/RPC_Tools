@@ -677,9 +677,9 @@ class MarktHinzufuegen(Tool):
 		messages.AddMessage("Georeferenzierung des Marktes")
 		##messages.AddMessage(projektname+" "+TypdesMarktes+" "+AlternativeFuerMarkttyp+" "+VKFL+" "+Strasse+" "+Hausnummer+" "+PLZ+" "+Ort+" "+radiobutton)
 		#Pfade einrichten
-		base_path = str(sys.path[0]).split("2_Tool")[0]
+		base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
-		workspace_Basis = join(base_path, '1_Basisdaten', 'FGBD_Basisdaten_deutschland.gdb')
+		workspace_Basis = join(base_path, '1_Basisdaten', 'FGDB_Basisdaten_deutschland.gdb')
 		workspace_projekt = join(base_path, '3 Benutzerdefinierte Projekte', projektname,
 										 'FGDB_Standortkonkurrenz_Supermaerkte_' + projektname + '.gdb')
 

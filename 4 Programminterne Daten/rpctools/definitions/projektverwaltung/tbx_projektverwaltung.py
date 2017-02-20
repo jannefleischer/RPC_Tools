@@ -21,10 +21,10 @@ class TbxProjektVerwaltung(Tbx):
         return Projektverwaltung
 
     def _getParameterInfo(self):
-        pars = self.par
+        params = self.par
 
         # Was_möchten_Sie_tun_
-        p = pars.action = arcpy.Parameter()
+        p = params.action = arcpy.Parameter()
         p.name = encode('Was_möchten_Sie_tun_')
         p.displayName = encode('Was möchten Sie tun?')
         p.parameterType = 'Required'
@@ -37,7 +37,7 @@ class TbxProjektVerwaltung(Tbx):
         projects = self.folders.get_projects()
 
         # Bestehendes_Projekt_auswählen
-        p = pars.existing_project = arcpy.Parameter()
+        p = params.existing_project = arcpy.Parameter()
         p.name = encode('Bestehendes_Projekt_auswählen')
         p.displayName = encode('Bestehendes Projekt auswählen')
         p.parameterType = 'Required'
@@ -47,7 +47,7 @@ class TbxProjektVerwaltung(Tbx):
         p.filter.list = projects
 
         # Name_des_neuen_Projektes
-        p = pars.name = arcpy.Parameter()
+        p = params.name = arcpy.Parameter()
         p.name = u'Name_des_neuen_Projektes'
         p.displayName = u'Name des neuen Projektes'
         p.parameterType = 'Required'
@@ -56,7 +56,7 @@ class TbxProjektVerwaltung(Tbx):
         p.value = u' '
 
         # Shapefile_des_Plangebiets____shp_
-        p = pars.shapefile = arcpy.Parameter()
+        p = params.shapefile = arcpy.Parameter()
         p.name = u'Shapefile_des_Plangebiets____shp_'
         p.displayName = u'Shapefile des Plangebiets (*.shp)'
         p.parameterType = 'Required'
@@ -65,7 +65,7 @@ class TbxProjektVerwaltung(Tbx):
         p.value = self.folders.TEMPLATE_FLAECHEN
 
         # Beginn_des_Betrachtungszeitraumes
-        p = pars.begin = arcpy.Parameter()
+        p = params.begin = arcpy.Parameter()
         p.name = u'Beginn_des_Betrachtungszeitraumes'
         p.displayName = u'Beginn des Betrachtungszeitraumes'
         p.parameterType = 'Required'
@@ -76,7 +76,7 @@ class TbxProjektVerwaltung(Tbx):
         p.value = datetime.datetime.now().year
 
         # Ende_des_Betrachtungszeitraumes
-        p = pars.end = arcpy.Parameter()
+        p = params.end = arcpy.Parameter()
         p.name = u'Ende_des_Betrachtungszeitraumes'
         p.displayName = u'Ende des Betrachtungszeitraumes'
         p.parameterType = 'Required'
@@ -86,16 +86,16 @@ class TbxProjektVerwaltung(Tbx):
 
 
         #Eingaben zu Beginn deaktiviere/füllen
-        pars.end.filter.list = [2010, 2050]
-        pars.end.value = 2050
-        pars.existing_project.enabled = False
-        pars.name.enabled = False
-        pars.shapefile.enabled = False
-        pars.begin.enabled = False
-        pars.end.enabled = False
-        pars.existing_project.filter.list = [" "]
+        params.end.filter.list = [2010, 2050]
+        params.end.value = 2050
+        params.existing_project.enabled = False
+        params.name.enabled = False
+        params.shapefile.enabled = False
+        params.begin.enabled = False
+        params.end.enabled = False
+        params.existing_project.filter.list = [" "]
 
-        return pars
+        return params
 
     def _updateParameters(self, params):
         """Modify the values and properties of parameters before internal

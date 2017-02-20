@@ -5,14 +5,15 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.flaeche_oekologie.oekologische_folgen import OekologischeFolgen
 
 class TbxOekologischeFolgen(Tbx):
 
     @property
     def label(self):
-        return encode(u'Ökologische Folgen berechnen')
+        return encode(u'Schritt 5: Ökologische Folgen berechnen')
 
     @property
     def Tool(self):
@@ -30,7 +31,8 @@ class TbxOekologischeFolgen(Tbx):
         param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = projekte
         if projekte:
             param_1.value = projekte[0]
@@ -41,7 +43,8 @@ class TbxOekologischeFolgen(Tbx):
         param_2.displayName = u'Region ausw\xe4hlen'
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
-        param_2.datatype = language('string')
+        param_2.datatype = u'GPString'
+
         param_2.filter.list = [u'Braunschweig-Salzgitter-Wolfenbuettel', u'In und um Duesseldorf', u'Kreis Euskirchen', u'Kreis Unna', u'Landkreis Harburg', u'Landkreis Wolfenbuettel', u'Rheinisch-Bergischer Kreis']
 
         # L�nge_der_gemeinsamen_Grenze_Planfl�che_Gemeinde__m_
@@ -66,7 +69,8 @@ class TbxOekologischeFolgen(Tbx):
         param_5.displayName = u'Was wird haupts\xe4chlich auf der Projektfl\xe4che errichtet?'
         param_5.parameterType = 'Required'
         param_5.direction = 'Input'
-        param_5.datatype = language('string')
+        param_5.datatype = u'GPString'
+
         param_5.filter.list = [u'Wohnen', u'Gewerbe', u'Einzelhandel']
 
         # Sind_schutzw�rdige_B�den_betroffen_
@@ -75,7 +79,8 @@ class TbxOekologischeFolgen(Tbx):
         param_6.displayName = u'Sind schutzw\xfcrdige B\xf6den betroffen?'
         param_6.parameterType = 'Required'
         param_6.direction = 'Input'
-        param_6.datatype = language('string')
+        param_6.datatype = u'GPString'
+
         param_6.filter.list = [u'Ja', u'Nein']
 
         return params

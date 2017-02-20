@@ -4,7 +4,8 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.einnahmen.T1_Vorberechnungen import Vorberechnungen
 
 
@@ -13,7 +14,7 @@ class TbxVorberechnungen(Tbx):
 
     @property
     def label(self):
-        return u'Vorberechnungen'
+        return u'Schritt 1: Vorberechnungen'
 
     @property
     def Tool(self):
@@ -29,7 +30,8 @@ class TbxVorberechnungen(Tbx):
         par.name.displayName = u'Projektname'
         par.name.parameterType = 'Required'
         par.name.direction = 'Input'
-        par.name.datatype = language('string')
+        par.name.datatype = u'GPString'
+
         par.name.filter.list = projects
 
         heading = "01 Nettozuzugsquoten (in %)"

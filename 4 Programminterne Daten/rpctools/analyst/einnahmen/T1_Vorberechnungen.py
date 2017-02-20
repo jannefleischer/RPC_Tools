@@ -14,7 +14,11 @@
 # -*- coding: utf-8 -*-
 
 
-import arcpy
+import arcpy, sys
+
+import arcpy, os, inspect, pyodbc, shutil, gc, sys, datetime, xlsxwriter, imp
+from xlsxwriter.utility import xl_rowcol_to_cell
+from os.path import join, isdir, abspath, dirname, basename
 
 from rpctools.utils.params import Tool
 
@@ -23,7 +27,7 @@ import rpctools.utils.population_lib as pop
 
 class Vorberechnungen(Tool):
 
-    _dbname = 'FGDEinnahmen.gdb'
+    _dbname = 'FGDB_Einnahmen.gdb'
 
     def run(self):
 
@@ -32,7 +36,7 @@ class Vorberechnungen(Tool):
         arcpy.env.overwriteOutput = True
 
         # Variablen definieren
-       
+
         projektname = self.par.name.value
         ### 01 Nettozuzugsquoten (in %) ###
         nettoZuzugsQuote_EW = self.par.nettozuzugquote_ew.value
@@ -41,11 +45,11 @@ class Vorberechnungen(Tool):
         einzugsbereich_EW = self.par.einzugsbereich_ew.value
         einzugsbereich_AP = self.par.einzugsbereich_jobs.value
         # Pfade einrichten
-        base_path = str(sys.path[0]).split("2_Tool")[0]
+        base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
-        workspace_basisdaten = self.folders.get_basedb('FGBD_Basisdaten_deutschland.gdb')
-        workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb')
-        workspace_projekt_einnahmen = self.folders.get_db('FGDEinnahmen.gdb')
+        workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
+        workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+        workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
 
         Teilflaechen_Plangebiet_Centroide = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_Centroide")
         Teilflaechen_Plangebiet_CentroideGK3 = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_CentroideGK3")
@@ -569,9 +573,9 @@ class Vorberechnungen(Tool):
 
 def getAGS(projektname):
     import arcpy,sys,os
-    base_path = str(sys.path[0]).split("2_Tool")[0]
-    projektFlaeche = join(base_path ,"3 Benutzerdefinierte Projekte",  projektname ,"FGDB_Definition_Projekt_" + projektname +".gdb","Teilflaechen_Plangebiet")
-    bkg_gemeinden = join( base_path, "1_Basisdaten","FGBD_Basisdaten_deutschland.gdb","bkg_gemeinden")
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    projektFlaeche = join(base_path ,"3 Benutzerdefinierte Projekte",  projektname ,"FGDB_Definition_Projekt.gdb","Teilflaechen_Plangebiet")
+    bkg_gemeinden = join( base_path, "4 Programminterne Daten", "fgdbs", "FGDB_Basisdaten_deutschland.gdb","bkg_gemeinden")
     #ags aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird
     #1. Feature Layer aus den bkg-daten erstellen
     try:
@@ -620,8 +624,8 @@ def getAGS(projektname):
 
 def getReGenesisAGS(ags_input, verbandsgemeinde, RS):
     #Weiche nach Bundeslaendern und gemeinschaftsangehoerigen Gemeinden
-    base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
     VG250 = join(workspace_basisdaten,'VG250')
     where = '"AGS"'+" ='"+ ags_input + "'"
 

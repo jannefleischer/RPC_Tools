@@ -9,7 +9,8 @@ import datetime
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.definitions.nutzungsart.nutzungen import Nutzungen
 
 class TbxNutzungen(Tbx):
@@ -32,7 +33,8 @@ class TbxNutzungen(Tbx):
         param.displayName = u'Projekt'
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = language('string')
+        param.datatype = u'GPString'
+
         param.filter.list = projekte
         if projekte:
             param.value = projekte[0]
@@ -43,7 +45,8 @@ class TbxNutzungen(Tbx):
         param.displayName = u'Teilfl\xe4che'
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = language('string')
+        param.datatype = u'GPString'
+
         param.filter.list = []
 
         heading = "1) Aufsiedlungszeitraum"
@@ -187,7 +190,8 @@ class TbxNutzungen(Tbx):
         param_13.displayName = u'Mittlere Anzahl Einwohner pro WE in Einfamilienh\xe4usern (kurz nach dem Bezug)'
         param_13.parameterType = 'Required'
         param_13.direction = 'Input'
-        param_13.datatype = language('string')
+        param_13.datatype = u'GPString'
+
         param_13.value = u'3,2 Bewohner pro Wohneinheit'
         param_13.filter.list = list_EwProWE
         param_13.category = heading
@@ -198,7 +202,8 @@ class TbxNutzungen(Tbx):
         param_14.displayName = u'Mittlere Anzahl Einwohner pro WE in Doppelh\xe4usern (kurz nach dem Bezug)'
         param_14.parameterType = 'Required'
         param_14.direction = 'Input'
-        param_14.datatype = language('string')
+        param_14.datatype = u'GPString'
+
         param_14.value = u'3,0 Bewohner pro Wohneinheit'
         param_14.filter.list = list_EwProWE
         param_14.category = heading
@@ -209,7 +214,8 @@ class TbxNutzungen(Tbx):
         param_15.displayName = u'Mittlere Anzahl Einwohner pro WE in Reihenh\xe4usern (kurz nach dem Bezug)'
         param_15.parameterType = 'Required'
         param_15.direction = 'Input'
-        param_15.datatype = language('string')
+        param_15.datatype = u'GPString'
+
         param_15.value = u'3,0 Bewohner pro Wohneinheit'
         param_15.filter.list = list_EwProWE
         param_15.category = heading
@@ -220,7 +226,8 @@ class TbxNutzungen(Tbx):
         param_16.displayName = u'Mittlere Anzahl Einwohner pro WE in Mehrfamilienh\xe4usern (kurz nach dem Bezug)'
         param_16.parameterType = 'Required'
         param_16.direction = 'Input'
-        param_16.datatype = language('string')
+        param_16.datatype = u'GPString'
+
         param_16.value = u'2,1 Bewohner pro Wohneinheit'
         param_16.filter.list = list_EwProWE
         param_16.category = heading
@@ -249,7 +256,8 @@ class TbxNutzungen(Tbx):
         param_18.displayName = u'Gebietstyp ausw\xe4hlen'
         param_18.parameterType = 'Required'
         param_18.direction = 'Input'
-        param_18.datatype = language('string')
+        param_18.datatype = u'GPString'
+
         param_18.value = u'<kein Gewerbegebiet vorhanden>'
         param_18.filter.list = [u'Industriegebiet', u'Logistikgebiet', u'Klassisches Gewerbegebiet', u'Kleinteiliges Gewerbegebiet', u'Hoeherwertiges Gewerbegebiet', u'Technologiepark, Wissenschaftspark', u'<kein Gewerbegebiet vorhanden>']
         param_18.category = heading

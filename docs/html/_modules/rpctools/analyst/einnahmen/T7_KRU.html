@@ -79,7 +79,7 @@
 
 <div class="viewcode-block" id="KRU"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T7_KRU.html#rpctools.analyst.einnahmen.T7_KRU.KRU">[docs]</a><span class="k">class</span> <span class="nc">KRU</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
 
-    <span class="n">_dbname</span> <span class="o">=</span> <span class="s1">&#39;FGDEinnahmen.gdb&#39;</span>
+    <span class="n">_dbname</span> <span class="o">=</span> <span class="s1">&#39;FGDB_Einnahmen.gdb&#39;</span>
 
 <div class="viewcode-block" id="KRU.run"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T7_KRU.html#rpctools.analyst.einnahmen.T7_KRU.KRU.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
@@ -93,9 +93,9 @@
         <span class="c1">#Pfade einrichten</span>
         <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">workspace_projekt_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
-        <span class="n">workspace_projekt_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDEinnahmen.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Einnahmen.gdb&#39;</span><span class="p">)</span>
         <span class="n">workspace_tool_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Art und Mass der Nutzung&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_Tool.gdb&quot;</span><span class="p">)</span>
-        <span class="n">workspace_tool_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;FGDEinnahmen_Tool.gdb&quot;</span><span class="p">)</span>
+        <span class="n">workspace_tool_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Einnahmen_Tool.gdb&quot;</span><span class="p">)</span>
 
         <span class="c1">#############################################################################################################</span>
         <span class="c1"># Vereinigungsmenge aus Umland erzeugen AGS aus EW und AP zusammen führen) inkl. eigene Kommune</span>

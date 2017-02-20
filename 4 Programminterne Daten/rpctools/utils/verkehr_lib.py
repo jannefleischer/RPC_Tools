@@ -21,8 +21,8 @@ def uebergabepunkt_bearbeiten(projektname,punkt_name,qp_wohnen,qp_versorgung,qp_
     import sys, os, arcpy
     print "bearbeiten"
     # Create Paths
-    base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
-    workspace_projekt_verkehr = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Verkehr.gdb')
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0] # Pfad zum Basisverzeichnis RPC
+    workspace_projekt_verkehr = self.folders.get_db('FGDB_Verkehr.gdb')
     workspace_tool_verkehr = join(base_path,"2_Tool","Verkehr","33_Verkehr_Tool.gdb")
 
     uebergabepunkt_tabelle = join(workspace_projekt_verkehr,'L01_Uebergabepunkte')

@@ -474,7 +474,7 @@ class Einrichtungen(Tool):
 
 		def xlsladen_undStandorteerstellen(pfad,Dateinamen):
 
-			messages.AddMessage("Kopieren der Excelinhalte in die Feature Class "+Dateinamen.replace('\\','')+".")
+			messages.AddMessage("Kopieren der Excelinhalte in die Feature CLass "+Dateinamen.replace('\\','')+".")
 		##    messages.AddMessage(pfad)
 			workbook = xlrd.open_workbook(pfad)
 			worksheet = workbook.sheet_by_name('Tabelle1')
@@ -733,7 +733,7 @@ class Einrichtungen(Tool):
 		Einzelhandel_feature = parameters[10].valueAsText
 
 		#Pfade einrichten
-		base_path = str(sys.path[0]).split("2_Tool")[0]
+		base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
 		workspace_definitionen=join(base_path, '3 Benutzerdefinierte Projekte', projektname,
 										 'FGDB_Definition_Projekt_' + projektname + '.gdb')
@@ -796,7 +796,7 @@ class Einrichtungen(Tool):
 
 
 		else:
-			messages.AddMessage("Feature Classes werden angelegt.")
+			messages.AddMessage("Feature CLasses werden angelegt.")
 			try:
 				if arcpy.Exists("\Einrichtungen_Kita"):
 					#leere es

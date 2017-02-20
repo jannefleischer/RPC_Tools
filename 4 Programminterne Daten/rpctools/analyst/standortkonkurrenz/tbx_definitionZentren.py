@@ -5,14 +5,15 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.standortkonkurrenz.T3_Definition_Zentren import DefinitionZentren
 
 class TbxDefinitionZentren(Tbx):
 
     @property
     def label(self):
-        return encode(u'Zentren definieren')
+        return encode(u'Schritt 3: Zentren definieren')
 
     @property
     def Tool(self):
@@ -23,13 +24,8 @@ class TbxDefinitionZentren(Tbx):
         params = self.par
         projekte = self.folders.get_projects()
 
-    	i=-1
-    	i+=1 ;
 
-    	i+=1 ;
-    	#zentren
-    	i+=1 ;
-    	self.params[i].filter.list = []
+
 
         # Projekt_auswählen
         param_1 = params.projectname = arcpy.Parameter()
@@ -37,7 +33,8 @@ class TbxDefinitionZentren(Tbx):
         param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = projekte
         if projekte:
             param_1.value = projekte[0]
@@ -48,7 +45,8 @@ class TbxDefinitionZentren(Tbx):
         param_2.displayName = u'Zentrenbezeichnung'
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
-        param_2.datatype = language('string')
+        param_2.datatype = u'GPString'
+
 
         # Auswahl_der_M�rkte
         param_3 = arcpy.Parameter()
@@ -56,7 +54,8 @@ class TbxDefinitionZentren(Tbx):
         param_3.displayName = u'Auswahl der M\xe4rkte'
         param_3.parameterType = 'Required'
         param_3.direction = 'Input'
-        param_3.datatype = language('string')
+        param_3.datatype = u'GPString'
+        param_3.filter.list = []
 
         # Speichern
         param_4 = arcpy.Parameter()
@@ -64,7 +63,8 @@ class TbxDefinitionZentren(Tbx):
         param_4.displayName = u'Speichern'
         param_4.parameterType = 'Required'
         param_4.direction = 'Input'
-        param_4.datatype = language('boolean')
+        param_4.datatype = u'GPBoolean'
+
 
         # Status
         param_5 = arcpy.Parameter()
@@ -72,7 +72,8 @@ class TbxDefinitionZentren(Tbx):
         param_5.displayName = u'Status'
         param_5.parameterType = 'Required'
         param_5.direction = 'Input'
-        param_5.datatype = language('string')
+        param_5.datatype = u'GPString'
+
 
         return params
 
@@ -84,7 +85,7 @@ class TbxDefinitionZentren(Tbx):
 
 		list_uebergabepunkte =[]
 
-		self.params[4].value = "Zum Speichern bitte das K�stchen anklicken"
+		self.params[4].value = "Zum Speichern bitte das Kästchen anklicken"
 
 		if (self.params[i].altered and not self.params[i].hasBeenValidated or self.params[1].altered and not self.params[1].hasBeenValidated ):
 

@@ -7,7 +7,7 @@ import T1_Basisdaten_bearbeiten
 import T2_Routings_durchfuehren
 import T3_Verkehrsmengen_ermitteln
 
-PROJECT_FOLDER = join(os.getcwd().split("2_Tool")[0], "3 Benutzerdefinierte Projekte")
+PROJECT_FOLDER = join(os.getcwd().split("2 Planungsprojekte analysieren")[0], "3 Benutzerdefinierte Projekte")
 TEST_TEMPLATE = 'Test_Template'
 PROJECT_TMP = '__unittest__'
 MAPQUEST_KEY = 'D0CXAXhgKGKmuAxA3x7HZq10MvbqhPiF'

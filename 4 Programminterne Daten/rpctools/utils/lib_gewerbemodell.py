@@ -19,7 +19,7 @@ def betriebsflaechenErmitteln(projektname):
     arcpy.AddMessage("Betriebsflaechen ermitteln")
     #ueberpruefen, ob schon Angaben zu den Betriebsstrukturen gemacht wurden
     #pfade anlegen
-    base_path = str(sys.path[0]).split("2_Tool")[0]
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
     tabelle_gewerbe = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_11_Definition_Projekt.gdb','Gewerbe_Teilflaechen')
     counter = 0
     gewerbe_teilflaechen = arcpy.SearchCursor(tabelle_gewerbe)
@@ -137,8 +137,8 @@ def flaechebilanzErmitteln(projektname,nameTeilflaeche,gebietstyp):
     arcpy.AddMessage("Flaechenbilanzen berechnen")
 
     #Pfade festlegen
-    base_path = str(sys.path[0]).split("2_Tool")[0]
-    #workspace_basis = join(base_path, '1_Basisdaten', 'FGBD_01_Basisdaten_deutschland.gdb')
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    #workspace_basis = join(base_path, '1_Basisdaten', 'FGDB_01_Basisdaten_deutschland.gdb')
     workspace_projekt = join(base_path, '3 Benutzerdefinierte Projekte', projektname,
                                  'FGDB_11_Definition_Projekt_' + projektname + '.gdb')
 
@@ -189,7 +189,7 @@ def nutzungsstruktur(projektname):
     #pfade anlegen
     import sys, os, arcpy
     arcpy.AddMessage("Nutzungstruktur berechnen")
-    base_path = str(sys.path[0]).split("2_Tool")[0]
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
     tabelle_gewerbe = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_11_Definition_Projekt.gdb','Gewerbe_Teilflaechen')
     tabelle_gewerbe_update = arcpy.UpdateCursor(tabelle_gewerbe)
     for row in tabelle_gewerbe_update:
@@ -262,7 +262,7 @@ def nutzungsstruktur(projektname):
 def betriebsstruktur(projektname):
     import sys,os,arcpy
     #Pfade festlegen
-    base_path = str(sys.path[0]).split("2_Tool")[0]
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
     workspace_projekt = join(base_path, '3 Benutzerdefinierte Projekte', projektname,'FGDB_11_Definition_Projekt_' + projektname + '.gdb')
 
     tabelle_gewerbe_teilflaechen = join(workspace_projekt, "Gewerbe_Teilflaechen")

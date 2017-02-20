@@ -27,7 +27,7 @@ def temp_mdb(eingangstabellen,sql,ausgabetabelle):
     arcpy.env.overwriteOutput = True
 
     # Create Temp Folder
-    base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0] # Pfad zum Basisverzeichnis RPC
     out_folder_path = join(base_path,'2_Tool',"Projektverwaltung","temp") # Pfad zur temporaeren mdb inkl.
     temp_mdb_path =  join(out_folder_path,"PGDB_Temp.mdb")
 

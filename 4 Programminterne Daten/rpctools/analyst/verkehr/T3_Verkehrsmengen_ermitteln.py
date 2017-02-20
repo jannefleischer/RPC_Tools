@@ -36,52 +36,51 @@ class VerkehrsmengenErmitteln(Tool):
     	arcpy.env.overwriteOutput = True
 
     	# Variables
-    	i=-1
 
-    	i+=1 ; projektname = parameters[i].valueAsText
+    	projektname = self.par.projectname.value
 
     	#projektname = "HCU_ZGB_OT_Salzdahlum"
 
     	#Eingangsparameter Wohnen
-    	i+=1 ; Wohnen_Wege_EW = parameters[i].value
-    	i+=1 ; Wohnen_MIV_Anteil = parameters[i].value / 100.
-    	i+=1 ; Wohnen_Pers_KFZ = parameters[i].value
-    	i+=1 ; Wohnen_Anteil_Besucherfahrten = parameters[i].value / 100.
-    	i+=1 ; Wohnen_WF_Fahrten_je_EW = parameters[i].value
+    	Wohnen_Wege_EW = self.par.wohnen_wege_ev.value
+    	Wohnen_MIV_Anteil = self.par.wohnen_MIV.value / 100.
+    	Wohnen_Pers_KFZ = self.par.wohnen_pers_kfz.value
+    	Wohnen_Anteil_Besucherfahrten = self.par.wohnen_besucherfahrten.value / 100.
+    	Wohnen_WF_Fahrten_je_EW = self.par.wohnen_fahrten_je_EW.value
 
     	#Eingangsparameter Versorgung
-    	i+=1 ; Versorgung_BGF_Beschaeftigter = parameters[i].value
-    	i+=1 ; Versorgung_Anwesenheit = parameters[i].value
-    	i+=1 ; Versorgung_Wege_Beschaeftigter = parameters[i].value
-    	i+=1 ; Versorgung_MIV_Anteil = parameters[i].value / 100.
-    	i+=1 ; Versorgung_Pers_KFZ = parameters[i].value
-    	i+=1 ; Versorgung_Besucher_Tag = parameters[i].value
-    	i+=1 ; Versorgung_Lieferwege_100m2 = parameters[i].value
+    	Versorgung_BGF_Beschaeftigter = self.par.Versorgung_BGF_Beschaeftigter.value
+    	Versorgung_Anwesenheit = self.par.Versorgung_Anwesenheit.value
+    	Versorgung_Wege_Beschaeftigter = self.par.Versorgung_Wege_Beschaeftigter.value
+    	Versorgung_MIV_Anteil = self.par.Versorgung_MIV.value / 100.
+    	Versorgung_Pers_KFZ = self.par.Versorgung_Pers_KFZ.value
+    	Versorgung_Besucher_Tag = self.par.Versorgung_Besucher_Tag.value
+    	Versorgung_Lieferwege_100m2 = self.par.Versorgung_Lieferwege_100m2.value
 
     	#Eingangsparameter Gewerbe
-    	i+=1 ; Gewerbe_Anwesenheit = parameters[i].value / 100.
-    	i+=1 ; Gewerbe_Wege_Beschaeftigter = parameters[i].value
-    	i+=1 ; Gewerbe_MIV_Anteil = parameters[i].value / 100.
-    	i+=1 ; Gewerbe_Pers_KFZ = parameters[i].value
-    	i+=1 ; Kundenwege_Beschaeftigte = parameters[i].value
-    	i+=1 ; Gewerbe_Lieferwege_Beschaeftigte = parameters[i].value
+    	Gewerbe_Anwesenheit = self.par.Gewerbe_Anwesenheit.value / 100.
+    	Gewerbe_Wege_Beschaeftigter = self.par.Gewerbe_Wege_Beschaeftigter.value
+    	Gewerbe_MIV_Anteil = self.par.Gewerbe_MIV_Anteil.value / 100.
+    	Gewerbe_Pers_KFZ = self.par.Gewerbe_Pers_KFZ.value
+        Kundenwege_Beschaeftigte = self.par.Gewerbe_Besucherfahrten.value
+    	Gewerbe_Lieferwege_Beschaeftigte = self.par.Gewerbe_Lieferwege_Beschaeftigte.value
 
     	#Eingangsparameter Schulen
-    	i+=1 ; Schulen_Wege_Schueler = parameters[i].value
-    	i+=1 ; Schulen_MIV_Anteil = parameters[i].value / 100.
-    	i+=1 ; Schulen_Schueler_KFZ = parameters[i].value
-    	i+=1 ; Schulen_Schueler_je_Lehrer = parameters[i].value
-    	i+=1 ; Schulen_Wege_Lehrer = parameters[i].value
-    	i+=1 ; Schulen_Pers_KFZ = parameters[i].value
-    	i+=1 ; Schulen_Lieferwege_Schueler = parameters[i].value
+    	Schulen_Wege_Schueler = self.par.Schulen_Wege_Schueler.value
+    	Schulen_MIV_Anteil = self.par.Schulen_MIV.value / 100.
+    	Schulen_Schueler_KFZ = self.par.Schulen_Schueler_KFZ.value
+    	Schulen_Schueler_je_Lehrer = self.par.Schulen_Schueler_je_Lehrer.value
+    	Schulen_Wege_Lehrer = self.par.Schulen_Wege_Lehrer.value
+    	Schulen_Pers_KFZ = self.par.paramsSchulen_Pers_KFZ.value
+        Schulen_Lieferwege_Schueler = self.par.Schulen_Lieferwege_Schueler.value
 
 
     	# Workspaces
-    	base_path = str(sys.path[0]).split("2_Tool")[0] # Pfad zum Basisverzeichnis RPC
+    	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0] # Pfad zum Basisverzeichnis RPC
     	workspace_projekt = join(base_path,'3 Benutzerdefinierte Projekte',projektname)
-    	workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
-    	workspace_projekt_definition = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
-    	workspace_projekt_verkehr = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Verkehr.gdb')
+    	workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
+    	workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+    	workspace_projekt_verkehr = self.folders.get_db('FGDB_Verkehr.gdb')
 
     	# Layers and Tables
     	out_folder_path = join(workspace_projekt,"temp") # Pfad zur temporaeren mdb inkl.
@@ -118,10 +117,10 @@ class VerkehrsmengenErmitteln(Tool):
     	messages.AddMessage(beginmeldung)
     	print beginmeldung
 
-    	# First, make a layer from the feature class
+    	# First, make a layer from the Feature Class
     	arcpy.MakeFeatureLayer_management(siedlungszellenlayer, "siedlungszellenlayer_lyr")
 
-    	# Then add a selection to the layer based on location to features in another feature class
+    	# Then add a selection to the layer based on location to features in another Feature Class
     	arcpy.SelectLayerByLocation_management ("siedlungszellenlayer_lyr", "INTERSECT", umfeldabgrenzung)
 
     	arcpy.CopyFeatures_management("siedlungszellenlayer_lyr", siedlungszellenlayer_eingangsdaten)

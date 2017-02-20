@@ -4,7 +4,8 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.einnahmen.T2_Einkommensteuer import Einkommenssteuer
 from rpctools.analyst.einnahmen.T3_Familienleistungsausgleich \
      import Familienleistungsausgleich
@@ -27,7 +28,8 @@ class _TbxEinnahmen(Tbx):
         param_1.displayName = u'Projektname'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = projekte
         if projekte:
             param_1.value = projekte[0]
@@ -40,7 +42,7 @@ class TbxEinkommenssteuer(_TbxEinnahmen):
 
     @property
     def label(self):
-        return u'Einkommensteuer'
+        return u'Schritt 2: Einkommensteuer'
 
     @property
     def Tool(self):
@@ -52,7 +54,7 @@ class TbxFamilienleistungsausgleich(_TbxEinnahmen):
 
     @property
     def label(self):
-        return u'Familienleistungsausgleich'
+        return u'Schritt 5: Familienleistungsausgleich'
 
     @property
     def Tool(self):
@@ -64,7 +66,7 @@ class TbxKFA(_TbxEinnahmen):
 
     @property
     def label(self):
-        return u'Kommunaler Finanzausgleich'
+        return u'Schritt 6: Kommunaler Finanzausgleich'
 
     @property
     def Tool(self):
@@ -76,7 +78,7 @@ class TbxKRU(_TbxEinnahmen):
 
     @property
     def label(self):
-        return u'Kreisumlage'
+        return u'Schritt 7: Kreisumlage'
 
     @property
     def Tool(self):

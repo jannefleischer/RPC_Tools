@@ -9,7 +9,7 @@ import T3_Erreichbarkeit_OEPNV
 import T4_Erreichbarkeit_Einrichtungen
 import T5_Ergebnissammler
 
-PROJECT_FOLDER = join(os.getcwd().split("2_Tool")[0], "3 Benutzerdefinierte Projekte")
+PROJECT_FOLDER = join(os.getcwd().split("2 Planungsprojekte analysieren")[0], "3 Benutzerdefinierte Projekte")
 TEST_TEMPLATE = 'Test_Template'
 PROJECT_TMP = '__unittest__'
 

@@ -20,7 +20,7 @@ import sys
 import imp
 import arcpy
 import xlsxwriter
-
+from os.path import join, isdir, abspath, dirname, basename
 from rpctools.utils.params import Tool
 import rpctools.utils.sheet_lib as sl
 import rpctools.utils.tempmdb_lib as mdb
@@ -28,7 +28,7 @@ import rpctools.utils.tempmdb_lib as mdb
 
 class KRU(Tool):
 
-    _dbname = 'FGDEinnahmen.gdb'
+    _dbname = 'FGDB_Einnahmen.gdb'
 
     def run(self):
 
@@ -37,14 +37,14 @@ class KRU(Tool):
         arcpy.env.overwriteOutput = True
 
         # Variablen definieren
-        projektname = parameters[0].value
+        projektname = self.par.name.value
 
         #Pfade einrichten
-        base_path = str(sys.path[0]).split("2_Tool")[0]
-        workspace_projekt_definition = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
-        workspace_projekt_einnahmen = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDEinnahmen.gdb')
-        workspace_tool_definition = join(base_path,"2_Tool","Art und Mass der Nutzung","FGDB_Definition_Projekt_Tool.gdb")
-        workspace_tool_einnahmen = join(base_path,"2_Tool","Einnahmen","FGDEinnahmen_Tool.gdb")
+        base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+        workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+        workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
+        workspace_tool_definition = self.folders.get_basedb('FGDB_Definition_Projekt_Tool.gdb')
+        workspace_tool_einnahmen = self.folders.get_basedb('FGDB_Einnahmen_Tool.gdb')
 
         #############################################################################################################
         # Vereinigungsmenge aus Umland erzeugen AGS aus EW und AP zusammen führen) inkl. eigene Kommune
@@ -99,7 +99,7 @@ class KRU(Tool):
         print schrittmeldung
 
         # Pfade setzen
-        logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+        logo = join((str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]),"1_Basisdaten","logo_rpc.png")
         ausgabeordner = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'Ergebnisausgabe','Excel')
         if not os.path.exists(ausgabeordner): os.makedirs(ausgabeordner)
         excelpfad = join(ausgabeordner,'Einnahmen_Kreisumlage.xlsx')

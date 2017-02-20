@@ -5,14 +5,15 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.utils.encoding import language
+
+
 from rpctools.analyst.flaeche_oekologie.Bodenbedeckungbeschreiben import BodenbedeckungVornutzung
 
 class TbxVornutzungbeschreiben(Tbx):
 
     @property
     def label(self):
-        return encode(u'Nullfall beschreiben')
+        return encode(u'Schritt 1: Nullfall beschreiben')
 
     @property
     def Tool(self):
@@ -22,31 +23,6 @@ class TbxVornutzungbeschreiben(Tbx):
 
         params = self.par
         projekte = self.folders.get_projects()
-    	list_teilflaechen = []
-    	i=-1
-
-    	#Filterliste fUer Bedeckungsarten
-    	bodenbedeckungListe =["Ueberbaute Flaechen","Asphalt, Beton","Platten","Kleinpflaster","Wassergebundene Decke, Rasengittersteine","Offener Boden, Acker","Rasen","Baeume, Straeucher","Stauden","Wiese","Natuerliche Wasserflaeche"]
-    	bodenbedeckungListe.sort()
-    	bodenbedeckungListe = list(set(bodenbedeckungListe))
-    	#set project
-    	i+=1
-
-    	#set point
-    	i+=1 ; self.params[i].filter.list = list_teilflaechen
-
-    	heading = "01_Bodenbedeckung"
-    	i+=1 ; self.params[i].category = heading
-    	self.params[i].filter.list = bodenbedeckungListe
-    	i+=1 ; self.params[i].category = heading
-    	#i+=1 ; self.params[i].category = heading
-    	#self.params[i].filter.list = bodenbedeckungListe
-    	#i+=1 ; self.params[i].category = heading;self.params[i].enabled = 1
-
-    	heading = "02_Speichern"
-    	i+=1 ; self.params[i].category = heading
-    	i+=1 ; self.params[i].category = heading ;self.params[i].enabled = 0
-
 
         # Projekt_auswählen
         param_1 = params.projectname = arcpy.Parameter()
@@ -54,30 +30,35 @@ class TbxVornutzungbeschreiben(Tbx):
         param_1.displayName = u'Projekt ausw\xe4hlen'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
-        param_1.datatype = language('string')
+        param_1.datatype = u'GPString'
+
         param_1.filter.list = projekte
         if projekte:
             param_1.value = projekte[0]
 
         # Teilfl�che
-        param_2 = arcpy.Parameter()
+        param_2 = params.teilflaeche = arcpy.Parameter()
         param_2.name = u'Teilfl\xe4che'
         param_2.displayName = u'Teilfl\xe4che'
         param_2.parameterType = 'Required'
         param_2.direction = 'Input'
-        param_2.datatype = language('string')
+        param_2.datatype = u'GPString'
+        list_teilflaechen = []
+        param_2.filter.list = list_teilflaechen
+
+        heading = encode("01_Bodenbedeckung")
 
         # geplante_Bodenbedeckung_auf_der_Teilfl�che
-        param_3 = arcpy.Parameter()
+        param_3 = params.bodenflaeche = arcpy.Parameter()
         param_3.name = u'geplante_Bodenbedeckung_auf_der_Teilfl\xe4che'
         param_3.displayName = u'geplante Bodenbedeckung auf der Teilfl\xe4che'
         param_3.parameterType = 'Required'
         param_3.direction = 'Input'
-        param_3.datatype = language('string')
+        param_3.datatype = u'GPString'
         param_3.filter.list = [u'Ueberbaute Flaechen', u'Natuerliche Wasserflaeche', u'Platten', u'Baeume, Straeucher', u'Wassergebundene Decke, Rasengittersteine', u'Stauden', u'Wiese', u'Asphalt, Beton', u'Offener Boden, Acker', u'Kleinpflaster', u'Rasen']
 
         # geplanter_Anteil_an_der_Teilfl�che____
-        param_4 = arcpy.Parameter()
+        param_4 = params.flaechenanteil = arcpy.Parameter()
         param_4.name = u'geplanter_Anteil_an_der_Teilfl\xe4che____'
         param_4.displayName = u'geplanter Anteil an der Teilfl\xe4che (%)'
         param_4.parameterType = 'Required'
@@ -87,21 +68,25 @@ class TbxVornutzungbeschreiben(Tbx):
         param_4.filter.type = 'Range'
         param_4.filter.list = [0, 100]
 
+        heading = encode("02_Speichern")
+
         # Speichern
-        param_5 = arcpy.Parameter()
+        param_5 = params.speichern = arcpy.Parameter()
         param_5.name = u'Speichern'
         param_5.displayName = u'Speichern'
         param_5.parameterType = 'Optional'
         param_5.direction = 'Input'
-        param_5.datatype = language('boolean')
+        param_5.datatype = u'GPBoolean'
+        param_5.enabled = False
 
         # Status
-        param_6 = arcpy.Parameter()
+        param_6 = params.status = arcpy.Parameter()
         param_6.name = u'Status'
         param_6.displayName = u'Status'
         param_6.parameterType = 'Required'
         param_6.direction = 'Input'
-        param_6.datatype = language('string')
+        param_6.datatype = u'GPString'
+
 
         return params
 

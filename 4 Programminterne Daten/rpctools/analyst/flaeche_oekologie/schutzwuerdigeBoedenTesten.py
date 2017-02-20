@@ -28,9 +28,9 @@ class Ueberschneidung(Tool):
     	projektname = parameters[0].valueAsText
     	#projektname = "Bultweg_Sued_fiktiv"
     	#Pfade einrichten
-    	base_path = str(sys.path[0]).split("2_Tool")[0]
+    	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
-    	workspace_projekt = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
+    	workspace_projekt = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
     	workspace_tool = join(base_path,'2_Tool','Flaeche_und_Oekologie')
 
     	pfadNiSa = join(workspace_tool,'bodenNiSa.lyr')

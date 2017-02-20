@@ -21,7 +21,7 @@ import imp
 import arcpy
 import xlsxwriter, urllib2, json
 import time
-
+from os.path import join, isdir, abspath, dirname, basename
 from rpctools.utils.params import Tool
 import rpctools.utils.sheet_lib as sl
 import rpctools.utils.tempmdb_lib as mdb
@@ -29,24 +29,24 @@ import rpctools.utils.tempmdb_lib as mdb
 
 class KFA(Tool):
 
-    _dbname = 'FGDEinnahmen.gdb'
+    _dbname = 'FGDB_Einnahmen.gdb'
 
     def run(self):
         parameters = self.par
         arcpy.env.overwriteOutput = True
 
         # Variablen definieren
-        projektname = parameters[0].value
+        projektname = self.par.name.value
 
         #projektname = 'HCU_LKH_Brackel'
 
         #Pfade einrichten
-        base_path = str(sys.path[0]).split("2_Tool")[0]
-        workspace_projekt_definition = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
-        workspace_projekt_einnahmen = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDEinnahmen.gdb')
+        base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+        workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+        workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
 
-        projektRahmendaten = join(base_path ,"3 Benutzerdefinierte Projekte",  projektname ,"FGDB_Definition_Projekt_" + projektname +".gdb","Projektrahmendaten")
-        projektFlaeche = join(base_path ,"3 Benutzerdefinierte Projekte",  projektname ,"FGDB_Definition_Projekt_" + projektname +".gdb","Teilflaechen_Plangebiet")
+        projektRahmendaten = join(workspace_projekt_definition ,"Projektrahmendaten")
+        projektFlaeche = join(workspace_projekt_definition ,"Teilflaechen_Plangebiet")
         kfa_01_jaehrlich = join(workspace_projekt_einnahmen, "KFA_01_Jahresdaten")
         kfa_02_statisch = join(workspace_projekt_einnahmen, "KFA_02_Statische_Daten")
         projektBevoelkerung = join(projektRahmendaten, "Einwohnerzahl")
@@ -69,13 +69,13 @@ class KFA(Tool):
         projektname = parameters[0].value
 
         #Pfade einrichten
-        base_path = str(sys.path[0]).split("2_Tool")[0]
+        base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
 
-        workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
-        workspace_projekt_definition = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
-        workspace_projekt_einnahmen = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDEinnahmen.gdb')
-        workspace_tool_definition = join(base_path,"2_Tool","Art und Mass der Nutzung","FGDB_Definition_Projekt_Tool.gdb")
-        workspace_tool_einnahmen = join(base_path,"2_Tool","Einnahmen","FGDEinnahmen_Tool.gdb")
+        workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
+        workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+        workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
+        workspace_tool_definition = join(base_path,'4 Programminterne Daten','fgdbs',"FGDB_Definition_Projekt_Tool.gdb")
+        workspace_tool_einnahmen = join(base_path,'4 Programminterne Daten','fgdbs', "FGDB_Einnahmen_Tool.gdb")
 
         Teilflaechen_Plangebiet_Centroide = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_Centroide")
         Teilflaechen_Plangebiet_CentroideGK3 = join(workspace_projekt_definition, "Teilflaechen_Plangebiet_CentroideGK3")
@@ -646,7 +646,7 @@ class KFA(Tool):
         print schrittmeldung
 
         # Pfade setzen
-        logo = join((str(sys.path[0]).split("2_Tool")[0]),"1_Basisdaten","logo_rpc.png")
+        logo = join((str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]),"1_Basisdaten","logo_rpc.png")
         ausgabeordner = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'Ergebnisausgabe','Excel')
         if not os.path.exists(ausgabeordner): os.makedirs(ausgabeordner)
         excelpfad = join(ausgabeordner,'Einnahmen_Kommunaler_Finanzausgleich.xlsx')
@@ -859,9 +859,10 @@ class KFA(Tool):
 
 def getAGS(projektname):
     import arcpy,sys,os
-    base_path = str(sys.path[0]).split("2_Tool")[0]
-    projektFlaeche = join(base_path ,"3 Benutzerdefinierte Projekte",  projektname ,"FGDB_Definition_Projekt_" + projektname +".gdb","Teilflaechen_Plangebiet")
-    bkg_gemeinden = join( base_path, "1_Basisdaten","FGBD_Basisdaten_deutschland.gdb","bkg_gemeinden")
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    projektFlaeche = join(base_path ,"3 Benutzerdefinierte Projekte",  projektname ,"FGDB_Definition_Projekt.gdb","Teilflaechen_Plangebiet")
+    bkg_gemeinden = join( base_path, "4 Programminterne Daten", "fgdbs"
+,"FGDB_Basisdaten_deutschland.gdb","bkg_gemeinden")
     #ags aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird
     #1. Feature Layer aus den bkg-daten erstellen
     try:
@@ -908,8 +909,8 @@ def getAGS(projektname):
     return ags, ags_vg, ags_regenesis
 
 def ags_samtgemeinde(ags_in):
-    base_path = str(sys.path[0]).split("2_Tool")[0]
-    workspace_basisdaten = join(base_path,'1_Basisdaten','FGBD_Basisdaten_deutschland.gdb')
+    base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
+    workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
 
     VG250 = join(workspace_basisdaten,'VG250')
     where = '"AGS"'+" ='"+ ags_in + "'"
