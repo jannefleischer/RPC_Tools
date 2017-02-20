@@ -125,7 +125,7 @@ class Folders(object):
         """The Projectpath"""
         return join(self.PROJECT_PATH, self._AUSGABE_PATH)
 
-    def get_db(self, fgdb='', project=''):
+    def get_db(self, fgdb='', project=None):
         """
         A FileGeodatabase in the Project Folder
 
