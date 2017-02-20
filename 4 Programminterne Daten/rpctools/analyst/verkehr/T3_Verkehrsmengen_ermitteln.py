@@ -80,7 +80,7 @@ class VerkehrsmengenErmitteln(Tool):
     	workspace_projekt = join(base_path,'3 Benutzerdefinierte Projekte',projektname)
     	workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
     	workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
-    	workspace_projekt_verkehr = self.folders.get_db('FGDB_Verkehr.gdb')
+    	workspace_projekt_verkehr = self.folders.get_db('FGDB_Verkehr.gdb', projektname)
 
     	# Layers and Tables
     	out_folder_path = join(workspace_projekt,"temp") # Pfad zur temporaeren mdb inkl.

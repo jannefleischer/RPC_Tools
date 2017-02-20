@@ -72,7 +72,7 @@ class Kostenmodell(Tool):
 
 
         kosten_tool = self.folders.get_basedb("FGDB_Kosten_Tool.gdb")
-        kosten_projekt = self.folders.get_db("FGDB_Kosten.gdb")
+        kosten_projekt = self.folders.get_db("FGDB_Kosten.gdb", projektname)
 
         tablepath_costrules_project = join(kosten_projekt,'Projektspez_Kostenauft')
 
@@ -110,8 +110,8 @@ class Kostenmodell(Tool):
         #-----------------------
 
         #Pfade einrichten
-        workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb')
-        workspace_projekt_kosten = self.folders.get_db('FGDB_Kosten.gdb')
+        workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+        workspace_projekt_kosten = self.folders.get_db('FGDB_Kosten.gdb', projektname)
         workspace_tool_kosten = self.folders.get_basedb("FGDB_Kosten_Tool.gdb")
 
         flaechenbilanz_planung = join(workspace_projekt_definition,'Flaechenbilanz')

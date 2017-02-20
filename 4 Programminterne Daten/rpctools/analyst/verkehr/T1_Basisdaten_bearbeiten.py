@@ -37,7 +37,7 @@ class Basisdatenbearbeiten(Tool):
 
         base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0] # Pfad zum Basisverzeichnis RPC
         workspace_projekt_definition =  self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
-        workspace_projekt_verkehr = self.folders.get_db('FGDB_Verkehr.gdb')
+        workspace_projekt_verkehr = self.folders.get_db('FGDB_Verkehr.gdb', projektname)
         directory_tool_verkehr = join(base_path,'4 Programminterne Daten','rpctools', 'analyst', 'verkehr')
 
         #Abgeleitete Variablen

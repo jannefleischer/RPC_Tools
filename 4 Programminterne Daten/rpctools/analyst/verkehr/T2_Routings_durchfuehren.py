@@ -48,7 +48,7 @@ class Routingsdurchfuehren(Tool):
     	base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0] # Pfad zum Basisverzeichnis RPC
     	workspace_projekt = join(base_path,'3 Benutzerdefinierte Projekte',projektname)
     	workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
-    	workspace_projekt_verkehr = self.folders.get_db('FGDB_Verkehr.gdb')
+    	workspace_projekt_verkehr = self.folders.get_db('FGDB_Verkehr.gdb', projektname)
     	workspace_tool_verkehr = join(base_path,'4 Programminterne Daten','fgdbs',"Verkehr_Tool.gdb")
 
     	# Layers and Tables
