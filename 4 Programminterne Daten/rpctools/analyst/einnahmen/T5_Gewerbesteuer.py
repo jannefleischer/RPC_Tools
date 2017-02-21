@@ -22,7 +22,7 @@ import json
 from os.path import join, isdir, abspath, dirname, basename
 import arcpy
 import xlsxwriter
-from rpctools.utils.params import Message as messages
+from rpctools.utils.params import Message
 from rpctools.utils.params import Tool
 import rpctools.utils.sheet_lib as sl
 import rpctools.utils.tempmdb_lib as mdb
@@ -66,13 +66,13 @@ class Gewerbesteuer(Tool):
         #
         #############################################################################################################
         beginmeldung = 'Durchlauf Gewerbesteuer \n'
-        arcpy.AddMessage(beginmeldung)
+        Message.AddMessage(beginmeldung)
         print beginmeldung
 
         #############################################################################################################
         # Schritt 1
         schrittmeldung = 'Ermittle Gewerbesteuer und Anzahl Arbeitsplaetze \n'
-        arcpy.AddMessage(schrittmeldung)
+        Message.AddMessage(schrittmeldung)
         print schrittmeldung
 
 
