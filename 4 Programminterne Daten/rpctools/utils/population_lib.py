@@ -16,14 +16,13 @@
 import rpctools.utils.tempmdb_lib as mdb
 from os.path import join
 import arcpy, os, imp, sys
-import rpctools.utils.config
 
 def recalcPopulation(projektname):
 
     #get Paths
 
     base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
-    workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
+    workspace_projekt_definition = join(base_path,'3 Benutzerdefinierte Projekte',projektname,'FGDB_Definition_Projekt.gdb')
 
     #WOHNEN - EINWOHNERBERECHNUNG
 
