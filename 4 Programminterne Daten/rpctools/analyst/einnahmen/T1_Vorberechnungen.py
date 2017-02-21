@@ -625,7 +625,7 @@ def getAGS(projektname):
 def getReGenesisAGS(ags_input, verbandsgemeinde, RS):
     #Weiche nach Bundeslaendern und gemeinschaftsangehoerigen Gemeinden
     base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
-    workspace_basisdaten = self.folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')
+    workspace_basisdaten = join(base_path,'4 Programminterne Daten','fgdbs','FGDB_Basisdaten_deutschland.gdb')
     VG250 = join(workspace_basisdaten,'VG250')
     where = '"AGS"'+" ='"+ ags_input + "'"
 
