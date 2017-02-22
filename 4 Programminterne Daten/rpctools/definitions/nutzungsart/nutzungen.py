@@ -7,6 +7,7 @@ import imp
 import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell, xl_col_to_name
 import arcpy, os
+from os.path import join
 import gc
 from rpctools.utils.params import Tool
 
@@ -249,9 +250,9 @@ class Nutzungen(Tool):
 
             #Pfade anlegen
             base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0]
-            shape_bkggemeiden=join(base_path,'1_Basisdaten','FGDB_Basisdaten_deutschland.gdb','bkg_gemeinden')
-            workspace_Basis_Daten_Versor=join(base_path,'2_Tool',"Standortkonkurrenz_Supermaerkte",'FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
-            workspace_Basis_Daten=join(base_path,'2_Tool',"Art und Mass der Nutzung",'FGDB_Definition_Projekt_Tool.gdb')
+            shape_bkggemeiden=join(base_path,'4 Programminterne Daten','fgdbs','FGDB_Basisdaten_deutschland.gdb','bkg_gemeinden')
+            workspace_Basis_Daten_Versor=join(base_path,'4 Programminterne Daten','fgdbs','FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
+            workspace_Basis_Daten=join(base_path,'4 Programminterne Daten','fgdbs','FGDB_Definition_Projekt_Tool.gdb')
             shape_teilflaeche = self.folders.get_table('Teilflaechen_Plangebiet')
             workspace_definition= join(self.folders.get_projectpath(), 'FGDB_Definition_Projekt.gdb')
 
@@ -708,39 +709,20 @@ class Nutzungen(Tool):
                 aufsiedlungsdauer = str(aufsiedlungsdauer)
 
                 sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
+                tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer, sql)
+                row2 = tabelle_parameter_aufsiedlungsdauer_Search.next()
                 row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
 
-                row3.anzahl_betriebe_jahr_0 = anzahl_betriebe_start * parameter_jahr1
-                row3.anzahl_betriebe_jahr_1 = anzahl_betriebe_start * parameter_jahr2
-                row3.anzahl_betriebe_jahr_2 = anzahl_betriebe_start * parameter_jahr3
-                row3.anzahl_betriebe_jahr_3 = anzahl_betriebe_start * parameter_jahr4
-                row3.anzahl_betriebe_jahr_4 = anzahl_betriebe_start * parameter_jahr5
-                row3.anzahl_betriebe_jahr_5 = anzahl_betriebe_start * parameter_jahr6
-                row3.anzahl_betriebe_jahr_6 = anzahl_betriebe_start * parameter_jahr7
-                row3.anzahl_betriebe_jahr_7 = anzahl_betriebe_start * parameter_jahr8
-                row3.anzahl_betriebe_jahr_8 = anzahl_betriebe_start * parameter_jahr9
-                row3.anzahl_betriebe_jahr_9 = anzahl_betriebe_start * parameter_jahr10
-                row3.anzahl_betriebe_jahr_10 = anzahl_betriebe_start * parameter_jahr11
-                row3.anzahl_betriebe_jahr_11 = anzahl_betriebe_start * parameter_jahr12
-                row3.anzahl_betriebe_jahr_12 = anzahl_betriebe_start * parameter_jahr13
-                row3.anzahl_betriebe_jahr_13 = anzahl_betriebe_start * parameter_jahr14
-                row3.anzahl_betriebe_jahr_14 = anzahl_betriebe_start * parameter_jahr15
-                row3.anzahl_betriebe_jahr_15 = anzahl_betriebe_start * parameter_jahr16
-                row3.anzahl_betriebe_jahr_16 = anzahl_betriebe_start * parameter_jahr17
-                row3.anzahl_betriebe_jahr_17 = anzahl_betriebe_start * parameter_jahr18
-                row3.anzahl_betriebe_jahr_18 = anzahl_betriebe_start * parameter_jahr19
-                row3.anzahl_betriebe_jahr_19 = anzahl_betriebe_start * parameter_jahr20
-                row3.anzahl_betriebe_jahr_20 = anzahl_betriebe_start * parameter_jahr21
-                row3.anzahl_betriebe_jahr_21 = anzahl_betriebe_start * parameter_jahr22
-                row3.anzahl_betriebe_jahr_22 = anzahl_betriebe_start * parameter_jahr23
-                row3.anzahl_betriebe_jahr_23 = anzahl_betriebe_start * parameter_jahr24
-                row3.anzahl_betriebe_jahr_24 = anzahl_betriebe_start * parameter_jahr25
-                row3.anzahl_betriebe_jahr_25 = anzahl_betriebe_start * parameter_jahr26
-                row3.anzahl_betriebe_jahr_26 = anzahl_betriebe_start * parameter_jahr27
-                row3.anzahl_betriebe_jahr_27 = anzahl_betriebe_start * parameter_jahr28
-                row3.anzahl_betriebe_jahr_28 = anzahl_betriebe_start * parameter_jahr29
-                row3.anzahl_betriebe_jahr_29 = anzahl_betriebe_start * parameter_jahr30
-                row3.anzahl_betriebe_jahr_30 = anzahl_betriebe_start * parameter_jahr30
+                # setze Parameter Anzahl Betriebe für jedes Jahr
+                YEARS = 30
+                for i in range(YEARS):
+                    parameter_jahr = getattr(row2, 'Jahr{}'.format(i+1))
+                    value = anzahl_betriebe_start * parameter_jahr
+                    setattr(row3, 'anzahl_betriebe_jahr_{}'.format(i), value)
+                setattr(row3, 'anzahl_betriebe_jahr_{}'.format(i + 1), value)
+
+                del tabelle_parameter_aufsiedlungsdauer_Search
+
                 row3.projekt = projektname
                 row3.teilflaeche = teilflaeche
                 row3.branche = "F"
@@ -751,42 +733,23 @@ class Nutzungen(Tool):
 
                 #für Branche G
                 anzahl_betriebe_start = Anz_Betr_HanKfZ
+                tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer, sql)
+                row2 = tabelle_parameter_aufsiedlungsdauer_Search.next()
                 aufsiedlungsdauer = str(aufsiedlungsdauer)
 
                 sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
                 row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
 
-                row3.anzahl_betriebe_jahr_0 = anzahl_betriebe_start * parameter_jahr1
-                row3.anzahl_betriebe_jahr_1 = anzahl_betriebe_start * parameter_jahr2
-                row3.anzahl_betriebe_jahr_2 = anzahl_betriebe_start * parameter_jahr3
-                row3.anzahl_betriebe_jahr_3 = anzahl_betriebe_start * parameter_jahr4
-                row3.anzahl_betriebe_jahr_4 = anzahl_betriebe_start * parameter_jahr5
-                row3.anzahl_betriebe_jahr_5 = anzahl_betriebe_start * parameter_jahr6
-                row3.anzahl_betriebe_jahr_6 = anzahl_betriebe_start * parameter_jahr7
-                row3.anzahl_betriebe_jahr_7 = anzahl_betriebe_start * parameter_jahr8
-                row3.anzahl_betriebe_jahr_8 = anzahl_betriebe_start * parameter_jahr9
-                row3.anzahl_betriebe_jahr_9 = anzahl_betriebe_start * parameter_jahr10
-                row3.anzahl_betriebe_jahr_10 = anzahl_betriebe_start * parameter_jahr11
-                row3.anzahl_betriebe_jahr_11 = anzahl_betriebe_start * parameter_jahr12
-                row3.anzahl_betriebe_jahr_12 = anzahl_betriebe_start * parameter_jahr13
-                row3.anzahl_betriebe_jahr_13 = anzahl_betriebe_start * parameter_jahr14
-                row3.anzahl_betriebe_jahr_14 = anzahl_betriebe_start * parameter_jahr15
-                row3.anzahl_betriebe_jahr_15 = anzahl_betriebe_start * parameter_jahr16
-                row3.anzahl_betriebe_jahr_16 = anzahl_betriebe_start * parameter_jahr17
-                row3.anzahl_betriebe_jahr_17 = anzahl_betriebe_start * parameter_jahr18
-                row3.anzahl_betriebe_jahr_18 = anzahl_betriebe_start * parameter_jahr19
-                row3.anzahl_betriebe_jahr_19 = anzahl_betriebe_start * parameter_jahr20
-                row3.anzahl_betriebe_jahr_20 = anzahl_betriebe_start * parameter_jahr21
-                row3.anzahl_betriebe_jahr_21 = anzahl_betriebe_start * parameter_jahr22
-                row3.anzahl_betriebe_jahr_22 = anzahl_betriebe_start * parameter_jahr23
-                row3.anzahl_betriebe_jahr_23 = anzahl_betriebe_start * parameter_jahr24
-                row3.anzahl_betriebe_jahr_24 = anzahl_betriebe_start * parameter_jahr25
-                row3.anzahl_betriebe_jahr_25 = anzahl_betriebe_start * parameter_jahr26
-                row3.anzahl_betriebe_jahr_26 = anzahl_betriebe_start * parameter_jahr27
-                row3.anzahl_betriebe_jahr_27 = anzahl_betriebe_start * parameter_jahr28
-                row3.anzahl_betriebe_jahr_28 = anzahl_betriebe_start * parameter_jahr29
-                row3.anzahl_betriebe_jahr_29 = anzahl_betriebe_start * parameter_jahr30
-                row3.anzahl_betriebe_jahr_30 = anzahl_betriebe_start * parameter_jahr30
+                # setze Parameter Anzahl Betriebe für jedes Jahr
+                YEARS = 30
+                for i in range(YEARS):
+                    parameter_jahr = getattr(row2, 'Jahr{}'.format(i+1))
+                    value = anzahl_betriebe_start * parameter_jahr
+                    setattr(row3, 'anzahl_betriebe_jahr_{}'.format(i), value)
+                setattr(row3, 'anzahl_betriebe_jahr_{}'.format(i + 1), value)
+
+                del tabelle_parameter_aufsiedlungsdauer_Search
+
                 row3.projekt = projektname
                 row3.teilflaeche = teilflaeche
                 row3.branche = "G"
@@ -800,39 +763,20 @@ class Nutzungen(Tool):
                 aufsiedlungsdauer = str(aufsiedlungsdauer)
 
                 sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
+                tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer, sql)
+                row2 = tabelle_parameter_aufsiedlungsdauer_Search.next()
                 row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
 
-                row3.anzahl_betriebe_jahr_0 = anzahl_betriebe_start * parameter_jahr1
-                row3.anzahl_betriebe_jahr_1 = anzahl_betriebe_start * parameter_jahr2
-                row3.anzahl_betriebe_jahr_2 = anzahl_betriebe_start * parameter_jahr3
-                row3.anzahl_betriebe_jahr_3 = anzahl_betriebe_start * parameter_jahr4
-                row3.anzahl_betriebe_jahr_4 = anzahl_betriebe_start * parameter_jahr5
-                row3.anzahl_betriebe_jahr_5 = anzahl_betriebe_start * parameter_jahr6
-                row3.anzahl_betriebe_jahr_6 = anzahl_betriebe_start * parameter_jahr7
-                row3.anzahl_betriebe_jahr_7 = anzahl_betriebe_start * parameter_jahr8
-                row3.anzahl_betriebe_jahr_8 = anzahl_betriebe_start * parameter_jahr9
-                row3.anzahl_betriebe_jahr_9 = anzahl_betriebe_start * parameter_jahr10
-                row3.anzahl_betriebe_jahr_10 = anzahl_betriebe_start * parameter_jahr11
-                row3.anzahl_betriebe_jahr_11 = anzahl_betriebe_start * parameter_jahr12
-                row3.anzahl_betriebe_jahr_12 = anzahl_betriebe_start * parameter_jahr13
-                row3.anzahl_betriebe_jahr_13 = anzahl_betriebe_start * parameter_jahr14
-                row3.anzahl_betriebe_jahr_14 = anzahl_betriebe_start * parameter_jahr15
-                row3.anzahl_betriebe_jahr_15 = anzahl_betriebe_start * parameter_jahr16
-                row3.anzahl_betriebe_jahr_16 = anzahl_betriebe_start * parameter_jahr17
-                row3.anzahl_betriebe_jahr_17 = anzahl_betriebe_start * parameter_jahr18
-                row3.anzahl_betriebe_jahr_18 = anzahl_betriebe_start * parameter_jahr19
-                row3.anzahl_betriebe_jahr_19 = anzahl_betriebe_start * parameter_jahr20
-                row3.anzahl_betriebe_jahr_20 = anzahl_betriebe_start * parameter_jahr21
-                row3.anzahl_betriebe_jahr_21 = anzahl_betriebe_start * parameter_jahr22
-                row3.anzahl_betriebe_jahr_22 = anzahl_betriebe_start * parameter_jahr23
-                row3.anzahl_betriebe_jahr_23 = anzahl_betriebe_start * parameter_jahr24
-                row3.anzahl_betriebe_jahr_24 = anzahl_betriebe_start * parameter_jahr25
-                row3.anzahl_betriebe_jahr_25 = anzahl_betriebe_start * parameter_jahr26
-                row3.anzahl_betriebe_jahr_26 = anzahl_betriebe_start * parameter_jahr27
-                row3.anzahl_betriebe_jahr_27 = anzahl_betriebe_start * parameter_jahr28
-                row3.anzahl_betriebe_jahr_28 = anzahl_betriebe_start * parameter_jahr29
-                row3.anzahl_betriebe_jahr_29 = anzahl_betriebe_start * parameter_jahr30
-                row3.anzahl_betriebe_jahr_30 = anzahl_betriebe_start * parameter_jahr30
+                # setze Parameter Anzahl Betriebe für jedes Jahr
+                YEARS = 30
+                for i in range(YEARS):
+                    parameter_jahr = getattr(row2, 'Jahr{}'.format(i+1))
+                    value = anzahl_betriebe_start * parameter_jahr
+                    setattr(row3, 'anzahl_betriebe_jahr_{}'.format(i), value)
+                setattr(row3, 'anzahl_betriebe_jahr_{}'.format(i + 1), value)
+
+                del tabelle_parameter_aufsiedlungsdauer_Search
+
                 row3.projekt = projektname
                 row3.teilflaeche = teilflaeche
                 row3.branche = "H"
@@ -845,39 +789,20 @@ class Nutzungen(Tool):
                 aufsiedlungsdauer = str(aufsiedlungsdauer)
 
                 sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
+                tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer, sql)
+                row2 = tabelle_parameter_aufsiedlungsdauer_Search.next()
                 row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
 
-                row3.anzahl_betriebe_jahr_0 = anzahl_betriebe_start * parameter_jahr1
-                row3.anzahl_betriebe_jahr_1 = anzahl_betriebe_start * parameter_jahr2
-                row3.anzahl_betriebe_jahr_2 = anzahl_betriebe_start * parameter_jahr3
-                row3.anzahl_betriebe_jahr_3 = anzahl_betriebe_start * parameter_jahr4
-                row3.anzahl_betriebe_jahr_4 = anzahl_betriebe_start * parameter_jahr5
-                row3.anzahl_betriebe_jahr_5 = anzahl_betriebe_start * parameter_jahr6
-                row3.anzahl_betriebe_jahr_6 = anzahl_betriebe_start * parameter_jahr7
-                row3.anzahl_betriebe_jahr_7 = anzahl_betriebe_start * parameter_jahr8
-                row3.anzahl_betriebe_jahr_8 = anzahl_betriebe_start * parameter_jahr9
-                row3.anzahl_betriebe_jahr_9 = anzahl_betriebe_start * parameter_jahr10
-                row3.anzahl_betriebe_jahr_10 = anzahl_betriebe_start * parameter_jahr11
-                row3.anzahl_betriebe_jahr_11 = anzahl_betriebe_start * parameter_jahr12
-                row3.anzahl_betriebe_jahr_12 = anzahl_betriebe_start * parameter_jahr13
-                row3.anzahl_betriebe_jahr_13 = anzahl_betriebe_start * parameter_jahr14
-                row3.anzahl_betriebe_jahr_14 = anzahl_betriebe_start * parameter_jahr15
-                row3.anzahl_betriebe_jahr_15 = anzahl_betriebe_start * parameter_jahr16
-                row3.anzahl_betriebe_jahr_16 = anzahl_betriebe_start * parameter_jahr17
-                row3.anzahl_betriebe_jahr_17 = anzahl_betriebe_start * parameter_jahr18
-                row3.anzahl_betriebe_jahr_18 = anzahl_betriebe_start * parameter_jahr19
-                row3.anzahl_betriebe_jahr_19 = anzahl_betriebe_start * parameter_jahr20
-                row3.anzahl_betriebe_jahr_20 = anzahl_betriebe_start * parameter_jahr21
-                row3.anzahl_betriebe_jahr_21 = anzahl_betriebe_start * parameter_jahr22
-                row3.anzahl_betriebe_jahr_22 = anzahl_betriebe_start * parameter_jahr23
-                row3.anzahl_betriebe_jahr_23 = anzahl_betriebe_start * parameter_jahr24
-                row3.anzahl_betriebe_jahr_24 = anzahl_betriebe_start * parameter_jahr25
-                row3.anzahl_betriebe_jahr_25 = anzahl_betriebe_start * parameter_jahr26
-                row3.anzahl_betriebe_jahr_26 = anzahl_betriebe_start * parameter_jahr27
-                row3.anzahl_betriebe_jahr_27 = anzahl_betriebe_start * parameter_jahr28
-                row3.anzahl_betriebe_jahr_28 = anzahl_betriebe_start * parameter_jahr29
-                row3.anzahl_betriebe_jahr_29 = anzahl_betriebe_start * parameter_jahr30
-                row3.anzahl_betriebe_jahr_30 = anzahl_betriebe_start * parameter_jahr30
+                # setze Parameter Anzahl Betriebe für jedes Jahr
+                YEARS = 30
+                for i in range(YEARS):
+                    parameter_jahr = getattr(row2, 'Jahr{}'.format(i+1))
+                    value = anzahl_betriebe_start * parameter_jahr
+                    setattr(row3, 'anzahl_betriebe_jahr_{}'.format(i), value)
+                setattr(row3, 'anzahl_betriebe_jahr_{}'.format(i + 1), value)
+
+                del tabelle_parameter_aufsiedlungsdauer_Search
+
                 row3.projekt = projektname
                 row3.teilflaeche = teilflaeche
                 row3.branche = "M"
@@ -885,51 +810,32 @@ class Nutzungen(Tool):
 
                 tabelle_gewerbe_betriebsstruktur_Insert.insertRow(row3)
 
+
                 #für Branche N
                 anzahl_betriebe_start = Anz_Betr_SoDi
+                tabelle_parameter_aufsiedlungsdauer_Search = arcpy.SearchCursor(tabelle_parameter_aufsiedlungsdauer, sql)
+                row2 = tabelle_parameter_aufsiedlungsdauer_Search.next()
                 aufsiedlungsdauer = str(aufsiedlungsdauer)
 
                 sql = "Dauer_Jahre = " + str(aufsiedlungsdauer)
                 row3 = tabelle_gewerbe_betriebsstruktur_Insert.newRow()
 
-                row3.anzahl_betriebe_jahr_0 = anzahl_betriebe_start * parameter_jahr1
-                row3.anzahl_betriebe_jahr_1 = anzahl_betriebe_start * parameter_jahr2
-                row3.anzahl_betriebe_jahr_2 = anzahl_betriebe_start * parameter_jahr3
-                row3.anzahl_betriebe_jahr_3 = anzahl_betriebe_start * parameter_jahr4
-                row3.anzahl_betriebe_jahr_4 = anzahl_betriebe_start * parameter_jahr5
-                row3.anzahl_betriebe_jahr_5 = anzahl_betriebe_start * parameter_jahr6
-                row3.anzahl_betriebe_jahr_6 = anzahl_betriebe_start * parameter_jahr7
-                row3.anzahl_betriebe_jahr_7 = anzahl_betriebe_start * parameter_jahr8
-                row3.anzahl_betriebe_jahr_8 = anzahl_betriebe_start * parameter_jahr9
-                row3.anzahl_betriebe_jahr_9 = anzahl_betriebe_start * parameter_jahr10
-                row3.anzahl_betriebe_jahr_10 = anzahl_betriebe_start * parameter_jahr11
-                row3.anzahl_betriebe_jahr_11 = anzahl_betriebe_start * parameter_jahr12
-                row3.anzahl_betriebe_jahr_12 = anzahl_betriebe_start * parameter_jahr13
-                row3.anzahl_betriebe_jahr_13 = anzahl_betriebe_start * parameter_jahr14
-                row3.anzahl_betriebe_jahr_14 = anzahl_betriebe_start * parameter_jahr15
-                row3.anzahl_betriebe_jahr_15 = anzahl_betriebe_start * parameter_jahr16
-                row3.anzahl_betriebe_jahr_16 = anzahl_betriebe_start * parameter_jahr17
-                row3.anzahl_betriebe_jahr_17 = anzahl_betriebe_start * parameter_jahr18
-                row3.anzahl_betriebe_jahr_18 = anzahl_betriebe_start * parameter_jahr19
-                row3.anzahl_betriebe_jahr_19 = anzahl_betriebe_start * parameter_jahr20
-                row3.anzahl_betriebe_jahr_20 = anzahl_betriebe_start * parameter_jahr21
-                row3.anzahl_betriebe_jahr_21 = anzahl_betriebe_start * parameter_jahr22
-                row3.anzahl_betriebe_jahr_22 = anzahl_betriebe_start * parameter_jahr23
-                row3.anzahl_betriebe_jahr_23 = anzahl_betriebe_start * parameter_jahr24
-                row3.anzahl_betriebe_jahr_24 = anzahl_betriebe_start * parameter_jahr25
-                row3.anzahl_betriebe_jahr_25 = anzahl_betriebe_start * parameter_jahr26
-                row3.anzahl_betriebe_jahr_26 = anzahl_betriebe_start * parameter_jahr27
-                row3.anzahl_betriebe_jahr_27 = anzahl_betriebe_start * parameter_jahr28
-                row3.anzahl_betriebe_jahr_28 = anzahl_betriebe_start * parameter_jahr29
-                row3.anzahl_betriebe_jahr_29 = anzahl_betriebe_start * parameter_jahr30
-                row3.anzahl_betriebe_jahr_30 = anzahl_betriebe_start * parameter_jahr30
+                # setze Parameter Anzahl Betriebe für jedes Jahr
+                YEARS = 30
+                for i in range(YEARS):
+                    parameter_jahr = getattr(row2, 'Jahr{}'.format(i+1))
+                    value = anzahl_betriebe_start * parameter_jahr
+                    setattr(row3, 'anzahl_betriebe_jahr_{}'.format(i), value)
+                setattr(row3, 'anzahl_betriebe_jahr_{}'.format(i + 1), value)
+
+                del tabelle_parameter_aufsiedlungsdauer_Search
+
                 row3.projekt = projektname
                 row3.teilflaeche = teilflaeche
                 row3.branche = "N"
                 row3.ID_ts = timestamp
 
                 tabelle_gewerbe_betriebsstruktur_Insert.insertRow(row3)
-
 
 
                 #### Aufsiedlugnsdauer Beschäftigte
