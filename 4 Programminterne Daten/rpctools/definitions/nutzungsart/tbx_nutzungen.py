@@ -382,6 +382,14 @@ class TbxNutzungen(Tbx):
         validation is performed.  This method is called whenever a parameter
         has been changed."""
 
+        # Update Projects
+        projects = self.folders.get_projects()
+        params.projectname.filter.list = projects
+        if len(projects) != 0:
+            params.projectname.value = projects[0]
+        else:
+            params.projectname.value = ''
+
         def eingaben_auslesen():
 
             projectname = self.par.projectname.value

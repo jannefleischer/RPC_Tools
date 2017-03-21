@@ -33,6 +33,7 @@ class TbxProjektVerwaltung(Tbx):
         p.filter.list = ['Neues Projekt anlegen',
                                      'Bestehendes Projekt kopieren',
                                      encode('Bestehendes Projekt löschen')]
+        p.value = p.filter.list[0]
 
         projects = self.folders.get_projects()
 
@@ -147,5 +148,5 @@ class TbxProjektVerwaltung(Tbx):
 
 if __name__ == '__main__':
     t=TbxProjektVerwaltung()
-    params =t.getParameterInfo()
+    params = t.getParameterInfo()
     print(t.print_test_parameters())

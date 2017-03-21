@@ -26,13 +26,13 @@ class TbxFlaechenbilanz(Tbx):
     def _getParameterInfo(self):
         # Projektname
         params = self.par
-        projekte = self.folders.get_projects()
         p = params.projectname = arcpy.Parameter()
         p.name = u'Projektname'
         p.displayName = u'Projektname'
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'GPString'
+        projekte = self.folders.get_projects()
         p.filter.list = projekte
         if projekte:
             p.value = projekte[0]
@@ -320,6 +320,13 @@ class TbxFlaechenbilanz(Tbx):
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
         has been changed."""
+
+        projects = self.folders.get_projects()
+        params.projectname.filter.list = projects
+        if len(projects) != 0:
+            params.projectname.value = projects[0]
+        else:
+            params.projectname.value = ''
 
         # Auswahl Teilfläche
         if params.projectname.altered and not params.projectname.hasBeenValidated:

@@ -16,7 +16,6 @@ import sys
 from os.path import abspath, dirname, join, isdir
 from rpctools.utils.params import Tool
 import arcpy
-
 import os, shutil, gc
 
 
@@ -37,6 +36,8 @@ class Projektverwaltung(Tool):
 
         else:
             self.projekt_loeschen()
+
+
 
     @property
     def teilflaeche(self):
@@ -127,8 +128,11 @@ class Projektverwaltung(Tool):
             arcpy.AddMessage(e)
             print e
             arcpy.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
-            arcpy.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
-            arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
+            arcpy.AddMessage("Es scheint bereits ein Projekt mit diesem " +
+                             "Namen zu existieren")
+            arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein oder " +
+                             "nutzen Sie die 'Projekt löschen' Funktion in " +
+                             "der Toolbox")
             sys.exit()
 
         # If shapefile was uploaded, add to gdb

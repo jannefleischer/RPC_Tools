@@ -30,7 +30,7 @@ class TbxTeilflaecheBenennen(Tbx):
         p.datatype = u'GPString'
         projects = self.folders.get_projects()
         p.filter.list = projects
-        p.value = p.filter.list[0]
+        p.value = '' if len(projects) == 0 else p.filter.list[0]
 
         # Teilfläche
         p = params.teilflaeche = arcpy.Parameter()
@@ -56,6 +56,13 @@ class TbxTeilflaecheBenennen(Tbx):
         validation is performed.  This method is called whenever a parameter
         has been changed."""
         #Projekt auswählen
+
+        projects = self.folders.get_projects()
+        params.project.filter.list = projects
+        if len(projects) != 0:
+            params.project.value = projects[0]
+        else:
+            params.project.value = ''
 
         if params.project.altered and not params.project.hasBeenValidated:
             projects = self.folders.get_projects()
@@ -108,6 +115,7 @@ class TbxTeilflaecheBenennen(Tbx):
 
 
 if __name__ == '__main__':
+
     t = TbxTeilflaecheBenennen()
     params = t.getParameterInfo()
     t.print_test_parameters()

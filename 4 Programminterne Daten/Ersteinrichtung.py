@@ -77,4 +77,4 @@ def install_packages(python_path):
     raw_input()
     sys.exit()
 
-install_packages('C:\\Python27\\ArcGIS10.2')
+install_packages('C:\\Python27\\ArcGIS10.4')
