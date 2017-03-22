@@ -14,7 +14,7 @@ import pytest
 @pytest.fixture(scope='module')
 def tbx_verwaltung():
     tbx = TbxProjektVerwaltung()
-    tbx._getParameterInfo()
+    tbx.getParameterInfo()
     return tbx
 
 @pytest.fixture(scope='module')
@@ -29,7 +29,7 @@ def tbx_flaeche():
 def flaechenname():
     return 'Nr. 1 | 50.77 ha | Flaeche_1'
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def params_verwaltung(tbx_verwaltung, test_name):
     params = tbx_verwaltung.par
     params.begin.value = 2010
@@ -65,6 +65,10 @@ def test3_loeschen(params_verwaltung, mocked_map_document):
     params_verwaltung.action.value = "Bestehendes Projekt löschen"
     Projektverwaltung(params_verwaltung).run()
 
-if __name__ == '__main__':
-    pytest.main([__file__])
+
+def test_try():
+    assert False
+
+#if __name__ == '__main__':
+#    pytest.main([__file__])
 

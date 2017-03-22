@@ -17,7 +17,7 @@ import pytest
 @pytest.fixture(scope='module')
 def tbx_bilanz(test_name):
     tbx = TbxFlaechenbilanz()
-    tbx._getParameterInfo()
+    tbx.getParameterInfo()
     tbx.par.projectname.value = test_name
     return tbx
 
