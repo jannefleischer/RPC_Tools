@@ -1,16 +1,45 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import T1_Vorberechnungen
-import T2_Einkommensteuer
-import T3_Familienleistungsausgleich
-import T4_Grundsteuer
-import T5_Gewerbesteuer
-import T6_KFA
-import T7_KRU
+import pytest
 import arcpy, csv, shutil, os
+from os.path import join
 
-PROJECT_FOLDER = join(os.getcwd().split("2 Planungsprojekte analysieren")[0], "3 Benutzerdefinierte Projekte")
+from rpctools.analyst.einnahmen.T1_Vorberechnungen import Vorberechnungen
+from rpctools.analyst.einnahmen.tbx_einnahmen import TbxVorberechnungen
+
+from rpctools.analyst.einnahmen.T2_Einkommensteuer import Einkommenssteuer
+from rpctools.analyst.einnahmen.T3_Familienleistungsausgleich \
+     import  Familienleistungsausgleich
+from rpctools.analyst.einnahmen.T4_Grundsteuer import Grundsteuer
+from rpctools.analyst.einnahmen.T5_Gewerbesteuer import Gewerbesteuer
+from rpctools.analyst.einnahmen.T6_KFA import KFA
+from rpctools.analyst.einnahmen.T7_KRU import KRU
+from rpctools.utils.config import Folders
+from test_lib import (test_name, test_name, setup_template_dir)
+
+
+"""
+TODO
+"""
+
+@pytest.fixture(scope='module')
+def tbx_vorberechnungen():
+    tbx = TbxVorberechnungen()
+    params = tbx.getParameterInfo()
+    tbx.updateParameterInfo(params)
+    return tbx
+
+@pytest.fixture(scope='module')
+def params_vorbetrachtungen(tbx_vorberechnungen):
+    params = tbx_vorberechnungen.par
+    params.name.value =
+
+"""
+TODO
+"""
+folders = Folders()
+PROJECT_FOLDER = folders.PROJECT_BASE_PATH
 TEST_TEMPLATE = 'Test_Template'
 PROJECT_TMP = '__unittest__'
 
@@ -38,6 +67,9 @@ def to_arcpy_params(lst):
     return arcpy_params
 
 
+
+
+
 class TestBEinnahmen(unittest.TestCase):
 
     @classmethod
@@ -49,8 +81,8 @@ class TestBEinnahmen(unittest.TestCase):
             shutil.rmtree(tmp_project_folder)
         shutil.copytree(
             join(PROJECT_FOLDER, TEST_TEMPLATE),
-            join(tmp_project_folder)
-        )
+            tmp_project_folder)
+
 
     def test1_vorberechnungen(self):
         params = load_csv_params(params_vorberechnungen_csv, params_common)

@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-import pytest
-from rpctools.analyst.infrastrukturkosten.tbx_kostenermittlung import TbxInfrastrukturkostenermittlung
-from rpctools.analyst.infrastrukturkosten.tbx_aufteilungsregeln import TbxKostenaufteilungsregeln
-from rpctools.analyst.infrastrukturkosten.tbx_aufteilungsregeln import ACTIONS
-from rpctools.analyst.infrastrukturkosten.kostenmodell import Kostenmodell
-from rpctools.analyst.infrastrukturkosten.tbx_aufteilungsregeln import Kostenregeln
 
-from test_lib import (test_name, test_name,
-                      setup_template_dir)
+import pytest
 import gc
+
+from rpctools.analyst.infrastrukturkosten.tbx_kostenermittlung \
+     import TbxInfrastrukturkostenermittlung
+from rpctools.analyst.infrastrukturkosten.tbx_aufteilungsregeln \
+     import TbxKostenaufteilungsregeln, Kostenregeln, ACTIONS
+from rpctools.analyst.infrastrukturkosten.kostenmodell import Kostenmodell
+from test_lib import test_name, test_name, setup_template_dir
+
 
 ### get the toolboxes with their parameters ###
 

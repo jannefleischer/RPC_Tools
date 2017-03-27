@@ -34,11 +34,11 @@ def infosheet(projektname, wirkungsfeld, wb):
     logo = join(folders.BASE_DBS, u"Erläuterungstexte", "logo_rpc.png")
 
     ####################################################################
-    #erstelle Diverse Tabellen zur Erzeugung des Uebersichtsdatenblattes
+    # erstelle Diverse Tabellen zur Erzeugung des Uebersichtsdatenblattes
     ####################################################################
 
 
-    #Tabelle "Teilflaechen_Flaechenbilanz_gruppiert" erzeugen, falls noch nicht vorhanden
+    # Tabelle "Teilflaechen_Flaechenbilanz_gruppiert" erzeugen, falls noch nicht vorhanden
     eingangstabellen = [(workspace_factsheet,'Flaechenbilanz')]
     ausgabetabelle = (workspace_factsheet,'Flaechenbilanz_gruppiert')
 
