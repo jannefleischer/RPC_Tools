@@ -1,0 +1,506 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.utils.params &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.utils.params</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pformat</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">abstractproperty</span>
+<span class="kn">from</span> <span class="nn">config</span> <span class="k">import</span> <span class="n">Folders</span>
+<span class="c1">#reload(sys.modules[Folders.__module__])</span>
+<span class="kn">import</span> <span class="nn">arcpy</span>
+
+
+<div class="viewcode-block" id="Message"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Message">[docs]</a><span class="k">class</span> <span class="nc">Message</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Message.addMessage"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Message.addMessage">[docs]</a>    <span class="k">def</span> <span class="nf">addMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Message.addErrorMessage"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Message.addErrorMessage">[docs]</a>    <span class="k">def</span> <span class="nf">addErrorMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Message.addWarningMessage"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Message.addWarningMessage">[docs]</a>    <span class="k">def</span> <span class="nf">addWarningMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddWarning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Message.addIDMessage"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Message.addIDMessage">[docs]</a>    <span class="k">def</span> <span class="nf">addIDMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">message_ID</span><span class="p">,</span>
+                     <span class="n">add_argument1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_argument2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddIDMessage</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">message_ID</span><span class="p">,</span>
+                           <span class="n">add_argument1</span><span class="o">=</span><span class="n">add_argument1</span><span class="p">,</span> <span class="n">add_argument2</span><span class="o">=</span><span class="n">add_argument2</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Message.addGPMessages"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Message.addGPMessages">[docs]</a>    <span class="k">def</span> <span class="nf">addGPMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Message.AddMessage"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Message.AddMessage">[docs]</a>    <span class="k">def</span> <span class="nf">AddMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Message.AddErrorMessage"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Message.AddErrorMessage">[docs]</a>    <span class="k">def</span> <span class="nf">AddErrorMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Message.AddWarningMessage"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Message.AddWarningMessage">[docs]</a>    <span class="k">def</span> <span class="nf">AddWarningMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddWarning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Message.AddIDMessage"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Message.AddIDMessage">[docs]</a>    <span class="k">def</span> <span class="nf">AddIDMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">message_ID</span><span class="p">,</span>
+                     <span class="n">add_argument1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_argument2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddIDMessage</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">message_ID</span><span class="p">,</span>
+                           <span class="n">add_argument1</span><span class="o">=</span><span class="n">add_argument1</span><span class="p">,</span>
+                           <span class="n">add_argument2</span><span class="o">=</span><span class="n">add_argument2</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Message.AddGPMessages"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Message.AddGPMessages">[docs]</a>    <span class="k">def</span> <span class="nf">AddGPMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="Singleton"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Singleton">[docs]</a><span class="k">class</span> <span class="nc">Singleton</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="n">_instances</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cls</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">_instances</span><span class="p">:</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">_instances</span><span class="p">[</span><span class="n">cls</span><span class="p">]</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Singleton</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_instances</span><span class="p">[</span><span class="n">cls</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Params"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Params">[docs]</a><span class="k">class</span> <span class="nc">Params</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parameter class like an ordered dict&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Params.__init__"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Params.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">param_projectname</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">,</span>
+                 <span class="n">dbname</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param_projectname : str (optional, default=&#39;name&#39;)</span>
+<span class="sd">            the name of the project_name-Parameter</span>
+<span class="sd">        param_dbname : str (optional)</span>
+<span class="sd">            the name of the Default Database for the Tool</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; params = Params()</span>
+<span class="sd">        &gt;&gt;&gt; params.param1 = 99</span>
+<span class="sd">        &gt;&gt;&gt; params.param2 = 42</span>
+<span class="sd">        &gt;&gt;&gt; params.param3 = 123</span>
+
+<span class="sd">        &gt;&gt;&gt; len(params)</span>
+<span class="sd">        3</span>
+<span class="sd">        &gt;&gt;&gt; params[0]</span>
+<span class="sd">        99</span>
+<span class="sd">        &gt;&gt;&gt; params[1]</span>
+<span class="sd">        42</span>
+<span class="sd">        &gt;&gt;&gt; params.param2</span>
+<span class="sd">        42</span>
+<span class="sd">        &gt;&gt;&gt; params.param1</span>
+<span class="sd">        99</span>
+<span class="sd">        &gt;&gt;&gt; params[&#39;param2&#39;]</span>
+<span class="sd">        42</span>
+<span class="sd">        &gt;&gt;&gt; for param in params:</span>
+<span class="sd">        ...     print(param)</span>
+<span class="sd">        99</span>
+<span class="sd">        42</span>
+<span class="sd">        123</span>
+<span class="sd">        &gt;&gt;&gt; del params.param1</span>
+<span class="sd">        &gt;&gt;&gt; params.param1</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">            ...</span>
+<span class="sd">        AttributeError: Attribute param1 not found in Params-instance. Available attributes are [&#39;param2&#39;, &#39;param3&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; params[0]</span>
+<span class="sd">        42</span>
+<span class="sd">        &gt;&gt;&gt; params[1]</span>
+<span class="sd">        123</span>
+<span class="sd">        &gt;&gt;&gt; params[2]</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">            ...</span>
+<span class="sd">        IndexError: list index out of range</span>
+<span class="sd">        &gt;&gt;&gt; del params[0]</span>
+<span class="sd">        &gt;&gt;&gt; params[0]</span>
+<span class="sd">        123</span>
+<span class="sd">        &gt;&gt;&gt; params.param3</span>
+<span class="sd">        123</span>
+<span class="sd">        &gt;&gt;&gt; params.param4 = 444</span>
+<span class="sd">        &gt;&gt;&gt; params.param5 = 555</span>
+<span class="sd">        &gt;&gt;&gt; params[:2]</span>
+<span class="sd">        [123, 444]</span>
+<span class="sd">        &gt;&gt;&gt; params[1:3]</span>
+<span class="sd">        [444, 555]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_od</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_param_projectname</span> <span class="o">=</span> <span class="n">param_projectname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dbname</span> <span class="o">=</span> <span class="n">dbname</span></div>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Attribute </span><span class="si">{}</span><span class="s1"> not found in Params-instance. Available attributes are </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__delattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="o">.</span><span class="n">items</span><span class="p">()[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="n">i</span><span class="p">]]</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="o">.</span><span class="n">itervalues</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="o">.</span><span class="n">values</span><span class="p">()</span><span class="o">.</span><span class="n">__getslice__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">pformat</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Params._update_parameters"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Params._update_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">_update_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;update the parameter values with a list of parameters&quot;&quot;&quot;</span>
+        <span class="n">n_params_tbx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">n_params_tool</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> Parameter der Toolbox passen nicht zu den </span><span class="si">{}</span><span class="s1"> Parametern des Tools&#39;</span>
+        <span class="k">assert</span> <span class="n">n_params_tbx</span> <span class="o">==</span> <span class="n">n_params_tool</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_params_tbx</span><span class="p">,</span>
+                                                         <span class="n">n_params_tool</span><span class="p">)</span>
+        <span class="c1"># setze die Werte</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_od</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Params._get_projectname"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Params._get_projectname">[docs]</a>    <span class="k">def</span> <span class="nf">_get_projectname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return the value for project name parameter if exists, else empty string</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        projectname : str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">param_projectname</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_projectname</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">param_projectname</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">param_projectname</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span></div></div>
+
+
+<div class="viewcode-block" id="Tool"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tool">[docs]</a><span class="k">class</span> <span class="nc">Tool</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base Class for a ArcGIS Tool</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    folders : Folders object</span>
+<span class="sd">        gives access to relative paths</span>
+
+<span class="sd">    mes : Message object</span>
+<span class="sd">        for sending messages to ArcGIS</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">ABCMeta</span>
+
+    <span class="n">_param_projectname</span> <span class="o">=</span> <span class="s1">&#39;projectname&#39;</span>
+    <span class="sd">&quot;&quot;&quot;The parameter that holds the projectname&quot;&quot;&quot;</span>
+    <span class="n">_dbname</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;the name of the default database of the tool&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Tool.__init__"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tool.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        params : Params object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">par</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mes</span> <span class="o">=</span> <span class="n">Message</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folders</span> <span class="o">=</span> <span class="n">Folders</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tool.main"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tool.main">[docs]</a>    <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">par</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">messages</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The main method</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        par : the Params-object</span>
+
+<span class="sd">        parameters : the list of parameters sent by ArcGIS</span>
+
+<span class="sd">        messages : the messages-object sent by ArcGIS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">par</span> <span class="o">=</span> <span class="n">par</span>
+        <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">_update_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">messages</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mes</span> <span class="o">=</span> <span class="n">messages</span>
+        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The full path to the default Database of the tool&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="o">.</span><span class="n">get_db</span><span class="p">()</span>
+
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="Tool.run"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tool.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The run method - has to be implemented in the subclass&quot;&quot;&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="Tbx"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx">[docs]</a><span class="k">class</span> <span class="nc">Tbx</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base Class for a ArcGIS Toolbox&quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">ABCMeta</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">Singleton</span>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">Tool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the Toolclass</span>
+
+<span class="sd">        To be defined in the subclass</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the label as string</span>
+
+<span class="sd">        To be defined in the subclass</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Tbx.__init__"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># reload the tool&#39;s module</span>
+        <span class="n">reload</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Tool</span><span class="o">.</span><span class="n">__module__</span><span class="p">])</span>
+
+        <span class="c1"># the parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">par</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span><span class="n">param_projectname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Tool</span><span class="o">.</span><span class="n">_param_projectname</span><span class="p">,</span>
+                          <span class="n">dbname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Tool</span><span class="o">.</span><span class="n">_dbname</span><span class="p">)</span>
+        <span class="c1"># define the folders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folders</span> <span class="o">=</span> <span class="n">Folders</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">)</span>
+        <span class="c1"># an instance of the tool</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canRunInBackground</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="Tbx._getParameterInfo"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx._getParameterInfo">[docs]</a>    <span class="k">def</span> <span class="nf">_getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the Parameters and return a list or Params()-instance with the</span>
+<span class="sd">        parameter</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Tbx.getParameterInfo"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx.getParameterInfo">[docs]</a>    <span class="k">def</span> <span class="nf">getParameterInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the Parameters and return a list or Params()-instance with the</span>
+<span class="sd">        parameter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getParameterInfo</span><span class="p">()</span><span class="o">.</span><span class="n">_od</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="c1"># set the parameters as real attributes to self.par</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">_od</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">params</span></div>
+
+<div class="viewcode-block" id="Tbx.isLicensed"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx.isLicensed">[docs]</a>    <span class="k">def</span> <span class="nf">isLicensed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;If toolbox is licenced&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Tbx.updateParameters"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx.updateParameters">[docs]</a>    <span class="k">def</span> <span class="nf">updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The updateParameters-method called by ArcGIS</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parameters : list of ArcGIS-Parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">_update_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tbx._updateParameters"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx._updateParameters">[docs]</a>    <span class="k">def</span> <span class="nf">_updateParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the Parameters if something changed</span>
+
+<span class="sd">        To define in the subclass</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Tbx.updateMessages"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx.updateMessages">[docs]</a>    <span class="k">def</span> <span class="nf">updateMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The updateMessages-method called by ArcGIS</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parameters : list of ArcGIS-Parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">_update_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_updateMessages</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tbx._updateMessages"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx._updateMessages">[docs]</a>    <span class="k">def</span> <span class="nf">_updateMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; to define in the subclass &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Tbx.execute"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">messages</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the tool with the parameters and messages from ArcGIS</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parameters : list of ArcGIS-Parameters</span>
+
+<span class="sd">        messages : the message-object of ArcGIS</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">messages</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tbx.print_test_parameters"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx.print_test_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">print_test_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print the parameters to use in tests</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; tbx.print_test_parameters()</span>
+<span class="sd">        ### Category 1 ###</span>
+<span class="sd">        params.param_1.value = 123</span>
+<span class="sd">        params.param_2.value = 456</span>
+<span class="sd">        ### Category 2 ###</span>
+<span class="sd">        params.param_3.value = &#39;DefaultString&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getParameterInfo</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_updateParameters</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">category</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">_od</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">category</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">category</span> <span class="o">!=</span> <span class="n">category</span><span class="p">:</span>
+                <span class="n">category</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">category</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">u&#39;### </span><span class="si">{}</span><span class="s1"> ###&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">category</span><span class="p">))</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">unicode</span><span class="p">)):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="s2">u&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s1">u&#39;params.</span><span class="si">{k}</span><span class="s1">.value = </span><span class="si">{v}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Tbx.print_tool_parameters"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.params.html#rpctools.utils.params.Tbx.print_tool_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">print_tool_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print the parameters to use in a Tool</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; tbx.print_tool_parameters()</span>
+<span class="sd">        ### Category 1 ###</span>
+<span class="sd">        param_1 = params.param_1.value</span>
+<span class="sd">        param_2 = params.param_2.value</span>
+<span class="sd">        ### Category 2 ###</span>
+<span class="sd">        param_3 = params.param_3.value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getParameterInfo</span><span class="p">()</span>
+        <span class="n">category</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">_od</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">category</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">category</span> <span class="o">!=</span> <span class="n">category</span><span class="p">:</span>
+                <span class="n">category</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">category</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">u&#39;### </span><span class="si">{}</span><span class="s1"> ###&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">category</span><span class="p">))</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s1">u&#39;</span><span class="si">{k}</span><span class="s1"> = self.par.</span><span class="si">{k}</span><span class="s1">.value&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">))</span></div></div>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 26, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

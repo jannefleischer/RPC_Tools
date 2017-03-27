@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.analyst.flaeche_oekologie.schutzwuerdigeBoedenTesten &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.analyst.flaeche_oekologie.schutzwuerdigeBoedenTesten</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># schutzwuerdigeBoedenTesten.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description:</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># ILS gGmbH</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.flaeche_oekologie.schutzwuerdigeBoedenTesten.html#rpctools.analyst.flaeche_oekologie.schutzwuerdigeBoedenTesten.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">messages</span><span class="p">):</span>
+    <span class="n">projektname</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+    <span class="c1">#projektname = &quot;Bultweg_Sued_fiktiv&quot;</span>
+    <span class="c1">#Pfade einrichten</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">workspace_projekt</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+    <span class="n">workspace_tool</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;Flaeche_und_Oekologie&#39;</span><span class="p">)</span>
+
+    <span class="n">pfadNiSa</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_tool</span><span class="p">,</span><span class="s1">&#39;bodenNiSa.lyr&#39;</span><span class="p">)</span>
+    <span class="n">pfadNRW</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_tool</span><span class="p">,</span><span class="s1">&#39;bodenNRW.lyr&#39;</span><span class="p">)</span>
+    <span class="n">pfadProjektflaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt</span><span class="p">,</span><span class="s1">&#39;Teilflaechen_Plangebiet&#39;</span><span class="p">)</span>
+
+    <span class="n">mxd</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="s2">&quot;CURRENT&quot;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListDataFrames</span><span class="p">(</span><span class="n">mxd</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1">#Pfade zu den hinzuzufügenden Dateien anlegen</span>
+    <span class="n">bodenNISA</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Layer</span><span class="p">(</span><span class="n">pfadNiSa</span><span class="p">)</span>
+    <span class="n">bodenNRW</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Layer</span><span class="p">(</span><span class="n">pfadNRW</span><span class="p">)</span>
+    <span class="n">projektgebiet</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Layer</span><span class="p">(</span><span class="n">pfadProjektflaeche</span><span class="p">)</span>
+    <span class="c1">#extent des projektgebietes speichern</span>
+    <span class="n">projektgebiet_extent</span> <span class="o">=</span> <span class="n">projektgebiet</span><span class="o">.</span><span class="n">getExtent</span><span class="p">()</span>
+    <span class="c1">#Layerhinzufuegen</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bodenNISA</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bodenNRW</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">projektgebiet</span><span class="p">)</span>
+    <span class="c1">#auf Projektgebiet zoomen</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">extent</span> <span class="o">=</span> <span class="n">projektgebiet_extent</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 26, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

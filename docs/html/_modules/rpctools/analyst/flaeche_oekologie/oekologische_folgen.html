@@ -1,0 +1,980 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.analyst.flaeche_oekologie.oekologische_folgen &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.analyst.flaeche_oekologie.oekologische_folgen</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># oekologischeFolgen.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description:</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># ILS gGmbH</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">imp</span>
+
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">import</span> <span class="nn">xlsxwriter</span>
+<span class="kn">from</span> <span class="nn">xlsxwriter.utility</span> <span class="k">import</span> <span class="n">xl_rowcol_to_cell</span><span class="p">,</span> <span class="n">xl_range</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
+
+<span class="kn">import</span> <span class="nn">rpctools.utils.sheet_lib</span> <span class="k">as</span> <span class="nn">sl</span>
+<span class="kn">import</span> <span class="nn">lib_oekologischeFolgen</span> <span class="k">as</span> <span class="nn">lib_oeko</span>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.flaeche_oekologie.oekologische_folgen.html#rpctools.analyst.flaeche_oekologie.oekologische_folgen.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">messages</span><span class="p">):</span>
+    <span class="c1">#Parameter erstellen</span>
+    <span class="n">i</span> <span class="o">=</span><span class="mi">0</span>
+    <span class="n">projektName</span> <span class="o">=</span> <span class="s2">&quot;Template&quot;</span>
+    <span class="n">projektName</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+    <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+    <span class="n">region</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+    <span class="c1">#if region == &quot;Landkreis Harburg&quot;:</span>
+    <span class="c1">#    region = &quot;Duesseldorf&quot;</span>
+
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Oekologische Flaechenleistung ermitteln  </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="n">wcd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">rootPfad</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bodenbedeckungTabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s2">&quot;FGDB_Flaeche_und_Oekologie_&quot;</span> <span class="o">+</span> <span class="n">projektName</span> <span class="o">+</span> <span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Bodenbedeckung&quot;</span><span class="p">)</span>
+
+    <span class="n">bedeckungstabelle</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">bodenbedeckungTabelle</span><span class="p">)</span>
+    <span class="n">NF_ueberbauteFlaechen</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NF_AsphaltBeton</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NF_Platten</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NF_Kleinpflaster</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NF_Rasengitter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NF_Acker</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NF_Rasen</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NF_BaeumeStraeucher</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NF_Stauden</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NF_Wiese</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NF_Wasserflaeche</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PF_ueberbauteFlaechen</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PF_AsphaltBeton</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PF_Platten</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PF_Kleinpflaster</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PF_Rasengitter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PF_Acker</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PF_Rasen</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PF_BaeumeStraeucher</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PF_Stauden</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PF_Wiese</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PF_Wasserflaeche</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">bedeckungstabelle</span><span class="p">:</span>
+        <span class="n">NF_ueberbauteFlaechen</span> <span class="o">=</span> <span class="n">NF_ueberbauteFlaechen</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">NF_ueberbauteFlaechen</span>
+        <span class="n">NF_AsphaltBeton</span> <span class="o">=</span> <span class="n">NF_AsphaltBeton</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">NF_AsphaltBeton</span>
+        <span class="n">NF_Platten</span> <span class="o">=</span> <span class="n">NF_Platten</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">NF_Platten</span>
+        <span class="n">NF_Kleinpflaster</span> <span class="o">=</span> <span class="n">NF_Kleinpflaster</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">NF_Kleinpflaster</span>
+        <span class="n">NF_Rasengitter</span> <span class="o">=</span> <span class="n">NF_Rasengitter</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">NF_Rasengitter</span>
+        <span class="n">NF_Acker</span> <span class="o">=</span> <span class="n">NF_Acker</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">NF_Acker</span>
+        <span class="n">NF_Rasen</span> <span class="o">=</span> <span class="n">NF_Rasen</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">NF_Rasen</span>
+        <span class="n">NF_BaeumeStraeucher</span> <span class="o">=</span> <span class="n">NF_BaeumeStraeucher</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">NF_BaeumeStraeucher</span>
+        <span class="n">NF_Stauden</span> <span class="o">=</span> <span class="n">NF_Stauden</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">NF_Stauden</span>
+        <span class="n">NF_Wiese</span> <span class="o">=</span> <span class="n">NF_Wiese</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">NF_Wiese</span>
+        <span class="n">NF_Wasserflaeche</span> <span class="o">=</span> <span class="n">NF_Wasserflaeche</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">NF_Wasserflaeche</span>
+
+        <span class="n">PF_ueberbauteFlaechen</span> <span class="o">=</span> <span class="n">PF_ueberbauteFlaechen</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">PF_ueberbauteFlaechen</span>
+        <span class="n">PF_AsphaltBeton</span> <span class="o">=</span> <span class="n">PF_AsphaltBeton</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">PF_AsphaltBeton</span>
+        <span class="n">PF_Platten</span> <span class="o">=</span> <span class="n">PF_Platten</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">PF_Platten</span>
+        <span class="n">PF_Kleinpflaster</span> <span class="o">=</span> <span class="n">PF_Kleinpflaster</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">PF_Kleinpflaster</span>
+        <span class="n">PF_Rasengitter</span> <span class="o">=</span> <span class="n">PF_Rasengitter</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">PF_Rasengitter</span>
+        <span class="n">PF_Acker</span> <span class="o">=</span> <span class="n">PF_Acker</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">PF_Acker</span>
+        <span class="n">PF_Rasen</span> <span class="o">=</span> <span class="n">PF_Rasen</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">PF_Rasen</span>
+        <span class="n">PF_BaeumeStraeucher</span> <span class="o">=</span> <span class="n">PF_BaeumeStraeucher</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">PF_BaeumeStraeucher</span>
+        <span class="n">PF_Stauden</span> <span class="o">=</span> <span class="n">PF_Stauden</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">PF_Stauden</span>
+        <span class="n">PF_Wiese</span> <span class="o">=</span> <span class="n">PF_Wiese</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">PF_Wiese</span>
+        <span class="n">PF_Wasserflaeche</span> <span class="o">=</span> <span class="n">PF_Wasserflaeche</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">PF_Wasserflaeche</span>
+    <span class="n">bedeckungNullfall</span> <span class="o">=</span> <span class="p">[</span><span class="n">NF_ueberbauteFlaechen</span><span class="p">,</span><span class="n">NF_AsphaltBeton</span><span class="p">,</span><span class="n">NF_Platten</span><span class="p">,</span><span class="n">NF_Kleinpflaster</span><span class="p">,</span><span class="n">NF_Rasengitter</span><span class="p">,</span><span class="n">NF_Acker</span><span class="p">,</span><span class="n">NF_Rasen</span><span class="p">,</span><span class="n">NF_BaeumeStraeucher</span><span class="p">,</span><span class="n">NF_Stauden</span><span class="p">,</span><span class="n">NF_Wiese</span><span class="p">,</span><span class="n">NF_Wasserflaeche</span><span class="p">]</span>
+    <span class="c1">#bedeckungNullfall = [4.9,4.9,0,0,0,0,0,0,0,14.7,0]</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">bedeckungNullfall</span><span class="p">)</span>
+    <span class="n">bedeckungPlanfall</span> <span class="o">=</span> <span class="p">[</span><span class="n">PF_ueberbauteFlaechen</span><span class="p">,</span><span class="n">PF_AsphaltBeton</span><span class="p">,</span><span class="n">PF_Platten</span><span class="p">,</span><span class="n">PF_Kleinpflaster</span><span class="p">,</span><span class="n">PF_Rasengitter</span><span class="p">,</span><span class="n">PF_Acker</span><span class="p">,</span><span class="n">PF_Rasen</span><span class="p">,</span><span class="n">PF_BaeumeStraeucher</span><span class="p">,</span><span class="n">PF_Stauden</span><span class="p">,</span><span class="n">PF_Wiese</span><span class="p">,</span><span class="n">PF_Wasserflaeche</span><span class="p">]</span>
+    <span class="c1">#bedeckungPlanfall = [9.8,7.3,0,0,0,0,0,0,0,7.3,0]</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">bedeckungPlanfall</span><span class="p">)</span>
+
+
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Integrationsgrad ermitteln  </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+    <span class="n">gemeinsameGrenze</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">gemeinsameGrenze</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+    <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+    <span class="n">gesamteGrenze</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">gesamteGrenze</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+    <span class="c1">#i=i+1</span>
+    <span class="c1">#neuinanspruchnameHA = 2.3</span>
+    <span class="c1">#neuinanspruchnameHA = parameters[i].valueAsText</span>
+    <span class="c1">#neuinanspruchnameHA = neuinanspruchnameHA.replace(&quot;,&quot;,&quot;.&quot;)</span>
+    <span class="c1">#i=i+1</span>
+    <span class="c1">#bebauungsdichteWEproHA = 25</span>
+    <span class="c1">#bebauungsdichteWEproHA = parameters[i].valueAsText</span>
+    <span class="c1">#i=i+1</span>
+    <span class="c1">#frueherBauluecke = &quot;False&quot;</span>
+    <span class="c1">#frueherBauluecke = parameters[i].valueAsText</span>
+    <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+    <span class="n">flaechentyp</span> <span class="o">=</span> <span class="s2">&quot;Wohnen&quot;</span>
+    <span class="n">flaechentyp</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+    <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+    <span class="n">schutzBoden</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="c1">#1.Lokale Effekte</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Oekologische Flaechenleistung bewerten  </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">oekologischeFlaechenleistungPunkte</span> <span class="o">=</span> <span class="n">lib_oeko</span><span class="o">.</span><span class="n">oekologischeFolgen</span><span class="p">(</span><span class="n">bedeckungNullfall</span><span class="p">,</span> <span class="n">bedeckungPlanfall</span><span class="p">)</span>
+        <span class="c1">#Rueckgabe: Liste: [&#39;Punktwert Nullfall=x&#39;, &#39;Punktwert Planfall=y&#39;]</span>
+        <span class="n">punktwertNullfall</span> <span class="o">=</span> <span class="n">oekologischeFlaechenleistungPunkte</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">punktwertPlanfall</span> <span class="o">=</span> <span class="n">oekologischeFlaechenleistungPunkte</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1">#2a. Regionale Effekte - Landschaftszerschneidung</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Landschaftszerschneidung bewerten  </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">uzvr</span> <span class="o">=</span> <span class="n">lib_oeko</span><span class="o">.</span><span class="n">uzvr</span><span class="p">(</span><span class="n">projektName</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
+        <span class="n">bewertungUZVRNullfall</span> <span class="o">=</span> <span class="n">uzvr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">begegnungswahrscheinlichkeitUZVRNullfall</span> <span class="o">=</span> <span class="n">uzvr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">begegnungswahrscheinlichkeitUZVRPlanfall</span> <span class="o">=</span> <span class="n">uzvr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">groessterUZVR</span> <span class="o">=</span> <span class="n">uzvr</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="c1">#</span>
+        <span class="c1"># print(&quot;bewertungUZVRNullfall: &quot;+str(bewertungUZVRNullfall) + &quot;\n&quot;)</span>
+        <span class="c1"># messages.AddMessage(&quot;bewertungUZVRNullfall: &quot;+str(bewertungUZVRNullfall) + &quot;\n&quot;)</span>
+        <span class="c1"># print(&quot;begegnungswahrscheinlichkeitUZVRNullfall: &quot;+str(begegnungswahrscheinlichkeitUZVRNullfall) + &quot;\n&quot;)</span>
+        <span class="c1"># messages.AddMessage(&quot;begegnungswahrscheinlichkeitUZVRNullfall: &quot;+str(begegnungswahrscheinlichkeitUZVRNullfall) + &quot;\n&quot;)</span>
+        <span class="c1"># print(&quot;begegnungswahrscheinlichkeitUZVRPlanfall: &quot;+str(begegnungswahrscheinlichkeitUZVRPlanfall) + &quot;\n&quot;)</span>
+        <span class="c1"># messages.AddMessage(&quot;begegnungswahrscheinlichkeitUZVRPlanfall: &quot;+str(begegnungswahrscheinlichkeitUZVRPlanfall) + &quot;\n&quot;)</span>
+        <span class="c1"># print(&quot;groessterUZVR: &quot;+str(groessterUZVR) + &quot;\n&quot;)</span>
+        <span class="c1"># messages.AddMessage(&quot;groessterUZVR: &quot;+str(groessterUZVR) + &quot;\n&quot;)</span>
+
+        <span class="c1">#2b - Regionale Effekte - Kaltluftstr??mungen</span>
+        <span class="c1">#Integration von KLAMM21</span>
+
+        <span class="c1">#3a. Einordnung der Region Schutzstatus Biotope &amp; Boden</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Betroffenheit von Schutzgebieten pruefen  </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">ueberschneidungen</span> <span class="o">=</span> <span class="n">lib_oeko</span><span class="o">.</span><span class="n">oekologischeWertigkeit</span><span class="p">(</span><span class="n">projektName</span><span class="p">)</span>
+        <span class="n">ueberschneidungBiotope</span> <span class="o">=</span> <span class="n">ueberschneidungen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ueberschneidungNaturschutzgebiete</span> <span class="o">=</span> <span class="n">ueberschneidungen</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ueberschneidungNationalparke</span> <span class="o">=</span> <span class="n">ueberschneidungen</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ueberschneidungFFHGebiete</span> <span class="o">=</span> <span class="n">ueberschneidungen</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ueberschneidungVogelschutzgebiete</span> <span class="o">=</span> <span class="n">ueberschneidungen</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">ueberschneidungBiotope</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">ueberschneidungNaturschutzgebiete</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">ueberschneidungNationalparke</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">ueberschneidungFFHGebiete</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">ueberschneidungVogelschutzgebiete</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">schutzstatusBiotope</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">schutzstatusBiotope</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1">#Schutzstatus Boden</span>
+        <span class="c1">#WMS einbinden und manuelle Kontrolle</span>
+            <span class="c1">#Test auf Ueberschneidung der Planflaeche mit Schutzwuerdigen Boeden:</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Betroffenheit von schutzwuerdigen Boeden pruefen  </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Schutzwuerdige Boeden betroffen:&quot;</span> <span class="o">+</span> <span class="n">schutzBoden</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">schutzBoden</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Ja&quot;</span><span class="p">:</span>
+            <span class="n">schutzStatusBoden</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">schutzBoden</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Nein&quot;</span><span class="p">:</span>
+            <span class="n">schutzStatusBoden</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+        <span class="c1">#3b - Einordnung in die Region - Fl??cheninanspruchname</span>
+        <span class="c1">#Vorraussetzung: Integrationsgrad berechnen:</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Integration bewerten  </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">integrationsgrad</span><span class="p">,</span> <span class="n">bewertungIntegration</span> <span class="o">=</span> <span class="n">lib_oeko</span><span class="o">.</span><span class="n">IntegrationsGrad</span><span class="p">(</span><span class="n">gemeinsameGrenze</span><span class="p">,</span><span class="n">gesamteGrenze</span><span class="p">)</span>
+        <span class="c1">#def flaechenInanspruchname(neuinanspruchname, projektName, bebauungsdichte, integrationsgrad,bauluecke,typ):</span>
+        <span class="n">flaecheninanspruchname</span> <span class="o">=</span> <span class="n">lib_oeko</span><span class="o">.</span><span class="n">flaechenInanspruchname</span><span class="p">(</span><span class="n">integrationsgrad</span><span class="p">,</span> <span class="n">flaechentyp</span><span class="p">)</span>
+        <span class="c1">#bewertungQuantitaet = flaecheninanspruchname[0]</span>
+        <span class="c1">#bewertungDichte = flaecheninanspruchname[1]</span>
+        <span class="c1">#bewertungIntegration = flaecheninanspruchname[2]</span>
+
+        <span class="c1">##Pfade vorbereiten</span>
+        <span class="c1">#aktueller Pfad</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Ergebnisse in Datenbank schreiben  </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">wcd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">rootPfad</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ergebnisTabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s1">&#39;FGDB_Flaeche_und_Oekologie.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;Ergebnisse_oekologischeWertigkeit&#39;</span><span class="p">)</span>
+        <span class="n">ueberschneidungBiotope</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ueberschneidungBiotope</span><span class="p">)</span>
+        <span class="n">ueberschneidungFFHGebiete</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ueberschneidungFFHGebiete</span><span class="p">)</span>
+        <span class="n">ueberschneidungNationalparke</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ueberschneidungNationalparke</span><span class="p">)</span>
+        <span class="n">ueberschneidungNaturschutzgebiete</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ueberschneidungNaturschutzgebiete</span><span class="p">)</span>
+        <span class="n">ueberschneidungVogelschutzgebiete</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ueberschneidungVogelschutzgebiete</span><span class="p">)</span>
+        <span class="n">punktwertNullfall</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">punktwertNullfall</span><span class="p">)</span>
+        <span class="n">punktwertPlanfall</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">punktwertPlanfall</span><span class="p">)</span>
+        <span class="n">begegnungswahrscheinlichkeitUZVRNullfall</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">begegnungswahrscheinlichkeitUZVRNullfall</span><span class="p">)</span>
+        <span class="n">begegnungswahrscheinlichkeitUZVRPlanfall</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">begegnungswahrscheinlichkeitUZVRPlanfall</span><span class="p">)</span>
+        <span class="n">bewertungUZVRNullfall</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">bewertungUZVRNullfall</span><span class="p">)</span>
+        <span class="n">schutzStatusBoden</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">schutzStatusBoden</span><span class="p">)</span>
+        <span class="n">integrationsgrad</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">integrationsgrad</span><span class="p">)</span>
+        <span class="n">bewertungIntegration</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">bewertungIntegration</span><span class="p">)</span>
+        <span class="n">groessterUZVR</span> <span class="o">=</span> <span class="n">groessterUZVR</span>
+
+        <span class="c1">#Ergebnisse speichern</span>
+        <span class="c1">#aktuelle Zeit</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">second</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">day</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">month</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+        <span class="c1">#insert Cursor f??r die Ergebnistabelle erstellen</span>
+        <span class="n">ergebnisCursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">ergebnisTabelle</span><span class="p">)</span>
+        <span class="c1">#eine neue Zeile f??r das Ergebnis dieses Durchlaufs anlegen</span>
+        <span class="n">ergebnisZeile</span> <span class="o">=</span> <span class="n">ergebnisCursor</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">pwNull</span> <span class="o">=</span> <span class="n">punktwertNullfall</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">pwPlan</span> <span class="o">=</span> <span class="n">punktwertPlanfall</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">begeg_null</span> <span class="o">=</span> <span class="n">begegnungswahrscheinlichkeitUZVRNullfall</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">begeg_plan</span> <span class="o">=</span> <span class="n">begegnungswahrscheinlichkeitUZVRPlanfall</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">uvzr_null</span> <span class="o">=</span> <span class="n">bewertungUZVRNullfall</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">groeUZVR</span> <span class="o">=</span> <span class="n">groessterUZVR</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">Biotope</span> <span class="o">=</span> <span class="n">ueberschneidungBiotope</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">Naturschutzgebiete</span> <span class="o">=</span> <span class="n">ueberschneidungNaturschutzgebiete</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">Nationalparke</span> <span class="o">=</span> <span class="n">ueberschneidungNationalparke</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">FFH_Gebiete</span> <span class="o">=</span> <span class="n">ueberschneidungFFHGebiete</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">Vogelschutzgebiete</span> <span class="o">=</span> <span class="n">ueberschneidungVogelschutzgebiete</span>
+    <span class="c1">##    ergebnisZeile.statusBiotope = schutzstatusBiotope --&gt; aufgrund fehlerhafter Abfrage wird dieser Schritt in der Ergebnisausgabe abgefragt</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">statusBoden</span> <span class="o">=</span> <span class="n">schutzStatusBoden</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">integration</span> <span class="o">=</span> <span class="n">integrationsgrad</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">bewertung_Integra</span> <span class="o">=</span> <span class="n">bewertungIntegration</span>
+        <span class="n">ergebnisZeile</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">timestamp</span>
+        <span class="n">ergebnisCursor</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">ergebnisZeile</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Schutzw??rdige B??den betroffen? = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">schutzBoden</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ergebnisse gespeichert&quot;</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Ergebnisse gespeichert&quot;</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">ergebnisCursor</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="n">e</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">ergebnisCursor</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="s2">&quot;Trauer&quot;</span>
+
+
+
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#############################################################################################################</span>
+
+    <span class="c1"># Schritt 6 - Datenexport in Excel-Datei</span>
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Datenexport in Excel-Datei  </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="c1"># Pfade setzen</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">workspace_projekt_oekologie</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s1">&#39;FGDB_Flaeche_und_Oekologie.gdb&#39;</span><span class="p">)</span>
+    <span class="n">tablepath_Bodenbedeckung</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_oekologie</span><span class="p">,</span><span class="s1">&#39;Bodenbedeckung&#39;</span><span class="p">)</span>
+    <span class="n">tablepath_Integration</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_oekologie</span><span class="p">,</span><span class="s1">&#39;Ergebnisse_Integrationsgrad&#39;</span><span class="p">)</span>
+    <span class="n">tablepath_oekWert</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_oekologie</span><span class="p">,</span><span class="s1">&#39;Ergebnisse_oekologischeWertigkeit&#39;</span><span class="p">)</span>
+    <span class="n">tablepath_Wohnflaechendichte</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_oekologie</span><span class="p">,</span><span class="s1">&#39;Ergebnisse_Wohnflaechendichte&#39;</span><span class="p">)</span>
+    <span class="n">grafikpath_erlauterungstext</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;Flaeche_und_Oekologie&#39;</span><span class="p">,</span><span class="s1">&#39;Erlauterungstexte&#39;</span><span class="p">)</span>
+
+    <span class="n">logo</span> <span class="o">=</span> <span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span><span class="s2">&quot;1_Basisdaten&quot;</span><span class="p">,</span><span class="s2">&quot;logo_rpc.png&quot;</span><span class="p">)</span>
+    <span class="n">ausgabeordner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektName</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Excel&#39;</span><span class="p">)</span>
+    <span class="n">excelpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">,</span><span class="s1">&#39;Flaeche_und_Oekologie.xlsx&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">excelpfad</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># Workbook und Tabellenbl??tter anlegen</span>
+    <span class="n">wb</span> <span class="o">=</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="n">excelpfad</span><span class="p">)</span>
+    <span class="n">sl</span><span class="o">.</span><span class="n">infosheet</span><span class="p">(</span><span class="n">projektName</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Projektrahmendaten&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">wb</span><span class="p">)</span>
+    <span class="n">ws2</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik_Uebersicht&#39;</span><span class="p">)</span>
+    <span class="n">ws3</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik_lokale Effekte&#39;</span><span class="p">)</span>
+    <span class="n">ws5</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Auswertungen_lokale Effekte&#39;</span><span class="p">)</span>
+    <span class="n">ws6</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik_regionale Effekte&#39;</span><span class="p">)</span>
+    <span class="n">ws7</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Auswertungen_regionale Effekte&#39;</span><span class="p">)</span>
+    <span class="n">ws8</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik_Einordnung Region&#39;</span><span class="p">)</span>
+    <span class="n">ws9</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Auswertungen_Einordnung Region&#39;</span><span class="p">)</span>
+    <span class="c1">#ws10 = wb.add_worksheet(&#39;Ergebnisuebersicht&#39;)</span>
+    <span class="n">ws11</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Literatur&#39;</span><span class="p">)</span>
+    <span class="n">ws4</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Rohdaten&#39;</span><span class="p">)</span>
+    <span class="c1">#ws12 = wb.add_worksheet(&#39;Rohdaten&#39;)</span>
+
+    <span class="c1">##Styles anlegen</span>
+    <span class="n">bold</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+    <span class="n">bold</span><span class="o">.</span><span class="n">set_align</span><span class="p">(</span><span class="s1">&#39;vtop&#39;</span><span class="p">)</span>
+    <span class="n">bold</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+    <span class="n">bold</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">wrap</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+    <span class="n">wrap</span><span class="o">.</span><span class="n">set_text_wrap</span><span class="p">()</span>
+    <span class="n">wrap</span><span class="o">.</span><span class="n">set_align</span><span class="p">(</span><span class="s1">&#39;vtop&#39;</span><span class="p">)</span>
+    <span class="n">wrap</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+    <span class="n">wrap</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">normal</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+    <span class="n">normal</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+    <span class="n">normal</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1">###Hintergrund weiss faerben</span>
+    <span class="nb">format</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+    <span class="nb">format</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+    <span class="nb">format</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="n">ws3</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="n">ws6</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="n">ws8</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="c1"># ws10.write(x,y,&quot;&quot;, format)</span>
+            <span class="n">ws11</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="c1">#ws12.write(x,y,&quot;&quot;, format)</span>
+
+    <span class="c1">###Spaltenbreiten definieren</span>
+    <span class="n">ws2</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">86</span><span class="p">)</span>
+    <span class="n">ws3</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">86</span><span class="p">)</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+    <span class="n">ws6</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">86</span><span class="p">)</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
+    <span class="n">ws8</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">86</span><span class="p">)</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+    <span class="n">ws11</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">86</span><span class="p">)</span>
+
+
+    <span class="c1">########</span>
+    <span class="c1">## Erl??uterungstexte einf??gen</span>
+    <span class="c1"># Pfade zu Grafiken herstellen</span>
+    <span class="n">Text1</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">grafikpath_erlauterungstext</span><span class="p">,</span> <span class="s1">&#39;Methodik_FlaecheOekologie1.png&#39;</span><span class="p">)</span>
+    <span class="n">Text2</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">grafikpath_erlauterungstext</span><span class="p">,</span> <span class="s1">&#39;Methodik_FlaecheOekologie2.png&#39;</span><span class="p">)</span>
+    <span class="n">Text3</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">grafikpath_erlauterungstext</span><span class="p">,</span> <span class="s1">&#39;Methodik_FlaecheOekologie3.png&#39;</span><span class="p">)</span>
+    <span class="n">Text4a</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">grafikpath_erlauterungstext</span><span class="p">,</span> <span class="s1">&#39;Methodik_FlaecheOekologie4a.png&#39;</span><span class="p">)</span>
+    <span class="n">Text4b</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">grafikpath_erlauterungstext</span><span class="p">,</span> <span class="s1">&#39;Methodik_FlaecheOekologie4b.png&#39;</span><span class="p">)</span>
+    <span class="n">Text5</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">grafikpath_erlauterungstext</span><span class="p">,</span> <span class="s1">&#39;Methodik_FlaecheOekologie5.png&#39;</span><span class="p">)</span>
+    <span class="n">Text6</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">grafikpath_erlauterungstext</span><span class="p">,</span> <span class="s1">&#39;Haftungsausschluss.png&#39;</span><span class="p">)</span>
+
+    <span class="c1">###Grafiken einf??gen</span>
+    <span class="n">ws2</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+    <span class="n">ws2</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text6</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+    <span class="n">ws3</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text2</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+    <span class="n">ws6</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text3</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+    <span class="n">ws8</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text4a</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+    <span class="n">ws8</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text4b</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+    <span class="n">ws11</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text5</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+
+
+    <span class="c1">########</span>
+    <span class="c1">###### Tabellenblatt 4: Rohdaten einladen</span>
+    <span class="c1">## Teil 1: Bodenbedeckung</span>
+    <span class="c1">#Teil 1a Bezeichnungen Bodenbedeckung einf??gen</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Rohadtentabelle&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Bodenbedeckung&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Zeilennummer&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">fieldnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">tablepath_Bodenbedeckung</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">:</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fieldname</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+
+
+    <span class="c1"># Teil 1b Werte Bodenbedeckung einf??gen</span>
+
+    <span class="c1">#Durch Ergebniszeilen iterieren und Werte in Excel einfuegen</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_Bodenbedeckung</span><span class="p">)</span>
+
+    <span class="c1">#Feldnamen auslesen</span>
+    <span class="n">fieldnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">tablepath_Bodenbedeckung</span><span class="p">)]</span>
+
+    <span class="c1">###Bodenbedeckung auslesen</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">BBedYstart</span> <span class="o">=</span> <span class="n">j</span>
+    <span class="n">wert</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">wert</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">wert</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span>
+            <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">wert</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">BBedYend</span> <span class="o">=</span> <span class="n">j</span>
+
+    <span class="c1"># Teil 2: ??kologische Wertigkeit</span>
+    <span class="c1">#Durch Ergebniszeilen iterieren und Werte in Excel einfuegen</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_oekWert</span><span class="p">)</span>
+
+    <span class="c1">#Feldnamen auslesen</span>
+    <span class="n">fieldnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">tablepath_oekWert</span><span class="p">)]</span>
+
+    <span class="c1">#Teil 2a: Bezeichnungen ??kologische Wertigkeit einf??gen</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">3</span>
+    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Oekologische Wertigkeit&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">:</span>
+        <span class="n">column_with</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">column_with</span><span class="p">)</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fieldname</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1">#Teil 2b: Ergebnisse ??kologische Wertigkeit auslesen</span>
+    <span class="n">wert</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">wert</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">wert</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span>
+            <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">wert</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">OekWertZeile</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="c1"># Teil 3: Wohnfl??chendichte</span>
+    <span class="c1"># Durch Ergebniszeilen iterieren und Werte in Excel einfuegen</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tablepath_Wohnflaechendichte</span><span class="p">)</span>
+
+    <span class="c1"># Feldnamen auslesen</span>
+    <span class="n">fieldnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">tablepath_Wohnflaechendichte</span><span class="p">)]</span>
+
+    <span class="c1">#Teil 2a: Bezeichnungen Wohnfl??chendichte einf??gen</span>
+    <span class="k">if</span> <span class="n">flaechentyp</span> <span class="o">==</span> <span class="s2">&quot;Wohnen&quot;</span><span class="p">:</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">3</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Wohnflaechendichte&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">:</span>
+            <span class="n">column_with</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span>
+            <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">column_with</span><span class="p">)</span>
+            <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fieldname</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># Teil 2b: Ergebnisse Wohnfl??chendichte auslesen</span>
+        <span class="n">wert</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">wert</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">wert</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">wert</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">WFDWertZeile</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+        <span class="c1"># Teil 3: Charts anlegen</span>
+        <span class="n">chart_wohnflaeche</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_chart</span><span class="p">({</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;column&#39;</span><span class="p">})</span>
+        <span class="n">chart_wohnflaeche</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+        <span class="n">chart_wohnflaeche</span><span class="o">.</span><span class="n">set_size</span><span class="p">({</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">800</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">})</span>
+        <span class="n">chart_wohnflaeche</span><span class="o">.</span><span class="n">set_chartarea</span><span class="p">({</span><span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span><span class="s1">&#39;fill&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}})</span>
+        <span class="n">chart_wohnflaeche</span><span class="o">.</span><span class="n">set_legend</span><span class="p">({</span><span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="s1">&#39;true&#39;</span><span class="p">})</span>
+        <span class="n">chart_wohnflaeche</span><span class="o">.</span><span class="n">set_title</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Wohnflaechendichte&#39;</span><span class="p">,</span><span class="s1">&#39;name_font&#39;</span><span class="p">:</span>  <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Tahoma&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">}})</span>
+
+        <span class="c1"># Werte in Chartobjekte schreiben: WICHTIG: Tabellenblaetter mit Leerzeichen sind in jedem Fall mit einfachen &#39; einzuklammern und aussen &quot; zu verwenden</span>
+        <span class="n">chart_wohnflaeche</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+            <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_Einordnung Regio&#39;!$B$18:$B$20&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_Einordnung Region&#39;!$A$18:$A$20&quot;</span><span class="p">,</span>
+        <span class="p">})</span>
+
+
+    <span class="c1">########</span>
+    <span class="c1">###### Tabellenblatt 5: Uebersicht lokale Effekte</span>
+    <span class="c1"># Teil 1: Beschriftungen</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Uebersicht lokale Effekte&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Bodenbedeckung [in Hektar]&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Nullfall&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Planfall&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Ueberbaute Flaechen&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Asphalt, Beton&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Platten&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Kleinpflaster&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Wassergebundene Decke, Rasengittersteine&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Offener Boden, Acker&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Rasen&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Baeume, Straeucher&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Stauden&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Wiese&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Natuerliche Wasserflaeche&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">3</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Bodenbedeckung [in Prozent]&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Nullfall&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Planfall&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Ueberbaute Flaechen&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Asphalt, Beton&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Platten&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Kleinpflaster&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Wassergebundene Decke, Rasengittersteine&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Offener Boden, Acker&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Rasen&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Baeume, Straeucher&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Stauden&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Wiese&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Natuerliche Wasserflaeche&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">18</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Bewertung&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Nullfall&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;von 5 Punkten&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Planfall&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;von 5 Punkten&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Gesamt&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;von 5 Punkten&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+
+
+    <span class="c1"># Teil 2: Formeln und Werte einladen</span>
+    <span class="n">formatDez</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+    <span class="n">formatDez</span><span class="o">.</span><span class="n">set_num_format</span><span class="p">(</span><span class="mh">0x02</span><span class="p">)</span>
+    <span class="n">formatDez</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+    <span class="n">formatDez</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># Schleife f??r Nullfall und Planfall in Hektar</span>
+    <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">:</span>
+        <span class="n">BBedRange</span> <span class="o">=</span> <span class="n">xl_range</span><span class="p">(</span><span class="n">BBedYstart</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">BBedYend</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">formulastring</span> <span class="o">=</span> <span class="s1">&#39;=SUM(Rohdaten!&#39;</span><span class="o">+</span><span class="n">BBedRange</span><span class="o">+</span><span class="s1">&#39;)&#39;</span>
+        <span class="n">ws5</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastring</span><span class="p">,</span><span class="n">formatDez</span><span class="p">)</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">:</span>
+        <span class="n">BBedRange</span> <span class="o">=</span> <span class="n">xl_range</span><span class="p">(</span><span class="n">BBedYstart</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">BBedYend</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">formulastring</span> <span class="o">=</span> <span class="s1">&#39;=SUM(Rohdaten!&#39;</span><span class="o">+</span><span class="n">BBedRange</span><span class="o">+</span><span class="s1">&#39;)&#39;</span>
+        <span class="n">ws5</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastring</span><span class="p">,</span><span class="n">formatDez</span><span class="p">)</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># Schleife f??r Nullfall und Planfall in Prozent</span>
+    <span class="n">formatProz</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+    <span class="n">formatProz</span><span class="o">.</span><span class="n">set_num_format</span><span class="p">(</span><span class="mh">0x09</span><span class="p">)</span>
+    <span class="n">formatProz</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+    <span class="n">formatProz</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">4</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">:</span>
+        <span class="n">RowColNull</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">RowColPlan</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">formulastringNull</span> <span class="o">=</span> <span class="s1">&#39;=&#39;</span><span class="o">+</span><span class="n">RowColNull</span><span class="o">+</span><span class="s1">&#39;/SUM(B$5:B$15)&#39;</span>
+        <span class="n">formulastringPlan</span> <span class="o">=</span> <span class="s1">&#39;=&#39;</span><span class="o">+</span><span class="n">RowColPlan</span><span class="o">+</span><span class="s1">&#39;/SUM(C$5:C$15)&#39;</span>
+        <span class="n">ws5</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringNull</span><span class="p">,</span><span class="n">formatProz</span><span class="p">)</span>
+        <span class="n">ws5</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">formulastringPlan</span><span class="p">,</span><span class="n">formatProz</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># Ergebniszusammenfassung Bodenbedeckung</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">18</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">RowColNull</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+    <span class="n">RowColPlan</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+    <span class="n">formulastringNull</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColNull</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+    <span class="n">formulastringPlan</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColPlan</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+    <span class="n">formulastringBOW</span> <span class="o">=</span> <span class="s1">&#39;=IF(B50=B49,IF(B50&gt;5,5,IF(B50&lt;1,1,B50)),IF(B49=(B50+1),IF(B50&gt;5,5,IF(B50&lt;1,1,B50)),IF(B49&lt;B50,IF((1+B50)&gt;5,5,IF((1+B50)&lt;1,1,(1+B50))),IF(B49&gt;B50,IF((B50-1)&gt;5,5,IF((B50-1)&lt;1,1,(B50-1)))))))&#39;</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringNull</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringPlan</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringBOW</span><span class="p">,</span><span class="n">bold</span><span class="p">)</span>
+
+    <span class="c1"># Teil 3: Charts anlegen</span>
+    <span class="n">chart_Bodenbedeckung</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_chart</span><span class="p">({</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;percent_stacked&#39;</span><span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">set_size</span><span class="p">({</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">800</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">set_chartarea</span><span class="p">({</span><span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span><span class="s1">&#39;fill&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">set_legend</span><span class="p">({</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="s1">&#39;bottom&#39;</span><span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">set_title</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Bodenbedeckungsarten&#39;</span><span class="p">,</span><span class="s1">&#39;name_font&#39;</span><span class="p">:</span>  <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Tahoma&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">}})</span>
+
+    <span class="c1"># Werte in Chartobjekte schreiben: WICHTIG: Tabellenblaetter mit Leerzeichen sind in jedem Fall mit einfachen &#39; einzuklammern und aussen &quot; zu verwenden</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+        <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$5:$C$5&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$4:$C$4&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Ueberbaute Flaechen&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+        <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$6:$C$6&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$4:$C$4&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Natuerliche Wasserflaeche&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+        <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$7:$C$7&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$4:$C$4&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Platten&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+        <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$8:$C$8&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$4:$C$4&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Baeume, Straeucher&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+        <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$9:$C$9&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$4:$C$4&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Wassergebundene Decke, Rasengittersteine&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+        <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$10:$C$10&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$4:$C$4&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Stauden&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+        <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$11:$C$11&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$4:$C$4&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Wiese&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+        <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$12:$C$12&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$4:$C$4&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Asphalt, Beton&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+        <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$13:$C$13&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$4:$C$4&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Offener Boden, Acker&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+        <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$14:$C$14&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$4:$C$4&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Kleinpflaster&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">chart_Bodenbedeckung</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+        <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$15:$C$15&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="s2">&quot;=&#39;Auswertungen_lokale Effekte&#39;!$B$4:$C$4&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Rasen&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+
+
+    <span class="c1"># Charts in Tabelle schreiben</span>
+    <span class="n">ws5</span><span class="o">.</span><span class="n">insert_chart</span><span class="p">(</span><span class="s1">&#39;A32&#39;</span><span class="p">,</span> <span class="n">chart_Bodenbedeckung</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">flaechentyp</span> <span class="o">==</span> <span class="s2">&quot;Wohnen&quot;</span><span class="p">:</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">insert_chart</span><span class="p">(</span><span class="s1">&#39;A23&#39;</span><span class="p">,</span> <span class="n">chart_wohnflaeche</span><span class="p">)</span>
+
+
+    <span class="c1">## Tabellenblatt 7: ??bersicht regionale Effekte</span>
+    <span class="c1"># Teil 1 Beschriftungen einf??gen</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Uebersicht regionale Effekte&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Begegnungswahrscheinlichkeit&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Nullfall&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;bei einem Index von 0 bis 1&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Planfall&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;bei einem Index von 0 bis 1&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Bewertung&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;von 5 Punkten&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Unzerschnittene verkehrsarme Raeume&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Groesster tangierter UZVR&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Hektar&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Bewertung UZVR&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;von 5 Punkten&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+
+    <span class="c1"># Teil 2: Formeln und Werte einladen</span>
+    <span class="n">formatHidden</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+    <span class="n">formatHidden</span><span class="o">.</span><span class="n">set_num_format</span><span class="p">(</span><span class="mh">0x01</span><span class="p">)</span>
+    <span class="n">formatHidden</span><span class="o">.</span><span class="n">set_font_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+    <span class="n">formatHidden</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+    <span class="n">formatHidden</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">RowColBegN</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+    <span class="n">RowColBegP</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">RowColUZVR</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="n">RowColUZVRbew</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+    <span class="n">formulastringBegN</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColBegN</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+    <span class="n">formulastringBegP</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColBegP</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+    <span class="n">formulastringBegB1</span> <span class="o">=</span> <span class="s1">&#39;=IF(AND(B4&lt;B5+0.2,B4&gt;B5-0.2),B5,IF(B5&lt;=B4-0.2,B5-0.2,IF(B5&gt;=B4+0.2,B5+0.2)))&#39;</span>
+    <span class="n">formulastringBegB2</span> <span class="o">=</span> <span class="s1">&#39;=IF(F6&gt;1,1,IF(F6&lt;0,0,F6))&#39;</span>
+    <span class="n">formulastringBegB3</span> <span class="o">=</span> <span class="s1">&#39;=IF(G6&lt;0.2,1,IF(AND(G6&gt;=0.2,G6&lt;0.4),2,IF(AND(G6&gt;=0.4,G6&lt;0.6),3,IF(AND(G6&gt;=0.6,G6&lt;0.8),4,IF(G6&gt;=0.8,5)))))&#39;</span>
+    <span class="n">formulastringUZVR</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColUZVR</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+    <span class="n">formulastringUZVRbew</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColUZVRbew</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringBegN</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringBegP</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">4</span><span class="p">,</span> <span class="n">formulastringBegB1</span><span class="p">,</span><span class="n">formatHidden</span><span class="p">)</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">5</span><span class="p">,</span> <span class="n">formulastringBegB2</span><span class="p">,</span><span class="n">formatHidden</span><span class="p">)</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringBegB3</span><span class="p">,</span><span class="n">bold</span><span class="p">)</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">5</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringUZVR</span><span class="p">,</span><span class="n">formatDez</span><span class="p">)</span>
+    <span class="n">ws7</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">6</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringUZVRbew</span><span class="p">)</span>
+
+    <span class="c1">#ToDo: Hier sollten nach M??glichkeit noch eine Karte mit den UZVR und ggf. auch die Klassengr????en eingef??gt werden</span>
+
+    <span class="c1">########</span>
+    <span class="c1">## Tabellenblatt 9: ??bersicht Einordnung in Region</span>
+    <span class="c1">## Teil 1 Beschriftungen einf??gen</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Uebersicht Einordnung in Region&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Schutzgebiete und schutzwuerdige Boeden&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Biotope&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;FFH Gebiete&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Nationalparke&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Naturschutzgebiete&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Vogelschutzgebiete&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Schutzgebiete&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Schutzwuerdige Boeden&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Integration&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Integrationsgrad&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;grenzen an den Siedlungskoerper&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Bewertung Integration&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;von 5 Punkten&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="k">if</span> <span class="n">flaechentyp</span> <span class="o">==</span> <span class="s2">&quot;Wohnen&quot;</span><span class="p">:</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Wohnflaechendichte&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Projektflaeche&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;qm Wohnflaeche je Hektar Bauland&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Kreis&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;qm Wohnflaeche je Hektar Bauland&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Kreistyp&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;qm Wohnflaeche je Hektar Bauland&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Bewertung&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;von 5 Punkten&#39;</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Teil 2: Formeln und Werte einladen</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">RowColBIO</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">RowColFFH</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">RowColNP</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">RowColNSG</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">RowColVSG</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+    <span class="n">RowColSWB</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+    <span class="n">RowColIG</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+    <span class="n">RowColBIG</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">OekWertZeile</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">flaechentyp</span> <span class="o">==</span> <span class="s2">&quot;Wohnen&quot;</span><span class="p">:</span>
+        <span class="n">RowColWDP</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">WFDWertZeile</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">RowColWDK</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">WFDWertZeile</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">RowColWDT</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">WFDWertZeile</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="n">RowColWDB</span> <span class="o">=</span> <span class="n">xl_rowcol_to_cell</span><span class="p">(</span><span class="n">WFDWertZeile</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">formulastringBIO</span> <span class="o">=</span> <span class="s1">&#39;=IF(Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColBIO</span><span class="o">+</span><span class="s1">&#39;=1,&quot;Ja&quot;,&quot;Nein&quot;)&#39;</span>
+    <span class="n">formulastringFFH</span> <span class="o">=</span> <span class="s1">&#39;=IF(Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColFFH</span><span class="o">+</span><span class="s1">&#39;=1,&quot;Ja&quot;,&quot;Nein&quot;)&#39;</span>
+    <span class="n">formulastringNP</span> <span class="o">=</span> <span class="s1">&#39;=IF(Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColNP</span><span class="o">+</span><span class="s1">&#39;=1,&quot;Ja&quot;,&quot;Nein&quot;)&#39;</span>
+    <span class="n">formulastringNSG</span> <span class="o">=</span> <span class="s1">&#39;=IF(Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColNSG</span><span class="o">+</span><span class="s1">&#39;=1,&quot;Ja&quot;,&quot;Nein&quot;)&#39;</span>
+    <span class="n">formulastringVSG</span> <span class="o">=</span> <span class="s1">&#39;=IF(Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColVSG</span><span class="o">+</span><span class="s1">&#39;=1,&quot;Ja&quot;,&quot;Nein&quot;)&#39;</span>
+    <span class="n">formulastringSG</span> <span class="o">=</span> <span class="s1">&#39;=IF(OR(B4=&quot;Ja&quot;,B5=&quot;Ja&quot;,B6=&quot;Ja&quot;,B7=&quot;Ja&quot;,B8=&quot;Ja&quot;)=TRUE,&quot;Ja&quot;,&quot;Nein&quot;)&#39;</span>
+    <span class="n">formulastringSWB</span> <span class="o">=</span> <span class="s1">&#39;=IF(Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColSWB</span><span class="o">+</span><span class="s1">&#39;=1,&quot;Ja&quot;,&quot;Nein&quot;)&#39;</span>
+    <span class="n">formulastringIG</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColIG</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+    <span class="n">formulastringBIG</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColBIG</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">flaechentyp</span> <span class="o">==</span> <span class="s2">&quot;Wohnen&quot;</span><span class="p">:</span>
+        <span class="n">formulastringWDP</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColWDP</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+        <span class="n">formulastringWDK</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColWDK</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+        <span class="n">formulastringWDT</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColWDT</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+        <span class="n">formulastringWDB</span> <span class="o">=</span> <span class="s1">&#39;=Rohdaten!&#39;</span><span class="o">+</span><span class="n">RowColWDB</span><span class="o">+</span><span class="s1">&#39;&#39;</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringBIO</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringFFH</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringNP</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">3</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringNSG</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">4</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringVSG</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">6</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringSG</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">7</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringSWB</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">10</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringIG</span><span class="p">,</span><span class="n">formatProz</span><span class="p">)</span>
+    <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">11</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringBIG</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">flaechentyp</span> <span class="o">==</span> <span class="s2">&quot;Wohnen&quot;</span><span class="p">:</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">14</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringWDP</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">15</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringWDK</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">16</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringWDT</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+        <span class="n">ws9</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">17</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">formulastringWDB</span><span class="p">,</span><span class="n">normal</span><span class="p">)</span>
+
+    <span class="c1">######</span>
+    <span class="c1">#Workbook speichern</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">wb</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Es liegt ein Fehler beim Speichern der Ausgabedatei vor. Ist diese ggf. noch geoeffnet?&quot;</span><span class="p">)</span>
+
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1"># Endmeldung</span>
+    <span class="nb">print</span> <span class="s1">&#39;Berechnung abgeschlossen&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s1">&#39;Berechnung abgeschlossen&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 26, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

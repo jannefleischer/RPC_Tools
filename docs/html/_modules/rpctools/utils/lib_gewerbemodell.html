@@ -1,0 +1,490 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.utils.lib_gewerbemodell &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.utils.lib_gewerbemodell</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># lib_gewerbemodell.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description:</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># ILS gGmbH</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<span class="c1">#Die Betriebsflaechen berechnen</span>
+<div class="viewcode-block" id="betriebsflaechenErmitteln"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.lib_gewerbemodell.html#rpctools.utils.lib_gewerbemodell.betriebsflaechenErmitteln">[docs]</a><span class="k">def</span> <span class="nf">betriebsflaechenErmitteln</span><span class="p">(</span><span class="n">projektname</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">arcpy</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Betriebsflaechen ermitteln&quot;</span><span class="p">)</span>
+    <span class="c1">#ueberpruefen, ob schon Angaben zu den Betriebsstrukturen gemacht wurden</span>
+    <span class="c1">#pfade anlegen</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">tabelle_gewerbe</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_11_Definition_Projekt.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;Gewerbe_Teilflaechen&#39;</span><span class="p">)</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">gewerbe_teilflaechen</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tabelle_gewerbe</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">flaeche</span> <span class="ow">in</span> <span class="n">gewerbe_teilflaechen</span><span class="p">:</span>
+        <span class="n">counter</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="k">del</span> <span class="n">gewerbe_teilflaechen</span>
+    <span class="k">if</span> <span class="n">counter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Es wurden noch keine Angaben zu der Gewerbenutzung gemacht, das Tool &#39;02_Planflaeche beschreiben/05_Gewerbe beschreiben&#39; zum Anlegen verwenden&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+    <span class="c1">#betriebsflaechengroessen berechnen</span>
+    <span class="c1">#flaechengroessen parameter laden</span>
+    <span class="n">betriebgroesse_parameter</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;11_Definition_Projekt&#39;</span><span class="p">,</span><span class="s1">&#39;FGDB_11_Definition_Projekt_Tool.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;gewerbe_betriebsflaechengroesse&#39;</span><span class="p">)</span>
+    <span class="n">betriebgroesse_parameter_cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">betriebgroesse_parameter</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">betriebgroesse_parameter_cursor</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span>
+            <span class="n">parameterC</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;D&quot;</span><span class="p">:</span>
+            <span class="n">parameterD</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;E&quot;</span><span class="p">:</span>
+            <span class="n">parameterE</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;F&quot;</span><span class="p">:</span>
+            <span class="n">parameterF</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span>
+            <span class="n">parameterG</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;H&quot;</span><span class="p">:</span>
+            <span class="n">parameterH</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;I&quot;</span><span class="p">:</span>
+            <span class="n">parameterI</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;J&quot;</span><span class="p">:</span>
+            <span class="n">parameterJ</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;K&quot;</span><span class="p">:</span>
+            <span class="n">parameterK</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span>
+            <span class="n">parameterL</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;M&quot;</span><span class="p">:</span>
+            <span class="n">parameterM</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;N&quot;</span><span class="p">:</span>
+            <span class="n">parameterN</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+        <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Branche</span> <span class="o">==</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span>
+            <span class="n">parameterS</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">Betriebsflaechengroesse_ha</span>
+
+
+    <span class="n">gewerbe_teilflaechen</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">tabelle_gewerbe</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">gewerbe_teilflaechen</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterC</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;D&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterD</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;E&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterE</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;F&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterF</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterG</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;H&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterH</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;I&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterI</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;J&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterJ</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;K&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterK</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterL</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;M&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterM</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;N&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterN</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span>
+            <span class="n">betriebsflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span> <span class="o">*</span> <span class="n">parameterS</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">betriebsflaeche</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">betriebsflaeche_gewichtet</span> <span class="o">=</span> <span class="n">betriebsflaeche</span>
+
+        <span class="n">gewerbe_teilflaechen</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">gewerbe_teilflaechen</span>
+        <span class="c1">#Alle gewichteten Betriebsflaechen mit dem selben Teilgebiet wie die aktuelle Zeile zusammen addieren</span>
+    <span class="n">gewerbe_teilflaechen</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">tabelle_gewerbe</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">gewerbe_teilflaechen</span><span class="p">:</span>
+        <span class="n">gebiet</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">teilflaeche</span>
+        <span class="c1">#arcpy.AddMessage(gebiet)</span>
+        <span class="n">summeFlaeche</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">gewerbe_teilflaechenSearch</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tabelle_gewerbe</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row2</span> <span class="ow">in</span> <span class="n">gewerbe_teilflaechenSearch</span><span class="p">:</span>
+            <span class="c1">#arcpy.AddMessage(row2.teilflaeche)</span>
+            <span class="k">if</span> <span class="n">row2</span><span class="o">.</span><span class="n">teilflaeche</span> <span class="o">==</span> <span class="n">gebiet</span><span class="p">:</span>
+                <span class="c1">#arcpy.AddMessage(row2.betriebsflaeche_gewichtet)</span>
+                <span class="n">summeFlaeche</span> <span class="o">=</span> <span class="n">summeFlaeche</span> <span class="o">+</span> <span class="n">betriebsflaeche</span>
+        <span class="c1">#Das nettobauland fuer die gesamte Teilflaeche ermitteln</span>
+        <span class="n">tabelle_gewerbe</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_11_Definition_Projekt.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;Gewerbe_Teilflaechen&#39;</span><span class="p">)</span>
+        <span class="n">gewerbe_teilflaechen_temp</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">tabelle_gewerbe</span><span class="p">)</span>
+        <span class="n">nettoflaeche</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">row3</span> <span class="ow">in</span> <span class="n">gewerbe_teilflaechen_temp</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">row3</span><span class="o">.</span><span class="n">teilflaeche</span> <span class="o">==</span> <span class="n">gebiet</span><span class="p">:</span>
+                <span class="n">nettoflaeche</span> <span class="o">=</span> <span class="n">nettoflaeche</span> <span class="o">+</span> <span class="n">row3</span><span class="o">.</span><span class="n">nettobauland</span>
+        <span class="k">del</span> <span class="n">gewerbe_teilflaechen_temp</span>
+        <span class="k">del</span> <span class="n">gewerbe_teilflaechenSearch</span>
+        <span class="c1">#Korrektur der gewichteten Betriebsflaeche</span>
+        <span class="c1">#arcpy.AddMessage(betriebflaecheGewichtetGesamt)</span>
+        <span class="c1">#arcpy.AddMessage(summeFlaeche)</span>
+        <span class="c1">#arcpy.AddMessage(nettoflaeche)</span>
+        <span class="n">betriebsflaeche_korrigiert</span> <span class="o">=</span> <span class="n">betriebsflaeche</span> <span class="o">/</span> <span class="n">summeFlaeche</span> <span class="o">*</span> <span class="n">nettoflaeche</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">betriebsflaeche_korrigiert</span> <span class="o">=</span> <span class="n">betriebsflaeche_korrigiert</span>
+        <span class="n">gewerbe_teilflaechen</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">gewerbe_teilflaechen</span></div>
+
+
+
+
+
+<span class="c1">#Fuer jede Kombination aus Gewerbetyp und Teilflaeche die Flaechennutzung ermitteln</span>
+<div class="viewcode-block" id="flaechebilanzErmitteln"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.lib_gewerbemodell.html#rpctools.utils.lib_gewerbemodell.flaechebilanzErmitteln">[docs]</a><span class="k">def</span> <span class="nf">flaechebilanzErmitteln</span><span class="p">(</span><span class="n">projektname</span><span class="p">,</span><span class="n">nameTeilflaeche</span><span class="p">,</span><span class="n">gebietstyp</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">arcpy</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span><span class="nn">os</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Flaechenbilanzen berechnen&quot;</span><span class="p">)</span>
+
+    <span class="c1">#Pfade festlegen</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1">#workspace_basis = join(base_path, &#39;1_Basisdaten&#39;, &#39;FGDB_01_Basisdaten_deutschland.gdb&#39;)</span>
+    <span class="n">workspace_projekt</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span> <span class="n">projektname</span><span class="p">,</span>
+                                 <span class="s1">&#39;FGDB_11_Definition_Projekt_&#39;</span> <span class="o">+</span> <span class="n">projektname</span> <span class="o">+</span> <span class="s1">&#39;.gdb&#39;</span><span class="p">)</span>
+
+
+    <span class="c1">#Bruttoflaeche aus dem Shapefile ermitteln</span>
+    <span class="n">pfad_teilflaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt</span><span class="p">,</span><span class="s1">&#39;Teilflaechen_Plangebiet&#39;</span><span class="p">)</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;Name =&#39;&quot;</span><span class="o">+</span><span class="n">nameTeilflaeche</span> <span class="o">+</span><span class="s2">&quot;&#39;&quot;</span>
+    <span class="n">Plangebiet</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">pfad_teilflaeche</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
+    <span class="n">bruttoflaeche</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">flaeche</span> <span class="ow">in</span> <span class="n">Plangebiet</span><span class="p">:</span>
+        <span class="n">bruttoflaeche</span> <span class="o">=</span> <span class="n">flaeche</span><span class="o">.</span><span class="n">Flaeche_ha</span>
+    <span class="k">del</span> <span class="n">Plangebiet</span>
+
+    <span class="c1">#Flaechengroessen berechnen</span>
+    <span class="c1">#Nettoflaeche berechnen</span>
+    <span class="c1">#aus Parametertabelle gewerbe_flaechenbilanzen die Parameter fuer den Gebietstypen ermitteln</span>
+    <span class="n">pfad_flaechenbilanz</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;11_Definition_Projekt&#39;</span><span class="p">,</span><span class="s1">&#39;FGDB_11_Definition_Projekt_Tool.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;gewerbe_flaechenbilanzen&#39;</span><span class="p">)</span>
+    <span class="c1">#sql = &#39;Gebietstyp = &#39;+&quot;&#39;&quot;+gebietstyp+&quot;&#39;&quot;</span>
+    <span class="c1">#arcpy.AddMessage(sql)</span>
+    <span class="n">parameter_Anteil_Nettobauland</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">parameter_Gruenflaeche</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">parameter_Erschliessungsflaeche</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">parameter_Sonstige</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">parameter_tabelle</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">pfad_flaechenbilanz</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">zeile</span> <span class="ow">in</span> <span class="n">parameter_tabelle</span><span class="p">:</span>
+        <span class="c1">#arcpy.AddMessage(zeile.Gebietstyp)</span>
+        <span class="c1">#arcpy.AddMessage(gebietstyp)</span>
+        <span class="k">if</span> <span class="n">zeile</span><span class="o">.</span><span class="n">Gebietstyp</span> <span class="o">==</span> <span class="n">gebietstyp</span><span class="p">:</span>
+            <span class="n">parameter_Anteil_Nettobauland</span> <span class="o">=</span> <span class="n">zeile</span><span class="o">.</span><span class="n">Anteil_Nettobauland</span>
+            <span class="n">parameter_Erschliessungsflaeche</span> <span class="o">=</span> <span class="n">zeile</span><span class="o">.</span><span class="n">Erschliessungsflaeche</span>
+            <span class="n">parameter_Gruenflaeche</span> <span class="o">=</span> <span class="n">zeile</span><span class="o">.</span><span class="n">Gruenflaeche</span>
+            <span class="n">parameter_Sonstige</span> <span class="o">=</span> <span class="n">zeile</span><span class="o">.</span><span class="n">Sonstige</span>
+    <span class="k">del</span> <span class="n">parameter_tabelle</span>
+    <span class="n">nettobauland</span> <span class="o">=</span> <span class="n">bruttoflaeche</span> <span class="o">*</span> <span class="n">parameter_Anteil_Nettobauland</span>
+    <span class="n">gruenflaeche</span> <span class="o">=</span> <span class="n">bruttoflaeche</span> <span class="o">*</span> <span class="n">parameter_Gruenflaeche</span>
+    <span class="n">erschliessungsflaeche</span> <span class="o">=</span> <span class="n">bruttoflaeche</span> <span class="o">*</span> <span class="n">parameter_Erschliessungsflaeche</span>
+    <span class="n">sonstige</span> <span class="o">=</span> <span class="n">bruttoflaeche</span> <span class="o">*</span> <span class="n">parameter_Sonstige</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Flaechenbilanz I: Bruttoflaeche: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bruttoflaeche</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; Nettobauland: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nettobauland</span><span class="p">)</span><span class="o">+</span> <span class="s2">&quot; Gruenflaeche: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">gruenflaeche</span><span class="p">)</span><span class="o">+</span> <span class="s2">&quot; Erschliessungsflaeche: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">erschliessungsflaeche</span><span class="p">)</span><span class="o">+</span> <span class="s2">&quot; Sonstiges: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">sonstige</span><span class="p">))</span>
+
+    <span class="n">resultat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bruttoflaeche</span><span class="p">,</span><span class="n">nettobauland</span><span class="p">,</span><span class="n">gruenflaeche</span><span class="p">,</span><span class="n">sonstige</span><span class="p">,</span><span class="n">erschliessungsflaeche</span><span class="p">]</span>
+    <span class="c1">#arcpy.AddMessage(resultat)</span>
+    <span class="k">return</span> <span class="n">resultat</span></div>
+
+
+<div class="viewcode-block" id="nutzungsstruktur"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.lib_gewerbemodell.html#rpctools.utils.lib_gewerbemodell.nutzungsstruktur">[docs]</a><span class="k">def</span> <span class="nf">nutzungsstruktur</span><span class="p">(</span><span class="n">projektname</span><span class="p">):</span>
+
+<span class="c1">#fuer jede angelegte Gewerbenutzung weitere Parameter berechnen</span>
+    <span class="c1">#pfade anlegen</span>
+    <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">arcpy</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Nutzungstruktur berechnen&quot;</span><span class="p">)</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">tabelle_gewerbe</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_11_Definition_Projekt.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;Gewerbe_Teilflaechen&#39;</span><span class="p">)</span>
+    <span class="n">tabelle_gewerbe_update</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">tabelle_gewerbe</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tabelle_gewerbe_update</span><span class="p">:</span>
+        <span class="n">branche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; -&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">nettobauland</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">nettobauland</span>
+
+        <span class="n">tabelle_flaechenkenziffer</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;11_Definition_Projekt&#39;</span><span class="p">,</span><span class="s1">&#39;FGDB_11_Definition_Projekt_Tool.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;gewerbe_flaechenkennziffern&#39;</span><span class="p">)</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;Branche = &#39;&quot;</span> <span class="o">+</span> <span class="n">branche</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span>
+        <span class="c1">#arcpy.AddMessage(sql)</span>
+        <span class="c1">#Flaechenkennziffer vorbereiten</span>
+        <span class="n">tabelle_flaechenkenziffer_search</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tabelle_flaechenkenziffer</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row2</span> <span class="ow">in</span> <span class="n">tabelle_flaechenkenziffer_search</span><span class="p">:</span>
+            <span class="n">flaechenkennziffer</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Beschaeftigte_je_Hektar</span>
+        <span class="k">del</span> <span class="n">tabelle_flaechenkenziffer</span><span class="p">,</span> <span class="n">row2</span>
+        <span class="c1">#Parameter Flaechengroesse Hallen und Verwaltung vorbereiten</span>
+        <span class="n">tabelle_gewerbe_verhaeltnis_hallen_verwaltung</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;11_Definition_Projekt&#39;</span><span class="p">,</span><span class="s1">&#39;FGDB_11_Definition_Projekt_Tool.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;gewerbe_verhaeltnis_hallen_verwaltung&#39;</span><span class="p">)</span>
+        <span class="n">tabelle_gewerbe_verhaeltnis_hallen_verwaltung_Search</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tabelle_gewerbe_verhaeltnis_hallen_verwaltung</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row3</span> <span class="ow">in</span> <span class="n">tabelle_gewerbe_verhaeltnis_hallen_verwaltung_Search</span><span class="p">:</span>
+            <span class="n">parameter_hallen</span> <span class="o">=</span> <span class="n">row3</span><span class="o">.</span><span class="n">Hallen</span>
+            <span class="n">parameter_verwaltung</span> <span class="o">=</span> <span class="n">row3</span><span class="o">.</span><span class="n">Verwaltung</span>
+        <span class="k">del</span> <span class="n">row3</span><span class="p">,</span> <span class="n">tabelle_gewerbe_verhaeltnis_hallen_verwaltung_Search</span>
+        <span class="c1">#Parameter Volumen vorbereiten</span>
+        <span class="n">gewerbe_gebaeudehoehen_tabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;11_Definition_Projekt&#39;</span><span class="p">,</span><span class="s1">&#39;FGDB_11_Definition_Projekt_Tool.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;gewerbe_verhaeltnis_hallen_verwaltung&#39;</span><span class="p">)</span>
+        <span class="n">gewerbe_gebaeudehoehen_tabelle_Search</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">gewerbe_gebaeudehoehen_tabelle</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row4</span> <span class="ow">in</span> <span class="n">gewerbe_gebaeudehoehen_tabelle_Search</span><span class="p">:</span>
+            <span class="n">parameter_hallen_hoehe</span> <span class="o">=</span> <span class="n">row4</span><span class="o">.</span><span class="n">Hallen</span>
+            <span class="n">parameter_verwaltung_hoehe</span> <span class="o">=</span> <span class="n">row4</span><span class="o">.</span><span class="n">Verwaltung</span>
+        <span class="k">del</span> <span class="n">row4</span><span class="p">,</span> <span class="n">gewerbe_gebaeudehoehen_tabelle_Search</span>
+        <span class="n">beschaeftigte</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">nettobauland</span> <span class="o">*</span> <span class="n">flaechenkennziffer</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">beschaeftigte</span> <span class="o">=</span> <span class="n">beschaeftigte</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_hallen</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">betriebsflaeche_korrigiert</span> <span class="o">*</span> <span class="n">parameter_hallen</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_verwaltung</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">betriebsflaeche_korrigiert</span> <span class="o">+</span> <span class="n">parameter_verwaltung</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">tabelle_gewerbe_update</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">tabelle_gewerbe_update</span>
+    <span class="n">tabelle_gewerbe_update</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">tabelle_gewerbe</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tabelle_gewerbe_update</span><span class="p">:</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">volumen_hallen</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">flaeche_hallen</span> <span class="o">*</span> <span class="n">parameter_hallen_hoehe</span> <span class="o">*</span> <span class="mi">10000</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">volumen_verwaltung</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">flaeche_verwaltung</span> <span class="o">*</span> <span class="n">parameter_verwaltung_hoehe</span> <span class="o">*</span> <span class="mi">10000</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">ueberbaute_Flaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">flaeche_hallen</span><span class="o">+</span><span class="n">row</span><span class="o">.</span><span class="n">flaeche_verwaltung</span>
+        <span class="c1">#flaechenbedeckung ermittelen</span>
+        <span class="c1">#parametertabelle laden</span>
+        <span class="n">gewerbe_flaechennutzung</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;11_Definition_Projekt&#39;</span><span class="p">,</span><span class="s1">&#39;FGDB_11_Definition_Projekt_Tool.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;gewerbe_flaechennutzungNettobaulandAllgemein&#39;</span><span class="p">)</span>
+        <span class="n">tabelle_gewerbe_flaechennutzung</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">gewerbe_flaechennutzung</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row5</span> <span class="ow">in</span> <span class="n">tabelle_gewerbe_flaechennutzung</span><span class="p">:</span>
+            <span class="n">parameter_flaeche_asphalt_beton</span> <span class="o">=</span> <span class="n">row5</span><span class="o">.</span><span class="n">Asphalt_Beton</span>
+            <span class="n">parameter_flaeche_kleinpflaster</span> <span class="o">=</span> <span class="n">row5</span><span class="o">.</span><span class="n">Kleinpflaster</span>
+            <span class="n">parameter_flaeche_platten</span> <span class="o">=</span> <span class="n">row5</span><span class="o">.</span><span class="n">Platten</span>
+            <span class="n">parameter_flaeche_wasser_decke_rasengitter</span> <span class="o">=</span> <span class="n">row5</span><span class="o">.</span><span class="n">Wassergebundene_Decke_Rasengittersteine</span>
+            <span class="n">parameter_flaeche_offener_boden_acker</span> <span class="o">=</span> <span class="n">row5</span><span class="o">.</span><span class="n">Offener_Boden_Acker</span>
+            <span class="n">parameter_flaeche_rasen</span> <span class="o">=</span> <span class="n">row5</span><span class="o">.</span><span class="n">Rasen</span>
+            <span class="n">parameter_flaeche_baeume_straeucher</span> <span class="o">=</span> <span class="n">row5</span><span class="o">.</span><span class="n">Baeume_Straeucher</span>
+            <span class="n">parameter_flaeche_stauden</span> <span class="o">=</span> <span class="n">row5</span><span class="o">.</span><span class="n">Stauden</span>
+            <span class="n">parameter_flaeche_wiese</span> <span class="o">=</span> <span class="n">row5</span><span class="o">.</span><span class="n">Wiese</span>
+            <span class="n">parameter_flaeche_wasser</span> <span class="o">=</span> <span class="n">row5</span><span class="o">.</span><span class="n">Natuerliche_Wasserflaeche</span>
+        <span class="k">del</span> <span class="n">tabelle_gewerbe_flaechennutzung</span><span class="p">,</span> <span class="n">row5</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_asphalt_beton</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">nettobauland</span> <span class="o">*</span> <span class="n">parameter_flaeche_asphalt_beton</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_kleinpflaster</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">nettobauland</span> <span class="o">*</span> <span class="n">parameter_flaeche_kleinpflaster</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_platten</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">nettobauland</span> <span class="o">*</span> <span class="n">parameter_flaeche_platten</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_wasser_decke_rasengitter</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">nettobauland</span> <span class="o">*</span> <span class="n">parameter_flaeche_wasser_decke_rasengitter</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_offener_boden_acker</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">nettobauland</span> <span class="o">*</span> <span class="n">parameter_flaeche_offener_boden_acker</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_rasen</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">nettobauland</span> <span class="o">*</span> <span class="n">parameter_flaeche_rasen</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_baeume_straeucher</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">nettobauland</span> <span class="o">*</span> <span class="n">parameter_flaeche_baeume_straeucher</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_stauden</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">nettobauland</span> <span class="o">*</span> <span class="n">parameter_flaeche_stauden</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_wiese</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">nettobauland</span> <span class="o">*</span> <span class="n">parameter_flaeche_wiese</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">flaeche_wasser</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">nettobauland</span> <span class="o">*</span> <span class="n">parameter_flaeche_wasser</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">tabelle_gewerbe_update</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">tabelle_gewerbe_update</span></div>
+
+
+<div class="viewcode-block" id="betriebsstruktur"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.lib_gewerbemodell.html#rpctools.utils.lib_gewerbemodell.betriebsstruktur">[docs]</a><span class="k">def</span> <span class="nf">betriebsstruktur</span><span class="p">(</span><span class="n">projektname</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span><span class="nn">os</span><span class="o">,</span><span class="nn">arcpy</span>
+    <span class="c1">#Pfade festlegen</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">workspace_projekt</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span> <span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_11_Definition_Projekt_&#39;</span> <span class="o">+</span> <span class="n">projektname</span> <span class="o">+</span> <span class="s1">&#39;.gdb&#39;</span><span class="p">)</span>
+
+    <span class="n">tabelle_gewerbe_teilflaechen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt</span><span class="p">,</span> <span class="s2">&quot;Gewerbe_Teilflaechen&quot;</span><span class="p">)</span>
+    <span class="n">tabelle_gewerbe_betriebsstruktur</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt</span><span class="p">,</span> <span class="s2">&quot;Gewerbe_Betriebsstruktur&quot;</span><span class="p">)</span>
+    <span class="n">tabelle_parameter_aufsiedlungsdauer</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;11_Definition_Projekt&#39;</span><span class="p">,</span><span class="s1">&#39;FGDB_11_Definition_Projekt_Tool.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;gewerbe_aufsiedlungsdauer&#39;</span><span class="p">)</span>
+
+    <span class="n">tabelle_gewerbe_teilflaechen_Search</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tabelle_gewerbe_teilflaechen</span><span class="p">)</span>
+    <span class="n">tabelle_gewerbe_betriebsstruktur_Insert</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">tabelle_gewerbe_betriebsstruktur</span><span class="p">)</span>
+
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tabelle_gewerbe_teilflaechen_Search</span><span class="p">:</span>
+        <span class="n">anzahl_betriebe_start</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">anzahlBetriebe</span>
+        <span class="n">aufsiedlungsdauer</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">aufsiedlungsdauer</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;Dauer_Jahre = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">aufsiedlungsdauer</span><span class="p">)</span>
+
+        <span class="n">tabelle_parameter_aufsiedlungsdauer_Search</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">tabelle_parameter_aufsiedlungsdauer</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row2</span> <span class="ow">in</span> <span class="n">tabelle_parameter_aufsiedlungsdauer_Search</span><span class="p">:</span>
+            <span class="n">parameter_jahr1</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr1</span>
+            <span class="n">parameter_jahr2</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr2</span>
+            <span class="n">parameter_jahr3</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr3</span>
+            <span class="n">parameter_jahr4</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr4</span>
+            <span class="n">parameter_jahr5</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr5</span>
+            <span class="n">parameter_jahr6</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr6</span>
+            <span class="n">parameter_jahr7</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr7</span>
+            <span class="n">parameter_jahr8</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr8</span>
+            <span class="n">parameter_jahr9</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr9</span>
+            <span class="n">parameter_jahr10</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr10</span>
+            <span class="n">parameter_jahr11</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr11</span>
+            <span class="n">parameter_jahr12</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr12</span>
+            <span class="n">parameter_jahr13</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr13</span>
+            <span class="n">parameter_jahr14</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr14</span>
+            <span class="n">parameter_jahr15</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr15</span>
+            <span class="n">parameter_jahr16</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr16</span>
+            <span class="n">parameter_jahr17</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr17</span>
+            <span class="n">parameter_jahr18</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr18</span>
+            <span class="n">parameter_jahr19</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr19</span>
+            <span class="n">parameter_jahr20</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr20</span>
+            <span class="n">parameter_jahr21</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr21</span>
+            <span class="n">parameter_jahr22</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr22</span>
+            <span class="n">parameter_jahr23</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr23</span>
+            <span class="n">parameter_jahr24</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr24</span>
+            <span class="n">parameter_jahr25</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr25</span>
+            <span class="n">parameter_jahr26</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr26</span>
+            <span class="n">parameter_jahr27</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr27</span>
+            <span class="n">parameter_jahr28</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr28</span>
+            <span class="n">parameter_jahr29</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr29</span>
+            <span class="n">parameter_jahr30</span> <span class="o">=</span> <span class="n">row2</span><span class="o">.</span><span class="n">Jahr30</span>
+        <span class="k">del</span> <span class="n">row2</span><span class="p">,</span> <span class="n">tabelle_parameter_aufsiedlungsdauer_Search</span>
+        <span class="c1">#Ergebnisse berechnen und einfuegen</span>
+        <span class="n">row3</span> <span class="o">=</span> <span class="n">tabelle_gewerbe_betriebsstruktur_Insert</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_1</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr1</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_2</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr2</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_3</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr3</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_4</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr4</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_5</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr5</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_6</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr6</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_7</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr7</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_8</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr8</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_9</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr9</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_10</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr10</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_11</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr11</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_12</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr12</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_13</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr13</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_14</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr14</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_15</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr15</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_16</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr16</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_17</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr17</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_18</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr18</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_19</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr19</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_20</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr20</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_21</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr21</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_22</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr22</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_23</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr23</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_24</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr24</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_25</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr25</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_26</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr26</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_27</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr27</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_28</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr28</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_29</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr29</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">anzahl_betriebe_jahr_30</span> <span class="o">=</span> <span class="n">anzahl_betriebe_start</span> <span class="o">*</span> <span class="n">parameter_jahr30</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">projekt</span> <span class="o">=</span> <span class="n">projektname</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">teilflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">teilflaeche</span>
+        <span class="n">row3</span><span class="o">.</span><span class="n">branche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">gewerbetyp</span>
+
+
+        <span class="n">tabelle_gewerbe_betriebsstruktur_Insert</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row3</span><span class="p">)</span></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="c1">##Bodenbedeckung berechnen</span>
+<span class="c1">#    #Parameter extrahieren</span>
+<span class="c1">#    bodenbedeckung_pfad = join(base_path,&#39;2_Tool&#39;,&#39;11_Definition_Projekt&#39;,&#39;FGDB_11_Definition_Projekt_Tool.gdb&#39;,&#39;gewerbe_flaechennutzungNettobaulandAllgemein&#39;)</span>
+<span class="c1">#    bodenbedeckung_cursor = arcpy.SearchCursor(bodenbedeckung_pfad)</span>
+<span class="c1">#    for row in bodenbedeckung_cursor:</span>
+<span class="c1">#        if row.Branche == &quot;C&quot;:</span>
+<span class="c1">#            C = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;D&quot;:</span>
+<span class="c1">#            D = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;E&quot;:</span>
+<span class="c1">#            E = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;F&quot;:</span>
+<span class="c1">#            F = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;G&quot;:</span>
+<span class="c1">#            G = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;H&quot;:</span>
+<span class="c1">#            H = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;I&quot;:</span>
+<span class="c1">#            I = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;J&quot;:</span>
+<span class="c1">#            J = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;K&quot;:</span>
+<span class="c1">#            K = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;L&quot;:</span>
+<span class="c1">#            L = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;M&quot;:</span>
+<span class="c1">#            M = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;N&quot;:</span>
+<span class="c1">#            N = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+<span class="c1">#        if row.Branche == &quot;S&quot;:</span>
+<span class="c1">#            S = [row.Uberbaute_Flaechen,row.Asphalt_Beton,row.Platten,row.Kleinpflaster,row.Wassergebundene_Decke_Rasengittersteine,row.Offener_Boden_Acker,row.Rasen,row.Baeume_Straeucher,row.Stauden,row.Wiese,row.Natuerliche_Wasserflaeche]</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 26, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

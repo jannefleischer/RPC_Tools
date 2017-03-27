@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.utils.verkehr_lib &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.utils.verkehr_lib</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># verkehr_lib.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description: Erstellung der Bevölkerungsprognose für das zu untersuchende Projekt</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># GGR Planung</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># Allgemeine Funktionen</span>
+<span class="c1">#</span>
+
+<div class="viewcode-block" id="uebergabepunkt_bearbeiten"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.verkehr_lib.html#rpctools.utils.verkehr_lib.uebergabepunkt_bearbeiten">[docs]</a><span class="k">def</span> <span class="nf">uebergabepunkt_bearbeiten</span><span class="p">(</span><span class="n">projektname</span><span class="p">,</span><span class="n">punkt_name</span><span class="p">,</span><span class="n">qp_wohnen</span><span class="p">,</span><span class="n">qp_versorgung</span><span class="p">,</span><span class="n">qp_gewerbe</span><span class="p">,</span><span class="n">qp_schulen</span><span class="p">,</span><span class="n">zp_wohnen</span><span class="p">,</span><span class="n">zp_versorgung</span><span class="p">,</span><span class="n">zp_gewerbe</span><span class="p">,</span><span class="n">zp_schulen</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">arcpy</span>
+    <span class="nb">print</span> <span class="s2">&quot;bearbeiten&quot;</span>
+    <span class="c1"># Create Paths</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># Pfad zum Basisverzeichnis RPC</span>
+    <span class="n">workspace_projekt_verkehr</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Verkehr.gdb&#39;</span><span class="p">)</span>
+    <span class="n">workspace_tool_verkehr</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Verkehr&quot;</span><span class="p">,</span><span class="s2">&quot;33_Verkehr_Tool.gdb&quot;</span><span class="p">)</span>
+
+    <span class="n">uebergabepunkt_tabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L01_Uebergabepunkte&#39;</span><span class="p">)</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">uebergabepunkt_tabelle</span><span class="p">)</span>
+
+    <span class="c1"># Update the field used in buffer so the distance is based on the road</span>
+    <span class="c1"># type. Road type is either 1, 2, 3 or 4. Distance is in meters.</span>
+    <span class="c1">#</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="c1"># Fields from the table can be dynamically accessed from the row object.</span>
+        <span class="c1">#   Here fields named BUFFER_DISTANCE and ROAD_TYPE are used</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">Punkt_Name</span> <span class="o">==</span> <span class="n">punkt_name</span><span class="p">:</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">QP_Wohnen</span> <span class="o">=</span> <span class="n">qp_wohnen</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">QP_Versorgung</span> <span class="o">=</span> <span class="n">qp_versorgung</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">QP_Gewerbe</span> <span class="o">=</span> <span class="n">qp_gewerbe</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">QP_Schulen</span> <span class="o">=</span> <span class="n">qp_schulen</span>
+
+                <span class="n">row</span><span class="o">.</span><span class="n">ZP_Wohnen</span> <span class="o">=</span> <span class="n">zp_wohnen</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">ZP_Versorgung</span> <span class="o">=</span> <span class="n">zp_versorgung</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">ZP_Gewerbe</span> <span class="o">=</span> <span class="n">zp_gewerbe</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">ZP_Schulen</span> <span class="o">=</span> <span class="n">zp_schulen</span>
+                <span class="n">rows</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="c1"># Delete cursor and row objects to remove locks on the data</span>
+    <span class="k">del</span> <span class="n">row</span><span class="p">,</span> <span class="n">rows</span></div>
+
+<div class="viewcode-block" id="get_mapquest_route"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.verkehr_lib.html#rpctools.utils.verkehr_lib.get_mapquest_route">[docs]</a><span class="k">def</span> <span class="nf">get_mapquest_route</span><span class="p">(</span><span class="n">route_id</span><span class="p">,</span><span class="n">lat_start</span><span class="p">,</span><span class="n">lon_start</span><span class="p">,</span><span class="n">lat_end</span><span class="p">,</span><span class="n">lon_end</span><span class="p">,</span><span class="n">mapquest_key</span><span class="p">):</span>
+
+    <span class="kn">import</span> <span class="nn">urllib2</span>
+    <span class="kn">import</span> <span class="nn">xml.dom.minidom</span> <span class="k">as</span> <span class="nn">dom</span>
+
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;fastest&#39;</span> <span class="c1"># types available: fastest, shortest, pedestrian, bicycle</span>
+
+        <span class="n">origin</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">lat_start</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">lon_start</span><span class="p">)</span>
+        <span class="n">destination</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">lat_end</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">lon_end</span><span class="p">)</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;http://open.mapquestapi.com/directions/v1/route?outFormat=xml&amp;from=&#39;</span><span class="o">+</span><span class="n">origin</span><span class="o">+</span><span class="s1">&#39;&amp;to=&#39;</span><span class="o">+</span><span class="n">destination</span><span class="o">+</span><span class="s1">&#39;+&amp;callback=renderNarrative&amp;routeType=&#39;</span><span class="o">+</span><span class="n">mode</span><span class="o">+</span><span class="s1">&#39;&amp;unit=k&amp;shapeFormat=raw&amp;generalize=0&amp;key=&#39;</span><span class="o">+</span><span class="n">mapquest_key</span>
+        <span class="c1">#arcpy.AddMessage(query)</span>
+
+        <span class="n">xml</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+        <span class="n">baum</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+
+        <span class="n">waypoints</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">baum</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;shapePoints&#39;</span><span class="p">):</span>
+
+            <span class="k">for</span> <span class="n">coordnote</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;latLng&#39;</span><span class="p">):</span>
+                <span class="c1">#extract lat from end_location</span>
+                <span class="k">for</span> <span class="n">latnode</span> <span class="ow">in</span> <span class="n">coordnote</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;lat&#39;</span><span class="p">):</span>
+                    <span class="n">lat</span> <span class="o">=</span>  <span class="n">latnode</span><span class="o">.</span><span class="n">toxml</span><span class="p">()</span>
+                    <span class="n">lat</span> <span class="o">=</span> <span class="n">lat</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;lat&gt;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">lat</span> <span class="o">=</span> <span class="n">lat</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;/lat&gt;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">lat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">lngnode</span> <span class="ow">in</span> <span class="n">coordnote</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;lng&#39;</span><span class="p">):</span>
+                    <span class="c1">#extract lng from end_location</span>
+                    <span class="n">lon</span> <span class="o">=</span>  <span class="n">lngnode</span><span class="o">.</span><span class="n">toxml</span><span class="p">()</span>
+                    <span class="n">lon</span> <span class="o">=</span> <span class="n">lon</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;lng&gt;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">lon</span> <span class="o">=</span> <span class="n">lon</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;/lng&gt;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">lon</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
+
+                <span class="n">werte</span> <span class="o">=</span> <span class="p">(</span><span class="n">route_id</span><span class="p">,</span><span class="n">lat</span><span class="p">,</span><span class="n">lon</span><span class="p">)</span>
+
+                <span class="n">waypoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">werte</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">waypoints</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Route von Punkt &quot;</span><span class="o">+</span><span class="n">origin</span><span class="o">+</span><span class="s2">&quot; nach &quot;</span><span class="o">+</span><span class="n">destination</span>
+
+    <span class="c1">#arcpy.AddMessage(message)</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">waypoints</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="verkehrserzeugung_einwohner"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.verkehr_lib.html#rpctools.utils.verkehr_lib.verkehrserzeugung_einwohner">[docs]</a><span class="k">def</span> <span class="nf">verkehrserzeugung_einwohner</span><span class="p">(</span><span class="n">EW</span><span class="p">,</span><span class="n">Wege_EW</span><span class="p">,</span><span class="n">MIV_Anteil</span><span class="p">,</span><span class="n">Pers_KFZ</span><span class="p">,</span><span class="n">Anteil_Besucherfahrten</span><span class="p">,</span><span class="n">WF_Fahrten_je_EW</span><span class="p">):</span>
+    <span class="n">fahrten_ew_tag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">EW</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Wege_EW</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">MIV_Anteil</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Pers_KFZ</span><span class="p">)))</span>
+    <span class="n">fahrten_besucher_tag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">fahrten_ew_tag</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Anteil_Besucherfahrten</span><span class="p">)))</span>
+    <span class="n">fahrten_wf_tag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">EW</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">WF_Fahrten_je_EW</span><span class="p">)))</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">fahrten_ew_tag</span><span class="p">,</span><span class="n">fahrten_besucher_tag</span><span class="p">,</span><span class="n">fahrten_wf_tag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="verkehrserzeugung_einzelhandel"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.verkehr_lib.html#rpctools.utils.verkehr_lib.verkehrserzeugung_einzelhandel">[docs]</a><span class="k">def</span> <span class="nf">verkehrserzeugung_einzelhandel</span><span class="p">(</span><span class="n">BGF</span><span class="p">,</span><span class="n">BGF_Beschaeftigter</span><span class="p">,</span><span class="n">Anwesenheit</span><span class="p">,</span><span class="n">Wege_Beschaeftigter</span><span class="p">,</span><span class="n">MIV_Anteil</span><span class="p">,</span><span class="n">Pers_KFZ</span><span class="p">,</span><span class="n">Besucher_Tag</span><span class="p">,</span><span class="n">Lieferwege_100m2</span><span class="p">):</span>
+    <span class="n">fahrten_beschaeftigte_tag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(((</span><span class="nb">float</span><span class="p">(</span><span class="n">BGF</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">BGF_Beschaeftigter</span><span class="p">))</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Anwesenheit</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Wege_Beschaeftigter</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">MIV_Anteil</span><span class="p">))</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">Pers_KFZ</span><span class="p">))</span>
+    <span class="n">fahrten_kunden_tag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(((((</span><span class="n">BGF</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Besucher_Tag</span><span class="p">))</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">MIV_Anteil</span><span class="p">))</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">Pers_KFZ</span><span class="p">))</span><span class="o">*</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">fahrten_wf_tag</span> <span class="o">=</span><span class="nb">int</span><span class="p">((</span><span class="n">BGF</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Lieferwege_100m2</span><span class="p">))</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">fahrten_beschaeftigte_tag</span><span class="p">,</span><span class="n">fahrten_kunden_tag</span><span class="p">,</span><span class="n">fahrten_wf_tag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="verkehrserzeugung_gewerbe"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.verkehr_lib.html#rpctools.utils.verkehr_lib.verkehrserzeugung_gewerbe">[docs]</a><span class="k">def</span> <span class="nf">verkehrserzeugung_gewerbe</span><span class="p">(</span><span class="n">Beschaeftigte</span><span class="p">,</span><span class="n">Anwesenheit</span><span class="p">,</span><span class="n">Wege_Beschaeftigter</span><span class="p">,</span><span class="n">MIV_Anteil</span><span class="p">,</span><span class="n">Pers_KFZ</span><span class="p">,</span><span class="n">Kundenwege_Beschaeftigte</span><span class="p">,</span><span class="n">Lieferwege_Beschaeftigte</span><span class="p">):</span>
+    <span class="n">fahrten_beschaeftigte_tag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">Beschaeftigte</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Anwesenheit</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Wege_Beschaeftigter</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">MIV_Anteil</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">Pers_KFZ</span><span class="p">)))</span>
+    <span class="n">fahrten_besucher_tag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">Beschaeftigte</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Kundenwege_Beschaeftigte</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">MIV_Anteil</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">Pers_KFZ</span><span class="p">)))</span>
+    <span class="n">fahrten_wf_tag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">Beschaeftigte</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Lieferwege_Beschaeftigte</span><span class="p">)))</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">fahrten_beschaeftigte_tag</span><span class="p">,</span><span class="n">fahrten_besucher_tag</span><span class="p">,</span><span class="n">fahrten_wf_tag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="verkehrserzeugung_schulen"><a class="viewcode-back" href="../../../rpctools/rpctools.utils.verkehr_lib.html#rpctools.utils.verkehr_lib.verkehrserzeugung_schulen">[docs]</a><span class="k">def</span> <span class="nf">verkehrserzeugung_schulen</span><span class="p">(</span><span class="n">Schueler</span><span class="p">,</span><span class="n">Wege_Schueler</span><span class="p">,</span><span class="n">MIV_Anteil</span><span class="p">,</span><span class="n">Schueler_KFZ</span><span class="p">,</span><span class="n">Schueler_je_Lehrer</span><span class="p">,</span><span class="n">Wege_Lehrer</span><span class="p">,</span><span class="n">Pers_KFZ</span><span class="p">,</span><span class="n">Lieferwege_Schueler</span><span class="p">):</span>
+    <span class="n">fahrten_schueler_tag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">Schueler</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Wege_Schueler</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">MIV_Anteil</span><span class="p">))</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">Schueler_KFZ</span><span class="p">))</span>
+    <span class="n">fahrten_lehrer_tag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(((</span><span class="nb">float</span><span class="p">(</span><span class="n">Schueler</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">Schueler_je_Lehrer</span><span class="p">))</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Wege_Lehrer</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">MIV_Anteil</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">Pers_KFZ</span><span class="p">)))</span>
+    <span class="n">fahrten_wf_tag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">Schueler</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">Lieferwege_Schueler</span><span class="p">)))</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">fahrten_schueler_tag</span><span class="p">,</span><span class="n">fahrten_lehrer_tag</span><span class="p">,</span><span class="n">fahrten_wf_tag</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 26, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

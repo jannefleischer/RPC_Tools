@@ -1,0 +1,332 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.analyst.flaeche_oekologie.bewertung_wohnflaechendichte &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.analyst.flaeche_oekologie.bewertung_wohnflaechendichte</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># bewertung_wohnflaechendichte.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description:</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># ILS gGmbH</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.flaeche_oekologie.bewertung_wohnflaechendichte.html#rpctools.analyst.flaeche_oekologie.bewertung_wohnflaechendichte.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">messages</span><span class="p">):</span>
+    <span class="c1">#Variablen definieren</span>
+    <span class="n">projektname</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+
+    <span class="c1">#aktueller Pfad</span>
+    <span class="n">rootPfad</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1">#Pfad zur Ergebnistabelle</span>
+
+    <span class="n">ergebnisTabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Flaeche_und_Oekologie.gdb&#39;</span><span class="p">,</span><span class="s1">&#39;Ergebnisse_oekologischeWertigkeit&#39;</span><span class="p">)</span>
+    <span class="c1">#ergebnisTabelle = rootPfad + &quot;\\3 Benutzerdefinierte Projekte\\&quot; + projektname + &quot;\\FGDB_Flaeche_und_Oekologie_&quot; + projektname + &quot;.gdb\\Ergebnisse_oekologischeWertigkeit&quot;</span>
+
+    <span class="n">workspace_basis</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s2">&quot;1_Basisdaten&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Basisdaten_deutschland.gdb&quot;</span><span class="p">)</span>
+    <span class="c1">#workspace_basis = rootPfad+&#39;\\1_Basisdaten\\FGDB_Basisdaten_deutschland.gdb\\&#39;</span>
+
+    <span class="n">workspace_projekt</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+    <span class="c1">#workspace_projekt = rootPfad+&#39;\\3 Benutzerdefinierte Projekte\\&#39;+projektname+&#39;\\FGDB_Definition_Projekt.gdb\\&#39;</span>
+
+    <span class="n">workspace_ergebnisse</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">rootPfad</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Flaeche_und_Oekologie.gdb&#39;</span><span class="p">)</span>
+    <span class="c1">#workspace_ergebnisse = rootPfad +&#39;\\3 Benutzerdefinierte Projekte\\&#39;+projektname+&#39;\\FGDB_36_Flaeche_und_Oekologie.gdb\\&#39;</span>
+
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1">##Daten für den Projektraum zusammenstellen</span>
+    <span class="c1">#AGS aus den Grundlagendaten extrahieren</span>
+    <span class="c1">#Wohnfläche und Nettobauland aus den Grundlagendaten extrahieren</span>
+    <span class="c1">#Wohnflaeche gesamt berechenen</span>
+    <span class="n">Wohneinheiten_Details</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt</span><span class="p">,</span> <span class="s1">&#39;Wohneinheiten_Details&#39;</span><span class="p">)</span>
+    <span class="n">wohnflaeche_gesamt</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">wohnflaecheTemp</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">efh</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">dh</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">rh</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">mfh</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">Wohneinheiten_Details</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">Gebaeudetyp</span> <span class="o">==</span> <span class="s2">&quot;Einfamilienhaus&quot;</span><span class="p">:</span>
+            <span class="n">efh</span> <span class="o">+=</span> <span class="n">row</span><span class="o">.</span><span class="n">Anzahl_WE</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">row</span><span class="o">.</span><span class="n">Gebaeudetyp</span> <span class="o">==</span> <span class="s2">&quot;Zweifamilien- oder Doppelhaus&quot;</span><span class="p">:</span>
+            <span class="n">efh</span> <span class="o">+=</span> <span class="n">row</span><span class="o">.</span><span class="n">Anzahl_WE</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">row</span><span class="o">.</span><span class="n">Gebaeudetyp</span> <span class="o">==</span> <span class="s2">&quot;Reihenhaus&quot;</span><span class="p">:</span>
+            <span class="n">efh</span> <span class="o">+=</span> <span class="n">row</span><span class="o">.</span><span class="n">Anzahl_WE</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">row</span><span class="o">.</span><span class="n">Gebaeudetyp</span> <span class="o">==</span> <span class="s2">&quot;Mehrfamilienhaus&quot;</span><span class="p">:</span>
+            <span class="n">efh</span> <span class="o">+=</span> <span class="n">row</span><span class="o">.</span><span class="n">Anzahl_WE</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span><span class="p">)</span>
+
+    <span class="n">wohnflaeche_gesamt</span> <span class="o">=</span> <span class="n">efh</span> <span class="o">+</span> <span class="n">dh</span> <span class="o">+</span><span class="n">rh</span> <span class="o">+</span> <span class="n">mfh</span>
+
+    <span class="c1">#Nettobaulang gesamt berechnen</span>
+    <span class="c1">#Flaechenbilanz_Planung = join(workspace_projekt,&#39;Flaechenbilanz_Planung_gruppiert&#39;)</span>
+    <span class="c1">#nettobauland_gesamt = 0</span>
+    <span class="c1">#sql = &quot;Flaechennutzung_S1 = &#39;Nettobauland&#39;&quot;</span>
+    <span class="c1">#cursor = arcpy.SearchCursor(Flaechenbilanz_Planung,sql)</span>
+
+    <span class="c1">#for row in cursor:</span>
+    <span class="c1">#    print &quot;Drin&quot;</span>
+    <span class="c1">#    nettobauland_temp = row.Flaeche_ha</span>
+    <span class="c1">#    nettobauland_gesamt = nettobauland_gesamt + nettobauland_temp</span>
+    <span class="c1">#Änderung: Gesamtprojektfläche anstelle von nettobauland verwenden</span>
+    <span class="n">pfad_flaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt</span><span class="p">,</span><span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">pfad_flaeche</span><span class="p">,</span><span class="s2">&quot;area_hektares&quot;</span><span class="p">,</span><span class="s2">&quot;FLOAT&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">CalculateField_management</span><span class="p">(</span><span class="n">pfad_flaeche</span><span class="p">,</span><span class="s2">&quot;area_hektares&quot;</span><span class="p">,</span><span class="s2">&quot;!shape.area@HECTARES!&quot;</span><span class="p">,</span><span class="s2">&quot;PYTHON_9.3&quot;</span><span class="p">)</span>
+
+    <span class="n">flaechengroesse</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">pfad_flaeche</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">flaeche</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+        <span class="n">flaechengroesse</span> <span class="o">=</span> <span class="n">flaechengroesse</span> <span class="o">+</span> <span class="n">flaeche</span><span class="o">.</span><span class="n">area_hektares</span>
+    <span class="n">flaechengroesse</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">flaechengroesse</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+    <span class="c1">#Übernahme der alten Vairable damit nicht zu viel im Folgenden geändert werden muss</span>
+    <span class="n">nettobauland_gesamt</span> <span class="o">=</span> <span class="n">flaechengroesse</span>
+    <span class="n">nettobauland_gesamt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">nettobauland_gesamt</span><span class="p">)</span>
+    <span class="c1">#Den AGS aus der Lage der projektfläche im Raum ermitteln</span>
+    <span class="n">projektFlaeche</span> <span class="o">=</span> <span class="n">rootPfad</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">3 Benutzerdefinierte Projekte</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">projektname</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">FGDB_Definition_Projekt_&quot;</span> <span class="o">+</span> <span class="n">projektname</span> <span class="o">+</span> <span class="s2">&quot;.gdb</span><span class="se">\\</span><span class="s2">Teilflaechen_Plangebiet&quot;</span>
+    <span class="n">bkg</span> <span class="o">=</span> <span class="n">rootPfad</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">1_Basisdaten</span><span class="se">\\</span><span class="s2">FGDB_Basisdaten_deutschland.gdb</span><span class="se">\\</span><span class="s2">bkg_gemeinden&quot;</span>
+    <span class="c1">#ags aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird</span>
+    <span class="c1">#1. Feature Layer aus den bkg-daten erstellen</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">bkg</span><span class="p">,</span><span class="s2">&quot;bkg_lyr&quot;</span><span class="p">)</span>
+    <span class="c1">#2.Spatial Select wo Planfläche bkg_lyr intersected</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByLocation_management</span><span class="p">(</span><span class="s2">&quot;bkg_lyr&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="n">projektFlaeche</span><span class="p">)</span>
+    <span class="c1">#Wenn Flaeche = 1, ags extrahieren</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">GetCount_management</span><span class="p">(</span><span class="s2">&quot;bkg_lyr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">getOutput</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span><span class="mi">1</span> <span class="p">):</span>
+        <span class="n">gemeindeCursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="s2">&quot;bkg_lyr&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">gemeinde</span> <span class="ow">in</span> <span class="n">gemeindeCursor</span><span class="p">:</span>
+            <span class="n">ags</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">AGS</span>
+    <span class="c1">#der AGS muss noch angepasst werden, da zur bestimmung des Kreises nur die ersten 5 Stellen gebraucht werden</span>
+    <span class="n">lenAGS</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">lenAGS</span> <span class="o">&gt;</span><span class="mi">5</span><span class="p">):</span>
+        <span class="n">ags</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span>
+        <span class="n">ags</span> <span class="o">=</span> <span class="n">ags</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span>
+
+    <span class="c1">#Mittelwerte der einzelnen Kreistypen berechnen</span>
+    <span class="c1">#Zur schnelleren Bearbeitung wird Grundlagentabelle komplett in den Arbeitsspeicher geladen</span>
+    <span class="n">table1</span> <span class="o">=</span> <span class="s2">&quot;in_memory//GrundlagenDE&quot;</span>
+    <span class="n">fc</span> <span class="o">=</span> <span class="n">rootPfad</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">2_Tool</span><span class="se">\\</span><span class="s2">Flaeche_und_Oekologie</span><span class="se">\\</span><span class="s2">FGDB_Flaeche_und_Oekologie_Tool.gdb</span><span class="se">\\</span><span class="s2">GrundlagenDE&quot;</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">CopyRows_management</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">table1</span><span class="p">)</span>
+    <span class="c1">#Erstellung einer weiteren in_memory Tabelle für die Ergebnisse der Mittelwertsberechnungen für die Kreistypen</span>
+    <span class="n">kreise</span> <span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">CreateTable_management</span><span class="p">(</span><span class="s2">&quot;in_memory&quot;</span><span class="p">,</span> <span class="s2">&quot;kreise&quot;</span> <span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">kreise</span><span class="p">,</span> <span class="s2">&quot;Kreistyp&quot;</span><span class="p">,</span><span class="s2">&quot;SHORT&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">kreise</span><span class="p">,</span> <span class="s2">&quot;Mittelwert_Wohnflaechendichte&quot;</span><span class="p">,</span><span class="s2">&quot;DOUBLE&quot;</span><span class="p">)</span>
+    <span class="c1">#Die einzelnen Kreistypen werden selected und der Mittelwert für die Wohnflächendichte wird berechnet</span>
+    <span class="n">i</span><span class="o">=</span><span class="mi">1</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">9</span><span class="p">):</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;Siedlungsstruktureller_Kreistyp = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">table1</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
+        <span class="n">anzahl</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">wohnflaechendichte</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Wohnflaeche_in_Wohngebaeuden_in_qm</span> <span class="o">/</span> <span class="n">row</span><span class="o">.</span><span class="n">Gebaeude_und_Freiflaeche_Wohnen_in_ha</span>
+            <span class="n">wohnflaechendichte</span> <span class="o">=</span> <span class="n">wohnflaechendichte</span> <span class="o">+</span> <span class="n">temp</span>
+            <span class="n">anzahl</span> <span class="o">=</span> <span class="n">anzahl</span> <span class="o">+</span><span class="mi">1</span>
+        <span class="n">average</span> <span class="o">=</span> <span class="n">wohnflaechendichte</span> <span class="o">/</span> <span class="n">anzahl</span>
+    <span class="c1">#Durschnittswerte der einzelnen Kreistypen in einer in_memory Tabelle ablegen</span>
+        <span class="n">cursor2</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">kreise</span><span class="p">)</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">cursor2</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Kreistyp</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">Mittelwert_Wohnflaechendichte</span> <span class="o">=</span> <span class="n">average</span>
+        <span class="n">cursor2</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">i</span><span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="c1">##Zusammenstellung der Vergleichswerte</span>
+    <span class="c1">#Für das Projektgebiet</span>
+    <span class="n">projektWohnflaechenDichte</span> <span class="o">=</span> <span class="n">wohnflaeche_gesamt</span> <span class="o">/</span> <span class="n">nettobauland_gesamt</span>
+
+    <span class="c1">#Für den Kreis</span>
+    <span class="c1">#Kreisdaten aus den Basisdaten Deutschland  anhand des AGS extrahieren</span>
+    <span class="n">fc</span> <span class="o">=</span> <span class="n">rootPfad</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">2_Tool</span><span class="se">\\</span><span class="s2">Flaeche_und_Oekologie</span><span class="se">\\</span><span class="s2">FGDB_Flaeche_und_Oekologie_Tool.gdb</span><span class="se">\\</span><span class="s2">GrundlagenDE&quot;</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;AGS LIKE &#39;%&quot;</span> <span class="o">+</span><span class="n">ags</span> <span class="o">+</span><span class="s2">&quot;%&#39;&quot;</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+        <span class="n">kreistyp</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Siedlungsstruktureller_Kreistyp</span>
+        <span class="n">wohnflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Wohnflaeche_in_Wohngebaeuden_in_qm</span>
+        <span class="n">freiflaeche</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Gebaeude_und_Freiflaeche_Wohnen_in_ha</span>
+        <span class="n">kreisName</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Kreis_kreisfreie_Stadt</span>
+    <span class="n">kreisWohnflaechendichte</span> <span class="o">=</span> <span class="n">wohnflaeche</span><span class="o">/</span><span class="n">freiflaeche</span>
+    <span class="c1">#kreisWohnflaechendichte = 0.26</span>
+
+    <span class="c1">#Durchschnitt fuer den Kreistyp</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;Kreistyp = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">kreistyp</span><span class="p">)</span>
+    <span class="n">cursor3</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">kreise</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor3</span><span class="p">:</span>
+        <span class="n">kreistypWohnflaechendichte</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Mittelwert_Wohnflaechendichte</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Wohnflaechendichte Projekt : &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">projektWohnflaechenDichte</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Wohnflaechendichte Kreis   : &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">kreisWohnflaechendichte</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Wohnflaechendichte Kreistyp: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">kreistypWohnflaechendichte</span><span class="p">))</span>
+
+    <span class="c1">##Abweichungen berechnen und Graphiken erstellen</span>
+    <span class="c1">#Abweichung Projektgebiet - Kreis</span>
+    <span class="n">abweichung</span> <span class="o">=</span> <span class="n">projektWohnflaechenDichte</span> <span class="o">/</span> <span class="n">kreisWohnflaechendichte</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Abweichung vom Kreisdurchschnitt: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">abweichung</span><span class="p">))</span>
+    <span class="c1">#Abweichung bewerten</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">abweichung</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">):</span>
+        <span class="n">bewertung</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">abweichung</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">abweichung</span><span class="o">&lt;=</span> <span class="mf">0.05</span><span class="p">):</span>
+        <span class="n">bewertung</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">abweichung</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">abweichung</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">bewertung</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">abweichung</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mf">0.10</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">abweichung</span><span class="o">&lt;=-</span><span class="mf">0.05</span><span class="p">):</span>
+        <span class="n">bewertung</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">abweichung</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mf">0.10</span><span class="p">):</span>
+        <span class="n">bewertung</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bewertung: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">bewertung</span><span class="p">))</span>
+
+    <span class="c1">#Ergebnisse in Ergebnisstabelle ablegen</span>
+    <span class="c1">#table = workspace_ergebnisse + &quot;Ergebnisse_Wohnflaechendichte&quot;</span>
+    <span class="n">table</span><span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_ergebnisse</span><span class="p">,</span><span class="s1">&#39;Ergebnisse_Wohnflaechendichte&#39;</span><span class="p">)</span>
+    <span class="n">ergebnisse</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">ergebnisse</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+
+    <span class="n">row</span><span class="o">.</span><span class="n">Name</span> <span class="o">=</span> <span class="n">projektname</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">Bewertung</span> <span class="o">=</span> <span class="n">bewertung</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">WohnflaechendichteProjektraum</span> <span class="o">=</span> <span class="n">projektWohnflaechenDichte</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">WohnflaechendichteProjektKreis</span> <span class="o">=</span> <span class="n">kreisWohnflaechendichte</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">WohnflaechendichteProjektKreistyp</span> <span class="o">=</span> <span class="n">kreistypWohnflaechendichte</span>
+    <span class="n">lt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">()</span>
+    <span class="n">year</span><span class="p">,</span> <span class="n">monat</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">stunde</span><span class="p">,</span> <span class="n">minute</span> <span class="o">=</span> <span class="n">lt</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span>  <span class="nb">str</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">monat</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; - &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">stunde</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">minute</span><span class="p">)</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">abweichungVonKreis</span> <span class="o">=</span> <span class="n">abweichung</span>
+    <span class="n">ergebnisse</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="c1">#Daten in die temp-Tabelle zur Diagrammerstellung schreiben</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_ergebnisse</span><span class="p">,</span><span class="s2">&quot;temp&quot;</span><span class="p">)</span>
+    <span class="c1">#table= r&#39;C:\Users\rieffel\Dropbox\RPC\00_Entwicklungsumgebung\3 Benutzerdefinierte Projekte\Duesseldorf\FGDB_36_Flaeche_und_Oekologie_Duesseldorf.gdb\temp&#39;</span>
+    <span class="c1">#Temp-Tabelle leeren</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteRows_management</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+    <span class="c1">#Daten in die  Temp Tabelle schreiben</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">Name</span> <span class="o">=</span> <span class="n">projektname</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">Wohnflaechendichte_in_qm</span> <span class="o">=</span> <span class="n">projektWohnflaechenDichte</span>
+    <span class="n">temp</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">Name</span> <span class="o">=</span> <span class="n">kreisName</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">Wohnflaechendichte_in_qm</span> <span class="o">=</span> <span class="n">kreisWohnflaechendichte</span>
+    <span class="n">temp</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+    <span class="c1">#Bezeichung des Kreistyps aus der RaumTypen Tabelle extrahieren</span>
+    <span class="c1">#table = workspace_basis + &quot;RaumTypen&quot;</span>
+    <span class="n">table2</span> <span class="o">=</span> <span class="n">rootPfad</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">2_Tool</span><span class="se">\\</span><span class="s2">Flaeche_und_Oekologie</span><span class="se">\\</span><span class="s2">FGDB_Flaeche_und_Oekologie_Tool.gdb</span><span class="se">\\</span><span class="s2">RaumTypen&quot;</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;ID = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">kreistyp</span><span class="p">))</span>
+    <span class="n">cursor4</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">table2</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row1</span> <span class="ow">in</span> <span class="n">cursor4</span><span class="p">:</span>
+        <span class="n">typName</span> <span class="o">=</span> <span class="n">row1</span><span class="o">.</span><span class="n">Name</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">Name</span> <span class="o">=</span> <span class="n">typName</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">Wohnflaechendichte_in_qm</span> <span class="o">=</span> <span class="n">kreistypWohnflaechendichte</span>
+    <span class="n">temp</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="c1">#Diagramm erstellen</span>
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="n">graph</span><span class="o">.</span><span class="n">addSeriesBarVertical</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s1">&#39;Wohnflaechendichte_in_qm&#39;</span><span class="p">,</span> <span class="n">fieldLabel</span><span class="o">=</span><span class="s1">&#39;Name&#39;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeGraph_management</span><span class="p">(</span><span class="s2">&quot;diagramm.tee&quot;</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="s2">&quot;Diagramm&quot;</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">rootPfad</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">3 Benutzerdefinierte Projekte</span><span class="se">\\</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">projektname</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">Ergebnisausgabe</span><span class="se">\\</span><span class="s2">Abbildungen</span><span class="se">\\</span><span class="s2">Bewertung_Wohnflaeachendichte.png&quot;</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">SaveGraph_management</span><span class="p">(</span><span class="s2">&quot;Diagramm&quot;</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">image_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">image_height</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+
+    <span class="c1">#Image.open(output).show()</span>
+
+
+    <span class="k">del</span> <span class="n">cursor</span><span class="p">,</span><span class="n">cursor2</span><span class="p">,</span><span class="n">cursor3</span><span class="p">,</span> <span class="n">cursor4</span><span class="p">,</span> <span class="n">table1</span><span class="p">,</span><span class="n">kreise</span><span class="p">,</span> <span class="n">ergebnisse</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">row1</span><span class="p">,</span> <span class="n">table2</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 26, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

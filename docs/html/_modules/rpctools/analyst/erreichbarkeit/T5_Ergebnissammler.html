@@ -1,0 +1,1111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.analyst.erreichbarkeit.T5_Ergebnissammler &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.analyst.erreichbarkeit.T5_Ergebnissammler</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># 05_Ergebnissammler.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description:</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># HCU Hamburg</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">imp</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">import</span> <span class="nn">xlsxwriter</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
+
+<span class="kn">import</span> <span class="nn">rpctools.utils.sheet_lib</span> <span class="k">as</span> <span class="nn">sl</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.erreichbarkeit.T5_Ergebnissammler.html#rpctools.analyst.erreichbarkeit.T5_Ergebnissammler.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">messages</span><span class="p">):</span>
+
+    <span class="n">projektname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span><span class="p">)</span>
+
+
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">workspace_projekt</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+    <span class="n">workspace_texte_erlaeterung</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;2_Tool&#39;</span><span class="p">,</span><span class="s1">&#39;Erreichbarkeit&#39;</span><span class="p">,</span><span class="s1">&#39;Erlaeuterungstexte&#39;</span><span class="p">)</span>
+    <span class="n">workspace_projekt_ergebnisse</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span> <span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span> <span class="s1">&#39;Abbildungen&#39;</span><span class="p">)</span>
+    <span class="n">workspace_wertveraenderung</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Standortkonkurrenz_Supermaerkte.gdb&#39;</span><span class="p">)</span>
+
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">workspace</span> <span class="o">=</span> <span class="n">workspace_projekt</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1">#========================================================================================================================================</span>
+    <span class="k">def</span> <span class="nf">erstelle_DichtesteEntfernung</span><span class="p">():</span>
+
+        <span class="k">if</span>  <span class="n">arcpy</span><span class="o">.</span><span class="n">Exists</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Distanzmatrix&quot;</span><span class="p">))</span><span class="o">==</span><span class="kc">False</span> <span class="ow">or</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Exists</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Distanzmatrix_planfall&quot;</span><span class="p">))</span><span class="o">==</span><span class="kc">False</span> <span class="ow">or</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Exists</span><span class="p">(</span>  <span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Siedlungszahlendaten&quot;</span><span class="p">))</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">cur_Search_Distanzm</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Distanzmatrix&quot;</span><span class="p">))</span>
+        <span class="n">cur_Search_Distanzm_plan</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Distanzmatrix_planfall&quot;</span><span class="p">))</span>
+        <span class="n">cur_Siedlungszellen</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Siedlungszahlendaten&quot;</span><span class="p">))</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteField_management</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Siedlungszahlendaten&quot;</span><span class="p">),</span><span class="s2">&quot;d_Dist&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+    <span class="c1">##        messages.AddMessage(&quot;Eroor1&quot;)</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Siedlungszahlendaten&quot;</span><span class="p">),</span> <span class="s2">&quot;d_Dist&quot;</span><span class="p">,</span> <span class="s2">&quot;DOUBLE&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+    <span class="c1">##        messages.AddMessage(&quot;Eroo2&quot;)</span>
+            <span class="k">pass</span>
+
+
+        <span class="c1">#nun such fuer alle siedlungszellen die dichteste Distanz zu dem naechst dichten markt</span>
+
+        <span class="n">fieldnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Distanzmatrix&quot;</span><span class="p">))]</span>
+        <span class="n">fieldnames</span> <span class="o">=</span> <span class="n">fieldnames</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="c1">##    print fieldnames</span>
+
+        <span class="n">vektor_d_dicht_vor</span><span class="o">=</span><span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">zeilen</span> <span class="ow">in</span> <span class="n">cur_Search_Distanzm</span><span class="p">:</span>
+            <span class="n">dist</span><span class="o">=</span><span class="mi">999999</span>
+            <span class="k">for</span> <span class="n">spalten</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dist</span> <span class="o">&gt;</span> <span class="n">zeilen</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">spalten</span><span class="p">)</span> <span class="ow">and</span> <span class="n">zeilen</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">spalten</span><span class="p">)</span><span class="o">!=</span><span class="mf">0.</span><span class="p">:</span>
+                    <span class="n">dist</span> <span class="o">=</span><span class="n">zeilen</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">spalten</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dist</span><span class="o">==</span><span class="mi">999999</span><span class="p">:</span>
+                <span class="n">dist</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">vektor_d_dicht_vor</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">zeilen</span><span class="o">.</span><span class="n">Siedlungsid</span><span class="p">,</span><span class="n">dist</span><span class="p">])</span>
+
+    <span class="c1">##    print vektor_d_dicht_vor</span>
+    <span class="c1">##    print len(vektor_d_dicht_vor)</span>
+
+
+
+
+        <span class="n">fieldnames_nach</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Distanzmatrix_planfall&quot;</span><span class="p">))]</span>
+        <span class="n">fieldnames_nach</span> <span class="o">=</span> <span class="n">fieldnames_nach</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+
+
+        <span class="n">vektor_d_dicht_nach</span><span class="o">=</span><span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">zeilen</span> <span class="ow">in</span> <span class="n">cur_Search_Distanzm_plan</span><span class="p">:</span>
+            <span class="n">dist</span><span class="o">=</span><span class="mi">999999</span>
+            <span class="k">for</span> <span class="n">spalten</span> <span class="ow">in</span> <span class="n">fieldnames_nach</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dist</span> <span class="o">&gt;</span> <span class="n">zeilen</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">spalten</span><span class="p">)</span> <span class="ow">and</span> <span class="n">zeilen</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">spalten</span><span class="p">)</span><span class="o">!=</span><span class="mf">0.</span><span class="p">:</span>
+                    <span class="n">dist</span> <span class="o">=</span><span class="n">zeilen</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">spalten</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dist</span><span class="o">==</span><span class="mi">999999</span><span class="p">:</span>
+                <span class="n">dist</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">vektor_d_dicht_nach</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">zeilen</span><span class="o">.</span><span class="n">Siedlungsid</span><span class="p">,</span><span class="n">dist</span><span class="p">])</span>
+
+    <span class="c1">##    print vektor_d_dicht_nach</span>
+    <span class="c1">##    print len(vektor_d_dicht_nach)</span>
+
+
+        <span class="n">diff_Dist_veraenderung</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">zeilen_1</span> <span class="ow">in</span> <span class="n">vektor_d_dicht_vor</span><span class="p">:</span>
+            <span class="n">found</span><span class="o">=</span><span class="mi">0</span>
+            <span class="k">for</span> <span class="n">zeilen_2</span> <span class="ow">in</span> <span class="n">vektor_d_dicht_nach</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">zeilen_1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">zeilen_2</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">found</span><span class="o">=</span><span class="mi">1</span>
+                    <span class="n">diff</span> <span class="o">=</span> <span class="p">(</span> <span class="n">zeilen_1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">zeilen_2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="mf">1000.</span>
+
+                    <span class="n">diff_Dist_veraenderung</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">zeilen_1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">diff</span><span class="p">])</span>
+    <span class="c1">##                if diff &gt;0:</span>
+    <span class="c1">##                    print ( zeilen_1[1]-zeilen_2[1])</span>
+    <span class="c1">##                    print ( zeilen_1[1]-zeilen_2[1])*1000.</span>
+    <span class="c1">##                    print float (( zeilen_1[1]-zeilen_2[1])*1000.)</span>
+    <span class="c1">##                    a = &quot;%.2f&quot; % float (( zeilen_1[1]-zeilen_2[1])*1000.)</span>
+    <span class="c1">##                    print &quot;%.2f&quot; % float (( zeilen_1[1]-zeilen_2[1])*1000.)</span>
+    <span class="c1">##                    print float(a)</span>
+
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">found</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span> <span class="s2">&quot;sehr komisch hier fehlt ne Siedlungszelle&quot;</span>
+
+
+
+        <span class="k">for</span> <span class="n">zeile</span> <span class="ow">in</span> <span class="n">cur_Siedlungszellen</span><span class="p">:</span>
+            <span class="n">gefunden</span><span class="o">=</span><span class="mi">0</span>
+            <span class="k">for</span> <span class="n">eintraege</span> <span class="ow">in</span> <span class="n">diff_Dist_veraenderung</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">zeile</span><span class="o">.</span><span class="n">SZ_ID</span> <span class="o">==</span> <span class="n">eintraege</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">gefunden</span><span class="o">=</span><span class="mi">1</span>
+                    <span class="n">a</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">eintraege</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">zeile</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;d_Dist&quot;</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+                    <span class="n">cur_Siedlungszellen</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">zeile</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">gefunden</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">zeile</span><span class="o">.</span><span class="n">d_Dist</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">cur_Siedlungszellen</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">zeile</span><span class="p">)</span>
+                <span class="nb">print</span> <span class="s2">&quot;sollte nicht vorkommen aber nicht gefunden&quot;</span>
+
+        <span class="k">del</span> <span class="n">cur_Search_Distanzm</span><span class="p">,</span><span class="n">cur_Siedlungszellen</span><span class="p">,</span><span class="n">fieldnames</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">check_planungsflaeche</span><span class="p">():</span>
+        <span class="n">cur_Search</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt</span><span class="p">,</span><span class="s2">&quot;Flaechenbilanz&quot;</span><span class="p">))</span>
+        <span class="n">typus</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">cur_Search</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="n">a</span><span class="o">.</span><span class="n">Flaechennutzung_S2</span>
+            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">Flaechennutzung_S2</span><span class="o">==</span><span class="s2">&quot;Gemeinbedarfsflaeche&quot;</span> <span class="ow">and</span> <span class="n">typus</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">typus</span><span class="o">=</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">Flaechennutzung_S2</span><span class="o">==</span><span class="s2">&quot;Nettowohnbauland&quot;</span> <span class="ow">and</span> <span class="n">typus</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">:</span>
+                <span class="n">typus</span><span class="o">=</span><span class="mi">2</span>
+            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">Flaechennutzung_S2</span><span class="o">==</span><span class="s2">&quot;Einzelhandel&quot;</span> <span class="ow">and</span> <span class="n">typus</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">:</span>
+                <span class="n">typus</span><span class="o">=</span><span class="mi">3</span>
+            <span class="k">if</span> <span class="s2">&quot;Gewerbeflaeche&quot;</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">Flaechennutzung_S2</span> <span class="ow">and</span> <span class="n">typus</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">:</span>
+                <span class="n">typus</span><span class="o">=</span><span class="mi">4</span>
+
+        <span class="k">del</span> <span class="n">cur_Search</span>
+
+        <span class="k">return</span> <span class="n">typus</span>
+
+    <span class="c1"># ##########################################################################################################################</span>
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Datenexport in Excel-Datei  </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1"># 1. Dokument einrichten</span>
+
+    <span class="c1"># Pfade setzen</span>
+    <span class="n">logo</span> <span class="o">=</span> <span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span><span class="s2">&quot;1_Basisdaten&quot;</span><span class="p">,</span><span class="s2">&quot;logo_rpc.png&quot;</span><span class="p">)</span>
+    <span class="n">ausgabeordner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Excel&#39;</span><span class="p">)</span>
+    <span class="n">excelpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">,</span><span class="s1">&#39;37_Erreichbarkeit.xlsx&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">excelpfad</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># Workbook und Tabellenblaetter anlegen</span>
+    <span class="n">wb</span> <span class="o">=</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="n">excelpfad</span><span class="p">)</span>
+    <span class="n">sl</span><span class="o">.</span><span class="n">infosheet</span><span class="p">(</span><span class="n">projektname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Erreichbarkeit&quot;</span><span class="p">),</span> <span class="n">wb</span><span class="p">)</span>
+
+
+    <span class="c1"># Styles anlegen</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;font_size&#39;</span><span class="p">:</span> <span class="s1">&#39;24&#39;</span><span class="p">,</span> <span class="s1">&#39;align&#39;</span><span class="p">:</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span><span class="s1">&#39;valign&#39;</span><span class="p">:</span> <span class="s1">&#39;vcenter&#39;</span><span class="p">,</span> <span class="s1">&#39;bg_color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">})</span>
+    <span class="n">normal</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span> <span class="s1">&#39;14&#39;</span><span class="p">,</span> <span class="s1">&#39;bg_color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">})</span>
+    <span class="n">rechts</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span> <span class="s1">&#39;14&#39;</span><span class="p">,</span> <span class="s1">&#39;align&#39;</span> <span class="p">:</span> <span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="s1">&#39;bg_color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">})</span>
+    <span class="n">bold</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;font_size&#39;</span><span class="p">:</span> <span class="s1">&#39;14&#39;</span><span class="p">,</span> <span class="s1">&#39;bg_color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">})</span>
+    <span class="n">bold_rechts</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;font_size&#39;</span><span class="p">:</span> <span class="s1">&#39;14&#39;</span><span class="p">,</span> <span class="s1">&#39;bg_color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;align&#39;</span> <span class="p">:</span> <span class="s1">&#39;right&#39;</span><span class="p">})</span>
+
+    <span class="n">background</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;bg_color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">})</span>
+
+    <span class="c1">#====================================================================================================================</span>
+    <span class="c1">#========================================================================================================================================</span>
+    <span class="n">Nutzungstyp</span><span class="o">=</span> <span class="n">check_planungsflaeche</span><span class="p">()</span>
+    <span class="c1">##messages.AddMessage(   Nutzungstyp)</span>
+
+    <span class="k">if</span> <span class="n">Nutzungstyp</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">a</span><span class="o">=</span><span class="s2">&quot;Keine Ausgabe, da nur kein Planvorhaben angegeben ist.&quot;</span>
+        <span class="nb">print</span> <span class="n">a</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddErrorMessage</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">Nutzungstyp</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">a</span><span class="o">=</span><span class="s2">&quot;Keine Ausgabe, da nur Gemeindebedarfsflaeche als Planvorhaben angegeben ist.&quot;</span>
+        <span class="nb">print</span> <span class="n">a</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddErrorMessage</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">Nutzungstyp</span><span class="o">==</span><span class="mi">3</span> <span class="ow">or</span> <span class="n">Nutzungstyp</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">Nutzungstyp</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">erstelle_DichtesteEntfernung</span><span class="p">()</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+
+                <span class="c1">#Kopiere Template.mxd</span>
+                <span class="n">mxd_template</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;37_Erreichbarkeit&quot;</span><span class="p">,</span><span class="s2">&quot;37_Template_Kartenerzeugung&quot;</span><span class="p">,</span><span class="s2">&quot;37_Distanzen_Template.mxd&quot;</span><span class="p">))</span>
+                <span class="n">mxdpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span><span class="s1">&#39;37_Distanzen.mxd&#39;</span><span class="p">)</span>
+                <span class="n">mxd_template</span><span class="o">.</span><span class="n">saveACopy</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+
+                <span class="c1"># Ersetze Datenquelle</span>
+                <span class="n">Haltestellen_mxd</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+                <span class="n">templatepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;37_Erreichbarkeit&quot;</span><span class="p">,</span><span class="s2">&quot;37_Template_Kartenerzeugung&quot;</span><span class="p">,</span><span class="s2">&quot;template.gdb&quot;</span><span class="p">)</span>
+                <span class="n">resultpath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s2">&quot;FGDB_34_Standortkonkurrenz_Supermaerkte_&quot;</span><span class="o">+</span><span class="n">projektname</span><span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">)</span>
+                <span class="n">Haltestellen_mxd</span><span class="o">.</span><span class="n">findAndReplaceWorkspacePaths</span><span class="p">(</span><span class="n">templatepath</span><span class="p">,</span> <span class="n">resultpath</span><span class="p">)</span>
+
+
+                <span class="c1"># Setze Viewport neu</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListDataFrames</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">gebietLayer</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListLayers</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">,</span> <span class="s2">&quot;Siedlungszahlendaten&quot;</span><span class="p">,</span> <span class="n">df</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="c1">##print gebietLayer</span>
+                <span class="c1">##arcpy.SelectLayerByAttribute_management(gebietLayer, &quot;NEW_SELECTION&quot;, &quot;\&quot;OBJECTID\&quot; &gt; 0&quot;)</span>
+                <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByLocation_management</span><span class="p">(</span><span class="n">gebietLayer</span><span class="p">,</span> <span class="s2">&quot;WITHIN_A_DISTANCE&quot;</span><span class="p">,</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Neuer_Markt&quot;</span><span class="p">),</span> <span class="s2">&quot;1 Kilometers&quot;</span><span class="p">,</span> <span class="s2">&quot;NEW_SELECTION&quot;</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">extent</span> <span class="o">=</span> <span class="n">gebietLayer</span><span class="o">.</span><span class="n">getSelectedExtent</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByAttribute_management</span><span class="p">(</span><span class="n">gebietLayer</span><span class="p">,</span> <span class="s2">&quot;CLEAR_SELECTION&quot;</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">scale</span> <span class="o">*</span> <span class="mf">2.5</span>
+
+
+                <span class="n">arcpy</span><span class="o">.</span><span class="n">RefreshActiveView</span><span class="p">()</span>
+                <span class="n">Haltestellen_mxd</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">del</span> <span class="n">mxd_template</span> <span class="p">,</span> <span class="n">df</span><span class="p">,</span><span class="n">mxdpfad</span><span class="p">,</span><span class="n">templatepath</span><span class="p">,</span><span class="n">resultpath</span><span class="p">,</span><span class="n">gebietLayer</span>
+
+                <span class="c1">#Exportiere Ergebnis</span>
+                <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ExportToJPEG</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">,</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span> <span class="s2">&quot;37_Distanz_veraenderung.jpg&quot;</span><span class="p">),</span> <span class="s2">&quot;PAGE_LAYOUT&quot;</span><span class="p">,</span><span class="n">resolution</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+                <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Uebersichtskarte mit Differenzveraenderung erstellt </span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+                <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+                <span class="k">del</span> <span class="n">Haltestellen_mxd</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">a</span><span class="o">=</span><span class="s2">&quot;Toolpaket 34_Standortkonkurrenz_Supermaerkte nicht vollstaendig. Bitte starten Sie 34_Standortkonkurrenz_Supermaerkte erneut.&quot;</span>
+                <span class="nb">print</span> <span class="n">a</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span> <span class="s2">&quot;37_Distanz_veraenderung.jpg&quot;</span><span class="p">))</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+        <span class="c1">#==================================================================================================================================================================================</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Grafiken erstellen  </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+        <span class="c1">#==================================================================================================================================================================================</span>
+    <span class="c1">##    messages.AddMessage(Nutzungstyp)</span>
+        <span class="k">if</span> <span class="n">Nutzungstyp</span><span class="o">==</span><span class="mi">3</span> <span class="ow">and</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Exists</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span> <span class="s2">&quot;37_Distanz_veraenderung.jpg&quot;</span><span class="p">)):</span>
+            <span class="c1">#Einzelhandel</span>
+            <span class="n">ws11</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik_&#39;</span><span class="p">)</span>
+            <span class="c1"># Hintergrund weiss faerben</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                    <span class="n">ws11</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+            <span class="c1"># Pfade zu Grafiken herstellen</span>
+            <span class="n">Text1</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_texte_erlaeterung</span><span class="p">,</span> <span class="s1">&#39;Methodik_ErreichbarkeitEinzelhandel.png&#39;</span><span class="p">)</span>
+            <span class="c1">###Grafiken einf??gen</span>
+            <span class="n">ws11</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+
+            <span class="n">ws12</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Karte Distanz_Maerkte&#39;</span><span class="p">)</span>
+            <span class="c1"># Hintergrund weiss faerben</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">300</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">300</span><span class="p">):</span>
+                    <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+            <span class="c1"># Pfade zu Grafiken herstellen</span>
+            <span class="n">image1</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Abbildungen&#39;</span><span class="p">,</span> <span class="s2">&quot;37_Distanz_veraenderung.jpg&quot;</span><span class="p">)</span>
+            <span class="c1">###Grafiken einf??gen</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Veraenderung der Entfernung zum naechsten Markt insgesamt&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B4&#39;</span><span class="p">,</span> <span class="n">image1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+            <span class="k">del</span> <span class="n">image1</span>
+
+
+            <span class="c1">#statistik berechnen - wie die veraenderung ausfaellt</span>
+            <span class="n">cur_Siedlungszellen</span><span class="o">=</span><span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_wertveraenderung</span><span class="p">,</span><span class="s2">&quot;Siedlungszahlendaten&quot;</span><span class="p">))</span>
+
+            <span class="n">arra_Siedlung</span><span class="o">=</span><span class="p">[]</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">cur_Siedlungszellen</span><span class="p">:</span>
+                <span class="n">arra_Siedlung</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">SZ_Einwohner</span><span class="p">),</span><span class="n">a</span><span class="o">.</span><span class="n">d_Dist</span><span class="p">])</span>
+
+            <span class="k">del</span> <span class="n">cur_Siedlungszellen</span><span class="p">,</span><span class="n">a</span>
+
+            <span class="n">array_u1500_neg</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">array_750bis1500_neg</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">array_250bis750_neg</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">array_250bis0_neg</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">array_0bis250_pos</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">array_250bis750_pos</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">array_750bis1500_pos</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">array_u1500_pos</span><span class="o">=</span><span class="p">[]</span>
+
+            <span class="k">for</span>  <span class="n">a</span> <span class="ow">in</span> <span class="n">arra_Siedlung</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;</span> <span class="o">-</span><span class="mi">1500</span><span class="p">:</span>
+                    <span class="n">array_u1500_neg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;-</span><span class="mi">750</span> <span class="ow">and</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;=-</span><span class="mi">1500</span><span class="p">:</span>
+                    <span class="n">array_750bis1500_neg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;-</span><span class="mi">250</span> <span class="ow">and</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;=-</span><span class="mi">750</span><span class="p">:</span>
+                    <span class="n">array_250bis750_neg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;=-</span><span class="mi">250</span> <span class="ow">and</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">array_250bis0_neg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;=</span><span class="mi">250</span><span class="p">:</span>
+                    <span class="n">array_0bis250_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">250</span> <span class="ow">and</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;=</span><span class="mi">750</span><span class="p">:</span>
+                    <span class="n">array_250bis750_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">750</span> <span class="ow">and</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;=</span><span class="mi">1500</span><span class="p">:</span>
+                    <span class="n">array_750bis1500_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">1500</span> <span class="p">:</span>
+                    <span class="n">array_u1500_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_u1500_neg</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">array_u1500_neg</span><span class="p">:</span>
+                    <span class="n">b</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#Einwohner</span>
+                    <span class="n">c</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#Distanz</span>
+
+                <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">array_u1500_neg</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">array_u1500_neg</span>
+                <span class="n">array_u1500_neg</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">array_u1500_neg</span>
+                <span class="n">array_u1500_neg</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_750bis1500_neg</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">array_750bis1500_neg</span><span class="p">:</span>
+                    <span class="n">b</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#Einwohner</span>
+                    <span class="n">c</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#Distanz</span>
+
+                <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">array_750bis1500_neg</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">array_750bis1500_neg</span>
+                <span class="n">array_750bis1500_neg</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">array_750bis1500_neg</span>
+                <span class="n">array_750bis1500_neg</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_250bis750_neg</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">array_250bis750_neg</span><span class="p">:</span>
+                    <span class="n">b</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#Einwohner</span>
+                    <span class="n">c</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#Distanz</span>
+
+                <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">array_250bis750_neg</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">array_250bis750_neg</span>
+                <span class="n">array_250bis750_neg</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">array_250bis750_neg</span>
+                <span class="n">array_250bis750_neg</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_250bis0_neg</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">array_250bis0_neg</span><span class="p">:</span>
+                    <span class="n">b</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#Einwohner</span>
+                    <span class="n">c</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#Distanz</span>
+
+                <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">array_250bis0_neg</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">array_250bis0_neg</span>
+                <span class="n">array_250bis0_neg</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">array_250bis0_neg</span>
+                <span class="n">array_250bis0_neg</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_0bis250_pos</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">array_0bis250_pos</span><span class="p">:</span>
+                    <span class="n">b</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#Einwohner</span>
+                    <span class="n">c</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#Distanz</span>
+
+                <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">array_0bis250_pos</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">array_0bis250_pos</span>
+                <span class="n">array_0bis250_pos</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">array_0bis250_pos</span>
+                <span class="n">array_0bis250_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_250bis750_pos</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">array_250bis750_pos</span><span class="p">:</span>
+                    <span class="n">b</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#Einwohner</span>
+                    <span class="n">c</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#Distanz</span>
+
+                <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">array_250bis750_pos</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">array_250bis750_pos</span>
+                <span class="n">array_250bis750_pos</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">array_250bis750_pos</span>
+                <span class="n">array_250bis750_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_750bis1500_pos</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">array_750bis1500_pos</span><span class="p">:</span>
+                    <span class="n">b</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#Einwohner</span>
+                    <span class="n">c</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#Distanz</span>
+
+                <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">array_750bis1500_pos</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">array_750bis1500_pos</span>
+                <span class="n">array_750bis1500_pos</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">array_750bis1500_pos</span>
+                <span class="n">array_750bis1500_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_u1500_pos</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">c</span><span class="o">=</span><span class="mi">0</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">array_u1500_pos</span><span class="p">:</span>
+                    <span class="n">b</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#Einwohner</span>
+                    <span class="n">c</span><span class="o">+=</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#Distanz</span>
+
+                <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">array_u1500_pos</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">array_u1500_pos</span>
+                <span class="n">array_u1500_pos</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">array_u1500_pos</span>
+                <span class="n">array_u1500_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">ws12</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">26</span><span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">44</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Statistische Veraenderung der Entfernung zum naechsten Markt&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">46</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Entfernungen in Meter&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">46</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Anzahl der Einwohner&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">46</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Durchschnittliche neue Entfernung in Meter&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+            <span class="n">oui</span><span class="o">=</span><span class="mi">46</span>
+            <span class="n">oui</span><span class="o">=</span><span class="n">oui</span><span class="o">+</span><span class="mi">1</span>
+            <span class="nb">print</span> <span class="nb">type</span><span class="p">(</span><span class="n">array_u1500_neg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;mehr als 1.500m Zunahme&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span>  <span class="nb">str</span><span class="p">(</span><span class="n">array_u1500_neg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">array_u1500_neg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+            <span class="n">oui</span><span class="o">=</span><span class="n">oui</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;750 bis 1.500m Zunahme&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">array_750bis1500_neg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">array_750bis1500_neg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+            <span class="n">oui</span><span class="o">=</span><span class="n">oui</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;250 bis 750m Zunahme&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">array_250bis750_neg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">array_250bis750_neg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+            <span class="n">oui</span><span class="o">=</span><span class="n">oui</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Zunahme bis zu 250m&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">array_250bis0_neg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">array_250bis0_neg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+            <span class="n">oui</span><span class="o">=</span><span class="n">oui</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Abnahme bis zu 250m&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">array_0bis250_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">array_0bis250_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+            <span class="n">oui</span><span class="o">=</span><span class="n">oui</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;250 bis 750m Abnahme&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">array_250bis750_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">array_250bis750_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+            <span class="n">oui</span><span class="o">=</span><span class="n">oui</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;750 bis 1.500m Abnahme&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">array_750bis1500_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">array_750bis1500_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+            <span class="n">oui</span><span class="o">=</span><span class="n">oui</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;mehr als 1.500m Abnahme&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">array_u1500_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">array_u1500_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+
+
+            <span class="n">oui</span><span class="o">=</span><span class="n">oui</span><span class="o">+</span><span class="mi">2</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;Grundlage der Berechnungen sind Luftliniendistanzen unter Beruecksichtigung eines Ungenauigkeitsfaktors. Aus technischen Gruenden ist ein auf dem Strassennetz&quot;</span><span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;basiertes Routing nicht moeglich. In der Naehe von Fluessen, groesseren Gebirgszuegen oder Naturschutzgebieten, die nur eingeschraenkt ueberwunden oder durchquert&quot;</span><span class="p">)</span>
+            <span class="n">ws12</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">oui</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;werden koennen, kann dies unter Umstaenden zu Ungenauigkeiten in den Ergebnissen fuehren.&quot;</span><span class="p">)</span>
+
+        <span class="c1">#==================================================================================================================================================================================</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ws1</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik_&#39;</span><span class="p">)</span>
+            <span class="c1"># Hintergrund weiss faerben</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                    <span class="n">ws1</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+            <span class="c1"># Pfade zu Grafiken herstellen</span>
+            <span class="n">Text1</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_texte_erlaeterung</span><span class="p">,</span> <span class="s1">&#39;Methodik_ErreichbarkeitGewerbe.png&#39;</span><span class="p">)</span>
+            <span class="c1">###Grafiken einf??gen</span>
+            <span class="n">ws1</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+            <span class="k">del</span> <span class="n">Text1</span>
+            <span class="c1">#=====================================================================================================================</span>
+
+
+
+        <span class="c1"># ############################################################################################################</span>
+        <span class="n">ws2</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Auswertung_Anbindung&#39;</span><span class="p">)</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+        <span class="c1"># Hintergrund weiss faerben</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+        <span class="c1"># 2.Ergebnisse aus Erreichbarkeit Zentral Orte einlesen und schreiben</span>
+
+        <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="n">nextmonday</span> <span class="o">=</span> <span class="n">today</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=-</span><span class="n">today</span><span class="o">.</span><span class="n">weekday</span><span class="p">(),</span> <span class="n">weeks</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">abfahrt_min</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">orte</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dauer_min</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">umsteigen_min</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">verkehrsmittel_min</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span><span class="s2">&quot;Zentrale_Orte_temp.csv&quot;</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">mycsv</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">mycsv</span><span class="p">:</span>
+                <span class="n">abfahrt_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">orte</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">dauer_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">umsteigen_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                <span class="n">verkehrsmittel_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+            <span class="k">del</span> <span class="n">row</span><span class="p">,</span> <span class="n">mycsv</span>
+            <span class="nb">print</span> <span class="n">abfahrt_min</span><span class="p">,</span> <span class="n">orte</span><span class="p">,</span> <span class="n">dauer_min</span><span class="p">,</span> <span class="n">umsteigen_min</span><span class="p">,</span> <span class="n">verkehrsmittel_min</span>
+
+        <span class="n">i</span><span class="o">=</span><span class="mi">7</span>
+        <span class="n">n</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Erreichbarkeit ausgewaehlter Mittel- &amp; Oberzentren mit dem OEPNV&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Schnellste Verbindung, ermittelt durch Zugriff auf die Fahrplanauskunft der Deutschen Bahn&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Abgefragt fuer den &quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nextmonday</span><span class="o">.</span><span class="n">day</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nextmonday</span><span class="o">.</span><span class="n">month</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nextmonday</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; im Zeitraum zwischen 7 - 19 Uhr&quot;</span><span class="p">)</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Abfahrt (naechstgelegene Haltestelle)&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Ziel&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Fahrtzeit in Minuten&#39;</span><span class="p">,</span> <span class="n">bold_rechts</span><span class="p">)</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;Anzahl Umstiege&#39;</span><span class="p">,</span> <span class="n">bold_rechts</span><span class="p">)</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;Verkehrsmittel&#39;</span><span class="p">,</span> <span class="n">bold_rechts</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ort</span> <span class="ow">in</span> <span class="n">orte</span><span class="p">:</span>
+            <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">abfahrt_min</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;latin1&#39;</span><span class="p">),</span> <span class="n">normal</span><span class="p">)</span>
+            <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ort</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">normal</span><span class="p">)</span>
+            <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">dauer_min</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">rechts</span><span class="p">)</span>
+            <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">umsteigen_min</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">rechts</span><span class="p">)</span>
+            <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">verkehrsmittel_min</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">rechts</span><span class="p">)</span>
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="n">n</span><span class="o">+=</span><span class="mi">1</span>
+
+        <span class="c1"># ############################################################################################################</span>
+        <span class="n">ws31</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik_Haltestellen&#39;</span><span class="p">)</span>
+        <span class="c1"># Hintergrund weiss faerben</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="n">ws31</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+        <span class="c1"># Pfade zu Grafiken herstellen</span>
+        <span class="n">Text1</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_texte_erlaeterung</span><span class="p">,</span> <span class="s1">&#39;Methodik_ErreichbarkeitWohnenAnbindungsqualitaet.png&#39;</span><span class="p">)</span>
+        <span class="c1">###Grafiken einf??gen</span>
+        <span class="n">ws31</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+        <span class="k">del</span> <span class="n">Text1</span>
+        <span class="c1"># ################################################################################################################</span>
+        <span class="c1"># 3.Karte mit den Haltestellen in der Umgebung einfuegen</span>
+
+        <span class="n">ws3</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s2">&quot;Karte_Haltestellen&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Hintergrund weiss faerben</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="n">ws3</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+        <span class="n">ws3</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Uebersichtskarte mit allen Haltestellen im Umkreis von 500m / 1.000m um das Projektgebiet&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+        <span class="n">ws3</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Ermittelt durch Zugriff auf die Fahrplanauskunft der Deutschen Bahn.&quot;</span><span class="p">)</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Abbildungen&#39;</span><span class="p">,</span> <span class="s2">&quot;37_Karte_Haltestellen.jpg&quot;</span><span class="p">)</span>
+        <span class="n">ws3</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B5&#39;</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">})</span>
+        <span class="k">del</span> <span class="n">image</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># 4.Diagramme und Daten aus Erreichbarkeit OePNV einlesen und schreiben</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">datum</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">name_long</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span><span class="s2">&quot;Haltestellen.csv&quot;</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">mycsv</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">mycsv</span><span class="p">:</span>
+                <span class="n">name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">style</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">datum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">name_long</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="k">del</span> <span class="n">row</span><span class="p">,</span> <span class="n">mycsv</span>
+            <span class="nb">print</span> <span class="n">name</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">datum</span>
+
+        <span class="n">i</span><span class="o">=</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">ws4</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s2">&quot;Auswertung_Haltestelle0&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="c1">#Excel-Sheet-Benennung =|= Haltestellenname zur Vermeidung von Codierungskonflikten</span>
+
+            <span class="c1"># Hintergrund weiss faerben</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+            <span class="n">barcode</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Abbildungen&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="s2">&quot;.png&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">barcode</span><span class="p">):</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Visualisierung der OEPNV-Taktung an der Haltestelle &quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">name_long</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;latin-1&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Ermittelt durch Zugriff auf die Fahrplanauskunft der Deutschen Bahn. Abgefragt fuer den &quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">datum</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">style</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span><span class="p">:</span>
+                    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Farbliche Unterscheidung nach Art des Verkehrstraegers&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">style</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;2&quot;</span><span class="p">:</span>
+                    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Farbliche Unterscheidung nach Fahrtziel&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">style</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;3&quot;</span><span class="p">:</span>
+                    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Farbliche Unterscheidung nach OEPNV-Linie&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">style</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;4&quot;</span><span class="p">:</span>
+                    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Linie mit der dichtesten Taktung farblich hervorgehoben&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B6&#39;</span><span class="p">,</span> <span class="n">barcode</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">del</span> <span class="n">i</span><span class="p">,</span> <span class="n">barcode</span>
+        <span class="c1">###### ###############################################################################################################################################</span>
+    <span class="c1">##    ws16 = wb.add_worksheet(&#39;Literatur&#39;)</span>
+    <span class="c1">##</span>
+    <span class="c1">##    # Pfade zu Grafiken herstellen</span>
+    <span class="c1">##    Text1 = join(workspace_texte_erlaeterung, &#39;Methodik_ErreichbarkeitWohnenLiteratur.png&#39;)</span>
+    <span class="c1">##    ###Grafiken einf??gen</span>
+    <span class="c1">##    ws16.insert_image(0, 0, Text1, {&#39;x_scale&#39;: 0.32, &#39;y_scale&#39;: 0.32})</span>
+    <span class="c1">##</span>
+    <span class="c1">##    del Text1</span>
+
+
+        <span class="c1">#Workbook speichern</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">wb</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;ACHTUNG </span><span class="se">\n</span><span class="s1">Die Ergebnisstabelle konnte nicht gespreichert werden, da eine aeltere Version der Datei momentan in Excel geoeffnet ist. Bitte schliessen Sie diese Tabelle und fuehren Sie den Arbeitsschritt erneut aus. </span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">AddErrorMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="n">schrittmeldung</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+
+
+
+
+
+
+    <span class="c1">#kann nur noch Nettowohnen sein</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="c1">#==================================================================================================================================================================================</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Grafiken erstellen  </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+        <span class="c1">#==================================================================================================================================================================================</span>
+
+
+        <span class="c1">#Kopiere Template.mxd</span>
+        <span class="n">mxd_template</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;37_Erreichbarkeit&quot;</span><span class="p">,</span><span class="s2">&quot;37_Template_Kartenerzeugung&quot;</span><span class="p">,</span><span class="s2">&quot;37_Erreichbarkeit_Fahrrad_Template.mxd&quot;</span><span class="p">))</span>
+        <span class="n">mxdpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span><span class="s1">&#39;37_Erreichbarkeit_Fahrrad.mxd&#39;</span><span class="p">)</span>
+        <span class="n">mxd_template</span><span class="o">.</span><span class="n">saveACopy</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+
+        <span class="c1"># Ersetze Datenquelle</span>
+        <span class="n">Haltestellen_mxd</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+        <span class="n">templatepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;37_Erreichbarkeit&quot;</span><span class="p">,</span><span class="s2">&quot;37_Template_Kartenerzeugung&quot;</span><span class="p">,</span><span class="s2">&quot;template.gdb&quot;</span><span class="p">)</span>
+        <span class="n">resultpath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s2">&quot;FGDB_37_Erreichbarkeit_&quot;</span><span class="o">+</span><span class="n">projektname</span><span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">)</span>
+        <span class="n">Haltestellen_mxd</span><span class="o">.</span><span class="n">findAndReplaceWorkspacePaths</span><span class="p">(</span><span class="n">templatepath</span><span class="p">,</span> <span class="n">resultpath</span><span class="p">)</span>
+
+
+        <span class="c1"># Setze Viewport neu</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListDataFrames</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">gebietLayer</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListLayers</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">,</span> <span class="s2">&quot;Buffer_1000_m_500_m_&quot;</span><span class="p">,</span> <span class="n">df</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByAttribute_management</span><span class="p">(</span><span class="n">gebietLayer</span><span class="p">,</span> <span class="s2">&quot;NEW_SELECTION&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">OBJECTID</span><span class="se">\&quot;</span><span class="s2"> &gt; 0&quot;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">extent</span> <span class="o">=</span> <span class="n">gebietLayer</span><span class="o">.</span><span class="n">getSelectedExtent</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByAttribute_management</span><span class="p">(</span><span class="n">gebietLayer</span><span class="p">,</span> <span class="s2">&quot;CLEAR_SELECTION&quot;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">scale</span> <span class="o">*</span> <span class="mf">3.0</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">RefreshActiveView</span><span class="p">()</span>
+        <span class="n">Haltestellen_mxd</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">mxd_template</span> <span class="p">,</span> <span class="n">df</span><span class="p">,</span><span class="n">mxdpfad</span><span class="p">,</span><span class="n">templatepath</span><span class="p">,</span><span class="n">resultpath</span><span class="p">,</span><span class="n">gebietLayer</span>
+
+        <span class="c1">#Exportiere Ergebnis</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ExportToJPEG</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">,</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span> <span class="s2">&quot;37_Erreichbarkeit_Fahrrad.jpg&quot;</span><span class="p">),</span> <span class="s2">&quot;PAGE_LAYOUT&quot;</span><span class="p">,</span><span class="n">resolution</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Uebersichtskarte mit der Erreichbarkeit von Einrichtungen mit dem Fahrrad erstellt </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="k">del</span> <span class="n">Haltestellen_mxd</span>
+        <span class="c1">#==================================================================================================================================================================================</span>
+        <span class="c1">#Kopiere Template.mxd</span>
+        <span class="n">mxd_template</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;37_Erreichbarkeit&quot;</span><span class="p">,</span><span class="s2">&quot;37_Template_Kartenerzeugung&quot;</span><span class="p">,</span><span class="s2">&quot;37_Erreichbarkeit_zuFuss_Template.mxd&quot;</span><span class="p">))</span>
+        <span class="n">mxdpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span><span class="s1">&#39;37_Erreichbarkeit_zuFuss.mxd&#39;</span><span class="p">)</span>
+        <span class="n">mxd_template</span><span class="o">.</span><span class="n">saveACopy</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+
+        <span class="c1"># Ersetze Datenquelle</span>
+        <span class="n">Haltestellen_mxd</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+        <span class="n">templatepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;37_Erreichbarkeit&quot;</span><span class="p">,</span><span class="s2">&quot;37_Template_Kartenerzeugung&quot;</span><span class="p">,</span><span class="s2">&quot;template.gdb&quot;</span><span class="p">)</span>
+        <span class="n">resultpath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s2">&quot;FGDB_37_Erreichbarkeit_&quot;</span><span class="o">+</span><span class="n">projektname</span><span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">)</span>
+        <span class="n">Haltestellen_mxd</span><span class="o">.</span><span class="n">findAndReplaceWorkspacePaths</span><span class="p">(</span><span class="n">templatepath</span><span class="p">,</span> <span class="n">resultpath</span><span class="p">)</span>
+
+
+        <span class="c1"># Setze Viewport neu</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListDataFrames</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">gebietLayer</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListLayers</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">,</span> <span class="s2">&quot;Buffer_1000_m_500_m_&quot;</span><span class="p">,</span> <span class="n">df</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByAttribute_management</span><span class="p">(</span><span class="n">gebietLayer</span><span class="p">,</span> <span class="s2">&quot;NEW_SELECTION&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">OBJECTID</span><span class="se">\&quot;</span><span class="s2"> &gt; 0&quot;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">extent</span> <span class="o">=</span> <span class="n">gebietLayer</span><span class="o">.</span><span class="n">getSelectedExtent</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByAttribute_management</span><span class="p">(</span><span class="n">gebietLayer</span><span class="p">,</span> <span class="s2">&quot;CLEAR_SELECTION&quot;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">scale</span> <span class="o">*</span> <span class="mf">3.0</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">RefreshActiveView</span><span class="p">()</span>
+        <span class="n">Haltestellen_mxd</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">mxd_template</span> <span class="p">,</span> <span class="n">df</span><span class="p">,</span><span class="n">mxdpfad</span><span class="p">,</span><span class="n">templatepath</span><span class="p">,</span><span class="n">resultpath</span><span class="p">,</span><span class="n">gebietLayer</span>
+
+        <span class="c1">#Exportiere Ergebnis</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ExportToJPEG</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">,</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span> <span class="s2">&quot;37_Erreichbarkeit_zuFuss.jpg&quot;</span><span class="p">),</span> <span class="s2">&quot;PAGE_LAYOUT&quot;</span><span class="p">,</span><span class="n">resolution</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Uebersichtskarte mit der Erreichbarkeit von Einrichtungen zu Fuss erstellt </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="k">del</span> <span class="n">Haltestellen_mxd</span>
+        <span class="c1">#==================================================================================================================================================================================</span>
+        <span class="c1">#Kopiere Template.mxd</span>
+        <span class="n">mxd_template</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;37_Erreichbarkeit&quot;</span><span class="p">,</span><span class="s2">&quot;37_Template_Kartenerzeugung&quot;</span><span class="p">,</span><span class="s2">&quot;37_Erreichbarkeit_Pkw_Template.mxd&quot;</span><span class="p">))</span>
+        <span class="n">mxdpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span><span class="s1">&#39;37_Erreichbarkeit_Pkw.mxd&#39;</span><span class="p">)</span>
+        <span class="n">mxd_template</span><span class="o">.</span><span class="n">saveACopy</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+
+        <span class="c1"># Ersetze Datenquelle</span>
+        <span class="n">Haltestellen_mxd</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+        <span class="n">templatepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;37_Erreichbarkeit&quot;</span><span class="p">,</span><span class="s2">&quot;37_Template_Kartenerzeugung&quot;</span><span class="p">,</span><span class="s2">&quot;template.gdb&quot;</span><span class="p">)</span>
+        <span class="n">resultpath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s2">&quot;FGDB_37_Erreichbarkeit_&quot;</span><span class="o">+</span><span class="n">projektname</span><span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">)</span>
+        <span class="n">Haltestellen_mxd</span><span class="o">.</span><span class="n">findAndReplaceWorkspacePaths</span><span class="p">(</span><span class="n">templatepath</span><span class="p">,</span> <span class="n">resultpath</span><span class="p">)</span>
+
+
+        <span class="c1"># Setze Viewport neu</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListDataFrames</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">gebietLayer</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListLayers</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">,</span> <span class="s2">&quot;Buffer_1000_m_500_m_&quot;</span><span class="p">,</span> <span class="n">df</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByAttribute_management</span><span class="p">(</span><span class="n">gebietLayer</span><span class="p">,</span> <span class="s2">&quot;NEW_SELECTION&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">OBJECTID</span><span class="se">\&quot;</span><span class="s2"> &gt; 0&quot;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">extent</span> <span class="o">=</span> <span class="n">gebietLayer</span><span class="o">.</span><span class="n">getSelectedExtent</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByAttribute_management</span><span class="p">(</span><span class="n">gebietLayer</span><span class="p">,</span> <span class="s2">&quot;CLEAR_SELECTION&quot;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">scale</span> <span class="o">*</span> <span class="mf">3.0</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">RefreshActiveView</span><span class="p">()</span>
+        <span class="n">Haltestellen_mxd</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">mxd_template</span> <span class="p">,</span> <span class="n">df</span><span class="p">,</span><span class="n">mxdpfad</span><span class="p">,</span><span class="n">templatepath</span><span class="p">,</span><span class="n">resultpath</span><span class="p">,</span><span class="n">gebietLayer</span>
+
+        <span class="c1">#Exportiere Ergebnis</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ExportToJPEG</span><span class="p">(</span><span class="n">Haltestellen_mxd</span><span class="p">,</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span> <span class="s2">&quot;37_Erreichbarkeit_Pkw.jpg&quot;</span><span class="p">),</span> <span class="s2">&quot;PAGE_LAYOUT&quot;</span><span class="p">,</span><span class="n">resolution</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Uebersichtskarte mit der Erreichbarkeit von Einrichtungen mit dem Pkw erstellt </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="k">del</span> <span class="n">Haltestellen_mxd</span>
+
+
+        <span class="c1"># ##################################################################################################################################################</span>
+
+
+        <span class="c1"># ##################################################################################################################################################</span>
+
+        <span class="n">ws1</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik_&#39;</span><span class="p">)</span>
+        <span class="c1"># Hintergrund weiss faerben</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="n">ws1</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+        <span class="c1"># Pfade zu Grafiken herstellen</span>
+        <span class="n">Text1</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_texte_erlaeterung</span><span class="p">,</span> <span class="s1">&#39;Methodik_ErreichbarkeitWohnen.png&#39;</span><span class="p">)</span>
+        <span class="c1">###Grafiken einf??gen</span>
+        <span class="n">ws1</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+        <span class="k">del</span> <span class="n">Text1</span>
+
+        <span class="c1"># ##################################################################################################################################################</span>
+
+        <span class="n">ws2</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik_Erreichbarkeit(Einr.)&#39;</span><span class="p">)</span>
+        <span class="c1"># Hintergrund weiss faerben</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+        <span class="c1"># Pfade zu Grafiken herstellen</span>
+        <span class="n">Text1</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_texte_erlaeterung</span><span class="p">,</span> <span class="s1">&#39;Methodik_ErreichbarkeitWohnenPkwFahrradZuFuss.png&#39;</span><span class="p">)</span>
+        <span class="c1">###Grafiken einf??gen</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+        <span class="k">del</span> <span class="n">Text1</span>
+
+        <span class="c1">#=====================================================================================================================</span>
+        <span class="n">ws111</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s2">&quot;Auswertung_zu Fuss&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Hintergrund weiss faerben</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="n">ws111</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+        <span class="n">barcode</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Abbildungen&#39;</span><span class="p">,</span><span class="s1">&#39;37_Erreichbarkeit_zuFuss.jpg&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">barcode</span><span class="p">):</span>
+            <span class="n">ws111</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Visualisierung der Einrichtungen, die zu Fuss innerhalb von 30 Minuten errreicht werden koennen.&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+            <span class="n">ws111</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B3&#39;</span><span class="p">,</span> <span class="n">barcode</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">})</span>
+            <span class="k">del</span> <span class="n">barcode</span>
+        <span class="c1">#=====================================================================================================================</span>
+        <span class="n">ws112</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s2">&quot;Auswertung_Fahrrad&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Hintergrund weiss faerben</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="n">ws112</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+        <span class="n">barcode</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Abbildungen&#39;</span><span class="p">,</span><span class="s1">&#39;37_Erreichbarkeit_Fahrrad.jpg&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">barcode</span><span class="p">):</span>
+            <span class="n">ws112</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Visualisierung der Einrichtungen, die mit dem Fahrrad innerhalb von 30 Minuten errreicht werden koennen.&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+            <span class="n">ws112</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B3&#39;</span><span class="p">,</span> <span class="n">barcode</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">})</span>
+            <span class="k">del</span> <span class="n">barcode</span>
+        <span class="c1">#=====================================================================================================================</span>
+        <span class="n">ws113</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s2">&quot;Auswertung_Pkw&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Hintergrund weiss faerben</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="n">ws113</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+        <span class="n">barcode</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Abbildungen&#39;</span><span class="p">,</span><span class="s1">&#39;37_Erreichbarkeit_Pkw.jpg&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">barcode</span><span class="p">):</span>
+            <span class="n">ws113</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Visualisierung der Einrichtungen, die mit dem Pkw innerhalb von 30 Minuten errreicht werden koennen.&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+            <span class="n">ws113</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B3&#39;</span><span class="p">,</span> <span class="n">barcode</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">})</span>
+            <span class="k">del</span> <span class="n">barcode</span>
+        <span class="c1">#=====================================================================================================================</span>
+        <span class="n">ws21</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Auswertung_Zentrale Orte&#39;</span><span class="p">)</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+        <span class="c1"># Hintergrund weiss faerben</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># 2.Ergebnisse aus Erreichbarkeit Zentral Orte einlesen und schreiben</span>
+
+        <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="n">nextmonday</span> <span class="o">=</span> <span class="n">today</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=-</span><span class="n">today</span><span class="o">.</span><span class="n">weekday</span><span class="p">(),</span> <span class="n">weeks</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">abfahrt_min</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">orte</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dauer_min</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">umsteigen_min</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">verkehrsmittel_min</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span><span class="s2">&quot;Zentrale_Orte_temp.csv&quot;</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">mycsv</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">mycsv</span><span class="p">:</span>
+                <span class="n">abfahrt_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">orte</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">dauer_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">umsteigen_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                <span class="n">verkehrsmittel_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+            <span class="k">del</span> <span class="n">row</span><span class="p">,</span> <span class="n">mycsv</span>
+            <span class="nb">print</span> <span class="n">abfahrt_min</span><span class="p">,</span> <span class="n">orte</span><span class="p">,</span> <span class="n">dauer_min</span><span class="p">,</span> <span class="n">umsteigen_min</span><span class="p">,</span> <span class="n">verkehrsmittel_min</span>
+
+        <span class="n">i</span><span class="o">=</span><span class="mi">7</span>
+        <span class="n">n</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Erreichbarkeit ausgewaehlter Mittel- &amp; Oberzentren mit dem OEPNV&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Schnellste Verbindung, ermittelt durch Zugriff auf die Fahrplanauskunft der Deutschen Bahn&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Abgefragt fuer den &quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nextmonday</span><span class="o">.</span><span class="n">day</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nextmonday</span><span class="o">.</span><span class="n">month</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nextmonday</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; im Zeitraum zwischen 7 - 19 Uhr&quot;</span><span class="p">)</span>
+
+        <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Abfahrt (naechstgelegene Haltestelle)&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Ziel&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Fahrtzeit in Minuten&#39;</span><span class="p">,</span> <span class="n">bold_rechts</span><span class="p">)</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;Anzahl Umstiege&#39;</span><span class="p">,</span> <span class="n">bold_rechts</span><span class="p">)</span>
+        <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;Verkehrsmittel&#39;</span><span class="p">,</span> <span class="n">bold_rechts</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ort</span> <span class="ow">in</span> <span class="n">orte</span><span class="p">:</span>
+            <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">abfahrt_min</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;latin1&#39;</span><span class="p">),</span> <span class="n">normal</span><span class="p">)</span>
+            <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ort</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">normal</span><span class="p">)</span>
+            <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">dauer_min</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">rechts</span><span class="p">)</span>
+            <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">umsteigen_min</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">rechts</span><span class="p">)</span>
+            <span class="n">ws21</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">verkehrsmittel_min</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">rechts</span><span class="p">)</span>
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="n">n</span><span class="o">+=</span><span class="mi">1</span>
+
+        <span class="c1">#############################################################################################################</span>
+
+        <span class="n">ws31</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik_Haltestellen&#39;</span><span class="p">)</span>
+        <span class="c1"># Hintergrund weiss faerben</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+        <span class="c1"># Pfade zu Grafiken herstellen</span>
+        <span class="n">Text1</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_texte_erlaeterung</span><span class="p">,</span> <span class="s1">&#39;Methodik_ErreichbarkeitWohnenAnbindungsqualitaet.png&#39;</span><span class="p">)</span>
+        <span class="c1">###Grafiken einf??gen</span>
+        <span class="n">ws31</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+        <span class="k">del</span> <span class="n">Text1</span>
+
+        <span class="c1"># ############################################################################################################</span>
+        <span class="c1"># 3.Karte mit den Haltestellen in der Umgebung einfuegen</span>
+
+        <span class="n">ws3</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s2">&quot;Karte_Haltestellen&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Hintergrund weiss faerben</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="n">ws3</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+        <span class="n">ws3</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Uebersichtskarte mit allen Haltestellen im Umkreis von 500m / 1.000m um das Projektgebiet&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+        <span class="n">ws3</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Ermittelt durch Zugriff auf die Fahrplanauskunft der Deutschen Bahn.&quot;</span><span class="p">)</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Abbildungen&#39;</span><span class="p">,</span> <span class="s2">&quot;37_Karte_Haltestellen.jpg&quot;</span><span class="p">)</span>
+        <span class="n">ws3</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B5&#39;</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">})</span>
+        <span class="k">del</span> <span class="n">image</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># 4.Diagramme und Daten aus Erreichbarkeit OePNV einlesen und schreiben</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">datum</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">name_long</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_ergebnisse</span><span class="p">,</span><span class="s2">&quot;Haltestellen.csv&quot;</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">mycsv</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">mycsv</span><span class="p">:</span>
+                <span class="n">name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">style</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">datum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">name_long</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="k">del</span> <span class="n">row</span><span class="p">,</span> <span class="n">mycsv</span>
+            <span class="nb">print</span> <span class="n">name</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">datum</span>
+
+        <span class="n">i</span><span class="o">=</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">ws4</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s2">&quot;Auswertung_Haltestelle0&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="c1">#Excel-Sheet-Benennung =|= Haltestellenname zur Vermeidung von Codierungskonflikten</span>
+
+            <span class="c1"># Hintergrund weiss faerben</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">):</span>
+                    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+
+            <span class="n">barcode</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Abbildungen&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="s2">&quot;.png&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">barcode</span><span class="p">):</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Visualisierung der OEPNV-Taktung an der Haltestelle &quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">name_long</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;latin-1&#39;</span><span class="p">),</span> <span class="n">bold</span><span class="p">)</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Ermittelt durch Zugriff auf die Fahrplanauskunft der Deutschen Bahn. Abgefragt fuer den &quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">datum</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">style</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span><span class="p">:</span>
+                    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Farbliche Unterscheidung nach Art des Verkehrstraegers&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">style</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;2&quot;</span><span class="p">:</span>
+                    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Farbliche Unterscheidung nach Fahrtziel&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">style</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;3&quot;</span><span class="p">:</span>
+                    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Farbliche Unterscheidung nach OEPNV-Linie&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">style</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;4&quot;</span><span class="p">:</span>
+                    <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Linie mit der dichtesten Taktung farblich hervorgehoben.&quot;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;Ueberlagerung der unterschiedlichen Linien / Fahrtziele durch gleiche Abfahrtszeiten moeglich.&quot;</span><span class="p">)</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B7&#39;</span><span class="p">,</span> <span class="n">barcode</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">del</span> <span class="n">i</span><span class="p">,</span> <span class="n">barcode</span>
+
+        <span class="c1"># ####################################################################################################################################</span>
+
+        <span class="n">ws16</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Literatur_Haftungsausschluss&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Pfade zu Grafiken herstellen</span>
+        <span class="n">Text1</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_texte_erlaeterung</span><span class="p">,</span> <span class="s1">&#39;Methodik_Haftung.jpg&#39;</span><span class="p">)</span>
+        <span class="c1">###Grafiken einf??gen</span>
+        <span class="n">ws16</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Text1</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span>
+
+        <span class="k">del</span> <span class="n">Text1</span>
+
+        <span class="c1">#Workbook speichern</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">wb</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;ACHTUNG </span><span class="se">\n</span><span class="s1">Die Ergebnisstabelle konnte nicht gespreichert werden, da eine aeltere Version der Datei momentan in Excel geoeffnet ist. Bitte schliessen Sie diese Tabelle und fuehren Sie den Arbeitsschritt erneut aus. </span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">AddErrorMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="c1"># Endmeldung</span>
+    <span class="nb">print</span> <span class="s1">&#39;Ergebnisse in Excel-Arbeitsmappe zusammengfuegt und exportiert </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s1">&#39;Ergebnisse in Excel-Arbeitsmappe zusammengfuegt und exportiert&#39;</span><span class="p">)</span></div>
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 26, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,655 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.analyst.verkehr.T3_Verkehrsmengen_ermitteln &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.analyst.verkehr.T3_Verkehrsmengen_ermitteln</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># 03_Verkehrsmengen_ermitteln.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description:</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># GGR Planung</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<span class="c1"># Import arcpy modules</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">imp</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
+
+<span class="kn">import</span> <span class="nn">rpctools.utils.tempmdb_lib</span> <span class="k">as</span> <span class="nn">mdb</span>
+<span class="kn">import</span> <span class="nn">rpctools.utils.population_lib</span> <span class="k">as</span> <span class="nn">pop</span>
+
+<span class="kn">import</span> <span class="nn">arcpy</span>
+
+<span class="kn">import</span> <span class="nn">rpctools.utils.verkehr_lib</span> <span class="k">as</span> <span class="nn">v</span>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.verkehr.T3_Verkehrsmengen_ermitteln.html#rpctools.analyst.verkehr.T3_Verkehrsmengen_ermitteln.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">messages</span><span class="p">):</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Variables</span>
+    <span class="n">i</span><span class="o">=-</span><span class="mi">1</span>
+
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">projektname</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+
+    <span class="c1">#projektname = &quot;HCU_ZGB_OT_Salzdahlum&quot;</span>
+
+    <span class="c1">#Eingangsparameter Wohnen</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Wohnen_Wege_EW</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Wohnen_MIV_Anteil</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="mf">100.</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Wohnen_Pers_KFZ</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Wohnen_Anteil_Besucherfahrten</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="mf">100.</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Wohnen_WF_Fahrten_je_EW</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="c1">#Eingangsparameter Versorgung</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Versorgung_BGF_Beschaeftigter</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Versorgung_Anwesenheit</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Versorgung_Wege_Beschaeftigter</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Versorgung_MIV_Anteil</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="mf">100.</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Versorgung_Pers_KFZ</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Versorgung_Besucher_Tag</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Versorgung_Lieferwege_100m2</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="c1">#Eingangsparameter Gewerbe</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Gewerbe_Anwesenheit</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="mf">100.</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Gewerbe_Wege_Beschaeftigter</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Gewerbe_MIV_Anteil</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="mf">100.</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Gewerbe_Pers_KFZ</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Kundenwege_Beschaeftigte</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Gewerbe_Lieferwege_Beschaeftigte</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="c1">#Eingangsparameter Schulen</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Schulen_Wege_Schueler</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Schulen_MIV_Anteil</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="mf">100.</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Schulen_Schueler_KFZ</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Schulen_Schueler_je_Lehrer</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Schulen_Wege_Lehrer</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Schulen_Pers_KFZ</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">Schulen_Lieferwege_Schueler</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+
+    <span class="c1"># Workspaces</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># Pfad zum Basisverzeichnis RPC</span>
+    <span class="n">workspace_projekt</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">)</span>
+    <span class="n">workspace_basisdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;1_Basisdaten&#39;</span><span class="p">,</span><span class="s1">&#39;FGDB_Basisdaten_deutschland.gdb&#39;</span><span class="p">)</span>
+    <span class="n">workspace_projekt_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+    <span class="n">workspace_projekt_verkehr</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Verkehr.gdb&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Layers and Tables</span>
+    <span class="n">out_folder_path</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt</span><span class="p">,</span><span class="s2">&quot;temp&quot;</span><span class="p">)</span> <span class="c1"># Pfad zur temporaeren mdb inkl.</span>
+    <span class="n">temp_mdb_path</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">out_folder_path</span><span class="p">,</span><span class="s2">&quot;PGDB_Temp.mdb&quot;</span><span class="p">)</span>
+
+    <span class="n">siedlungszellenlayer</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;Siedlungszellen&#39;</span><span class="p">)</span>
+    <span class="n">siedlungszellenlayer_eingangsdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L12_SZ_Projektumfeld_Daten_Verkehrserzeugung&#39;</span><span class="p">)</span>
+    <span class="n">siedlungszellenlayer_eingangsdaten_temp1</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;Siedlungszellen_Eingangsdaten_temp1&#39;</span><span class="p">)</span>
+    <span class="n">siedlungszellenlayer_eingangsdaten_temp2</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;Siedlungszellen_Eingangsdaten_temp2&#39;</span><span class="p">)</span>
+
+    <span class="n">projektlayer_teilflaechen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Teilflaechen_Plangebiet&#39;</span><span class="p">)</span>
+    <span class="n">projektlayer_eingangsdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L12_TF_Daten_Verkehrserzeugung&#39;</span><span class="p">)</span>
+    <span class="n">projekt_bevoelkerungszahl</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Einwohnerzahl&#39;</span><span class="p">)</span>
+
+    <span class="n">umfeldabgrenzung</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L00_Umfeldabgrenzung&quot;</span><span class="p">)</span>
+    <span class="n">bestand_arbeitsplaetze</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L10_Bestand_Arbeitsplaetze&quot;</span><span class="p">)</span>
+    <span class="n">bestand_einzelhandelsflaechen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L11_Bestand_Einzelhandelsflaechen&quot;</span><span class="p">)</span>
+    <span class="n">bestand_schulen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L11_Bestand_Schulen&quot;</span><span class="p">)</span>
+
+    <span class="n">routen_sz</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L03_Routen_SZ&quot;</span><span class="p">)</span>
+    <span class="n">routen_tf</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L03_Routen_TF&quot;</span><span class="p">)</span>
+
+    <span class="n">routen_ergebniskacheln</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L05_Ergebniskacheln&quot;</span><span class="p">)</span>
+
+    <span class="n">strassenabschnitte_sz</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">temp_mdb_path</span><span class="p">,</span><span class="s2">&quot;strassenabschnitte_sz&quot;</span><span class="p">)</span>
+    <span class="n">strassenabschnitte_tf</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">temp_mdb_path</span><span class="p">,</span><span class="s2">&quot;strassenabschnitte_tf&quot;</span><span class="p">)</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#</span>
+    <span class="c1"># Durchlauf Berechnung</span>
+    <span class="c1">#</span>
+    <span class="c1">#############################################################################################################</span>
+    <span class="n">beginmeldung</span> <span class="o">=</span> <span class="s1">&#39;Erzeugen der Eingangsdaten je Siedlungszelle </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">beginmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">beginmeldung</span>
+
+    <span class="c1"># First, make a layer from the language('feature class')</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">siedlungszellenlayer</span><span class="p">,</span> <span class="s2">&quot;siedlungszellenlayer_lyr&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Then add a selection to the layer based on location to features in another language('feature class')</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByLocation_management</span> <span class="p">(</span><span class="s2">&quot;siedlungszellenlayer_lyr&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="n">umfeldabgrenzung</span><span class="p">)</span>
+
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">CopyFeatures_management</span><span class="p">(</span><span class="s2">&quot;siedlungszellenlayer_lyr&quot;</span><span class="p">,</span> <span class="n">siedlungszellenlayer_eingangsdaten</span><span class="p">)</span>
+
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">SpatialJoin_analysis</span><span class="p">(</span><span class="n">siedlungszellenlayer_eingangsdaten</span><span class="p">,</span> <span class="n">bestand_arbeitsplaetze</span><span class="p">,</span> <span class="n">siedlungszellenlayer_eingangsdaten_temp1</span><span class="p">,</span> <span class="s2">&quot;JOIN_ONE_TO_ONE&quot;</span><span class="p">,</span> <span class="s2">&quot;KEEP_ALL&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">SpatialJoin_analysis</span><span class="p">(</span><span class="n">siedlungszellenlayer_eingangsdaten_temp1</span><span class="p">,</span> <span class="n">bestand_einzelhandelsflaechen</span><span class="p">,</span> <span class="n">siedlungszellenlayer_eingangsdaten_temp2</span><span class="p">,</span> <span class="s2">&quot;JOIN_ONE_TO_ONE&quot;</span><span class="p">,</span> <span class="s2">&quot;KEEP_ALL&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">SpatialJoin_analysis</span><span class="p">(</span><span class="n">siedlungszellenlayer_eingangsdaten_temp2</span><span class="p">,</span> <span class="n">bestand_schulen</span><span class="p">,</span> <span class="n">siedlungszellenlayer_eingangsdaten</span><span class="p">,</span> <span class="s2">&quot;JOIN_ONE_TO_ONE&quot;</span><span class="p">,</span> <span class="s2">&quot;KEEP_ALL&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">dropFields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Join_Count&quot;</span><span class="p">,</span> <span class="s2">&quot;TARGET_FID&quot;</span><span class="p">,</span><span class="s2">&quot;Join_Count_1&quot;</span><span class="p">,</span> <span class="s2">&quot;TARGET_FID_1&quot;</span><span class="p">,</span><span class="s2">&quot;Join_Count_12&quot;</span><span class="p">,</span><span class="s2">&quot;TARGET_FID_12&quot;</span><span class="p">,</span><span class="s2">&quot;SUM_Join_Count&quot;</span><span class="p">,</span> <span class="s2">&quot;GEN&quot;</span><span class="p">,</span> <span class="s2">&quot;AGS&quot;</span><span class="p">,</span> <span class="s2">&quot;EWZ&quot;</span><span class="p">,</span><span class="s2">&quot;Anteil&quot;</span><span class="p">,</span><span class="s2">&quot;Punkt_Name&quot;</span><span class="p">,</span><span class="s2">&quot;Punkt_Name_1&quot;</span><span class="p">]</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteField_management</span><span class="p">(</span><span class="n">siedlungszellenlayer_eingangsdaten</span><span class="p">,</span> <span class="n">dropFields</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="n">siedlungszellenlayer_eingangsdaten_temp1</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="n">siedlungszellenlayer_eingangsdaten_temp2</span><span class="p">)</span>
+
+    <span class="c1">#Fuege Felder fuer die Ergebniseintraege an</span>
+    <span class="n">addfiellist</span> <span class="o">=</span><span class="p">[</span><span class="s2">&quot;fahrten_wohnen_ew_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_wohnen_besucher_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_wohnen_wf_tag&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;fahrten_versorgung_beschaeftigte_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_versorgung_kunden_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_versorgung_wf_tag&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;fahrten_gewerbe_beschaeftigte_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_gewerbe_besucher_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_gewerbe_wf_tag&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;fahrten_schulen_schueler_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_schulen_lehrer_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_schulen_wf_tag&quot;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">addfiellist</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">siedlungszellenlayer_eingangsdaten</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s2">&quot;Double&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="n">beginmeldung</span> <span class="o">=</span> <span class="s1">&#39;Erzeugen der Eingangsdaten je Teilfaeche Plangebiet </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">beginmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">beginmeldung</span>
+
+    <span class="c1">#kopiere Teilflaechenlayer als Eingangsdatenlayer fuer Verkehrsmengenerzeugung und loesche nicht benoetigte felder</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="n">projektlayer_eingangsdaten</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">CopyFeatures_management</span><span class="p">(</span><span class="n">projektlayer_teilflaechen</span><span class="p">,</span> <span class="n">projektlayer_eingangsdaten</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">CopyFeatures_management</span><span class="p">(</span><span class="n">projektlayer_teilflaechen</span><span class="p">,</span> <span class="n">projektlayer_eingangsdaten</span><span class="p">)</span>
+
+    <span class="n">dropFields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Startjahr&quot;</span><span class="p">,</span><span class="s2">&quot;Vornutzung1&quot;</span><span class="p">,</span><span class="s2">&quot;Vornutzung2&quot;</span><span class="p">,</span><span class="s2">&quot;Vornutzung3&quot;</span><span class="p">,</span><span class="s2">&quot;Anteil1&quot;</span><span class="p">,</span><span class="s2">&quot;Anteil2&quot;</span><span class="p">,</span><span class="s2">&quot;Anteil3&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">dropFields</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteField_management</span><span class="p">(</span><span class="n">projektlayer_eingangsdaten</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="c1">#WOHNEN - EINWOHNERBERECHNUNG</span>
+
+    <span class="n">pop</span><span class="o">.</span><span class="n">recalcPopulation</span><span class="p">(</span><span class="n">projektname</span><span class="p">)</span>
+
+    <span class="c1">#berechne maximale Personenzahl je Teilflaeche</span>
+    <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Einwohnerzahl&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Einwohnerzahl_max&#39;</span><span class="p">)</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT Einwohnerzahl.Teilflaeche_Plangebiet, Max(Einwohnerzahl.Einwohnerzahl) AS EW INTO Einwohnerzahl_max</span>
+<span class="s2">                FROM Einwohnerzahl</span>
+<span class="s2">                GROUP BY Einwohnerzahl.Teilflaeche_Plangebiet;</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+
+    <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+
+    <span class="c1">#Fuege Felder fuer die Ergebniseintraege an</span>
+    <span class="n">addfiellist</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;TF_Einwohner&quot;</span><span class="p">,</span><span class="s2">&quot;Verkaufsflaeche&quot;</span><span class="p">,</span><span class="s2">&quot;Arbeitsplaetze&quot;</span><span class="p">,</span><span class="s2">&quot;Schueler&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_wohnen_ew_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_wohnen_besucher_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_wohnen_wf_tag&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;fahrten_versorgung_beschaeftigte_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_versorgung_kunden_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_versorgung_wf_tag&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;fahrten_gewerbe_beschaeftigte_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_gewerbe_besucher_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_gewerbe_wf_tag&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;fahrten_schulen_schueler_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_schulen_lehrer_tag&quot;</span><span class="p">,</span><span class="s2">&quot;fahrten_schulen_wf_tag&quot;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">addfiellist</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">projektlayer_eingangsdaten</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s2">&quot;Double&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1">#Fuege Einwohnerzahl an</span>
+    <span class="n">bevoelkerung_max_tf</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s2">&quot;Einwohnerzahl_max&quot;</span><span class="p">)</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">bevoelkerung_max_tf</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">Teilflaeche_Plangebiet</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Teilflaeche_Plangebiet</span>
+        <span class="n">EW</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">EW</span>
+
+        <span class="n">rows2</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">projektlayer_eingangsdaten</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">row2</span> <span class="ow">in</span> <span class="n">rows2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">row2</span><span class="o">.</span><span class="n">Name</span> <span class="o">==</span> <span class="n">Teilflaeche_Plangebiet</span><span class="p">:</span>
+                <span class="n">row2</span><span class="o">.</span><span class="n">TF_Einwohner</span> <span class="o">=</span> <span class="n">EW</span>
+            <span class="n">rows2</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row2</span><span class="p">)</span>
+
+
+    <span class="c1">#GEWERBE - BESCHAEFTIGTENBERECHNUNG</span>
+    <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Gewerbe_Beschaeftigte&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Gewerbe_Beschaeftigte_temp&#39;</span><span class="p">)</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT Gewerbe_Beschaeftigte.Jahr, Gewerbe_Beschaeftigte.Teilflaeche_Plangebiet, Sum(Gewerbe_Beschaeftigte.Anzahl) AS Summe INTO Gewerbe_Beschaeftigte_temp</span>
+<span class="s2">                FROM Gewerbe_Beschaeftigte</span>
+<span class="s2">                GROUP BY Gewerbe_Beschaeftigte.Jahr, Gewerbe_Beschaeftigte.Teilflaeche_Plangebiet</span>
+<span class="s2">                ORDER BY Gewerbe_Beschaeftigte.Jahr, Gewerbe_Beschaeftigte.Teilflaeche_Plangebiet, Sum(Gewerbe_Beschaeftigte.Anzahl);</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+
+    <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+    <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Gewerbe_Beschaeftigte_temp&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Gewerbe_Beschaeftigte_Max&#39;</span><span class="p">)</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT Gewerbe_Beschaeftigte_temp.Teilflaeche_Plangebiet, Max(Gewerbe_Beschaeftigte_temp.Summe) AS [Max] INTO Gewerbe_Beschaeftigte_Max</span>
+<span class="s2">                FROM Gewerbe_Beschaeftigte_temp</span>
+<span class="s2">                GROUP BY Gewerbe_Beschaeftigte_temp.Teilflaeche_Plangebiet;</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+
+    <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+    <span class="c1">#Fuege Beschaeftigtenzahl an</span>
+    <span class="n">beschaeftigte_max_tf</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s2">&quot;Gewerbe_Beschaeftigte_Max&quot;</span><span class="p">)</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">beschaeftigte_max_tf</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">Teilflaeche_Plangebiet</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Teilflaeche_Plangebiet</span>
+        <span class="n">Beschaeftigte_TF</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Max</span>
+
+        <span class="n">rows2</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">projektlayer_eingangsdaten</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">row2</span> <span class="ow">in</span> <span class="n">rows2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">row2</span><span class="o">.</span><span class="n">Name</span> <span class="o">==</span> <span class="n">Teilflaeche_Plangebiet</span><span class="p">:</span>
+                <span class="n">row2</span><span class="o">.</span><span class="n">Arbeitsplaetze</span> <span class="o">=</span> <span class="n">Beschaeftigte_TF</span>
+            <span class="n">rows2</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row2</span><span class="p">)</span>
+
+
+    <span class="c1">#VERSORGUNG - FLAECHENBERECHNUNG</span>
+
+    <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Versorgung_Verkaufsflaechen&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Versorgung_Verkaufsflaechen_temp&#39;</span><span class="p">)</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT Versorgung_Verkaufsflaechen.Jahr, Versorgung_Verkaufsflaechen.Teilflaeche_Plangebiet, Sum(Versorgung_Verkaufsflaechen.Verkaufsflaeche) AS Summe INTO Versorgung_Verkaufsflaechen_temp</span>
+<span class="s2">                FROM Versorgung_Verkaufsflaechen</span>
+<span class="s2">                GROUP BY Versorgung_Verkaufsflaechen.Jahr, Versorgung_Verkaufsflaechen.Teilflaeche_Plangebiet</span>
+<span class="s2">                ORDER BY Versorgung_Verkaufsflaechen.Jahr, Versorgung_Verkaufsflaechen.Teilflaeche_Plangebiet, Sum(Versorgung_Verkaufsflaechen.Verkaufsflaeche);</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+
+    <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+    <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Versorgung_Verkaufsflaechen_temp&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Versorgung_Verkaufsflaechen_Max&#39;</span><span class="p">)</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT Versorgung_Verkaufsflaechen_temp.Teilflaeche_Plangebiet, Max(Versorgung_Verkaufsflaechen_temp.Summe) AS [Max] INTO Versorgung_Verkaufsflaechen_Max</span>
+<span class="s2">                FROM Versorgung_Verkaufsflaechen_temp</span>
+<span class="s2">                GROUP BY Versorgung_Verkaufsflaechen_temp.Teilflaeche_Plangebiet;</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+
+    <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+    <span class="c1">#Fuege Verkaufsflaeche an</span>
+    <span class="n">verkaufsflaeche_max_tf</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s2">&quot;Versorgung_Verkaufsflaechen_Max&quot;</span><span class="p">)</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">verkaufsflaeche_max_tf</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">Teilflaeche_Plangebiet</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Teilflaeche_Plangebiet</span>
+        <span class="n">Verkaufsflaeche_TF</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Max</span>
+
+        <span class="n">rows2</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">projektlayer_eingangsdaten</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">row2</span> <span class="ow">in</span> <span class="n">rows2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">row2</span><span class="o">.</span><span class="n">Name</span> <span class="o">==</span> <span class="n">Teilflaeche_Plangebiet</span><span class="p">:</span>
+                <span class="n">row2</span><span class="o">.</span><span class="n">Verkaufsflaeche</span> <span class="o">=</span> <span class="n">Verkaufsflaeche_TF</span>
+            <span class="n">rows2</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row2</span><span class="p">)</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="n">beginmeldung</span> <span class="o">=</span> <span class="s1">&#39;Verkehrsmengenerzeugung Nullfall </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">beginmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">beginmeldung</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">siedlungszellenlayer_eingangsdaten</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">SZ_ID</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">SZ_ID</span>
+        <span class="n">EW</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">SZ_Einwohner</span>
+        <span class="n">BGF</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Verkaufsflaeche</span>
+        <span class="n">Beschaeftigte</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Arbeitsplaetze</span>
+        <span class="n">Schueler</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Schueler</span>
+
+        <span class="k">if</span> <span class="n">EW</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">EW</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="n">BGF</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">BGF</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="n">Beschaeftigte</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Beschaeftigte</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="n">Schueler</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Schueler</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1">#Starte Berechnungen je Siedlungszelle</span>
+        <span class="n">fahrten_EW</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">verkehrserzeugung_einwohner</span><span class="p">(</span><span class="n">EW</span><span class="p">,</span><span class="n">Wohnen_Wege_EW</span><span class="p">,</span><span class="n">Wohnen_MIV_Anteil</span><span class="p">,</span><span class="n">Wohnen_Pers_KFZ</span><span class="p">,</span><span class="n">Wohnen_Anteil_Besucherfahrten</span><span class="p">,</span><span class="n">Wohnen_WF_Fahrten_je_EW</span><span class="p">)</span>
+        <span class="n">fahrten_versorgung</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">verkehrserzeugung_einzelhandel</span><span class="p">(</span><span class="n">BGF</span><span class="p">,</span><span class="n">Versorgung_BGF_Beschaeftigter</span><span class="p">,</span><span class="n">Versorgung_Anwesenheit</span><span class="p">,</span><span class="n">Versorgung_Wege_Beschaeftigter</span><span class="p">,</span><span class="n">Versorgung_MIV_Anteil</span><span class="p">,</span><span class="n">Versorgung_Pers_KFZ</span><span class="p">,</span><span class="n">Versorgung_Besucher_Tag</span><span class="p">,</span><span class="n">Versorgung_Lieferwege_100m2</span><span class="p">)</span>
+        <span class="n">fahrten_gewerbe</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">verkehrserzeugung_gewerbe</span><span class="p">(</span><span class="n">Beschaeftigte</span><span class="p">,</span><span class="n">Gewerbe_Anwesenheit</span><span class="p">,</span><span class="n">Gewerbe_Wege_Beschaeftigter</span><span class="p">,</span><span class="n">Gewerbe_MIV_Anteil</span><span class="p">,</span><span class="n">Gewerbe_Pers_KFZ</span><span class="p">,</span><span class="n">Kundenwege_Beschaeftigte</span><span class="p">,</span><span class="n">Gewerbe_Lieferwege_Beschaeftigte</span><span class="p">)</span>
+        <span class="n">fahrten_schule</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">verkehrserzeugung_schulen</span><span class="p">(</span><span class="n">Schueler</span><span class="p">,</span><span class="n">Schulen_Wege_Schueler</span><span class="p">,</span><span class="n">Schulen_MIV_Anteil</span><span class="p">,</span><span class="n">Schulen_Schueler_KFZ</span><span class="p">,</span><span class="n">Schulen_Schueler_je_Lehrer</span><span class="p">,</span><span class="n">Schulen_Wege_Lehrer</span><span class="p">,</span><span class="n">Schulen_Pers_KFZ</span><span class="p">,</span><span class="n">Schulen_Lieferwege_Schueler</span><span class="p">)</span>
+
+        <span class="n">rows2</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">siedlungszellenlayer_eingangsdaten</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">SZ_ID</span> <span class="o">==</span> <span class="n">SZ_ID</span><span class="p">:</span>
+                <span class="c1">#Ergebnisse Wohnen</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_WOHNEN_EW_TAG</span> <span class="o">=</span> <span class="n">fahrten_EW</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_WOHNEN_BESUCHER_TAG</span> <span class="o">=</span> <span class="n">fahrten_EW</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_WOHNEN_WF_TAG</span> <span class="o">=</span> <span class="n">fahrten_EW</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+                <span class="c1">#Ergebnisse Versorgung</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_VERSORGUNG_BESCHAEFTIGTE_TAG</span> <span class="o">=</span> <span class="n">fahrten_versorgung</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_VERSORGUNG_KUNDEN_TAG</span> <span class="o">=</span> <span class="n">fahrten_versorgung</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_VERSORGUNG_WF_TAG</span> <span class="o">=</span> <span class="n">fahrten_versorgung</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+                <span class="c1">#Ergebnisse Gewerbe</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_GEWERBE_BESCHAEFTIGTE_TAG</span> <span class="o">=</span> <span class="n">fahrten_gewerbe</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_GEWERBE_BESUCHER_TAG</span> <span class="o">=</span> <span class="n">fahrten_gewerbe</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_GEWERBE_WF_TAG</span> <span class="o">=</span> <span class="n">fahrten_gewerbe</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+                <span class="c1">#Ergebnisse Schule</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_SCHULEN_SCHUELER_TAG</span> <span class="o">=</span> <span class="n">fahrten_schule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_SCHULEN_LEHRER_TAG</span> <span class="o">=</span> <span class="n">fahrten_schule</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_SCHULEN_WF_TAG</span> <span class="o">=</span> <span class="n">fahrten_schule</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="n">rows2</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">del</span> <span class="n">rows</span><span class="p">,</span><span class="n">rows2</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="n">beginmeldung</span> <span class="o">=</span> <span class="s1">&#39;Verkehrsmengenerzeugung Planfall </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">beginmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">beginmeldung</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">projektlayer_eingangsdaten</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">Name</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Name</span>
+        <span class="n">EW</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">TF_Einwohner</span>
+        <span class="n">BGF</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Verkaufsflaeche</span>
+        <span class="n">Beschaeftigte</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">Arbeitsplaetze</span>
+
+        <span class="k">if</span> <span class="n">EW</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">EW</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="n">BGF</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">BGF</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="n">Beschaeftigte</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Beschaeftigte</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="n">Schueler</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Schueler</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1">#Starte Berechnungen je Projektteilflaeche</span>
+        <span class="n">fahrten_EW</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">verkehrserzeugung_einwohner</span><span class="p">(</span><span class="n">EW</span><span class="p">,</span><span class="n">Wohnen_Wege_EW</span><span class="p">,</span><span class="n">Wohnen_MIV_Anteil</span><span class="p">,</span><span class="n">Wohnen_Pers_KFZ</span><span class="p">,</span><span class="n">Wohnen_Anteil_Besucherfahrten</span><span class="p">,</span><span class="n">Wohnen_WF_Fahrten_je_EW</span><span class="p">)</span>
+        <span class="n">fahrten_versorgung</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">verkehrserzeugung_einzelhandel</span><span class="p">(</span><span class="n">BGF</span><span class="p">,</span><span class="n">Versorgung_BGF_Beschaeftigter</span><span class="p">,</span><span class="n">Versorgung_Anwesenheit</span><span class="p">,</span><span class="n">Versorgung_Wege_Beschaeftigter</span><span class="p">,</span><span class="n">Versorgung_MIV_Anteil</span><span class="p">,</span><span class="n">Versorgung_Besucher_Tag</span><span class="p">,</span><span class="n">Versorgung_Pers_KFZ</span><span class="p">,</span><span class="n">Versorgung_Lieferwege_100m2</span><span class="p">)</span>
+        <span class="n">fahrten_gewerbe</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">verkehrserzeugung_gewerbe</span><span class="p">(</span><span class="n">Beschaeftigte</span><span class="p">,</span><span class="n">Gewerbe_Anwesenheit</span><span class="p">,</span><span class="n">Gewerbe_Wege_Beschaeftigter</span><span class="p">,</span><span class="n">Gewerbe_MIV_Anteil</span><span class="p">,</span><span class="n">Gewerbe_Pers_KFZ</span><span class="p">,</span><span class="n">Kundenwege_Beschaeftigte</span><span class="p">,</span><span class="n">Gewerbe_Lieferwege_Beschaeftigte</span><span class="p">)</span>
+        <span class="n">fahrten_schule</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">verkehrserzeugung_schulen</span><span class="p">(</span><span class="n">Schueler</span><span class="p">,</span><span class="n">Schulen_Wege_Schueler</span><span class="p">,</span><span class="n">Schulen_MIV_Anteil</span><span class="p">,</span><span class="n">Schulen_Schueler_KFZ</span><span class="p">,</span><span class="n">Schulen_Schueler_je_Lehrer</span><span class="p">,</span><span class="n">Schulen_Wege_Lehrer</span><span class="p">,</span><span class="n">Schulen_Pers_KFZ</span><span class="p">,</span><span class="n">Schulen_Lieferwege_Schueler</span><span class="p">)</span>
+
+        <span class="n">rows2</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">projektlayer_eingangsdaten</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">Name</span> <span class="o">==</span> <span class="n">Name</span><span class="p">:</span>
+                <span class="c1">#Ergebnisse Wohnen</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_WOHNEN_EW_TAG</span> <span class="o">=</span> <span class="n">fahrten_EW</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_WOHNEN_BESUCHER_TAG</span> <span class="o">=</span> <span class="n">fahrten_EW</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_WOHNEN_WF_TAG</span> <span class="o">=</span> <span class="n">fahrten_EW</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="c1">#print r.Name, fahrten_EW[0]</span>
+
+                <span class="c1">#Ergebnisse Versorgung</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_VERSORGUNG_BESCHAEFTIGTE_TAG</span> <span class="o">=</span> <span class="n">fahrten_versorgung</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_VERSORGUNG_KUNDEN_TAG</span> <span class="o">=</span> <span class="n">fahrten_versorgung</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_VERSORGUNG_WF_TAG</span> <span class="o">=</span> <span class="n">fahrten_versorgung</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+                <span class="c1">#Ergebnisse Gewerbe</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_GEWERBE_BESCHAEFTIGTE_TAG</span> <span class="o">=</span> <span class="n">fahrten_gewerbe</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_GEWERBE_BESUCHER_TAG</span> <span class="o">=</span> <span class="n">fahrten_gewerbe</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_GEWERBE_WF_TAG</span> <span class="o">=</span> <span class="n">fahrten_gewerbe</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+                <span class="c1">#Ergebnisse Schule</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_SCHULEN_SCHUELER_TAG</span> <span class="o">=</span> <span class="n">fahrten_schule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_SCHULEN_LEHRER_TAG</span> <span class="o">=</span> <span class="n">fahrten_schule</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">FAHRTEN_SCHULEN_WF_TAG</span> <span class="o">=</span> <span class="n">fahrten_schule</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="n">rows2</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">del</span> <span class="n">rows</span><span class="p">,</span><span class="n">rows2</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="n">beginmeldung</span> <span class="o">=</span> <span class="s1">&#39;Verkehrsmengen an Routen anspielen  </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">beginmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">beginmeldung</span>
+
+    <span class="c1">#Abschnitt Nullfall</span>
+    <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L01_Uebergabepunkte&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L03_Routen_SZ&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L03_Routen_TF&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L06_Routen_je_Kachel&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L12_SZ_Projektumfeld_Daten_Verkehrserzeugung&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L13_SZ_Routen_Verkehrsmenge&#39;</span><span class="p">)</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT L03_Routen_SZ.Routen_ID, L03_Routen_SZ.SZ_ID, L03_Routen_SZ.Punkt_Name, ([QP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2 AS Wohnen_QP, ([ZP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2 AS Wohnen_ZP, ([QP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2 AS Versorgung_QP, ([QP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2 AS Schulen_QP, ([ZP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2 AS Versorgung_ZP, ([QP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2 AS Gewerbe_QP, ([ZP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2 AS Gewerbe_ZP, ([ZP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2 AS Schulen_ZP INTO L13_SZ_Routen_Verkehrsmenge</span>
+<span class="s2">                FROM (L01_Uebergabepunkte INNER JOIN L03_Routen_SZ ON L01_Uebergabepunkte.Punkt_Name = L03_Routen_SZ.Punkt_Name) INNER JOIN L12_SZ_Projektumfeld_Daten_Verkehrserzeugung ON L03_Routen_SZ.SZ_ID = L12_SZ_Projektumfeld_Daten_Verkehrserzeugung.SZ_ID</span>
+<span class="s2">                GROUP BY L03_Routen_SZ.Routen_ID, L03_Routen_SZ.SZ_ID, L03_Routen_SZ.Punkt_Name, ([QP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([ZP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([QP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2, ([ZP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2;</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+
+    <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+    <span class="c1">#Abschnitt Planfall</span>
+    <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L01_Uebergabepunkte&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L03_Routen_SZ&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L03_Routen_TF&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L06_Routen_je_Kachel&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L12_SZ_Projektumfeld_Daten_Verkehrserzeugung&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L12_TF_Daten_Verkehrserzeugung&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L13_TF_Routen_Verkehrsmenge&#39;</span><span class="p">)</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT L03_Routen_TF.Routen_ID, L03_Routen_TF.TF_ID, L03_Routen_TF.Punkt_Name, ([QP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2 AS Wohnen_QP, ([ZP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2 AS Wohnen_ZP, ([QP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2 AS Versorgung_QP, ([QP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2 AS Schulen_QP, ([ZP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2 AS Versorgung_ZP, ([QP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2 AS Gewerbe_QP, ([ZP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2 AS Gewerbe_ZP, ([ZP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2 AS Schulen_ZP INTO L13_TF_Routen_Verkehrsmenge</span>
+<span class="s2">                FROM (L01_Uebergabepunkte INNER JOIN L03_Routen_TF ON L01_Uebergabepunkte.Punkt_Name = L03_Routen_TF.Punkt_Name) INNER JOIN L12_TF_Daten_Verkehrserzeugung ON L03_Routen_TF.TF_ID = L12_TF_Daten_Verkehrserzeugung.TF_ID</span>
+<span class="s2">                GROUP BY L03_Routen_TF.Routen_ID, L03_Routen_TF.TF_ID, L03_Routen_TF.Punkt_Name, ([QP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([ZP_Wohnen]/100)*([fahrten_wohnen_ew_tag]+[fahrten_wohnen_besucher_tag]+[fahrten_wohnen_wf_tag])/2, ([QP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2, ([ZP_Versorgung]/100)*([fahrten_versorgung_beschaeftigte_tag]+[fahrten_versorgung_kunden_tag]+[fahrten_versorgung_wf_tag])/2, ([QP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Gewerbe]/100)*([fahrten_gewerbe_beschaeftigte_tag]+[fahrten_gewerbe_besucher_tag]+[fahrten_gewerbe_wf_tag])/2, ([ZP_Schulen]/100)*([fahrten_schulen_schueler_tag]+[fahrten_schulen_lehrer_tag]+[fahrten_schulen_wf_tag])/2;&quot;&quot;&quot;</span>
+
+    <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="n">beginmeldung</span> <span class="o">=</span> <span class="s1">&#39;Routenmengen an Ausgaberaster anspielen </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">beginmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">beginmeldung</span>
+
+    <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L13_SZ_Routen_Verkehrsmenge&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L13_TF_Routen_Verkehrsmenge&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L06_Routen_je_Kachel&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L14_SZ_Grid_Verkehrsmenge&#39;</span><span class="p">)</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT L06_Routen_je_Kachel.GRID_ID, Sum([L13_TF_Routen_Verkehrsmenge]![Wohnen_QP]+[L13_TF_Routen_Verkehrsmenge]![Wohnen_ZP]+[L13_TF_Routen_Verkehrsmenge]![Versorgung_QP]+[L13_TF_Routen_Verkehrsmenge]![Versorgung_ZP]+[L13_TF_Routen_Verkehrsmenge]![Gewerbe_QP]+[L13_TF_Routen_Verkehrsmenge]![Gewerbe_ZP]+[L13_TF_Routen_Verkehrsmenge]![Schulen_QP]+[L13_TF_Routen_Verkehrsmenge]![Schulen_ZP]) AS Traffic_Plangebiet, Sum([L13_SZ_Routen_Verkehrsmenge]![Wohnen_QP]+[L13_SZ_Routen_Verkehrsmenge]![Wohnen_ZP]+[L13_SZ_Routen_Verkehrsmenge]![Versorgung_QP]+[L13_SZ_Routen_Verkehrsmenge]![Versorgung_ZP]+[L13_SZ_Routen_Verkehrsmenge]![Gewerbe_QP]+[L13_SZ_Routen_Verkehrsmenge]![Gewerbe_ZP]+[L13_SZ_Routen_Verkehrsmenge]![Schulen_QP]+[L13_SZ_Routen_Verkehrsmenge]![Schulen_ZP]) AS Traffic_Nullfall INTO L14_SZ_Grid_Verkehrsmenge</span>
+<span class="s2">                FROM (L06_Routen_je_Kachel LEFT JOIN L13_TF_Routen_Verkehrsmenge ON L06_Routen_je_Kachel.Route_ID = L13_TF_Routen_Verkehrsmenge.Routen_ID) LEFT JOIN L13_SZ_Routen_Verkehrsmenge ON L06_Routen_je_Kachel.Route_ID = L13_SZ_Routen_Verkehrsmenge.Routen_ID</span>
+<span class="s2">                GROUP BY L06_Routen_je_Kachel.GRID_ID;</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+
+    <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+    <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L13_SZ_Routen_Verkehrsmenge&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L13_TF_Routen_Verkehrsmenge&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L06_Routen_je_Kachel&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="c1">#Berechne Feld Planfall</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L14_SZ_Grid_Verkehrsmenge&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="s2">&quot;Traffic_Planfall&quot;</span><span class="p">,</span> <span class="s2">&quot;Double&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">CalculateField_management</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="s2">&quot;Traffic_Planfall&quot;</span><span class="p">,</span> <span class="s2">&quot;(!Traffic_Nullfall! or 0) + (!Traffic_Plangebiet! or 0)&quot;</span><span class="p">,</span> <span class="s2">&quot;PYTHON&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1">#Berechne Feld prozentuale Steigerung</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L14_SZ_Grid_Verkehrsmenge&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="s2">&quot;Traffic_Steigerung&quot;</span><span class="p">,</span> <span class="s2">&quot;Double&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">CalculateField_management</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="s2">&quot;Traffic_Steigerung&quot;</span><span class="p">,</span> <span class="s2">&quot;(!Traffic_Planfall! or 0) / (!Traffic_Nullfall! or 0)&quot;</span><span class="p">,</span> <span class="s2">&quot;PYTHON&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1">#Join Data to Result_Grid</span>
+    <span class="c1"># Process: Feature-Layer erstellen</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">routen_ergebniskacheln</span><span class="p">,</span> <span class="s2">&quot;L05_Ergebniskacheln_Layer&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;OID OID VISIBLE NONE;Shape Shape VISIBLE NONE;Shape_Length Shape_Length VISIBLE NONE;Shape_Area Shape_Area VISIBLE NONE;GRID_ID GRID_ID VISIBLE NONE&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Process: Verbindung hinzuf??gen</span>
+    <span class="n">grid_final</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L15_Grid_Ergebnis&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddJoin_management</span><span class="p">(</span><span class="s2">&quot;L05_Ergebniskacheln_Layer&quot;</span><span class="p">,</span> <span class="s2">&quot;GRID_ID&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="s2">&quot;GRID_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;KEEP_ALL&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">CopyFeatures_management</span><span class="p">(</span><span class="s2">&quot;L05_Ergebniskacheln_Layer&quot;</span><span class="p">,</span> <span class="n">grid_final</span><span class="p">)</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#Setze Pfad auf Vorlagen - MXD und tausche Datenquelle aus</span>
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Vorbereitung Ergebnisexport </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="c1">#Checke Pfad der mxd_template und tausche diesen aus</span>
+    <span class="n">mxd_template</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Verkehr&quot;</span><span class="p">,</span><span class="s2">&quot;Style&quot;</span><span class="p">,</span><span class="s2">&quot;template.mxd&quot;</span><span class="p">))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListDataFrames</span><span class="p">(</span><span class="n">mxd_template</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">lyr</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListLayers</span><span class="p">(</span><span class="n">mxd_template</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">df</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">templatepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Verkehr&quot;</span><span class="p">,</span><span class="s2">&quot;Style&quot;</span><span class="p">,</span><span class="s2">&quot;template.gdb&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">lyr</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListLayers</span><span class="p">(</span><span class="n">mxd_template</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">lyr</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;L15_Grid_Ergebnis&quot;</span><span class="p">:</span>
+            <span class="n">lyr</span><span class="o">.</span><span class="n">replaceDataSource</span><span class="p">(</span><span class="n">templatepath</span><span class="p">,</span> <span class="s1">&#39;FILEGDB_WORKSPACE&#39;</span><span class="p">)</span>
+    <span class="n">mxd_template</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="c1">#Kopiere Templatemxd</span>
+    <span class="n">ausgabeordner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Abbildungen&#39;</span><span class="p">)</span>
+    <span class="n">mxdpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">,</span><span class="s1">&#39;Verkehr.mxd&#39;</span><span class="p">)</span>
+    <span class="n">mxd_template</span><span class="o">.</span><span class="n">saveACopy</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+
+    <span class="c1">#Ersetze Datenquelle</span>
+    <span class="n">verkehr_mxd</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="n">mxdpfad</span><span class="p">)</span>
+
+    <span class="n">templatepath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Verkehr&quot;</span><span class="p">,</span><span class="s2">&quot;Style&quot;</span><span class="p">,</span><span class="s2">&quot;template.gdb&quot;</span><span class="p">)</span>
+    <span class="n">resultpath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s2">&quot;FGDB_Verkehr_&quot;</span><span class="o">+</span><span class="n">projektname</span><span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">)</span>
+
+    <span class="n">verkehr_mxd</span><span class="o">.</span><span class="n">findAndReplaceWorkspacePaths</span><span class="p">(</span><span class="n">templatepath</span><span class="p">,</span> <span class="n">resultpath</span><span class="p">)</span>
+    <span class="n">verkehr_mxd</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListDataFrames</span><span class="p">(</span><span class="n">verkehr_mxd</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">lyr</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListLayers</span><span class="p">(</span><span class="n">verkehr_mxd</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">df</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">lyr</span><span class="o">.</span><span class="n">getExtent</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">extent</span> <span class="o">=</span> <span class="n">ext</span>
+
+    <span class="k">for</span> <span class="n">lyr</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListLayers</span><span class="p">(</span><span class="n">verkehr_mxd</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">lyr</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;L15_Grid_Ergebnis&quot;</span><span class="p">:</span>
+            <span class="n">lyr</span><span class="o">.</span><span class="n">symbology</span><span class="o">.</span><span class="n">numClasses</span> <span class="o">=</span> <span class="mi">8</span>
+
+    <span class="n">verkehr_mxd</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="c1">#Exportiere Ergebnis</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ExportToJPEG</span><span class="p">(</span><span class="n">verkehr_mxd</span><span class="p">,</span> <span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">,</span> <span class="s1">&#39;Verkehr.jpg&#39;</span><span class="p">),</span> <span class="s2">&quot;PAGE_LAYOUT&quot;</span><span class="p">,</span><span class="n">resolution</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#Aufraeumen und ueberfluessige Variablen loeschen</span>
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Aufraeumen und ueberfluessige Variablen loeschen </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="n">routen_ergebniskacheln_sz_join</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L05_Ergebniskacheln_sz_join&quot;</span><span class="p">)</span>
+    <span class="n">routen_ergebniskacheln_tf_join</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s2">&quot;L05_Ergebniskacheln_tf_join&quot;</span><span class="p">)</span>
+    <span class="n">gewerbebeschaeftigtetemp</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Gewerbe_Beschaeftigte_temp&#39;</span><span class="p">)</span>
+
+    <span class="n">deletelist</span> <span class="o">=</span> <span class="p">[</span><span class="n">routen_ergebniskacheln_sz_join</span><span class="p">,</span><span class="n">routen_ergebniskacheln_tf_join</span><span class="p">,</span><span class="n">gewerbebeschaeftigtetemp</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">deletelist</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="n">element</span><span class="p">,</span> <span class="s2">&quot;konnte nicht geloescht werden&quot;</span>
+
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+    <span class="c1"># Endmeldung</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Script abgeschlossen&#39;</span>
+    <span class="nb">print</span> <span class="n">message</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 26, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

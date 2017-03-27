@@ -1,0 +1,1118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.analyst.einnahmen.T6_KFA &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.analyst.einnahmen.T6_KFA</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># 32_KFA_01.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description: Berechnung des Kommunalen Finanzausgleichs für das zu untersuchende Projekt</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># ILS / GGR Planung</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">imp</span>
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">import</span> <span class="nn">xlsxwriter</span><span class="o">,</span> <span class="nn">urllib2</span><span class="o">,</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">rpctools.utils.params</span> <span class="k">import</span> <span class="n">Tool</span>
+<span class="kn">import</span> <span class="nn">rpctools.utils.sheet_lib</span> <span class="k">as</span> <span class="nn">sl</span>
+<span class="kn">import</span> <span class="nn">rpctools.utils.tempmdb_lib</span> <span class="k">as</span> <span class="nn">mdb</span>
+
+
+<div class="viewcode-block" id="KFA"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T6_KFA.html#rpctools.analyst.einnahmen.T6_KFA.KFA">[docs]</a><span class="k">class</span> <span class="nc">KFA</span><span class="p">(</span><span class="n">Tool</span><span class="p">):</span>
+
+    <span class="n">_dbname</span> <span class="o">=</span> <span class="s1">&#39;FGDB_Einnahmen.gdb&#39;</span>
+
+<div class="viewcode-block" id="KFA.run"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T6_KFA.html#rpctools.analyst.einnahmen.T6_KFA.KFA.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">par</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Variablen definieren</span>
+        <span class="n">projektname</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1">#projektname = &#39;HCU_LKH_Brackel&#39;</span>
+
+        <span class="c1">#Pfade einrichten</span>
+        <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">workspace_projekt_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Einnahmen.gdb&#39;</span><span class="p">)</span>
+
+        <span class="n">projektRahmendaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span> <span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span>  <span class="n">projektname</span> <span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_&quot;</span> <span class="o">+</span> <span class="n">projektname</span> <span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Projektrahmendaten&quot;</span><span class="p">)</span>
+        <span class="n">projektFlaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span> <span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span>  <span class="n">projektname</span> <span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_&quot;</span> <span class="o">+</span> <span class="n">projektname</span> <span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
+        <span class="n">kfa_01_jaehrlich</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span> <span class="s2">&quot;KFA_01_Jahresdaten&quot;</span><span class="p">)</span>
+        <span class="n">kfa_02_statisch</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span> <span class="s2">&quot;KFA_02_Statische_Daten&quot;</span><span class="p">)</span>
+        <span class="n">projektBevoelkerung</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">projektRahmendaten</span><span class="p">,</span> <span class="s2">&quot;Einwohnerzahl&quot;</span><span class="p">)</span>
+
+
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1">#</span>
+        <span class="c1"># Beginne Hauptteil</span>
+        <span class="c1">#</span>
+        <span class="c1">#############################################################################################################</span>
+
+
+        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Variablen definieren</span>
+        <span class="n">projektname</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1">#Pfade einrichten</span>
+        <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">workspace_basisdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;1_Basisdaten&#39;</span><span class="p">,</span><span class="s1">&#39;FGDB_Basisdaten_deutschland.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_projekt_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Einnahmen.gdb&#39;</span><span class="p">)</span>
+        <span class="n">workspace_tool_definition</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Art und Mass der Nutzung&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_Tool.gdb&quot;</span><span class="p">)</span>
+        <span class="n">workspace_tool_einnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Einnahmen_Tool.gdb&quot;</span><span class="p">)</span>
+
+        <span class="n">Teilflaechen_Plangebiet_Centroide</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s2">&quot;Teilflaechen_Plangebiet_Centroide&quot;</span><span class="p">)</span>
+        <span class="n">Teilflaechen_Plangebiet_CentroideGK3</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s2">&quot;Teilflaechen_Plangebiet_CentroideGK3&quot;</span><span class="p">)</span>
+        <span class="n">gemeindenWirkraumEW_Centroide</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s2">&quot;gemeindenWirkraumEW_Centroide&quot;</span><span class="p">)</span>
+        <span class="n">gemeindenWirkraumAP_Centroide</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s2">&quot;gemeindenWirkraumAP_Centroide&quot;</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Vereinigungsmenge aus Umland erzeugen AGS aus EW und AP zusammen führen) inkl. eigene Kommune</span>
+
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Vereinigungsmenge aus Umland erzeugen </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1"># Erzeuge KFA_01_Wirkraum_temp</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_WanderungsfaktorAP&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_01_Wirkraum_temp&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT AWU_WanderungsfaktorAP.AGS, AWU_WanderungsfaktorAP.AGS_VG, AWU_WanderungsfaktorAP.AGS_Regenesis INTO KFA_01_Wirkraum_temp</span>
+<span class="s2">        FROM AWU_WanderungsfaktorAP</span>
+<span class="s2">        GROUP BY AWU_WanderungsfaktorAP.AGS, AWU_WanderungsfaktorAP.AGS_VG, AWU_WanderungsfaktorAP.AGS_Regenesis;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+
+        <span class="c1"># Fuege Werte an  KFA_01_Wirkraum_temp an</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_01_Wirkraum_temp&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_WanderungsfaktorEW&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_01_Wirkraum_temp&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;INSERT INTO KFA_01_Wirkraum_temp ( AGS, AGS_VG, AGS_Regenesis )</span>
+<span class="s2">        SELECT AWU_WanderungsfaktorEW.AGS, AWU_WanderungsfaktorEW.AGS_VG, AWU_WanderungsfaktorEW.AGS_Regenesis</span>
+<span class="s2">        FROM AWU_WanderungsfaktorEW;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1"># Fuege Werte an  KFA_01_Wirkraum_temp an</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_01_Wirkraum_temp&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_01_Wirkraum&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT KFA_01_Wirkraum_temp.AGS, KFA_01_Wirkraum_temp.AGS_VG, KFA_01_Wirkraum_temp.AGS_Regenesis INTO KFA_01_Wirkraum</span>
+<span class="s2">        FROM KFA_01_Wirkraum_temp</span>
+<span class="s2">        GROUP BY KFA_01_Wirkraum_temp.AGS,KFA_01_Wirkraum_temp.AGS_VG, KFA_01_Wirkraum_temp.AGS_Regenesis</span>
+<span class="s2">        ORDER BY KFA_01_Wirkraum_temp.AGS;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1"># Erzeuge Tabelle KRU_01_Kreisumlagesaetze_Wirkraum</span>
+
+        <span class="c1">#TODO: Tabelle KRU_01_Kreisumlagesaetze_Wirkraum</span>
+        <span class="c1">#Spalte 1 AGS5 gruppieren und Filtern über kreisfrei anhand von Nullen der AGS</span>
+        <span class="c1">#Spalte 2 &quot;0&quot; rein schreiben - Name der Spalte &quot;Umlagensatz_in_vH&quot; Double</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_01_Wirkraum&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KRU_01_Kreisumlagesaetze_Wirkraum&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT Left([AGS],5) AS AGS5 INTO KRU_01_Kreisumlagesaetze_Wirkraum FROM KFA_01_Wirkraum GROUP BY Left([AGS],5);&quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+
+        <span class="c1"># Kreisfreie Kommunen entfernen durch Filterung auf 000 hinten in der AGS</span>
+        <span class="n">KRU_01_Kreisumlagesaetze_Wirkraum</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KRU_01_Kreisumlagesaetze_Wirkraum&#39;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">KRU_01_Kreisumlagesaetze_Wirkraum</span><span class="p">,</span> <span class="s2">&quot;Umlagensatz_in_vH&quot;</span><span class="p">,</span> <span class="s2">&quot;DOUBLE&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">,</span> <span class="s2">&quot;REQUIRED&quot;</span><span class="p">)</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="s2">&quot;AGS5&quot;</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">KRU_01_Kreisumlagesaetze_Wirkraum</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">AGS5</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">AGS5</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span> <span class="o">==</span> <span class="s2">&quot;000&quot;</span><span class="p">:</span>
+                <span class="n">rows</span><span class="o">.</span><span class="n">deleteRow</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">rows</span>
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 2</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Tabelle KFA_02 erzeugen </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">kfa_02_statisch</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_02_Statische_Daten&#39;</span><span class="p">)</span>
+
+        <span class="c1">#Tabelle leeren</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">TruncateTable_management</span><span class="p">(</span><span class="n">kfa_02_statisch</span><span class="p">)</span>
+
+        <span class="n">KFA_01_Wirkraum</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_01_Wirkraum&#39;</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">KFA_01_Wirkraum</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">ags</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">AGS</span>
+            <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">AGS_VG</span>
+            <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">AGS_Regenesis</span>
+
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">ags_regenesis</span><span class="p">)</span>
+
+            <span class="n">EWZ</span> <span class="o">=</span> <span class="n">getEWZ</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="s2">&quot;EWZ: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">EWZ</span><span class="p">)</span>
+
+            <span class="n">kreisfrei</span> <span class="o">=</span> <span class="n">getKreisfrei</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span> <span class="c1"># zur Bestimmung der Kreisfreiheit wird die Original-AGS verwendet</span>
+            <span class="nb">print</span> <span class="s2">&quot;Kreisfrei: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">kreisfrei</span><span class="p">)</span>
+
+            <span class="n">HebesatzGrStA</span> <span class="o">=</span> <span class="n">getHebesatzGrStA</span><span class="p">(</span><span class="n">ags_regenesis</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="s2">&quot;HebesatzGrStA: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">HebesatzGrStA</span><span class="p">)</span>
+
+            <span class="n">HebesatzGrStB</span> <span class="o">=</span> <span class="n">getHebesatzGrStB</span><span class="p">(</span><span class="n">ags_regenesis</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="s2">&quot;HebesatzGrStB: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">HebesatzGrStB</span><span class="p">)</span>
+
+            <span class="n">HebesatzGewSt</span> <span class="o">=</span> <span class="n">getHebesatzGewSt</span><span class="p">(</span><span class="n">ags_regenesis</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="s2">&quot;HebesatzGewSt: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">HebesatzGewSt</span><span class="p">)</span>
+
+            <span class="c1">#Insert Values into Table &quot;kfa_02_statisch&quot;</span>
+            <span class="n">rows1</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">kfa_02_statisch</span><span class="p">)</span>
+            <span class="n">row1</span> <span class="o">=</span> <span class="n">rows1</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+            <span class="n">row1</span><span class="o">.</span><span class="n">AGS</span> <span class="o">=</span> <span class="n">ags</span>
+            <span class="n">row1</span><span class="o">.</span><span class="n">AGS_VG</span> <span class="o">=</span> <span class="n">ags_vg</span>
+            <span class="n">row1</span><span class="o">.</span><span class="n">AGS_Regenesis</span> <span class="o">=</span> <span class="n">ags_regenesis</span>
+            <span class="n">row1</span><span class="o">.</span><span class="n">EW</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">EWZ</span><span class="p">)</span>
+            <span class="n">row1</span><span class="o">.</span><span class="n">HebGrStA</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">HebesatzGrStA</span><span class="p">)</span>
+            <span class="n">row1</span><span class="o">.</span><span class="n">HebGrStB</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">HebesatzGrStB</span><span class="p">)</span>
+            <span class="n">row1</span><span class="o">.</span><span class="n">HebGewSt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">HebesatzGewSt</span><span class="p">)</span>
+            <span class="n">row1</span><span class="o">.</span><span class="n">Kreisfrei</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kreisfrei</span><span class="p">)</span>
+            <span class="n">rows1</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row1</span><span class="p">)</span>
+
+            <span class="k">del</span> <span class="n">row1</span><span class="p">,</span> <span class="n">rows1</span>
+
+        <span class="k">del</span> <span class="n">row</span><span class="p">,</span> <span class="n">rows</span>
+
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 2</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Tabelle KFA_03_Jahresdaten erzeugen </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">KFA_03_Jahresdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_03_Jahresdaten&#39;</span><span class="p">)</span>
+        <span class="n">KFA_01_Wirkraum</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_01_Wirkraum&#39;</span><span class="p">)</span>
+
+        <span class="c1">#Tabelle leeren</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">TruncateTable_management</span><span class="p">(</span><span class="n">KFA_03_Jahresdaten</span><span class="p">)</span>
+
+        <span class="c1"># Betrachtungszeitraum ermitteln</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">projektRahmendaten</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">beginnZeitraum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">Beginn_Betrachtungszeitraum</span><span class="p">)</span>
+            <span class="n">endeZeitraum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">Ende_Betrachtungszeitraum</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">row</span><span class="p">,</span> <span class="n">rows</span>
+
+        <span class="c1"># Iteration ueber Betrachtungszeitraum und fuellen der Tabelle mit Nullwerten</span>
+        <span class="n">jahre</span> <span class="o">=</span> <span class="n">endeZeitraum</span> <span class="o">-</span> <span class="n">beginnZeitraum</span>
+        <span class="n">rows_out</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">KFA_03_Jahresdaten</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">jahre</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+
+            <span class="n">rows_in</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">KFA_01_Wirkraum</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">gemeinde</span> <span class="ow">in</span> <span class="n">rows_in</span><span class="p">:</span>
+
+                <span class="n">ags</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">AGS</span>
+                <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">AGS_VG</span>
+                <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">AGS_Regenesis</span>
+
+                <span class="n">row_out</span> <span class="o">=</span> <span class="n">rows_out</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+                <span class="n">row_out</span><span class="o">.</span><span class="n">Jahr</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">beginnZeitraum</span>
+                <span class="n">row_out</span><span class="o">.</span><span class="n">AGS</span> <span class="o">=</span> <span class="n">ags</span>
+                <span class="n">row_out</span><span class="o">.</span><span class="n">AGS_VG</span> <span class="o">=</span> <span class="n">ags_vg</span>
+                <span class="n">row_out</span><span class="o">.</span><span class="n">AGS_Regenesis</span> <span class="o">=</span> <span class="n">ags_regenesis</span>
+
+                <span class="n">row_out</span><span class="o">.</span><span class="n">DeltaEW</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row_out</span><span class="o">.</span><span class="n">DeltaGrSt</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row_out</span><span class="o">.</span><span class="n">DeltaGewSt</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row_out</span><span class="o">.</span><span class="n">DeltaUmsSt</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row_out</span><span class="o">.</span><span class="n">DeltaEinkSt</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row_out</span><span class="o">.</span><span class="n">DeltaFaLeiA</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="n">rows_out</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row_out</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">row_out</span>
+
+        <span class="k">del</span> <span class="n">rows_out</span>
+
+
+        <span class="c1">#####################################################################</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39; - Delta Einwohner&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;AWU_WanderungsfaktorEW&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Einwohnerzahl&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_03_Jahresdaten&#39;</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_03_Jahresdaten_temp&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT KFA_03_Jahresdaten.Jahr, KFA_03_Jahresdaten.AGS, KFA_03_Jahresdaten.AGS_VG, KFA_03_Jahresdaten.AGS_Regenesis,  ([Einwohnerzahl]*[AWU_Wanderungsfaktor])*-1 AS DeltaEW, KFA_03_Jahresdaten.DeltaGrSt, KFA_03_Jahresdaten.DeltaGewSt, KFA_03_Jahresdaten.DeltaUmsSt, KFA_03_Jahresdaten.DeltaEinkSt, KFA_03_Jahresdaten.DeltaFaLeiA INTO KFA_03_Jahresdaten_temp</span>
+<span class="s2">        FROM (KFA_03_Jahresdaten LEFT JOIN AWU_WanderungsfaktorEW ON KFA_03_Jahresdaten.AGS = AWU_WanderungsfaktorEW.AGS) LEFT JOIN Einwohnerzahl ON KFA_03_Jahresdaten.Jahr = Einwohnerzahl.Jahr;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1">#DeltwEinwohner aufsummieren</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_03_Jahresdaten_temp&#39;</span><span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_03_Jahresdaten&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT KFA_03_Jahresdaten_temp.Jahr, KFA_03_Jahresdaten_temp.AGS, KFA_03_Jahresdaten_temp.AGS_VG, KFA_03_Jahresdaten_temp.AGS_Regenesis, Sum(KFA_03_Jahresdaten_temp.DeltaEW) AS DeltaEW, Sum(KFA_03_Jahresdaten_temp.DeltaGrSt) AS DeltaGrSt, Sum(KFA_03_Jahresdaten_temp.DeltaGewSt) AS DeltaGewSt, Sum(KFA_03_Jahresdaten_temp.DeltaUmsSt) AS DeltaUmsSt, Sum(KFA_03_Jahresdaten_temp.DeltaEinkSt) AS DeltaEinkSt, Sum(KFA_03_Jahresdaten_temp.DeltaFaLeiA) AS DeltaFaLeiA INTO KFA_03_Jahresdaten</span>
+<span class="s2">        FROM KFA_03_Jahresdaten_temp</span>
+<span class="s2">        GROUP BY KFA_03_Jahresdaten_temp.Jahr, KFA_03_Jahresdaten_temp.AGS, KFA_03_Jahresdaten_temp.AGS_VG, KFA_03_Jahresdaten_temp.AGS_Regenesis;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+
+        <span class="c1">#Nullwerte von Delta-Einwohner auf 0 setzen</span>
+
+        <span class="n">KFA_03_Jahresdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_03_Jahresdaten&#39;</span><span class="p">)</span>
+        <span class="n">where_clause</span> <span class="o">=</span> <span class="s1">&#39;&quot;DeltaEW&quot; IS NULL&#39;</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">KFA_03_Jahresdaten</span><span class="p">,</span> <span class="n">where_clause</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">DeltaEW</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">row</span><span class="p">,</span> <span class="n">cur</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1">#DeltaEinwohner eigene Kommune addieren</span>
+        <span class="n">ags</span> <span class="o">=</span> <span class="n">getAGS</span><span class="p">(</span><span class="n">projektname</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Einwohnerzahl&#39;</span><span class="p">)]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_Bevoelkerung_temp&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT Einwohnerzahl.Jahr, Sum(Einwohnerzahl.Einwohnerzahl) AS EW INTO KFA_Bevoelkerung_temp</span>
+<span class="s2">        FROM Einwohnerzahl</span>
+<span class="s2">        GROUP BY Einwohnerzahl.Jahr;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="n">KFA_Bevoelkerung_temp</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_Bevoelkerung_temp&#39;</span><span class="p">)</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EW&#39;</span><span class="p">,</span><span class="s1">&#39;Jahr&#39;</span><span class="p">]</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">KFA_Bevoelkerung_temp</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+            <span class="n">ew</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">jahr</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">where_clause</span> <span class="o">=</span> <span class="s1">&#39;&quot;Jahr&quot;= &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">jahr</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; AND AGS = &#39;&quot;</span> <span class="o">+</span> <span class="n">ags</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+
+            <span class="n">rows_update</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">KFA_03_Jahresdaten</span><span class="p">,</span><span class="n">where_clause</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row_update</span> <span class="ow">in</span> <span class="n">rows_update</span><span class="p">:</span>
+                <span class="n">row_update</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="s2">&quot;DeltaEW&quot;</span><span class="p">,</span> <span class="n">row_update</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;DeltaEW&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">ew</span><span class="p">)</span>
+                <span class="n">rows_update</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">row_update</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">rows_update</span><span class="p">,</span> <span class="n">row_update</span><span class="p">,</span> <span class="n">where_clause</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">del</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">row</span>
+
+
+        <span class="c1">##rows_bev = arcpy.SearchCursor(KFA_Bevoelkerung_temp)</span>
+        <span class="c1">##</span>
+        <span class="c1">##for row_bev in rows_bev:</span>
+        <span class="c1">##    ew = row_bev.EW</span>
+        <span class="c1">##    jahr = row_bev.Jahr</span>
+        <span class="c1">##</span>
+        <span class="c1">##    where_clause = &#39;&quot;Jahr&quot;= &#39; + str(jahr) + &quot; AND AGS = &#39;&quot; + ags + &quot;&#39;&quot;</span>
+        <span class="c1">##</span>
+        <span class="c1">##    rows_update = arcpy.UpdateCursor(KFA_03_Jahresdaten,where_clause)</span>
+        <span class="c1">##    for row_update in rows_update:</span>
+        <span class="c1">##        row_update.setValue(&quot;DeltaEW&quot;, row_update.getValue(&quot;DeltaEW&quot;) + ew)</span>
+        <span class="c1">##        rows_update.updateRow(row_update)</span>
+        <span class="c1">##try:</span>
+        <span class="c1">##    del rows_update, row_update, rows_bev, row_bev</span>
+        <span class="c1">##except:</span>
+        <span class="c1">##    pass</span>
+
+
+        <span class="c1">#####################################################################</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39; - Delta Grundsteuer&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">GRST_Grundsteuereinnahmen</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GRST_Grundsteuereinnahmen&#39;</span><span class="p">)</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GrStEinnahmen&#39;</span><span class="p">,</span><span class="s1">&#39;Jahr&#39;</span><span class="p">]</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">GRST_Grundsteuereinnahmen</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+            <span class="n">GrStEinnahmen</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">jahr</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">updateFields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DeltaGrSt&#39;</span><span class="p">]</span>
+            <span class="n">where_clause</span> <span class="o">=</span> <span class="s1">&#39;&quot;Jahr&quot;= &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">jahr</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; AND AGS = &#39;&quot;</span> <span class="o">+</span> <span class="n">ags</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+            <span class="n">updateCursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">KFA_03_Jahresdaten</span><span class="p">,</span> <span class="n">updateFields</span><span class="p">,</span> <span class="n">where_clause</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">updateRow</span> <span class="ow">in</span> <span class="n">updateCursor</span><span class="p">:</span>
+                <span class="n">updateRow</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">GrStEinnahmen</span>
+                <span class="n">updateCursor</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">updateRow</span><span class="p">)</span>
+
+
+        <span class="c1">#####################################################################</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39; - Delta Gewerbesteuer&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">GWST_06_Bilanz</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;GWST_06_Bilanz&#39;</span><span class="p">)</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SummevonGWST_EUR&#39;</span><span class="p">,</span><span class="s1">&#39;Jahr&#39;</span><span class="p">,</span> <span class="s1">&#39;AGS&#39;</span><span class="p">]</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">GWST_06_Bilanz</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+            <span class="n">GWST</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">jahr</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">ags</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="n">updateFields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DeltaGewSt&#39;</span><span class="p">]</span>
+            <span class="n">where_clause</span> <span class="o">=</span> <span class="s1">&#39;&quot;Jahr&quot;= &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">jahr</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; AND AGS = &#39;&quot;</span> <span class="o">+</span> <span class="n">ags</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+            <span class="n">updateCursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">KFA_03_Jahresdaten</span><span class="p">,</span> <span class="n">updateFields</span><span class="p">,</span> <span class="n">where_clause</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">updateRow</span> <span class="ow">in</span> <span class="n">updateCursor</span><span class="p">:</span>
+                <span class="n">updateRow</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">GWST</span>
+                <span class="n">updateCursor</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">updateRow</span><span class="p">)</span>
+
+
+        <span class="c1">#####################################################################</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39; - Delta Einkommensteuer&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">EKST_06_Bilanz</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;EKST_06_Bilanz&#39;</span><span class="p">)</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Bilanz_EST_EUR&#39;</span><span class="p">,</span><span class="s1">&#39;Betrachtungsjahr&#39;</span><span class="p">,</span><span class="s1">&#39;AGS&#39;</span><span class="p">]</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">EKST_06_Bilanz</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+            <span class="n">EKST</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">jahr</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">ags</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="n">updateFields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DeltaEinkSt&#39;</span><span class="p">]</span>
+            <span class="n">where_clause_update</span> <span class="o">=</span> <span class="s1">&#39;&quot;Jahr&quot;= &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">jahr</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; AND AGS = &#39;&quot;</span> <span class="o">+</span> <span class="n">ags</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+            <span class="n">updateCursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">KFA_03_Jahresdaten</span><span class="p">,</span> <span class="n">updateFields</span><span class="p">,</span> <span class="n">where_clause_update</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">updateRow</span> <span class="ow">in</span> <span class="n">updateCursor</span><span class="p">:</span>
+                <span class="n">updateRow</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">EKST</span>
+                <span class="n">updateCursor</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">updateRow</span><span class="p">)</span>
+
+
+        <span class="c1">#####################################################################</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39; - Delta Familienleistungsausgleich </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">FLA_01_Ergebnis</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;FLA_01_Ergebnis&#39;</span><span class="p">)</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;FLA_Euro&#39;</span><span class="p">,</span><span class="s1">&#39;Betrachtungsjahr&#39;</span><span class="p">,</span><span class="s1">&#39;AGS&#39;</span><span class="p">]</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">FLA_01_Ergebnis</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+            <span class="n">FLA</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">jahr</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">ags</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="n">updateFields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DeltaFaLeiA&#39;</span><span class="p">]</span>
+            <span class="n">where_clause_update</span> <span class="o">=</span> <span class="s1">&#39;&quot;Jahr&quot;= &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">jahr</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; AND AGS = &#39;&quot;</span> <span class="o">+</span> <span class="n">ags</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+            <span class="n">updateCursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">KFA_03_Jahresdaten</span><span class="p">,</span> <span class="n">updateFields</span><span class="p">,</span> <span class="n">where_clause_update</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">updateRow</span> <span class="ow">in</span> <span class="n">updateCursor</span><span class="p">:</span>
+                <span class="n">updateRow</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">FLA</span>
+                <span class="n">updateCursor</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">updateRow</span><span class="p">)</span>
+
+        <span class="c1">#####################################################################</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Berechne Steuerkraftmesszahl </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1">#Erstelle leere Tabelle KFA_03_Jahresdaten</span>
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_03_Jahresdaten&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_02_Statische_Daten&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_03_Steuerkraftmesszahl&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT KFA_03_Jahresdaten.AGS, KFA_03_Jahresdaten.AGS_VG, KFA_03_Jahresdaten.AGS_Regenesis, KFA_03_Jahresdaten.Jahr, KFA_02_Statische_Daten.EW AS EW_Referenz, KFA_02_Statische_Daten.HebGrStA, KFA_02_Statische_Daten.HebGrStB, KFA_02_Statische_Daten.HebGewSt, KFA_03_Jahresdaten.DeltaEW, KFA_03_Jahresdaten.DeltaGrST, KFA_03_Jahresdaten.DeltaGewSt, KFA_03_Jahresdaten.DeltaUmsSt, KFA_03_Jahresdaten.DeltaEinkSt, KFA_03_Jahresdaten.DeltaFaLeiA, KFA_02_Statische_Daten.Kreisfrei INTO KFA_03_Steuerkraftmesszahl</span>
+<span class="s2">        FROM KFA_03_Jahresdaten INNER JOIN KFA_02_Statische_Daten ON KFA_03_Jahresdaten.AGS = KFA_02_Statische_Daten.AGs;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="n">KFA_03_Steuerkraftmesszahl</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_03_Steuerkraftmesszahl&#39;</span><span class="p">)</span>
+
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">KFA_03_Steuerkraftmesszahl</span><span class="p">,</span> <span class="s2">&quot;deltaSKMZ&quot;</span><span class="p">,</span> <span class="s2">&quot;DOUBLE&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">,</span> <span class="s2">&quot;REQUIRED&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">KFA_03_Steuerkraftmesszahl</span><span class="p">,</span> <span class="s2">&quot;Ausgleichsfaktor&quot;</span><span class="p">,</span> <span class="s2">&quot;DOUBLE&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">,</span> <span class="s2">&quot;REQUIRED&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">KFA_03_Steuerkraftmesszahl</span><span class="p">,</span> <span class="s2">&quot;Grundbetrag&quot;</span><span class="p">,</span> <span class="s2">&quot;DOUBLE&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">,</span> <span class="s2">&quot;REQUIRED&quot;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">KFA_03_Steuerkraftmesszahl</span><span class="p">,</span> <span class="s2">&quot;Faktor_Zuweisungen_KU&quot;</span><span class="p">,</span> <span class="s2">&quot;DOUBLE&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">,</span> <span class="s2">&quot;REQUIRED&quot;</span><span class="p">)</span>
+
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AGS&#39;</span><span class="p">,</span><span class="s1">&#39;Jahr&#39;</span><span class="p">,</span><span class="s1">&#39;EW_Referenz&#39;</span><span class="p">,</span><span class="s1">&#39;Kreisfrei&#39;</span><span class="p">,</span><span class="s1">&#39;HebGrStA&#39;</span><span class="p">,</span><span class="s1">&#39;HebGrStB&#39;</span><span class="p">,</span><span class="s1">&#39;HebGewSt&#39;</span><span class="p">,</span><span class="s1">&#39;DeltaGrST&#39;</span><span class="p">,</span><span class="s1">&#39;DeltaGewSt&#39;</span><span class="p">,</span><span class="s1">&#39;DeltaUmsSt&#39;</span><span class="p">,</span><span class="s1">&#39;DeltaEinkSt&#39;</span><span class="p">,</span><span class="s1">&#39;DeltaFaLeiA&#39;</span><span class="p">]</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">KFA_03_Steuerkraftmesszahl</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+            <span class="n">ags</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">jahr</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">EW_Referenz</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">kreisfrei</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">HebGrStA</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+            <span class="n">HebGrStB</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+            <span class="n">HebGewSt</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+            <span class="n">DeltaGrST</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+            <span class="n">DeltaGewSt</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+            <span class="n">DeltaUmsSt</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+            <span class="n">DeltaEinkSt</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+            <span class="n">DeltaFaLeiA</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span>
+
+            <span class="n">KFA_Rahmendaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_tool_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_Rahmendaten&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">kreisfrei</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">where_clause</span> <span class="o">=</span> <span class="s1">&#39;&quot;Kreisfrei&quot;= 1 AND &quot;AGS_Land&quot; = &#39;</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">ags</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39; AND &quot;</span><span class="o">+</span> <span class="s1">&#39;&quot;Einwohner_von&quot; &lt;=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">EW_Referenz</span><span class="p">)</span><span class="o">+</span> <span class="s2">&quot; AND &quot;</span><span class="o">+</span> <span class="s1">&#39;&quot;Einwohner_bis&quot; &gt;=&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">EW_Referenz</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">where_clause</span> <span class="o">=</span> <span class="s1">&#39;&quot;Kreisangehoerig&quot;= 1 AND &quot;AGS_Land&quot; = &#39;</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">ags</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39; AND &quot;</span><span class="o">+</span> <span class="s1">&#39;&quot;Einwohner_von&quot; &lt;=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">EW_Referenz</span><span class="p">)</span><span class="o">+</span> <span class="s2">&quot; AND &quot;</span><span class="o">+</span> <span class="s1">&#39;&quot;Einwohner_bis&quot; &gt;=&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">EW_Referenz</span><span class="p">)</span>
+
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;Grundbetrag&#39;</span><span class="p">,</span><span class="s1">&#39;Ausgleichsfaktor&#39;</span><span class="p">,</span><span class="s1">&#39;Nivellierter_Hebesatz_GrSt_B&#39;</span><span class="p">,</span><span class="s1">&#39;Faktor_Grundsteuer_B&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Nivellierter_Hebesatz_GewSt_netto&#39;</span><span class="p">,</span><span class="s1">&#39;Faktor_Gewerbesteuer&#39;</span><span class="p">,</span><span class="s1">&#39;Faktor_Umsatzsteuer&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Faktor_Anteil_Einkommensteuer&#39;</span><span class="p">,</span><span class="s1">&#39;Faktor_Familienleistungsausgleich&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Faktor_Zuweisungen_in_Kreisumlage&#39;</span><span class="p">]</span>
+
+            <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">KFA_Rahmendaten</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">where_clause</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+                <span class="n">grundbetrag</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">ausgleichsfaktor</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">Nivellierter_Hebesatz_GrSt_B</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">Faktor_Grundsteuer_B</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                <span class="n">Nivellierter_Hebesatz_GewSt_netto</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                <span class="n">Faktor_Gewerbesteuer</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+                <span class="n">Faktor_Umsatzsteuer</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+                <span class="n">Faktor_Anteil_Einkommensteuer</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+                <span class="n">Faktor_Familienleistungsausgleich</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+                <span class="n">Faktor_Zuweisungen_in_Kreisumlage</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+
+            <span class="n">deltaSKMZ</span> <span class="o">=</span> <span class="n">DeltaGrST</span><span class="o">/</span><span class="n">HebGrStB</span><span class="o">*</span><span class="n">Nivellierter_Hebesatz_GrSt_B</span><span class="o">*</span><span class="n">Faktor_Grundsteuer_B</span><span class="o">+</span><span class="n">DeltaGewSt</span><span class="o">/</span><span class="n">HebGewSt</span><span class="o">*</span><span class="n">Nivellierter_Hebesatz_GewSt_netto</span><span class="o">*</span><span class="n">Faktor_Gewerbesteuer</span><span class="o">+</span><span class="n">DeltaUmsSt</span><span class="o">*</span><span class="n">Faktor_Umsatzsteuer</span><span class="o">+</span><span class="n">DeltaEinkSt</span><span class="o">*</span><span class="n">Faktor_Anteil_Einkommensteuer</span><span class="o">+</span><span class="n">DeltaFaLeiA</span><span class="o">*</span><span class="n">Faktor_Familienleistungsausgleich</span>
+
+            <span class="n">updateFields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;deltaSKMZ&#39;</span><span class="p">,</span><span class="s1">&#39;Grundbetrag&#39;</span><span class="p">,</span><span class="s1">&#39;Ausgleichsfaktor&#39;</span><span class="p">,</span><span class="s1">&#39;Faktor_Zuweisungen_KU&#39;</span><span class="p">]</span>
+            <span class="n">where_clause_update</span> <span class="o">=</span> <span class="s1">&#39;&quot;AGS&quot;= &#39;</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span><span class="o">+</span> <span class="n">ags</span> <span class="o">+</span><span class="s2">&quot;&#39;&quot;</span><span class="o">+</span><span class="s1">&#39; AND &quot;Jahr&quot; = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">jahr</span><span class="p">)</span>
+            <span class="n">updateCursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">UpdateCursor</span><span class="p">(</span><span class="n">KFA_03_Steuerkraftmesszahl</span><span class="p">,</span> <span class="n">updateFields</span><span class="p">,</span> <span class="n">where_clause_update</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">updateRow</span> <span class="ow">in</span> <span class="n">updateCursor</span><span class="p">:</span>
+                <span class="n">updateRow</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">deltaSKMZ</span>
+                <span class="n">updateRow</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">grundbetrag</span>
+                <span class="n">updateRow</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ausgleichsfaktor</span>
+                <span class="n">updateRow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">Faktor_Zuweisungen_in_Kreisumlage</span>
+                <span class="n">updateCursor</span><span class="o">.</span><span class="n">updateRow</span><span class="p">(</span><span class="n">updateRow</span><span class="p">)</span>
+
+        <span class="c1">#####################################################################</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Berechne Veredelungsfaktor je Gemeinde </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_tool_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_Veredelungsfaktor&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_02_Statische_Daten&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_Veredelung_temp&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT Left([AGs],2) AS AGS_2, KFA_02_Statische_Daten.AGS, KFA_02_Statische_Daten.AGS_VG, KFA_02_Statische_Daten.AGS_Regenesis, KFA_02_Statische_Daten.EW, KFA_02_Statische_Daten.Kreisfrei INTO KFA_Veredelung_temp</span>
+<span class="s2">        FROM KFA_02_Statische_Daten;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+
+        <span class="c1">#Veredelungsfaktor je Gemeinde erzeugen</span>
+        <span class="n">KFA_04_VeredelungsfaktorenGemeinden</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_04_VeredelungsfaktorenGemeinden&#39;</span><span class="p">)</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">TruncateTable_management</span><span class="p">(</span><span class="n">KFA_04_VeredelungsfaktorenGemeinden</span><span class="p">)</span>
+
+        <span class="n">KFA_02_Statische_Daten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_02_Statische_Daten&#39;</span><span class="p">)</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AGS&#39;</span><span class="p">,</span><span class="s1">&#39;AGS_VG&#39;</span><span class="p">,</span><span class="s1">&#39;EW&#39;</span><span class="p">]</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">KFA_02_Statische_Daten</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+            <span class="n">ags</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">ewz</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+            <span class="n">dataset</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">fields1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Stuetzwert_EWZ&#39;</span><span class="p">,</span><span class="s1">&#39;Stuetzwert_Veredelungsfaktor&#39;</span><span class="p">]</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_tool_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_Veredelungsfaktor&#39;</span><span class="p">)</span>
+            <span class="n">where</span> <span class="o">=</span> <span class="s1">&#39;&quot;AGS_Land&quot;&#39;</span><span class="o">+</span><span class="s2">&quot; =&#39;&quot;</span><span class="o">+</span> <span class="n">ags</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+
+            <span class="n">cursor2</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">fields1</span><span class="p">,</span> <span class="n">where</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row2</span> <span class="ow">in</span> <span class="n">cursor2</span><span class="p">:</span>
+                <span class="n">ew</span> <span class="o">=</span> <span class="n">row2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">vf</span> <span class="o">=</span> <span class="n">row2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">werte</span> <span class="o">=</span> <span class="p">(</span><span class="n">ew</span><span class="p">,</span> <span class="n">vf</span><span class="p">)</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">werte</span><span class="p">)</span>
+
+            <span class="c1">#Werte nach Einwohnerzahl aufsteigend sortieren</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="c1">#nächsten Wert zur aktuellen Einwohnerzahl finden</span>
+            <span class="n">closest_value</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">ewz</span><span class="p">))</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">closest_value</span><span class="p">)</span>
+
+            <span class="c1">#Steigung berechnen</span>
+            <span class="k">if</span> <span class="n">closest_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&lt;</span><span class="n">ewz</span><span class="p">:</span>
+                <span class="n">index_min</span> <span class="o">=</span> <span class="n">index</span>
+                <span class="n">index_max</span> <span class="o">=</span> <span class="n">index</span><span class="o">+</span><span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">index_min</span> <span class="o">=</span> <span class="n">index</span><span class="o">-</span><span class="mi">1</span>
+                <span class="n">index_max</span> <span class="o">=</span> <span class="n">index</span>
+
+            <span class="n">p1</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">index_min</span><span class="p">]</span>
+            <span class="n">p2</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">index_max</span><span class="p">]</span>
+
+            <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="c1">#Veredelungsfaktor berechnen</span>
+            <span class="n">vf</span> <span class="o">=</span> <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="p">(</span><span class="n">ewz</span><span class="o">-</span><span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">s</span>
+
+            <span class="n">cur_vf</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">InsertCursor</span><span class="p">(</span><span class="n">KFA_04_VeredelungsfaktorenGemeinden</span><span class="p">)</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">cur_vf</span><span class="o">.</span><span class="n">newRow</span><span class="p">()</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">AGS</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">AGS_VG</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ags_vg</span><span class="p">)</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">EWZ</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ewz</span><span class="p">)</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">VeredelungsFaktor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">vf</span><span class="p">)</span>
+            <span class="n">cur_vf</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+
+        <span class="c1">#####################################################################</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Berechne KFA_05_Zuweisungen </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">eingangstabellen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_03_Steuerkraftmesszahl&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_04_VeredelungsfaktorenGemeinden&#39;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_05_Zuweisungen&#39;</span><span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT KFA_03_Steuerkraftmesszahl.AGS, KFA_03_Steuerkraftmesszahl.AGS_VG, KFA_03_Steuerkraftmesszahl.AGS_Regenesis, KFA_03_Steuerkraftmesszahl.Jahr, [DeltaEW]*[VeredelungsFaktor]*[Grundbetrag] AS deltaBedarf, KFA_03_Steuerkraftmesszahl.deltaSKMZ, [DeltaEW]*[VeredelungsFaktor]*[Grundbetrag]-[deltaSKMZ] AS deltaBedarf_minus_deltaSteuerkraft, ([deltaEW]*[Veredelungsfaktor]*[Grundbetrag]-[deltaSKMZ])*[Ausgleichsfaktor] AS Zuweisungen, KFA_03_Steuerkraftmesszahl.Faktor_Zuweisungen_KU INTO KFA_05_Zuweisungen</span>
+<span class="s2">        FROM KFA_03_Steuerkraftmesszahl INNER JOIN KFA_04_VeredelungsfaktorenGemeinden ON KFA_03_Steuerkraftmesszahl.AGS = KFA_04_VeredelungsfaktorenGemeinden.AGS</span>
+<span class="s2">        ORDER BY KFA_03_Steuerkraftmesszahl.AGS, KFA_03_Steuerkraftmesszahl.Jahr;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">mdb</span><span class="o">.</span><span class="n">temp_mdb</span><span class="p">(</span><span class="n">eingangstabellen</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 6 - Datenexport in Excel-Datei</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Datenexport in Excel-Datei  </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="c1"># Pfade setzen</span>
+        <span class="n">logo</span> <span class="o">=</span> <span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span><span class="s2">&quot;1_Basisdaten&quot;</span><span class="p">,</span><span class="s2">&quot;logo_rpc.png&quot;</span><span class="p">)</span>
+        <span class="n">ausgabeordner</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;Ergebnisausgabe&#39;</span><span class="p">,</span><span class="s1">&#39;Excel&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">):</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">)</span>
+        <span class="n">excelpfad</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">ausgabeordner</span><span class="p">,</span><span class="s1">&#39;Einnahmen_Kommunaler_Finanzausgleich.xlsx&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">excelpfad</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># Workbook und Tabellenblätter anlegen</span>
+        <span class="n">wb</span> <span class="o">=</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="n">excelpfad</span><span class="p">)</span>
+        <span class="n">sl</span><span class="o">.</span><span class="n">infosheet</span><span class="p">(</span><span class="n">projektname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Kommunaler Finanzausgleich&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">wb</span><span class="p">)</span>
+        <span class="n">ws1</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Methodik&#39;</span><span class="p">)</span>
+        <span class="n">ws2</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Auswertungen&#39;</span><span class="p">)</span>
+        <span class="n">ws3</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Grafiken&#39;</span><span class="p">)</span>
+        <span class="n">ws4</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Rohdaten_KFA&#39;</span><span class="p">)</span>
+        <span class="n">ws5</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;Haftungsausschluss&#39;</span><span class="p">)</span>
+
+        <span class="c1">#Charts anlegen</span>
+
+
+        <span class="c1">#Styles anlegen</span>
+        <span class="n">bold</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+        <span class="n">bold</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+        <span class="n">bold</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">normal</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+        <span class="n">normal</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+        <span class="n">normal</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">money</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+        <span class="n">money</span><span class="o">.</span><span class="n">set_num_format</span><span class="p">(</span><span class="s1">&#39;#,##0&#39;</span><span class="p">)</span>
+        <span class="n">money</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+        <span class="n">money</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1">#Hintergrund weiss faerben</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">()</span>
+        <span class="nb">format</span><span class="o">.</span><span class="n">set_bg_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+        <span class="nb">format</span><span class="o">.</span><span class="n">set_border</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">400</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">400</span><span class="p">):</span>
+                <span class="n">ws1</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+                <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+                <span class="n">ws3</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+                <span class="n">ws5</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+
+        <span class="c1">################################</span>
+        <span class="c1">#Werteblatt 1 einfuegen</span>
+
+        <span class="n">ausgabetabelle</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="s1">&#39;KFA_05_Zuweisungen&#39;</span><span class="p">)</span>
+
+        <span class="c1">#Durch Ergebniszeilen iterieren und Werte in Excel einfuegen</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+        <span class="n">fieldnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListFields</span><span class="p">(</span><span class="n">ausgabetabelle</span><span class="p">)]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">:</span>
+                <span class="n">wert</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span>
+                <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">wert</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+
+            <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span>
+
+        <span class="c1">#Felder als Header in Worksheet einfuegen</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">:</span>
+            <span class="n">column_with</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fieldname</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span>
+            <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">column_with</span><span class="p">)</span>
+            <span class="n">ws4</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fieldname</span><span class="p">,</span> <span class="n">bold</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+
+        <span class="c1">#Eurobetrag formatieren</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;A:A&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;B:B&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;C:C&#39;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;D:D&#39;</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">money</span><span class="p">)</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;E:E&#39;</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">money</span><span class="p">)</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;F:F&#39;</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="n">money</span><span class="p">)</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;G:G&#39;</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">money</span><span class="p">)</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;G:G&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="n">money</span><span class="p">)</span>
+        <span class="n">ws4</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s1">&#39;H:H&#39;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+
+        <span class="c1">################################</span>
+        <span class="c1">#Methodikblatt einfuegen</span>
+        <span class="n">methodik_grafik</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;Erlaeuterungstexte&quot;</span><span class="p">,</span><span class="s2">&quot;Methodik_06_KFA.png&quot;</span><span class="p">)</span>
+        <span class="n">ws1</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="n">methodik_grafik</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">})</span> <span class="c1">#Korrigiert Verzerrung die bei 1x1 auftritt</span>
+
+        <span class="c1">################################</span>
+        <span class="c1">#Haftungsausschluss einfuegen</span>
+        <span class="n">haftung_grafik</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Einnahmen&quot;</span><span class="p">,</span><span class="s2">&quot;Erlaeuterungstexte&quot;</span><span class="p">,</span><span class="s2">&quot;Haftungsausschluss.png&quot;</span><span class="p">)</span>
+        <span class="n">ws5</span><span class="o">.</span><span class="n">insert_image</span><span class="p">(</span><span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="n">haftung_grafik</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">,</span> <span class="s1">&#39;y_scale&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">})</span> <span class="c1">#Korrigiert Verzerrung die bei 1x1 auftritt</span>
+
+        <span class="c1">################################</span>
+        <span class="c1">#Auswertungen formatieren</span>
+
+        <span class="c1">#Ueberschrift</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;Mehr- bzw. Mindereinnahmen im Zeitverlauf&quot;</span><span class="p">,</span><span class="n">bold</span><span class="p">)</span>
+
+        <span class="n">AGSListe</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">JahrListe</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">AGSListe</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;AGS&quot;</span><span class="p">))</span>
+
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">ausgabetabelle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">JahrListe</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s2">&quot;Jahr&quot;</span><span class="p">))</span>
+
+        <span class="n">AGSListe</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">AGSListe</span><span class="p">))</span>
+        <span class="n">JahrListe</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">JahrListe</span><span class="p">))</span>
+
+        <span class="nb">print</span> <span class="n">JahrListe</span>
+        <span class="nb">print</span> <span class="n">AGSListe</span>
+
+        <span class="c1">#schreibe Jahre</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">JahrListe</span><span class="p">:</span>
+            <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">bold</span><span class="p">)</span>
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+
+        <span class="c1">#schreibe AGS</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">AGSListe</span><span class="p">:</span>
+            <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">bold</span><span class="p">)</span>
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+
+        <span class="c1">#schreibe Werte</span>
+        <span class="n">i</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">f</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">alphabet</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;j&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;q&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;aa&#39;</span><span class="p">,</span><span class="s1">&#39;ab&#39;</span><span class="p">,</span><span class="s1">&#39;ac&#39;</span><span class="p">,</span><span class="s1">&#39;ad&#39;</span><span class="p">,</span><span class="s1">&#39;ae&#39;</span><span class="p">,</span><span class="s1">&#39;af&#39;</span><span class="p">,</span><span class="s1">&#39;ag&#39;</span><span class="p">,</span><span class="s1">&#39;ah&#39;</span><span class="p">,</span><span class="s1">&#39;ai&#39;</span><span class="p">,</span><span class="s1">&#39;aj&#39;</span><span class="p">,</span><span class="s1">&#39;ak&#39;</span><span class="p">,</span><span class="s1">&#39;al&#39;</span><span class="p">,</span><span class="s1">&#39;am&#39;</span><span class="p">,</span><span class="s1">&#39;an&#39;</span><span class="p">,</span><span class="s1">&#39;ao&#39;</span><span class="p">,</span><span class="s1">&#39;ap&#39;</span><span class="p">,</span><span class="s1">&#39;aq&#39;</span><span class="p">,</span><span class="s1">&#39;ar&#39;</span><span class="p">,</span> <span class="s1">&#39;as&#39;</span><span class="p">,</span> <span class="s1">&#39;at&#39;</span><span class="p">,</span> <span class="s1">&#39;au&#39;</span><span class="p">,</span> <span class="s1">&#39;av&#39;</span><span class="p">,</span> <span class="s1">&#39;aw&#39;</span><span class="p">,</span> <span class="s1">&#39;ax&#39;</span><span class="p">,</span> <span class="s1">&#39;ay&#39;</span><span class="p">,</span> <span class="s1">&#39;az&#39;</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">JahrListe</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">AGSListe</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">formula</span> <span class="o">=</span> <span class="s2">&quot;=SUMIFS(Rohdaten_KFA!$I:$I,Rohdaten_KFA!$B:$B,Auswertungen!B&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">5</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;,Rohdaten_KFA!$E:$E,Auswertungen!&quot;</span><span class="o">+</span><span class="n">alphabet</span><span class="p">[</span><span class="n">f</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;4)&quot;</span>
+                    <span class="n">ws2</span><span class="o">.</span><span class="n">write_formula</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">4</span><span class="p">,</span> <span class="n">f</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">formula</span><span class="p">,</span> <span class="n">money</span><span class="p">)</span>
+                    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span> <span class="n">e</span>
+            <span class="n">i</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">f</span><span class="o">+=</span><span class="mi">1</span>
+
+        <span class="c1">#Schreibe AGS als Ueberschrift</span>
+        <span class="n">ws2</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;AGS&quot;</span><span class="p">,</span><span class="n">bold</span><span class="p">)</span>
+
+        <span class="c1">################################</span>
+        <span class="c1">#Grafiken einfuegen</span>
+
+        <span class="nb">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">JahrListe</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">AGSListe</span><span class="p">)</span>
+
+        <span class="n">chart</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_chart</span><span class="p">({</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;line&#39;</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;stacked&#39;</span><span class="p">})</span>
+        <span class="n">chart</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+        <span class="n">chart</span><span class="o">.</span><span class="n">set_size</span><span class="p">({</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="mi">800</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">600</span><span class="p">})</span>
+        <span class="n">chart</span><span class="o">.</span><span class="n">set_chartarea</span><span class="p">({</span><span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span><span class="s1">&#39;fill&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}})</span>
+        <span class="n">chart</span><span class="o">.</span><span class="n">set_legend</span><span class="p">({</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="s1">&#39;bottom&#39;</span><span class="p">})</span>
+        <span class="n">chart</span><span class="o">.</span><span class="n">set_title</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Kommunaler Finanzausgleich in Euro&#39;</span><span class="p">,</span><span class="s1">&#39;name_font&#39;</span><span class="p">:</span>  <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Tahoma&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">}})</span>
+
+        <span class="n">i</span><span class="o">=</span><span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">ags</span> <span class="ow">in</span> <span class="n">AGSListe</span><span class="p">:</span>
+
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+
+            <span class="n">chart</span><span class="o">.</span><span class="n">add_series</span><span class="p">({</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Auswertungen&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="o">+</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="o">+</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                    <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Auswertungen&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">JahrListe</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="s1">&#39;values&#39;</span><span class="p">:</span>     <span class="p">[</span><span class="s1">&#39;Auswertungen&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="o">+</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="o">+</span><span class="n">i</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">JahrListe</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="c1"># Format: Zeile, Spalte Anfang, Zeile , Spalte Ende</span>
+                <span class="p">})</span>
+
+        <span class="n">ws3</span><span class="o">.</span><span class="n">insert_chart</span><span class="p">(</span><span class="s1">&#39;B2&#39;</span><span class="p">,</span> <span class="n">chart</span><span class="p">)</span>
+
+
+        <span class="c1">################################</span>
+        <span class="c1">#Workbook speichern</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">wb</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Es liegt ein Fehler beim Speichern der Ausgabedatei vor. Ist diese ggf. noch geoeffnet?&quot;</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+
+        <span class="c1">#############################################################################################################</span>
+        <span class="c1"># Schritt 4</span>
+        <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;temporaere Tabellen loeschen </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+        <span class="n">deleteList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KFA_01_Wirkraum_temp&#39;</span><span class="p">,</span><span class="s1">&#39;KFA_03_Jahresdaten_temp&#39;</span><span class="p">,</span><span class="s1">&#39;KFA_Bevoelkerung_temp&#39;</span><span class="p">,</span><span class="s1">&#39;KFA_Veredelung_temp&#39;</span><span class="p">,</span><span class="s1">&#39;KFA_01_Wirkraum_temp&#39;</span><span class="p">,</span><span class="s1">&#39;KFA_03_Jahresdaten_temp&#39;</span><span class="p">,</span><span class="s1">&#39;KRU_01_Kreisumlagesaetze_Wirkraum_temp&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">deleteList</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_einnahmen</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+        <span class="nb">print</span> <span class="s2">&quot;fertig&quot;</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s1">&#39;06_Kommunaler Finanzausgleich abgeschlossen&#39;</span><span class="p">)</span></div></div>
+
+<span class="c1">#############################################################################################################</span>
+<span class="c1">#Funktionen</span>
+
+<div class="viewcode-block" id="getAGS"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T6_KFA.html#rpctools.analyst.einnahmen.T6_KFA.getAGS">[docs]</a><span class="k">def</span> <span class="nf">getAGS</span><span class="p">(</span><span class="n">projektname</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">arcpy</span><span class="o">,</span><span class="nn">sys</span><span class="o">,</span><span class="nn">os</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">projektFlaeche</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span> <span class="p">,</span><span class="s2">&quot;3 Benutzerdefinierte Projekte&quot;</span><span class="p">,</span>  <span class="n">projektname</span> <span class="p">,</span><span class="s2">&quot;FGDB_Definition_Projekt_&quot;</span> <span class="o">+</span> <span class="n">projektname</span> <span class="o">+</span><span class="s2">&quot;.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;Teilflaechen_Plangebiet&quot;</span><span class="p">)</span>
+    <span class="n">bkg_gemeinden</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span> <span class="n">base_path</span><span class="p">,</span> <span class="s2">&quot;1_Basisdaten&quot;</span><span class="p">,</span><span class="s2">&quot;FGDB_Basisdaten_deutschland.gdb&quot;</span><span class="p">,</span><span class="s2">&quot;bkg_gemeinden&quot;</span><span class="p">)</span>
+    <span class="c1">#ags aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird</span>
+    <span class="c1">#1. Feature Layer aus den bkg-daten erstellen</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="s2">&quot;bkg_gemeinden_lyr&quot;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="s2">&quot;&quot;</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">bkg_gemeinden</span><span class="p">,</span><span class="s2">&quot;bkg_gemeinden_lyr&quot;</span><span class="p">)</span>
+    <span class="c1">#2.Spatial Select wo Planfläche vgm_lyr intersected</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">SelectLayerByLocation_management</span><span class="p">(</span><span class="s2">&quot;bkg_gemeinden_lyr&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERSECT&quot;</span><span class="p">,</span> <span class="n">projektFlaeche</span><span class="p">)</span>
+    <span class="c1">#Wenn Flaeche = 1, ags extrahieren</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">GetCount_management</span><span class="p">(</span><span class="s2">&quot;bkg_gemeinden_lyr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">getOutput</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">n</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">):</span>
+        <span class="n">gemeindeCursor</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="s2">&quot;bkg_gemeinden_lyr&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">gemeinde</span> <span class="ow">in</span> <span class="n">gemeindeCursor</span><span class="p">:</span>
+            <span class="n">verbandsgemeinde</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">BEMERK</span>
+            <span class="n">ags</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">AGS</span>
+            <span class="n">RS</span> <span class="o">=</span> <span class="n">gemeinde</span><span class="o">.</span><span class="n">RS</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="s2">&quot;Die Projektflaechen liegen innerhalb mehrerer Gemeinden, das Tool unterstuetzt zur Zeit keine interkommunalen Projekte.&quot;</span><span class="p">)</span>
+        <span class="c1">## TODO Dateien loeschen und Projektregistrierung loeschen)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+    <span class="c1">#Weiche nach Bundeslaendern und gemeinschaftsangehoerigen Gemeinden</span>
+    <span class="k">if</span> <span class="n">verbandsgemeinde</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;gem&quot;</span><span class="p">:</span>
+        <span class="n">ags_vg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">ags</span>
+
+    <span class="k">elif</span> <span class="n">ags</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;03&quot;</span><span class="p">:</span> <span class="c1">#Niedersachsen</span>
+        <span class="nb">print</span> <span class="s2">&quot;NS&quot;</span>
+        <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">RS</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">9</span><span class="p">:]</span>
+        <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">RS</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">ags_vg</span><span class="p">)</span>
+
+
+    <span class="k">elif</span> <span class="n">ags</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;07&quot;</span><span class="p">:</span> <span class="c1">#Rheinland-Pfalz</span>
+        <span class="nb">print</span> <span class="s2">&quot;RP&quot;</span>
+        <span class="n">ags_vg</span> <span class="o">=</span> <span class="n">RS</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">9</span><span class="p">]</span>
+        <span class="n">ags_regenesis</span> <span class="o">=</span> <span class="n">RS</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="n">RS</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
+        <span class="n">arcpy</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">ags_vg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ags</span><span class="p">,</span> <span class="n">ags_vg</span><span class="p">,</span> <span class="n">ags_regenesis</span></div>
+
+<div class="viewcode-block" id="ags_samtgemeinde"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T6_KFA.html#rpctools.analyst.einnahmen.T6_KFA.ags_samtgemeinde">[docs]</a><span class="k">def</span> <span class="nf">ags_samtgemeinde</span><span class="p">(</span><span class="n">ags_in</span><span class="p">):</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">workspace_basisdaten</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;1_Basisdaten&#39;</span><span class="p">,</span><span class="s1">&#39;FGDB_Basisdaten_deutschland.gdb&#39;</span><span class="p">)</span>
+
+    <span class="n">VG250</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_basisdaten</span><span class="p">,</span><span class="s1">&#39;VG250&#39;</span><span class="p">)</span>
+    <span class="n">where</span> <span class="o">=</span> <span class="s1">&#39;&quot;AGS&quot;&#39;</span><span class="o">+</span><span class="s2">&quot; =&#39;&quot;</span><span class="o">+</span> <span class="n">ags_in</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="n">VG250</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">where</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">ags_out</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_L</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_R</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_K</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_V1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_V2</span> <span class="o">+</span> <span class="n">row</span><span class="o">.</span><span class="n">SN_G</span>
+
+    <span class="k">return</span> <span class="n">ags_out</span></div>
+
+
+<div class="viewcode-block" id="getKreisfrei"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T6_KFA.html#rpctools.analyst.einnahmen.T6_KFA.getKreisfrei">[docs]</a><span class="k">def</span> <span class="nf">getKreisfrei</span><span class="p">(</span><span class="n">ags</span><span class="p">):</span>
+    <span class="c1">#kreisfrei = &quot;ja&quot; wenn die letzten drei Stellen der AGS Nullen sind</span>
+    <span class="k">if</span> <span class="n">ags</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;000&#39;</span><span class="p">:</span>
+        <span class="n">kreisfrei</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kreisfrei</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">kreisfrei</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getEWZ"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T6_KFA.html#rpctools.analyst.einnahmen.T6_KFA.getEWZ">[docs]</a><span class="k">def</span> <span class="nf">getEWZ</span><span class="p">(</span><span class="n">ags_input</span><span class="p">):</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;http://www.statistik-portal.de/Statistik-Portal/gemeindeverz.asp?G=&quot;</span><span class="o">+</span><span class="n">ags_input</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">queryresult</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">AnzHH</span> <span class="o">=</span> <span class="n">queryresult</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&lt;tr&gt;&lt;th&gt;Einwohner&lt;/th&gt;&lt;td&gt;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&lt;/td&gt;&lt;/tr&gt;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">AnzHH</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">AnzHH</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getAnzHH"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T6_KFA.html#rpctools.analyst.einnahmen.T6_KFA.getAnzHH">[docs]</a><span class="k">def</span> <span class="nf">getAnzHH</span><span class="p">(</span><span class="n">ags_input</span><span class="p">):</span>
+    <span class="c1">#TODO: Haushalte, nicht Einwohner!</span>
+
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;http://www.statistik-portal.de/Statistik-Portal/gemeindeverz.asp?G=&quot;</span><span class="o">+</span><span class="n">ags_input</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">queryresult</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">AnzHH</span> <span class="o">=</span> <span class="n">queryresult</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&lt;tr&gt;&lt;th&gt;Einwohner&lt;/th&gt;&lt;td&gt;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&lt;/td&gt;&lt;/tr&gt;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">AnzHH</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">AnzHH</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getHebesatzGrStA"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T6_KFA.html#rpctools.analyst.einnahmen.T6_KFA.getHebesatzGrStA">[docs]</a><span class="k">def</span> <span class="nf">getHebesatzGrStA</span><span class="p">(</span><span class="n">ags_input</span><span class="p">):</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;http://api.regenesis.pudo.org/cube/71231gj001/facts?cut=gemein.name:&quot;</span><span class="o">+</span><span class="n">ags_input</span><span class="o">+</span><span class="s2">&quot;|jahr.text:2012&quot;</span>
+    <span class="n">queryresult</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="n">jsonContent</span> <span class="o">=</span> <span class="n">queryresult</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonContent</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="p">[]:</span>
+
+        <span class="n">ags</span> <span class="o">=</span> <span class="n">ags_samtgemeinde</span><span class="p">(</span><span class="n">ags_input</span><span class="p">)</span>
+
+        <span class="nb">print</span> <span class="s2">&quot;Es wird die AGS der Verwaltungsgemeinschaft verwendet: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;http://api.regenesis.pudo.org/cube/71231gj001/facts?cut=gemein.name:&quot;</span><span class="o">+</span><span class="n">ags</span><span class="o">+</span><span class="s2">&quot;|jahr.text:2012&quot;</span>
+        <span class="n">queryresult</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">jsonContent</span> <span class="o">=</span> <span class="n">queryresult</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonContent</span><span class="p">)</span>
+
+
+    <span class="n">HebesatzGrStA</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">u&#39;stenw1&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">HebesatzGrStA</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getHebesatzGrStB"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T6_KFA.html#rpctools.analyst.einnahmen.T6_KFA.getHebesatzGrStB">[docs]</a><span class="k">def</span> <span class="nf">getHebesatzGrStB</span><span class="p">(</span><span class="n">ags_input</span><span class="p">):</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;http://api.regenesis.pudo.org/cube/71231gj001/facts?cut=gemein.name:&quot;</span><span class="o">+</span><span class="n">ags_input</span><span class="o">+</span><span class="s2">&quot;|jahr.text:2012&quot;</span>
+    <span class="n">queryresult</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="n">jsonContent</span> <span class="o">=</span> <span class="n">queryresult</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonContent</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="p">[]:</span>
+        <span class="n">ags</span> <span class="o">=</span> <span class="n">ags_samtgemeinde</span><span class="p">(</span><span class="n">ags_input</span><span class="p">)</span>
+
+        <span class="nb">print</span> <span class="s2">&quot;Es wird die AGS der Verwaltungsgemeinschaft verwendet: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;http://api.regenesis.pudo.org/cube/71231gj001/facts?cut=gemein.name:&quot;</span><span class="o">+</span><span class="n">ags</span><span class="o">+</span><span class="s2">&quot;|jahr.text:2012&quot;</span>
+        <span class="n">queryresult</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">jsonContent</span> <span class="o">=</span> <span class="n">queryresult</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonContent</span><span class="p">)</span>
+
+    <span class="n">HebesatzGrStB</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">u&#39;stenw2&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">HebesatzGrStB</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getHebesatzGewSt"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.einnahmen.T6_KFA.html#rpctools.analyst.einnahmen.T6_KFA.getHebesatzGewSt">[docs]</a><span class="k">def</span> <span class="nf">getHebesatzGewSt</span><span class="p">(</span><span class="n">ags_input</span><span class="p">):</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;http://api.regenesis.pudo.org/cube/71231gj001/facts?cut=gemein.name:&quot;</span><span class="o">+</span><span class="n">ags_input</span><span class="o">+</span><span class="s2">&quot;|jahr.text:2012&quot;</span>
+    <span class="n">queryresult</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="n">jsonContent</span> <span class="o">=</span> <span class="n">queryresult</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonContent</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="p">[]:</span>
+        <span class="n">ags</span> <span class="o">=</span> <span class="n">ags_samtgemeinde</span><span class="p">(</span><span class="n">ags_input</span><span class="p">)</span>
+
+        <span class="nb">print</span> <span class="s2">&quot;Es wird die AGS der Verwaltungsgemeinschaft verwendet: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;http://api.regenesis.pudo.org/cube/71231gj001/facts?cut=gemein.name:&quot;</span><span class="o">+</span><span class="n">ags</span><span class="o">+</span><span class="s2">&quot;|jahr.text:2012&quot;</span>
+        <span class="n">queryresult</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">jsonContent</span> <span class="o">=</span> <span class="n">queryresult</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonContent</span><span class="p">)</span>
+
+    <span class="n">HebesatzGewSt</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">u&#39;stenw3&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">HebesatzGewSt</span><span class="p">)</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 26, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

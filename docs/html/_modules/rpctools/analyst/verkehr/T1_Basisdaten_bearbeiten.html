@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpctools.analyst.verkehr.T1_Basisdaten_bearbeiten &#8212; RPC Profi</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rpctools.analyst.verkehr.T1_Basisdaten_bearbeiten</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># REGIOPROJEKTCHECK</span>
+<span class="c1"># 00_Templates_einladen.py</span>
+<span class="c1">#</span>
+<span class="c1"># Description: Erstellung der Bevölkerungsprognose für das zu untersuchende Projekt</span>
+<span class="c1"># PROJECT URL: http://www.regioprojektcheck.de</span>
+<span class="c1">#</span>
+<span class="c1"># Author:</span>
+<span class="c1"># GGR Planung</span>
+<span class="c1">#</span>
+<span class="c1"># LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<span class="c1"># Import arcpy modules</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
+
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../rpctools/rpctools.analyst.verkehr.T1_Basisdaten_bearbeiten.html#rpctools.analyst.verkehr.T1_Basisdaten_bearbeiten.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">messages</span><span class="p">):</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">overwriteOutput</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1">#Pfade einrichten</span>
+
+    <span class="n">i</span><span class="o">=-</span><span class="mi">1</span>
+
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span> <span class="p">;</span> <span class="n">projektname</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">valueAsText</span>
+
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># Pfad zum Basisverzeichnis RPC</span>
+    <span class="n">workspace_projekt_definition</span> <span class="o">=</span>  <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Definition_Projekt.gdb&#39;</span><span class="p">)</span>
+    <span class="n">workspace_projekt_verkehr</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span><span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;FGDB_Verkehr.gdb&#39;</span><span class="p">)</span>
+    <span class="n">directory_tool_verkehr</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span><span class="s2">&quot;2_Tool&quot;</span><span class="p">,</span><span class="s2">&quot;Verkehr&quot;</span><span class="p">)</span>
+
+    <span class="c1">#Abgeleitete Variablen</span>
+    <span class="n">Teilflaechen_Plangebiet</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span> <span class="s1">&#39;Teilflaechen_Plangebiet&#39;</span><span class="p">)</span>
+    <span class="n">Teilflaechen_Plangebiet_Proj</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span> <span class="s1">&#39;Teilflaechen_Plangebiet&#39;</span><span class="p">)</span>
+    <span class="n">Teilflaechen_Plangebiet_Buffer</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span> <span class="s1">&#39;Teilflaechen_Plangebiet_Buffer&#39;</span><span class="p">)</span>
+    <span class="n">bounding_box</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span> <span class="s1">&#39;Teilflaechen_Plangebiet_BBox&#39;</span><span class="p">)</span>
+
+    <span class="n">gridWGS84</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span> <span class="s1">&#39;Siedlungszellen&#39;</span><span class="p">)</span>
+    <span class="n">grid_bound</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span> <span class="s1">&#39;Gridbound&#39;</span><span class="p">)</span>
+
+    <span class="n">zensusRaster</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;1_Basisdaten&#39;</span><span class="p">,</span><span class="s1">&#39;ZensusGrid&#39;</span><span class="p">,</span><span class="s1">&#39;Zensus2011GridWGS84_int.tif&#39;</span><span class="p">)</span>
+    <span class="n">clippedRaster</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;3 Benutzerdefinierte Projekte&#39;</span><span class="p">,</span> <span class="n">projektname</span><span class="p">,</span><span class="s1">&#39;clippedZensus100mGrid.tif&#39;</span><span class="p">)</span>
+
+    <span class="c1">#ggf vorhandene Layer loeschen</span>
+    <span class="n">deletelist</span> <span class="o">=</span> <span class="p">[</span><span class="n">gridWGS84</span><span class="p">,</span> <span class="n">clippedRaster</span><span class="p">,</span> <span class="n">bounding_box</span><span class="p">,</span> <span class="n">Teilflaechen_Plangebiet_Buffer</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">deletelist</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="n">element</span><span class="p">,</span> <span class="s2">&quot;konnte nicht geloescht werden&quot;</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#Puffern und Entstehende Elemente Zusammenfuehren (Dissolve)</span>
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;2000m Umring um Teilflaechen des Plangebietes erstellen </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">Buffer_analysis</span><span class="p">(</span><span class="n">Teilflaechen_Plangebiet</span><span class="p">,</span> <span class="n">Teilflaechen_Plangebiet_Buffer</span><span class="p">,</span> <span class="s2">&quot;2000 Meters&quot;</span><span class="p">,</span> <span class="s2">&quot;FULL&quot;</span><span class="p">,</span> <span class="s2">&quot;ROUND&quot;</span><span class="p">,</span> <span class="s2">&quot;NONE&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Entstehende Elemente zu einem Projektumkreis zusammenfuehren </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">Dissolve_management</span><span class="p">(</span><span class="n">Teilflaechen_Plangebiet_Buffer</span><span class="p">,</span> <span class="n">bounding_box</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;MULTI_PART&quot;</span><span class="p">,</span> <span class="s2">&quot;DISSOLVE_LINES&quot;</span><span class="p">)</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#Zensus 2011 Raster zuschneiden</span>
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Zensus-2011-Raster zuschneiden&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="c1"># ClipDeutschlandRaster</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">Clip_management</span><span class="p">(</span><span class="n">zensusRaster</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="n">clippedRaster</span><span class="p">,</span> <span class="n">bounding_box</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;ClippingGeometry&quot;</span><span class="p">)</span>
+
+    <span class="c1">#Zugeschnittenes Zensus-Raster vektorisieren</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">RasterToPolygon_conversion</span><span class="p">(</span><span class="n">clippedRaster</span><span class="p">,</span> <span class="n">gridWGS84</span><span class="p">,</span> <span class="s2">&quot;NO_SIMPLIFY&quot;</span><span class="p">,</span> <span class="s2">&quot;VALUE&quot;</span><span class="p">)</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#SiedlungszellenIDs erzeugen</span>
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;SiedlungszellenIDs und Einwohnerzahl erzeugen </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="c1"># Felder hinzufügen</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">gridWGS84</span><span class="p">,</span> <span class="s2">&quot;SZ_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;LONG&quot;</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;SZ_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">,</span> <span class="s2">&quot;REQUIRED&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">AddField_management</span><span class="p">(</span><span class="n">gridWGS84</span><span class="p">,</span> <span class="s2">&quot;SZ_Einwohner&quot;</span><span class="p">,</span> <span class="s2">&quot;DOUBLE&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;NULLABLE&quot;</span><span class="p">,</span> <span class="s2">&quot;NON_REQUIRED&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Felder berechnen</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">CalculateField_management</span><span class="p">(</span><span class="n">gridWGS84</span><span class="p">,</span> <span class="s2">&quot;SZ_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;!OBJECTID!&quot;</span><span class="p">,</span> <span class="s2">&quot;PYTHON&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">CalculateField_management</span><span class="p">(</span><span class="n">gridWGS84</span><span class="p">,</span> <span class="s2">&quot;SZ_Einwohner&quot;</span><span class="p">,</span> <span class="s2">&quot;round (([Shape_Area]*1000000),0)* [gridcode]&quot;</span><span class="p">,</span> <span class="s2">&quot;VB&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># nicht mehr benötigte Felder löschen</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">DeleteField_management</span><span class="p">(</span><span class="n">gridWGS84</span><span class="p">,</span> <span class="s2">&quot;gridcode&quot;</span><span class="p">)</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1"># Einladen der Umgebungslayer</span>
+    <span class="n">beginmeldung</span> <span class="o">=</span> <span class="s1">&#39;Starte Ueberarbeitung Uebergabepunkte </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">beginmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">beginmeldung</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1"># Schritt 1 - Fuege Layer hinzu</span>
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Fuege Layer hinzu </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="n">OSM_Baselayer</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Layer</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">directory_tool_verkehr</span><span class="p">,</span><span class="s1">&#39;OpenStreetMap.lyr&#39;</span><span class="p">))</span>
+    <span class="n">Teilflaechen_Plangebiet</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Layer</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_definition</span><span class="p">,</span><span class="s1">&#39;Teilflaechen_Plangebiet&#39;</span><span class="p">))</span>
+    <span class="n">L00_Umfeldabgrenzung</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Layer</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L00_Umfeldabgrenzung&#39;</span><span class="p">))</span>
+    <span class="n">L01_Uebergabepunkte</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Layer</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L01_Uebergabepunkte&#39;</span><span class="p">))</span>
+    <span class="n">L10_Bestand_Arbeitsplaetze</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Layer</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L10_Bestand_Arbeitsplaetze&#39;</span><span class="p">))</span>
+    <span class="n">L11_Bestand_Einzelhandelsflaechen</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Layer</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L11_Bestand_Einzelhandelsflaechen&#39;</span><span class="p">))</span>
+    <span class="n">L11_Bestand_Schulen</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Layer</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_projekt_verkehr</span><span class="p">,</span><span class="s1">&#39;L11_Bestand_Schulen&#39;</span><span class="p">))</span>
+
+    <span class="n">mxd</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">MapDocument</span><span class="p">(</span><span class="s2">&quot;CURRENT&quot;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListDataFrames</span><span class="p">(</span><span class="n">mxd</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">OSM_Baselayer</span><span class="p">,</span><span class="s2">&quot;TOP&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">L00_Umfeldabgrenzung</span><span class="p">,</span><span class="s2">&quot;TOP&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">Teilflaechen_Plangebiet</span><span class="p">,</span><span class="s2">&quot;TOP&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">L01_Uebergabepunkte</span><span class="p">,</span><span class="s2">&quot;TOP&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">L10_Bestand_Arbeitsplaetze</span><span class="p">,</span><span class="s2">&quot;TOP&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">L11_Bestand_Einzelhandelsflaechen</span><span class="p">,</span><span class="s2">&quot;TOP&quot;</span><span class="p">)</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">L11_Bestand_Schulen</span><span class="p">,</span><span class="s2">&quot;TOP&quot;</span><span class="p">)</span>
+
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">Teilflaechen_Plangebiet</span><span class="o">.</span><span class="n">getExtent</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">extent</span> <span class="o">=</span> <span class="n">ext</span>
+
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;L00_Umfeldabgrenzung&#39;</span><span class="p">]</span>
+    <span class="n">layers</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">ListLayers</span><span class="p">(</span><span class="n">mxd</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+            <span class="n">layer</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">RefreshTOC</span><span class="p">()</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">RefreshActiveView</span><span class="p">()</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1">#Aufraeumen und ueberfluessige Variablen loeschen</span>
+    <span class="n">schrittmeldung</span> <span class="o">=</span> <span class="s1">&#39;Aufraeumen und ueberfluessige Variablen loeschen </span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">schrittmeldung</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">schrittmeldung</span>
+
+    <span class="n">deletelist</span> <span class="o">=</span> <span class="p">[</span><span class="n">clippedRaster</span><span class="p">,</span> <span class="n">bounding_box</span><span class="p">,</span> <span class="n">Teilflaechen_Plangebiet_Buffer</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">deletelist</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+            <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="n">element</span><span class="p">,</span> <span class="s2">&quot;konnte nicht geloescht werden&quot;</span>
+
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+    <span class="c1">#############################################################################################################</span>
+    <span class="c1"># Endmeldung</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Script abgeschlossen&#39;</span>
+    <span class="nb">print</span> <span class="n">message</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">AddMessage</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">RPC</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, GGR, ILS.
+      Last updated on Jan 26, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>
