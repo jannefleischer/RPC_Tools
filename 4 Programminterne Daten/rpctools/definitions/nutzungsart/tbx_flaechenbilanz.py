@@ -8,7 +8,6 @@ import datetime
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 
-
 from rpctools.definitions.nutzungsart.flaechenbilanz import Flaechenbilanz
 
 
@@ -320,14 +319,6 @@ class TbxFlaechenbilanz(Tbx):
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
         has been changed."""
-
-        projects = self.folders.get_projects()
-        params.project.filter.list = projects
-        if len(projects) == 0:
-            params.project.value = ''
-        # if previously selected project was deleted in the meantime
-        elif params.project.value not in projects:
-            params.project.value = projects[0]
 
         # Auswahl Teilfläche
         if params.projectname.altered and not params.projectname.hasBeenValidated:

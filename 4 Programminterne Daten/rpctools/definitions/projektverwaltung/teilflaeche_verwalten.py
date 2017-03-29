@@ -6,7 +6,7 @@ import os
 from rpctools.utils.params import Tool
 
 
-class TeilflaechenBenennen(Tool):
+class TeilflaechenVerwalten(Tool):
 
     _param_projectname = 'project'
     _dbname = 'FGDB_Definition_Projekt.gdb'

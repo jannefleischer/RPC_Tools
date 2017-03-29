@@ -6,8 +6,8 @@ import sys
 
 from rpctools.definitions.projektverwaltung import tbx_projektverwaltung
 reload(tbx_projektverwaltung)
-from rpctools.definitions.projektverwaltung import tbx_teilflaechen_benennen
-reload(tbx_teilflaechen_benennen)
+from rpctools.definitions.projektverwaltung import tbx_teilflaechen_verwalten
+reload(tbx_teilflaechen_verwalten)
 
 
 from rpctools.definitions.nutzungsart import (tbx_flaechenbilanz,
@@ -17,7 +17,7 @@ reload(tbx_nutzungen)
 
 from rpctools.definitions.projektverwaltung.tbx_projektverwaltung \
      import TbxProjektVerwaltung
-from rpctools.definitions.projektverwaltung.tbx_teilflaechen_benennen \
+from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten \
      import TbxTeilflaecheBenennen
 
 from rpctools.definitions.nutzungsart.tbx_flaechenbilanz import TbxFlaechenbilanz

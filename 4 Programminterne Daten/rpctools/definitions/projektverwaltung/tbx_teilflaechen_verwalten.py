@@ -5,7 +5,7 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.definitions.projektverwaltung.teilflaeche_benennen import TeilflaechenBenennen
+from rpctools.definitions.projektverwaltung.teilflaeche_verwalten import TeilflaechenVerwalten
 
 
 class TbxTeilflaecheBenennen(Tbx):
@@ -17,7 +17,7 @@ class TbxTeilflaecheBenennen(Tbx):
 
     @property
     def Tool(self):
-        return TeilflaechenBenennen
+        return TeilflaechenVerwalten
 
     def _getParameterInfo(self):
         # Projekt
@@ -49,25 +49,25 @@ class TbxTeilflaecheBenennen(Tbx):
         p.direction = 'Input'
         p.datatype = u'GPString'
 
+        # Nutzungsart
+        p = params.teilflaeche = arcpy.Parameter()
+        p.name = encode(u'Nutzungsart')
+        p.displayName = encode(u'Nutzungsart')
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'GPString'
+        table = self.folders.get_table('Nutzungsart')
+        table = self.folders.get_table('asdfgf')
+        #fields = ['id', '']
+        #rows = arcpy.da.SearchCursor(table, fields)
+        p.filter.list = []
+
         return params
 
     def _updateParameters(self, params):
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
         has been changed."""
-        #Projekt auswählen
-
-        projects = self.folders.get_projects()
-        params.project.filter.list = projects
-        if len(projects) == 0:
-            params.project.value = ''
-        # if previously selected project was deleted in the meantime
-        elif params.project.value not in projects:
-            params.project.value = projects[0]
-
-        #if params.project.altered and not params.project.hasBeenValidated:
-            #projects = self.folders.get_projects()
-            #params.project.filter.list = projects
 
         if params.project.altered and not params.project.hasBeenValidated:
             projectname = params.project.value

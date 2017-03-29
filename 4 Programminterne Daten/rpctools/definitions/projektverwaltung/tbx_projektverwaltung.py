@@ -31,8 +31,8 @@ class TbxProjektVerwaltung(Tbx):
         p.direction = 'Input'
         p.datatype = 'GPString'
         p.filter.list = ['Neues Projekt anlegen',
-                                     'Bestehendes Projekt kopieren',
-                                     encode('Bestehendes Projekt löschen')]
+                         'Bestehendes Projekt kopieren',
+                         encode('Bestehendes Projekt löschen')]
         p.value = p.filter.list[0]
 
         projects = self.folders.get_projects()

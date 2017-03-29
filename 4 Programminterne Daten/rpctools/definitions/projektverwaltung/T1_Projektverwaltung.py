@@ -15,6 +15,7 @@
 import sys
 from os.path import abspath, dirname, join, isdir
 from rpctools.utils.params import Tool
+from rpctools.utils.constants import Nutzungsart
 import arcpy
 import os, shutil, gc
 
@@ -123,7 +124,7 @@ class Projektverwaltung(Tool):
         # copy template folder
         try:
             shutil.copytree(self.folders.PROJECT_TEMPLATE,
-                            self.folders.PROJECT_PATH)
+                            self.folders.get_projectpath(check=False))
         except Exception as e:
             arcpy.AddMessage(e)
             print e
@@ -174,7 +175,7 @@ class Projektverwaltung(Tool):
         arcpy.AddField_management(teilfaechen_plangebiet, "Aufsiedlungsdauer", "LONG")
         arcpy.AddField_management(teilfaechen_plangebiet, "Flaeche_ha", "DOUBLE", "", "", "", "", "", "")
         arcpy.AddField_management(teilfaechen_plangebiet, "umfang_meter", "FLOAT")
-        arcpy.AddField_management(teilfaechen_plangebiet, "Nutzungsart", "SHORT")
+        #arcpy.AddField_management(teilfaechen_plangebiet, "Nutzungsart", "SHORT")
         #arcpy.AddField_management(teilfaechen_plangebiet, "Bilanzsumme", "FLOAT")
 
         # Berechne ha der Teilflaechen
@@ -193,6 +194,7 @@ class Projektverwaltung(Tool):
         i = 1
         for row in cursor:
             row.setValue("Startjahr", startjahr)
+            #row.setValue("Nutzungsart", TypeOfUse.UNDEFINIERT)
             row.setValue("Name", "Flaeche_"+str(i))
             row.setValue("Aufsiedlungsdauer", 5)
             #row.setValue("Bilanzsumme", 0)
@@ -264,7 +266,8 @@ class Projektverwaltung(Tool):
         template_folder = join(self.folders.MXDS, "Style_Minimap")
         template = join(template_folder, "template.mxd")
         mxd_template = arcpy.mapping.MapDocument(template)
-        ausgabeordner_img = join(self.folders.AUSGABE_PATH, 'Abbildungen')
+        ausgabeordner_img = join(self.folders.get_projectpath(),
+                                 self.folders._AUSGABE_PATH, 'Abbildungen')
         os.makedirs(ausgabeordner_img)
         mxdpfad = join(ausgabeordner_img, 'Definition_Projekt.mxd')
         mxd_template.saveACopy(mxdpfad)
