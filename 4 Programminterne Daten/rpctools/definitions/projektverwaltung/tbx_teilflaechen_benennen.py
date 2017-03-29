@@ -59,14 +59,15 @@ class TbxTeilflaecheBenennen(Tbx):
 
         projects = self.folders.get_projects()
         params.project.filter.list = projects
-        if len(projects) != 0:
-            params.project.value = projects[0]
-        else:
+        if len(projects) == 0:
             params.project.value = ''
+        # if previously selected project was deleted in the meantime
+        elif params.project.value not in projects:
+            params.project.value = projects[0]
 
-        if params.project.altered and not params.project.hasBeenValidated:
-            projects = self.folders.get_projects()
-            params.project.filter.list = projects
+        #if params.project.altered and not params.project.hasBeenValidated:
+            #projects = self.folders.get_projects()
+            #params.project.filter.list = projects
 
         if params.project.altered and not params.project.hasBeenValidated:
             projectname = params.project.value
@@ -87,15 +88,18 @@ class TbxTeilflaecheBenennen(Tbx):
             params.teilflaeche.filter.list = list_teilflaechen
 
             if list_teilflaechen:
+                flaeche = list_teilflaechen[0]
                 params.teilflaeche.value = list_teilflaechen[0]
 
+        if params.teilflaeche.altered:
+            flaeche = params.teilflaeche.value
+            flaechenname = flaeche.split('|')[2]
+            params.name.value = flaechenname
 
         #Teilfläche auswählen
-        if params.teilflaeche.altered and not params.teilflaeche.hasBeenValidated:
-
-            projectname = params.project.value
-            flaechenname = params.teilflaeche.value
-            flaechenname_id = flaechenname.split('|')[0].replace('Nr.', '').strip()
+        #if params.teilflaeche.altered and not params.teilflaeche.hasBeenValidated:
+            #projectname = params.project.value
+            #flaechenname_id = flaechenname.split('|')[0].replace('Nr.', '').strip()
 
     def _updateMessages(self, params):
         """Modify the messages created by internal validation for each tool

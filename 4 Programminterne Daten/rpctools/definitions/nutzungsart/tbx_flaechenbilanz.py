@@ -322,11 +322,12 @@ class TbxFlaechenbilanz(Tbx):
         has been changed."""
 
         projects = self.folders.get_projects()
-        params.projectname.filter.list = projects
-        if len(projects) != 0:
-            params.projectname.value = projects[0]
-        else:
-            params.projectname.value = ''
+        params.project.filter.list = projects
+        if len(projects) == 0:
+            params.project.value = ''
+        # if previously selected project was deleted in the meantime
+        elif params.project.value not in projects:
+            params.project.value = projects[0]
 
         # Auswahl Teilfläche
         if params.projectname.altered and not params.projectname.hasBeenValidated:
