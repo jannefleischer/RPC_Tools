@@ -174,6 +174,7 @@ class Projektverwaltung(Tool):
         arcpy.AddField_management(teilfaechen_plangebiet, "Aufsiedlungsdauer", "LONG")
         arcpy.AddField_management(teilfaechen_plangebiet, "Flaeche_ha", "DOUBLE", "", "", "", "", "", "")
         arcpy.AddField_management(teilfaechen_plangebiet, "umfang_meter", "FLOAT")
+        arcpy.AddField_management(teilfaechen_plangebiet, "Nutzungsart", "SHORT")
         #arcpy.AddField_management(teilfaechen_plangebiet, "Bilanzsumme", "FLOAT")
 
         # Berechne ha der Teilflaechen
