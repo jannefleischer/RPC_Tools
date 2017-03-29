@@ -12,7 +12,9 @@
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 from os import listdir
+import sys
 from os.path import join, isdir, abspath, dirname, basename
+import arcpy
 
 TEST_TMP_PROJECT = '__unittest__'
 
@@ -33,9 +35,32 @@ class Folders(object):
         self._AUSGABE_PATH = 'Ergebnisausgabe'
         self._TEXTE = 'texte'
         self._MXDS = 'mxds'
-        self.PYTHON_EXECUTABLE = u'C:\\Python27-ArcGIS\\ArcGIS10.4'
         # the params
         self._params = params
+        self._invalid_paths = []
+
+
+    def join_and_check(self, *args, **kwargs):
+        """
+        Joins paths and checks if joined path points to existing resource
+        (directory, database or table) if requested and stores the invalid
+        paths
+
+        Parameters
+        ----------
+        args: paths to join
+        check : str, optional
+            if True, checks if joined path points to existing resource
+        Returns
+        -------
+        path : str
+            the joined path
+        """
+        path = join(*args)
+        check = kwargs.get('check', True)
+        if check and not arcpy.Exists(path):
+            self._invalid_paths.append(path)
+        return path
 
     @property
     def project(self):
@@ -51,43 +76,44 @@ class Folders(object):
 
     @property
     def INTERN(self):
-        return join(self.BASE_PATH, self._INTERN)
+        return self.join_and_check(self.BASE_PATH, self._INTERN)
 
     @property
     def BASE_DBS(self):
-        return join(self.INTERN, self._BASE_DBS)
+        arcpy.AddError
+        return self.join_and_check(self.INTERN, self._BASE_DBS)
 
     @property
     def MXDS(self):
-        return join(self.TEMPLATE_BASE_PATH, self._MXDS)
+        return self.join_and_check(self.TEMPLATE_BASE_PATH, self._MXDS)
 
     @property
     def TEXTE(self):
-        return join(self.INTERN, self._TEXTE)
+        return self.join_and_check(self.INTERN, self._TEXTE)
 
     @property
     def PROJECT_BASE_PATH(self):
-        return join(self.BASE_PATH, self._PROJECT_BASE_PATH)
+        return self.join_and_check(self.BASE_PATH, self._PROJECT_BASE_PATH)
 
     @property
     def TEMPLATE_BASE_PATH(self):
-        return join(self.BASE_PATH, self._INTERN, self._TEMPLATE_BASE_PATH)
+        return self.join_and_check(self.BASE_PATH, self._INTERN, self._TEMPLATE_BASE_PATH)
 
     @property
     def TEMPLATE_FLAECHEN(self):
-        return join(self.TEMPLATE_BASE_PATH, self._TEMPLATE_FLAECHEN)
+        return self.join_and_check(self.TEMPLATE_BASE_PATH, self._TEMPLATE_FLAECHEN)
 
     @property
     def PROJECT_TEMPLATE(self):
-        return join(self.TEMPLATE_BASE_PATH, self._PROJECT_TEMPLATE)
+        return self.join_and_check(self.TEMPLATE_BASE_PATH, self._PROJECT_TEMPLATE)
 
     @property
     def TEST_TEMPLATE(self):
-        return join(self.TEMPLATE_BASE_PATH, self._TEST_TEMPLATE)
+        return self.join_and_check(self.TEMPLATE_BASE_PATH, self._TEST_TEMPLATE)
 
     @property
     def TEST_TMP_PROJECT(self):
-        return join(self.PROJECT_BASE_PATH, self._TEST_TMP_PROJECT)
+        return self.join_and_check(self.PROJECT_BASE_PATH, self._TEST_TMP_PROJECT)
 
     def get_projects(self):
         '''
@@ -99,7 +125,7 @@ class Folders(object):
                       and f != self._TEST_TMP_PROJECT]
         return sorted(subfolders)
 
-    def get_projectpath(self, project=None):
+    def get_projectpath(self, project=None, check=True):
         """
         The Path to the Project Folder
 
@@ -113,7 +139,9 @@ class Folders(object):
             the full path of the Project folder
         """
         projectname = project or self.project
-        return join(self.PROJECT_BASE_PATH, projectname)
+        return self.join_and_check(self.PROJECT_BASE_PATH,
+                                   projectname,
+                                   check=check)
 
     @property
     def PROJECT_PATH(self):
@@ -123,9 +151,9 @@ class Folders(object):
     @property
     def AUSGABE_PATH(self):
         """The Projectpath"""
-        return join(self.PROJECT_PATH, self._AUSGABE_PATH)
+        return self.join_and_check(self.PROJECT_PATH, self._AUSGABE_PATH)
 
-    def get_db(self, fgdb='', project=None):
+    def get_db(self, fgdb='', project=None, check=True):
         """
         A FileGeodatabase in the Project Folder
 
@@ -143,9 +171,10 @@ class Folders(object):
         """
         dbname = basename(fgdb) or self.dbname
         projectname = project or self.project
-        return join(self.get_projectpath(projectname), dbname)
+        return self.join_and_check(self.get_projectpath(projectname), dbname,
+                                   check=check)
 
-    def get_table(self, tablename, fgdb='', project=''):
+    def get_table(self, tablename, fgdb='', project='', check=True):
         """
         A Table in a FileGeodatabase in the Project Folder
 
@@ -164,10 +193,12 @@ class Folders(object):
         """
         dbname = basename(fgdb) or self.dbname
         projectname = project or self.project
-        table = join(self.get_db(dbname, projectname), tablename)
+        table = self.join_and_check(self.get_db(dbname, projectname),
+                                    tablename,
+                                    check=check)
         return table
 
-    def get_basedb(self, fgdb):
+    def get_basedb(self, fgdb, check=True):
         """
         A Base FileGeodatabase
 
@@ -181,9 +212,9 @@ class Folders(object):
         basedb : str
             the full path of the FileGeodatabase
         """
-        return join(self.BASE_DBS, fgdb)
+        return self.join_and_check(self.BASE_DBS, fgdb, check=check)
 
-    def get_base_table(self, fgdb, table):
+    def get_base_table(self, fgdb, table, check=True):
         """
         A Table in a Base FileGeodatabase
 
@@ -193,6 +224,8 @@ class Folders(object):
             the name of the FileGeodatabase
         tablename : str
             the name of the table
+        check : bool
+            if false, don't check if table exists
 
         Returns
         -------
@@ -200,5 +233,6 @@ class Folders(object):
             the full path to the table in the Base FileGeodatabase
         """
         dbname = basename(fgdb)
-        table = join(self.get_basedb(dbname), table)
+        table = self.join_and_check(self.get_basedb(dbname), table,
+                                    check=check)
         return table

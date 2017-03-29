@@ -138,6 +138,10 @@ class Params(object):
         [123, 444]
         >>> params[1:3]
         [444, 555]
+        >>> 'param5' in params
+        True
+        >>> 'param6' in params
+        False
         """
         self._od = OrderedDict(*args, **kwargs)
         self._param_projectname = param_projectname
@@ -147,7 +151,8 @@ class Params(object):
         try:
             return self._od[name]
         except KeyError:
-            raise AttributeError('Attribute {} not found in Params-instance. Available attributes are {}'.format(name, self._od.keys()))
+            msg = 'Attribute {} not found in Params-instance. Available attributes are {}'.format(name, self._od.keys())
+            raise AttributeError(msg)
 
     def __setattr__(self, name, value):
         if name.startswith('_'):
@@ -178,6 +183,9 @@ class Params(object):
 
     def __iter__(self):
         return self._od.itervalues()
+
+    def __contains__(self, value):
+        return value in self._od
 
     def __len__(self):
         return len(self._od)
@@ -214,6 +222,34 @@ class Params(object):
         return ''
 
 
+class ToolFolders(Folders):
+    def join_and_check(self, *args, **kwargs):
+        """
+        Joins paths and checks if joined path points to existing resource
+        (directory, database or table) if requested
+
+        overrides check function to show path errors while running and exit
+        when first error occurs
+
+        Parameters
+        ----------
+        args: paths to join
+        check : str, optional
+            if True, checks if joined path points to existing resource
+        Returns
+        -------
+        path : str
+            the joined path
+        """
+        path = os.path.join(*args)
+        check = kwargs.get('check', True)
+        if check and not arcpy.Exists(path):
+            arcpy.AddError(
+                'Pfad oder Tabelle existiert nicht: "{}"'.format(path))
+            sys.exit()
+        return path
+
+
 class Tool(object):
     """
     Base Class for a ArcGIS Tool
@@ -241,7 +277,7 @@ class Tool(object):
         """
         self.par = params
         self.mes = Message()
-        self.folders = Folders(params=self.par)
+        self.folders = ToolFolders(params=self.par)
 
     def main(self, par, parameters=None, messages=None):
         """
@@ -295,17 +331,30 @@ class Tbx(object):
         """
 
     def __init__(self):
-        # reload the tool's module
-        reload(sys.modules[self.Tool.__module__])
+        # todo: replace later with Tool=self.Tool
+        Tool = self.reload_tool()
 
         # the parameters
-        self.par = Params(param_projectname=self.Tool._param_projectname,
-                          dbname=self.Tool._dbname)
+        self.par = Params(param_projectname=Tool._param_projectname,
+                          dbname=Tool._dbname)
         # define the folders
         self.folders = Folders(params=self.par)
         # an instance of the tool
-        self.tool = self.Tool(self.par)
+        self.tool = Tool(self.par)
         self.canRunInBackground = False
+
+    def reload_tool(self):
+        # reload the tool's module
+        tool_module_name = self.Tool.__module__
+        reload(sys.modules[tool_module_name])
+        tool_name = self.Tool.__name__
+        tool_module = __import__(tool_module_name,
+                                 globals(),
+                                 locals(),
+                                 [tool_name],
+                                 -1)
+        Tool = getattr(tool_module, tool_name)
+        return Tool
 
     @abstractmethod
     def _getParameterInfo(self):
@@ -335,7 +384,24 @@ class Tbx(object):
         parameters : list of ArcGIS-Parameters
         """
         self.par._update_parameters(parameters)
+        self._update_project_list()
         self._updateParameters(self.par)
+
+    def _update_project_list(self):
+        """
+        Update the parameter list of existing projects
+        """
+        projects = self.folders.get_projects()
+        if self.par._param_projectname not in self.par:
+            return
+        project_param = self.par[self.par._param_projectname]
+        project_param.filter.list = projects
+        if len(projects) == 0:
+            project_param.value = ''
+        # if previously selected project was deleted in the meantime
+        elif project_param.value not in projects:
+            project_param.value = projects[0]
+
 
     def _updateParameters(self, params):
         """
@@ -353,6 +419,12 @@ class Tbx(object):
         parameters : list of ArcGIS-Parameters
         """
         self.par._update_parameters(parameters)
+        params = self.par._od.values()
+        # check if toolbox contains invalid paths
+        if params and self.folders._invalid_paths:
+            invalid = ', '.join(self.folders._invalid_paths)
+            params[0].setErrorMessage(
+                'Pfade oder Tabellen existieren nicht: {}'.format(invalid))
         self._updateMessages(self.par)
 
     def _updateMessages(self, parameters):
