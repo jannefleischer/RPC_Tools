@@ -22,10 +22,12 @@ import os, shutil, gc
 
 class Projektverwaltung(Tool):
 
-    _param_projectname = 'name'
+    _param_projectname = 'existing_project'
     _dbname = 'FGDB_Definition_Projekt.gdb'
 
     def run(self):
+        # prevent eventual locks
+        gc.collect()
 
         arcpy.AddMessage(self.par.action.value)
 
@@ -37,12 +39,6 @@ class Projektverwaltung(Tool):
 
         else:
             self.projekt_loeschen()
-
-
-
-    @property
-    def teilflaeche(self):
-        return self.folders.get_table('Teilflaechen_Plangebiet')
 
     def projekt_loeschen(self):
         projektName = self.par.existing_project.value
@@ -89,14 +85,14 @@ class Projektverwaltung(Tool):
             # get new Project Name as input
             projectNameOld = self.par.existing_project.value
             # allow the upload of a shapefile containg the projektgebiet
-            projectNameNew = self.par.name.value
+            project_name = self.par.name.value
 
             # copy template folder
-            templatePath = self.folders.get_projectpath(projectNameOld)
-            projectPath = self.folders.PROJECT_PATH
+            template_path = self.folders.get_projectpath()
+            project_path = join(self.folders.PROJECT_BASE_PATH, project_name)
 
             try:
-                shutil.copytree(templatePath, projectPath)
+                shutil.copytree(template_path, project_path)
             except Exception as e:
                 arcpy.AddMessage(e)
                 arcpy.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
@@ -107,24 +103,24 @@ class Projektverwaltung(Tool):
             # output information to user
             print("Succesfully copied")
             arcpy.AddMessage("Succesfully copied")
-            print("New Project registered at " + projectPath)
-            arcpy.AddMessage("New Project registered at " + projectPath)
+            print("New Project registered at " + project_path)
+            arcpy.AddMessage("New Project registered at " + project_path)
         except Exception as e:
-            arcpy.AddMessage(e, sys.exc_traceback)
+            arcpy.AddMessage(e)
 
     def projekt_anlegen(self):
         arcpy.env.overwriteOutput = True
 
         # get new Project input Data
-        projectName = self.par.name.value
+        project_name = self.par.name.value
         flaeche = self.par.shapefile.value
         beginn_betrachtung = self.par.begin.value
         ende_betrachtung = self.par.end.value
+        project_path = join(self.folders.PROJECT_BASE_PATH, project_name)
 
         # copy template folder
         try:
-            shutil.copytree(self.folders.PROJECT_TEMPLATE,
-                            self.folders.get_projectpath(check=False))
+            shutil.copytree(self.folders.PROJECT_TEMPLATE, project_path)
         except Exception as e:
             arcpy.AddMessage(e)
             print e
@@ -136,9 +132,9 @@ class Projektverwaltung(Tool):
                              "der Toolbox")
             sys.exit()
 
+        gdbPfad = join(project_path, 'FGDB_Definition_Projekt.gdb')
         # If shapefile was uploaded, add to gdb
         if flaeche != "":
-            gdbPfad = self.folders.get_db('FGDB_Definition_Projekt.gdb')
             arcpy.FeatureClassToGeodatabase_conversion(flaeche, gdbPfad)
 
             dsc = arcpy.Describe(flaeche)
@@ -157,7 +153,7 @@ class Projektverwaltung(Tool):
             fcs = arcpy.ListFeatureClasses()
 
         # Prepare Shapefile for use in RPC
-        teilfaechen_plangebiet = self.teilflaeche
+        teilfaechen_plangebiet = join(gdbPfad, 'Teilflaechen_Plangebiet')
 
         # delete unused fields
         fieldObjList = arcpy.ListFields(teilfaechen_plangebiet)
@@ -175,7 +171,7 @@ class Projektverwaltung(Tool):
         arcpy.AddField_management(teilfaechen_plangebiet, "Aufsiedlungsdauer", "LONG")
         arcpy.AddField_management(teilfaechen_plangebiet, "Flaeche_ha", "DOUBLE", "", "", "", "", "", "")
         arcpy.AddField_management(teilfaechen_plangebiet, "umfang_meter", "FLOAT")
-        #arcpy.AddField_management(teilfaechen_plangebiet, "Nutzungsart", "SHORT")
+        arcpy.AddField_management(teilfaechen_plangebiet, "Nutzungsart", "SHORT")
         #arcpy.AddField_management(teilfaechen_plangebiet, "Bilanzsumme", "FLOAT")
 
         # Berechne ha der Teilflaechen
@@ -194,7 +190,7 @@ class Projektverwaltung(Tool):
         i = 1
         for row in cursor:
             row.setValue("Startjahr", startjahr)
-            #row.setValue("Nutzungsart", TypeOfUse.UNDEFINIERT)
+            row.setValue("Nutzungsart", Nutzungsart.UNDEFINIERT)
             row.setValue("Name", "Flaeche_"+str(i))
             row.setValue("Aufsiedlungsdauer", 5)
             #row.setValue("Bilanzsumme", 0)
@@ -206,8 +202,7 @@ class Projektverwaltung(Tool):
         # Den AGS aus der Lage der projektfläche im Raum ermitteln
         bkg = self.folders.get_base_table('FGDB_Basisdaten_deutschland.gdb',
                                           'bkg_gemeinden')
-        workspace_projekt_definition = self.folders.get_db(
-            'FGDB_Definition_Projekt.gdb')
+        workspace_projekt_definition = gdbPfad
         projektrahmendaten = join(workspace_projekt_definition,
                                   'Projektrahmendaten')
         projektFlaeche = join(workspace_projekt_definition,
@@ -251,7 +246,7 @@ class Projektverwaltung(Tool):
         row.ENDE_BETRACHTUNGSZEITRAUM = ende_betrachtung
         row.GEMEINDENAME = gen
         row.PROJEKTSPEZIFISCHER_SONDERKOSTENFAKTOR = sonderkostenfaktor
-        row.PROJEKTNAME = projectName
+        row.PROJEKTNAME = project_name
         row.AGS = ags
         cursor.insertRow(row)
 
@@ -266,7 +261,7 @@ class Projektverwaltung(Tool):
         template_folder = join(self.folders.MXDS, "Style_Minimap")
         template = join(template_folder, "template.mxd")
         mxd_template = arcpy.mapping.MapDocument(template)
-        ausgabeordner_img = join(self.folders.get_projectpath(),
+        ausgabeordner_img = join(project_path,
                                  self.folders._AUSGABE_PATH, 'Abbildungen')
         os.makedirs(ausgabeordner_img)
         mxdpfad = join(ausgabeordner_img, 'Definition_Projekt.mxd')
@@ -275,7 +270,7 @@ class Projektverwaltung(Tool):
         # Ersetze Datenquelle
         minimap_mxd = arcpy.mapping.MapDocument(mxdpfad)
         templatepath = join(template_folder, "template.gdb")
-        resultpath = self.folders.get_db('FGDB_Definition_Projekt.gdb')
+        resultpath = gdbPfad
         minimap_mxd.findAndReplaceWorkspacePaths(templatepath, resultpath)
 
         # Setze Viewport neu
@@ -304,5 +299,5 @@ class Projektverwaltung(Tool):
         # print("Neues Projekt angelegt im Ordner " + projectPath)
 
         arcpy.AddMessage("Neues Projekt angelegt im Ordner {}\n".format(
-            self.folders.PROJECT_PATH))
+            project_path))
 

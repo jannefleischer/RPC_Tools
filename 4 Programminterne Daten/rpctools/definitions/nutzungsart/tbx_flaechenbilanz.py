@@ -238,7 +238,7 @@ class TbxFlaechenbilanz(Tbx):
         params = self.par
         projectname = params.projectname.value
         teilflaeche = params.teilflaeche.value
-        tablepath_teilflaechen = self.tool.teilflaechen
+        tablepath_teilflaechen = self.tool.teilflaechen_table
         tablepath_flaechenbilanz = self.tool.flaechenbilanz
 
         # Oberkategorien
@@ -325,7 +325,7 @@ class TbxFlaechenbilanz(Tbx):
             #projectname = params.name.value
             #self.folders.project = projectname
 
-            tablepath_teilflaechen = self.tool.teilflaechen
+            tablepath_teilflaechen = self.tool.teilflaechen_table
             rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
             list_teilflaechen = []
             for row in rows_teilflaechen :

@@ -339,9 +339,11 @@ class Tbx(object):
                           dbname=Tool._dbname)
         # define the folders
         self.folders = Folders(params=self.par)
+        self.projects = []
         # an instance of the tool
         self.tool = Tool(self.par)
         self.canRunInBackground = False
+        self.update_projects = True
 
     def reload_tool(self):
         # reload the tool's module
@@ -384,17 +386,21 @@ class Tbx(object):
         parameters : list of ArcGIS-Parameters
         """
         self.par._update_parameters(parameters)
-        self._update_project_list()
+        # updating projects messes up the initial project management
+        if self.update_projects:
+            self._update_project_list()
         self._updateParameters(self.par)
 
     def _update_project_list(self):
         """
         Update the parameter list of existing projects
         """
-        projects = self.folders.get_projects()
         if self.par._param_projectname not in self.par:
             return
+        projects = self.folders.get_projects()
         project_param = self.par[self.par._param_projectname]
+        if projects == project_param.filter.list:
+            return
         project_param.filter.list = projects
         if len(projects) == 0:
             project_param.value = ''
@@ -420,7 +426,7 @@ class Tbx(object):
         """
         self.par._update_parameters(parameters)
         params = self.par._od.values()
-        # check if toolbox contains invalid paths
+        # check if toolbox contains invalid paths, add errors to first param.
         if params and self.folders._invalid_paths:
             invalid = ', '.join(self.folders._invalid_paths)
             params[0].setErrorMessage(

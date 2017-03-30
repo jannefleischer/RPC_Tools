@@ -50,17 +50,13 @@ class TbxTeilflaecheBenennen(Tbx):
         p.datatype = u'GPString'
 
         # Nutzungsart
-        p = params.teilflaeche = arcpy.Parameter()
+        p = params.nutzungsart = arcpy.Parameter()
         p.name = encode(u'Nutzungsart')
         p.displayName = encode(u'Nutzungsart')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        table = self.folders.get_table('Nutzungsart')
-        table = self.folders.get_table('asdfgf')
-        #fields = ['id', '']
-        #rows = arcpy.da.SearchCursor(table, fields)
-        p.filter.list = []
+        p.filter.list = self.tool.nutzungsarten.keys()
 
         return params
 
@@ -73,28 +69,25 @@ class TbxTeilflaecheBenennen(Tbx):
             projectname = params.project.value
             params.teilflaeche.value = ''
 
-            tablepath_teilflaechen = self.tool.teilflaechen
-
-            rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
-            list_teilflaechen = []
-            for row in rows_teilflaechen:
-                list_teilflaechen.append('Nr. ' + str(row.OBJECTID) + " | "
-                                         + str(round(row.Flaeche_ha, 2))
-                                         + " ha" + " | " + row.NAME)
-
-            list_teilflaechen = list(set(list_teilflaechen))
-            list_teilflaechen = sorted(list_teilflaechen)
-
+            list_teilflaechen = self.tool.teilflaechen.keys()
             params.teilflaeche.filter.list = list_teilflaechen
 
             if list_teilflaechen:
                 flaeche = list_teilflaechen[0]
                 params.teilflaeche.value = list_teilflaechen[0]
 
-        if params.teilflaeche.altered:
+        if ((params.project.altered and not params.project.hasBeenValidated) or
+            (params.teilflaeche.altered and not params.teilflaeche.hasBeenValidated)):
             flaeche = params.teilflaeche.value
-            flaechenname = flaeche.split('|')[2]
+            # ToDo: get the currently selected name without splitting string
+            flaechenname = self.tool.get_flaechenname(flaeche)
             params.name.value = flaechenname
+            flaechen_id = self.tool.teilflaechen[flaeche]
+            nutzungsart_id = self.tool.get_nutzungsart_id(flaechen_id)
+            nutzungsarten = self.tool.nutzungsarten
+            nutzungsart = nutzungsarten.keys()[
+                nutzungsarten.values().index(nutzungsart_id)]
+            params.nutzungsart.value = nutzungsart
 
         #Teilfläche auswählen
         #if params.teilflaeche.altered and not params.teilflaeche.hasBeenValidated:
@@ -108,7 +101,7 @@ class TbxTeilflaecheBenennen(Tbx):
 
         if params.project.value != None and params.name.value != None:
             projectname = params[0].value
-            tablepath_teilflaechen = self.tool.teilflaechen
+            tablepath_teilflaechen = self.tool.teilflaechen_table
             namen_cursor = arcpy.da.SearchCursor(tablepath_teilflaechen, "Name")
 
             params.name.clearMessage()

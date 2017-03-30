@@ -25,7 +25,7 @@ class Flaechenbilanz(Tool):
     _dbname = 'FGDB_Definition_Projekt.gdb'
 
     @property
-    def teilflaechen(self):
+    def teilflaechen_table(self):
         return self.folders.get_table('Teilflaechen_Plangebiet')
 
     @property
@@ -34,7 +34,7 @@ class Flaechenbilanz(Tool):
 
     def run(self):
         arcpy.env.overwriteOutput = True
-    
+
         #projektname = self.par.name.value
         teilflaeche = self.par.teilflaeche.value
         startjahr = self.par.startjahr.value
@@ -56,13 +56,13 @@ class Flaechenbilanz(Tool):
         strassenbegleitgruen = self.par.strassenbegleitgruen.value
         ausgleich_ersatz = self.par.ausgleich_ersatz.value
         allg_gruen = self.par.allg_gruen.value
-        
+
         #Pfade einrichten
-        teilflaechen = self.teilflaechen
+        teilflaechen_table = self.teilflaechen_table
         flaechenbilanz = self.flaechenbilanz
 
         # Suche Größe der aktuellen Teilfläche heraus
-        with arcpy.da.SearchCursor(teilflaechen, ['Name',
+        with arcpy.da.SearchCursor(teilflaechen_table, ['Name',
                                                   'Flaeche_ha']) as cursor:
             for row in cursor:
                 if row[0] == teilflaeche:

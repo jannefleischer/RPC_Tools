@@ -20,6 +20,10 @@ class TbxProjektVerwaltung(Tbx):
     def Tool(self):
         return Projektverwaltung
 
+    def __init__(self):
+        super(TbxProjektVerwaltung, self).__init__()
+        self.update_projects = False
+
     def _getParameterInfo(self):
         params = self.par
 
@@ -83,7 +87,6 @@ class TbxProjektVerwaltung(Tbx):
         p.direction = 'Input'
         p.datatype = u'GPLong'
         p.filter.type = 'Range'
-
 
         #Eingaben zu Beginn deaktiviere/füllen
         params.end.filter.list = [2010, 2050]
