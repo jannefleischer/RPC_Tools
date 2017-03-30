@@ -8,7 +8,7 @@ from rpctools.utils.encoding import encode
 from rpctools.definitions.projektverwaltung.teilflaeche_verwalten import TeilflaechenVerwalten
 
 
-class TbxTeilflaecheBenennen(Tbx):
+class TbxTeilflaecheVerwalten(Tbx):
     """Toolbox to name Teilflächen"""
 
     @property
@@ -66,7 +66,6 @@ class TbxTeilflaecheBenennen(Tbx):
         has been changed."""
 
         if params.project.altered and not params.project.hasBeenValidated:
-            projectname = params.project.value
             params.teilflaeche.value = ''
 
             list_teilflaechen = self.tool.teilflaechen.keys()
@@ -89,18 +88,12 @@ class TbxTeilflaecheBenennen(Tbx):
                 nutzungsarten.values().index(nutzungsart_id)]
             params.nutzungsart.value = nutzungsart
 
-        #Teilfläche auswählen
-        #if params.teilflaeche.altered and not params.teilflaeche.hasBeenValidated:
-            #projectname = params.project.value
-            #flaechenname_id = flaechenname.split('|')[0].replace('Nr.', '').strip()
-
     def _updateMessages(self, params):
         """Modify the messages created by internal validation for each tool
         parameter.  This method is called after internal validation."""
 
-
         if params.project.value != None and params.name.value != None:
-            projectname = params[0].value
+            projectname = params.project.value
             tablepath_teilflaechen = self.tool.teilflaechen_table
             namen_cursor = arcpy.da.SearchCursor(tablepath_teilflaechen, "Name")
 
@@ -113,7 +106,7 @@ class TbxTeilflaecheBenennen(Tbx):
 
 if __name__ == '__main__':
 
-    t = TbxTeilflaecheBenennen()
+    t = TbxTeilflaecheVerwalten()
     params = t.getParameterInfo()
     t.print_test_parameters()
     t.print_tool_parameters()

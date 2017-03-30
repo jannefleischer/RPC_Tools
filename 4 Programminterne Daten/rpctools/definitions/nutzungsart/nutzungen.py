@@ -9,11 +9,53 @@ from xlsxwriter.utility import xl_rowcol_to_cell, xl_col_to_name
 import arcpy, os
 from os.path import join
 import gc
+from collections import OrderedDict
+
 from rpctools.utils.params import Tool
 
 
 class Nutzungen(Tool):
+    _param_projectname = 'projectname'
     _dbname = 'FGDB_Definition_Projekt.gdb'
+    _nutzungsarten = None
+    _seperator = ' | '
+
+    @property
+    def teilflaechen_table(self):
+        return self.folders.get_table('Teilflaechen_Plangebiet')
+
+    @property
+    def nutzungsart_table(self):
+        return self.folders.get_table('Nutzungsart')
+
+    @property
+    def nutzungsarten(self):
+        # only fetch once, won't change because it's a base definition
+        if self._nutzungsarten is None:
+            table = self.folders.get_base_table(
+                'FGDB_Definition_Projekt_Tool.gdb', 'Nutzungsarten')
+            fields = ['nutzungsart', 'id']
+            rows = arcpy.da.SearchCursor(table, fields)
+            self._nutzungsarten = OrderedDict([r for r in rows])
+        return self._nutzungsarten
+
+    @property
+    def teilflaechen(self):
+        rows = arcpy.SearchCursor(self.teilflaechen_table)
+        teilflaechen = OrderedDict()
+        for row in rows:
+            representation = self._seperator.join([
+                'Nr. {}'.format(row.OBJECTID),
+                '{} ha'.format(round(row.Flaeche_ha, 2)),
+                row.NAME
+            ])
+            teilflaechen[representation] = row.OBJECTID
+        return teilflaechen
+
+    def get_nutzungsart_id(self, flaechen_id):
+        where = '"OBJECTID" = {}'.format(flaechen_id)
+        row = arcpy.SearchCursor(self.teilflaechen_table, where).next()
+        return row.Nutzungsart
 
     def run(self):
 

@@ -19,7 +19,7 @@ def tbx_verwaltung():
 
 @pytest.fixture(scope='module')
 def tbx_flaeche():
-    tbx = TbxTeilflaecheBenennen()
+    tbx = TbxTeilflaecheVerwalten()
     tbx.getParameterInfo()
     return tbx
 
