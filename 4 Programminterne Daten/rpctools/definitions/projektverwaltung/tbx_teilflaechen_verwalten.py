@@ -60,6 +60,18 @@ class TbxTeilflaecheVerwalten(Tbx):
 
         return params
 
+    def get_row(self):
+        flaechen_id = self.teilflaechen[flaechenname]
+        where = '"OBJECTID" = {}'.format(flaechen_id)
+        nutzungsart_id = self.nutzungsarten[self.par.nutzungsart.value]
+        rows = arcpy.UpdateCursor(self.teilflaechen_table, where)
+        row = row.next()
+        for row in rows:
+            row.NAME = neuer_name  #self.par.name.valueAsText
+            row.Nutzungsart = nutzungsart_id
+            rows.updateRow(row)
+
+
     def _updateParameters(self, params):
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
@@ -77,6 +89,7 @@ class TbxTeilflaecheVerwalten(Tbx):
 
         if ((params.project.altered and not params.project.hasBeenValidated) or
             (params.teilflaeche.altered and not params.teilflaeche.hasBeenValidated)):
+
             flaeche = params.teilflaeche.value
             # ToDo: get the currently selected name without splitting string
             flaechenname = self.tool.get_flaechenname(flaeche)

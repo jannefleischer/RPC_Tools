@@ -61,11 +61,12 @@ class TbxProjektVerwaltung(Tbx):
 
         # Shapefile_des_Plangebiets____shp_
         p = params.shapefile = arcpy.Parameter()
-        p.name = u'Shapefile_des_Plangebiets____shp_'
-        p.displayName = u'Shapefile des Plangebiets (*.shp)'
+        p.name = u'Flaechen_des_Plangebiets'
+        p.displayName = u'(Teil-)Flächen des Plangebiets'
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'DEShapefile'
+        #p.datatype = u'GPFeatureLayer'
         p.value = self.folders.TEMPLATE_FLAECHEN
 
         # Beginn_des_Betrachtungszeitraumes

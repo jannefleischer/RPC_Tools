@@ -65,20 +65,20 @@ class TbxNutzungen(Tbx):
         param.datatype = u'Long'
         param.filter.type = 'Range'
         param.filter.list = [2010, 2050]
-        param.heading = heading
+
         param.value = datetime.datetime.now().year + 1
 
         # Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_
-        param_4 = params.dauer_aufsiedlung = arcpy.Parameter()
-        param_4.name = u'Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_'
-        param_4.displayName = u'Dauer der Aufsiedlung (Jahre, 1 = Aufsiedlung wird noch im Jahr des Aufsiedlungsbeginns abgeschlossen)'
-        param_4.parameterType = 'Required'
-        param_4.direction = 'Input'
-        param_4.datatype = u'Long'
-        param_4.value = 5
-        param_4.filter.type = 'Range'
-        param_4.filter.list = [1, 20]
-        param_4.category = heading
+        param = params.dauer_aufsiedlung = arcpy.Parameter()
+        param.name = u'Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_'
+        param.displayName = u'Dauer der Aufsiedlung (Jahre, 1 = Aufsiedlung wird noch im Jahr des Aufsiedlungsbeginns abgeschlossen)'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.value = 5
+        param.filter.type = 'Range'
+        param.filter.list = [1, 20]
+        param.category = heading
 
 
         heading = encode(u"2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen")
@@ -94,7 +94,6 @@ class TbxNutzungen(Tbx):
         param.value = u'0'
         param.filter.type = 'Range'
         param.filter.list = [0, 500]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -108,8 +107,9 @@ class TbxNutzungen(Tbx):
         param.value = u'0'
         param.filter.type = 'Range'
         param.filter.list = [0, 500]
-        param.heading = heading
+
         param.category = heading
+        param.nutzungsart = nutzungsart
 
         # Anzahl_WE_in_Reihenhäusern
         param = params.we_rh = arcpy.Parameter()
@@ -121,7 +121,7 @@ class TbxNutzungen(Tbx):
         param.value = u'0'
         param.filter.type = 'Range'
         param.filter.list = [0, 500]
-        param.heading = heading
+
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -135,7 +135,6 @@ class TbxNutzungen(Tbx):
         param.value = u'0'
         param.filter.type = 'Range'
         param.filter.list = [0, 500]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -152,7 +151,6 @@ class TbxNutzungen(Tbx):
         param.value = u'90'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -166,7 +164,6 @@ class TbxNutzungen(Tbx):
         param.value = u'80'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -180,7 +177,6 @@ class TbxNutzungen(Tbx):
         param.value = u'70'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -194,7 +190,6 @@ class TbxNutzungen(Tbx):
         param.value = u'20'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -215,7 +210,6 @@ class TbxNutzungen(Tbx):
         param.datatype = u'GPString'
         param.value = u'3,2 Bewohner pro Wohneinheit'
         param.filter.list = list_EwProWE
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -228,7 +222,6 @@ class TbxNutzungen(Tbx):
         param.datatype = u'GPString'
         param.value = u'3,0 Bewohner pro Wohneinheit'
         param.filter.list = list_EwProWE
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -241,7 +234,6 @@ class TbxNutzungen(Tbx):
         param.datatype = u'GPString'
         param.value = u'3,0 Bewohner pro Wohneinheit'
         param.filter.list = list_EwProWE
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -254,7 +246,6 @@ class TbxNutzungen(Tbx):
         param.datatype = u'GPString'
         param.value = u'2,1 Bewohner pro Wohneinheit'
         param.filter.list = list_EwProWE
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -271,7 +262,6 @@ class TbxNutzungen(Tbx):
         param.value = u'80'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -288,7 +278,6 @@ class TbxNutzungen(Tbx):
         param.datatype = u'GPString'
         param.value = u'<kein Gewerbegebiet vorhanden>'
         param.filter.list = [u'Industriegebiet', u'Logistikgebiet', u'Klassisches Gewerbegebiet', u'Kleinteiliges Gewerbegebiet', u'Hoeherwertiges Gewerbegebiet', u'Technologiepark, Wissenschaftspark', u'<kein Gewerbegebiet vorhanden>']
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -302,7 +291,6 @@ class TbxNutzungen(Tbx):
         param.value = u'40'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -316,7 +304,6 @@ class TbxNutzungen(Tbx):
         param.value = u'6'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -330,7 +317,6 @@ class TbxNutzungen(Tbx):
         param.value = u'17'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -344,7 +330,6 @@ class TbxNutzungen(Tbx):
         param.value = u'10'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -358,7 +343,6 @@ class TbxNutzungen(Tbx):
         param.value = u'14'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -372,7 +356,6 @@ class TbxNutzungen(Tbx):
         param.value = u'13'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -389,7 +372,6 @@ class TbxNutzungen(Tbx):
         param.value = u'80'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -403,7 +385,6 @@ class TbxNutzungen(Tbx):
         param.value = u'100'
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.heading = heading
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -412,7 +393,7 @@ class TbxNutzungen(Tbx):
 
         # Verkaufsfläche__in_Quadratmetern_
         param = params.verkaufsflaeche = arcpy.Parameter()
-        param.name = encode(u'Verkaufsfl\xe4che__in_Quadratmetern_')
+        param.name = nutzungsart
         param.displayName = encode(u'Verkaufsfl\xe4che (in Quadratmetern)')
         param.parameterType = 'Required'
         param.direction = 'Input'
@@ -420,7 +401,7 @@ class TbxNutzungen(Tbx):
         param.value = u'0'
         param.filter.type = 'Range'
         param.filter.list = [0, 20000]
-        param.heading = heading
+
         param.category = heading
         param.nutzungsart = nutzungsart
 
@@ -435,7 +416,7 @@ class TbxNutzungen(Tbx):
             for param in params:
                 if hasattr(param, 'nutzungsart'):
                     if param.nutzungsart != nutzungsart_id:
-                        param.category = 'None'  #does not work
+                        #param.category = u'nicht benötigt'
                         param.enabled = False
                     else:
                         param.enabled = True
@@ -460,7 +441,6 @@ class TbxNutzungen(Tbx):
                 nutzungsarten.values().index(nutzungsart_id)]
             params.nutzungsart.value = nutzungsart
             update_categories(nutzungsart_id)
-
 
         def eingaben_auslesen():
 
