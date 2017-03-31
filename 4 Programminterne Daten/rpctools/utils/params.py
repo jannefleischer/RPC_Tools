@@ -206,7 +206,7 @@ class Params(object):
                                                          n_params_tool)
         # setze die Werte
         for i, key in enumerate(self._od):
-            self[key] = parameters[i]
+            self[key]._arc_object = parameters[i]
 
     def _get_projectname(self):
         """
@@ -220,6 +220,9 @@ class Params(object):
         if param_projectname:
             return param_projectname.value
         return ''
+
+    def param_altered(self):
+        return [p for p in self.values() if p.altered]
 
 
 class ToolFolders(Folders):
