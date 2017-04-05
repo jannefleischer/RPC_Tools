@@ -148,6 +148,8 @@ class Params(object):
         self._dbname = dbname
 
     def __getattr__(self, name):
+        if name in self.__dict__:
+            return self.__dict__[name]
         try:
             return self._od[name]
         except KeyError:
@@ -221,8 +223,20 @@ class Params(object):
             return param_projectname.value
         return ''
 
-    def param_altered(self):
-        return [p for p in self.values() if p.altered]
+    def changed(self, *names):
+        """check parameter with names if thy are altered and not validated"""
+        change = False
+        for name in names:
+            param = self._od[name]
+            if param.altered and not param.hasBeenValidated:
+                change = True
+        return change
+
+    def selected_index(self, name):
+        """get the index of the current selection of given list-parameter"""
+        param = self._od[name]
+        index = param.filter.list.index(param.value)
+        return index
 
 
 class ToolFolders(Folders):
