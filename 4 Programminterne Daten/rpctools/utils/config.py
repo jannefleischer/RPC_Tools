@@ -238,7 +238,7 @@ class Folders(object):
         return table
 
     def update_table(self, table, column_values, where=None, fgdb='',
-                     check=True):
+                     project='', check=True):
         """
         Update rows in a FileGeodatabase in the Project Folder
 
@@ -252,10 +252,12 @@ class Folders(object):
             a where clause to pick single rows
         fgdb : str, optional
             the name of the FileGeodatabase
+        project : str, optional
+            the project name
         check : bool, optional
             if false, don't check if table exists
         """
-        table = self.get_table(table, fgdb=fgdb, check=True)
+        table = self.get_table(table, fgdb=fgdb, project=project, check=True)
         columns = column_values.keys()
         cursor = arcpy.da.UpdateCursor(table, columns, where_clause=where)
         for row in cursor:

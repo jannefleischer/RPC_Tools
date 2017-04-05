@@ -15,6 +15,7 @@
 import sys
 from os.path import abspath, dirname, join, isdir
 from rpctools.utils.params import Tool
+from rpctools.utils.spatial_lib import get_ags
 from rpctools.utils.constants import Nutzungsart
 import arcpy
 import os, shutil, gc
@@ -165,6 +166,7 @@ class Projektverwaltung(Tool):
         arcpy.DeleteField_management(teilfaechen_plangebiet, fieldNameList)
 
         # add needed fields
+        arcpy.AddField_management(teilfaechen_plangebiet, "id_teilflaeche", "LONG")
         arcpy.AddField_management(teilfaechen_plangebiet, "Name", "TEXT")
         arcpy.AddField_management(teilfaechen_plangebiet, "Startjahr", "LONG")
         arcpy.AddField_management(teilfaechen_plangebiet, "Beginn_Nutzung", "LONG")
@@ -172,6 +174,8 @@ class Projektverwaltung(Tool):
         arcpy.AddField_management(teilfaechen_plangebiet, "Flaeche_ha", "DOUBLE", "", "", "", "", "", "")
         arcpy.AddField_management(teilfaechen_plangebiet, "umfang_meter", "FLOAT")
         arcpy.AddField_management(teilfaechen_plangebiet, "Nutzungsart", "SHORT")
+        arcpy.AddField_management(teilfaechen_plangebiet, "ags_bkg", "TEXT")
+        arcpy.AddField_management(teilfaechen_plangebiet, "gemeinde_name", "TEXT")
         #arcpy.AddField_management(teilfaechen_plangebiet, "Bilanzsumme", "FLOAT")
 
         # Berechne ha der Teilflaechen
@@ -187,15 +191,26 @@ class Projektverwaltung(Tool):
         startjahr = int(beginn_betrachtung)
 
         cursor = arcpy.UpdateCursor(teilfaechen_plangebiet)
-        i = 1
-        for row in cursor:
+        for i, row in enumerate(cursor):
+            row.setValue("id_teilflaeche", i + 1)
             row.setValue("Startjahr", startjahr)
             row.setValue("Nutzungsart", Nutzungsart.UNDEFINIERT)
-            row.setValue("Name", "Flaeche_"+str(i))
+            row.setValue("Name", "Flaeche_" + str(i + 1))
             row.setValue("Aufsiedlungsdauer", 5)
-            #row.setValue("Bilanzsumme", 0)
             cursor.updateRow(row)
-            i += 1
+
+        flaechen_ags = get_ags(teilfaechen_plangebiet, 'id_teilflaeche')
+        cursor = arcpy.UpdateCursor(teilfaechen_plangebiet)
+        for row in cursor:
+            flaechen_id = row.id_teilflaeche
+            if flaechen_id not in flaechen_ags:
+                raise ValueError(
+                    u'AGS für Fläche {} konnte nicht ermittelt werden'
+                    .format(flaechen_id))
+            ags, gen = flaechen_ags[flaechen_id]
+            row.setValue('ags_bkg', ags)
+            row.setValue('gemeinde_name', gen)
+            cursor.updateRow(row)
 
         # add project-data to Projektrahmendaten
 
