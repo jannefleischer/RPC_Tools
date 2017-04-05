@@ -4,6 +4,7 @@ from collections import OrderedDict
 import gc
 import sys
 import os
+import numpy as np
 from pprint import pformat
 from abc import ABCMeta, abstractmethod, abstractproperty
 from rpctools.utils.config import Folders
@@ -237,6 +238,47 @@ class Params(object):
         param = self._od[name]
         index = param.filter.list.index(param.value)
         return index
+
+    def get_multivalues(self, name):
+        """
+        return a numpy recarray with the values of a value table
+
+        Parameters
+        ----------
+        name : str
+            the name of the value-table parameter
+
+        Returns
+        -------
+        ra : np.recarray
+            the values as np.recarray. The column names are defined
+            by the param.columns
+        """
+        param = getattr(self, name)
+        if not param.datatype == 'GPValueTable':
+            raise ValueError('{} is no ValueTable'.format(name))
+        column_names = [p[1] for p in param.columns]
+        ra = np.rec.fromrecords(param.values, names=column_names)
+        return ra
+
+    def set_multivalues(self, name, values):
+        """
+        set the values of a value table with the values
+        given as a recarray
+
+        Parameters
+        ----------
+        name : str
+            the name of the value-table parameter
+        values : np.recarray
+            the values to assign to the parameter
+        """
+        msg = 'values must be a recarray and not {}'.format(type(ra).__name__)
+        assert isinstance(values, np.rec.recarray), msg
+        param = getattr(self, name)
+        if not param.datatype == 'GPValueTable':
+            raise ValueError('{} is no ValueTable'.format(name))
+        param.values = ra.tolist()
 
 
 class ToolFolders(Folders):
