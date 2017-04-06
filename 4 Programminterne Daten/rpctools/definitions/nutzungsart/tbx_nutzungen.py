@@ -24,30 +24,32 @@ class TbxNutzungen(TbxFlaechendefinition):
     def label(self):
         return self._label
 
-    def init_aufsiedlung(self, params):
+    def init_aufsiedlung(self, params, heading='', beginn_name=''):
         """WORKAROUND: add the aufsiedlungs parameters outside of
         _getParameterInfo, strangely the subclasses of TbxNutzungen are
         not recognized as subclasses (so you can't call _getParameterInfo
         of TbxFlaechendefinition here"""
 
-        heading = "1) Aufsiedlungszeitraum"
 
         # Beginn_der_Aufsiedlung__Jahreszahl_
-        param = params.beginn_aufsiedlung = arcpy.Parameter()
+        param = params.bezugsbeginn = arcpy.Parameter()
         param.name = u'Beginn_der_Aufsiedlung__Jahreszahl_'
-        param.displayName = u'Beginn der Aufsiedlung (Jahreszahl)'
+        param.displayName = beginn_name or u'Beginn der Aufsiedlung (Jahreszahl)'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
         param.filter.type = 'Range'
         param.filter.list = [2010, 2050]
+        param.value = 2018
+        param.category = heading
 
         param.value = datetime.datetime.now().year + 1
 
         # Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_
         param = params.dauer_aufsiedlung = arcpy.Parameter()
-        param.name = u'Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_'
-        param.displayName = u'Dauer der Aufsiedlung (Jahre, 1 = Aufsiedlung wird noch im Jahr des Aufsiedlungsbeginns abgeschlossen)'
+        param.name = u'dauer_aufsiedlung'
+        param.displayName = (u'Dauer des Bezugs (Jahre, 1 = Bezug wird noch ' +
+                             'im Jahr des Bezugsbeginns abgeschlossen)')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -76,7 +78,125 @@ class TbxNutzungenWohnen(TbxNutzungen):
     def _getParameterInfo(self):
         params = super(TbxNutzungenWohnen, self)._getParameterInfo()
         # workaround
-        params = self.init_aufsiedlung(params)
+        heading = "1) Bezugszeitraum"
+        beginn_name="Beginn des Bezugs (Jahreszahl)"
+        params = self.init_aufsiedlung(params, heading=heading,
+                                       beginn_name=beginn_name)
+
+        # specific parameters for "Wohnen"
+
+        heading = encode(u"2) Anzahl Wohneinheiten nach Gebäudetypen")
+        nutzungsart = Nutzungsart.WOHNEN
+
+        # Anzahl_WE_in_Ein-_und_Zweifamilienhäusern
+        param = params.we_efh = arcpy.Parameter()
+        param.name = u'Anzahl_WE_in_Einfamilienh\xe4usern'
+        param.displayName = u'Anzahl WE in Einfamilienh\xe4usern'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.value = u'0'
+        param.filter.type = 'Range'
+        param.filter.list = [0, 500]
+        param.category = heading
+        param.nutzungsart = nutzungsart
+
+        # Anzahl_WE_in_Doppelhäusern
+        param = params.we_zfh = arcpy.Parameter()
+        param.name = u'Anzahl_WE_in_Doppelh\xe4usern'
+        param.displayName = u'Anzahl WE in Doppelh\xe4usern'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.value = u'0'
+        param.filter.type = 'Range'
+        param.filter.list = [0, 500]
+
+        param.category = heading
+        param.nutzungsart = nutzungsart
+
+        # Anzahl_WE_in_Reihenhäusern
+        param = params.we_rh = arcpy.Parameter()
+        param.name = u'Anzahl_WE_in_Reihenh\xe4usern'
+        param.displayName = u'Anzahl WE in Reihenh\xe4usern'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.value = u'0'
+        param.filter.type = 'Range'
+        param.filter.list = [0, 500]
+
+        param.category = heading
+        param.nutzungsart = nutzungsart
+
+        # Anzahl_WE_in_Mehrfamilienhäusern
+        param = params.we_mfh = arcpy.Parameter()
+        param.name = u'Anzahl_WE_in_Mehrfamilienh\xe4usern'
+        param.displayName = u'Anzahl WE in Mehrfamilienh\xe4usern'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.value = u'0'
+        param.filter.type = 'Range'
+        param.filter.list = [0, 500]
+        param.category = heading
+        param.nutzungsart = nutzungsart
+
+        heading = "3) Einwohner pro Wohneinheit"
+
+        list_EwProWE = []
+        for i in range(1,5):
+            for j in range(0,10):
+                list_EwProWE.append(str(i)+","+str(j)+" Bewohner pro Wohneinheit")
+
+        # Mittlere_Anzahl_Einwohner_pro_WE_in_Einfamilienhäusern__kurz_nach_dem_Bezug_
+        param = params.ew_je_we_efh = arcpy.Parameter()
+        param.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Einfamilienh\xe4usern__kurz_nach_dem_Bezug_'
+        param.displayName = u'Mittlere Anzahl Einwohner pro WE in Einfamilienh\xe4usern (kurz nach dem Bezug)'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPString'
+        param.value = u'3,2 Bewohner pro Wohneinheit'
+        param.filter.list = list_EwProWE
+        param.category = heading
+        param.nutzungsart = nutzungsart
+
+        # Mittlere_Anzahl_Einwohner_pro_WE_in_Doppelhäusern__kurz_nach_dem_Bezug_
+        param = params.ew_je_we_zfh = arcpy.Parameter()
+        param.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Doppelh\xe4usern__kurz_nach_dem_Bezug_'
+        param.displayName = u'Mittlere Anzahl Einwohner pro WE in Doppelh\xe4usern (kurz nach dem Bezug)'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPString'
+        param.value = u'3,0 Bewohner pro Wohneinheit'
+        param.filter.list = list_EwProWE
+        param.category = heading
+        param.nutzungsart = nutzungsart
+
+        # Mittlere_Anzahl_Einwohner_pro_WE_in_Reihenhäusern__kurz_nach_dem_Bezug_
+        param = params.ew_je_we_rh = arcpy.Parameter()
+        param.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Reihenh\xe4usern__kurz_nach_dem_Bezug_'
+        param.displayName = u'Mittlere Anzahl Einwohner pro WE in Reihenh\xe4usern (kurz nach dem Bezug)'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPString'
+        param.value = u'3,0 Bewohner pro Wohneinheit'
+        param.filter.list = list_EwProWE
+        param.category = heading
+        param.nutzungsart = nutzungsart
+
+        # Mittlere_Anzahl_Einwohner_pro_WE_in_Mehrfamilienhäusern__kurz_nach_dem_Bezug_
+        param = params.ew_je_we_mfh = arcpy.Parameter()
+        param.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Mehrfamilienh\xe4usern__kurz_nach_dem_Bezug_'
+        param.displayName = u'Mittlere Anzahl Einwohner pro WE in Mehrfamilienh\xe4usern (kurz nach dem Bezug)'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPString'
+        param.value = u'2,1 Bewohner pro Wohneinheit'
+        param.filter.list = list_EwProWE
+        param.category = heading
+        param.nutzungsart = nutzungsart
+
         return params
 
     def _updateParameters(self, params):
