@@ -10,9 +10,125 @@ import datetime
 from rpctools.utils.params import Tbx
 from rpctools.utils.constants import Nutzungsart
 from rpctools.utils.encoding import encode
-
-
+from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten import \
+     TbxFlaechendefinition
 from rpctools.definitions.nutzungsart.nutzungen import Nutzungen
+from rpctools.utils.encoding import encode
+
+
+class TbxNutzungen(TbxFlaechendefinition):
+    _label = u'Schritt 3{sub}: Nutzungen - {name} definieren'
+    _nutzungsart = Nutzungsart.UNDEFINIERT
+
+    @property
+    def label(self):
+        return self._label
+
+    def init_aufsiedlung(self, params):
+        """WORKAROUND: add the aufsiedlungs parameters outside of
+        _getParameterInfo, strangely the subclasses of TbxNutzungen are
+        not recognized as subclasses (so you can't call _getParameterInfo
+        of TbxFlaechendefinition here"""
+
+        heading = "1) Aufsiedlungszeitraum"
+
+        # Beginn_der_Aufsiedlung__Jahreszahl_
+        param = params.beginn_aufsiedlung = arcpy.Parameter()
+        param.name = u'Beginn_der_Aufsiedlung__Jahreszahl_'
+        param.displayName = u'Beginn der Aufsiedlung (Jahreszahl)'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.filter.type = 'Range'
+        param.filter.list = [2010, 2050]
+
+        param.value = datetime.datetime.now().year + 1
+
+        # Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_
+        param = params.dauer_aufsiedlung = arcpy.Parameter()
+        param.name = u'Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_'
+        param.displayName = u'Dauer der Aufsiedlung (Jahre, 1 = Aufsiedlung wird noch im Jahr des Aufsiedlungsbeginns abgeschlossen)'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.value = 5
+        param.filter.type = 'Range'
+        param.filter.list = [1, 20]
+        param.category = heading
+
+        return params
+
+    def _updateParameters(self, params):
+        if params.changed('projectname'):
+            params.teilflaeche.value = ''
+            self.update_teilflaechen_list(self._nutzungsart)
+        return params
+
+
+class TbxNutzungenWohnen(TbxNutzungen):
+    _label = TbxNutzungen._label.format(sub='a', name='Wohnen')
+    _nutzungsart = Nutzungsart.WOHNEN
+
+    @property
+    def Tool(self):
+        return Nutzungen
+
+    def _getParameterInfo(self):
+        params = super(TbxNutzungenWohnen, self)._getParameterInfo()
+        # workaround
+        params = self.init_aufsiedlung(params)
+        return params
+
+    def _updateParameters(self, params):
+        params = super(TbxNutzungenWohnen, self)._updateParameters(params)
+        return params
+
+    def _updateMessages(self, params):
+        pass
+
+
+class TbxNutzungenGewerbe(TbxNutzungen):
+    _label = TbxNutzungen._label.format(sub='b', name='Gewerbe')
+    _nutzungsart = Nutzungsart.GEWERBE
+
+    @property
+    def Tool(self):
+        return Nutzungen
+
+    def _getParameterInfo(self):
+        params = super(TbxNutzungenGewerbe, self)._getParameterInfo()
+        # workaround
+        params = self.init_aufsiedlung(params)
+        return params
+
+    def _updateParameters(self, params):
+        params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
+        return params
+
+    def _updateMessages(self, params):
+        pass
+
+
+class TbxNutzungenEinzelhandel(TbxNutzungen):
+    _label = TbxNutzungen._label.format(sub='c', name='Einzelhandel')
+    _nutzungsart = Nutzungsart.EINZELHANDEL
+
+    @property
+    def Tool(self):
+        return Nutzungen
+
+    def _getParameterInfo(self):
+        params = super(TbxNutzungenEinzelhandel, self)._getParameterInfo()
+        # workaround
+        params = self.init_aufsiedlung(params)
+        return params
+
+    def _updateParameters(self, params):
+        params = super(TbxNutzungenEinzelhandel, self)._updateParameters(params)
+        return params
+
+    def _updateMessages(self, params):
+        pass
 
 class TbxNutzungen(Tbx):
 
@@ -590,7 +706,7 @@ class TbxNutzungen(Tbx):
         return params
 
 if __name__ == '__main__':
-    t = TbxNutzungen()
+    t = TbxNutzungenWohnen()
     params = t.getParameterInfo()
     #t.print_test_parameters()
     #t.print_tool_parameters()

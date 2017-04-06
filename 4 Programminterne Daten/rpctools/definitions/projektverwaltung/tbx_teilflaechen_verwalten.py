@@ -10,12 +10,57 @@ from rpctools.definitions.projektverwaltung.teilflaeche_verwalten import Teilfla
 
 
 class TbxFlaechendefinition(Tbx):
-    _nutzungsarten = None
+
+    @property
+    def teilflaechen_table(self):
+        return self.folders.get_table('Teilflaechen_Plangebiet')
+
+    def get_teilflaechen(self, nutzungsart=None):
+        """
+        get pretty names of all teilflaechen of current project along with
+        their ids and stored names,
+        optionally filtered by nutzungsart
+
+        Parameters
+        ----------
+        nutzungsart : int, optional
+            the nutzungsart of the flaechen
+
+        Returns
+        -------
+        teilflaechen : dict
+            key/value pairs of pretty names as keys and (id, name) as values
+        """
+
+        columns = ['id_teilflaeche', 'Flaeche_ha', 'Name',
+                   'gemeinde_name', 'Nutzungsart']
+        rows = arcpy.da.SearchCursor(self.teilflaechen_table, columns)
+        teilflaechen = OrderedDict()
+
+        for flaechen_id, ha, name, gemeinde, nutzungsart_id in rows:
+            # ignore other nutzungsart_ids, if filtering is requested
+            if nutzungsart is not None and nutzungsart != nutzungsart_id:
+                continue
+            pretty = ' | '.join([
+                'Nr. {}'.format(flaechen_id),
+                name,
+                str(gemeinde),
+                '{} ha'.format(round(ha, 2))
+            ])
+            teilflaechen[pretty] = flaechen_id, name
+
+        return teilflaechen
+
+    def get_nutzungsart_id(self, flaechen_id):
+        """get the nutzungsart of the given flaeche (by id)"""
+        where = '"id_teilflaeche" = {}'.format(flaechen_id)
+        row = arcpy.SearchCursor(self.teilflaechen_table, where).next()
+        return row.Nutzungsart
 
     def _getParameterInfo(self):
         # Projekt
         params = self.par
-        p = params.project = arcpy.Parameter()
+        p = params.projectname = arcpy.Parameter()
         p.name = u'Projekt'
         p.displayName = u'Projekt'
         p.parameterType = 'Required'
@@ -36,9 +81,27 @@ class TbxFlaechendefinition(Tbx):
 
         return params
 
+    def update_teilflaechen_list(self, nutzungsart=None):
+        """update the parameter list of teilflaeche (opt. filter nutzungsart)"""
+        list_teilflaechen = self.get_teilflaechen(
+            nutzungsart=nutzungsart).keys()
+        self.par.teilflaeche.filter.list = list_teilflaechen
+
+        if list_teilflaechen:
+            flaeche = list_teilflaechen[0]
+            self.par.teilflaeche.value = flaeche
+
+class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
+    """Toolbox to name Teilflächen"""
+    _nutzungsarten = None
+
     @property
-    def teilflaechen_table(self):
-        return self.folders.get_table('Teilflaechen_Plangebiet')
+    def label(self):
+        return u'Schritt 2: Teilflaechen verwalten'
+
+    @property
+    def Tool(self):
+        return TeilflaechenVerwalten
 
     @property
     def nutzungsart_table(self):
@@ -54,36 +117,6 @@ class TbxFlaechendefinition(Tbx):
             rows = arcpy.da.SearchCursor(table, fields)
             self._nutzungsarten = OrderedDict([r for r in rows])
         return self._nutzungsarten
-
-    @property
-    def teilflaechen(self):
-        rows = arcpy.SearchCursor(self.teilflaechen_table)
-        teilflaechen = OrderedDict()
-        for row in rows:
-            representation = ' | '.join([
-                'Nr. {}'.format(row.OBJECTID),
-                '{} ha'.format(round(row.Flaeche_ha, 2)),
-                row.NAME
-            ])
-            teilflaechen[representation] = row.OBJECTID, row.Name
-        return teilflaechen
-
-    def get_nutzungsart_id(self, flaechen_id):
-        where = '"OBJECTID" = {}'.format(flaechen_id)
-        row = arcpy.SearchCursor(self.teilflaechen_table, where).next()
-        return row.Nutzungsart
-
-
-class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
-    """Toolbox to name Teilflächen"""
-
-    @property
-    def label(self):
-        return u'Schritt 2: Teilflaechen verwalten'
-
-    @property
-    def Tool(self):
-        return TeilflaechenVerwalten
 
     def _getParameterInfo(self):
         params = super(TbxTeilflaecheVerwalten, self)._getParameterInfo()
@@ -107,18 +140,14 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
         return params
 
     def _updateParameters(self, params):
-        """Modify the values and properties of parameters before internal
-        validation is performed.  This method is called whenever a parameter
-        has been changed."""
-
-        if params.changed('project'):
+        if params.changed('projectname'):
             params.teilflaeche.value = ''
             self.update_teilflaechen_list()
 
         flaeche = params.teilflaeche.value
         if flaeche:
-            flaechen_id, flaechenname = self.teilflaechen[flaeche]
-            if params.changed('project', 'teilflaeche'):
+            flaechen_id, flaechenname = self.get_teilflaechen()[flaeche]
+            if params.changed('projectname', 'teilflaeche'):
                 self.update_teilflaechen_inputs(flaechen_id, flaechenname)
 
             if params.changed('name'):
@@ -140,16 +169,8 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
 
         return params
 
-
-    def update_teilflaechen_list(self):
-        list_teilflaechen = self.tool.teilflaechen.keys()
-        self.par.teilflaeche.filter.list = list_teilflaechen
-
-        if list_teilflaechen:
-            flaeche = list_teilflaechen[0]
-            self.par.teilflaeche.value = flaeche
-
     def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
+        """update all inputs based on currently selected teilflaeche"""
         self.par.name.value = flaechenname
         nutzungsart_id = self.get_nutzungsart_id(flaechen_id)
         nutzungsarten = self.nutzungsarten
@@ -161,9 +182,9 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
         """Modify the messages created by internal validation for each tool
         parameter.  This method is called after internal validation."""
 
-        if params.project.value != None and params.name.value != None:
-            projectname = params.project.value
-            tablepath_teilflaechen = self.tool.teilflaechen_table
+        if params.projectname.value != None and params.name.value != None:
+            projectname = params.projectname.value
+            tablepath_teilflaechen = self.teilflaechen_table
             namen_cursor = arcpy.da.SearchCursor(tablepath_teilflaechen, "Name")
 
             params.name.clearMessage()
@@ -177,6 +198,7 @@ if __name__ == '__main__':
 
     t = TbxTeilflaecheVerwalten()
     params = t.getParameterInfo()
+    t.get_teilflaechen()
     t.print_test_parameters()
     t.print_tool_parameters()
     t.updateParameters(params)
