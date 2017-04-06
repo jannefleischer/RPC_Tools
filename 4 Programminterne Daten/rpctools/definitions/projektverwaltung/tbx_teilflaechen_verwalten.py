@@ -97,7 +97,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
 
     @property
     def label(self):
-        return u'Schritt 2: Teilflaechen verwalten'
+        return u'Schritt 2: Teilflächen verwalten'
 
     @property
     def Tool(self):
