@@ -451,11 +451,6 @@ class Tbx(object):
         """
 
         self.par._update_parameters(parameters)
-        with open(r'C:\Users\GGR\Desktop\open_test.txt', mode='a') as f:
-            if self.par.toolbox_opened():
-                f.write('toolbox opened \n')
-            else:
-                f.write('sonstige Änderung \n')
         # updating projects messes up the initial project management
         if self.update_projects:
             self._update_project_list()
