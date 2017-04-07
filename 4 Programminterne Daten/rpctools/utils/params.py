@@ -233,6 +233,11 @@ class Params(object):
                 change = True
         return change
 
+    def toolbox_opened(self):
+        """return True if toolbox is opened"""
+        opened = not any([p.hasBeenValidated for p in self])
+        return opened
+
     def selected_index(self, name):
         """get the index of the current selection of given list-parameter"""
         param = self._od[name]
@@ -444,7 +449,13 @@ class Tbx(object):
         ----------
         parameters : list of ArcGIS-Parameters
         """
+
         self.par._update_parameters(parameters)
+        with open(r'C:\Users\GGR\Desktop\open_test.txt', mode='a') as f:
+            if self.par.toolbox_opened():
+                f.write('toolbox opened \n')
+            else:
+                f.write('sonstige Änderung \n')
         # updating projects messes up the initial project management
         if self.update_projects:
             self._update_project_list()
