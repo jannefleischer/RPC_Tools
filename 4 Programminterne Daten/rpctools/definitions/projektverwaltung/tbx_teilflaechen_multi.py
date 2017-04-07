@@ -76,7 +76,6 @@ class TbxTeilflaechenMultiTest(Tbx):
             ['GPLong', u'Hektar'],
             ['GPString', u'Nutzungsart']
         ]
-        p.filters[0].enable = False
         p.filters[2].type = 'Range'
         p.filters[2].list = [0, 10000]
         p.filters[3].type = 'ValueList'
@@ -94,11 +93,14 @@ class TbxTeilflaechenMultiTest(Tbx):
                 self.nutzungsarten.values().index(nutzungsart_id)]
             rows.append([flaechen_id, name, ha, nutzungsart])
 
-        table.filters[0].list = teilflaechen.keys()
-        table.values = rows
+        n_rows = len(teilflaechen.keys())
+        #table.filters[0].list = teilflaechen.keys()
+        table.values = rows[:n_rows]
 
     def _updateParameters(self, params):
         if params.changed('projectname'):
+            self.update_table()
+        if params.changed('flaechen_table'):
             self.update_table()
         return params
 

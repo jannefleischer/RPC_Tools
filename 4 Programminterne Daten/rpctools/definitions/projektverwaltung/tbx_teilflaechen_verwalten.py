@@ -166,6 +166,8 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                     'Teilflaechen_Plangebiet',
                     {'Nutzungsart': nutzungsart_id},
                     where='id_teilflaeche={}'.format(flaechen_id))
+                # ToDo delete corresponding rows wohnen/gewerbe/einzelhandel
+                # if nutzungsart changed
 
         return params
 

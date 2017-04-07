@@ -27,7 +27,8 @@ from rpctools.definitions.projektverwaltung.tbx_teilflaechen_multi \
 
 #from rpctools.definitions.nutzungsart.tbx_flaechenbilanz import TbxFlaechenbilanz
 from rpctools.definitions.nutzungsart.tbx_nutzungen import (
-    TbxNutzungenWohnen, TbxNutzungenGewerbe, TbxNutzungenEinzelhandel)
+    TbxNutzungenWohnen, TbxNutzungenGewerbe, TbxNutzungenEinzelhandel,
+    TbxNutzungenAlt)
 
 
 class Toolbox(object):
@@ -38,6 +39,7 @@ class Toolbox(object):
                       TbxTeilflaecheVerwalten,
                       TbxTeilflaechenMultiTest,
                       #TbxFlaechenbilanz,
+                      TbxNutzungenAlt,
                       TbxNutzungenWohnen,
                       TbxNutzungenGewerbe,
                       TbxNutzungenEinzelhandel]
