@@ -31,10 +31,11 @@ class TbxNutzungen(TbxFlaechendefinition):
         of TbxFlaechendefinition here"""
 
 
-        # Beginn_der_Aufsiedlung__Jahreszahl_
+        # Beginn der Aufsiedlung (Jahreszahl)
         param = params.bezugsbeginn = arcpy.Parameter()
         param.name = u'Beginn_der_Aufsiedlung__Jahreszahl_'
-        param.displayName = beginn_name or u'Beginn der Aufsiedlung (Jahreszahl)'
+        param.displayName = beginn_name or encode(u'Beginn der Aufsiedlung '
+                                                  u'(Jahreszahl)')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -45,11 +46,12 @@ class TbxNutzungen(TbxFlaechendefinition):
 
         param.value = datetime.datetime.now().year + 1
 
-        # Dauer_der_Aufsiedlung__Jahre__1___Aufsiedlung_wird_noch_im_Jahr_des_Aufsiedlungsbeginns_abgeschlossen_
+        # Dauer des Bezugs (Jahre, 1 = Bezug wird noch im Jahr des
+        # Bezugsbeginns abgeschlossen)
         param = params.dauer_aufsiedlung = arcpy.Parameter()
         param.name = u'dauer_aufsiedlung'
-        param.displayName = (u'Dauer des Bezugs (Jahre, 1 = Bezug wird noch ' +
-                             'im Jahr des Bezugsbeginns abgeschlossen)')
+        param.displayName = (u'Dauer des Bezugs (Jahre, 1 = Bezug wird noch '
+                             u'im Jahr des Bezugsbeginns abgeschlossen)')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -86,12 +88,11 @@ class TbxNutzungenWohnen(TbxNutzungen):
         # specific parameters for "Wohnen"
 
         heading = encode(u"2) Anzahl Wohneinheiten nach Gebäudetypen")
-        nutzungsart = Nutzungsart.WOHNEN
 
-        # Anzahl_WE_in_Ein-_und_Zweifamilienhäusern
+        # Anzahl WE in Einfamilienhäusern
         param = params.we_efh = arcpy.Parameter()
-        param.name = encode(u'Anzahl_WE_in_Einfamilienhäusern')
-        param.displayName = u'Anzahl WE in Einfamilienh\xe4usern'
+        param.name = encode(u'Bewohner Einfamilienhaus')
+        param.displayName = encode(u'Anzahl WE in Einfamilienhäusern')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -99,12 +100,11 @@ class TbxNutzungenWohnen(TbxNutzungen):
         param.filter.type = 'Range'
         param.filter.list = [0, 500]
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Anzahl_WE_in_Doppelhäusern
+        # Anzahl WE in Doppelhäusern
         param = params.we_zfh = arcpy.Parameter()
-        param.name = u'Anzahl_WE_in_Doppelh\xe4usern'
-        param.displayName = u'Anzahl WE in Doppelh\xe4usern'
+        param.name = encode(u'Bewohner Doppelhaus')
+        param.displayName = encode(u'Anzahl WE in Doppelhäusern')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -113,12 +113,11 @@ class TbxNutzungenWohnen(TbxNutzungen):
         param.filter.list = [0, 500]
 
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Anzahl_WE_in_Reihenhäusern
+        # Anzahl WE in Reihenhäusern
         param = params.we_rh = arcpy.Parameter()
-        param.name = u'Anzahl_WE_in_Reihenh\xe4usern'
-        param.displayName = u'Anzahl WE in Reihenh\xe4usern'
+        param.name = encode(u'Bewohner Reihenhaus')
+        param.displayName = encode(u'Anzahl WE in Reihenhäusern')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -127,12 +126,11 @@ class TbxNutzungenWohnen(TbxNutzungen):
         param.filter.list = [0, 500]
 
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Anzahl_WE_in_Mehrfamilienhäusern
+        # Anzahl WE in Mehrfamilienhäusern
         param = params.we_mfh = arcpy.Parameter()
-        param.name = u'Anzahl_WE_in_Mehrfamilienh\xe4usern'
-        param.displayName = u'Anzahl WE in Mehrfamilienh\xe4usern'
+        param.name = encode(u'Bewohner Mehrfamilienhaus')
+        param.displayName = encode(u'Anzahl WE in Mehrfamilienhäusern')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -140,62 +138,67 @@ class TbxNutzungenWohnen(TbxNutzungen):
         param.filter.type = 'Range'
         param.filter.list = [0, 500]
         param.category = heading
-        param.nutzungsart = nutzungsart
 
         heading = "3) Einwohner pro Wohneinheit"
 
         list_EwProWE = []
         for i in range(1,5):
             for j in range(0,10):
-                list_EwProWE.append(str(i)+","+str(j)+" Bewohner pro Wohneinheit")
+                list_EwProWE.append(str(i)+","+str(j)+
+                                    " Bewohner pro Wohneinheit")
 
-        # Mittlere_Anzahl_Einwohner_pro_WE_in_Einfamilienhäusern__kurz_nach_dem_Bezug_
+        # Mittlere Anzahl Einwohner pro WE in Einfamilienhäusern
+        # (kurz nach dem Bezug)
         param = params.ew_je_we_efh = arcpy.Parameter()
-        param.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Einfamilienh\xe4usern__kurz_nach_dem_Bezug_'
-        param.displayName = u'Mittlere Anzahl Einwohner pro WE in Einfamilienh\xe4usern (kurz nach dem Bezug)'
+        param.name = u'Bewohner Einfamilienhaus kndB'
+        param.displayName = encode(u'Mittlere Anzahl Einwohner pro WE in '
+                                   u'Einfamilienhäusern (kurz nach dem Bezug)')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.value = u'3,2 Bewohner pro Wohneinheit'
         param.filter.list = list_EwProWE
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Mittlere_Anzahl_Einwohner_pro_WE_in_Doppelhäusern__kurz_nach_dem_Bezug_
+        # Mittlere Anzahl Einwohner pro WE in Doppelhäusern
+        # (kurz nach dem Bezug)
         param = params.ew_je_we_zfh = arcpy.Parameter()
-        param.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Doppelh\xe4usern__kurz_nach_dem_Bezug_'
-        param.displayName = u'Mittlere Anzahl Einwohner pro WE in Doppelh\xe4usern (kurz nach dem Bezug)'
+        param.name = u'Bewohner Doppelhäuser kndB'
+        param.displayName = encode(u'Mittlere Anzahl Einwohner pro WE in '
+                                   u'Doppelhäusern (kurz nach dem Bezug)')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.value = u'3,0 Bewohner pro Wohneinheit'
         param.filter.list = list_EwProWE
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Mittlere_Anzahl_Einwohner_pro_WE_in_Reihenhäusern__kurz_nach_dem_Bezug_
+        # Mittlere Anzahl Einwohner pro WE in Reihenhäusern
+        # (kurz nach dem Bezug)
         param = params.ew_je_we_rh = arcpy.Parameter()
-        param.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Reihenh\xe4usern__kurz_nach_dem_Bezug_'
-        param.displayName = u'Mittlere Anzahl Einwohner pro WE in Reihenh\xe4usern (kurz nach dem Bezug)'
+        param.name = u'Bewohner Reihenhaus kndB'
+        param.displayName = encode(u'Mittlere Anzahl Einwohner pro WE in '
+                                   u'Reihenhäusern (kurz nach dem Bezug)')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.value = u'3,0 Bewohner pro Wohneinheit'
         param.filter.list = list_EwProWE
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Mittlere_Anzahl_Einwohner_pro_WE_in_Mehrfamilienhäusern__kurz_nach_dem_Bezug_
+        # Mittlere Anzahl Einwohner pro WE in Mehrfamilienhäusern kurz nach
+        # dem Bezug
         param = params.ew_je_we_mfh = arcpy.Parameter()
-        param.name = u'Mittlere_Anzahl_Einwohner_pro_WE_in_Mehrfamilienh\xe4usern__kurz_nach_dem_Bezug_'
-        param.displayName = u'Mittlere Anzahl Einwohner pro WE in Mehrfamilienh\xe4usern (kurz nach dem Bezug)'
+        param.name = u'Bewohner Mehrfamilienhaus kndB'
+        param.displayName = encode(u'Mittlere Anzahl Einwohner pro WE in '
+                                   u'Mehrfamilienhäusern '
+                                   u'(kurz nach dem Bezug)')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.value = u'2,1 Bewohner pro Wohneinheit'
         param.filter.list = list_EwProWE
         param.category = heading
-        param.nutzungsart = nutzungsart
 
         return params
 
@@ -217,138 +220,143 @@ class TbxNutzungenGewerbe(TbxNutzungen):
 
     def _getParameterInfo(self):
         params = super(TbxNutzungenGewerbe, self)._getParameterInfo()
+
         # workaround
         heading = "1) Bezugszeitraum"
         params = self.init_aufsiedlung(params, heading=heading)
 
-        heading = "6) Gewerbe - Gebietstyp und Brachenstruktur"
-        nutzungsart = Nutzungsart.GEWERBE
+        heading = u"2) Voraussichtlicher Anteil der Branchen an der Nettofläche"
 
-        # Gebietstyp_auswählen
+        # Gebietstyp auswählen
         param = params.gebietstyp = arcpy.Parameter()
-        param.name = u'Gebietstyp_ausw\xe4hlen'
-        param.displayName = u'Gebietstyp ausw\xe4hlen'
+        param.name = u'Gebietstyp'
+        param.displayName = encode(u'Gebietstyp auswählen')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.value = u'<kein Gewerbegebiet vorhanden>'
-        param.filter.list = [u'Industriegebiet', u'Logistikgebiet', u'Klassisches Gewerbegebiet', u'Kleinteiliges Gewerbegebiet', u'Hoeherwertiges Gewerbegebiet', u'Technologiepark, Wissenschaftspark', u'<kein Gewerbegebiet vorhanden>']
+        param.filter.list = [u'Industriegebiet', u'Logistikgebiet',
+                             u'Klassisches Gewerbegebiet',
+                             u'Kleinteiliges Gewerbegebiet',
+                             u'Hoeherwertiges Gewerbegebiet',
+                             u'Technologiepark, Wissenschaftspark',
+                             u'<kein Gewerbegebiet vorhanden>']
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Anteil_der_Arbeitsplätze_im_verarbeitenden_Gewerbe__in_Prozent_
+        # Anteil der Arbeitsplätze im verarbeitenden Gewerbe in Prozent
         param = params.ant_jobs_verarb_gewerbe = arcpy.Parameter()
-        param.name = u'Anteil_der_Arbeitspl\xe4tze_im_verarbeitenden_Gewerbe__in_Prozent_'
-        param.displayName = u'Anteil der Arbeitspl\xe4tze im verarbeitenden Gewerbe (in Prozent)'
+        param.name = u'verarbeitendes Gewerbe'
+        param.displayName = encode(u'Verarbeitendes Gewerbe (in % der '
+                                   u'Nettofläche)')
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'40'
+        param.datatype = u'GPLong'
+        param.value = 40
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Anteil_der_Arbeitsplätze_im_Baugewerbe__in_Prozent_
+        # Anteil der Arbeitsplätze im Baugewerbe in Prozent
         param = params.ant_jobs_baugewerbe = arcpy.Parameter()
-        param.name = u'Anteil_der_Arbeitspl\xe4tze_im_Baugewerbe__in_Prozent_'
-        param.displayName = u'Anteil der Arbeitspl\xe4tze im Baugewerbe (in Prozent)'
+        param.name = u'Baugewerbe'
+        param.displayName = encode(u'Baugewerbe (in % der Nettofläche)')
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'6'
+        param.datatype = u'GPLong'
+        param.value = 10
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Anteil_der_Arbeitsplätze_im_Handel__inkl__Kfz___in_Prozent_
+        # Anteil der Arbeitsplätze im Handel inkl. Kfz in Prozent
         param = params.ant_jobs_handel = arcpy.Parameter()
-        param.name = u'Anteil_der_Arbeitspl\xe4tze_im_Handel__inkl__Kfz___in_Prozent_'
-        param.displayName = u'Anteil der Arbeitspl\xe4tze im Handel (inkl. Kfz) (in Prozent)'
+        param.name = u'Handel'
+        param.displayName = encode(u'Großhandel, Logistik, Kfz-Handel '
+                                   u'(in % der Nettofläche)')
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'17'
+        param.datatype = u'GPLong'
+        param.value = 5
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Anteil_der_Arbeitsplätze_im_Verkehrs-_und_Lagereibereich___in_Prozent_
-        param = params.ant_jobs_logistik = arcpy.Parameter()
-        param.name = u'Anteil_der_Arbeitspl\xe4tze_im_Verkehrs-_und_Lagereibereich___in_Prozent_'
-        param.displayName = u'Anteil der Arbeitspl\xe4tze im Verkehrs- und Lagereibereich  (in Prozent)'
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'10'
-        param.filter.type = 'Range'
-        param.filter.list = [0, 100]
-        param.category = heading
-        param.nutzungsart = nutzungsart
-
-        # Anteil_der_Arbeitsplätze_im_Bereich_der_freiberuflichen__wissenschaftl__bzw__techn__Dienstleistungen__in_Prozent_
+        # Anteil der Arbeitsplätze im Bereich der freiberuflichen wissenschaftl
+        # bzw. techn. Dienstleistungen in Prozent
         param = params.ant_jobs_freiwisstech = arcpy.Parameter()
-        param.name = u'Anteil_der_Arbeitspl\xe4tze_im_Bereich_der_freiberuflichen__wissenschaftl__bzw__techn__Dienstleistungen__in_Prozent_'
-        param.displayName = u'Anteil der Arbeitspl\xe4tze im Bereich der freiberuflichen, wissenschaftl. bzw. techn. Dienstleistungen (in Prozent)'
+        param.name = u'Finanzen'
+        param.displayName = encode(u'Finanzen, Versicherungen, IuK, '
+                                   u'wissensorientierte Dienstleistungen '
+                                   u'(in % der Nettofläche)')
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'14'
+        param.datatype = u'GPLong'
+        param.value = 25
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Anteil_der_Arbeitsplätze_im_Bereich_sonstiger_Diensteistungen
+        # Anteil der Arbeitsplätze im Bereich sonstiger Diensteistungen
         param = params.ant_jobs_sonst_dl = arcpy.Parameter()
-        param.name = u'Anteil_der_Arbeitspl\xe4tze_im_Bereich_sonstiger_Diensteistungen'
-        param.displayName = u'Anteil der Arbeitspl\xe4tze im Bereich sonstiger Diensteistungen'
+        param.name = u'Sonstige'
+        param.displayName = encode(u'Sonstige unternehmensorientierte '
+                                   u'Dienstleistungen (in % der Nettofläche)')
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'13'
+        param.datatype = u'GPLong'
+        param.value = 10
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-
-        heading = "3) Gewerbe - Zuzugs- und Eigentumsquote"
-
-        # Wie_viel_Prozent_der_Unternehmen_werden_neu_in_die_Gemeinde_ziehen_
-        param = params.zuzugsquote_gewerbe = arcpy.Parameter()
-        param.name = u'Wie_viel_Prozent_der_Unternehmen_werden_neu_in_die_Gemeinde_ziehen_'
-        param.displayName = u'Wie viel Prozent der Unternehmen werden neu in die Gemeinde ziehen?'
+        # Öffentliche Verwaltung
+        param = params.ant_oev = arcpy.Parameter()
+        param.name = u'Öffentliche Verwaltung'
+        param.displayName = encode(u'Öffentliche Verwaltung '
+                                   u'(in % der Nettofläche)')
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'80'
+        param.datatype = u'GPLong'
+        param.value = 10
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-        # Welcher_Anteil_der_Gebäude_ist_voraussichtlich_im_Eigentum_der_Unternehmen_
-        param = params.ant_eigentum_gewerbe = arcpy.Parameter()
-        param.name = encode(u'Welcher_Anteil_der_Geb\xe4ude_ist_voraussichtlich_im_Eigentum_der_Unternehmen_')
-        param.displayName = encode(u'Welcher Anteil der Geb\xe4ude ist voraussichtlich im Eigentum der Unternehmen?')
+
+        heading = u'3) Voraussichtliche Anzahl an Arbeitsplätzen'
+
+
+        # Arbeitsplatzzahl schätzen
+        param = params.auto_select = arcpy.Parameter()
+        param.name = u'Arbeitsplatzzahl schätzen'
+        param.displayName = encode(u'Vorgehen zur Schätzung der Zahl der '
+                                   u'Arbeitsplätze nach Vollbezug')
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'100'
-        param.filter.type = 'Range'
-        param.filter.list = [0, 100]
+        param.datatype = u'GPString'
+        param.filter.list = [u'Arbeitsplatzzahl automatisch schätzen',
+                             u'Eigenen Wert eingeben']
+        param.value = param.filter.list[0]
         param.category = heading
-        param.nutzungsart = nutzungsart
 
-
+        # Arbeitsplätze insgesamt
+        param = params.arbeitsplaetze_insgesamt = arcpy.Parameter()
+        param.name = u'Arbeitsplätze insgesamt'
+        param.displayName = encode(u'Schätzung der Zahl der Arbeitsplätze '
+                                   u'nach Vollbezug (Summe über alle '
+                                   u'Branchen)')
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPLong'
+        param.category = heading
 
         return params
 
     def _updateParameters(self, params):
         params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
+
+        #idx = auto_select.filter.list.index(auto_select.value)
+        #if idx == 0:
         return params
 
     def _updateMessages(self, params):
@@ -368,6 +376,72 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         # workaround
         heading = '1) Voraussichtliche Eröffnung '
         params = self.init_aufsiedlung(params, heading=heading)
+
+        heading = u'2) Verkaufsflächen'
+
+        # Lebensmittel (Verkaufsfläche in qm)
+        param = params.lebensmittel = arcpy.Parameter()
+        param.name = u'Lebensmittel'
+        param.displayName = encode(u'Lebensmittel (Verkaufsfläche in qm)')
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPLong'
+        param.value = 1200
+        param.filter.type = 'Range'
+        param.filter.list = [0, 20000]
+        param.category = heading
+
+        # Sonstiger periodischer Bedarf (Verkaufsfläche in qm)
+        param = params.periodischer_bedarf = arcpy.Parameter()
+        param.name = u'periodische Bedarf'
+        param.displayName = encode(u'Sonstiger periodischer Bedarf '
+                                   u'(Verkaufsfläche in qm)')
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPLong'
+        param.value = 1200
+        param.filter.type = 'Range'
+        param.filter.list = [0, 20000]
+        param.category = heading
+
+        # Aperiodischer Bedarf ohne Baumarkt und Möbel (Verkaufsfläche in qm)
+        param = params.aperiodischer_bedarf = arcpy.Parameter()
+        param.name = u'aperiodische Bedarf'
+        param.displayName = encode(u'Aperiodischer Bedarf ohne Baumarkt und '
+                                   u'Möbel (Verkaufsfläche in qm)')
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPLong'
+        param.value = 1200
+        param.filter.type = 'Range'
+        param.filter.list = [0, 20000]
+        param.category = heading
+
+        # Baumarkt (Verkaufsfläche in qm)
+        param = params.baumarkt = arcpy.Parameter()
+        param.name = u'Baumarkt'
+        param.displayName = encode(u'Baumarkt (Verkaufsfläche in qm)')
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPLong'
+        param.value = 1200
+        param.filter.type = 'Range'
+        param.filter.list = [0, 20000]
+        param.category = heading
+
+        # Möbel (Verkaufsfläche in qm)
+        param = params.moebel = arcpy.Parameter()
+        param.name = u'Möbel'
+        param.displayName = encode(u'Möbel (Verkaufsfläche in qm)')
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPLong'
+        param.value = 1200
+        param.filter.type = 'Range'
+        param.filter.list = [0, 20000]
+        param.category = heading
+
+
         return params
 
     def _updateParameters(self, params):
