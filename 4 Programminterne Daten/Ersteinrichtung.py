@@ -88,8 +88,14 @@ def install_packages(python_path):
 
     for package, filename in used_packages.iteritems():
         arcpy.AddMessage('{p}: {f}'.format(p=package, f=filename))
-        pip.main(['install', '-f', wheel_path, os.path.join(wheel_path, filename)])
-
+        process = subprocess.Popen([os.path.join(python_path, 'Scripts', 'pip.exe'),
+                                    'install',
+                                    '-f', wheel_path,
+                                    os.path.join(wheel_path, filename)],
+                                   shell=True)
+        ret = process.wait()
+        if ret:
+            arcpy.AddWarning("Paket " + package + " konnte ggf. nicht installiert werden." + "\n")
         try:
             new_package = __import__(package)
             arcpy.AddMessage("Paket " + package + " wurde installiert." + "\n")
@@ -100,8 +106,7 @@ def install_packages(python_path):
     # ToDo: Finally change from --editable to wheel
     arcpy.AddMessage("installiere RPCTools")
 
-    process = subprocess.Popen([os.path.join(python_path, 'python.exe'),
-                                "-m", "pip",
+    process = subprocess.Popen([os.path.join(python_path, 'Scripts', 'pip.exe'),
                                 'install',
                                 '--editable',
                                 base_path],

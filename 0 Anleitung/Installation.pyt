@@ -8,19 +8,16 @@ import imp
 class Toolbox(object):
     def __init__(self):
         self.label = u'ProjektCheck Tools installieren'
-        self.alias = ''
+        self.alias = u'ProjektCheck Tools installieren'
         self.tools = [TbxInstallation]
 
 
 class TbxInstallation(object):
     def __init__(self):
-        self.name = 'Installation'
-        self.label = 'ProjektCheck Tools installieren'
-        self.alias = 'ProjektCheck Tools installieren'
-        self.tools = [TbxInstallation]
-
-    def __init__(self):
         """"""
+        self.label = u'Installation'
+        self.description = u'ProjektCheck Tools installieren'
+
         self.pythonpath = sys.exec_prefix
         base = os.path.dirname(os.path.dirname(__file__))
         install_module_path = os.path.join(base, '4 Programminterne Daten',
