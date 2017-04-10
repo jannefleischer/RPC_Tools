@@ -41,6 +41,12 @@ class Projektverwaltung(Tool):
         else:
             self.projekt_loeschen()
 
+        group = self.output.module[8]
+        name = "Test_Output"
+        fc = self.folders.get_table(project = name, tablename = "Teilflaechen_Plangebiet")
+        layer = self.folders.get_layer("Teilflächen des Plangebiets")
+        self.output.add_output(group, fc, layer)
+
     def projekt_loeschen(self):
         projektName = self.par.existing_project.value
         arcpy.AddMessage("Projektname: " + projektName)

@@ -293,5 +293,6 @@ class Folders(object):
         layer : str
             the full path to the lyr-file
         """
-        layer = self.join_and_check(self.TEMPLATE_LAYERFOLDER, folder, layername)
+        layerfile = '{}.lyr'.format(layername)
+        layer = self.join_and_check(self.TEMPLATE_LAYERFOLDER, folder, layerfile)
         return layer

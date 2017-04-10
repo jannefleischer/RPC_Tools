@@ -603,14 +603,28 @@ class Output():
                 ]
 
     def __init__(self, folders):
-        self.folders=folders
+        self.folders = folders
 
     @property
     def group_path(self):
         group_path = self.folders.get_layer(projektName, folder='toc')
         return group_path
 
-    def add_output(group, featureclass, layername):
+    def add_output(self, group, featureclass, layername):
+        """
+        Add output layer to group
+
+        Parameters
+        ----------
+        group : str
+            the layer group
+
+        fratureclass : str
+            the full path of the feature class, which should be converted into a layer
+
+        layername : str
+            the layername (and the name of the .lyr-file)
+        """
 
         # Layer-Gruppe hinuzfuegen, falls nicht vorhanden
         if not arcpy.Exists(group):
@@ -644,13 +658,14 @@ class Output():
         target_grouplayer.visible = True
         current_mxd.save()
 
-    def delete_output(projectname=None, layer = None):
+    def delete_output(self, projectname=None, layer = None):
 
         if arcpy.Exists(layer):
             arcpy.Delete_management(layer)
 
 
-    def update_output(projectname=None, group = None, layer = None):
+    def update_output(self, group, layername ):
+        """"""
 
 
 
