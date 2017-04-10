@@ -31,6 +31,8 @@ class Folders(object):
         self._TEMPLATE_FLAECHEN = 'projektflaechen_template.shp'
         self._PROJECT_TEMPLATE = 'Template'
         self._TEST_TEMPLATE = 'Test_Template'
+        self._TEMPLATE_LAYERFOLDER = 'layers'
+        self._TOCFOLDER = 'toc'
         self._TEST_TMP_PROJECT = TEST_TMP_PROJECT
         self._AUSGABE_PATH = 'Ergebnisausgabe'
         self._TEXTE = 'texte'
@@ -102,6 +104,14 @@ class Folders(object):
     @property
     def TEMPLATE_FLAECHEN(self):
         return self.join_and_check(self.TEMPLATE_BASE_PATH, self._TEMPLATE_FLAECHEN)
+
+    @property
+    def TEMPLATE_LAYERFOLDER(self):
+        return self.join_and_check(self.TEMPLATE_BASE_PATH, self._TEMPLATE_LAYERFOLDER)
+
+    @property
+    def TOCFOLDER(self):
+        return self.join_and_check(self.TEMPLATE_LAYERFOLDER, self._TOCFOLDER)
 
     @property
     def PROJECT_TEMPLATE(self):
@@ -265,3 +275,23 @@ class Folders(object):
                 row[i] = column_values[column]
             cursor.updateRow(row)
         del cursor
+
+    def get_layer(self, layername, folder=''):
+        """
+        A lyr-file
+
+        Parameters
+        ----------
+        layername : str
+            the name of the lyr-file
+
+        folder : str, optional
+            a subfolder
+
+        Returns
+        -------
+        layer : str
+            the full path to the lyr-file
+        """
+        layer = self.join_and_check(self.TEMPLATE_LAYERFOLDER, folder, layername)
+        return layer

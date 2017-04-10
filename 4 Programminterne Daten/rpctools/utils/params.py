@@ -342,6 +342,7 @@ class Tool(object):
         self.par = params
         self.mes = Message()
         self.folders = ToolFolders(params=self.par)
+        self.output = Output(folders=self.folders)
 
     def main(self, par, parameters=None, messages=None):
         """
@@ -588,24 +589,47 @@ class Output():
     Add and update layers to the current ArcMap file.
     """
 
-    module = ["Analysen", "Modul 1", "Modul 2", "Modul 3", "Modul 4", "Modul 5", "Modul 6", "Modul 7", 'Projektdefinition',  "Hintergrundkarten"]
-    group_path = r"C:\ProjektCheck\4 Programminterne Daten\rpctools\utils\layer"
+    module = [
+                "Analysen",
+                "Wirkungsbereich 1 - Bewohner und Arbeitsplaetze",
+                "Wirkungsbereich 2 - Erreichbarkeit",
+                "Wirkungsbereich 3 - Verkehr im Umfeld",
+                "Wirkungsbereich 4 - Fläche und Ökologie",
+                "Wirkungsbereich 5 - Infrastrukturfolgekosten",
+                "Wirkungsbereich 6 - Kommunale Steuereinnahmen",
+                "Wirkungsbereich 7 - Standortkonkurrenz Lebensmitteleinzelhandel",
+                "Projektdefinition",
+                "Hintergrundkarten Projekt-Check"
+                ]
 
-    def add_output(projectname=None, group = None, layer = None):
+    def __init__(self, folders):
+        self.folders=folders
+
+    @property
+    def group_path(self):
+        group_path = self.folders.get_layer(projektName, folder='toc')
+        return group_path
+
+    def add_output(group, featureclass, layername):
 
         # Layer-Gruppe hinuzfuegen, falls nicht vorhanden
         if not arcpy.Exists(group):
             mxd = arcpy.mapping.MapDocument("CURRENT")
             df = current_mxd.activeDataFrame
-            addLayer = arcpy.mapping.Layer(os.path.join(group_path, group))
+            addLayer = arcpy.mapping.Layer(os.path.join(self.group_path, group))
             arcpy.mapping.AddLayer(df, addLayer, "BOTTOM")
 
         # Neuen Layer hinzufuegen
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
         target_grouplayer = arcpy.mapping.ListLayers(current_mxd, group, current_dataframe)[0]
-        add_layer = arcpy.mapping.Layer(layer)
-        arcpy.mapping.AddLayerToGroup(current_dataframe, target_grouplayer, add_layer, "BOTTOM")
+        arcpy.MakeFeatureLayer_management(featureclass, layername)
+
+        template_layer = self.folders.get_layer(layername)
+        arcpy.mapping.UpdateLayer(current_dataframe, layername,
+        template_layer, symbology_only=True)
+        arcpy.mapping.AddLayerToGroup(current_dataframe,
+        target_grouplayer, layername, "BOTTOM")
 
         # Auf Layer zentrieren
         new_layer = arcpy.mapping.ListLayers(current_mxd, layer, current_dataframe)[0]
@@ -628,8 +652,7 @@ class Output():
 
     def update_output(projectname=None, group = None, layer = None):
 
-        deleteOutput(projectname, layer)
-        addOutput(projectname, group, layer)
+
 
 
 if __name__ == '__main__':
