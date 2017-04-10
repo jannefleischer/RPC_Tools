@@ -37,3 +37,7 @@ wheels/
 
 # Sphinx documentation
 docs/_build/
+
+# pyt.xml-files
+*.pyt.xml
+
