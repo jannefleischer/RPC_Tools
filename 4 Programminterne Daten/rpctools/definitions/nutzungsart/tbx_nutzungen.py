@@ -234,17 +234,28 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-        param.value = u'<kein Gewerbegebiet vorhanden>'
-        param.filter.list = [u'Industriegebiet', u'Logistikgebiet',
-                             u'Klassisches Gewerbegebiet',
-                             u'Kleinteiliges Gewerbegebiet',
-                             u'Hoeherwertiges Gewerbegebiet',
-                             u'Technologiepark, Wissenschaftspark',
-                             u'<kein Gewerbegebiet vorhanden>']
+          
+        table = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb', 
+                                            'Gewerbegebietstypen')
+        types = [u'<benutzerdefiniert>']
+        #try:
+        columns = ['Name_Gewerbegebietstyp']
+        cursor = arcpy.da.SearchCursor(table, columns)
+        for r in cursor: 
+            types.append(r[0])
+        #except:
+            ## warning handled in toolbox class
+            #pass
+        param.filter.list = types
+        param.value = types[0]
         param.category = heading
+    
+        dependent_params = []
 
         # Anteil der Arbeitsplätze im verarbeitenden Gewerbe in Prozent
-        param = params.ant_jobs_verarb_gewerbe = arcpy.Parameter()
+        name = 'ant_jobs_verarb_gewerbe'
+        dependent_params.append(name)
+        param = params[name] = arcpy.Parameter()
         param.name = u'verarbeitendes Gewerbe'
         param.displayName = encode(u'Verarbeitendes Gewerbe (in % der '
                                    u'Nettofläche)')
@@ -254,10 +265,12 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.value = 40
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.category = heading
+        param.category = heading        
 
         # Anteil der Arbeitsplätze im Baugewerbe in Prozent
-        param = params.ant_jobs_baugewerbe = arcpy.Parameter()
+        name = 'ant_jobs_baugewerbe'
+        dependent_params.append(name)
+        param = params[name] = arcpy.Parameter()
         param.name = u'Baugewerbe'
         param.displayName = encode(u'Baugewerbe (in % der Nettofläche)')
         param.parameterType = 'Required'
@@ -269,7 +282,9 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.category = heading
 
         # Anteil der Arbeitsplätze im Handel inkl. Kfz in Prozent
-        param = params.ant_jobs_handel = arcpy.Parameter()
+        name = 'ant_jobs_handel'
+        dependent_params.append(name)
+        param = params[name] = arcpy.Parameter()
         param.name = u'Handel'
         param.displayName = encode(u'Großhandel, Logistik, Kfz-Handel '
                                    u'(in % der Nettofläche)')
@@ -283,7 +298,9 @@ class TbxNutzungenGewerbe(TbxNutzungen):
 
         # Anteil der Arbeitsplätze im Bereich der freiberuflichen wissenschaftl
         # bzw. techn. Dienstleistungen in Prozent
-        param = params.ant_jobs_freiwisstech = arcpy.Parameter()
+        name = 'ant_jobs_freiwisstech'
+        dependent_params.append(name)
+        param = params[name] = arcpy.Parameter()
         param.name = u'Finanzen'
         param.displayName = encode(u'Finanzen, Versicherungen, IuK, '
                                    u'wissensorientierte Dienstleistungen '
@@ -297,7 +314,9 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.category = heading
 
         # Anteil der Arbeitsplätze im Bereich sonstiger Diensteistungen
-        param = params.ant_jobs_sonst_dl = arcpy.Parameter()
+        name = 'ant_jobs_sonst_dl'
+        dependent_params.append(name)
+        param = params[name] = arcpy.Parameter()
         param.name = u'Sonstige'
         param.displayName = encode(u'Sonstige unternehmensorientierte '
                                    u'Dienstleistungen (in % der Nettofläche)')
@@ -310,7 +329,9 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.category = heading
 
         # Öffentliche Verwaltung
-        param = params.ant_oev = arcpy.Parameter()
+        name = 'ant_oev'
+        dependent_params.append(name)
+        param = params[name] = arcpy.Parameter()
         param.name = u'Öffentliche Verwaltung'
         param.displayName = encode(u'Öffentliche Verwaltung '
                                    u'(in % der Nettofläche)')
@@ -330,7 +351,6 @@ class TbxNutzungenGewerbe(TbxNutzungen):
                             'ant_oev']
         
         self.add_sum_dependency(dependent_params, 100)
-        
 
         heading = u'3) Voraussichtliche Anzahl an Arbeitsplätzen'
 
