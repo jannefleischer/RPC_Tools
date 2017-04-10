@@ -20,6 +20,10 @@ class TbxProjektVerwaltung(Tbx):
     def Tool(self):
         return Projektverwaltung
 
+    def __init__(self):
+        super(TbxProjektVerwaltung, self).__init__()
+        self.update_projects = False
+
     def _getParameterInfo(self):
         params = self.par
 
@@ -31,8 +35,8 @@ class TbxProjektVerwaltung(Tbx):
         p.direction = 'Input'
         p.datatype = 'GPString'
         p.filter.list = ['Neues Projekt anlegen',
-                                     'Bestehendes Projekt kopieren',
-                                     encode('Bestehendes Projekt löschen')]
+                         'Bestehendes Projekt kopieren',
+                         encode('Bestehendes Projekt löschen')]
         p.value = p.filter.list[0]
 
         projects = self.folders.get_projects()
@@ -57,11 +61,12 @@ class TbxProjektVerwaltung(Tbx):
 
         # Shapefile_des_Plangebiets____shp_
         p = params.shapefile = arcpy.Parameter()
-        p.name = u'Shapefile_des_Plangebiets____shp_'
-        p.displayName = u'Shapefile des Plangebiets (*.shp)'
+        p.name = u'Flaechen_des_Plangebiets'
+        p.displayName = u'(Teil-)Flächen des Plangebiets'
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'DEShapefile'
+        #p.datatype = u'GPFeatureLayer'
         p.value = self.folders.TEMPLATE_FLAECHEN
 
         # Beginn_des_Betrachtungszeitraumes
@@ -83,7 +88,6 @@ class TbxProjektVerwaltung(Tbx):
         p.direction = 'Input'
         p.datatype = u'GPLong'
         p.filter.type = 'Range'
-
 
         #Eingaben zu Beginn deaktiviere/füllen
         params.end.filter.list = [2010, 2050]

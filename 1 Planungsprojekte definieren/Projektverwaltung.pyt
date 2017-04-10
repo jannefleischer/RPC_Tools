@@ -6,23 +6,29 @@ import sys
 
 from rpctools.definitions.projektverwaltung import tbx_projektverwaltung
 reload(tbx_projektverwaltung)
-from rpctools.definitions.projektverwaltung import tbx_teilflaechen_benennen
-reload(tbx_teilflaechen_benennen)
+from rpctools.definitions.projektverwaltung import tbx_teilflaechen_verwalten
+reload(tbx_teilflaechen_verwalten)
+from rpctools.definitions.projektverwaltung import tbx_teilflaechen_multi
+reload(tbx_teilflaechen_verwalten)
 
 
 from rpctools.definitions.nutzungsart import (tbx_flaechenbilanz,
                                               tbx_nutzungen)
 reload(tbx_flaechenbilanz)
 reload(tbx_nutzungen)
+reload(tbx_teilflaechen_multi)
 
 from rpctools.definitions.projektverwaltung.tbx_projektverwaltung \
      import TbxProjektVerwaltung
-from rpctools.definitions.projektverwaltung.tbx_teilflaechen_benennen \
-     import TbxTeilflaecheBenennen
+from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten \
+     import TbxTeilflaecheVerwalten
+from rpctools.definitions.projektverwaltung.tbx_teilflaechen_multi \
+     import TbxTeilflaechenMultiTest
 
-from rpctools.definitions.nutzungsart.tbx_flaechenbilanz import TbxFlaechenbilanz
-from rpctools.definitions.nutzungsart.tbx_nutzungen import TbxNutzungen
-from rpctools.utils.encoding import encode
+#from rpctools.definitions.nutzungsart.tbx_flaechenbilanz import TbxFlaechenbilanz
+from rpctools.definitions.nutzungsart.tbx_nutzungen import (
+    TbxNutzungenWohnen, TbxNutzungenGewerbe, TbxNutzungenEinzelhandel,
+    TbxNutzungenAlt)
 
 
 class Toolbox(object):
@@ -30,6 +36,10 @@ class Toolbox(object):
         self.label = u'Projekte definieren'
         self.alias = ''
         self.tools = [TbxProjektVerwaltung,
-                      TbxTeilflaecheBenennen,
-                      TbxFlaechenbilanz,
-                      TbxNutzungen]
+                      TbxTeilflaecheVerwalten,
+                      TbxTeilflaechenMultiTest,
+                      #TbxFlaechenbilanz,
+                      TbxNutzungenAlt,
+                      TbxNutzungenWohnen,
+                      TbxNutzungenGewerbe,
+                      TbxNutzungenEinzelhandel]

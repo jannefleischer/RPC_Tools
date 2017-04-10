@@ -9,10 +9,13 @@ from xlsxwriter.utility import xl_rowcol_to_cell, xl_col_to_name
 import arcpy, os
 from os.path import join
 import gc
+from collections import OrderedDict
+
 from rpctools.utils.params import Tool
 
 
 class Nutzungen(Tool):
+    _param_projectname = 'projectname'
     _dbname = 'FGDB_Definition_Projekt.gdb'
 
     def run(self):
@@ -111,23 +114,23 @@ class Nutzungen(Tool):
         cursor = arcpy.da.UpdateCursor(plangebiet, ['Name','Beginn_Nutzung','Aufsiedlungsdauer'])
         for row in cursor:
             if row[0] == parameters[1].value:
-                row[1] = parameters[2].value
-                row[2] = parameters[3].value
+                row[1] = parameters[3].value
+                row[2] = parameters[4].value
                 cursor.updateRow(row)
 
-        for i in range(0,int(parameters[3].value)):
+        for i in range(0,int(parameters[4].value)):
 
-            jahr = int(parameters[2].value) + i
+            jahr = int(parameters[3].value) + i
 
             messages.AddMessage(jahr)
             Insert = arcpy.da.InsertCursor(tabelle_gebaude, ['Teilflaeche_Plangebiet','Gebaeudetyp','Anzahl_Gebaeude','Jahr'])
             row = ["","","",""]
 
             #Ein- und Zweifamilienhäuser
-            if int(parameters[4].value) >0:
+            if int(parameters[5].value) >0:
                 row[0] = parameters[1].value
                 row[1] = "Einfamilienhaus"
-                row[2] = int(parameters[4].value) / int(parameters[3].value)
+                row[2] = int(parameters[5].value) / int(parameters[4].value)
                 row[3] = jahr
                 Insert.insertRow(row)
 
@@ -135,23 +138,23 @@ class Nutzungen(Tool):
             if int(parameters[5].value) >0:
                 row[0] = parameters[1].value
                 row[1] = "Zweifamilien- oder Doppelhaus"
-                row[2] =  int(parameters[5].value) / int(parameters[3].value)
+                row[2] =  int(parameters[6].value) / int(parameters[4].value)
                 row[3] = jahr
                 Insert.insertRow(row)
 
             #Reihenhäuser
-            if int(parameters[6].value) >0:
+            if int(parameters[7].value) >0:
                 row[0] = parameters[1].value
                 row[1] = "Reihenhaus"
-                row[2] =  int(parameters[6].value) / int(parameters[3].value)
+                row[2] =  int(parameters[7].value) / int(parameters[4].value)
                 row[3] = jahr
                 Insert.insertRow(row)
 
             #Mehrfamilienhäuser
-            if int(parameters[7].value) >0:
+            if int(parameters[8].value) >0:
                 row[0] = parameters[1].value
                 row[1] = "Mehrfamilienhaus"
-                row[2] =  int(parameters[7].value) / int(parameters[3].value)
+                row[2] =  int(parameters[8].value) / int(parameters[4].value)
                 row[3] = jahr
                 Insert.insertRow(row)
 
@@ -167,63 +170,63 @@ class Nutzungen(Tool):
             row = ["","","","","","",""]
 
             #Ein- und Zweifamilienhäuser
-            eigentum = int(parameters[8].value)
-            miete = 100 - int(parameters[8].value)
+            eigentum = int(parameters[9].value)
+            miete = 100 - int(parameters[9].value)
             nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
             for nutzungstyp in nutzungstypen:
                 row[0] = "Einfamilienhaus"
                 row[1] = parameters[1].value
                 row[2] = nutzungstyp[1]
-                row[3] = float((parameters[12].value.split(" ")[0]).replace(",", "."))
+                row[3] = float((parameters[13].value.split(" ")[0]).replace(",", "."))
                 row[4] = jahr
-                row[5] = int(parameters[4].value) / int(parameters[3].value) * nutzungstyp[0] / 100
-                row[6] = parameters[8].value
+                row[5] = int(parameters[5].value) / int(parameters[4].value) * nutzungstyp[0] / 100
+                row[6] = parameters[9].value
                 Insert.insertRow(row)
 
             #Doppelhäuser
-            eigentum = int(parameters[9].value)
-            miete = 100 - int(parameters[9].value)
+            eigentum = int(parameters[10].value)
+            miete = 100 - int(parameters[10].value)
             nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
             for nutzungstyp in nutzungstypen:
                 row[0] = "Zweifamilien- oder Doppelhaus"
                 row[1] = parameters[1].value
                 row[2] = nutzungstyp[1]
-                row[3] = float((parameters[12].value.split(" ")[0]).replace(",", "."))
+                row[3] = float((parameters[13].value.split(" ")[0]).replace(",", "."))
                 row[4] = jahr
-                row[5] = int(parameters[4].value) / int(parameters[3].value) * nutzungstyp[0] / 100
-                row[6] = parameters[9].value
+                row[5] = int(parameters[5].value) / int(parameters[4].value) * nutzungstyp[0] / 100
+                row[6] = parameters[10].value
                 Insert.insertRow(row)
 
             #Reihenhäuser
-            eigentum = int(parameters[10].value)
-            miete = 100 - int(parameters[10].value)
+            eigentum = int(parameters[11].value)
+            miete = 100 - int(parameters[11].value)
             nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
             for nutzungstyp in nutzungstypen:
                 row[0] = "Reihenhaus"
                 row[1] = parameters[1].value
                 row[2] = nutzungstyp[1]
-                row[3] = float((parameters[12].value.split(" ")[0]).replace(",", "."))
+                row[3] = float((parameters[13].value.split(" ")[0]).replace(",", "."))
                 row[4] = jahr
-                row[5] = int(parameters[4].value) / int(parameters[3].value) * nutzungstyp[0] / 100
-                row[6] = parameters[10].value
+                row[5] = int(parameters[5].value) / int(parameters[4].value) * nutzungstyp[0] / 100
+                row[6] = parameters[11].value
                 Insert.insertRow(row)
 
             #RMehrfamilienhäuser
-            eigentum = int(parameters[11].value)
-            miete = 100 - int(parameters[11].value)
+            eigentum = int(parameters[12].value)
+            miete = 100 - int(parameters[12].value)
             nutzungstypen = [(eigentum,'Eigentum'),(miete,'Miete')]
 
             for nutzungstyp in nutzungstypen:
                 row[0] = "Mehrfamilienhaus"
                 row[1] = parameters[1].value
                 row[2] = nutzungstyp[1]
-                row[3] = float((parameters[12].value.split(" ")[0]).replace(",", "."))
+                row[3] = float((parameters[13].value.split(" ")[0]).replace(",", "."))
                 row[4] = jahr
-                row[5] = int(parameters[4].value) / int(parameters[3].value) * nutzungstyp[0] / 100
-                row[6] = parameters[11].value
+                row[5] = int(parameters[5].value) / int(parameters[4].value) * nutzungstyp[0] / 100
+                row[6] = parameters[12].value
                 Insert.insertRow(row)
 
         del row, Insert
@@ -234,15 +237,15 @@ class Nutzungen(Tool):
         Insert = arcpy.InsertCursor(tabelle_gewerbeanteile)
         row = Insert.newRow()
         row.setValue("teilflaeche", parameters[1].value)
-        row.setValue("branche", parameters[17].value)
-        row.setValue("Anteil_A", parameters[18].value)
-        row.setValue("Anteil_B", parameters[19].value)
-        row.setValue("Anteil_C", parameters[20].value)
-        row.setValue("Anteil_D", parameters[21].value)
-        row.setValue("Anteil_E", parameters[22].value)
-        row.setValue("Anteil_F", parameters[23].value)
-        row.setValue("Anteil_Zuzug", parameters[24].value)
-        row.setValue("Anteil_Eigentum", parameters[25].value)
+        row.setValue("branche", parameters[18].value)
+        row.setValue("Anteil_A", parameters[19].value)
+        row.setValue("Anteil_B", parameters[20].value)
+        row.setValue("Anteil_C", parameters[21].value)
+        row.setValue("Anteil_D", parameters[22].value)
+        row.setValue("Anteil_E", parameters[23].value)
+        row.setValue("Anteil_F", parameters[24].value)
+        row.setValue("Anteil_Zuzug", parameters[25].value)
+        row.setValue("Anteil_Eigentum", parameters[26].value)
         Insert.insertRow(row)
         del row, Insert
 
@@ -427,17 +430,17 @@ class Nutzungen(Tool):
 
         projektname = parameters[0].value
         teilflaeche = parameters[1].value
-        startjahr = parameters[2].value
-        aufsiedlungsdauer = parameters[3].value
-        gebtyp = parameters[17].value
-        zuzugsquote = parameters[24].value
-        eigentumsquote = parameters[25].value
-        Ant_Betr_VerarbGew = parameters[18].value
-        Ant_Betr_BauGew = parameters[19].value
-        Ant_Betr_HanKfZ = parameters[20].value
-        Ant_Betr_VerLag = parameters[21].value
-        Ant_Betr_FrWiTeDi = parameters[22].value
-        Ant_Betr_SoDi = parameters[23].value
+        startjahr = parameters[3].value
+        aufsiedlungsdauer = parameters[4].value
+        gebtyp = parameters[18].value
+        zuzugsquote = parameters[25].value
+        eigentumsquote = parameters[26].value
+        Ant_Betr_VerarbGew = parameters[19].value
+        Ant_Betr_BauGew = parameters[20].value
+        Ant_Betr_HanKfZ = parameters[21].value
+        Ant_Betr_VerLag = parameters[22].value
+        Ant_Betr_FrWiTeDi = parameters[23].value
+        Ant_Betr_SoDi = parameters[24].value
 
         if gebtyp != "<kein Gewerbegebiet vorhanden>":
 

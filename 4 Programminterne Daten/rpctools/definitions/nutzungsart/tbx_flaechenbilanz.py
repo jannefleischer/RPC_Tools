@@ -8,7 +8,6 @@ import datetime
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 
-
 from rpctools.definitions.nutzungsart.flaechenbilanz import Flaechenbilanz
 
 
@@ -239,7 +238,7 @@ class TbxFlaechenbilanz(Tbx):
         params = self.par
         projectname = params.projectname.value
         teilflaeche = params.teilflaeche.value
-        tablepath_teilflaechen = self.tool.teilflaechen
+        tablepath_teilflaechen = self.tool.teilflaechen_table
         tablepath_flaechenbilanz = self.tool.flaechenbilanz
 
         # Oberkategorien
@@ -321,20 +320,12 @@ class TbxFlaechenbilanz(Tbx):
         validation is performed.  This method is called whenever a parameter
         has been changed."""
 
-        projects = self.folders.get_projects()
-        params.project.filter.list = projects
-        if len(projects) == 0:
-            params.project.value = ''
-        # if previously selected project was deleted in the meantime
-        elif params.project.value not in projects:
-            params.project.value = projects[0]
-
         # Auswahl Teilfläche
         if params.projectname.altered and not params.projectname.hasBeenValidated:
             #projectname = params.name.value
             #self.folders.project = projectname
 
-            tablepath_teilflaechen = self.tool.teilflaechen
+            tablepath_teilflaechen = self.tool.teilflaechen_table
             rows_teilflaechen = arcpy.SearchCursor(tablepath_teilflaechen)
             list_teilflaechen = []
             for row in rows_teilflaechen :

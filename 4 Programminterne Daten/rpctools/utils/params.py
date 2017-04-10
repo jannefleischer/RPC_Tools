@@ -4,6 +4,7 @@ from collections import OrderedDict
 import gc
 import sys
 import os
+import numpy as np
 from pprint import pformat
 from abc import ABCMeta, abstractmethod, abstractproperty
 from rpctools.utils.config import Folders
@@ -138,16 +139,23 @@ class Params(object):
         [123, 444]
         >>> params[1:3]
         [444, 555]
+        >>> 'param5' in params
+        True
+        >>> 'param6' in params
+        False
         """
         self._od = OrderedDict(*args, **kwargs)
         self._param_projectname = param_projectname
         self._dbname = dbname
 
     def __getattr__(self, name):
+        if name in self.__dict__:
+            return self.__dict__[name]
         try:
             return self._od[name]
         except KeyError:
-            raise AttributeError('Attribute {} not found in Params-instance. Available attributes are {}'.format(name, self._od.keys()))
+            msg = 'Attribute {} not found in Params-instance. Available attributes are {}'.format(name, self._od.keys())
+            raise AttributeError(msg)
 
     def __setattr__(self, name, value):
         if name.startswith('_'):
@@ -179,6 +187,9 @@ class Params(object):
     def __iter__(self):
         return self._od.itervalues()
 
+    def __contains__(self, value):
+        return value in self._od
+
     def __len__(self):
         return len(self._od)
 
@@ -198,7 +209,7 @@ class Params(object):
                                                          n_params_tool)
         # setze die Werte
         for i, key in enumerate(self._od):
-            self[key] = parameters[i]
+            self[key]._arc_object = parameters[i]
 
     def _get_projectname(self):
         """
@@ -212,6 +223,95 @@ class Params(object):
         if param_projectname:
             return param_projectname.value
         return ''
+
+    def changed(self, *names):
+        """check parameter with names if thy are altered and not validated"""
+        change = False
+        for name in names:
+            param = self._od[name]
+            if param.altered and not param.hasBeenValidated:
+                change = True
+        return change
+
+    def toolbox_opened(self):
+        """return True if toolbox is opened"""
+        opened = not any([p.hasBeenValidated for p in self])
+        return opened
+
+    def selected_index(self, name):
+        """get the index of the current selection of given list-parameter"""
+        param = self._od[name]
+        index = param.filter.list.index(param.value)
+        return index
+
+    def get_multivalues(self, name):
+        """
+        return a numpy recarray with the values of a value table
+
+        Parameters
+        ----------
+        name : str
+            the name of the value-table parameter
+
+        Returns
+        -------
+        ra : np.recarray
+            the values as np.recarray. The column names are defined
+            by the param.columns
+        """
+        param = getattr(self, name)
+        if not param.datatype == 'GPValueTable':
+            raise ValueError('{} is no ValueTable'.format(name))
+        column_names = [p[1] for p in param.columns]
+        ra = np.rec.fromrecords(param.values, names=column_names)
+        return ra
+
+    def set_multivalues(self, name, values):
+        """
+        set the values of a value table with the values
+        given as a recarray
+
+        Parameters
+        ----------
+        name : str
+            the name of the value-table parameter
+        values : np.recarray
+            the values to assign to the parameter
+        """
+        msg = 'values must be a recarray and not {}'.format(type(ra).__name__)
+        assert isinstance(values, np.rec.recarray), msg
+        param = getattr(self, name)
+        if not param.datatype == 'GPValueTable':
+            raise ValueError('{} is no ValueTable'.format(name))
+        param.values = ra.tolist()
+
+
+class ToolFolders(Folders):
+    def join_and_check(self, *args, **kwargs):
+        """
+        Joins paths and checks if joined path points to existing resource
+        (directory, database or table) if requested
+
+        overrides check function to show path errors while running and exit
+        when first error occurs
+
+        Parameters
+        ----------
+        args: paths to join
+        check : str, optional
+            if True, checks if joined path points to existing resource
+        Returns
+        -------
+        path : str
+            the joined path
+        """
+        path = os.path.join(*args)
+        check = kwargs.get('check', True)
+        if check and not arcpy.Exists(path):
+            arcpy.AddError(
+                'Pfad oder Tabelle existiert nicht: "{}"'.format(path))
+            sys.exit()
+        return path
 
 
 class Tool(object):
@@ -241,7 +341,7 @@ class Tool(object):
         """
         self.par = params
         self.mes = Message()
-        self.folders = Folders(params=self.par)
+        self.folders = ToolFolders(params=self.par)
 
     def main(self, par, parameters=None, messages=None):
         """
@@ -295,17 +395,32 @@ class Tbx(object):
         """
 
     def __init__(self):
-        # reload the tool's module
-        reload(sys.modules[self.Tool.__module__])
+        # todo: replace later with Tool=self.Tool
+        Tool = self.reload_tool()
 
         # the parameters
-        self.par = Params(param_projectname=self.Tool._param_projectname,
-                          dbname=self.Tool._dbname)
+        self.par = Params(param_projectname=Tool._param_projectname,
+                          dbname=Tool._dbname)
         # define the folders
         self.folders = Folders(params=self.par)
+        self.projects = []
         # an instance of the tool
-        self.tool = self.Tool(self.par)
+        self.tool = Tool(self.par)
         self.canRunInBackground = False
+        self.update_projects = True
+
+    def reload_tool(self):
+        # reload the tool's module
+        tool_module_name = self.Tool.__module__
+        reload(sys.modules[tool_module_name])
+        tool_name = self.Tool.__name__
+        tool_module = __import__(tool_module_name,
+                                 globals(),
+                                 locals(),
+                                 [tool_name],
+                                 -1)
+        Tool = getattr(tool_module, tool_name)
+        return Tool
 
     @abstractmethod
     def _getParameterInfo(self):
@@ -334,8 +449,30 @@ class Tbx(object):
         ----------
         parameters : list of ArcGIS-Parameters
         """
+
         self.par._update_parameters(parameters)
+        # updating projects messes up the initial project management
+        if self.update_projects:
+            self._update_project_list()
         self._updateParameters(self.par)
+
+    def _update_project_list(self):
+        """
+        Update the parameter list of existing projects
+        """
+        if self.par._param_projectname not in self.par:
+            return
+        projects = self.folders.get_projects()
+        project_param = self.par[self.par._param_projectname]
+        if projects == project_param.filter.list:
+            return
+        project_param.filter.list = projects
+        if len(projects) == 0:
+            project_param.value = ''
+        # if previously selected project was deleted in the meantime
+        elif project_param.value not in projects:
+            project_param.value = projects[0]
+
 
     def _updateParameters(self, params):
         """
@@ -353,6 +490,12 @@ class Tbx(object):
         parameters : list of ArcGIS-Parameters
         """
         self.par._update_parameters(parameters)
+        params = self.par._od.values()
+        # check if toolbox contains invalid paths, add errors to first param.
+        if params and self.folders._invalid_paths:
+            invalid = ', '.join(self.folders._invalid_paths)
+            params[0].setErrorMessage(
+                'Pfade oder Tabellen existieren nicht: {}'.format(invalid))
         self._updateMessages(self.par)
 
     def _updateMessages(self, parameters):
