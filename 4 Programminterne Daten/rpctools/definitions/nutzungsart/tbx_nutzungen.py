@@ -321,10 +321,18 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
-
+        
+        dependent_params = ['ant_jobs_verarb_gewerbe', 
+                            'ant_jobs_baugewerbe', 
+                            'ant_jobs_handel', 
+                            'ant_jobs_freiwisstech', 
+                            'ant_jobs_sonst_dl', 
+                            'ant_oev']
+        
+        self.add_sum_dependency(dependent_params, 100)
+        
 
         heading = u'3) Voraussichtliche Anzahl an Arbeitsplätzen'
-
 
         # Arbeitsplatzzahl schätzen
         param = params.auto_select = arcpy.Parameter()
@@ -1027,7 +1035,7 @@ class TbxNutzungenAlt(Tbx):
         return params
 
 if __name__ == '__main__':
-    t = TbxNutzungenWohnen()
+    t = TbxNutzungenGewerbe()
     params = t.getParameterInfo()
     #t.print_test_parameters()
     #t.print_tool_parameters()

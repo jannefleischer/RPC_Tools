@@ -283,7 +283,7 @@ class Params(object):
         param = getattr(self, name)
         if not param.datatype == 'GPValueTable':
             raise ValueError('{} is no ValueTable'.format(name))
-        param.values = ra.tolist()
+        param.values = ra.tolist()        
 
 
 class ToolFolders(Folders):
@@ -408,7 +408,9 @@ class Tbx(object):
         # an instance of the tool
         self.tool = Tool(self.par)
         self.canRunInBackground = False
+        # update projects on call of updateParameters
         self.update_projects = True
+        self._dependencies = []
 
     def reload_tool(self):
         # reload the tool's module
@@ -455,6 +457,7 @@ class Tbx(object):
         # updating projects messes up the initial project management
         if self.update_projects:
             self._update_project_list()
+        self._update_dependencies()
         self._updateParameters(self.par)
 
     def _update_project_list(self):
@@ -474,6 +477,49 @@ class Tbx(object):
         elif project_param.value not in projects:
             project_param.value = projects[0]
 
+    def add_sum_dependency(self, param_names, target_sum):
+        """
+        define a dependency between different parameters, they have to sum up 
+        to a target value.
+        if one of them is changed, the others will be auto set while updating
+        the parameters
+
+        Parameters
+        ----------
+        param_names : list,
+               qualified names of the parameters
+
+        target_sum : int
+               the target value the parameters sum up to
+        """
+        dependency = (param_names, target_sum)
+        self._dependencies.append(dependency)
+        
+    def _update_dependencies(self):
+        """check if dependent params were altered and set them to target sum"""
+        for param_names, target_sum in self._dependencies:
+            actual_sum = 0
+            altered = False
+            for name in param_names:
+                param = self.par[name]
+                altered = altered or param.altered
+                actual_sum += param.value
+                
+            if not altered:
+                continue
+        
+            if actual_sum != target_sum:
+                difference = target_sum - actual_sum
+                for name in reversed(param_names):
+                    param = self.par[name]
+                    old_val = param.value
+                    new_val = param.value + difference
+                    if new_val < 0:
+                        new_val = 0
+                    elif new_val > target_sum:
+                        new_val = target_sum
+                    difference = difference + old_val - new_val
+                    param.value = new_val       
 
     def _updateParameters(self, params):
         """
