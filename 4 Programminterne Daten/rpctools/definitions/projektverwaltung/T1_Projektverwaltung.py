@@ -195,9 +195,6 @@ class Projektverwaltung(Tool):
         # Berechne Umfang der Flächen
         arcpy.CalculateField_management(teilfaechen_plangebiet, "umfang_meter", "!shape.length@METER!", "PYTHON_9.3")
 
-        # add year
-        startjahr = int(beginn_betrachtung)
-
         cursor = arcpy.UpdateCursor(teilfaechen_plangebiet)
         for i, row in enumerate(cursor):
             row.setValue("id_teilflaeche", i + 1)
@@ -205,6 +202,7 @@ class Projektverwaltung(Tool):
             row.setValue("Name", "Flaeche_" + str(i + 1))
             row.setValue("Aufsiedlungsdauer", 1)
             row.setValue("validiert", 0)
+            row.setValue("Beginn_Nutzung", beginn_betrachtung)
             cursor.updateRow(row)
 
         flaechen_ags = get_ags(teilfaechen_plangebiet, 'id_teilflaeche')
