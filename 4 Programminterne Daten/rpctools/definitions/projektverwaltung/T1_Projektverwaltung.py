@@ -168,7 +168,6 @@ class Projektverwaltung(Tool):
         # add needed fields
         arcpy.AddField_management(teilfaechen_plangebiet, "id_teilflaeche", "LONG")
         arcpy.AddField_management(teilfaechen_plangebiet, "Name", "TEXT")
-        arcpy.AddField_management(teilfaechen_plangebiet, "Startjahr", "LONG")
         arcpy.AddField_management(teilfaechen_plangebiet, "Beginn_Nutzung", "LONG")
         arcpy.AddField_management(teilfaechen_plangebiet, "Aufsiedlungsdauer", "LONG")
         arcpy.AddField_management(teilfaechen_plangebiet, "Flaeche_ha", "DOUBLE", "", "", "", "", "", "")
@@ -176,6 +175,7 @@ class Projektverwaltung(Tool):
         arcpy.AddField_management(teilfaechen_plangebiet, "Nutzungsart", "SHORT")
         arcpy.AddField_management(teilfaechen_plangebiet, "ags_bkg", "TEXT")
         arcpy.AddField_management(teilfaechen_plangebiet, "gemeinde_name", "TEXT")
+        arcpy.AddField_management(teilfaechen_plangebiet, "validiert", "SHORT")
         #arcpy.AddField_management(teilfaechen_plangebiet, "Bilanzsumme", "FLOAT")
 
         # Berechne ha der Teilflaechen
@@ -193,10 +193,10 @@ class Projektverwaltung(Tool):
         cursor = arcpy.UpdateCursor(teilfaechen_plangebiet)
         for i, row in enumerate(cursor):
             row.setValue("id_teilflaeche", i + 1)
-            row.setValue("Startjahr", startjahr)
             row.setValue("Nutzungsart", Nutzungsart.UNDEFINIERT)
             row.setValue("Name", "Flaeche_" + str(i + 1))
-            row.setValue("Aufsiedlungsdauer", 5)
+            row.setValue("Aufsiedlungsdauer", 1)
+            row.setValue("validiert", 0)
             cursor.updateRow(row)
 
         flaechen_ags = get_ags(teilfaechen_plangebiet, 'id_teilflaeche')
@@ -231,23 +231,6 @@ class Projektverwaltung(Tool):
         # 2.Spatial Select wo Planfläche bkg_lyr intersected
         arcpy.SelectLayerByLocation_management("bkg_lyr", "INTERSECT",
                                                projektFlaeche)
-        # Wenn Flaeche = 1, ags extrahieren
-        n = arcpy.GetCount_management("bkg_lyr").getOutput(0)
-        if(int(n) == 0):
-            arcpy.AddMessage("Die Projektflaechen liegen außerhalb der Gemeinden Deutschlands.")
-            ## TODO Dateien loeschen und Projektregistrierung loeschen
-            sys.exit()
-
-        elif(int(n) > 1):
-            arcpy.AddMessage("Die Projektflaechen liegen innerhalb mehrerer Gemeinden, das Tool unterstuetzt zur Zeit keine interkommunalen Projekte.")
-            ## TODO Dateien loeschen und Projektregistrierung loeschen
-
-            sys.exit()
-        elif(int(n) == 1):
-            gemeindeCursor = arcpy.SearchCursor("bkg_lyr")
-            for gemeinde in gemeindeCursor:
-                ags = gemeinde.AGS
-                gen = gemeinde.GEN
 
         # Setzen des Sonderkostenfaktors auf 1 =100% - Sonderkostenfaktor wird im Themenfeld Kosten durch nutzer eingegeben und in der Tabelle aktualisiert
         sonderkostenfaktor = 1

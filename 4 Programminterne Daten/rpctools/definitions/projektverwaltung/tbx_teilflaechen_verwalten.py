@@ -135,7 +135,23 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = self.nutzungsarten.keys()
+        p.filter.list = self.nutzungsarten.keys()        
+    
+        ## Flaechen ID
+        #p = params.flaechen_id = arcpy.Parameter()
+        #p.name = encode(u'fid')
+        #p.displayName = encode(u'fid')
+        #p.parameterType = 'Derived'
+        #p.direction = 'Input'
+        #p.datatype = u'GPLong' 
+        
+        ## Nutzungsart ID
+        #p = params.nutzungsart_id = arcpy.Parameter()
+        #p.name = encode(u'nid')
+        #p.displayName = encode(u'nid')
+        #p.parameterType = 'Derived'
+        #p.direction = 'Input'
+        #p.datatype = u'GPLong' 
 
         return params
 
@@ -147,6 +163,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
         flaeche = params.teilflaeche.value
         if flaeche:
             flaechen_id, flaechenname = self.get_teilflaechen()[flaeche]
+            #params.flaechen_id.value = flaechen_id
             if params.changed('projectname', 'teilflaeche'):
                 self.update_teilflaechen_inputs(flaechen_id, flaechenname)
 
@@ -162,6 +179,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
 
             if params.changed('nutzungsart'):
                 nutzungsart_id = self.nutzungsarten[params.nutzungsart.value]
+                #params.nutzungsart_id.value = nutzungsart_id
                 self.folders.update_table(
                     'Teilflaechen_Plangebiet',
                     {'Nutzungsart': nutzungsart_id},
