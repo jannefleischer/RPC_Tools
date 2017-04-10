@@ -605,10 +605,6 @@ class Output():
     def __init__(self, folders):
         self.folders = folders
 
-    @property
-    def group_path(self):
-        group_path = self.folders.get_layer(projektName, folder='toc')
-        return group_path
 
     def add_output(self, group, featureclass, layername):
         """
@@ -628,9 +624,12 @@ class Output():
 
         # Layer-Gruppe hinuzfuegen, falls nicht vorhanden
         if not arcpy.Exists(group):
-            mxd = arcpy.mapping.MapDocument("CURRENT")
+            current_mxd = arcpy.mapping.MapDocument("CURRENT")
             df = current_mxd.activeDataFrame
-            addLayer = arcpy.mapping.Layer(os.path.join(self.group_path, group))
+            group_layer_template = self.folders.get_layer(layername = group,
+                folder='toc')
+            arcpy.AddMessage(group_layer_template)
+            addLayer = arcpy.mapping.Layer(group_layer_template)
             arcpy.mapping.AddLayer(df, addLayer, "BOTTOM")
 
         # Neuen Layer hinzufuegen
