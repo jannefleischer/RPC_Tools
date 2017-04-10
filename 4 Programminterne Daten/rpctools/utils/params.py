@@ -440,6 +440,55 @@ class Tbx(object):
             new_file.write(src)
 
 
+class Output():
+    """
+    Add and update layers to the current ArcMap file.
+    """
+
+    module = ["Analysen", "Modul 1", "Modul 2", "Modul 3", "Modul 4", "Modul 5", "Modul 6", "Modul 7", 'Projektdefinition',  "Hintergrundkarten"]
+    group_path = r"U:\RPC\TOC_Layer"
+
+    def add_output(projectname=None, group = None, layer = None):
+
+        # Layer-Gruppe hinuzfuegen, falls nicht vorhanden
+        if not arcpy.Exists(group):
+            mxd = arcpy.mapping.MapDocument("CURRENT")
+            df = current_mxd.activeDataFrame
+            addLayer = arcpy.mapping.Layer(join(group_path, group))
+            arcpy.mapping.AddLayer(df, addLayer, "BOTTOM")
+
+        # Neuen Layer hinzufuegen
+        current_mxd = arcpy.mapping.MapDocument("CURRENT")
+        current_dataframe = current_mxd.activeDataFrame
+        target_grouplayer = arcpy.mapping.ListLayers(current_mxd, group, current_dataframe)[0]
+        add_layer = arcpy.mapping.Layer(layer)
+        arcpy.mapping.AddLayerToGroup(current_dataframe, target_grouplayer, add_layer, "BOTTOM")
+
+        # Auf Layer zentrieren
+        new_layer = arcpy.mapping.ListLayers(current_mxd, layer, current_dataframe)[0]
+        ext = new_layer.getExtent()
+        current_dataframe.extent = ext
+        arcpy.RefreshActiveView
+        arcpy.RefreshTOC
+        
+        for lyr in arcpy.mapping. ListLayers (m
+            lyr.visible = False
+        new_layer.visible = True
+        target_grouplayer.visible = True
+        current_mxd.save()
+
+    def delete_output(projectname=None, layer = None):
+
+        if arcpy.Exists(layer):
+            arcpy.Delete_management(layer)
+
+
+    def update_output(projectname=None, group = None, layer = None):
+
+        deleteOutput(projectname, layer)
+        addOutput(projectname, group, layer)
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod(verbose=True)
