@@ -41,10 +41,11 @@ def install_packages(python_path):
     used_packages['matplotlib']='matplotlib-2.0.0-cp27-cp27m-win32.whl'
 
     used_packages['pyodbc']='pyodbc-4.0.16-cp27-cp27m-win32.whl'
-    
-    used_packages['jdcal'] = 'jdcal-1.3.tar.gz'
-    used_packages['et-xmlfile'] = 'et_xmlfile-1.0.1.tar.gz'
-    used_packages['openpyxl'] = 'openpyxl-2.4.5.tar.gz'
+
+    used_packages['jdcal'] = 'jdcal-1.3-py2.py3-none-any.whl'
+    used_packages['et-xmlfile'] = 'et_xmlfile-1.0.1-py2.py3-none-any.whl'
+    used_packages['openpyxl'] = 'openpyxl-2.4.5-py2.py3-none-any.whl'
+
     used_packages['xlrd'] = 'xlrd-1.0.0-py2-none-any.whl'
     used_packages['xlsxwriter'] = 'XlsxWriter-0.9.6-py2.py3-none-any.whl'
 
