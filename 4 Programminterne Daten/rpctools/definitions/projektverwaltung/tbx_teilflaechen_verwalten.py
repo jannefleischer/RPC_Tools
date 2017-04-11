@@ -10,6 +10,7 @@ from rpctools.definitions.projektverwaltung.teilflaeche_verwalten import Teilfla
 
 
 class TbxFlaechendefinition(Tbx):
+    _nutzungsart = None
 
     @property
     def teilflaechen_table(self):
@@ -18,7 +19,7 @@ class TbxFlaechendefinition(Tbx):
     def get_teilflaechen(self, nutzungsart=None):
         """
         get pretty names of all teilflaechen of current project along with
-        their ids and stored names,
+        their ids, stored names and hectars, 
         optionally filtered by nutzungsart
 
         Parameters
@@ -29,15 +30,16 @@ class TbxFlaechendefinition(Tbx):
         Returns
         -------
         teilflaechen : dict
-            key/value pairs of pretty names as keys and (id, name) as values
+            key/value pairs of pretty names as keys and (id, name, ha, ags) as 
+            values
         """
 
         columns = ['id_teilflaeche', 'Flaeche_ha', 'Name',
-                   'gemeinde_name', 'Nutzungsart']
+                   'gemeinde_name', 'Nutzungsart', 'ags_bkg']
         rows = arcpy.da.SearchCursor(self.teilflaechen_table, columns)
         teilflaechen = OrderedDict()
 
-        for flaechen_id, ha, name, gemeinde, nutzungsart_id in rows:
+        for flaechen_id, ha, name, gemeinde, nutzungsart_id, ags in rows:
             # ignore other nutzungsart_ids, if filtering is requested
             if nutzungsart is not None and nutzungsart != nutzungsart_id:
                 continue
@@ -47,7 +49,7 @@ class TbxFlaechendefinition(Tbx):
                 str(gemeinde),
                 '{} ha'.format(round(ha, 2))
             ])
-            teilflaechen[pretty] = flaechen_id, name
+            teilflaechen[pretty] = flaechen_id, name, ha, ags
 
         return teilflaechen
 
@@ -79,7 +81,22 @@ class TbxFlaechendefinition(Tbx):
         p.datatype = u'GPString'
         p.filter.list = []
 
-        return params
+        return params    
+
+    def _updateParameters(self, params):
+        if params.changed('projectname'):
+            params.teilflaeche.value = ''
+            self.update_teilflaechen_list(self._nutzungsart)
+            
+        # add attributes like id to the selected teilflaeche
+        if params.changed('teilflaeche'):
+            flaechen_id, flaechenname, ha, ags = \
+                self.get_teilflaechen()[params.teilflaeche.value]
+            params.teilflaeche.id = flaechen_id
+            params.teilflaeche.flaechenname = flaechenname
+            params.teilflaeche.ha = ha
+            params.teilflaeche.ags = ags
+        return params    
 
     def update_teilflaechen_list(self, nutzungsart=None):
         """update the parameter list of teilflaeche (opt. filter nutzungsart)"""
@@ -87,6 +104,7 @@ class TbxFlaechendefinition(Tbx):
             nutzungsart=nutzungsart).keys()
         self.par.teilflaeche.filter.list = list_teilflaechen
 
+        # select first one
         if list_teilflaechen:
             flaeche = list_teilflaechen[0]
             self.par.teilflaeche.value = flaeche
@@ -135,35 +153,17 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = self.nutzungsarten.keys()        
-    
-        ## Flaechen ID
-        #p = params.flaechen_id = arcpy.Parameter()
-        #p.name = encode(u'fid')
-        #p.displayName = encode(u'fid')
-        #p.parameterType = 'Derived'
-        #p.direction = 'Input'
-        #p.datatype = u'GPLong' 
-        
-        ## Nutzungsart ID
-        #p = params.nutzungsart_id = arcpy.Parameter()
-        #p.name = encode(u'nid')
-        #p.displayName = encode(u'nid')
-        #p.parameterType = 'Derived'
-        #p.direction = 'Input'
-        #p.datatype = u'GPLong' 
+        p.filter.list = self.nutzungsarten.keys()
 
         return params
 
     def _updateParameters(self, params):
-        if params.changed('projectname'):
-            params.teilflaeche.value = ''
-            self.update_teilflaechen_list()
+        params = super(TbxTeilflaecheVerwalten, self)._updateParameters(params)
 
         flaeche = params.teilflaeche.value
         if flaeche:
-            flaechen_id, flaechenname = self.get_teilflaechen()[flaeche]
-            #params.flaechen_id.value = flaechen_id
+            flaechen_id = params.teilflaeche.id
+            flaechenname = params.teilflaeche.flaechenname
             if params.changed('projectname', 'teilflaeche'):
                 self.update_teilflaechen_inputs(flaechen_id, flaechenname)
 
