@@ -38,6 +38,16 @@ def get_ags(features, id_column):
     arcpy.Delete_management(tmp_table)
     return ags_res
 
+def get_gemeindetyp(ags):
+    """get the gemeindetyp referenced by ags"""
+    folders = Folders()
+    table = folders.get_base_table('FGDB_Basisdaten_deutschland.gdb',
+                                   'bkg_gemeinden')
+    columns = ['Gemeindetyp', 'AGS']
+    cursor = arcpy.da.SearchCursor(table, columns, 
+                                   where_clause="AGS='{}'".format(ags))
+    return cursor.next()[0]
+
 if __name__ == '__main__':
     folders = Folders()
     project = folders.get_projects()[0]
@@ -45,4 +55,5 @@ if __name__ == '__main__':
                                            fgdb='FGDB_Definition_Projekt.gdb',
                                            project=project)
     ags = get_ags(teilflaechen_table, 'id_teilflaeche')
+    typ = get_gemeindetyp(ags.values()[0][0])
     print(ags)
