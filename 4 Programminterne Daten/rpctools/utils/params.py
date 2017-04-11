@@ -674,22 +674,63 @@ class Output():
     Add and update layers to the current ArcMap file.
     """
 
-    module = [
-                "Analysen",
-                "Wirkungsbereich 1 - Bewohner und Arbeitsplaetze",
-                "Wirkungsbereich 2 - Erreichbarkeit",
-                "Wirkungsbereich 3 - Verkehr im Umfeld",
-                "Wirkungsbereich 4 - Fläche und Ökologie",
-                "Wirkungsbereich 5 - Infrastrukturfolgekosten",
-                "Wirkungsbereich 6 - Kommunale Steuereinnahmen",
-                "Wirkungsbereich 7 - Standortkonkurrenz Lebensmitteleinzelhandel",
-                "Projektdefinition",
-                "Hintergrundkarten Projekt-Check"
-                ]
+    module = {
+                "analyse" : "Analysen",
+                "modul1": "Wirkungsbereich 1 - Bewohner und Arbeitsplaetze",
+                "modul2": "Wirkungsbereich 2 - Erreichbarkeit",
+                "modul3": "Wirkungsbereich 3 - Verkehr im Umfeld",
+                "modul4": "Wirkungsbereich 4 - Fläche und Ökologie",
+                "modul5": "Wirkungsbereich 5 - Infrastrukturfolgekosten",
+                "modul6": "Wirkungsbereich 6 - Kommunale Steuereinnahmen",
+                "modul7": "Wirkungsbereich 7 - Standortkonkurrenz Lebensmitteleinzelhandel",
+                "projektdefinition": "Projektdefinition",
+                "hintergrundkarten": "Hintergrundkarten Projekt-Check"}
+
+
 
     def __init__(self, folders):
         self.folders = folders
 
+
+    def get_projectlayer(self, projektname):
+        """
+        Check and add project layer
+        """
+
+        current_mxd = arcpy.mapping.MapDocument("CURRENT")
+        current_dataframe = current_mxd.activeDataFrame
+
+        layer_exists = arcpy.mapping.ListLayers(
+                                                    current_mxd,
+                                                    projektname,
+                                                    current_dataframe)
+        if layer_exists:
+            is_grouplayer = layer_exists[0].isGroupLayer
+        else:
+            is_grouplayer = False
+
+        if not layer_exists or not is_grouplayer:
+            group_layer_template = self.folders.get_layer(layername = "__Projektname__", folder='toc', enhance = True)
+            addLayer = arcpy.mapping.Layer(group_layer_template)
+            addLayer.name = projektname
+            arcpy.mapping.AddLayer(current_dataframe, addLayer, "BOTTOM")
+            arcpy.mapping.AddLayerToGroup(project_layer, "Analyse", addLayer, "BOTTOM")
+            arcpy.RefreshActiveView()
+            arcpy.RefreshTOC()
+
+
+    def get_grouplayer(self, project_layer, group, dataframe):
+        """
+        Check and add group layer
+        """
+        if not arcpy.mapping.ListLayers(project_layer, group, dataframe):
+            group_layer_template = self.folders.get_layer(layername = group,
+                folder='toc', enhance = True)
+            addLayer = arcpy.mapping.Layer(group_layer_template)
+            target_grouplayer = arcpy.mapping.ListLayers(current_dataframe, projektname, current_dataframe)[0]
+            arcpy.mapping.AddLayerToGroup(project_layer, "Analyse", addLayer, "BOTTOM")
+            arcpy.RefreshActiveView()
+            arcpy.RefreshTOC()
 
     def add_output(self, group, featureclass, layername):
         """
@@ -707,40 +748,45 @@ class Output():
             the layername (and the name of the .lyr-file)
         """
 
+        projektname = self.folders.project
+
+        #Projekt-Layer hinzufuegen
+        self.get_projectlayer(projektname)
+        arcpy.AddMessage(r"Layer hinzugefügt")
+
         # Layer-Gruppe hinuzfuegen, falls nicht vorhanden
-        if not arcpy.Exists(group):
-            current_mxd = arcpy.mapping.MapDocument("CURRENT")
-            df = current_mxd.activeDataFrame
-            group_layer_template = self.folders.get_layer(layername = group,
-                folder='toc')
-            arcpy.AddMessage(group_layer_template)
-            addLayer = arcpy.mapping.Layer(group_layer_template)
-            arcpy.mapping.AddLayer(df, addLayer, "BOTTOM")
+        current_mxd = arcpy.mapping.MapDocument("CURRENT")
+        current_dataframe = current_mxd.activeDataFrame
+        project_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)[0]
+
+        self.get_grouplayer(project_layer, group, current_dataframe)
 
         # Neuen Layer hinzufuegen
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
-        target_grouplayer = arcpy.mapping.ListLayers(current_mxd, group, current_dataframe)[0]
-        arcpy.MakeFeatureLayer_management(featureclass, layername)
+        target_grouplayer = arcpy.mapping.ListLayers(projektname, group, current_dataframe)[0]
 
-        template_layer = self.folders.get_layer(layername)
-        arcpy.mapping.UpdateLayer(current_dataframe, layername,
-        template_layer, symbology_only=True)
-        arcpy.mapping.AddLayerToGroup(current_dataframe,
-        target_grouplayer, layername, "BOTTOM")
+        template_layer = self.folders.get_layer(layername, enhance = False)
+        source_layer = arcpy.mapping.Layer(template_layer)
+        source_ws = arcpy.Describe(source_layer).path
+        target_ws = arcpy.Describe(featureclass).path
+        source_layer.findAndReplaceWorkspacePath(source_ws, target_ws)
+        arcpy.mapping.AddLayerToGroup(project_layer,
+        target_grouplayer, source_layer, "BOTTOM")
 
         # Auf Layer zentrieren
-        new_layer = arcpy.mapping.ListLayers(current_mxd, layer, current_dataframe)[0]
+        new_layer = arcpy.mapping.ListLayers(projektname, source_layer.name, current_dataframe)[0]
         ext = new_layer.getExtent()
         current_dataframe.extent = ext
-        arcpy.RefreshActiveView
-        arcpy.RefreshTOC
+        arcpy.RefreshActiveView()
+        arcpy.RefreshTOC()
 
-        for lyr in arcpy.mapping. ListLayers:
+        for lyr in arcpy.mapping.ListLayers(projektname):
             lyr.visible = False
         new_layer.visible = True
         target_grouplayer.visible = True
-        current_mxd.save()
+        arcpy.RefreshActiveView()
+        arcpy.RefreshTOC()
 
     def delete_output(self, projectname=None, layer = None):
 

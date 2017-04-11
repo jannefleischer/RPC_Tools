@@ -276,7 +276,7 @@ class Folders(object):
             cursor.updateRow(row)
         del cursor
 
-    def get_layer(self, layername, folder=''):
+    def get_layer(self, layername, folder='', enhance = True):
         """
         A lyr-file
 
@@ -288,11 +288,18 @@ class Folders(object):
         folder : str, optional
             a subfolder
 
+        enhance = boolean, optional
+            True -> ".lyr" will be added to layername
+
         Returns
         -------
         layer : str
             the full path to the lyr-file
         """
-        layerfile = '{}.lyr'.format(layername)
+        if (enhance == True):
+            layerfile = '{}.lyr'.format(layername)
+        else:
+            layerfile = layername
+
         layer = self.join_and_check(self.TEMPLATE_LAYERFOLDER, folder, layerfile)
         return layer
