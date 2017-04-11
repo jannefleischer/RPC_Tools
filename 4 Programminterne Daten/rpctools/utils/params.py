@@ -342,7 +342,7 @@ class Tool(object):
         self.par = params
         self.mes = Message()
         self.folders = ToolFolders(params=self.par)
-        self.output = Output(folders=self.folders)
+        self.output = Output(folders=self.folders, params=params)
 
     def main(self, par, parameters=None, messages=None):
         """
@@ -675,21 +675,22 @@ class Output():
     """
 
     module = {
-                "analyse" : "Analysen",
-                "modul1": "Wirkungsbereich 1 - Bewohner und Arbeitsplaetze",
-                "modul2": "Wirkungsbereich 2 - Erreichbarkeit",
-                "modul3": "Wirkungsbereich 3 - Verkehr im Umfeld",
-                "modul4": "Wirkungsbereich 4 - Fläche und Ökologie",
-                "modul5": "Wirkungsbereich 5 - Infrastrukturfolgekosten",
-                "modul6": "Wirkungsbereich 6 - Kommunale Steuereinnahmen",
-                "modul7": "Wirkungsbereich 7 - Standortkonkurrenz Lebensmitteleinzelhandel",
+                "analysen" : "Analysen",
+                "bevoelkerung": "Wirkungsbereich 1 - Bewohner und Arbeitsplaetze",
+                "erreichbarkeit": "Wirkungsbereich 2 - Erreichbarkeit",
+                "verkehr": "Wirkungsbereich 3 - Verkehr im Umfeld",
+                "oekologie": "Wirkungsbereich 4 - Fläche und Ökologie",
+                "infrastruktur": "Wirkungsbereich 5 - Infrastrukturfolgekosten",
+                "einnahmen": "Wirkungsbereich 6 - Kommunale Steuereinnahmen",
+                "standortkonkurrenz": "Wirkungsbereich 7 - Standortkonkurrenz Lebensmitteleinzelhandel",
                 "projektdefinition": "Projektdefinition",
                 "hintergrundkarten": "Hintergrundkarten Projekt-Check"}
 
 
 
-    def __init__(self, folders):
+    def __init__(self, folders, params):
         self.folders = folders
+        self.params = params
 
 
     def get_projectlayer(self, projektname):
@@ -714,21 +715,41 @@ class Output():
             addLayer = arcpy.mapping.Layer(group_layer_template)
             addLayer.name = projektname
             arcpy.mapping.AddLayer(current_dataframe, addLayer, "BOTTOM")
-            arcpy.mapping.AddLayerToGroup(project_layer, "Analyse", addLayer, "BOTTOM")
+            projekt_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)[0]
             arcpy.RefreshActiveView()
             arcpy.RefreshTOC()
 
 
-    def get_grouplayer(self, project_layer, group, dataframe):
+    def get_headgrouplayer(self, project_layer, dataframe):
         """
-        Check and add group layer
+        Check and add headgroup layer
         """
-        if not arcpy.mapping.ListLayers(project_layer, group, dataframe):
-            group_layer_template = self.folders.get_layer(layername = group,
+        if not arcpy.mapping.ListLayers(project_layer, self.module["projektdefinition"], dataframe):
+            group_layer_template = self.folders.get_layer(layername = self.module["projektdefinition"], folder='toc', enhance = True)
+            addLayer = arcpy.mapping.Layer(group_layer_template)
+            arcpy.mapping.AddLayerToGroup(dataframe, project_layer, addLayer, "BOTTOM")
+
+        if not arcpy.mapping.ListLayers(project_layer, self.module["analysen"], dataframe):
+            group_layer_template = self.folders.get_layer(layername = self.module["analysen"], folder='toc', enhance = True)
+            addLayer = arcpy.mapping.Layer(group_layer_template)
+            arcpy.mapping.AddLayerToGroup(dataframe, project_layer, addLayer, "BOTTOM")
+
+        if not arcpy.mapping.ListLayers(arcpy.mapping.MapDocument("CURRENT"), self.module["hintergrundkarten"], dataframe):
+            group_layer_template = self.folders.get_layer(layername = self.module["hintergrundkarten"], folder='toc', enhance = True)
+            addLayer = arcpy.mapping.Layer(group_layer_template)
+            arcpy.mapping.AddLayer(dataframe, addLayer, "BOTTOM")
+
+
+    def get_subgrouplayer(self, project_layer, subgroup, dataframe):
+        """
+        Check and add subgroup layer
+        """
+        if not arcpy.mapping.ListLayers(project_layer, subgroup, dataframe):
+            group_layer_template = self.folders.get_layer(layername = subgroup,
                 folder='toc', enhance = True)
             addLayer = arcpy.mapping.Layer(group_layer_template)
-            target_grouplayer = arcpy.mapping.ListLayers(current_dataframe, projektname, current_dataframe)[0]
-            arcpy.mapping.AddLayerToGroup(project_layer, "Analyse", addLayer, "BOTTOM")
+            target_grouplayer = arcpy.mapping.ListLayers(project_layer, "Analysen", dataframe)[0]
+            arcpy.mapping.AddLayerToGroup(dataframe, target_grouplayer, addLayer, "BOTTOM")
             arcpy.RefreshActiveView()
             arcpy.RefreshTOC()
 
@@ -748,54 +769,57 @@ class Output():
             the layername (and the name of the .lyr-file)
         """
 
-        projektname = self.folders.project
+        projektname = self.params._get_projectname()
 
-        #Projekt-Layer hinzufuegen
-        self.get_projectlayer(projektname)
-        arcpy.AddMessage(r"Layer hinzugefügt")
-
-        # Layer-Gruppe hinuzfuegen, falls nicht vorhanden
+        # Layer-Gruppen hinuzfuegen, falls nicht vorhanden
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
-        project_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)[0]
 
-        self.get_grouplayer(project_layer, group, current_dataframe)
+        self.get_projectlayer(projektname)
+        project_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)[0]
+        self.get_headgrouplayer(project_layer, current_dataframe)
+        self.get_subgrouplayer(project_layer, group, current_dataframe)
 
         # Neuen Layer hinzufuegen
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
-        target_grouplayer = arcpy.mapping.ListLayers(projektname, group, current_dataframe)[0]
-
+        target_grouplayer = arcpy.mapping.ListLayers(project_layer, group, current_dataframe)[0]
         template_layer = self.folders.get_layer(layername, enhance = False)
         source_layer = arcpy.mapping.Layer(template_layer)
         source_ws = arcpy.Describe(source_layer).path
         target_ws = arcpy.Describe(featureclass).path
         source_layer.findAndReplaceWorkspacePath(source_ws, target_ws)
-        arcpy.mapping.AddLayerToGroup(project_layer,
-        target_grouplayer, source_layer, "BOTTOM")
+        arcpy.mapping.AddLayerToGroup(current_dataframe, target_grouplayer, source_layer, "BOTTOM")
 
         # Auf Layer zentrieren
-        new_layer = arcpy.mapping.ListLayers(projektname, source_layer.name, current_dataframe)[0]
+        new_layer = arcpy.mapping.ListLayers(project_layer, source_layer.name, current_dataframe)[0]
         ext = new_layer.getExtent()
         current_dataframe.extent = ext
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
 
-        for lyr in arcpy.mapping.ListLayers(projektname):
+        for lyr in arcpy.mapping.ListLayers(project_layer):
             lyr.visible = False
         new_layer.visible = True
         target_grouplayer.visible = True
+        project_layer.visible = True
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
 
-    def delete_output(self, projectname=None, layer = None):
+    def delete_output(self, layer):
 
-        if arcpy.Exists(layer):
+        projektname = self.params._get_projectname()
+        current_mxd = arcpy.mapping.MapDocument("CURRENT")
+        current_dataframe = current_mxd.activeDataFrame
+        project_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)[0]
+        layer_exists = arcpy.mapping.ListLayers(project_layer, layer, current_dataframe)[0]
+        if layer_exists:
             arcpy.Delete_management(layer)
-
 
     def update_output(self, group, layername ):
         """"""
+        projektname = self.params._get_projectname()
+
 
 
 
