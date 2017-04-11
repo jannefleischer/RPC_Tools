@@ -14,12 +14,9 @@
 
 
 # Import arcpy modules
-import os
 import gc
-import sys
 
 import arcpy
-from os.path import join
 from rpctools.utils.params import Tool
 from rpctools.utils.encoding import encode
 
@@ -47,16 +44,12 @@ class Basisdatenbearbeiten(Tool):
 
     def run(self):
 
-        messages = self.mes
-        parameters = self.par
-
         arcpy.env.overwriteOutput = True
 
         #Abgeleitete Variablen
         Teilflaechen_Plangebiet = self.folders.get_table(
             'Teilflaechen_Plangebiet', workspace=self.ws_definition)
-        Teilflaechen_Plangebiet_Proj = self.folders.get_table(
-            'Teilflaechen_Plangebiet')
+
         Teilflaechen_Plangebiet_Buffer = self.folders.get_table(
             'Teilflaechen_Plangebiet_Buffer', check=False)
         bounding_box = self.folders.get_table('Teilflaechen_Plangebiet_BBox',
@@ -64,8 +57,7 @@ class Basisdatenbearbeiten(Tool):
 
         gridWGS84 = self.folders.get_table('Siedlungszellen',
                                            check=False)
-        grid_bound = self.folders.get_table('Gridbound',
-                                            check=False)
+
 
         zensusRaster = self.folders.get_base_table(
             'ZensusGrid', 'Zensus2011GridWGS84_int.tif', )
@@ -80,19 +72,19 @@ class Basisdatenbearbeiten(Tool):
         #############################################################################################################
         #Puffern und Entstehende Elemente Zusammenfuehren (Dissolve)
         schrittmeldung = u'2000m Umring um Teilflächen des Plangebietes erstellen \n'
-        messages.AddMessage(encode(schrittmeldung))
+        arcpy.AddMessage(encode(schrittmeldung))
 
         arcpy.Buffer_analysis(Teilflaechen_Plangebiet, Teilflaechen_Plangebiet_Buffer, "2000 Meters", "FULL", "ROUND", "NONE", "")
 
         schrittmeldung = u'Entstehende Elemente zu einem Projektumkreis zusammenführen \n'
-        messages.AddMessage(encode(schrittmeldung))
+        arcpy.AddMessage(encode(schrittmeldung))
 
         arcpy.Dissolve_management(Teilflaechen_Plangebiet_Buffer, bounding_box, "", "", "MULTI_PART", "DISSOLVE_LINES")
 
         #############################################################################################################
         #Zensus 2011 Raster zuschneiden
         schrittmeldung = u'Zensus-2011-Raster zuschneiden'
-        messages.AddMessage(encode(schrittmeldung))
+        arcpy.AddMessage(encode(schrittmeldung))
 
         # ClipDeutschlandRaster
         arcpy.Clip_management(zensusRaster, "#", clippedRaster, bounding_box, "0", "ClippingGeometry")
@@ -103,7 +95,7 @@ class Basisdatenbearbeiten(Tool):
         #############################################################################################################
         #SiedlungszellenIDs erzeugen
         schrittmeldung = u'SiedlungszellenIDs und Einwohnerzahl erzeugen \n'
-        messages.AddMessage(encode(schrittmeldung))
+        arcpy.AddMessage(encode(schrittmeldung))
 
         # Felder hinzufügen
         arcpy.AddField_management(gridWGS84, "SZ_ID", "LONG", 9, "", "", "SZ_ID", "NULLABLE", "REQUIRED")
@@ -119,12 +111,12 @@ class Basisdatenbearbeiten(Tool):
         #############################################################################################################
         # Einladen der Umgebungslayer
         beginmeldung = u'Starte Überarbeitung Übergabepunkte \n'
-        messages.AddMessage(encode(beginmeldung))
+        arcpy.AddMessage(encode(beginmeldung))
 
         #############################################################################################################
         # Schritt 1 - Fuege Layer hinzu
         schrittmeldung = u'Füge Layer hinzu \n'
-        messages.AddMessage(encode(schrittmeldung))
+        arcpy.AddMessage(encode(schrittmeldung))
 
         OSM_Baselayer = self.folders.get_layer('OpenStreetMap', enhance=True)
         Teilflaechen_Plangebiet = self.folders.get_table(
@@ -164,7 +156,7 @@ class Basisdatenbearbeiten(Tool):
         #############################################################################################################
         #Aufraeumen und ueberfluessige Variablen loeschen
         schrittmeldung = 'Aufräumen und überfluessige Variablen löschen \n'
-        messages.AddMessage(encode(schrittmeldung))
+        arcpy.AddMessage(encode(schrittmeldung))
 
         deletelist = [clippedRaster, bounding_box,
                       Teilflaechen_Plangebiet_Buffer]
@@ -176,4 +168,4 @@ class Basisdatenbearbeiten(Tool):
         # Endmeldung
         gc.collect()
         message = 'Script abgeschlossen'
-        messages.AddMessage(encode(message))
+        arcpy.AddMessage(encode(message))
