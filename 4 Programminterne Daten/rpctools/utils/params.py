@@ -231,7 +231,14 @@ class Params(object):
             param = self._od[name]
             if param.altered and not param.hasBeenValidated:
                 change = True
-        return change
+        return change    
+
+    def set_changed(self, *names):
+        """set parameter with names to altered and not validated"""
+        for name in names:
+            param = self._od[name]
+            param.altered = True 
+            param.hasBeenValidated = True    
 
     def toolbox_opened(self):
         """return True if toolbox is opened"""
@@ -402,7 +409,7 @@ class Dependency():
         params : Param object
         """
         if self.type == 'sum':
-            self._update_sum(params)
+            self._set_sum(params)
         
     def _set_sum(self, params):
         """set values of dependent parameters to sum up to target value"""
