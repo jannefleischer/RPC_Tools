@@ -15,6 +15,7 @@ from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten import \
 from rpctools.definitions.nutzungsart.nutzungen import Nutzungen
 from rpctools.utils.encoding import encode
 from rpctools.utils.constants import Branche, Gewerbegebietstyp
+from rpctools.utils.spatial_lib import get_gemeindetyp
 from collections import OrderedDict
 
 
@@ -63,13 +64,7 @@ class TbxNutzungen(TbxFlaechendefinition):
         param.category = heading
 
         return params
-
-    def _updateParameters(self, params):
-        if params.changed('projectname'):
-            params.teilflaeche.value = ''
-            self.update_teilflaechen_list(self._nutzungsart)
-        return params
-
+    
 
 class TbxNutzungenWohnen(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='a', name='Wohnen')
@@ -215,8 +210,11 @@ class TbxNutzungenWohnen(TbxNutzungen):
 class TbxNutzungenGewerbe(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='b', name='Gewerbe')
     _nutzungsart = Nutzungsart.GEWERBE
+    
+    # properties derived from base tables
     _gewerbegebietstypen = None
     _presets = None
+    _dichtekennwerte = None
 
     @property
     def Tool(self):
@@ -253,7 +251,26 @@ class TbxNutzungenGewerbe(TbxNutzungen):
                 if id_gewerbe not in self._presets:
                     self._presets[id_gewerbe] = {}
                 self._presets[id_gewerbe][id_branche] = value
-        return self._presets    
+        return self._presets
+    
+    @property
+    def dichtekennwerte(self):    
+        """dictionary with gewerbetyp as keys and dictionaries 
+        (key / value-pairs: id branche / jobs per ha) as values"""        
+        if self._dichtekennwerte is None:            
+            table = self.folders.get_base_table(
+                'FGDB_Definition_Projekt_Tool.gdb',
+                'Dichtekennwerte_Gewerbe')
+            self._dichtekennwerte = {}
+            columns = ['Gemeindetyp_ProjektCheck', 
+                       'ID_Branche_ProjektCheck', 
+                       'AP_pro_ha_brutto']
+            cursor = arcpy.da.SearchCursor(table, columns)
+            for gemeindetyp, id_branche, jobs_per_ha in cursor: 
+                if gemeindetyp not in self._dichtekennwerte:
+                    self._dichtekennwerte[gemeindetyp] = {}
+                self._dichtekennwerte[gemeindetyp][id_branche] = jobs_per_ha
+        return self._dichtekennwerte    
 
     def _getParameterInfo(self):
         params = super(TbxNutzungenGewerbe, self)._getParameterInfo()
@@ -403,6 +420,9 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.direction = 'Input'
         param.datatype = u'GPLong'
         param.category = heading
+        param.enabled = False
+        param.filter.type = 'Range'
+        param.filter.list = [0, 2000]
 
         return params
     
@@ -416,29 +436,58 @@ class TbxNutzungenGewerbe(TbxNutzungen):
 
     def _updateParameters(self, params):
         params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
+
+        reestimate_jobs = False
         
         # set presets
         if self.par.changed('gebietstyp'):
             id_gewerbe = self.gewerbegebietstypen[params.gebietstyp.value]
             if id_gewerbe != Gewerbegebietstyp.BENUTZERDEFINIERT:
                 self.set_gewerbe_presets(id_gewerbe)
+                reestimate_jobs = True
                 # ToDo: write to db
-                
-        # if one of the values is changed, set selection to "benutzerdefiniert"
-        for param_name in self.branche_params:
-            if self.par.changed(param_name):
+        else:
+            altered = False
+            # check if one of the branchenanteile changed
+            if any(map(self.par.changed, self.branche_params)):
+                # set selection to "benutzerdefiniert" and recalc. jobs
                 self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
-                
+                reestimate_jobs = True
+         
+        auto_idx = self.par.auto_select.filter.list.index(
+            self.par.auto_select.value)
+        
         if self.par.changed('auto_select'):
-            idx = auto_select.filter.list.index(auto_select.value)
             # auto calc. entry
-            if idx == 0:
-                pass
+            if auto_idx == 0:
+                reestimate_jobs = True
+                params.arbeitsplaetze_insgesamt.enabled = False
             # manual entry
-            else:
-                pass
+            else:                
+                params.arbeitsplaetze_insgesamt.enabled = True
+        
+        if reestimate_jobs and auto_idx == 0:
+            self.set_estimate_jobs()
+            # ToDo write to gdb
             
         return params
+    
+    def set_estimate_jobs(self):
+        """calculate estimation of number of jobs and set value of corresponding 
+        param 'arbeitsplaetze_insgesamt'"""
+        if not self.par.teilflaeche.value:
+            return
+        n_jobs = 0
+        ha = self.par.teilflaeche.ha
+        ags = self.par.teilflaeche.ags
+        gemeindetyp = get_gemeindetyp(ags)
+        kennwerte = self.dichtekennwerte[gemeindetyp]
+        for name in self.branche_params:
+            param = self.par[name]
+            jobs_per_ha = kennwerte[param.id_branche]
+            n_jobs += ha * (param.value / 100.) * jobs_per_ha
+        
+        self.par.arbeitsplaetze_insgesamt.value = n_jobs
 
     def _updateMessages(self, params):
         pass
@@ -1045,7 +1094,6 @@ class TbxNutzungenAlt(Tbx):
                     params.ant_jobs_sonst_dl.value = row[7]
                     params.zuzugsquote_gewerbe.value = row[8]
                     params.ant_eigentum_gewerbe.value = row[9]
-
 
             #Einzelhandel (nur Lebensmitteleinzelhandel)
             fields = ['Verkaufsflaeche', 'Teilflaeche_Plangebiet']
