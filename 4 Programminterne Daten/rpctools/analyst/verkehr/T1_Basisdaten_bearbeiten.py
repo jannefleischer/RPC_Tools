@@ -21,8 +21,29 @@ import sys
 import arcpy
 from os.path import join
 from rpctools.utils.params import Tool
+from rpctools.utils.encoding import encode
+
 
 class Basisdatenbearbeiten(Tool):
+    ws_definition = 'FGDB_Definition_Projekt.gdb'
+    _dbname = 'FGDB_Verkehr.gdb'
+
+    def delete_feature_classes(self, deletelist):
+        """
+        delete feature classes
+
+        Parameters
+        ----------
+        deletelist : list of str
+            the feature classes to be deleted
+        """
+        for element in deletelist:
+            try:
+                e = str(element)
+                arcpy.Delete_management(e)
+            except:
+                arcpy.AddWarning(encode(
+                    "{} konnte nicht gelöscht werden".format(element)))
 
     def run(self):
 
@@ -31,56 +52,47 @@ class Basisdatenbearbeiten(Tool):
 
         arcpy.env.overwriteOutput = True
 
-        #Pfade einrichten
-
-        projektname = self.par.projectname.value
-
-        base_path = str(sys.path[0]).split("2 Planungsprojekte analysieren")[0] # Pfad zum Basisverzeichnis RPC
-        workspace_projekt_definition =  self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
-        workspace_projekt_verkehr = self.folders.get_db('FGDB_Verkehr.gdb', projektname)
-        directory_tool_verkehr = join(base_path,'4 Programminterne Daten','rpctools', 'analyst', 'verkehr')
-
         #Abgeleitete Variablen
-        Teilflaechen_Plangebiet = join(workspace_projekt_definition, 'Teilflaechen_Plangebiet')
-        Teilflaechen_Plangebiet_Proj = join(workspace_projekt_verkehr, 'Teilflaechen_Plangebiet')
-        Teilflaechen_Plangebiet_Buffer = join(workspace_projekt_verkehr, 'Teilflaechen_Plangebiet_Buffer')
-        bounding_box = join(workspace_projekt_verkehr, 'Teilflaechen_Plangebiet_BBox')
+        Teilflaechen_Plangebiet = self.folders.get_table(
+            'Teilflaechen_Plangebiet', workspace=self.ws_definition)
+        Teilflaechen_Plangebiet_Proj = self.folders.get_table(
+            'Teilflaechen_Plangebiet')
+        Teilflaechen_Plangebiet_Buffer = self.folders.get_table(
+            'Teilflaechen_Plangebiet_Buffer', check=False)
+        bounding_box = self.folders.get_table('Teilflaechen_Plangebiet_BBox',
+                                              check=False)
 
-        gridWGS84 = join(workspace_projekt_verkehr, 'Siedlungszellen')
-        grid_bound = join(workspace_projekt_verkehr, 'Gridbound')
+        gridWGS84 = self.folders.get_table('Siedlungszellen',
+                                           check=False)
+        grid_bound = self.folders.get_table('Gridbound',
+                                            check=False)
 
-        zensusRaster = join(base_path, '4 Programminterne Daten','fgdbs','ZensusGrid','Zensus2011GridWGS84_int.tif')
-        clippedRaster = join(base_path, '3 Benutzerdefinierte Projekte', projektname,'clippedZensus100mGrid.tif')
+        zensusRaster = self.folders.get_base_table(
+            'ZensusGrid', 'Zensus2011GridWGS84_int.tif', )
+        clippedRaster = self.folders.get_table('clippedZensus100mGrid.tif', check=False)
 
         #ggf vorhandene Layer loeschen
-        deletelist = [gridWGS84, clippedRaster, bounding_box, Teilflaechen_Plangebiet_Buffer]
+        deletelist = [gridWGS84, clippedRaster,
+                      bounding_box, Teilflaechen_Plangebiet_Buffer]
 
-        for element in deletelist:
-        	try:
-        		e = str(element)
-        		arcpy.Delete_management(e)
-        	except:
-        		print element, "konnte nicht geloescht werden"
+        self.delete_feature_classes(deletelist)
 
         #############################################################################################################
         #Puffern und Entstehende Elemente Zusammenfuehren (Dissolve)
-        schrittmeldung = '2000m Umring um Teilflaechen des Plangebietes erstellen \n'
-        messages.AddMessage(schrittmeldung)
-        print schrittmeldung
+        schrittmeldung = u'2000m Umring um Teilflächen des Plangebietes erstellen \n'
+        messages.AddMessage(encode(schrittmeldung))
 
         arcpy.Buffer_analysis(Teilflaechen_Plangebiet, Teilflaechen_Plangebiet_Buffer, "2000 Meters", "FULL", "ROUND", "NONE", "")
 
-        schrittmeldung = 'Entstehende Elemente zu einem Projektumkreis zusammenfuehren \n'
-        messages.AddMessage(schrittmeldung)
-        print schrittmeldung
+        schrittmeldung = u'Entstehende Elemente zu einem Projektumkreis zusammenführen \n'
+        messages.AddMessage(encode(schrittmeldung))
 
         arcpy.Dissolve_management(Teilflaechen_Plangebiet_Buffer, bounding_box, "", "", "MULTI_PART", "DISSOLVE_LINES")
 
         #############################################################################################################
         #Zensus 2011 Raster zuschneiden
-        schrittmeldung = 'Zensus-2011-Raster zuschneiden'
-        messages.AddMessage(schrittmeldung)
-        print schrittmeldung
+        schrittmeldung = u'Zensus-2011-Raster zuschneiden'
+        messages.AddMessage(encode(schrittmeldung))
 
         # ClipDeutschlandRaster
         arcpy.Clip_management(zensusRaster, "#", clippedRaster, bounding_box, "0", "ClippingGeometry")
@@ -90,9 +102,8 @@ class Basisdatenbearbeiten(Tool):
 
         #############################################################################################################
         #SiedlungszellenIDs erzeugen
-        schrittmeldung = 'SiedlungszellenIDs und Einwohnerzahl erzeugen \n'
-        messages.AddMessage(schrittmeldung)
-        print schrittmeldung
+        schrittmeldung = u'SiedlungszellenIDs und Einwohnerzahl erzeugen \n'
+        messages.AddMessage(encode(schrittmeldung))
 
         # Felder hinzufügen
         arcpy.AddField_management(gridWGS84, "SZ_ID", "LONG", 9, "", "", "SZ_ID", "NULLABLE", "REQUIRED")
@@ -107,23 +118,24 @@ class Basisdatenbearbeiten(Tool):
 
         #############################################################################################################
         # Einladen der Umgebungslayer
-        beginmeldung = 'Starte Ueberarbeitung Uebergabepunkte \n'
-        messages.AddMessage(beginmeldung)
-        print beginmeldung
+        beginmeldung = u'Starte Überarbeitung Übergabepunkte \n'
+        messages.AddMessage(encode(beginmeldung))
 
         #############################################################################################################
         # Schritt 1 - Fuege Layer hinzu
-        schrittmeldung = 'Fuege Layer hinzu \n'
-        messages.AddMessage(schrittmeldung)
-        print schrittmeldung
+        schrittmeldung = u'Füge Layer hinzu \n'
+        messages.AddMessage(encode(schrittmeldung))
 
-        OSM_Baselayer = arcpy.mapping.Layer(join(directory_tool_verkehr,'OpenStreetMap.lyr'))
-        Teilflaechen_Plangebiet = arcpy.mapping.Layer(join(workspace_projekt_definition,'Teilflaechen_Plangebiet'))
-        L00_Umfeldabgrenzung = arcpy.mapping.Layer(join(workspace_projekt_verkehr,'L00_Umfeldabgrenzung'))
-        L01_Uebergabepunkte = arcpy.mapping.Layer(join(workspace_projekt_verkehr,'L01_Uebergabepunkte'))
-        L10_Bestand_Arbeitsplaetze = arcpy.mapping.Layer(join(workspace_projekt_verkehr,'L10_Bestand_Arbeitsplaetze'))
-        L11_Bestand_Einzelhandelsflaechen = arcpy.mapping.Layer(join(workspace_projekt_verkehr,'L11_Bestand_Einzelhandelsflaechen'))
-        L11_Bestand_Schulen = arcpy.mapping.Layer(join(workspace_projekt_verkehr,'L11_Bestand_Schulen'))
+        OSM_Baselayer = self.folders.get_layer('OpenStreetMap', enhance=True)
+        Teilflaechen_Plangebiet = self.folders.get_table(
+            'Teilflaechen_Plangebiet', workspace=self.ws_definition)
+        L00_Umfeldabgrenzung = self.folders.get_table('L00_Umfeldabgrenzung')
+        L01_Uebergabepunkte = self.folders.get_table('L01_Uebergabepunkte')
+        L10_Bestand_Arbeitsplaetze = self.folders.get_table(
+            'L10_Bestand_Arbeitsplaetze')
+        L11_Bestand_Einzelhandelsflaechen = self.folders.get_table(
+            'L11_Bestand_Einzelhandelsflaechen')
+        L11_Bestand_Schulen = self.folders.get_table('L11_Bestand_Schulen')
 
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = arcpy.mapping.ListDataFrames(mxd, "*")[0]
@@ -143,32 +155,25 @@ class Basisdatenbearbeiten(Tool):
         layers = arcpy.mapping.ListLayers(mxd, "*", df)
 
         for layer in layers:
-        	if layer.name in names:
-        		layer.visible = False
+            if layer.name in names:
+                layer.visible = False
 
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
 
         #############################################################################################################
         #Aufraeumen und ueberfluessige Variablen loeschen
-        schrittmeldung = 'Aufraeumen und ueberfluessige Variablen loeschen \n'
-        messages.AddMessage(schrittmeldung)
-        print schrittmeldung
+        schrittmeldung = 'Aufräumen und überfluessige Variablen löschen \n'
+        messages.AddMessage(encode(schrittmeldung))
 
-        deletelist = [clippedRaster, bounding_box, Teilflaechen_Plangebiet_Buffer]
+        deletelist = [clippedRaster, bounding_box,
+                      Teilflaechen_Plangebiet_Buffer]
 
-        for element in deletelist:
-        	try:
-        		e = str(element)
-        		arcpy.Delete_management(e)
-        	except:
-        		print element, "konnte nicht geloescht werden"
-
+        self.delete_feature_classes(deletelist)
         gc.collect()
 
         #############################################################################################################
         # Endmeldung
         gc.collect()
         message = 'Script abgeschlossen'
-        print message
-        messages.AddMessage(message)
+        messages.AddMessage(encode(message))
