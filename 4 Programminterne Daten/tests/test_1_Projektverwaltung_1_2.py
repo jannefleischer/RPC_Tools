@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from rpctools.definitions.projektverwaltung.tbx_projektverwaltung import TbxProjektVerwaltung
-from rpctools.definitions.projektverwaltung.tbx_teilflaechen_benennen import TbxTeilflaecheBenennen
+from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten import TbxTeilflaecheVerwalten
 from rpctools.definitions.projektverwaltung.T1_Projektverwaltung import Projektverwaltung
-from rpctools.definitions.projektverwaltung.teilflaeche_benennen import TeilflaechenBenennen
+from rpctools.definitions.projektverwaltung.teilflaeche_verwalten import TeilflaechenVerwalten
 
 from test_lib import mocked_map_document, test_name, remove_project_dir
 import gc
@@ -71,4 +71,3 @@ def test_try():
 
 #if __name__ == '__main__':
 #    pytest.main([__file__])
-
