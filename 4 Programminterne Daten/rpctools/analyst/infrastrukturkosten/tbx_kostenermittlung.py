@@ -302,8 +302,9 @@ class TbxInfrastrukturkostenermittlung(Tbx):
 
             projectname = self.par.projectname.value
 
-            tablepath_costrules_project = self.folders.get_table('Projektspez_Kostenauft',
-                                                                 fgdb='FGDB_Kosten.gdb')
+            tablepath_costrules_project = self.folders.get_table(
+                'Projektspez_Kostenauft',
+                workspace='FGDB_Kosten.gdb')
 
             #params = self.par
 

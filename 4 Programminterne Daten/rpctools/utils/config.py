@@ -92,7 +92,7 @@ class Folders(object):
         self.BASE_PATH = abspath(join(dirname(__file__), '..', '..', '..'))
         self._PROJECT_BASE_PATH = '3 Benutzerdefinierte Projekte'
         self._INTERN = '4 Programminterne Daten'
-        self._BASE_DBS = 'fgdbs'
+        self._BASE_DBS = 'workspaces'
         self._TEMPORARY_GDB_PATH = 'temp_gdb'
         self._TEMPLATE_BASE_PATH = 'templates'
         self._TEMPLATE_FLAECHEN = 'projektflaechen_template.shp'
@@ -267,75 +267,75 @@ class Folders(object):
         """The Projectpath"""
         return self.join_and_check(self.PROJECT_PATH, self._AUSGABE_PATH)
 
-    def get_db(self, fgdb='', project=None, check=True):
+    def get_db(self, workspace='', project=None, check=True):
         """
-        A FileGeodatabase in the Project Folder
+        A Workspace in the Project Folder
 
         Parameters
         ----------
-        fgdb : str, optional
-            the name of the FileGeodatabase
+        workspace : str, optional
+            the name of the Workspace
         project : str, optional
             the project name
 
         Returns
         -------
         projectdb : str
-            the full path of the FileGeodatabase
+            the full path of the Workspace
         """
-        dbname = basename(fgdb) or self.dbname
+        dbname = basename(workspace) or self.dbname
         projectname = project or self.project
         return self.join_and_check(self.get_projectpath(projectname), dbname,
                                    check=check)
 
-    def get_table(self, tablename, fgdb='', project='', check=True):
+    def get_table(self, tablename, workspace='', project='', check=True):
         """
-        A Table in a FileGeodatabase in the Project Folder
+        A Table in a Workspace in the Project Folder
 
         Parameters
         ----------
         tablename : str
-        fgdb : str, optional
-            the name of the FileGeodatabase
+        workspace : str, optional
+            the name of the Workspace
         project : str, optional
             the project name
 
         Returns
         -------
         table : str
-            the full path to a table in the FileGeodatabase
+            the full path to a table in the Workspace
         """
-        dbname = basename(fgdb) or self.dbname
+        dbname = basename(workspace) or self.dbname
         projectname = project or self.project
         table = self.join_and_check(self.get_db(dbname, projectname),
                                     tablename,
                                     check=check)
         return table        
 
-    def get_basedb(self, fgdb, check=True):
+    def get_basedb(self, workspace, check=True):
         """
-        A Base FileGeodatabase
+        A Base Workspace
 
         Parameters
         ----------
-        fgdb : str
-            the name of the FileGeodatabase
+        workspace : str
+            the name of the Workspace
 
         Returns
         -------
         basedb : str
-            the full path of the FileGeodatabase
+            the full path of the Workspace
         """
-        return self.join_and_check(self.BASE_DBS, fgdb, check=check)
+        return self.join_and_check(self.BASE_DBS, workspace, check=check)
 
-    def get_base_table(self, fgdb, table, check=True):
+    def get_base_table(self, workspace, table, check=True):
         """
-        A Table in a Base FileGeodatabase
+        A Table in a Base Workspace
 
         Parameters
         ----------
-        fgdb : str
-            the name of the FileGeodatabase
+        workspace : str
+            the name of the Workspace
         tablename : str
             the name of the table
         check : bool
@@ -344,12 +344,41 @@ class Folders(object):
         Returns
         -------
         base_table : str
-            the full path to the table in the Base FileGeodatabase
+            the full path to the table in the Base Workspace
         """
-        dbname = basename(fgdb)
+        dbname = basename(workspace)
         table = self.join_and_check(self.get_basedb(dbname), table,
                                     check=check)
         return table
+
+    def update_table(self, table, column_values, where=None, workspace='',
+                     project='', check=True):
+        """
+        Update rows in a Workspace in the Project Folder
+
+        Parameters
+        ----------
+        table : str
+            the name of the table
+        column_values: dict,
+            the columns and the values to update them with as key/value-pairs
+        where: str, optional
+            a where clause to pick single rows
+        workspace : str, optional
+            the name of the Workspace
+        project : str, optional
+            the project name
+        check : bool, optional
+            if false, don't check if table exists
+        """
+        table = self.get_table(table, workspace=workspace, project=project, check=True)
+        columns = column_values.keys()
+        cursor = arcpy.da.UpdateCursor(table, columns, where_clause=where)
+        for row in cursor:
+            for i, column in enumerate(columns):
+                row[i] = column_values[column]
+            cursor.updateRow(row)
+        del cursor
 
     def get_layer(self, layername, folder='', enhance = True):
         """

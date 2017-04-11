@@ -51,9 +51,10 @@ def get_gemeindetyp(ags):
 if __name__ == '__main__':
     folders = Folders()
     project = folders.get_projects()[0]
-    teilflaechen_table = folders.get_table('Teilflaechen_Plangebiet',
-                                           fgdb='FGDB_Definition_Projekt.gdb',
-                                           project=project)
+    teilflaechen_table = folders.get_table(
+        'Teilflaechen_Plangebiet',
+        workspace='FGDB_Definition_Projekt.gdb',
+        project=project)
     ags = get_ags(teilflaechen_table, 'id_teilflaeche')
     typ = get_gemeindetyp(ags.values()[0][0])
     print(ags)

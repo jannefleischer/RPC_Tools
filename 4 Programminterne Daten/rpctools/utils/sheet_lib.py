@@ -22,7 +22,7 @@ def infosheet(projektname, wirkungsfeld, wb):
     folders = Folders()
     # Pfade setzen
     base_path = folders.BASE_PATH
-    workspace_factsheet = folders.get_db(fgdb='FGDB_Definition_Projekt.gdb', project=projektname)
+    workspace_factsheet = folders.get_db(workspace='FGDB_Definition_Projekt.gdb', project=projektname)
     tablepath_vor = join(workspace_factsheet,'Vornutzungen_Details_Prozent')
     tablepath_teil = join(workspace_factsheet,'Teilflaechen_Plangebiet')
     tablepath_neu  = join(workspace_factsheet,'Flaechenbilanz_gruppiert')
@@ -124,18 +124,18 @@ def infosheet(projektname, wirkungsfeld, wb):
 
     rows = arcpy.SearchCursor(tablepath_neu)
     for row in rows:
-    	typ = row.getValue("Flaechennutzung_S2")
-    	wert = row.getValue("Flaeche_ha")
-    	anteil = wert / gesamtflaeche_neu
-    	if typ == 'Gewerbeflaeche': gewerbe_neu = gewerbe_neu + anteil
-    	if typ == 'Laermschutzanlagen': laerm_neu = laerm_neu + anteil
-    	if typ == 'Oeffentlich - Innere Erschliessung' or typ == 'Oeffentlich - Aeussere Erschliessung' or typ == 'Privat - Innere Erschliessung': erschlie_neu = erschlie_neu + anteil
-    	if typ == 'Gemeinbedarfsflaeche' or typ == 'Spielplaetze': sozial_neu = sozial_neu + anteil
-    	if typ == 'Einzelhandel': ezh_neu = ezh_neu + anteil
-    	if typ == 'Nettowohnbauland': wohnen_neu = wohnen_neu + anteil
-    	if typ == 'Allgemeine Gruenflaechen' or typ == 'Strassenbegleitgruen': gruen_neu = gruen_neu + anteil
-    	if typ == 'Ausgleichs- und Ersatzflaechen': natur_neu = natur_neu + anteil
-    	if typ == 'Sonstige Flaechen': sonstige_neu = sonstige_neu + anteil
+        typ = row.getValue("Flaechennutzung_S2")
+        wert = row.getValue("Flaeche_ha")
+        anteil = wert / gesamtflaeche_neu
+        if typ == 'Gewerbeflaeche': gewerbe_neu = gewerbe_neu + anteil
+        if typ == 'Laermschutzanlagen': laerm_neu = laerm_neu + anteil
+        if typ == 'Oeffentlich - Innere Erschliessung' or typ == 'Oeffentlich - Aeussere Erschliessung' or typ == 'Privat - Innere Erschliessung': erschlie_neu = erschlie_neu + anteil
+        if typ == 'Gemeinbedarfsflaeche' or typ == 'Spielplaetze': sozial_neu = sozial_neu + anteil
+        if typ == 'Einzelhandel': ezh_neu = ezh_neu + anteil
+        if typ == 'Nettowohnbauland': wohnen_neu = wohnen_neu + anteil
+        if typ == 'Allgemeine Gruenflaechen' or typ == 'Strassenbegleitgruen': gruen_neu = gruen_neu + anteil
+        if typ == 'Ausgleichs- und Ersatzflaechen': natur_neu = natur_neu + anteil
+        if typ == 'Sonstige Flaechen': sonstige_neu = sonstige_neu + anteil
     del rows
 
     # Gemeindename einesen
@@ -224,8 +224,8 @@ def infosheet(projektname, wirkungsfeld, wb):
     ws2.write_column('A2', category_names)
 
     for n,i in enumerate(data_neu):
-    	if i > 0:
-    		ws2.write(n+1,1,data_neu[n], percent) # nur Werte >0 in die Tabelle schreiben um Labels mit 0,0% zu vermeiden
+        if i > 0:
+            ws2.write(n+1,1,data_neu[n], percent) # nur Werte >0 in die Tabelle schreiben um Labels mit 0,0% zu vermeiden
 
 
     ######## 5. Diagramm Flächenbilanz erstellen ########
@@ -235,49 +235,49 @@ def infosheet(projektname, wirkungsfeld, wb):
     chart.set_size({'width': 1170, 'height': 200})
     chart.set_chartarea({'border': {'none': True}})
     chart.set_title({
-    	'name': 'FLÄCHENBILANZ'.decode('utf-8'),
-    	'name_font': {
-    		'size': 14
-    	},
-    	'layout': {
-    		'x': 0.003,
-    		'y': 0.05,
-    	}
+        'name': 'FLÄCHENBILANZ'.decode('utf-8'),
+            'name_font': {
+                'size': 14
+                    },
+            'layout': {
+                'x': 0.003,
+                    'y': 0.05,
+            }
     })
 
     chart.set_x_axis({
-    	'num_font': {
-    		'color': '#7f7f7f',
-    	},
-    	'major_gridlines': {
-    		'visible': True,
-    		'line': {
-    			'width': 0.75,
-    			'dash_type': 'dash',
-    			'color': '#bfbfbf',
-    		}
-    	}
+        'num_font': {
+                'color': '#7f7f7f',
+                    },
+            'major_gridlines': {
+                'visible': True,
+                    'line': {
+                        'width': 0.75,
+                            'dash_type': 'dash',
+                            'color': '#bfbfbf',
+                    }
+            }
     })
 
     chart.set_y_axis({
-    	'num_font': {
-    		'color': '#7f7f7f',
-    	}
+        'num_font': {
+                'color': '#7f7f7f',
+            }
     })
 
     chart.set_legend({'position': 'bottom'})
 
     # Datenbezüge definieren
     for i in range(0, 10):
-    	chart.add_series({
-    		'name':         '=raw_data!$A$'+str(i+2)+'',
-    		'categories':   '=raw_data!$A$1:$A$1',
-    		'values':       '=raw_data!$B$'+str(i+2)+':$B$'+str(i+2)+'',
-    		'fill': 		{'color': ''+category_colors[i]+''},
-    		'num_font':     {'color': 'white'},
-    		'data_labels': 	{'value':  True},
-    		'gap':        40,
-    	})
+        chart.add_series({
+                'name':         '=raw_data!$A$'+str(i+2)+'',
+                    'categories':   '=raw_data!$A$1:$A$1',
+                    'values':       '=raw_data!$B$'+str(i+2)+':$B$'+str(i+2)+'',
+                    'fill': 		{'color': ''+category_colors[i]+''},
+                    'num_font':     {'color': 'white'},
+                    'data_labels': 	{'value':  True},
+                    'gap':        40,
+            })
     ws1.insert_chart('B21', chart)
 
     # Datenblatt mit Rohdaten ausblenden

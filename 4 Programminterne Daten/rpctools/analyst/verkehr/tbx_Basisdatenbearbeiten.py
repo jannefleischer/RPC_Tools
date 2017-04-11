@@ -26,8 +26,8 @@ class TbxBasisdatenbearbeiten(Tbx):
 
         # Projekt_auswählen
         param_1 = params.projectname = arcpy.Parameter()
-        param_1.name = u'Projekt_ausw\xe4hlen'
-        param_1.displayName = u'Projekt ausw\xe4hlen'
+        param_1.name = u'Projekt_auswählen'.encode('cp1252')
+        param_1.displayName = u'Projekt auswählen'.encode('cp1252')
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = u'GPString'
@@ -40,4 +40,4 @@ class TbxBasisdatenbearbeiten(Tbx):
 
 
     def _updateParameters(self, params):
-    	return
+        return
