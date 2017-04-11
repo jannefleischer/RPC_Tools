@@ -46,6 +46,9 @@ def install_packages(python_path):
     used_packages['et-xmlfile'] = 'et_xmlfile-1.0.1-py2.py3-none-any.whl'
     used_packages['openpyxl'] = 'openpyxl-2.4.5-py2.py3-none-any.whl'
 
+    used_packages['polyline'] = 'polyline-1.3.2-py2.py3-none-any.whl'
+
+
     used_packages['xlrd'] = 'xlrd-1.0.0-py2-none-any.whl'
     used_packages['xlsxwriter'] = 'XlsxWriter-0.9.6-py2.py3-none-any.whl'
 
