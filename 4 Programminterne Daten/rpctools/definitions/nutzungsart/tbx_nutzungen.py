@@ -14,6 +14,8 @@ from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten import \
      TbxFlaechendefinition
 from rpctools.definitions.nutzungsart.nutzungen import Nutzungen
 from rpctools.utils.encoding import encode
+from rpctools.utils.constants import Branche, Gewerbegebietstyp
+from collections import OrderedDict
 
 
 class TbxNutzungen(TbxFlaechendefinition):
@@ -213,10 +215,45 @@ class TbxNutzungenWohnen(TbxNutzungen):
 class TbxNutzungenGewerbe(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='b', name='Gewerbe')
     _nutzungsart = Nutzungsart.GEWERBE
+    _gewerbegebietstypen = None
+    _presets = None
 
     @property
     def Tool(self):
         return Nutzungen
+    
+    @property
+    def gewerbegebietstypen(self):
+        """dictionary with names of gewerbegebiete as keys and ids as values"""
+        if self._gewerbegebietstypen is None:            
+            table = self.folders.get_base_table(
+                'FGDB_Definition_Projekt_Tool.gdb',
+                'Gewerbegebietstypen')
+            self._gewerbegebietstypen = OrderedDict({u'<benutzerdefiniert>': 0})
+            columns = ['Name_Gewerbegebietstyp', 'IDGewerbegebietstyp']
+            cursor = arcpy.da.SearchCursor(table, columns)
+            for name, id_gewerbe in cursor: 
+                self._gewerbegebietstypen[name] = id_gewerbe
+        return self._gewerbegebietstypen
+
+    @property
+    def presets(self):    
+        """dictionary with gewerbetyp as keys and dictionaries 
+        (key / value-pairs: id branche / recommended value) as values"""        
+        if self._presets is None:            
+            table = self.folders.get_base_table(
+                'FGDB_Definition_Projekt_Tool.gdb',
+                'Vorschlagswerte_Branchenstruktur')
+            self._presets = {}
+            columns = ['IDGewerbegebietstyp', 
+                       'ID_Branche_ProjektCheck', 
+                       'Vorschlagswert_in_Prozent']
+            cursor = arcpy.da.SearchCursor(table, columns)
+            for id_gewerbe, id_branche, value in cursor: 
+                if id_gewerbe not in self._presets:
+                    self._presets[id_gewerbe] = {}
+                self._presets[id_gewerbe][id_branche] = value
+        return self._presets    
 
     def _getParameterInfo(self):
         params = super(TbxNutzungenGewerbe, self)._getParameterInfo()
@@ -235,26 +272,16 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.direction = 'Input'
         param.datatype = u'GPString'
           
-        table = self.folders.get_base_table('FGDB_Definition_Projekt_Tool.gdb', 
-                                            'Gewerbegebietstypen')
-        types = [u'<benutzerdefiniert>']
-        #try:
-        columns = ['Name_Gewerbegebietstyp']
-        cursor = arcpy.da.SearchCursor(table, columns)
-        for r in cursor: 
-            types.append(r[0])
-        #except:
-            ## warning handled in toolbox class
-            #pass
-        param.filter.list = types
-        param.value = types[0]
+        param.filter.list = self.gewerbegebietstypen.keys()
+        param.value = param.filter.list[0]
         param.category = heading
     
-        dependent_params = []
+        # remember params of 
+        self.branche_params = []
 
         # Anteil der Arbeitsplätze im verarbeitenden Gewerbe in Prozent
         name = 'ant_jobs_verarb_gewerbe'
-        dependent_params.append(name)
+        self.branche_params.append(name)
         param = params[name] = arcpy.Parameter()
         param.name = u'verarbeitendes Gewerbe'
         param.displayName = encode(u'Verarbeitendes Gewerbe (in % der '
@@ -265,11 +292,12 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.value = 40
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
-        param.category = heading        
+        param.category = heading
+        param.id_branche = Branche.VERARBEITEND
 
         # Anteil der Arbeitsplätze im Baugewerbe in Prozent
         name = 'ant_jobs_baugewerbe'
-        dependent_params.append(name)
+        self.branche_params.append(name)
         param = params[name] = arcpy.Parameter()
         param.name = u'Baugewerbe'
         param.displayName = encode(u'Baugewerbe (in % der Nettofläche)')
@@ -280,10 +308,11 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
+        param.id_branche = Branche.BAUGEWERBE
 
         # Anteil der Arbeitsplätze im Handel inkl. Kfz in Prozent
-        name = 'ant_jobs_handel'
-        dependent_params.append(name)
+        name = 'ant_jobs_grosshandel'
+        self.branche_params.append(name)
         param = params[name] = arcpy.Parameter()
         param.name = u'Handel'
         param.displayName = encode(u'Großhandel, Logistik, Kfz-Handel '
@@ -295,11 +324,12 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
+        param.id_branche = Branche.GROSSHANDEL
 
         # Anteil der Arbeitsplätze im Bereich der freiberuflichen wissenschaftl
         # bzw. techn. Dienstleistungen in Prozent
         name = 'ant_jobs_freiwisstech'
-        dependent_params.append(name)
+        self.branche_params.append(name)
         param = params[name] = arcpy.Parameter()
         param.name = u'Finanzen'
         param.displayName = encode(u'Finanzen, Versicherungen, IuK, '
@@ -312,10 +342,11 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
+        param.id_branche = Branche.FINANZEN
 
         # Anteil der Arbeitsplätze im Bereich sonstiger Diensteistungen
         name = 'ant_jobs_sonst_dl'
-        dependent_params.append(name)
+        self.branche_params.append(name)
         param = params[name] = arcpy.Parameter()
         param.name = u'Sonstige'
         param.displayName = encode(u'Sonstige unternehmensorientierte '
@@ -327,10 +358,11 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
+        param.id_branche = Branche.DIENSTLEISTUNGEN
 
         # Öffentliche Verwaltung
         name = 'ant_oev'
-        dependent_params.append(name)
+        self.branche_params.append(name)
         param = params[name] = arcpy.Parameter()
         param.name = u'Öffentliche Verwaltung'
         param.displayName = encode(u'Öffentliche Verwaltung '
@@ -342,15 +374,9 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
+        param.id_branche = Branche.OEFFENTLICH
         
-        dependent_params = ['ant_jobs_verarb_gewerbe', 
-                            'ant_jobs_baugewerbe', 
-                            'ant_jobs_handel', 
-                            'ant_jobs_freiwisstech', 
-                            'ant_jobs_sonst_dl', 
-                            'ant_oev']
-        
-        self.add_sum_dependency(dependent_params, 100)
+        self.add_sum_dependency(self.branche_params, 100)
 
         heading = u'3) Voraussichtliche Anzahl an Arbeitsplätzen'
 
@@ -379,9 +405,21 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.category = heading
 
         return params
+    
+    def set_gewerbe_presets(self, id_gewerbe):
+        presets = self.presets[id_gewerbe]
+        for param_name in self.branche_params:
+            param = self.par[param_name]
+            preset = presets[param.id_branche]
+            param.value = preset
 
     def _updateParameters(self, params):
         params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
+        if self.par.changed('gebietstyp'):
+            id_gewerbe = self.gewerbegebietstypen[params.gebietstyp.value]
+            if id_gewerbe != Gewerbegebietstyp.BENUTZERDEFINIERT:
+                self.set_gewerbe_presets(id_gewerbe)
+                # ToDo: write to db
 
         #idx = auto_select.filter.list.index(auto_select.value)
         #if idx == 0:

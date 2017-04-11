@@ -436,7 +436,8 @@ class Tbx(object):
         """
         Define the Parameters and return a list or Params()-instance with the
         parameter
-        """
+        """    
+        self.folders._invalid_paths = []
         params = self._getParameterInfo()._od.values()
         return params
 
