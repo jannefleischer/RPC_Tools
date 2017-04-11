@@ -23,7 +23,7 @@ import os, shutil, gc
 
 class Projektverwaltung(Tool):
 
-    _param_projectname = 'existing_project'
+    _param_projectname = 'name'
     _dbname = 'FGDB_Definition_Projekt.gdb'
 
     def run(self):
@@ -34,19 +34,26 @@ class Projektverwaltung(Tool):
 
         if self.par.action.value == "Neues Projekt anlegen":
             self.projekt_anlegen()
-
-            group = self.output.module[8]
-            name = "Test_Output"
-            fc = self.folders.get_table(project = name, tablename = "Teilflaechen_Plangebiet")
-            layer = self.folders.get_layer("Teilflächen des Plangebiets")
-            self.output.add_output(group, fc, layer)
+            self.add_output_new_project()
 
         elif self.par.action.value == "Bestehendes Projekt kopieren":
             self.projekt_kopieren()
+            self.add_output_new_project()
 
         else:
+            _param_projectname = 'existing_project'
             self.projekt_loeschen()
+            self.remove_project_from_output()
 
+    def add_output_new_project(self):
+        group = self.output.module["projektdefinition"]
+        name = self.par.name.value
+        fc = self.folders.get_table(project = name, tablename = "Teilflaechen_Plangebiet")
+        layer = self.folders.get_layer("Teilflächen des Plangebiets")
+        self.output.add_output(group, fc, layer)
+
+    def remove_project_from_output(self):
+        """ToDo"""
 
 
     def projekt_loeschen(self):
@@ -141,9 +148,13 @@ class Projektverwaltung(Tool):
                              "der Toolbox")
             sys.exit()
 
-        gdbPfad = join(project_path, 'FGDB_Definition_Projekt.gdb')
+        gdbPfad = self.folders.get_db(project=project_name)
         # If shapefile was uploaded, add to gdb
         if flaeche != "":
+            tfl = self.folders.get_table('Teilflaechen_Plangebiet',
+            project=project_name, check=False)
+            if arcpy.Exists(tfl):
+                arcpy.Delete_management(tfl)
             arcpy.FeatureClassToGeodatabase_conversion(flaeche, gdbPfad)
 
             dsc = arcpy.Describe(flaeche)
