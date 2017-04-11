@@ -372,6 +372,62 @@ class Tool(object):
     @abstractmethod
     def run(self):
         """The run method - has to be implemented in the subclass"""
+        
+        
+class Dependency():
+    """Class for defining dependencies between multiple paramaters and updating
+    their values according to the defined target"""
+    def __init__(self, param_names, target_value, type='sum'):
+        """
+        Parameters
+        ----------
+        param_names : list of str
+                names of the parameters depending on each other
+        target_value : the targeted value
+        type : str, optional
+                the type of the dependency (atm only sum, may be extended to 
+                other cases in the future)
+        """
+        
+        self.param_names = param_names
+        self.target_value = target_value
+        self.type = type
+        
+    def update(self, params):
+        """
+        check if dependent params were altered and set them to target value
+        
+        Parameters
+        ----------
+        params : Param object
+        """
+        if self.type == 'sum':
+            self._update_sum(params)
+        
+    def _set_sum(self, params):
+        """set values of dependent parameters to sum up to target value"""
+        actual_sum = 0
+        altered = False
+        for name in self.param_names:
+            param = params[name]
+            altered = altered or param.altered
+            actual_sum += param.value
+            
+        if not altered:
+            return
+    
+        if actual_sum != self.target_value:
+            difference = self.target_value - actual_sum
+            for name in reversed(self.param_names):
+                param = params[name]
+                old_val = param.value
+                new_val = param.value + difference
+                if new_val < 0:
+                    new_val = 0
+                elif new_val > self.target_value:
+                    new_val = self.target_value
+                difference = difference + old_val - new_val
+                param.value = new_val           
 
 
 class Tbx(object):
@@ -458,7 +514,7 @@ class Tbx(object):
         # updating projects messes up the initial project management
         if self.update_projects:
             self._update_project_list()
-        self._update_dependencies()
+        self._update_dependencies(self.par)
         self._updateParameters(self.par)
 
     def _update_project_list(self):
@@ -478,7 +534,7 @@ class Tbx(object):
         elif project_param.value not in projects:
             project_param.value = projects[0]
 
-    def add_sum_dependency(self, param_names, target_sum):
+    def add_dependency(self, param_names, target_value, type='sum'):
         """
         define a dependency between different parameters, they have to sum up 
         to a target value.
@@ -492,35 +548,17 @@ class Tbx(object):
 
         target_sum : int
                the target value the parameters sum up to
+        
+        type : str, optional
+               only 'sum' supported atm
         """
-        dependency = (param_names, target_sum)
+        dependency = Dependency(param_names, target_value, type=type)
         self._dependencies.append(dependency)
-        
-    def _update_dependencies(self):
+
+    def _update_dependencies(self, params):
         """check if dependent params were altered and set them to target sum"""
-        for param_names, target_sum in self._dependencies:
-            actual_sum = 0
-            altered = False
-            for name in param_names:
-                param = self.par[name]
-                altered = altered or param.altered
-                actual_sum += param.value
-                
-            if not altered:
-                continue
-        
-            if actual_sum != target_sum:
-                difference = target_sum - actual_sum
-                for name in reversed(param_names):
-                    param = self.par[name]
-                    old_val = param.value
-                    new_val = param.value + difference
-                    if new_val < 0:
-                        new_val = 0
-                    elif new_val > target_sum:
-                        new_val = target_sum
-                    difference = difference + old_val - new_val
-                    param.value = new_val       
+        for dependency in self._dependencies:
+            dependency.update(params)
 
     def _updateParameters(self, params):
         """

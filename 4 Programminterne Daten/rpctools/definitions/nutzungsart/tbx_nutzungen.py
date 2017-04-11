@@ -376,7 +376,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.category = heading
         param.id_branche = Branche.OEFFENTLICH
         
-        self.add_sum_dependency(self.branche_params, 100)
+        self.add_dependency(self.branche_params, 100)
 
         heading = u'3) Voraussichtliche Anzahl an Arbeitsplätzen'
 
@@ -407,6 +407,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         return params
     
     def set_gewerbe_presets(self, id_gewerbe):
+        """set all branche values to db-presets of given gewerbe-id"""
         presets = self.presets[id_gewerbe]
         for param_name in self.branche_params:
             param = self.par[param_name]
@@ -415,14 +416,28 @@ class TbxNutzungenGewerbe(TbxNutzungen):
 
     def _updateParameters(self, params):
         params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
+        
+        # set presets
         if self.par.changed('gebietstyp'):
             id_gewerbe = self.gewerbegebietstypen[params.gebietstyp.value]
             if id_gewerbe != Gewerbegebietstyp.BENUTZERDEFINIERT:
                 self.set_gewerbe_presets(id_gewerbe)
                 # ToDo: write to db
-
-        #idx = auto_select.filter.list.index(auto_select.value)
-        #if idx == 0:
+                
+        # if one of the values is changed, set selection to "benutzerdefiniert"
+        for param_name in self.branche_params:
+            if self.par.changed(param_name):
+                self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
+                
+        if self.par.changed('auto_select'):
+            idx = auto_select.filter.list.index(auto_select.value)
+            # auto calc. entry
+            if idx == 0:
+                pass
+            # manual entry
+            else:
+                pass
+            
         return params
 
     def _updateMessages(self, params):
@@ -506,7 +521,6 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         param.filter.type = 'Range'
         param.filter.list = [0, 20000]
         param.category = heading
-
 
         return params
 
