@@ -475,11 +475,13 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     def set_estimate_jobs(self):
         """calculate estimation of number of jobs and set value of corresponding 
         param 'arbeitsplaetze_insgesamt'"""
-        if not self.par.teilflaeche.value:
+        flaeche = self.par.teilflaeche.value
+        if not flaeche:
             return
         n_jobs = 0
-        ha = self.par.teilflaeche.ha
-        ags = self.par.teilflaeche.ags
+        
+        flaechen_id, flaechenname, ha, ags = \
+            self.teilflaechen[flaeche]
         gemeindetyp = get_gemeindetyp(ags)
         kennwerte = self.dichtekennwerte[gemeindetyp]
         for name in self.branche_params:

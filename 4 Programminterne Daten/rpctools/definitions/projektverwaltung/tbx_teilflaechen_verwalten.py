@@ -11,12 +11,17 @@ from rpctools.definitions.projektverwaltung.teilflaeche_verwalten import Teilfla
 
 class TbxFlaechendefinition(Tbx):
     _nutzungsart = None
+    _teilflaechen = None
 
     @property
     def teilflaechen_table(self):
         return self.folders.get_table('Teilflaechen_Plangebiet')
+    
+    @property
+    def teilflaechen(self):
+        return self._teilflaechen
 
-    def get_teilflaechen(self, nutzungsart=None):
+    def _get_teilflaechen(self, nutzungsart=None):
         """
         get pretty names of all teilflaechen of current project along with
         their ids, stored names and hectars, 
@@ -80,28 +85,22 @@ class TbxFlaechendefinition(Tbx):
         p.direction = 'Input'
         p.datatype = u'GPString'
         p.filter.list = []
+        
+        self.update_teilflaechen(self._nutzungsart)
 
         return params    
 
     def _updateParameters(self, params):
         if params.changed('projectname'):
             params.teilflaeche.value = ''
-            self.update_teilflaechen_list(self._nutzungsart)
+            self.update_teilflaechen(self._nutzungsart)
             
-        # add attributes like id to the selected teilflaeche
-        if params.changed('teilflaeche'):
-            flaechen_id, flaechenname, ha, ags = \
-                self.get_teilflaechen()[params.teilflaeche.value]
-            params.teilflaeche.id = flaechen_id
-            params.teilflaeche.flaechenname = flaechenname
-            params.teilflaeche.ha = ha
-            params.teilflaeche.ags = ags
         return params    
 
-    def update_teilflaechen_list(self, nutzungsart=None):
+    def update_teilflaechen(self, nutzungsart=None):
         """update the parameter list of teilflaeche (opt. filter nutzungsart)"""
-        list_teilflaechen = self.get_teilflaechen(
-            nutzungsart=nutzungsart).keys()
+        self._teilflaechen = self._get_teilflaechen(nutzungsart=nutzungsart)
+        list_teilflaechen = self.teilflaechen.keys()
         self.par.teilflaeche.filter.list = list_teilflaechen
 
         # select first one
@@ -162,8 +161,8 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
 
         flaeche = params.teilflaeche.value
         if flaeche:
-            flaechen_id = params.teilflaeche.id
-            flaechenname = params.teilflaeche.flaechenname
+            flaechen_id, flaechenname, ha, ags = \
+                self.teilflaechen[params.teilflaeche.value]
             if params.changed('projectname', 'teilflaeche'):
                 self.update_teilflaechen_inputs(flaechen_id, flaechenname)
 
@@ -174,7 +173,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                     where='id_teilflaeche={}'.format(flaechen_id))
                 # update teilflaechen but keep selected index
                 idx = self.par.selected_index('teilflaeche')
-                self.update_teilflaechen_list()
+                self.update_teilflaechen()
                 params.teilflaeche.value = params.teilflaeche.filter.list[idx]
 
             if params.changed('nutzungsart'):
@@ -218,7 +217,7 @@ if __name__ == '__main__':
 
     t = TbxTeilflaecheVerwalten()
     params = t.getParameterInfo()
-    t.get_teilflaechen()
+    t._get_teilflaechen()
     t.print_test_parameters()
     t.print_tool_parameters()
     t.updateParameters(params)
