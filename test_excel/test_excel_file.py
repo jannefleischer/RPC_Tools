@@ -74,23 +74,20 @@ class Edit_Excel(object):
         wb.save(self.filename)
         wb.close()
         
-      
+              
     def clear_cellblock(self, upper_left, lower_right):
         """
-        clear the all cells between upper_left and lower_right
-        """
-        wb = openpyxl.load_workbook(self.filename)
-        sh = wb.get_sheet_by_name("range names")
-        for row in sh[upper_left+':'+lower_right]:
-            for cell in row:
-                cell.value = None
-        wb.save(self.filename)
-        wb.close()    
+        Clear all Cells between upper_left and lower_right corner.
         
-        
-    def clear_cellblock_2(self, upper_left, lower_right):
-        """
-        delete all rows between first an last
+        Parameters
+        ----------
+        upper_left : str
+            Marks the upper-left corner of the cellblock.
+            Example: 'A1'
+        lower_right : str
+            Marks the lower-right corner of the cellblock.
+            Example: 'D90'
+            
         """
         excel = win32com.client.gencache.EnsureDispatch("Excel.Application")
         excel.Visible = 0
@@ -103,7 +100,15 @@ class Edit_Excel(object):
         
     def delete_rows(self, first, last):
         """
-        All rows from first to last are removed completely
+        Delete all rows from first to last.
+        
+        Parameters
+        ----------
+        first : int
+            first row to delete
+        last : int
+            last row to delete
+            
         """
         excel = win32com.client.gencache.EnsureDispatch("Excel.Application")
         excel.Visible = 0
@@ -117,10 +122,18 @@ class Edit_Excel(object):
         
     def delete_columns(self, first, last):
         """
-        All columns from first to last are removed completely
+        Delete all columns from first to last.
+        
+        Parameters
+        ----------
+        first : int
+            first row to delete
+        last : int
+            last row to delete
+         
         """
         excel = win32com.client.gencache.EnsureDispatch("Excel.Application")
-        excel.Visible = 1
+        excel.Visible = 0
         wb = excel.Workbooks.Open(self.filename)
         sh = wb.ActiveSheet
         rangeObj = sh.Range(first+'1:'+last+'1')
@@ -138,7 +151,6 @@ class Edit_Excel(object):
         xl.Visible = True
         xl.Workbooks.Open(self.filename)
     
-        time.sleep(5)
     
     
     def check_if_file_is_open(self):
