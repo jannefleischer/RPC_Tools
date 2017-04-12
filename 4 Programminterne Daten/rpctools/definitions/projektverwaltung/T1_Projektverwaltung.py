@@ -35,6 +35,7 @@ class Projektverwaltung(Tool):
         if self.par.action.value == "Neues Projekt anlegen":
             self.projekt_anlegen()
             self.add_output_new_project()
+            self.add_diagramm()
 
         elif self.par.action.value == "Bestehendes Projekt kopieren":
             self.projekt_kopieren()
@@ -51,6 +52,25 @@ class Projektverwaltung(Tool):
         fc = self.folders.get_table(project = name, tablename = "Teilflaechen_Plangebiet")
         layer = self.folders.get_layer("Teilflächen des Plangebiets")
         self.output.add_output(group, fc, layer)
+
+    def add_diagramm(self):
+        # Erstelle Diagramm Teilflaechen nach Hektar
+        project_name = self.par.name.value
+        out_graph_name = project_name + ": Teilflaechen nach Hektar"
+        input_template = r"C:\ProjektCheck\4 Programminterne Daten\templates\diagrams\Teilflaechen_Hektar.grf"
+        input_data = self.folders.get_table('Teilflaechen_Plangebiet', project=project_name, check=False)
+        # Create the graph
+        graph = arcpy.Graph()
+        input_data = arcpy.mapping.ListLayers(arcpy.mapping.MapDocument("CURRENT"), "Teilflaechen_Plangebiet",
+                                                arcpy.mapping.MapDocument("CURRENT").activeDataFrame)[0]
+        # Add a vertical bar series to the graph
+        graph.addSeriesBarVertical(dataSrc = input_data, fieldY = "Flaeche_ha", fieldLabel = "Name")
+        graph.graphPropsGeneral.title = project_name + ": Teilflaechen des Plangebiets (Bruttoflaeche)"
+        arcpy.env.addOutputsToMap = True
+        arcpy.MakeGraph_management(input_template, graph, out_graph_name)
+        arcpy.env.addOutputsToMap = False
+        arcpy.RefreshActiveView()
+        arcpy.RefreshTOC()
 
     def remove_project_from_output(self):
         """ToDo"""
@@ -297,6 +317,7 @@ class Projektverwaltung(Tool):
             minimap,
             "PAGE_LAYOUT",
             resolution=150)
+
 
     # output information to user
         print("Basisdaten erfolgreich kopiert")
