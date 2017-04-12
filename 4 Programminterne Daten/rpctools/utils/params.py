@@ -233,15 +233,8 @@ class Params(object):
                 change = True
         return change    
 
-    def set_changed(self, *names):
-        """set parameter with names to altered and not validated"""
-        for name in names:
-            param = self._od[name]
-            param.altered = True 
-            param.hasBeenValidated = True    
-
     def toolbox_opened(self):
-        """return True if toolbox is opened"""
+        """return True if toolbox was opened just before last update"""
         opened = not any([p.hasBeenValidated for p in self])
         return opened
 
@@ -441,6 +434,14 @@ class Tbx(object):
     """Base Class for a ArcGIS Toolbox"""
     __metaclass__ = ABCMeta
     __metaclass__ = Singleton
+    
+    _temp_db = arcpy.env.scratchGDB
+    _temp_table_prefix = 'RPC_Tools'
+    # name of temp. tables, project needs to be appended
+    _temp_table_name = (
+        _temp_table_prefix + 
+        '_{class_name}_{source_db}_{source_table}_'
+    )
 
     @abstractproperty
     def Tool(self):
@@ -474,6 +475,11 @@ class Tbx(object):
         # update projects on call of updateParameters
         self.update_projects = True
         self._dependencies = []
+        # updates to these tables are written to temp. tables and written to
+        # project db only on execution of tool
+        self._temporary_tables = {}
+        
+        self.recently_opened = False
 
     def reload_tool(self):
         # reload the tool's module
@@ -518,10 +524,18 @@ class Tbx(object):
         """
 
         self.par._update_parameters(parameters)
+        #with open(r'C:\Users\JMG.GGRS\Desktop\test.txt', 'a') as f:
+            #f.write('just opened: {}\n'.format(self.par.toolbox_opened()))
+        if self.par.toolbox_opened():
+            self.clear_temporary_tables()
+            self.recently_opened = True
+        else:        
+            self.recently_opened = False            
         # updating projects messes up the initial project management
         if self.update_projects:
             self._update_project_list()
         self._update_dependencies(self.par)
+            #self._create_temporary_copies()
         self._updateParameters(self.par)
 
     def _update_project_list(self):
@@ -565,7 +579,7 @@ class Tbx(object):
     def _update_dependencies(self, params):
         """check if dependent params were altered and set them to target sum"""
         for dependency in self._dependencies:
-            dependency.update(params)
+            dependency.update(params)            
 
     def _updateParameters(self, params):
         """
@@ -594,6 +608,113 @@ class Tbx(object):
     def _updateMessages(self, parameters):
         """ to define in the subclass """
 
+    def update_table(self, table_path, column_values, where=None):
+        """
+        Update rows in a FileGeodatabase with given values
+
+        Parameters
+        ----------
+        table : str
+            full path to the table
+        column_values: dict,
+            the columns and the values to update them with as key/value-pairs
+        where: str, optional
+            a where clause to pick single rows
+        """
+        # if table is in temp. management -> write to temporary table instead
+        if table_path in self._temporary_tables.keys():
+            temp_table = self._temporary_tables[table_path]
+            temp_table += self.par._get_projectname()
+            # create on demand
+            if not arcpy.Exists(temp_table):
+                self._create_temporary_copy(table_path, temp_table)
+            table_path = temp_table
+        columns = column_values.keys()
+        cursor = arcpy.da.UpdateCursor(table_path, columns, where_clause=where)
+        for row in cursor:
+            for i, column in enumerate(columns):
+                row[i] = column_values[column]
+            cursor.updateRow(row)
+        del cursor
+        
+    def query_table(self, table_path, columns, where=None):
+        """
+        get rows from a FileGeodatabase with given values
+
+        Parameters
+        ----------
+        table : str
+            full path to the table
+        columns: list,
+            the requested columns
+        where: str, optional
+            a where clause to pick single rows
+            
+        Returns
+        -------
+        rows : list of lists
+            the queried rows with values of requested columns in same order as
+            in columns argument
+        """
+        if table_path in self._temporary_tables.keys():
+            temp_table = self._temporary_tables[table_path]
+            temp_table += self.par._get_projectname()
+            # temporaries may not be initialized yet (happens if already used 
+            # in _getParameterInfo) -> use project table instead
+            if arcpy.Exists(temp_table):
+                table_path = temp_table
+        cursor = arcpy.da.SearchCursor(table_path, columns, where_clause=where)
+        rows = [row for row in cursor]
+        return rows
+    
+    def clear_temporary_tables(self):
+        """remove all temporary tables"""
+        path, dirnames, table_names = arcpy.da.Walk(self._temp_db).next()
+        for table_name in table_names:
+            if table_name.startswith(self._temp_table_prefix):
+                table = os.path.join(path, table_name)
+                arcpy.Delete_management(table)
+        
+    def add_temporary_management(self, *args):
+        """
+        add a table to be managed within a temporary database, all updates on 
+        the given tables happen inside the temporary database, 
+        the changes made are only transferred into the project database after
+        pressing OK in the UI
+
+        Parameters
+        ----------
+        args : str
+            full path to the table
+        """        
+        for arg in args:
+            path, table_name = os.path.split(arg)
+            # if '.' is in table name, arcpy cuts off all chars in front
+            db_name = os.path.split(path)[1].replace('.','')
+            temp_name = self._temp_table_name.format(
+                class_name=self.__class__.__name__, source_db=db_name,
+                source_table=table_name
+            )
+            temp_table = os.path.join(self._temp_db, temp_name)
+            self._temporary_tables[arg] = temp_table
+            
+    def _create_temporary_copy(self, project_table, temp_table):
+        """make a copy of a project table in the given temporary table"""
+        if arcpy.Exists(temp_table):
+            arcpy.Delete_management(temp_table)
+        prev_state = arcpy.env.addOutputsToMap
+        arcpy.env.addOutputsToMap = False
+        arcpy.Copy_management(project_table, temp_table)
+        arcpy.env.addOutputsToMap = prev_state
+            
+    def _commit_temporaries(self):
+        """transfer all changes made in temporary tables into project tables"""
+        for project_table, temp_table in self._temporary_tables.iteritems():
+            temp_table += self.par._get_projectname()
+            if arcpy.Exists(project_table):
+                arcpy.Delete_management(project_table)
+            arcpy.Copy_management(temp_table, project_table)
+
     def execute(self, parameters=None, messages=None):
         """
         Run the tool with the parameters and messages from ArcGIS
@@ -605,6 +726,7 @@ class Tbx(object):
         messages : the message-object of ArcGIS
 
         """
+        self._commit_temporaries()
         self.tool.main(self.par, parameters, messages)
 
     def print_test_parameters(self):
@@ -826,10 +948,6 @@ class Output():
     def update_output(self, group, layername ):
         """"""
         projektname = self.params._get_projectname()
-
-
-
-
 
 if __name__ == '__main__':
     import doctest

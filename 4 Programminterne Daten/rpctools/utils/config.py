@@ -247,35 +247,6 @@ class Folders(object):
                                     check=check)
         return table
 
-    def update_table(self, table, column_values, where=None, fgdb='',
-                     project='', check=True):
-        """
-        Update rows in a FileGeodatabase in the Project Folder
-
-        Parameters
-        ----------
-        table : str
-            the name of the table
-        column_values: dict,
-            the columns and the values to update them with as key/value-pairs
-        where: str, optional
-            a where clause to pick single rows
-        fgdb : str, optional
-            the name of the FileGeodatabase
-        project : str, optional
-            the project name
-        check : bool, optional
-            if false, don't check if table exists
-        """
-        table = self.get_table(table, fgdb=fgdb, project=project, check=True)
-        columns = column_values.keys()
-        cursor = arcpy.da.UpdateCursor(table, columns, where_clause=where)
-        for row in cursor:
-            for i, column in enumerate(columns):
-                row[i] = column_values[column]
-            cursor.updateRow(row)
-        del cursor
-
     def get_layer(self, layername, folder='', enhance = True):
         """
         A lyr-file
