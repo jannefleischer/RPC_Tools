@@ -69,6 +69,8 @@ class TbxNutzungen(TbxFlaechendefinition):
 class TbxNutzungenWohnen(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='a', name='Wohnen')
     _nutzungsart = Nutzungsart.WOHNEN
+    
+    ew_je_we_range = [str(r / 10.0).replace('.', ',') for r in range(10, 50)]
 
     @property
     def Tool(self):
@@ -136,66 +138,55 @@ class TbxNutzungenWohnen(TbxNutzungen):
         param.filter.list = [0, 500]
         param.category = heading
 
-        heading = "3) Einwohner pro Wohneinheit"
-
-        list_EwProWE = []
-        for i in range(1,5):
-            for j in range(0,10):
-                list_EwProWE.append(str(i)+","+str(j)+
-                                    " Bewohner pro Wohneinheit")
+        heading = ("3) Mittlere Anzahl Einwohner pro Wohneinheit " + 
+                   "(3 Jahre nach Bezug)")
 
         # Mittlere Anzahl Einwohner pro WE in Einfamilienhäusern
         # (kurz nach dem Bezug)
         param = params.ew_je_we_efh = arcpy.Parameter()
         param.name = u'Bewohner Einfamilienhaus kndB'
-        param.displayName = encode(u'Mittlere Anzahl Einwohner pro WE in '
-                                   u'Einfamilienhäusern (kurz nach dem Bezug)')
+        param.displayName = encode(u'in Einfamilienhäusern')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPDouble'
-        param.value = 3.2
-        param.filter.type = 'Range'
-        param.filter.list = [0., 4.]
+        param.value = '3,2'
+        param.filter.list = self.ew_je_we_range
         param.category = heading
 
         # Mittlere Anzahl Einwohner pro WE in Doppelhäusern
         # (kurz nach dem Bezug)
         param = params.ew_je_we_zfh = arcpy.Parameter()
         param.name = u'Bewohner Doppelhäuser kndB'
-        param.displayName = encode(u'Mittlere Anzahl Einwohner pro WE in '
-                                   u'Doppelhäusern (kurz nach dem Bezug)')
+        param.displayName = encode(u'in Doppelhäusern')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-        param.value = u'3,0 Bewohner pro Wohneinheit'
-        param.filter.list = list_EwProWE
+        param.value = '3,0'
+        param.filter.list = self.ew_je_we_range
         param.category = heading
 
         # Mittlere Anzahl Einwohner pro WE in Reihenhäusern
         # (kurz nach dem Bezug)
         param = params.ew_je_we_rh = arcpy.Parameter()
         param.name = u'Bewohner Reihenhaus kndB'
-        param.displayName = encode(u'Mittlere Anzahl Einwohner pro WE in '
-                                   u'Reihenhäusern (kurz nach dem Bezug)')
+        param.displayName = encode(u'in Reihenhäusern')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-        param.value = u'3,0 Bewohner pro Wohneinheit'
-        param.filter.list = list_EwProWE
+        param.value = '3,0'
+        param.filter.list = self.ew_je_we_range
         param.category = heading
 
         # Mittlere Anzahl Einwohner pro WE in Mehrfamilienhäusern kurz nach
         # dem Bezug
         param = params.ew_je_we_mfh = arcpy.Parameter()
         param.name = u'Bewohner Mehrfamilienhaus kndB'
-        param.displayName = encode(u'Mittlere Anzahl Einwohner pro WE in '
-                                   u'Mehrfamilienhäusern '
-                                   u'(kurz nach dem Bezug)')
+        param.displayName = encode(u'in Mehrfamilienhäusern')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-        param.value = u'2,1 Bewohner pro Wohneinheit'
-        param.filter.list = list_EwProWE
+        param.value = '2,1'
+        param.filter.list = self.ew_je_we_range
         param.category = heading
 
         return params
