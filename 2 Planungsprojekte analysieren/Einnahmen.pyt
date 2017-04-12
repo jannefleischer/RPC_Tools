@@ -12,7 +12,8 @@ from rpctools.analyst.einnahmen.tbx_einnahmen import (
     TbxEinkommenssteuer,
     TbxFamilienleistungsausgleich,
     TbxKFA,
-    TbxKRU)
+    TbxKRU,
+    TbxTest)
 from rpctools.analyst.einnahmen.tbx_grundsteuer import TbxGrundsteuer
 from rpctools.analyst.einnahmen.tbx_gewerbesteuer import TbxGewerbesteuer
 
@@ -26,4 +27,5 @@ class Toolbox(object):
                       TbxGrundsteuer,
                       TbxGewerbesteuer,
                       TbxKFA,
-                      TbxKRU]
+                      TbxKRU,
+                      TbxTest]

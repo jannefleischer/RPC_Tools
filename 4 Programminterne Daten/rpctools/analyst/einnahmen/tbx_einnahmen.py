@@ -12,6 +12,8 @@ from rpctools.analyst.einnahmen.T3_Familienleistungsausgleich \
 from rpctools.analyst.einnahmen.T6_KFA import KFA
 from rpctools.analyst.einnahmen.T7_KRU import KRU
 
+from rpctools.analyst.einnahmen.T99_create_diagrams import TestTool
+
 
 class _TbxEinnahmen(Tbx):
     """
@@ -37,6 +39,18 @@ class _TbxEinnahmen(Tbx):
         return params
 
 
+class TbxTest(_TbxEinnahmen):
+    """Test Toolbox"""
+
+    @property
+    def label(self):
+        return u'Schritt 99: Test'
+
+    @property
+    def Tool(self):
+        return TestTool
+    
+    
 class TbxEinkommenssteuer(_TbxEinnahmen):
     """Toolbox Einkommenssteuer"""
 
