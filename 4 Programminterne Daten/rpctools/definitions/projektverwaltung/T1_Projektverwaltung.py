@@ -148,65 +148,56 @@ class Projektverwaltung(Tool):
                              "der Toolbox")
             sys.exit()
 
-        gdbPfad = self.folders.get_db(project=project_name)
-        # If shapefile was uploaded, add to gdb
-        if flaeche != "":
-            tfl = self.folders.get_table('Teilflaechen_Plangebiet',
-            project=project_name, check=False)
-            if arcpy.Exists(tfl):
-                arcpy.Delete_management(tfl)
-            arcpy.FeatureClassToGeodatabase_conversion(flaeche, gdbPfad)
+        # add layer teilflächen to gdb
+        tfl = self.folders.get_table('Teilflaechen_Plangebiet',
+        project=project_name, check=False)
+        if arcpy.Exists(tfl):
+            arcpy.Delete_management(tfl)
+        espgcode_gk3 = 31467
+        sr = arcpy.SpatialReference(espgcode_gk3)
+        arcpy.Project_management(flaeche, tfl, sr)
 
-            dsc = arcpy.Describe(flaeche)
-            filename = dsc.baseName
-            filename = filename.replace(" ", "_")
-            filename = filename.replace("-", "_")
-            arcpy.AddMessage(filename)
-
-            arcpy.env.workspace = gdbPfad
-            fcs = arcpy.ListFeatureClasses()
-            fcsPfad = join(gdbPfad, filename)
-            try:
-                arcpy.Rename_management(fcsPfad, "Teilflaechen_Plangebiet")
-            except:
-                arcpy.AddMessage("Fehler: Umbenennung nicht erfolgreich")
-            fcs = arcpy.ListFeatureClasses()
+        gdbPfad = self.folders.get_db()
+        arcpy.env.workspace = gdbPfad
 
         # Prepare Shapefile for use in RPC
-        teilfaechen_plangebiet = join(gdbPfad, 'Teilflaechen_Plangebiet')
 
         # delete unused fields
-        fieldObjList = arcpy.ListFields(teilfaechen_plangebiet)
+        fieldObjList = arcpy.ListFields(tfl)
         fieldNameList = []
         for field in fieldObjList:
             if not field.required:
                 fieldNameList.append(field.name)
 
-        arcpy.DeleteField_management(teilfaechen_plangebiet, fieldNameList)
+        arcpy.DeleteField_management(tfl, fieldNameList)
 
         # add needed fields
-        arcpy.AddField_management(teilfaechen_plangebiet, "id_teilflaeche", "LONG")
-        arcpy.AddField_management(teilfaechen_plangebiet, "Name", "TEXT")
-        arcpy.AddField_management(teilfaechen_plangebiet, "Beginn_Nutzung", "LONG")
-        arcpy.AddField_management(teilfaechen_plangebiet, "Aufsiedlungsdauer", "LONG")
-        arcpy.AddField_management(teilfaechen_plangebiet, "Flaeche_ha", "DOUBLE", "", "", "", "", "", "")
-        arcpy.AddField_management(teilfaechen_plangebiet, "umfang_meter", "FLOAT")
-        arcpy.AddField_management(teilfaechen_plangebiet, "Nutzungsart", "SHORT")
-        arcpy.AddField_management(teilfaechen_plangebiet, "ags_bkg", "TEXT")
-        arcpy.AddField_management(teilfaechen_plangebiet, "gemeinde_name", "TEXT")
-        arcpy.AddField_management(teilfaechen_plangebiet, "validiert", "SHORT")
+        arcpy.AddField_management(tfl, "id_teilflaeche", "LONG")
+        arcpy.AddField_management(tfl, "Name", "TEXT")
+        arcpy.AddField_management(tfl, "Beginn_Nutzung", "LONG")
+        arcpy.AddField_management(tfl, "Aufsiedlungsdauer", "LONG")
+        arcpy.AddField_management(tfl, "Flaeche_ha", "DOUBLE", "", "", "", "", "", "")
+        arcpy.AddField_management(tfl, "umfang_meter", "FLOAT")
+        arcpy.AddField_management(tfl, "Nutzungsart", "SHORT")
+        arcpy.AddField_management(tfl, "ags_bkg", "TEXT")
+        arcpy.AddField_management(tfl, "gemeinde_name", "TEXT")
+        arcpy.AddField_management(tfl, "validiert", "SHORT")
         #arcpy.AddField_management(teilfaechen_plangebiet, "Bilanzsumme", "FLOAT")
 
         # Berechne ha der Teilflaechen
-        arcpy.CalculateField_management(teilfaechen_plangebiet,
+        arcpy.CalculateField_management(tfl,
                                         "Flaeche_ha",
                                         "!SHAPE.AREA@HECTARES!",
                                         "PYTHON_9.3", "")
 
-        # Berechne Umfang der Flächen
-        arcpy.CalculateField_management(teilfaechen_plangebiet, "umfang_meter", "!shape.length@METER!", "PYTHON_9.3")
+        # Berechne Gauß-Krüger-Koordinaten
+        arcpy.AddGeometryAttributes_management(Input_Features = tfl,
+                                                Geometry_Properties = "CENTROID_INSIDE")
 
-        cursor = arcpy.UpdateCursor(teilfaechen_plangebiet)
+        # Berechne Umfang der Flächen
+        arcpy.CalculateField_management(tfl, "umfang_meter", "!shape.length@METER!", "PYTHON_9.3")
+
+        cursor = arcpy.UpdateCursor(tfl)
         for i, row in enumerate(cursor):
             row.setValue("id_teilflaeche", i + 1)
             row.setValue("Nutzungsart", Nutzungsart.UNDEFINIERT)
@@ -216,8 +207,8 @@ class Projektverwaltung(Tool):
             row.setValue("Beginn_Nutzung", beginn_betrachtung)
             cursor.updateRow(row)
 
-        flaechen_ags = get_ags(teilfaechen_plangebiet, 'id_teilflaeche')
-        cursor = arcpy.UpdateCursor(teilfaechen_plangebiet)
+        flaechen_ags = get_ags(tfl, 'id_teilflaeche')
+        cursor = arcpy.UpdateCursor(tfl)
         for row in cursor:
             flaechen_id = row.id_teilflaeche
             if flaechen_id not in flaechen_ags:
