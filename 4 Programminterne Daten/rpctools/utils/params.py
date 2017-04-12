@@ -283,7 +283,7 @@ class Params(object):
         param = getattr(self, name)
         if not param.datatype == 'GPValueTable':
             raise ValueError('{} is no ValueTable'.format(name))
-        param.values = ra.tolist()        
+        param.values = ra.tolist()
 
 
 class ToolFolders(Folders):
@@ -372,8 +372,8 @@ class Tool(object):
     @abstractmethod
     def run(self):
         """The run method - has to be implemented in the subclass"""
-        
-        
+
+
 class Dependency():
     """Class for defining dependencies between multiple paramaters and updating
     their values according to the defined target"""
@@ -385,25 +385,25 @@ class Dependency():
                 names of the parameters depending on each other
         target_value : the targeted value
         type : str, optional
-                the type of the dependency (atm only sum, may be extended to 
+                the type of the dependency (atm only sum, may be extended to
                 other cases in the future)
         """
-        
+
         self.param_names = param_names
         self.target_value = target_value
         self.type = type
-        
+
     def update(self, params):
         """
         check if dependent params were altered and set them to target value
-        
+
         Parameters
         ----------
         params : Param object
         """
         if self.type == 'sum':
             self._set_sum(params)
-        
+
     def _set_sum(self, params):
         """set values of dependent parameters to sum up to target value"""
         actual_sum = 0
@@ -412,10 +412,10 @@ class Dependency():
             param = params[name]
             altered = altered or param.altered
             actual_sum += param.value
-            
+
         if not altered:
             return
-    
+
         if actual_sum != self.target_value:
             difference = self.target_value - actual_sum
             for name in reversed(self.param_names):
@@ -427,7 +427,7 @@ class Dependency():
                 elif new_val > self.target_value:
                     new_val = self.target_value
                 difference = difference + old_val - new_val
-                param.value = new_val           
+                param.value = new_val
 
 
 class Tbx(object):
@@ -505,7 +505,7 @@ class Tbx(object):
         """
         Define the Parameters and return a list or Params()-instance with the
         parameter
-        """    
+        """
         self.folders._invalid_paths = []
         params = self._getParameterInfo()._od.values()
         return params
@@ -557,7 +557,7 @@ class Tbx(object):
 
     def add_dependency(self, param_names, target_value, type='sum'):
         """
-        define a dependency between different parameters, they have to sum up 
+        define a dependency between different parameters, they have to sum up
         to a target value.
         if one of them is changed, the others will be auto set while updating
         the parameters
@@ -569,7 +569,7 @@ class Tbx(object):
 
         target_sum : int
                the target value the parameters sum up to
-        
+
         type : str, optional
                only 'sum' supported atm
         """
@@ -822,7 +822,7 @@ class Output():
         self.params = params
 
 
-    def get_projectlayer(self, projektname):
+    def set_projectlayer(self, projektname):
         """
         Check and add project layer
         """
@@ -843,13 +843,13 @@ class Output():
             group_layer_template = self.folders.get_layer(layername = "__Projektname__", folder='toc', enhance = True)
             addLayer = arcpy.mapping.Layer(group_layer_template)
             addLayer.name = projektname
-            arcpy.mapping.AddLayer(current_dataframe, addLayer, "BOTTOM")
+            arcpy.mapping.AddLayer(current_dataframe, addLayer, "TOP")
             projekt_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)[0]
             arcpy.RefreshActiveView()
             arcpy.RefreshTOC()
 
 
-    def get_headgrouplayer(self, project_layer, dataframe):
+    def set_headgrouplayer(self, project_layer, dataframe):
         """
         Check and add headgroup layer
         """
@@ -869,20 +869,36 @@ class Output():
             arcpy.mapping.AddLayer(dataframe, addLayer, "BOTTOM")
 
 
-    def get_subgrouplayer(self, project_layer, subgroup, dataframe):
+    def set_grouplayer(self, project_layer, group, dataframe, headgroup = ""):
         """
         Check and add subgroup layer
         """
-        if not arcpy.mapping.ListLayers(project_layer, subgroup, dataframe):
-            group_layer_template = self.folders.get_layer(layername = subgroup,
+        if not arcpy.mapping.ListLayers(project_layer, group, dataframe):
+            group_layer_template = self.folders.get_layer(layername = group,
                 folder='toc', enhance = True)
             addLayer = arcpy.mapping.Layer(group_layer_template)
-            target_grouplayer = arcpy.mapping.ListLayers(project_layer, "Analysen", dataframe)[0]
+            if headgroup == "":
+                target_headgroup = self.module["analysen"]
+            target_headgrouplayer = arcpy.mapping.ListLayers(project_layer, target_headgroup, dataframe)[0]
+            arcpy.mapping.AddLayerToGroup(dataframe, target_headgrouplayer, addLayer, "BOTTOM")
+            arcpy.RefreshActiveView()
+            arcpy.RefreshTOC()
+
+    def set_subgrouplayer(self, project_layer, group, subgroup, dataframe):
+        """
+        Check and add subgroup layer
+        """
+        group_layer = arcpy.mapping.ListLayers(project_layer, group, dataframe)[0]
+        if not arcpy.mapping.ListLayers(group_layer, subgroup, dataframe):
+            subgroup_layer_template = self.folders.get_layer(layername = subgroup,
+                folder='toc', enhance = True)
+            addLayer = arcpy.mapping.Layer(subgroup_layer_template)
+            target_grouplayer = arcpy.mapping.ListLayers(project_layer, group, dataframe)[0]
             arcpy.mapping.AddLayerToGroup(dataframe, target_grouplayer, addLayer, "BOTTOM")
             arcpy.RefreshActiveView()
             arcpy.RefreshTOC()
 
-    def add_output(self, group, featureclass, layername):
+    def add_output(self, group, featureclass, layername, disable_other = True, subgroup=""):
         """
         Add output layer to group
 
@@ -891,11 +907,17 @@ class Output():
         group : str
             the layer group
 
-        fratureclass : str
+        featureclass : str
             the full path of the feature class, which should be converted into a layer
 
         layername : str
             the layername (and the name of the .lyr-file)
+
+        disable_other = boolean
+            if true, then all other layers will be turned off
+
+        subgroup = str
+            the subgroup of the layergroup
         """
 
         projektname = self.params._get_projectname()
@@ -904,21 +926,28 @@ class Output():
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
 
-        self.get_projectlayer(projektname)
+        self.set_projectlayer(projektname)
         project_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)[0]
-        self.get_headgrouplayer(project_layer, current_dataframe)
-        self.get_subgrouplayer(project_layer, group, current_dataframe)
+        self.set_headgrouplayer(project_layer, current_dataframe)
+        self.set_grouplayer(project_layer, group, current_dataframe)
+        if subgroup != "":
+            self.set_subgrouplayer(project_layer, group, subgroup, current_dataframe)
 
         # Neuen Layer hinzufuegen
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
         target_grouplayer = arcpy.mapping.ListLayers(project_layer, group, current_dataframe)[0]
+        if subgroup != "":
+            target_subgrouplayer = arcpy.mapping.ListLayers(target_grouplayer, subgroup, current_dataframe)[0]
         template_layer = self.folders.get_layer(layername, enhance = False)
         source_layer = arcpy.mapping.Layer(template_layer)
         source_ws = arcpy.Describe(source_layer).path
         target_ws = arcpy.Describe(featureclass).path
         source_layer.findAndReplaceWorkspacePath(source_ws, target_ws)
-        arcpy.mapping.AddLayerToGroup(current_dataframe, target_grouplayer, source_layer, "BOTTOM")
+        if subgroup == "":
+            arcpy.mapping.AddLayerToGroup(current_dataframe, target_grouplayer, source_layer, "BOTTOM")
+        else:
+            arcpy.mapping.AddLayerToGroup(current_dataframe, target_subgrouplayer, source_layer, "BOTTOM")
 
         # Auf Layer zentrieren
         new_layer = arcpy.mapping.ListLayers(project_layer, source_layer.name, current_dataframe)[0]
@@ -927,11 +956,18 @@ class Output():
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
 
-        for lyr in arcpy.mapping.ListLayers(project_layer):
-            lyr.visible = False
+        if disable_other == True:
+            for lyr in arcpy.mapping.ListLayers(project_layer):
+                lyr.visible = False
         new_layer.visible = True
+        if subgroup != "":
+            target_subgrouplayer.visible = True
         target_grouplayer.visible = True
         project_layer.visible = True
+        if group in [self.module["verkehr"], self.module["einnahmen"], self.module["erreichbarkeit"],
+                        self.module["infrastruktur"], self.module["oekologie"], self.module["standortkonkurrenz"],
+                        self.module["bevoelkerung"]]:
+            arcpy.mapping.ListLayers(project_layer, self.module["analysen"], current_dataframe)[0].visible = True
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
 
@@ -940,10 +976,12 @@ class Output():
         projektname = self.params._get_projectname()
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
-        project_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)[0]
-        layer_exists = arcpy.mapping.ListLayers(project_layer, layer, current_dataframe)[0]
+        project_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)
+        if project_layer:
+            project_layer = project_layer[0]
+        layer_exists = arcpy.mapping.ListLayers(project_layer, layer, current_dataframe)
         if layer_exists:
-            arcpy.Delete_management(layer)
+            arcpy.Delete_management(layer_exists[0])
 
     def update_output(self, group, layername ):
         """"""
