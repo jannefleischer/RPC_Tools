@@ -152,9 +152,10 @@ class TbxNutzungenWohnen(TbxNutzungen):
                                    u'Einfamilienhäusern (kurz nach dem Bezug)')
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'GPString'
-        param.value = u'3,2 Bewohner pro Wohneinheit'
-        param.filter.list = list_EwProWE
+        param.datatype = u'GPDouble'
+        param.value = 3.2
+        param.filter.type = 'Range'
+        param.filter.list = [0., 4.]
         param.category = heading
 
         # Mittlere Anzahl Einwohner pro WE in Doppelhäusern

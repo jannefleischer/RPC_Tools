@@ -435,7 +435,6 @@ class Tbx(object):
     __metaclass__ = ABCMeta
     __metaclass__ = Singleton
     
-    _temp_db = arcpy.env.scratchGDB
     _temp_table_prefix = 'RPC_Tools'
     # name of temp. tables, project needs to be appended
     _temp_table_name = (
@@ -477,7 +476,7 @@ class Tbx(object):
         self._dependencies = []
         # updates to these tables are written to temp. tables and written to
         # project db only on execution of tool
-        self._temporary_tables = {}
+        self._temporary_gdbs = []
         
         self.recently_opened = False
 
@@ -527,7 +526,7 @@ class Tbx(object):
         #with open(r'C:\Users\JMG.GGRS\Desktop\test.txt', 'a') as f:
             #f.write('just opened: {}\n'.format(self.par.toolbox_opened()))
         if self.par.toolbox_opened():
-            self.clear_temporary_tables()
+            self.clear_temporary_dbs()
             self.recently_opened = True
         else:        
             self.recently_opened = False            
@@ -608,7 +607,7 @@ class Tbx(object):
     def _updateMessages(self, parameters):
         """ to define in the subclass """
 
-    def update_table(self, table_path, column_values, where=None):
+    def update_table(self, table, column_values, fgdb='', where=None):
         """
         Update rows in a FileGeodatabase with given values
 
@@ -621,14 +620,17 @@ class Tbx(object):
         where: str, optional
             a where clause to pick single rows
         """
+        dbname = os.path.basename(fgdb) or self.tool._dbname
+        table = os.path.basename(table)
         # if table is in temp. management -> write to temporary table instead
-        if table_path in self._temporary_tables.keys():
-            temp_table = self._temporary_tables[table_path]
-            temp_table += self.par._get_projectname()
+        if dbname in self._temporary_gdbs:
+            temp_db = self.folders.get_temporary_db(fgdb=fgdb, check=False)
             # create on demand
-            if not arcpy.Exists(temp_table):
-                self._create_temporary_copy(table_path, temp_table)
-            table_path = temp_table
+            if not arcpy.Exists(temp_db):
+                self._create_temporary_copy(fgdb)
+            table_path = self.folders.get_temporary_table(table, fgdb=fgdb)
+        else:
+            table_path = self.folders.get_table(table, fgdb=fgdb)
         columns = column_values.keys()
         cursor = arcpy.da.UpdateCursor(table_path, columns, where_clause=where)
         for row in cursor:
@@ -637,7 +639,7 @@ class Tbx(object):
             cursor.updateRow(row)
         del cursor
         
-    def query_table(self, table_path, columns, where=None):
+    def query_table(self, table, columns, fgdb='', where=None):
         """
         get rows from a FileGeodatabase with given values
 
@@ -656,64 +658,66 @@ class Tbx(object):
             the queried rows with values of requested columns in same order as
             in columns argument
         """
-        if table_path in self._temporary_tables.keys():
-            temp_table = self._temporary_tables[table_path]
-            temp_table += self.par._get_projectname()
-            # temporaries may not be initialized yet (happens if already used 
-            # in _getParameterInfo) -> use project table instead
-            if arcpy.Exists(temp_table):
-                table_path = temp_table
+        table = os.path.basename(table)
+        dbname = os.path.basename(fgdb) or self.tool._dbname
+        table_path = self.folders.get_table(table, fgdb=fgdb)
+        if dbname in self._temporary_gdbs:
+            temp_db = self.folders.get_temporary_db(fgdb=fgdb, check=False)
+            # only query temp. db if it exists (created on demand in update)
+            if arcpy.Exists(temp_db):
+                table_path = self.folders.get_temporary_table(table, fgdb=fgdb)
         cursor = arcpy.da.SearchCursor(table_path, columns, where_clause=where)
         rows = [row for row in cursor]
         return rows
     
-    def clear_temporary_tables(self):
-        """remove all temporary tables"""
-        path, dirnames, table_names = arcpy.da.Walk(self._temp_db).next()
-        for table_name in table_names:
-            if table_name.startswith(self._temp_table_prefix):
-                table = os.path.join(path, table_name)
-                arcpy.Delete_management(table)
+    def clear_temporary_dbs(self):
+        """remove all temporary gdbs"""
+        for project in self.folders.get_temporary_projects():
+            path = self.folders.get_temporary_projectpath(project=project)
+            #for fgdb in self._temporary_gdbs:
+                #path = self.folders.get_temporary_db(fgdb=fgdb, project=project,
+                                                     #check=False)
+            if arcpy.Exists(path):
+                arcpy.Delete_management(path)
         
-    def add_temporary_management(self, *args):
+    def add_temporary_management(self, fgdb=''):
         """
-        add a table to be managed within a temporary database, all updates on 
-        the given tables happen inside the temporary database, 
+        add a FileGeoDatabase to be managed temporarly, 
+        all updates on their tables happen inside the temporary database, 
         the changes made are only transferred into the project database after
         pressing OK in the UI
 
         Parameters
         ----------
-        args : str
-            full path to the table
-        """        
-        for arg in args:
-            path, table_name = os.path.split(arg)
-            # if '.' is in table name, arcpy cuts off all chars in front
-            db_name = os.path.split(path)[1].replace('.','')
-            temp_name = self._temp_table_name.format(
-                class_name=self.__class__.__name__, source_db=db_name,
-                source_table=table_name
-            )
-            temp_table = os.path.join(self._temp_db, temp_name)
-            self._temporary_tables[arg] = temp_table
+        fgdb : str
+            name of the FileGeoDatabase
+        """
+        dbname = os.path.basename(fgdb) or self.dbname
+        self._temporary_gdbs.append(fgdb)
             
-    def _create_temporary_copy(self, project_table, temp_table):
-        """make a copy of a project table in the given temporary table"""
-        if arcpy.Exists(temp_table):
-            arcpy.Delete_management(temp_table)
-        prev_state = arcpy.env.addOutputsToMap
+    def _create_temporary_copy(self, fgdb=''):
+        """make a copy of a project fgdbs in the given temporary table"""
+        project_db = self.folders.get_db(fgdb=fgdb)
+        temp_db = self.folders.get_temporary_db(fgdb=fgdb, check=False)
+        if arcpy.Exists(temp_db):
+            arcpy.Delete_management(temp_db)
+        # deactivate adding of temp. gdbs to table of contents
+        old_state = arcpy.env.addOutputsToMap
         arcpy.env.addOutputsToMap = False
-        arcpy.Copy_management(project_table, temp_table)
-        arcpy.env.addOutputsToMap = prev_state
+        arcpy.Copy_management(project_db, temp_db)
+        arcpy.env.addOutputsToMap = old_state
             
     def _commit_temporaries(self):
         """transfer all changes made in temporary tables into project tables"""
-        for project_table, temp_table in self._temporary_tables.iteritems():
-            temp_table += self.par._get_projectname()
-            if arcpy.Exists(project_table):
-                arcpy.Delete_management(project_table)
-            arcpy.Copy_management(temp_table, project_table)
+        for project in self.folders.get_temporary_projects():
+            for fgdb in self._temporary_gdbs:
+                project_db = self.folders.get_db(fgdb=fgdb, project=project)
+                temp_db = self.folders.get_temporary_db(fgdb=fgdb, 
+                                                        project=project,
+                                                        check=False)
+                if arcpy.Exists(temp_db):
+                    arcpy.Delete_management(project_db)
+                    arcpy.Copy_management(temp_db, project_db)
 
     def execute(self, parameters=None, messages=None):
         """
@@ -727,6 +731,7 @@ class Tbx(object):
 
         """
         self._commit_temporaries()
+        self.clear_temporary_dbs()
         self.tool.main(self.par, parameters, messages)
 
     def print_test_parameters(self):

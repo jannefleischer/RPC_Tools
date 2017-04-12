@@ -13,7 +13,8 @@
 # ---------------------------------------------------------------------------
 from os import listdir
 import sys
-from os.path import join, isdir, abspath, dirname, basename
+from os.path import join, isdir, abspath, dirname, basename, exists
+from os import mkdir
 import arcpy
 
 TEST_TMP_PROJECT = '__unittest__'
@@ -27,6 +28,7 @@ class Folders(object):
         self._PROJECT_BASE_PATH = '3 Benutzerdefinierte Projekte'
         self._INTERN = '4 Programminterne Daten'
         self._BASE_DBS = 'fgdbs'
+        self._TEMPORARY_GDB_PATH = 'temp_gdb'
         self._TEMPLATE_BASE_PATH = 'templates'
         self._TEMPLATE_FLAECHEN = 'projektflaechen_template.shp'
         self._PROJECT_TEMPLATE = 'Template'
@@ -82,7 +84,6 @@ class Folders(object):
 
     @property
     def BASE_DBS(self):
-        arcpy.AddError
         return self.join_and_check(self.INTERN, self._BASE_DBS)
 
     @property
@@ -99,7 +100,15 @@ class Folders(object):
 
     @property
     def TEMPLATE_BASE_PATH(self):
-        return self.join_and_check(self.BASE_PATH, self._INTERN, self._TEMPLATE_BASE_PATH)
+        return self.join_and_check(self.BASE_PATH, self._INTERN, 
+                                   self._TEMPLATE_BASE_PATH)
+
+    @property
+    def TEMPORARY_GDB_PATH(self):
+        path = join(self.INTERN, self._TEMPORARY_GDB_PATH)
+        if not exists(path):
+            mkdir(path)
+        return path    
 
     @property
     def TEMPLATE_FLAECHEN(self):
@@ -134,6 +143,14 @@ class Folders(object):
                       if isdir(self.get_projectpath(f))
                       and f != self._TEST_TMP_PROJECT]
         return sorted(subfolders)
+    
+    def get_temporary_projects(self):
+        '''
+        returns all projects for which temporary databases exist
+        '''
+        subfolders = [f for f in listdir(self.TEMPORARY_GDB_PATH)
+                      if isdir(self.get_temporary_projectpath(f))]
+        return sorted(subfolders)    
 
     def get_projectpath(self, project=None, check=True):
         """
@@ -152,6 +169,24 @@ class Folders(object):
         return self.join_and_check(self.PROJECT_BASE_PATH,
                                    projectname,
                                    check=check)
+    
+    def get_temporary_projectpath(self, project=None):
+        projectname = project or self.project
+        path = join(self.TEMPORARY_GDB_PATH, projectname)
+        if not exists(path):
+            mkdir(path)
+        return path
+    
+    def get_temporary_db(self, project=None, fgdb='', check=True):
+        dbname = basename(fgdb) or self.dbname
+        return self.join_and_check(
+            self.get_temporary_projectpath(project=project), 
+            dbname, check=check)
+    
+    def get_temporary_table(self, table_name, fgdb='', project=None, check=True):
+        return self.join_and_check(
+            self.get_temporary_db(fgdb=fgdb, project=project, check=True), 
+            table_name, check=check)
 
     @property
     def PROJECT_PATH(self):
@@ -206,7 +241,7 @@ class Folders(object):
         table = self.join_and_check(self.get_db(dbname, projectname),
                                     tablename,
                                     check=check)
-        return table
+        return table        
 
     def get_basedb(self, fgdb, check=True):
         """

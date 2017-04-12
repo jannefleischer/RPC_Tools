@@ -55,7 +55,6 @@ class Projektverwaltung(Tool):
     def remove_project_from_output(self):
         """ToDo"""
 
-
     def projekt_loeschen(self):
         projektName = self.par.existing_project.value
         arcpy.AddMessage("Projektname: " + projektName)

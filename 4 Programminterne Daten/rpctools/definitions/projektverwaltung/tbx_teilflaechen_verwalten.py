@@ -46,7 +46,7 @@ class TbxFlaechendefinition(Tbx):
 
         columns = ['id_teilflaeche', 'Flaeche_ha', 'Name',
                    'gemeinde_name', 'Nutzungsart', 'ags_bkg']        
-        rows = self.query_table(self.teilflaechen_table, columns)
+        rows = self.query_table('Teilflaechen_Plangebiet', columns)
         teilflaechen = OrderedDict()
 
         for flaechen_id, ha, name, gemeinde, nutzungsart_id, ags in rows:
@@ -65,9 +65,10 @@ class TbxFlaechendefinition(Tbx):
 
     def get_nutzungsart_id(self, flaechen_id):
         """get the nutzungsart of the given flaeche (by id)"""
-        where = '"id_teilflaeche" = {}'.format(flaechen_id)
-        row = arcpy.SearchCursor(self.teilflaechen_table, where).next()
-        return row.Nutzungsart
+        row = self.query_table(
+            'Teilflaechen_Plangebiet', ['Nutzungsart'], 
+            where = '"id_teilflaeche" = {}'.format(flaechen_id))[0]
+        return row[0]
 
     def _getParameterInfo(self):
         # Projekt
@@ -93,9 +94,9 @@ class TbxFlaechendefinition(Tbx):
         
         self.update_teilflaechen(self._nutzungsart)
         
-        self.add_temporary_management(self.teilflaechen_table)
+        self.add_temporary_management('FGDB_Definition_Projekt.gdb')
 
-        return params    
+        return params
 
     def _updateParameters(self, params):
         if params.changed('projectname') or self.recently_opened:
@@ -174,7 +175,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                 self.update_teilflaechen_inputs(flaechen_id, flaechenname)
 
             if params.changed('name'):
-                self.update_table(self.teilflaechen_table,
+                self.update_table('Teilflaechen_Plangebiet',
                                   {'Name': params.name.value},
                                   where='id_teilflaeche={}'.format(flaechen_id))
                 # update teilflaechen but keep selected index
@@ -184,7 +185,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
 
             if params.changed('nutzungsart'):
                 nutzungsart_id = self.nutzungsarten[params.nutzungsart.value]
-                self.update_table(self.teilflaechen_table, 
+                self.update_table('Teilflaechen_Plangebiet', 
                                   {'Nutzungsart': nutzungsart_id},
                                   where='id_teilflaeche={}'.format(flaechen_id))
                 # ToDo delete corresponding rows wohnen/gewerbe/einzelhandel
@@ -216,13 +217,13 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                 if params.name.value == row[0]:
                     params.name.setErrorMessage("Name wurde bereits vergeben.")
 
-
 if __name__ == '__main__':
 
     t = TbxTeilflaecheVerwalten()
     params = t.getParameterInfo()
-    t.update_table(t.teilflaechen_table, {'Nutzungsart': 1})
-    print(t.query_table(t.teilflaechen_table, ['Nutzungsart']))
+    t.update_table('Teilflaechen_Plangebiet', {'Nutzungsart': 1})
+    print(t.query_table('Teilflaechen_Plangebiet', ['Nutzungsart']))
+    t._commit_temporaries()
     t._get_teilflaechen()
     t.print_test_parameters()
     t.print_tool_parameters()
