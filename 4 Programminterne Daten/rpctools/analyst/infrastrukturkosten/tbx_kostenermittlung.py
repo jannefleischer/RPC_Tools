@@ -13,7 +13,7 @@ class TbxInfrastrukturkostenermittlung(Tbx):
 
     @property
     def label(self):
-        return encode(u'Schritt 2: Infrastrukturkosten ermitteln')
+        return encode(u'Schritt 3: Infrastrukturkosten ermitteln')
 
     @property
     def Tool(self):

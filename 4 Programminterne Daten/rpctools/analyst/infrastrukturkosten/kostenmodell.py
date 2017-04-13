@@ -36,7 +36,7 @@ class Kostenmodell(Tool):
 
 
         #-----------------------
-        #Kostenaufteilungsregeln speichern
+        #Kostenaufteilungen speichern
         #-----------------------
 
         projektname = self.par.projectname.value
@@ -76,7 +76,8 @@ class Kostenmodell(Tool):
 
         tablepath_costrules_project = join(kosten_projekt,'Projektspez_Kostenauft')
 
-        kostenbereiche = [('01 - Planungsaufwand',1),('02 - Gruen-, Ausgleichs- und Ersatzflaechen',2),('03 - Innere Verkehrserschliessung',3),('04 - Aeussere Verkehrserschliessung',4),('05 - Wasserversorgung',5),('06 - Abwasserentsorgung',6),('07 - Laermschutz',7),('08 - Zusatzkosten',8)]
+        kostenbereiche = [('01 - Planungsaufwand',1),('02 - Gruen-, Ausgleichs- und Ersatzflaechen',2),('03 - Innere Verkehrserschliessung',3),('04 - Aeussere Verkehrserschliessung',4),
+                            ('05 - Wasserversorgung',5),('06 - Abwasserentsorgung',6),('07 - Laermschutz',7)]
         kostenphasen = [('1 - Erstmalige Herstellung',1),('2 - Betrieb und Unterhaltung',2),('3 - Erneuerung',3)]
 
         for kostenbereich in kostenbereiche:
@@ -190,7 +191,7 @@ class Kostenmodell(Tool):
             teilflaechenabfrage = arcpy.SearchCursor(teilflaechenlayer, where_clause, "", "","")
 
             for s in teilflaechenabfrage:
-                startjahr = s.Startjahr
+                startjahr = s.Beginn_Nutzung
 
             rows = arcpy.SearchCursor(element_und_preisliste)
 

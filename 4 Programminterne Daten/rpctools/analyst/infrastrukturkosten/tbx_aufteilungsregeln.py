@@ -39,7 +39,7 @@ class Kostenregeln(Tool):
 class TbxKostenaufteilungsregeln(Tbx):
     @property
     def label(self):
-        return encode(u'Schritt 1: Kostenaufteilungsregeln verwalten')
+        return encode(u'Schritt 2: Kostenaufteilungsregeln verwalten')
 
     @property
     def Tool(self):

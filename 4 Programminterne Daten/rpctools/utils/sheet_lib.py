@@ -28,7 +28,7 @@ def infosheet(projektname, wirkungsfeld, wb):
     tablepath_neu  = join(workspace_factsheet,'Flaechenbilanz_gruppiert')
 
     tablepath_rahmendaten = join(workspace_factsheet,'Projektrahmendaten')
-    tablepath_WE = join(workspace_factsheet,'Wohneinheiten_Details')
+    tablepath_WE = join(workspace_factsheet,'Wohnen_WE_in_Gebaeudetypen')
     tablepath_Gewerbe = join(workspace_factsheet,'Gewerbe_Beschaeftigte')
     tablepath_EZH = join(workspace_factsheet,'Versorgung_Verkaufsflaechen_Max')
     logo = join(folders.BASE_DBS, u"Erläuterungstexte", "logo_rpc.png")
