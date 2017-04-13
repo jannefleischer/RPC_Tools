@@ -231,7 +231,7 @@ class Params(object):
             param = self._od[name]
             if param.altered and not param.hasBeenValidated:
                 change = True
-        return change    
+        return change
 
     def toolbox_opened(self):
         """return True if toolbox was opened just before last update"""
@@ -434,11 +434,11 @@ class Tbx(object):
     """Base Class for a ArcGIS Toolbox"""
     __metaclass__ = ABCMeta
     __metaclass__ = Singleton
-    
+
     _temp_table_prefix = 'RPC_Tools'
     # name of temp. tables, project needs to be appended
     _temp_table_name = (
-        _temp_table_prefix + 
+        _temp_table_prefix +
         '_{class_name}_{source_db}_{source_table}_'
     )
 
@@ -477,7 +477,7 @@ class Tbx(object):
         # updates to these tables are written to temp. tables and written to
         # project db only on execution of tool
         self._temporary_gdbs = []
-        
+
         self.recently_opened = False
 
     def reload_tool(self):
@@ -528,8 +528,8 @@ class Tbx(object):
         if self.par.toolbox_opened():
             self.clear_temporary_dbs()
             self.recently_opened = True
-        else:        
-            self.recently_opened = False            
+        else:
+            self.recently_opened = False
         # updating projects messes up the initial project management
         if self.update_projects:
             self._update_project_list()
@@ -578,7 +578,7 @@ class Tbx(object):
     def _update_dependencies(self, params):
         """check if dependent params were altered and set them to target sum"""
         for dependency in self._dependencies:
-            dependency.update(params)            
+            dependency.update(params)
 
     def _updateParameters(self, params):
         """
@@ -638,7 +638,7 @@ class Tbx(object):
                 row[i] = column_values[column]
             cursor.updateRow(row)
         del cursor
-        
+
     def query_table(self, table, columns, fgdb='', where=None):
         """
         get rows from a FileGeodatabase with given values
@@ -651,7 +651,7 @@ class Tbx(object):
             the requested columns
         where: str, optional
             a where clause to pick single rows
-            
+
         Returns
         -------
         rows : list of lists
@@ -670,7 +670,7 @@ class Tbx(object):
         rows = [row for row in cursor]
         del cursor
         return rows
-    
+
     def clear_temporary_dbs(self):
         """remove all temporary gdbs"""
         for project in self.folders.get_temporary_projects():
@@ -680,11 +680,11 @@ class Tbx(object):
                                                      #check=False)
             if arcpy.Exists(path):
                 arcpy.Delete_management(path)
-        
+
     def add_temporary_management(self, fgdb=''):
         """
-        add a FileGeoDatabase to be managed temporarly, 
-        all updates on their tables happen inside the temporary database, 
+        add a FileGeoDatabase to be managed temporarly,
+        all updates on their tables happen inside the temporary database,
         the changes made are only transferred into the project database after
         pressing OK in the UI
 
@@ -695,7 +695,7 @@ class Tbx(object):
         """
         dbname = os.path.basename(fgdb) or self.dbname
         self._temporary_gdbs.append(fgdb)
-            
+
     def _create_temporary_copy(self, fgdb=''):
         """make a copy of a project fgdbs in the given temporary table"""
         project_db = self.folders.get_db(fgdb=fgdb)
@@ -707,7 +707,7 @@ class Tbx(object):
         arcpy.env.addOutputsToMap = False
         arcpy.Copy_management(project_db, temp_db)
         arcpy.env.addOutputsToMap = old_state
-            
+
     def _commit_temporaries(self):
         """transfer all changes made in temporary tables into project tables"""
         gc.collect()
@@ -716,7 +716,7 @@ class Tbx(object):
         for project in self.folders.get_temporary_projects():
             for fgdb in self._temporary_gdbs:
                 project_db = self.folders.get_db(fgdb=fgdb, project=project)
-                temp_db = self.folders.get_temporary_db(fgdb=fgdb, 
+                temp_db = self.folders.get_temporary_db(fgdb=fgdb,
                                                         project=project,
                                                         check=False)      
                 if arcpy.Exists(temp_db):                    
@@ -859,10 +859,23 @@ class Output():
             addLayer = arcpy.mapping.Layer(group_layer_template)
             addLayer.name = projektname
             arcpy.mapping.AddLayer(current_dataframe, addLayer, "TOP")
-            projekt_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)[0]
             arcpy.RefreshActiveView()
             arcpy.RefreshTOC()
 
+
+    def get_projectlayer(self, projectname):
+        """
+        Returns project layer in table of contents
+        """
+        current_mxd = arcpy.mapping.MapDocument("CURRENT")
+        current_dataframe = current_mxd.activeDataFrame
+        layers = arcpy.mapping.ListLayers(current_mxd, projectname, current_dataframe)
+        projectlayer = []
+        for layer in layers:
+            if layer.isGroupLayer:
+                projectlayer = layer
+
+        return projectlayer
 
     def set_headgrouplayer(self, project_layer, dataframe):
         """
@@ -913,7 +926,7 @@ class Output():
             arcpy.RefreshActiveView()
             arcpy.RefreshTOC()
 
-    def add_output(self, group, featureclass, layername, disable_other = True, subgroup=""):
+    def add_output(self, group, featureclass, template_layer, disable_other = True, subgroup=""):
         """
         Add output layer to group
 
@@ -925,8 +938,8 @@ class Output():
         featureclass : str
             the full path of the feature class, which should be converted into a layer
 
-        layername : str
-            the layername (and the name of the .lyr-file)
+        template_layer : str
+            full path of the template layer
 
         disable_other = boolean
             if true, then all other layers will be turned off
@@ -936,13 +949,14 @@ class Output():
         """
 
         projektname = self.params._get_projectname()
+        arcpy.AddMessage(template_layer)
 
         # Layer-Gruppen hinuzfuegen, falls nicht vorhanden
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
 
         self.set_projectlayer(projektname)
-        project_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)[0]
+        project_layer = self.get_projectlayer(projektname)
         self.set_headgrouplayer(project_layer, current_dataframe)
         self.set_grouplayer(project_layer, group, current_dataframe)
         if subgroup != "":
@@ -954,8 +968,9 @@ class Output():
         target_grouplayer = arcpy.mapping.ListLayers(project_layer, group, current_dataframe)[0]
         if subgroup != "":
             target_subgrouplayer = arcpy.mapping.ListLayers(target_grouplayer, subgroup, current_dataframe)[0]
-        template_layer = self.folders.get_layer(layername, enhance = False)
         source_layer = arcpy.mapping.Layer(template_layer)
+        arcpy.AddMessage(source_layer)
+        arcpy.AddMessage(featureclass)
         source_ws = arcpy.Describe(source_layer).path
         target_ws = arcpy.Describe(featureclass).path
         source_layer.findAndReplaceWorkspacePath(source_ws, target_ws)
@@ -991,12 +1006,15 @@ class Output():
         projektname = self.params._get_projectname()
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
-        project_layer = arcpy.mapping.ListLayers(current_mxd, projektname, current_dataframe)
+        project_layer = self.get_projectlayer(projektname)
+
         if project_layer:
-            project_layer = project_layer[0]
-        layer_exists = arcpy.mapping.ListLayers(project_layer, layer, current_dataframe)
-        if layer_exists:
-            arcpy.Delete_management(layer_exists[0])
+            layer_exists = arcpy.mapping.ListLayers(project_layer, layer, current_dataframe)
+            if layer_exists:
+                arcpy.mapping.RemoveLayer(current_dataframe, layer_exists[0])
+
+        arcpy.RefreshActiveView()
+        arcpy.RefreshTOC()
 
     def update_output(self, group, layername ):
         """"""
