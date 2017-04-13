@@ -16,6 +16,7 @@ import sys
 from os.path import abspath, dirname, join, isdir
 from rpctools.utils.params import Tool
 from rpctools.utils.spatial_lib import get_ags
+from rpctools.utils.spatial_lib import get_gemeindetyp
 from rpctools.utils.constants import Nutzungsart
 import arcpy
 import os, shutil, gc
@@ -153,6 +154,14 @@ class Projektverwaltung(Tool):
         ende_betrachtung = self.par.end.value
         project_path = join(self.folders.PROJECT_BASE_PATH, project_name)
 
+        # check if  a) all ags of teilflaechen are identical and
+        #           b) maximal distance of teilflaechen smaller than x
+
+        # to do (Stefaan)
+        ags_projekt = '02000000' # wird nebenbei bestimmt
+        gemeindename_projekt = "Hamburg"# nebenbei bestimmen
+
+
         # copy template folder
         try:
             shutil.copytree(self.folders.PROJECT_TEMPLATE, project_path)
@@ -225,55 +234,26 @@ class Projektverwaltung(Tool):
             row.setValue("Aufsiedlungsdauer", 1)
             row.setValue("validiert", 0)
             row.setValue("Beginn_Nutzung", beginn_betrachtung)
+            row.setValue("ags_bkg", ags_projekt)
+            row.setValue("gemeinde_name", gemeindename_projekt)
             cursor.updateRow(row)
 
-        flaechen_ags = get_ags(tfl, 'id_teilflaeche')
-        cursor = arcpy.UpdateCursor(tfl)
-        for row in cursor:
-            flaechen_id = row.id_teilflaeche
-            if flaechen_id not in flaechen_ags:
-                raise ValueError(
-                    u'AGS für Fläche {} konnte nicht ermittelt werden'
-                    .format(flaechen_id))
-            ags, gen = flaechen_ags[flaechen_id]
-            row.setValue('ags_bkg', ags)
-            row.setValue('gemeinde_name', gen)
-            cursor.updateRow(row)
 
         # add project-data to Projektrahmendaten
+        gemeindetyp = get_gemeindetyp(ags_projekt)
 
-        # Den AGS aus der Lage der projektfläche im Raum ermitteln
-        bkg = self.folders.get_base_table('FGDB_Basisdaten_deutschland.gdb',
-                                          'bkg_gemeinden')
-        workspace_projekt_definition = gdbPfad
-        projektrahmendaten = join(workspace_projekt_definition,
-                                  'Projektrahmendaten')
-        projektFlaeche = join(workspace_projekt_definition,
-                              'Teilflaechen_Plangebiet')
-
-        arcpy.AddMessage(bkg)
-
-        # ags aus BKG Daten extrahieren, dafür Gemeinde selektieren, die von Planfläche geschnitten wird
-        # 1. Feature Layer aus den bkg-daten erstellen
-        arcpy.MakeFeatureLayer_management(bkg, "bkg_lyr")
-        # 2.Spatial Select wo Planfläche bkg_lyr intersected
-        arcpy.SelectLayerByLocation_management("bkg_lyr", "INTERSECT",
-                                               projektFlaeche)
-
-        # Setzen des Sonderkostenfaktors auf 1 =100% - Sonderkostenfaktor wird im Themenfeld Kosten durch nutzer eingegeben und in der Tabelle aktualisiert
-        sonderkostenfaktor = 1
-
-        # loesche ggf. vorhandene zeilen in den rojektrahmendaten und fuege neue daten danach hinzu
+        # loesche ggf. vorhandene zeilen in den Projektrahmendaten und fuege neue daten danach hinzu
+        projektrahmendaten = self.folders.get_table(tablename = "Projektrahmendaten", project = project_name)
         arcpy.DeleteRows_management(projektrahmendaten)
 
         cursor = arcpy.InsertCursor(projektrahmendaten)
         row = cursor.newRow()
         row.BEGINN_BETRACHTUNGSZEITRAUM = beginn_betrachtung
         row.ENDE_BETRACHTUNGSZEITRAUM = ende_betrachtung
-        row.GEMEINDENAME = gen
-        row.PROJEKTSPEZIFISCHER_SONDERKOSTENFAKTOR = sonderkostenfaktor
+        row.GEMEINDENAME = gemeindename_projekt
         row.PROJEKTNAME = project_name
-        row.AGS = ags
+        row.AGS = ags_projekt
+        row.GEMEINDETYP = gemeindetyp
         cursor.insertRow(row)
 
         del cursor, row

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import arcpy, sys
-import numpy
+import numpy as np
 import arcpy, os, inspect, pyodbc, shutil, gc, sys, datetime, xlsxwriter, imp
 from xlsxwriter.utility import xl_rowcol_to_cell
 from os.path import join, isdir, abspath, dirname, basename
 
 from rpctools.utils.params import Tool
-
+import rpctools.utils.weighted_mean as wmean
 import rpctools.utils.tempmdb_lib as mdb
-import rpctools.utils.population_lib as pop
+import rpctools.utils.allgemeine_Rahmendaten as rahmendaten
 
 class Wanderungssalden(Tool):
 
@@ -105,9 +105,13 @@ class Wanderungssalden(Tool):
         konstant_bis_km_gewerbe = 3
 
         # Mittelpunkt der Projektflächen
-        ##x_projektflaeche = 3546723
-        ##y_projektflaeche = 5922056
-        gewichtete_koordinaten = calc_weighted_mean(Data, Nutzungsart=None)
+        table = 'Teilflaechen_Plangebiet'
+        columns = np.array(['Nutzungsart', 'Flaeche_ha', 'INSIDE_X', 'INSIDE_Y'])
+        Results = wmean.Read_FGDB(workspace_projekt_definition, table, columns)
+        Results.get_result_block()
+        gewichtete_koordinaten = wmean.calc_weighted_mean(Results.result_block)
+        x_projektflaeche = gewichtete_koordinaten[0]
+        y_projektflaeche = gewichtete_koordinaten[1]
 
         # Gewichtete Einwohner/SvB bestimmen
         gewichtete_ew_gesamt = 0
@@ -125,7 +129,7 @@ class Wanderungssalden(Tool):
             if entfernung_km < konstant_bis_km_wohnen:
                 entfernungsgewichtung_wohnen = 1
             else:
-                entfernungsgewichtung_wohnen = numpy.exp((entfernung_km - konstant_bis_km_wohnen) * exponentialfaktor_wohnen)
+                entfernungsgewichtung_wohnen = np.exp((entfernung_km - konstant_bis_km_wohnen) * exponentialfaktor_wohnen)
             gewichtete_ew = gemeinde[1] * (flaeche_verschnitt / gemeinde[3]) * entfernungsgewichtung_wohnen
             gemeinde[4] = gewichtete_ew
             gewichtete_ew_gesamt += gewichtete_ew
@@ -133,18 +137,23 @@ class Wanderungssalden(Tool):
             if entfernung_km < konstant_bis_km_gewerbe:
                 entfernungsgewichtung_gewerbe = 1
             else:
-                entfernungsgewichtung_gewerbe = numpy.exp((entfernung_km - konstant_bis_km_gewerbe) * exponentialfaktor_gewerbe)
+                entfernungsgewichtung_gewerbe = np.exp((entfernung_km - konstant_bis_km_gewerbe) * exponentialfaktor_gewerbe)
             gewichtete_SvB = gemeinde[1] * gemeinde[2] * (flaeche_verschnitt / gemeinde[3]) * entfernungsgewichtung_gewerbe
             gemeinde[5] = gewichtete_SvB
             gewichtete_SvB_gesamt += gewichtete_SvB
             cursor.updateRow(gemeinde)
 
         # Wanderungsanteile bestimmen
-        fields = ["Gewichtete_Ew", "Wanderungsanteil_Ew", "Wanderungsanteil_SvB"]
+        fields = ["Gewichtete_Ew", "Wanderungsanteil_Ew", "Gewichtete_SvB", "Wanderungsanteil_SvB"]
         cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
         for gemeinde in cursor:
             gemeinde[1] = gemeinde[0] / gewichtete_ew_gesamt
+            gemeinde[3] = gemeinde[2] / gewichtete_SvB_gesamt
             cursor.updateRow(gemeinde)
+
+        # Berechnung der Einwohner und SvB im Plangebiet
+        einwohner_projekt = rahmendaten.Bewohner_referenz_plangebiet(projektname)
+
 
         #Ergebnis einfügen
         fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "SvB_Zuzug", "SvB_Fortzug", "SvB_Saldo", "Shape_Area"]

@@ -68,7 +68,15 @@ class Message(object):
     @staticmethod
     def AddGPMessages():
         arcpy.AddMessage('')
-        
+
+
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
 
 class Params(object):
     """Parameter class like an ordered dict"""
@@ -327,7 +335,7 @@ class Tool(object):
     _dbname = None
     """the name of the default database of the tool"""
 
-    def __init__(self, params, parent_tbx):
+    def __init__(self, params):
         """
         Parameters
         ----------
@@ -437,7 +445,7 @@ class Tbx(object):
     _temp_table_name = (
         _temp_table_prefix +
         '_{class_name}_{source_db}_{source_table}_'
-    )    
+    )
     
     config = Config()
 
@@ -474,7 +482,7 @@ class Tbx(object):
         self.folders = Folders(params=self.par)
         self.projects = []
         # an instance of the tool
-        self.tool = Tool(self.par, self)
+        self.tool = Tool(self.par)
         self.canRunInBackground = False
         # update projects on call of updateParameters
         self.update_projects = True
@@ -526,9 +534,10 @@ class Tbx(object):
         ----------
         parameters : list of ArcGIS-Parameters
         """
-    
+
         self.par._update_parameters(parameters)
-        # if a toolbox is opened, remove ALL temporary databases
+        #with open(r'C:\Users\JMG.GGRS\Desktop\test.txt', 'a') as f:
+            #f.write('just opened: {}\n'.format(self.par.toolbox_opened()))
         if self.par.toolbox_opened():
             self.clear_temporary_dbs()
             self.recently_opened = True
@@ -537,6 +546,9 @@ class Tbx(object):
                 self._set_active_project()
         else:
             self.recently_opened = False
+        # updating projects messes up the initial project management
+        if self.update_projects:
+            self._update_project_list()
         self._update_dependencies(self.par)
             #self._create_temporary_copies()
         self._updateParameters(self.par)
@@ -712,8 +724,8 @@ class Tbx(object):
 
     def add_temporary_management(self, fgdb=''):
         """
-        add a FileGeoDatabase to be managed temporarly, 
-        all updates on their tables happen inside the temporary database, 
+        add a FileGeoDatabase to be managed temporarly,
+        all updates on their tables happen inside the temporary database,
         the changes made are only transferred into the project database after
         pressing OK in the UI
 
@@ -725,7 +737,7 @@ class Tbx(object):
         dbname = os.path.basename(fgdb) or self.dbname
         if fgdb not in self._temporary_gdbs:
             self._temporary_gdbs.append(fgdb)
-            
+
     def _create_temporary_copy(self, fgdb=''):
         """make a copy of a project fgdbs in the given temporary table"""
         project_db = self.folders.get_db(fgdb=fgdb)
@@ -741,25 +753,29 @@ class Tbx(object):
     def _commit_temporaries(self):
         """transfer all changes made in temporary tables into project tables"""
         gc.collect()
-    
+
         arcpy.AddMessage(
             'Getätigte Änderungen werden in das Projekt übernommen...')
-        changes = 0
+
         old_state = arcpy.env.overwriteOutput
-        for fgdb in self._temporary_gdbs:
-            project_db = self.folders.get_db(fgdb=fgdb)
-            temp_db = self.folders.get_temporary_db(fgdb=fgdb,
-                                                    check=False)
-            # temporary dbs only exist, if changes were made (else nothing
-            # to do here)
-            if arcpy.Exists(temp_db):
-                arcpy.Delete_management(project_db)
-                arcpy.Copy_management(temp_db, project_db)
-                changes += 1
-        
-        if changes:
-            arcpy.AddMessage(
-                '{} Datenbank(en) wurden erfolgreich geändert'.format(changes))
+        arcpy.env.overwriteOutput = True
+        changes = 0
+        for project in self.folders.get_temporary_projects():
+            for fgdb in self._temporary_gdbs:
+                project_db = self.folders.get_db(fgdb=fgdb, project=project)
+                temp_db = self.folders.get_temporary_db(fgdb=fgdb,
+                                                        project=project,
+                                                        check=False)
+                # temporary dbs only exist, if changes were made (else nothing
+                # to do here)
+                if arcpy.Exists(temp_db):
+                    arcpy.Delete_management(project_db)
+                    arcpy.Copy_management(temp_db, project_db)
+                    changes += 1
+
+        arcpy.AddMessage(
+            '{} Datenbanken wurden erfolgreich geändert'.format(changes))
+        arcpy.env.overwriteOutput = old_state
 
     def execute(self, parameters=None, messages=None):
         """
@@ -775,6 +791,7 @@ class Tbx(object):
         self._commit_temporaries()
         self.tool.main(self.par, parameters, messages)
         self.clear_temporary_dbs()
+        self.tool.main(self.par, parameters, messages)
 
     def print_test_parameters(self):
         """
@@ -981,7 +998,6 @@ class Output():
         """
 
         projektname = self.params._get_projectname()
-        arcpy.AddMessage(template_layer)
 
         # Layer-Gruppen hinuzfuegen, falls nicht vorhanden
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
