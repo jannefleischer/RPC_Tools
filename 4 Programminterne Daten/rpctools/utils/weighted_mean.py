@@ -1,5 +1,60 @@
+import arcpy
+from arcpy import env
 import numpy as np
 
+
+
+
+class Read_FGDB(object):
+    
+    
+    def __init__(self, gdb_path, table, columns, clause=None, header=0):
+        self.gdb_path = gdb_path
+        self.table = table
+        self.columns = columns
+        self.clause = clause
+        self.result_block = []
+        self.header = header
+        
+    def get_result_block(self):
+        """
+        Extract data from gdb.
+        
+        Parameters
+        ----------
+        gdb_path : str
+            Path to GDB
+        table : str
+            Table inside the GDB
+        columns : np.array of str
+            Columns inside the table
+        
+        Returns
+        -------
+        result_block : np.array of str
+            Extracted data from GDB
+        """
+        env.workspace = self.gdb_path
+        result_block = self.columns
+        with arcpy.da.SearchCursor(self.table, self.columns, 
+                                   where_clause=self.clause) as cur:
+            for cols in cur:
+                new_row = np.array(cols)
+                result_block = np.vstack((result_block, new_row))
+        # delete header
+        if not self.header:
+            result_block = np.delete(result_block, 0, axis=0)
+        # overwrite self.result_block
+        self.result_block = result_block
+
+
+    def sort_results_by_col(self, col):
+        """
+        """
+        self.result_block[self.header:, :] = self.result_block[self.header:, :]\
+            [self.result_block[self.header:, col].argsort()]
+        
+        
 
 def calc_weighted_mean(Data, Nutzungsart=None):
     """
@@ -29,3 +84,10 @@ def calc_weighted_mean(Data, Nutzungsart=None):
     
     return XY
     
+database = r'c:\projektcheck\3 Benutzerdefinierte Projekte\test_mean2' + \
+    '\FGDB_Definition_Projekt.gdb'
+table = 'Teilflaechen_Plangebiet'
+columns = np.array(['Nutzungsart', 'Flaeche_ha', 'INSIDE_X', 'INSIDE_Y'])
+Results = Read_FGDB(database, table, columns)
+Results.get_result_block()
+print(calc_weighted_mean(Results.result_block, Nutzungsart=0))
