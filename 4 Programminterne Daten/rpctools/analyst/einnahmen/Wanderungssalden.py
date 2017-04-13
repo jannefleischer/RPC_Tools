@@ -21,13 +21,17 @@ class Wanderungssalden(Tool):
         parameters = self.par
         projektname = self.par.name.value
 
-    # Pruefen, ob Wanderungssalden-Layer existiert; falls ja, dann loeschen
+    # Pruefen, ob Wanderungssalden-Tabelle existiert; falls ja, dann loeschen
         layer_pfad = self.folders.get_db("FGDB_Einnahmen.gdb", projektname)
         wanderungssalden_pfad = os.path.join(layer_pfad, "Wanderungssalden")
         layer_existiert = arcpy.Exists(wanderungssalden_pfad)
 
         if layer_existiert == 1:
             arcpy.Delete_management(wanderungssalden_pfad)
+
+    #Alte Layer löschen
+        self.output.delete_output("Wanderungssalden Einwohner")
+        self.output.delete_output("Wanderungssalden Erwerbstätige")
 
 
     # Gemeinden im Umkreis ermitteln und speichern
@@ -87,18 +91,19 @@ class Wanderungssalden(Tool):
             if flaeche[0] == 2:
                 gewerbe_exists = True
 
+
     #Einwohnersaldo-Layer hinzuf?gen
         if wohnen_exists:
             self.output.delete_output("Positive Wanderungssalden Einwohner")
             self.output.add_output(group = self.output.module["einnahmen"],
                                 featureclass = self.folders.get_table(project = projektname, tablename = "Wanderungssalden"),
-                                layername = self.folders.get_layer(layername = "Positive Wanderungssalden Einwohner", enhance = True, folder="einnahmen"),
+                                template_layer = self.folders.get_layer(layername = "Positive Wanderungssalden Einwohner", enhance = True, folder="einnahmen"),
                                 subgroup = "Wanderungssalden Einwohner"
                                     )
             self.output.delete_output("Negative Wanderungssalden Einwohner")
             self.output.add_output(group = self.output.module["einnahmen"],
                                     featureclass = self.folders.get_table(project = projektname, tablename = "Wanderungssalden"),
-                                    layername = self.folders.get_layer(layername = "Negative Wanderungssalden Einwohner", enhance = True, folder="einnahmen"),
+                                    template_layer = self.folders.get_layer(layername = "Negative Wanderungssalden Einwohner", enhance = True, folder="einnahmen"),
                                     disable_other = False,
                                     subgroup = "Wanderungssalden Einwohner"
                                     )
@@ -108,14 +113,14 @@ class Wanderungssalden(Tool):
             self.output.delete_output("Positive Wanderungssalden Erwerbstätige")
             self.output.add_output(group = self.output.module["einnahmen"],
                                 featureclass = self.folders.get_table(project = projektname, tablename = "Wanderungssalden"),
-                                layername = self.folders.get_layer(layername = "Positive Wanderungssalden Erwerbstätige", enhance = True, folder="einnahmen"),
+                                template_layer = self.folders.get_layer(layername = "Positive Wanderungssalden Erwerbstätige", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Wanderungssalden Erwerbstätige"
                                 )
             self.output.delete_output("Negative Wanderungssalden Erwerbstätige")
             self.output.add_output(group = self.output.module["einnahmen"],
                                 featureclass = self.folders.get_table(project = projektname, tablename = "Wanderungssalden"),
-                                layername = self.folders.get_layer(layername = "Negative Wanderungssalden Erwerbstätige", enhance = True, folder="einnahmen"),
+                                template_layer = self.folders.get_layer(layername = "Negative Wanderungssalden Erwerbstätige", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Wanderungssalden Erwerbstätige"
                                 )
@@ -123,7 +128,7 @@ class Wanderungssalden(Tool):
     #   Symbology anpassen
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = mxd.activeDataFrame
-        projekt_layer = arcpy.mapping.ListLayers(mxd, projektname, df)[0]
+        projekt_layer = self.output.get_projectlayer(projektname)
         if arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Einwohner"):
             lyr = arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Einwohner")[0]
             lyr.symbology.reclassify()

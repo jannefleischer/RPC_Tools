@@ -21,7 +21,7 @@ class Steuersalden(Tool):
         parameters = self.par
         projektname = self.par.name.value
 
-    # Pruefen, ob Wanderungssalden-Layer existiert; falls ja, dann loeschen
+    # Pruefen, ob Wanderungssalden-Tabelle existiert; falls ja, dann loeschen
         layer_pfad = self.folders.get_db("FGDB_Einnahmen.gdb", projektname)
         wanderungssalden_pfad = os.path.join(layer_pfad, "Wanderungssalden")
         layer_existiert = arcpy.Exists(wanderungssalden_pfad)
@@ -29,6 +29,9 @@ class Steuersalden(Tool):
         if layer_existiert == 0:
             arcpy.AddMessage("Es wurden noch keine Wanderungssalden für das angegebene Projekt berechnet. Bitte zuerst 'Schritt 1: Wanderungssalden schätzen' durchführen.")
             sys.exit()
+
+        #Löschen bisheriger Layer
+        self.output.delete_output("Steuereinnahmesalden")
 
 
     # Layer "Steuereinnahmesalden" mit Gemeinden aus dem Layer "Wanderungssalden" erzeugen, vorhandenen Steuersaldo-Layer löschen
@@ -108,97 +111,90 @@ class Steuersalden(Tool):
     # Anzeigen der Saldo-Layer
 
         #Grundsteuer
-        self.output.delete_output("Positiver Grundsteuersaldo")
         self.output.add_output(group = self.output.module["einnahmen"],
                             featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                            layername = self.folders.get_layer(layername = "Positiver Grundsteuersaldo", enhance = True, folder="einnahmen"),
+                            template_layer = self.folders.get_layer(layername = "Positiver Grundsteuersaldo", enhance = True, folder="einnahmen"),
                             subgroup = "Steuereinnahmesalden"
                                 )
-        self.output.delete_output("Negativer Grundsteuersaldo")
         self.output.add_output(group = self.output.module["einnahmen"],
                                 featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                                layername = self.folders.get_layer(layername = "Negativer Grundsteuersaldo", enhance = True, folder="einnahmen"),
+                                template_layer = self.folders.get_layer(layername = "Negativer Grundsteuersaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"
                                 )
 
         #Einkommensteuer
-        self.output.delete_output("Positiver Einkommensteuersaldo")
         self.output.add_output(group = self.output.module["einnahmen"],
                             featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                            layername = self.folders.get_layer(layername = "Positiver Einkommensteuersaldo", enhance = True, folder="einnahmen"),
+                            template_layer = self.folders.get_layer(layername = "Positiver Einkommensteuersaldo", enhance = True, folder="einnahmen"),
                             disable_other = False,
                             subgroup = "Steuereinnahmesalden"
                                 )
-        self.output.delete_output("Negativer Einkommensteuersaldo")
+
         self.output.add_output(group = self.output.module["einnahmen"],
                                 featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                                layername = self.folders.get_layer(layername = "Negativer Einkommensteuersaldo", enhance = True, folder="einnahmen"),
+                                template_layer = self.folders.get_layer(layername = "Negativer Einkommensteuersaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"
                                 )
 
         #Familienleistungsausgleich
-        self.output.delete_output("Positiver Familienleistungsausgleichssaldo")
         self.output.add_output(group = self.output.module["einnahmen"],
                             featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                            layername = self.folders.get_layer(layername = "Positiver Familienleistungsausgleichssaldo", enhance = True, folder="einnahmen"),
+                            template_layer = self.folders.get_layer(layername = "Positiver Familienleistungsausgleichssaldo", enhance = True, folder="einnahmen"),
                             disable_other = False,
                             subgroup = "Steuereinnahmesalden"
                                 )
-        self.output.delete_output("Negativer Familienleistungsausgleichssaldo")
+
         self.output.add_output(group = self.output.module["einnahmen"],
                                 featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                                layername = self.folders.get_layer(layername = "Negativer Familienleistungsausgleichssaldo", enhance = True, folder="einnahmen"),
+                                template_layer = self.folders.get_layer(layername = "Negativer Familienleistungsausgleichssaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"
                                 )
 
         #Gewerbesteuer
-        self.output.delete_output("Positiver Gewerbesteuersaldo")
         self.output.add_output(group = self.output.module["einnahmen"],
                             featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                            layername = self.folders.get_layer(layername = "Positiver Gewerbesteuersaldo", enhance = True, folder="einnahmen"),
+                            template_layer = self.folders.get_layer(layername = "Positiver Gewerbesteuersaldo", enhance = True, folder="einnahmen"),
                             disable_other = False,
                             subgroup = "Steuereinnahmesalden"
                                 )
-        self.output.delete_output("Negativer Gewerbesteuersaldo")
+
         self.output.add_output(group = self.output.module["einnahmen"],
                                 featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                                layername = self.folders.get_layer(layername = "Negativer Gewerbesteuersaldo", enhance = True, folder="einnahmen"),
+                                template_layer = self.folders.get_layer(layername = "Negativer Gewerbesteuersaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"
                                 )
 
         #Umsatzsteuer
-        self.output.delete_output("Positiver Umsatzsteuersaldo")
         self.output.add_output(group = self.output.module["einnahmen"],
                             featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                            layername = self.folders.get_layer(layername = "Positiver Umsatzsteuersaldo", enhance = True, folder="einnahmen"),
+                            template_layer = self.folders.get_layer(layername = "Positiver Umsatzsteuersaldo", enhance = True, folder="einnahmen"),
                             disable_other = False,
                             subgroup = "Steuereinnahmesalden"
                                 )
-        self.output.delete_output("Negativer Umsatzsteuersaldo")
+
         self.output.add_output(group = self.output.module["einnahmen"],
                                 featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                                layername = self.folders.get_layer(layername = "Negativer Umsatzsteuersaldo", enhance = True, folder="einnahmen"),
+                                template_layer = self.folders.get_layer(layername = "Negativer Umsatzsteuersaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"
                                 )
 
 
         #Gesamtsaldo
-        self.output.delete_output("Positiver Gesamtsaldo")
         self.output.add_output(group = self.output.module["einnahmen"],
                             featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                            layername = self.folders.get_layer(layername = "Positiver Gesamtsaldo", enhance = True, folder="einnahmen"),
+                            template_layer = self.folders.get_layer(layername = "Positiver Gesamtsaldo", enhance = True, folder="einnahmen"),
                             disable_other = False,
                             subgroup = "Steuereinnahmesalden"
                                 )
-        self.output.delete_output("Negativer Gesamtsaldo")
+
         self.output.add_output(group = self.output.module["einnahmen"],
                                 featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
-                                layername = self.folders.get_layer(layername = "Negativer Gesamtsaldo", enhance = True, folder="einnahmen"),
+                                template_layer = self.folders.get_layer(layername = "Negativer Gesamtsaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"
                                 )
@@ -208,7 +204,7 @@ class Steuersalden(Tool):
     #   Symbology anpassen
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = mxd.activeDataFrame
-        projekt_layer = arcpy.mapping.ListLayers(mxd, projektname, df)[0]
+        projekt_layer = self.output.get_projectlayer(projektname)
         if arcpy.mapping.ListLayers(mxd, "Negativer Grundsteuersaldo"):
             lyr = arcpy.mapping.ListLayers(mxd, "Negativer Grundsteuersaldo")[0]
             lyr.symbology.reclassify()
