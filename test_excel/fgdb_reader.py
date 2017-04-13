@@ -11,7 +11,7 @@ import numpy as np
 class Read_FGDB(object):
     
     
-    def __init__(self, gdb_path, table, columns, clause):
+    def __init__(self, gdb_path, table, columns, clause=None):
         self.gdb_path = gdb_path
         self.table = table
         self.columns = columns
@@ -53,3 +53,18 @@ class Read_FGDB(object):
         """
         self.result_block[header:, :] = self.result_block[header:, :]\
             [self.result_block[header:, col].argsort()]
+
+
+
+if __name__ == '__main__':
+    filename = 'demo.xlsx'
+    filename2 = r'C:\ProjektCheck\test_excel\demo.xlsx'
+    gdb_path = r"C:\ProjektCheck\3 Benutzerdefinierte Projekte" + \
+    "\Wir_wollen_Diagramme\FGDB_Definition_Projekt.gdb"
+    test_data = 'Wohnen_WE_in_Gebaeudetypen'
+    columns = np.array(["WE", "EW_je_WE"])
+    
+    Results = Read_FGDB(gdb_path, test_data, columns, 'WE>0 and WE<20')
+    Results.get_result_block()
+    Results.sort_results_by_col(1)
+    cell_block = Results.result_block    
