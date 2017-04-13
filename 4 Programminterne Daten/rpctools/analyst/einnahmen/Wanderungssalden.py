@@ -156,10 +156,13 @@ class Wanderungssalden(Tool):
         erwerbstaetige_projekt = rahmendaten.Erwerbstaetige_referenz_plangebiet(projektname)
 
         # Bestimme AGS der Projektgemeinde
-        pfad_rahmendaten = self.folders.get_table(tablename= 'Projektrahmendaten', fgdb = "FGDB_Definition_Projekt.gdb", project = projektname)
+        pfad_rahmendaten = self.folders.get_table(
+            tablename='Projektrahmendaten',
+            workspace="FGDB_Definition_Projekt.gdb",
+            project=projektname)
         cursor = arcpy.da.SearchCursor(pfad_rahmendaten, ["AGS"])
         for projekt in cursor:
-         ags_projekt = projekt[0]
+            ags_projekt = projekt[0]
 
 
         #Ergebnis einfügen
@@ -184,7 +187,10 @@ class Wanderungssalden(Tool):
         wohnen_exists = False
         gewerbe_exists = False
 
-        table_teilflaechen = self.folders.get_table(tablename= 'Teilflaechen_Plangebiet', fgdb = "FGDB_Definition_Projekt.gdb", project = projektname)
+        table_teilflaechen = self.folders.get_table(
+            tablename='Teilflaechen_Plangebiet',
+            workspace="FGDB_Definition_Projekt.gdb",
+            project=projektname)
         fields = "Nutzungsart"
         cursor = arcpy.da.SearchCursor(table_teilflaechen, fields)
         wohnen_gewerbe_exists = False
@@ -200,13 +206,13 @@ class Wanderungssalden(Tool):
         if wohnen_exists:
             self.output.delete_output("Positive Wanderungssalden Einwohner")
             self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project = projektname, tablename = "Wanderungssalden"),
+                                featureclass = self.folders.get_table(project=projektname, tablename = "Wanderungssalden"),
                                 template_layer = self.folders.get_layer(layername = "Positive Wanderungssalden Einwohner", enhance = True, folder="einnahmen"),
                                 subgroup = "Wanderungssalden Einwohner"
                                     )
             self.output.delete_output("Negative Wanderungssalden Einwohner")
             self.output.add_output(group = self.output.module["einnahmen"],
-                                    featureclass = self.folders.get_table(project = projektname, tablename = "Wanderungssalden"),
+                                    featureclass = self.folders.get_table(project=projektname, tablename = "Wanderungssalden"),
                                     template_layer = self.folders.get_layer(layername = "Negative Wanderungssalden Einwohner", enhance = True, folder="einnahmen"),
                                     disable_other = False,
                                     subgroup = "Wanderungssalden Einwohner"
@@ -216,14 +222,14 @@ class Wanderungssalden(Tool):
         if gewerbe_exists:
             self.output.delete_output("Positive Wanderungssalden Erwerbstätige")
             self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project = projektname, tablename = "Wanderungssalden"),
+                                featureclass = self.folders.get_table(project=projektname, tablename = "Wanderungssalden"),
                                 template_layer = self.folders.get_layer(layername = "Positive Wanderungssalden Erwerbstätige", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Wanderungssalden Erwerbstätige"
                                 )
             self.output.delete_output("Negative Wanderungssalden Erwerbstätige")
             self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project = projektname, tablename = "Wanderungssalden"),
+                                featureclass = self.folders.get_table(project=projektname, tablename = "Wanderungssalden"),
                                 template_layer = self.folders.get_layer(layername = "Negative Wanderungssalden Erwerbstätige", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Wanderungssalden Erwerbstätige"

@@ -39,14 +39,17 @@ class TbxSteuersalden(Tbx):
         projects_wohnen_gewerbe = []
 
         for project in projects:
-            table_teilflaechen = self.folders.get_table(tablename= 'Teilflaechen_Plangebiet', fgdb = "FGDB_Definition_Projekt.gdb", project = project)
+            table_teilflaechen = self.folders.get_table(
+                tablename='Teilflaechen_Plangebiet',
+                workspace="FGDB_Definition_Projekt.gdb",
+                project=project)
             fields = "Nutzungsart"
             cursor = arcpy.da.SearchCursor(table_teilflaechen, fields)
             wohnen_gewerbe_exists = False
 
             for flaeche in cursor:
-               if flaeche[0] == 1 or flaeche[0] == 2:
-                     wohnen_gewerbe_exists = True
+                if flaeche[0] == 1 or flaeche[0] == 2:
+                    wohnen_gewerbe_exists = True
 
             if wohnen_gewerbe_exists == True:
                 projects_wohnen_gewerbe.append(project)

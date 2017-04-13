@@ -112,12 +112,12 @@ class Steuersalden(Tool):
 
         #Grundsteuer
         self.output.add_output(group = self.output.module["einnahmen"],
-                            featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                            featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                             template_layer = self.folders.get_layer(layername = "Positiver Grundsteuersaldo", enhance = True, folder="einnahmen"),
                             subgroup = "Steuereinnahmesalden"
                                 )
         self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                                featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                                 template_layer = self.folders.get_layer(layername = "Negativer Grundsteuersaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"
@@ -125,14 +125,14 @@ class Steuersalden(Tool):
 
         #Einkommensteuer
         self.output.add_output(group = self.output.module["einnahmen"],
-                            featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                            featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                             template_layer = self.folders.get_layer(layername = "Positiver Einkommensteuersaldo", enhance = True, folder="einnahmen"),
                             disable_other = False,
                             subgroup = "Steuereinnahmesalden"
                                 )
 
         self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                                featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                                 template_layer = self.folders.get_layer(layername = "Negativer Einkommensteuersaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"
@@ -140,14 +140,14 @@ class Steuersalden(Tool):
 
         #Familienleistungsausgleich
         self.output.add_output(group = self.output.module["einnahmen"],
-                            featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                            featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                             template_layer = self.folders.get_layer(layername = "Positiver Familienleistungsausgleichssaldo", enhance = True, folder="einnahmen"),
                             disable_other = False,
                             subgroup = "Steuereinnahmesalden"
                                 )
 
         self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                                featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                                 template_layer = self.folders.get_layer(layername = "Negativer Familienleistungsausgleichssaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"
@@ -155,14 +155,14 @@ class Steuersalden(Tool):
 
         #Gewerbesteuer
         self.output.add_output(group = self.output.module["einnahmen"],
-                            featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                            featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                             template_layer = self.folders.get_layer(layername = "Positiver Gewerbesteuersaldo", enhance = True, folder="einnahmen"),
                             disable_other = False,
                             subgroup = "Steuereinnahmesalden"
                                 )
 
         self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                                featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                                 template_layer = self.folders.get_layer(layername = "Negativer Gewerbesteuersaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"
@@ -170,14 +170,14 @@ class Steuersalden(Tool):
 
         #Umsatzsteuer
         self.output.add_output(group = self.output.module["einnahmen"],
-                            featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                            featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                             template_layer = self.folders.get_layer(layername = "Positiver Umsatzsteuersaldo", enhance = True, folder="einnahmen"),
                             disable_other = False,
                             subgroup = "Steuereinnahmesalden"
                                 )
 
         self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                                featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                                 template_layer = self.folders.get_layer(layername = "Negativer Umsatzsteuersaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"
@@ -186,14 +186,14 @@ class Steuersalden(Tool):
 
         #Gesamtsaldo
         self.output.add_output(group = self.output.module["einnahmen"],
-                            featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                            featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                             template_layer = self.folders.get_layer(layername = "Positiver Gesamtsaldo", enhance = True, folder="einnahmen"),
                             disable_other = False,
                             subgroup = "Steuereinnahmesalden"
                                 )
 
         self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project = projektname, tablename = "Steuersalden"),
+                                featureclass = self.folders.get_table(project=projektname, tablename = "Steuersalden"),
                                 template_layer = self.folders.get_layer(layername = "Negativer Gesamtsaldo", enhance = True, folder="einnahmen"),
                                 disable_other = False,
                                 subgroup = "Steuereinnahmesalden"

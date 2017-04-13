@@ -243,7 +243,7 @@ class Projektverwaltung(Tool):
         gemeindetyp = get_gemeindetyp(ags_projekt)
 
         # loesche ggf. vorhandene zeilen in den Projektrahmendaten und fuege neue daten danach hinzu
-        projektrahmendaten = self.folders.get_table(tablename = "Projektrahmendaten", project = project_name)
+        projektrahmendaten = self.folders.get_table(tablename = "Projektrahmendaten", project=project_name)
         arcpy.DeleteRows_management(projektrahmendaten)
 
         cursor = arcpy.InsertCursor(projektrahmendaten)

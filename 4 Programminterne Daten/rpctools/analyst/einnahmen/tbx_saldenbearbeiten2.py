@@ -55,14 +55,17 @@ class TbxSaldenbearbeiten2(Tbx):
         projects_gewerbe = []
 
         for project in projects:
-            table_teilflaechen = self.folders.get_table(tablename= 'Teilflaechen_Plangebiet', fgdb = "FGDB_Definition_Projekt.gdb", project = project)
+            table_teilflaechen = self.folders.get_table(
+                tablename='Teilflaechen_Plangebiet',
+                workspace="FGDB_Definition_Projekt.gdb",
+                project=project)
             fields = "Nutzungsart"
             cursor = arcpy.da.SearchCursor(table_teilflaechen, fields)
             gewerbe_exists = False
 
             for flaeche in cursor:
-               if flaeche[0] == 2:
-                     gewerbe_exists = True
+                if flaeche[0] == 2:
+                    gewerbe_exists = True
 
             if gewerbe_exists == True:
                 projects_gewerbe.append(project)
