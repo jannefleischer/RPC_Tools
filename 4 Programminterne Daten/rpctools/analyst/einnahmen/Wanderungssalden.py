@@ -56,9 +56,10 @@ class Wanderungssalden(Tool):
         arcpy.CopyFeatures_management("gemeinden_lyr", wanderungssalden)
 
     # Hinzuf?gen leerer Spalten zu Wanderungssalden
-        #arcpy.AddField_management(wanderungssalden, "Gewichtete_Ew", "DOUBLE")
-        #arcpy.AddField_management(wanderungssalden, "Wanderungsanteil_Ew", "DOUBLE")
-        #arcpy.AddField_management(wanderungssalden, "Wanderungsanteil_SvB", "DOUBLE")
+        arcpy.AddField_management(wanderungssalden, "Gewichtete_Ew", "DOUBLE")
+        arcpy.AddField_management(wanderungssalden, "Gewichtete_SvB", "DOUBLE")
+        arcpy.AddField_management(wanderungssalden, "Wanderungsanteil_Ew", "DOUBLE")
+        arcpy.AddField_management(wanderungssalden, "Wanderungsanteil_SvB", "DOUBLE")
         arcpy.AddField_management(wanderungssalden, "Einw_Zuzug", "LONG")
         arcpy.AddField_management(wanderungssalden, "Einw_Fortzug", "LONG")
         arcpy.AddField_management(wanderungssalden, "Einw_Saldo", "LONG")
@@ -78,7 +79,6 @@ class Wanderungssalden(Tool):
             cursor.updateRow(gemeinde)
 
     # Anteile der Herkunftsgemeinden an SvB/Einwohner bestimmen
-    # Dummy-Rechenweg
 
         # Buffer um Teilflächen
         pfad_buffer = os.path.join(workspace_projekt_einnahmen, "Buffer")
@@ -108,9 +108,10 @@ class Wanderungssalden(Tool):
         x_projektflaeche = 3546723
         y_projektflaeche = 5922056
 
-        # Gewichtete Einwohner bestimmen
+        # Gewichtete Einwohner/SvB bestimmen
         gewichtete_ew_gesamt = 0
-        fields = ["AGS", "Einwohner", "SvB_pro_Ew", "Shape_Area", "Gewichtete_Ew", "GK3_X", "GK3_Y"]
+        gewichtete_SvB_gesamt = 0
+        fields = ["AGS", "Einwohner", "SvB_pro_Ew", "Shape_Area", "Gewichtete_Ew", "Gewichtete_SvB", "GK3_X", "GK3_Y"]
         cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
         for gemeinde in cursor:
             flaeche_verschnitt = 0
@@ -118,14 +119,23 @@ class Wanderungssalden(Tool):
             for gemeinde_verschnitt in cursor_verschnitt:
                 if gemeinde[0] == gemeinde_verschnitt[0]:
                     flaeche_verschnitt += gemeinde_verschnitt[1]
-            entfernung_km = (((x_projektflaeche - gemeinde[5]) ** 2 +  (y_projektflaeche - gemeinde[6]) ** 2) ** 0.5) / 1000
+            entfernung_km = (((x_projektflaeche - gemeinde[6]) ** 2 +  (y_projektflaeche - gemeinde[7]) ** 2) ** 0.5) / 1000
+            # Einwohner
             if entfernung_km < konstant_bis_km_wohnen:
-                entfernungsgewichtung = 1
+                entfernungsgewichtung_wohnen = 1
             else:
-                entfernungsgewichtung = numpy.exp((entfernung_km - konstant_bis_km_wohnen) * exponentialfaktor_wohnen)
-            gewichtete_ew = gemeinde[1] * (flaeche_verschnitt / gemeinde[3]) * entfernungsgewichtung
+                entfernungsgewichtung_wohnen = numpy.exp((entfernung_km - konstant_bis_km_wohnen) * exponentialfaktor_wohnen)
+            gewichtete_ew = gemeinde[1] * (flaeche_verschnitt / gemeinde[3]) * entfernungsgewichtung_wohnen
             gemeinde[4] = gewichtete_ew
             gewichtete_ew_gesamt += gewichtete_ew
+            # Gewerbe
+            if entfernung_km < konstant_bis_km_gewerbe:
+                entfernungsgewichtung_gewerbe = 1
+            else:
+                entfernungsgewichtung_gewerbe = numpy.exp((entfernung_km - konstant_bis_km_gewerbe) * exponentialfaktor_gewerbe)
+            gewichtete_SvB = gemeinde[1] * gemeinde[2] * (flaeche_verschnitt / gemeinde[3]) * entfernungsgewichtung_gewerbe
+            gemeinde[5] = gewichtete_SvB
+            gewichtete_SvB_gesamt += gewichtete_SvB
             cursor.updateRow(gemeinde)
 
         # Wanderungsanteile bestimmen
