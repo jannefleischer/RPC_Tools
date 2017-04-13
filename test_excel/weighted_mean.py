@@ -13,6 +13,11 @@ def calc_weighted_mean(Data, Nutzungsart=None):
         Input data; Columns: Nutzungsart, Flaeche_ha, INSIDE_X, INSIDE_Y
     Nutzungsart : int, optional
         Only areas of the given 'Nutzungsart' will be considered
+    
+    Returns
+    -------
+    XY : np.array of float
+        X and Y Coordinates of the weighted mean
     """
     Data = Data.astype(np.float)
     if Nutzungsart is not None:
