@@ -11,13 +11,13 @@ import numpy as np
 class Read_FGDB(object):
     
     
-    def __init__(self, gdb_path, table, columns, clause=None):
+    def __init__(self, gdb_path, table, columns, clause=None, header=0):
         self.gdb_path = gdb_path
         self.table = table
         self.columns = columns
         self.clause = clause
         self.result_block = []
-        
+        self.header = header
         
     def get_result_block(self):
         """
@@ -44,15 +44,18 @@ class Read_FGDB(object):
             for cols in cur:
                 new_row = np.array(cols)
                 result_block = np.vstack((result_block, new_row))
-        
+        # delete header
+        if not self.header:
+            result_block = np.delete(result_block, 0, axis=0)
+        # overwrite self.result_block
         self.result_block = result_block
 
 
-    def sort_results_by_col(self, col, header=1):
+    def sort_results_by_col(self, col):
         """
         """
-        self.result_block[header:, :] = self.result_block[header:, :]\
-            [self.result_block[header:, col].argsort()]
+        self.result_block[self.header:, :] = self.result_block[self.header:, :]\
+            [self.result_block[self.header:, col].argsort()]
 
 
 
