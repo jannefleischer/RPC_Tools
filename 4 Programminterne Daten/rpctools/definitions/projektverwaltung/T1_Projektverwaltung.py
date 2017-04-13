@@ -56,7 +56,7 @@ class Projektverwaltung(Tool):
     def add_diagramm(self):
         # Erstelle Diagramm Teilflaechen nach Hektar
         project_name = self.par.name.value
-        out_graph_name = project_name + ": Teilflaechen nach Hektar"
+        out_graph_name = str(project_name) + ": Teilflächen nach Hektar"
         input_template = r"C:\ProjektCheck\4 Programminterne Daten\templates\diagrams\Teilflaechen_Hektar.grf"
         input_data = self.folders.get_table('Teilflaechen_Plangebiet', project=project_name, check=False)
         # Create the graph
@@ -65,7 +65,7 @@ class Projektverwaltung(Tool):
                                                 arcpy.mapping.MapDocument("CURRENT").activeDataFrame)[0]
         # Add a vertical bar series to the graph
         graph.addSeriesBarVertical(dataSrc = input_data, fieldY = "Flaeche_ha", fieldLabel = "Name")
-        graph.graphPropsGeneral.title = project_name + ": Teilflaechen des Plangebiets (Bruttoflaeche)"
+        graph.graphPropsGeneral.title = str(project_name) + ": Teilflächen des Plangebiets (Bruttofläche)"
         arcpy.env.addOutputsToMap = True
         arcpy.MakeGraph_management(input_template, graph, out_graph_name)
         arcpy.env.addOutputsToMap = False
