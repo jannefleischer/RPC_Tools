@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import arcpy, sys
-
+import numpy
 import arcpy, os, inspect, pyodbc, shutil, gc, sys, datetime, xlsxwriter, imp
 from xlsxwriter.utility import xl_rowcol_to_cell
 from os.path import join, isdir, abspath, dirname, basename
@@ -56,6 +56,9 @@ class Wanderungssalden(Tool):
         arcpy.CopyFeatures_management("gemeinden_lyr", wanderungssalden)
 
     # Hinzuf?gen leerer Spalten zu Wanderungssalden
+        #arcpy.AddField_management(wanderungssalden, "Gewichtete_Ew", "DOUBLE")
+        #arcpy.AddField_management(wanderungssalden, "Wanderungsanteil_Ew", "DOUBLE")
+        #arcpy.AddField_management(wanderungssalden, "Wanderungsanteil_SvB", "DOUBLE")
         arcpy.AddField_management(wanderungssalden, "Einw_Zuzug", "LONG")
         arcpy.AddField_management(wanderungssalden, "Einw_Fortzug", "LONG")
         arcpy.AddField_management(wanderungssalden, "Einw_Saldo", "LONG")
@@ -63,8 +66,76 @@ class Wanderungssalden(Tool):
         arcpy.AddField_management(wanderungssalden, "SvB_Fortzug", "LONG")
         arcpy.AddField_management(wanderungssalden, "SvB_Saldo", "LONG")
 
+        fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "SvB_Zuzug", "SvB_Fortzug", "SvB_Saldo"]
+        cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
+        for gemeinde in cursor:
+            gemeinde[0] = 0
+            gemeinde[1] = 0
+            gemeinde[2] = 0
+            gemeinde[3] = 0
+            gemeinde[4] = 0
+            gemeinde[5] = 0
+            cursor.updateRow(gemeinde)
+
     # Anteile der Herkunftsgemeinden an SvB/Einwohner bestimmen
     # Dummy-Rechenweg
+
+        # Buffer um Teilflächen
+        pfad_buffer = os.path.join(workspace_projekt_einnahmen, "Buffer")
+        if arcpy.Exists(pfad_buffer):
+            arcpy.Delete_management(pfad_buffer)
+
+        arcpy.Buffer_analysis(
+                                in_features = "projektflaechen_lyr",
+                                out_feature_class = pfad_buffer,
+                                buffer_distance_or_field = umkreis_km,
+                                dissolve_option = "ALL")
+
+        # Verschneiden von Buffer und Wanderungssalden-Gemeinde-Layer
+        pfad_verschnitt = os.path.join(workspace_projekt_einnahmen, "Verschnitt")
+        if arcpy.Exists(pfad_verschnitt):
+            arcpy.Delete_management(pfad_verschnitt)
+
+        arcpy.Intersect_analysis([wanderungssalden, pfad_buffer], pfad_verschnitt)
+
+        # Parameter: Exponentialfaktoren für Umzugsweiten Wohnen und Gewerbe
+        exponentialfaktor_wohnen = -0.1
+        exponentialfaktor_gewerbe = -0.13
+        konstant_bis_km_wohnen = 3
+        konstant_bis_km_gewerbe = 3
+
+        # Mittelpunkt der Projektflächen
+        x_projektflaeche = 3546723
+        y_projektflaeche = 5922056
+
+        # Gewichtete Einwohner bestimmen
+        gewichtete_ew_gesamt = 0
+        fields = ["AGS", "Einwohner", "SvB_pro_Ew", "Shape_Area", "Gewichtete_Ew", "GK3_X", "GK3_Y"]
+        cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
+        for gemeinde in cursor:
+            flaeche_verschnitt = 0
+            cursor_verschnitt = arcpy.da.SearchCursor(pfad_verschnitt, ["AGS", "Shape_Area"])
+            for gemeinde_verschnitt in cursor_verschnitt:
+                if gemeinde[0] == gemeinde_verschnitt[0]:
+                    flaeche_verschnitt += gemeinde_verschnitt[1]
+            entfernung_km = (((x_projektflaeche - gemeinde[5]) ** 2 +  (y_projektflaeche - gemeinde[6]) ** 2) ** 0.5) / 1000
+            if entfernung_km < konstant_bis_km_wohnen:
+                entfernungsgewichtung = 1
+            else:
+                entfernungsgewichtung = numpy.exp((entfernung_km - konstant_bis_km_wohnen) * exponentialfaktor_wohnen)
+            gewichtete_ew = gemeinde[1] * (flaeche_verschnitt / gemeinde[3]) * entfernungsgewichtung
+            gemeinde[4] = gewichtete_ew
+            gewichtete_ew_gesamt += gewichtete_ew
+            cursor.updateRow(gemeinde)
+
+        # Wanderungsanteile bestimmen
+        fields = ["Gewichtete_Ew", "Wanderungsanteil_Ew", "Wanderungsanteil_SvB"]
+        cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
+        for gemeinde in cursor:
+            gemeinde[1] = gemeinde[0] / gewichtete_ew_gesamt
+            cursor.updateRow(gemeinde)
+
+        #Ergebnis einfügen
         fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "SvB_Zuzug", "SvB_Fortzug", "SvB_Saldo", "Shape_Area"]
         cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
         for gemeinde in cursor:
@@ -136,5 +207,7 @@ class Wanderungssalden(Tool):
             lyr = arcpy.mapping.ListLayers(mxd, "Negative Wanderungssalden Erwerbstätige")[0]
             lyr.symbology.reclassify()
         arcpy.RefreshTOC()
+
+
 
 
