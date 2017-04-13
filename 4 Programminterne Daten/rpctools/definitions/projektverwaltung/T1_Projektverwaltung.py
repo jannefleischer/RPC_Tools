@@ -188,7 +188,8 @@ class Projektverwaltung(Tool):
             if not field.required:
                 fieldNameList.append(field.name)
 
-        arcpy.DeleteField_management(tfl, fieldNameList)
+        if fieldNameList:
+            arcpy.DeleteField_management(tfl, fieldNameList)
 
         # add needed fields
         arcpy.AddField_management(tfl, "id_teilflaeche", "LONG")
