@@ -728,14 +728,8 @@ class Tbx(object):
                 # temporary dbs only exist, if changes were made (else nothing
                 # to do here)
                 if arcpy.Exists(temp_db):
-                    #arcpy.Delete_management(project_db)
-                    #arcpy.Copy_management(temp_db, project_db)                
-                    dirpath, dirname, tables = arcpy.da.Walk(temp_db).next()   
-                    for table in tables:
-                        temp_table = os.path.join(temp_db, table)
-                        project_table = os.path.join(project_db, table)
-                        #arcpy.Delete_management(project_table)
-                        arcpy.Copy_management(temp_table, project_table)
+                    arcpy.Delete_management(project_db)
+                    arcpy.Copy_management(temp_db, project_db)
                     changes += 1
                 
         arcpy.AddMessage(
