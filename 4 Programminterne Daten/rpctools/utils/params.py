@@ -8,6 +8,8 @@ import numpy as np
 from pprint import pformat
 from abc import ABCMeta, abstractmethod, abstractproperty
 from rpctools.utils.config import Folders
+from rpctools.utils.config import Config
+from rpctools.utils.config import Singleton
 #reload(sys.modules[Folders.__module__])
 import arcpy
 
@@ -66,15 +68,7 @@ class Message(object):
     @staticmethod
     def AddGPMessages():
         arcpy.AddMessage('')
-
-
-class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
+        
 
 class Params(object):
     """Parameter class like an ordered dict"""
@@ -333,14 +327,17 @@ class Tool(object):
     _dbname = None
     """the name of the default database of the tool"""
 
-    def __init__(self, params):
+    def __init__(self, params, parent_tbx):
         """
         Parameters
         ----------
         params : Params object
+        parent_tbx: Tbx object, the toolbox the Tool belongs to 
+                    (=the calling toolbox)
         """
         self.par = params
         self.mes = Message()
+        self.parent_tbx = parent_tbx
         self.folders = ToolFolders(params=self.par)
         self.output = Output(folders=self.folders, params=params)
 
@@ -440,7 +437,9 @@ class Tbx(object):
     _temp_table_name = (
         _temp_table_prefix +
         '_{class_name}_{source_db}_{source_table}_'
-    )
+    )    
+    
+    config = Config()
 
     @abstractproperty
     def Tool(self):
@@ -457,6 +456,12 @@ class Tbx(object):
 
         To be defined in the subclass
         """
+        
+    @property
+    def projects_changed(self):
+        """projects that were changed (only works if toolbox works with
+        temporary databases)"""
+        return self.folders.get_temporary_projects()
 
     def __init__(self):
         # todo: replace later with Tool=self.Tool
@@ -469,7 +474,7 @@ class Tbx(object):
         self.folders = Folders(params=self.par)
         self.projects = []
         # an instance of the tool
-        self.tool = Tool(self.par)
+        self.tool = Tool(self.par, self)
         self.canRunInBackground = False
         # update projects on call of updateParameters
         self.update_projects = True
@@ -523,19 +528,35 @@ class Tbx(object):
         """
     
         self.par._update_parameters(parameters)
-        #with open(r'C:\Users\JMG.GGRS\Desktop\test.txt', 'a') as f:
-            #f.write('just opened: {}\n'.format(self.par.toolbox_opened()))
+        # if a toolbox is opened, remove ALL temporary databases
         if self.par.toolbox_opened():
             self.clear_temporary_dbs()
             self.recently_opened = True
+            # updating projects messes up the initial project management
+            if self.update_projects:
+                self._set_active_project()
         else:
             self.recently_opened = False
-        # updating projects messes up the initial project management
-        if self.update_projects:
-            self._update_project_list()
         self._update_dependencies(self.par)
             #self._create_temporary_copies()
         self._updateParameters(self.par)
+        
+    def _set_active_project(self):
+        active_project = self.config.active_project
+        projects = self.folders.get_projects()
+        project_param = self.par[self.par._param_projectname]
+        project_param.filter.list = []
+        project_param.value = active_project
+        project_param.enabled = False
+        
+    def _validate_active_project(self):    
+        active_project = self.config.active_project
+        projects = self.folders.get_projects()
+        if not active_project:
+            return False, (u'Kein aktives Projekt ausgewählt!')
+        elif active_project not in projects:
+            return False, (u'Aktives Projekt kann nicht gefunden werden!')
+        return True, ''
 
     def _update_project_list(self):
         """
@@ -553,6 +574,9 @@ class Tbx(object):
         # if previously selected project was deleted in the meantime
         elif project_param.value not in projects:
             project_param.value = projects[0]
+            
+    def _check_project(self):
+        pass
 
     def add_dependency(self, param_names, target_value, type='sum'):
         """
@@ -597,6 +621,11 @@ class Tbx(object):
         """
         self.par._update_parameters(parameters)
         params = self.par._od.values()
+        if self.update_projects:
+            valid, message = self._validate_active_project()
+            if not valid:
+                params[0].setErrorMessage(message)
+                return
         # check if toolbox contains invalid paths, add errors to first param.
         if params and self.folders._invalid_paths:
             invalid = ', '.join(self.folders._invalid_paths)
@@ -715,26 +744,22 @@ class Tbx(object):
     
         arcpy.AddMessage(
             'Getätigte Änderungen werden in das Projekt übernommen...')
-        
-        old_state = arcpy.env.overwriteOutput
-        arcpy.env.overwriteOutput = True
         changes = 0
-        for project in self.folders.get_temporary_projects():
-            for fgdb in self._temporary_gdbs:
-                project_db = self.folders.get_db(fgdb=fgdb, project=project)
-                temp_db = self.folders.get_temporary_db(fgdb=fgdb,
-                                                        project=project,
-                                                        check=False)
-                # temporary dbs only exist, if changes were made (else nothing
-                # to do here)
-                if arcpy.Exists(temp_db):
-                    arcpy.Delete_management(project_db)
-                    arcpy.Copy_management(temp_db, project_db)
-                    changes += 1
-                
-        arcpy.AddMessage(
-            '{} Datenbanken wurden erfolgreich geändert'.format(changes))
-        arcpy.env.overwriteOutput = old_state
+        old_state = arcpy.env.overwriteOutput
+        for fgdb in self._temporary_gdbs:
+            project_db = self.folders.get_db(fgdb=fgdb)
+            temp_db = self.folders.get_temporary_db(fgdb=fgdb,
+                                                    check=False)
+            # temporary dbs only exist, if changes were made (else nothing
+            # to do here)
+            if arcpy.Exists(temp_db):
+                arcpy.Delete_management(project_db)
+                arcpy.Copy_management(temp_db, project_db)
+                changes += 1
+        
+        if changes:
+            arcpy.AddMessage(
+                '{} Datenbank(en) wurden erfolgreich geändert'.format(changes))
 
     def execute(self, parameters=None, messages=None):
         """
@@ -748,8 +773,8 @@ class Tbx(object):
 
         """
         self._commit_temporaries()
-        self.clear_temporary_dbs()
         self.tool.main(self.par, parameters, messages)
+        self.clear_temporary_dbs()
 
     def print_test_parameters(self):
         """
