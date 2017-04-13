@@ -16,8 +16,73 @@ import sys
 from os.path import join, isdir, abspath, dirname, basename, exists
 from os import mkdir
 import arcpy
+import json
 
 TEST_TMP_PROJECT = '__unittest__'
+
+
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+    
+
+class Config(object):
+    __metaclass__ = Singleton
+    
+    _default = {
+        'active_project': ''
+    }
+
+    _config = {}
+
+    def __init__(self):
+        
+        self.config_file = Folders().CONFIG_FILE
+        
+        if exists(self.config_file):
+            self.read()
+        # write default config, if file doesn't exist yet
+        else:
+            self._config = self._default.copy()
+            self.write() 
+
+    def read(self, config_file=None):
+        if config_file is None:
+            config_file = self.config_file
+        try:
+            with open(config_file, 'r') as f:
+                self._config = json.load(f)
+        except:
+            self._config = self._default.copy()
+            print('Error while loading config. Using default values.')
+
+    def write(self, config_file=None): 
+        if config_file is None:
+            config_file = self.config_file
+
+        with open(config_file, 'w') as f:
+            config_copy = self._config.copy()
+            # pretty print to file
+            json.dump(config_copy, f, indent=4, separators=(',', ': '))
+
+    # access stored config entries like fields        
+    def __getattr__(self, name):
+        if name in self.__dict__:
+            return self.__dict__[name]
+        elif name in self._config:
+            return self._config[name]
+        raise AttributeError
+
+    def __setattr__(self, name, value):   
+        if name in self._config:
+            self._config[name] = value  
+        else:
+            self.__dict__[name] = value 
+        
+    
 
 ########################################################################
 class Folders(object):
@@ -42,7 +107,7 @@ class Folders(object):
         # the params
         self._params = params
         self._invalid_paths = []
-
+        self._config_file = 'config.txt'
 
     def join_and_check(self, *args, **kwargs):
         """
@@ -133,6 +198,10 @@ class Folders(object):
     @property
     def TEST_TMP_PROJECT(self):
         return self.join_and_check(self.PROJECT_BASE_PATH, self._TEST_TMP_PROJECT)
+    
+    @property
+    def CONFIG_FILE(self):
+        return join(self.INTERN, self._config_file)
 
     def get_projects(self):
         '''
