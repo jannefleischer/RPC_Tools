@@ -335,7 +335,7 @@ class Tool(object):
     _dbname = None
     """the name of the default database of the tool"""
 
-    def __init__(self, params):
+    def __init__(self, params, parent_tbx):
         """
         Parameters
         ----------
@@ -446,7 +446,7 @@ class Tbx(object):
         _temp_table_prefix +
         '_{class_name}_{source_db}_{source_table}_'
     )
-    
+
     config = Config()
 
     @abstractproperty
