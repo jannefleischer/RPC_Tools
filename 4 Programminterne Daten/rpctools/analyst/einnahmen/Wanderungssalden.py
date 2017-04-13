@@ -153,17 +153,30 @@ class Wanderungssalden(Tool):
 
         # Berechnung der Einwohner und SvB im Plangebiet
         einwohner_projekt = rahmendaten.Bewohner_referenz_plangebiet(projektname)
+        erwerbstaetige_projekt = rahmendaten.Erwerbstaetige_referenz_plangebiet(projektname)
+
+        # Bestimme AGS der Projektgemeinde
+        pfad_rahmendaten = self.folders.get_table(tablename= 'Projektrahmendaten', fgdb = "FGDB_Definition_Projekt.gdb", project = projektname)
+        cursor = arcpy.da.SearchCursor(pfad_rahmendaten, ["AGS"])
+        for projekt in cursor:
+         ags_projekt = projekt[0]
 
 
         #Ergebnis einfügen
-        fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "SvB_Zuzug", "SvB_Fortzug", "SvB_Saldo", "Shape_Area"]
+        fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "SvB_Zuzug", "SvB_Fortzug", "Wanderungsanteil_Ew", "Wanderungsanteil_SvB", "AGS"]
         cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
         for gemeinde in cursor:
-            gemeinde[0] = (gemeinde[6] % 10) *2
-            gemeinde[1] = ((gemeinde[6] % 8) * -1) *2
+            gemeinde[0] = einwohner_projekt * gemeinde[5] * -1
+            if gemeinde[7] == ags_projekt:
+                gemeinde[1] = einwohner_projekt
+            else:
+                gemeinde[1] = 0
             gemeinde[2] = gemeinde[0] + gemeinde[1]
-            gemeinde[3] = (gemeinde[6] % 7) *2
-            gemeinde[4] = ((gemeinde[6] % 6) * -1)*2
+            gemeinde[3] = erwerbstaetige_projekt * gemeinde[6] * -1
+            if gemeinde[7] == ags_projekt:
+                gemeinde[1] = erwerbstaetige_projekt
+            else:
+                gemeinde[1] = 0
             gemeinde[5] = gemeinde[3] + gemeinde[4]
             cursor.updateRow(gemeinde)
 
