@@ -41,8 +41,8 @@ class Read_FGDB(object):
         result_block = self.columns
         with arcpy.da.SearchCursor(self.table, self.columns, 
                                    where_clause=self.clause) as cur:
-            for we, ew_je_ew in cur:
-                new_row = np.array([we, ew_je_ew])
+            for cols in cur:
+                new_row = np.array(cols)
                 result_block = np.vstack((result_block, new_row))
         
         self.result_block = result_block

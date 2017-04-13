@@ -44,7 +44,7 @@ class Edit_Excel(object):
         wb = openpyxl.load_workbook(self.filename)
         ws1 = wb.active
         ws1.title = "sheet1"
-        block_cols, block_rows = np.shape(cell_block)
+        block_rows, block_cols = np.shape(cell_block)
         start_row = upper_left[0]
         start_col = upper_left[1]
         for row in range(block_rows):
@@ -176,8 +176,8 @@ if __name__ == '__main__':
     # Variables:
     filename = 'demo.xlsx'
     filename2 = r'C:\ProjektCheck\test_excel\demo.xlsx'
-    gdb_path = r"C:\ProjektCheck\3 Benutzerdefinierte Projekte" + \
-    "\Wir_wollen_Diagramme\FGDB_Definition_Projekt.gdb"
+    gdb_path = r"C:\ProjektCheck\3 Benutzerdefinierte Projekte\test_mean" + \
+        "\FGDB_Definition_Projekt.gdb"
     test_data = 'Wohnen_WE_in_Gebaeudetypen'
     columns = np.array(["WE", "EW_je_WE"])
     
