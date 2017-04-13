@@ -683,8 +683,8 @@ class Tbx(object):
 
     def add_temporary_management(self, fgdb=''):
         """
-        add a FileGeoDatabase to be managed temporarly,
-        all updates on their tables happen inside the temporary database,
+        add a FileGeoDatabase to be managed temporarly, 
+        all updates on their tables happen inside the temporary database, 
         the changes made are only transferred into the project database after
         pressing OK in the UI
 
@@ -694,8 +694,9 @@ class Tbx(object):
             name of the FileGeoDatabase
         """
         dbname = os.path.basename(fgdb) or self.dbname
-        self._temporary_gdbs.append(fgdb)
-
+        if fgdb not in self._temporary_gdbs:
+            self._temporary_gdbs.append(fgdb)
+            
     def _create_temporary_copy(self, fgdb=''):
         """make a copy of a project fgdbs in the given temporary table"""
         project_db = self.folders.get_db(fgdb=fgdb)
@@ -711,22 +712,34 @@ class Tbx(object):
     def _commit_temporaries(self):
         """transfer all changes made in temporary tables into project tables"""
         gc.collect()
+    
+        arcpy.AddMessage(
+            'Getätigte Änderungen werden in das Projekt übernommen...')
+        
         old_state = arcpy.env.overwriteOutput
         arcpy.env.overwriteOutput = True
+        changes = 0
         for project in self.folders.get_temporary_projects():
             for fgdb in self._temporary_gdbs:
                 project_db = self.folders.get_db(fgdb=fgdb, project=project)
                 temp_db = self.folders.get_temporary_db(fgdb=fgdb,
                                                         project=project,
-                                                        check=False)      
-                if arcpy.Exists(temp_db):                    
+                                                        check=False)
+                # temporary dbs only exist, if changes were made (else nothing
+                # to do here)
+                if arcpy.Exists(temp_db):
                     #arcpy.Delete_management(project_db)
                     #arcpy.Copy_management(temp_db, project_db)                
                     dirpath, dirname, tables = arcpy.da.Walk(temp_db).next()   
                     for table in tables:
                         temp_table = os.path.join(temp_db, table)
                         project_table = os.path.join(project_db, table)
+                        #arcpy.Delete_management(project_table)
                         arcpy.Copy_management(temp_table, project_table)
+                    changes += 1
+                
+        arcpy.AddMessage(
+            '{} Datenbanken wurden erfolgreich geändert'.format(changes))
         arcpy.env.overwriteOutput = old_state
 
     def execute(self, parameters=None, messages=None):
