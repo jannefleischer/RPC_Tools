@@ -307,6 +307,7 @@ class Link(object):
         self.routes = set()
         self.weight = 0.0
         self.geom = None
+        self.distance_from_source = 9999999
 
     def __repr__(self):
         return '->'.join([repr(self.node1), repr(self.node2)])
@@ -458,29 +459,28 @@ class OTPRouter(object):
 
         return destinations
 
-    def get_max_node_for_route(self, dist_matrix, route_id, source_id):
+    def get_max_node_for_route(self, dist_vector, route_id):
         """
         get the max distant node for a given route_id
 
         Parameters
         ----------
-        dist_matrix
+        dist_vector
         route_id : int
 
         Returns
         -------
-        node_id : int
+        transfer_node : Node
         """
         route = self.routes[route_id]
         route_nodes = route.node_ids
-        dist_vector = dist_matrix[source_id, route_nodes]
-        #dist_vector = dist_matrix[route_nodes]
+        route_dist_vector = dist_vector[route_nodes]
 
-        idx = np.argmax(dist_vector)
+        idx = np.argmax(route_dist_vector)
         node_id = route_nodes[idx]
         node = self.nodes.get_node(node_id)
         transfer_node = self.transfer_nodes.get_node(node, route)
-        transfer_node.dist = dist_vector[idx]
+        transfer_node.dist = route_dist_vector[idx]
         print('Route {}: node {} {} {} at {} meters'.format(route_id,
                                                       transfer_node.node_id,
                                                       transfer_node.lat,
@@ -488,15 +488,13 @@ class OTPRouter(object):
                                                       transfer_node.dist))
         return transfer_node
 
-    def get_max_nodes(self, dist_matrix):
+    def get_max_nodes(self, dist_vector):
         """
         """
-
+        # for several Teilflächen: use the maximum to one of the origins
         for route in self.routes.itervalues():
-            #if route.source_id == 0:
-            transfer_node = self.get_max_node_for_route(dist_matrix,
-                                                        route.route_id,
-                                                        route.source_id)
+            transfer_node = self.get_max_node_for_route(dist_vector,
+                                                        route.route_id)
 
     def nodes_to_graph(self, meters=600):
         """Convert nodes and links to graph"""
@@ -507,13 +505,24 @@ class OTPRouter(object):
         N = len(self.nodes)
         mat = csc_matrix((data, (row, col)), shape=(N, N))
         source_nodes = self.routes.source_nodes
-        self.dist_matrix = dijkstra(mat,
+        dist_matrix = dijkstra(mat,
                                     directed=True,
                                     return_predecessors=False,
                                     indices=self.routes.source_nodes,
-                                    limit=meters)
-        self.dist_matrix[np.isinf(self.dist_matrix)] = np.NINF
-        self.get_max_nodes(self.dist_matrix)
+                                    #limit=meters,
+                                    )
+        dist_vector = dist_matrix.min(axis=0)
+        self.set_link_distance(dist_vector)
+        dist_vector[dist_vector > meters] = np.NINF
+        self.get_max_nodes(dist_vector)
+
+    def set_link_distance(self, dist_vector):
+        """set distance to plangebiet for each link"""
+        for link in self.nodes.links:
+            node_id = link.node2.node_id
+            dist = dist_vector[node_id]
+            link.distance_from_source = dist
+
 
     def calc_vertex_weights(self):
         """calc weight of link"""
@@ -527,7 +536,7 @@ class OTPRouter(object):
     def create_polyline_features(self):
         """Create the polyline-features from the links"""
         sr = arcpy.SpatialReference(self.epsg)
-        fields = ['link_id', 'weight', 'SHAPE@']
+        fields = ['link_id', 'weight', 'distance_from_source', 'SHAPE@']
 
         fc = os.path.join(self.ws, 'links')
         self.truncate(fc)
@@ -535,7 +544,8 @@ class OTPRouter(object):
             for link in self.nodes.links:
                 link.create_geom()
                 if link.geom:
-                    rows.insertRow((link.link_id, link.weight, link.geom))
+                    rows.insertRow((link.link_id, link.weight,
+                                    link.distance_from_source, link.geom))
 
     def create_transfer_node_features(self):
         """Create the point-features from the transfer nodes"""
@@ -599,7 +609,7 @@ if __name__ == '__main__':
         o.decode_coords(json, route_id=d, source_id=source_id)
 
     max_d = d
-    source = Point(lat=53.51, lon=9.587)
+    source = Point(lat=53.502, lon=9.587)
     source_id = 1
     for d, (lon, lat) in enumerate(destinations):
         destination = Point(lat, lon)
