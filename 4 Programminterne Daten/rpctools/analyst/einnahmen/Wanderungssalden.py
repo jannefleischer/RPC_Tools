@@ -105,8 +105,9 @@ class Wanderungssalden(Tool):
         konstant_bis_km_gewerbe = 3
 
         # Mittelpunkt der Projektflächen
-        x_projektflaeche = 3546723
-        y_projektflaeche = 5922056
+        ##x_projektflaeche = 3546723
+        ##y_projektflaeche = 5922056
+        gewichtete_koordinaten = calc_weighted_mean(Data, Nutzungsart=None)
 
         # Gewichtete Einwohner/SvB bestimmen
         gewichtete_ew_gesamt = 0
