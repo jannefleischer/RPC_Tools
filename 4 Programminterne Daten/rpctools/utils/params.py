@@ -482,7 +482,7 @@ class Tbx(object):
         self.folders = Folders(params=self.par)
         self.projects = []
         # an instance of the tool
-        self.tool = Tool(self.par)
+        self.tool = Tool(self.par, self)
         self.canRunInBackground = False
         # update projects on call of updateParameters
         self.update_projects = True
@@ -536,8 +536,7 @@ class Tbx(object):
         """
 
         self.par._update_parameters(parameters)
-        #with open(r'C:\Users\JMG.GGRS\Desktop\test.txt', 'a') as f:
-            #f.write('just opened: {}\n'.format(self.par.toolbox_opened()))
+        # if a toolbox is opened, remove ALL temporary databases
         if self.par.toolbox_opened():
             self.clear_temporary_dbs()
             self.recently_opened = True
@@ -552,7 +551,7 @@ class Tbx(object):
         self._update_dependencies(self.par)
             #self._create_temporary_copies()
         self._updateParameters(self.par)
-        
+
     def _set_active_project(self):
         active_project = self.config.active_project
         projects = self.folders.get_projects()
@@ -560,8 +559,8 @@ class Tbx(object):
         project_param.filter.list = []
         project_param.value = active_project
         project_param.enabled = False
-        
-    def _validate_active_project(self):    
+
+    def _validate_active_project(self):
         active_project = self.config.active_project
         projects = self.folders.get_projects()
         if not active_project:
@@ -586,7 +585,7 @@ class Tbx(object):
         # if previously selected project was deleted in the meantime
         elif project_param.value not in projects:
             project_param.value = projects[0]
-            
+
     def _check_project(self):
         pass
 
@@ -773,8 +772,8 @@ class Tbx(object):
                     arcpy.Copy_management(temp_db, project_db)
                     changes += 1
 
-        arcpy.AddMessage(
-            '{} Datenbanken wurden erfolgreich geändert'.format(changes))
+            arcpy.AddMessage(
+                '{} Datenbank(en) wurden erfolgreich geändert'.format(changes))
         arcpy.env.overwriteOutput = old_state
 
     def execute(self, parameters=None, messages=None):
