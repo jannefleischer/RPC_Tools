@@ -10,7 +10,7 @@ def calc_weighted_mean(Data, Nutzungsart=None):
     Parameters
     ----------
     Data : np.array of str
-        Input data. Columns: Nutzungsart, Flaeche_ha, INSIDE_X, INSIDE_Y
+        Input data; Columns: Nutzungsart, Flaeche_ha, INSIDE_X, INSIDE_Y
     Nutzungsart : int, optional
         Only areas of the given 'Nutzungsart' will be considered
     """
