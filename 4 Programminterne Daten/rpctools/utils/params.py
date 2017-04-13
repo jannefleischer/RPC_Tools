@@ -521,7 +521,7 @@ class Tbx(object):
         ----------
         parameters : list of ArcGIS-Parameters
         """
-
+    
         self.par._update_parameters(parameters)
         #with open(r'C:\Users\JMG.GGRS\Desktop\test.txt', 'a') as f:
             #f.write('just opened: {}\n'.format(self.par.toolbox_opened()))
@@ -668,6 +668,7 @@ class Tbx(object):
                 table_path = self.folders.get_temporary_table(table, fgdb=fgdb)
         cursor = arcpy.da.SearchCursor(table_path, columns, where_clause=where)
         rows = [row for row in cursor]
+        del cursor
         return rows
     
     def clear_temporary_dbs(self):
@@ -709,15 +710,24 @@ class Tbx(object):
             
     def _commit_temporaries(self):
         """transfer all changes made in temporary tables into project tables"""
+        gc.collect()
+        old_state = arcpy.env.overwriteOutput
+        arcpy.env.overwriteOutput = True
         for project in self.folders.get_temporary_projects():
             for fgdb in self._temporary_gdbs:
                 project_db = self.folders.get_db(fgdb=fgdb, project=project)
                 temp_db = self.folders.get_temporary_db(fgdb=fgdb, 
                                                         project=project,
-                                                        check=False)
-                if arcpy.Exists(temp_db):
-                    arcpy.Delete_management(project_db)
-                    arcpy.Copy_management(temp_db, project_db)
+                                                        check=False)      
+                if arcpy.Exists(temp_db):                    
+                    #arcpy.Delete_management(project_db)
+                    #arcpy.Copy_management(temp_db, project_db)                
+                    dirpath, dirname, tables = arcpy.da.Walk(temp_db).next()   
+                    for table in tables:
+                        temp_table = os.path.join(temp_db, table)
+                        project_table = os.path.join(project_db, table)
+                        arcpy.Copy_management(temp_table, project_table)
+        arcpy.env.overwriteOutput = old_state
 
     def execute(self, parameters=None, messages=None):
         """
