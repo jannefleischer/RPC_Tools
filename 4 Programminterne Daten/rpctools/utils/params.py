@@ -464,7 +464,7 @@ class Tbx(object):
 
         To be defined in the subclass
         """
-        
+
     @property
     def projects_changed(self):
         """projects that were changed (only works if toolbox works with
