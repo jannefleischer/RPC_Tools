@@ -107,14 +107,20 @@ class TbxFlaechendefinition(Tbx):
 
     def update_teilflaechen(self, nutzungsart=None):
         """update the parameter list of teilflaeche (opt. filter nutzungsart)"""
-        self._teilflaechen = self._get_teilflaechen(nutzungsart=nutzungsart)
-        list_teilflaechen = self.teilflaechen.keys()
+        if not self.par.projectname.value:
+            list_teilflaechen = []
+        else:
+            self._teilflaechen = self._get_teilflaechen(nutzungsart=nutzungsart)
+            list_teilflaechen = self.teilflaechen.keys()
         self.par.teilflaeche.filter.list = list_teilflaechen
 
         # select first one
         if list_teilflaechen:
             flaeche = list_teilflaechen[0]
-            self.par.teilflaeche.value = flaeche
+        else:
+            flaeche = ''
+        
+        self.par.teilflaeche.value = flaeche        
 
 class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
     """Toolbox to name Teilflächen"""
