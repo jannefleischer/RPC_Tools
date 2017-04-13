@@ -340,7 +340,7 @@ class Tool(object):
         Parameters
         ----------
         params : Params object
-        parent_tbx: Tbx object, the toolbox the Tool belongs to 
+        parent_tbx: Tbx object, the toolbox the Tool belongs to
                     (=the calling toolbox)
         """
         self.par = params
