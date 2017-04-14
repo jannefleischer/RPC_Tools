@@ -18,20 +18,16 @@ from os import mkdir
 import arcpy
 import json
 
+from rpctools.utils.singleton import Singleton
+from rpctools.utils.encoding import encode
+
 TEST_TMP_PROJECT = '__unittest__'
 
 
-class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-    
 
 class Config(object):
     __metaclass__ = Singleton
-    
+
     _default = {
         'active_project': ''
     }
@@ -39,15 +35,15 @@ class Config(object):
     _config = {}
 
     def __init__(self):
-        
+
         self.config_file = Folders().CONFIG_FILE
-        
+
         if exists(self.config_file):
             self.read()
         # write default config, if file doesn't exist yet
         else:
             self._config = self._default.copy()
-            self.write() 
+            self.write()
 
     def read(self, config_file=None):
         if config_file is None:
@@ -59,7 +55,7 @@ class Config(object):
             self._config = self._default.copy()
             print('Error while loading config. Using default values.')
 
-    def write(self, config_file=None): 
+    def write(self, config_file=None):
         if config_file is None:
             config_file = self.config_file
 
@@ -68,7 +64,7 @@ class Config(object):
             # pretty print to file
             json.dump(config_copy, f, indent=4, separators=(',', ': '))
 
-    # access stored config entries like fields        
+    # access stored config entries like fields
     def __getattr__(self, name):
         if name in self.__dict__:
             return self.__dict__[name]
@@ -76,13 +72,13 @@ class Config(object):
             return self._config[name]
         raise AttributeError
 
-    def __setattr__(self, name, value):   
+    def __setattr__(self, name, value):
         if name in self._config:
-            self._config[name] = value  
+            self._config[name] = value
         else:
-            self.__dict__[name] = value 
-        
-    
+            self.__dict__[name] = value
+
+
 
 ########################################################################
 class Folders(object):
@@ -99,6 +95,7 @@ class Folders(object):
         self._PROJECT_TEMPLATE = 'Template'
         self._TEST_TEMPLATE = 'Test_Template'
         self._TEMPLATE_LAYERFOLDER = 'layers'
+        self._TEMPLATE_DIAGRAMFOLDER = 'diagrams'
         self._TOCFOLDER = 'toc'
         self._TEST_TMP_PROJECT = TEST_TMP_PROJECT
         self._AUSGABE_PATH = 'Ergebnisausgabe'
@@ -165,7 +162,7 @@ class Folders(object):
 
     @property
     def TEMPLATE_BASE_PATH(self):
-        return self.join_and_check(self.BASE_PATH, self._INTERN, 
+        return self.join_and_check(self.BASE_PATH, self._INTERN,
                                    self._TEMPLATE_BASE_PATH)
 
     @property
@@ -173,15 +170,22 @@ class Folders(object):
         path = join(self.INTERN, self._TEMPORARY_GDB_PATH)
         if not exists(path):
             mkdir(path)
-        return path    
+        return path
 
     @property
     def TEMPLATE_FLAECHEN(self):
-        return self.join_and_check(self.TEMPLATE_BASE_PATH, self._TEMPLATE_FLAECHEN)
+        return self.join_and_check(self.TEMPLATE_BASE_PATH,
+                                   self._TEMPLATE_FLAECHEN)
 
     @property
     def TEMPLATE_LAYERFOLDER(self):
-        return self.join_and_check(self.TEMPLATE_BASE_PATH, self._TEMPLATE_LAYERFOLDER)
+        return self.join_and_check(self.TEMPLATE_BASE_PATH,
+                                   self._TEMPLATE_LAYERFOLDER)
+
+    @property
+    def TEMPLATE_DIAGRAMFOLDER(self):
+        return self.join_and_check(self.TEMPLATE_BASE_PATH,
+                                   self._TEMPLATE_DIAGRAMFOLDER)
 
     @property
     def TOCFOLDER(self):
@@ -189,16 +193,19 @@ class Folders(object):
 
     @property
     def PROJECT_TEMPLATE(self):
-        return self.join_and_check(self.TEMPLATE_BASE_PATH, self._PROJECT_TEMPLATE)
+        return self.join_and_check(self.TEMPLATE_BASE_PATH,
+                                   self._PROJECT_TEMPLATE)
 
     @property
     def TEST_TEMPLATE(self):
-        return self.join_and_check(self.TEMPLATE_BASE_PATH, self._TEST_TEMPLATE)
+        return self.join_and_check(self.TEMPLATE_BASE_PATH,
+                                   self._TEST_TEMPLATE)
 
     @property
     def TEST_TMP_PROJECT(self):
-        return self.join_and_check(self.PROJECT_BASE_PATH, self._TEST_TMP_PROJECT)
-    
+        return self.join_and_check(self.PROJECT_BASE_PATH,
+                                   self._TEST_TMP_PROJECT)
+
     @property
     def CONFIG_FILE(self):
         return join(self.INTERN, self._config_file)
@@ -212,14 +219,14 @@ class Folders(object):
                       if isdir(self.get_projectpath(f))
                       and f != self._TEST_TMP_PROJECT]
         return sorted(subfolders)
-    
+
     def get_temporary_projects(self):
         '''
         returns all projects for which temporary databases exist
         '''
         subfolders = [f for f in listdir(self.TEMPORARY_GDB_PATH)
                       if isdir(self.get_temporary_projectpath(f))]
-        return sorted(subfolders)    
+        return sorted(subfolders)
 
     def get_projectpath(self, project=None, check=True):
         """
@@ -238,23 +245,24 @@ class Folders(object):
         return self.join_and_check(self.PROJECT_BASE_PATH,
                                    projectname,
                                    check=check)
-    
+
     def get_temporary_projectpath(self, project=None):
         projectname = project or self.project
         path = join(self.TEMPORARY_GDB_PATH, projectname)
         if not exists(path):
             mkdir(path)
         return path
-    
+
     def get_temporary_db(self, project=None, fgdb='', check=True):
         dbname = basename(fgdb) or self.dbname
         return self.join_and_check(
-            self.get_temporary_projectpath(project=project), 
+            self.get_temporary_projectpath(project=project),
             dbname, check=check)
-    
-    def get_temporary_table(self, table_name, fgdb='', project=None, check=True):
+
+    def get_temporary_table(self, table_name, fgdb='',
+                            project=None, check=True):
         return self.join_and_check(
-            self.get_temporary_db(fgdb=fgdb, project=project, check=True), 
+            self.get_temporary_db(fgdb=fgdb, project=project, check=True),
             table_name, check=check)
 
     @property
@@ -310,7 +318,7 @@ class Folders(object):
         table = self.join_and_check(self.get_db(dbname, projectname),
                                     tablename,
                                     check=check)
-        return table        
+        return table
 
     def get_basedb(self, workspace, check=True):
         """
@@ -400,6 +408,7 @@ class Folders(object):
         layer : str
             the full path to the lyr-file
         """
+        layername = encode(layername)
         if (enhance == True):
             layerfile = '{}.lyr'.format(layername)
         else:
@@ -407,3 +416,29 @@ class Folders(object):
 
         layer = self.join_and_check(self.TEMPLATE_LAYERFOLDER, folder, layerfile)
         return layer
+
+    def get_diagram_template(self, name, subfolder='', enhance=True):
+        """
+        Return a diagram from the templates
+
+        Parameters
+        ----------
+        name : str
+            the name of the diagram
+        subfolder : str, optional
+            a subfolder for a specific diagram
+        enhance : bool, optional (Default=True)
+            if true, add .grf as extension to the diagram name
+
+        Returns
+        -------
+        path : str
+            the full path to the diagram
+        """
+        filename = encode(name)
+        if enhance:
+            filename = '{}.grf'.format(filename)
+        diagram_path = self.join_and_check(self.TEMPLATE_DIAGRAMFOLDER,
+                                           subfolder,
+                                           filename)
+        return diagram_path

@@ -1,291 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from collections import OrderedDict
 import gc
 import sys
 import os
-import numpy as np
-from pprint import pformat
 from abc import ABCMeta, abstractmethod, abstractproperty
 from rpctools.utils.config import Folders
 from rpctools.utils.config import Config
-from rpctools.utils.config import Singleton
-#reload(sys.modules[Folders.__module__])
+from rpctools.utils.output import Output
+from rpctools.utils.message import Message
+from rpctools.utils.singleton import Singleton
+from rpctools.utils.param_module import Params
+from rpctools.utils.arcpy_parameter import Parameter
 import arcpy
-
-
-class Message(object):
-
-    @staticmethod
-    def addMessage(message):
-        arcpy.AddMessage(message)
-        print(message)
-
-    @staticmethod
-    def addErrorMessage(message):
-        arcpy.AddError(message)
-        print(message)
-
-    @staticmethod
-    def addWarningMessage(message):
-        arcpy.AddWarning(message)
-        print(message)
-
-    @staticmethod
-    def addIDMessage(message, message_ID,
-                     add_argument1=None, add_argument2=None):
-        arcpy.AddIDMessage(message, message_ID,
-                           add_argument1=add_argument1, add_argument2=add_argument2)
-        print(message)
-
-    @staticmethod
-    def addGPMessages():
-        arcpy.AddMessage('')
-
-    @staticmethod
-    def AddMessage(message):
-        arcpy.AddMessage(message)
-        print(message)
-
-    @staticmethod
-    def AddErrorMessage(message):
-        arcpy.AddError(message)
-        print(message)
-
-    @staticmethod
-    def AddWarningMessage(message):
-        arcpy.AddWarning(message)
-        print(message)
-
-    @staticmethod
-    def AddIDMessage(message, message_ID,
-                     add_argument1=None, add_argument2=None):
-        arcpy.AddIDMessage(message, message_ID,
-                           add_argument1=add_argument1,
-                           add_argument2=add_argument2)
-        print(message)
-
-    @staticmethod
-    def AddGPMessages():
-        arcpy.AddMessage('')
-
-
-class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-
-class Params(object):
-    """Parameter class like an ordered dict"""
-
-    def __init__(self,
-                 param_projectname='name',
-                 dbname='',
-                 *args, **kwargs):
-        """
-        Parameters
-        ----------
-        param_projectname : str (optional, default='name')
-            the name of the project_name-Parameter
-        param_dbname : str (optional)
-            the name of the Default Database for the Tool
-
-        Examples
-        --------
-        >>> params = Params()
-        >>> params.param1 = 99
-        >>> params.param2 = 42
-        >>> params.param3 = 123
-
-        >>> len(params)
-        3
-        >>> params[0]
-        99
-        >>> params[1]
-        42
-        >>> params.param2
-        42
-        >>> params.param1
-        99
-        >>> params['param2']
-        42
-        >>> for param in params:
-        ...     print(param)
-        99
-        42
-        123
-        >>> del params.param1
-        >>> params.param1
-        Traceback (most recent call last):
-            ...
-        AttributeError: Attribute param1 not found in Params-instance. Available attributes are ['param2', 'param3']
-        >>> params[0]
-        42
-        >>> params[1]
-        123
-        >>> params[2]
-        Traceback (most recent call last):
-            ...
-        IndexError: list index out of range
-        >>> del params[0]
-        >>> params[0]
-        123
-        >>> params.param3
-        123
-        >>> params.param4 = 444
-        >>> params.param5 = 555
-        >>> params[:2]
-        [123, 444]
-        >>> params[1:3]
-        [444, 555]
-        >>> 'param5' in params
-        True
-        >>> 'param6' in params
-        False
-        """
-        self._od = OrderedDict(*args, **kwargs)
-        self._param_projectname = param_projectname
-        self._dbname = dbname
-
-    def __getattr__(self, name):
-        if name in self.__dict__:
-            return self.__dict__[name]
-        try:
-            return self._od[name]
-        except KeyError:
-            msg = 'Attribute {} not found in Params-instance. Available attributes are {}'.format(name, self._od.keys())
-            raise AttributeError(msg)
-
-    def __setattr__(self, name, value):
-        if name.startswith('_'):
-            self.__dict__[name] = value
-        else:
-            self._od[name] = value
-
-    def __delattr__(self, name):
-        del self._od[name]
-
-    def __getitem__(self, i):
-        try:
-            return self._od.values()[i]
-        except TypeError:
-            return self._od[i]
-
-    def __setitem__(self, i, value):
-        try:
-            self._od.items()[i] = value
-        except TypeError:
-            self._od[i] = value
-
-    def __delitem__(self, i):
-        try:
-            del self._od[i]
-        except KeyError:
-            del self._od[self._od.keys()[i]]
-
-    def __iter__(self):
-        return self._od.itervalues()
-
-    def __contains__(self, value):
-        return value in self._od
-
-    def __len__(self):
-        return len(self._od)
-
-    def __getslice__(self, start, stop):
-        return self._od.values().__getslice__(start, stop)
-
-    def __repr__(self):
-        ret = self._od.items()
-        return pformat(ret)
-
-    def _update_parameters(self, parameters):
-        """update the parameter values with a list of parameters"""
-        n_params_tbx = len(self)
-        n_params_tool = len(parameters)
-        msg = '{} Parameter der Toolbox passen nicht zu den {} Parametern des Tools'
-        assert n_params_tbx == n_params_tool, msg.format(n_params_tbx,
-                                                         n_params_tool)
-        # setze die Werte
-        for i, key in enumerate(self._od):
-            self[key]._arc_object = parameters[i]
-
-    def _get_projectname(self):
-        """
-        return the value for project name parameter if exists, else empty string
-
-        Returns
-        -------
-        projectname : str
-        """
-        param_projectname = getattr(self, self._param_projectname, None)
-        if param_projectname:
-            return param_projectname.value
-        return ''
-
-    def changed(self, *names):
-        """check parameter with names if thy are altered and not validated"""
-        change = False
-        for name in names:
-            param = self._od[name]
-            if param.altered and not param.hasBeenValidated:
-                change = True
-        return change
-
-    def toolbox_opened(self):
-        """return True if toolbox was opened just before last update"""
-        opened = not any([p.hasBeenValidated for p in self])
-        return opened
-
-    def selected_index(self, name):
-        """get the index of the current selection of given list-parameter"""
-        param = self._od[name]
-        index = param.filter.list.index(param.value)
-        return index
-
-    def get_multivalues(self, name):
-        """
-        return a numpy recarray with the values of a value table
-
-        Parameters
-        ----------
-        name : str
-            the name of the value-table parameter
-
-        Returns
-        -------
-        ra : np.recarray
-            the values as np.recarray. The column names are defined
-            by the param.columns
-        """
-        param = getattr(self, name)
-        if not param.datatype == 'GPValueTable':
-            raise ValueError('{} is no ValueTable'.format(name))
-        column_names = [p[1] for p in param.columns]
-        ra = np.rec.fromrecords(param.values, names=column_names)
-        return ra
-
-    def set_multivalues(self, name, values):
-        """
-        set the values of a value table with the values
-        given as a recarray
-
-        Parameters
-        ----------
-        name : str
-            the name of the value-table parameter
-        values : np.recarray
-            the values to assign to the parameter
-        """
-        msg = 'values must be a recarray and not {}'.format(type(ra).__name__)
-        assert isinstance(values, np.rec.recarray), msg
-        param = getattr(self, name)
-        if not param.datatype == 'GPValueTable':
-            raise ValueError('{} is no ValueTable'.format(name))
-        param.values = ra.tolist()
 
 
 class ToolFolders(Folders):
@@ -379,7 +105,7 @@ class Tool(object):
         """The run method - has to be implemented in the subclass"""
 
 
-class Dependency():
+class Dependency(object):
     """Class for defining dependencies between multiple paramaters and updating
     their values according to the defined target"""
     def __init__(self, param_names, target_value, type='sum'):
@@ -472,7 +198,8 @@ class Tbx(object):
         return self.folders.get_temporary_projects()
 
     def __init__(self):
-        # todo: replace later with Tool=self.Tool
+
+        # ggf. später reload entfernen???
         Tool = self.reload_tool()
 
         # the parameters
@@ -494,7 +221,7 @@ class Tbx(object):
         self.recently_opened = False
 
     def reload_tool(self):
-        # reload the tool's module
+        """reload the tool's module"""
         tool_module_name = self.Tool.__module__
         reload(sys.modules[tool_module_name])
         tool_name = self.Tool.__name__
@@ -512,6 +239,21 @@ class Tbx(object):
         Define the Parameters and return a list or Params()-instance with the
         parameter
         """
+
+    def add_parameter(self, param_name):
+        """
+        Add a (patched) arcpy-parameter and return this parameter
+
+        Parameters
+        ----------
+        param_name : str
+
+        Returns
+        -------
+        parameter : arcpy.Parameter-instance
+        """
+        parameter = self.par[param_name] = Parameter()
+        return parameter
 
     def getParameterInfo(self):
         """
@@ -554,7 +296,6 @@ class Tbx(object):
 
     def _set_active_project(self):
         active_project = self.config.active_project
-        projects = self.folders.get_projects()
         project_param = self.par[self.par._param_projectname]
         project_param.filter.list = []
         project_param.value = active_project
@@ -670,7 +411,7 @@ class Tbx(object):
                 self._create_temporary_copy(fgdb)
             table_path = self.folders.get_temporary_table(table, fgdb=fgdb)
         else:
-            table_path = self.folders.get_table(table, fgdb=fgdb)
+            table_path = self.folders.get_table(table, workspace=fgdb)
         columns = column_values.keys()
         cursor = arcpy.da.UpdateCursor(table_path, columns, where_clause=where)
         for row in cursor:
@@ -700,7 +441,7 @@ class Tbx(object):
         """
         table = os.path.basename(table)
         dbname = os.path.basename(fgdb) or self.tool._dbname
-        table_path = self.folders.get_table(table, fgdb=fgdb)
+        table_path = self.folders.get_table(table, workspace=fgdb)
         if dbname in self._temporary_gdbs:
             temp_db = self.folders.get_temporary_db(fgdb=fgdb, check=False)
             # only query temp. db if it exists (created on demand in update)
@@ -733,13 +474,14 @@ class Tbx(object):
         fgdb : str
             name of the FileGeoDatabase
         """
-        dbname = os.path.basename(fgdb) or self.dbname
         if fgdb not in self._temporary_gdbs:
             self._temporary_gdbs.append(fgdb)
 
     def _create_temporary_copy(self, fgdb=''):
-        """make a copy of a project fgdbs in the given temporary table"""
-        project_db = self.folders.get_db(fgdb=fgdb)
+        """
+        make a copy of a project fgdbs in the given temporary table
+        """
+        project_db = self.folders.get_db(workspace=fgdb)
         temp_db = self.folders.get_temporary_db(fgdb=fgdb, check=False)
         if arcpy.Exists(temp_db):
             arcpy.Delete_management(temp_db)
@@ -747,6 +489,8 @@ class Tbx(object):
         old_state = arcpy.env.addOutputsToMap
         arcpy.env.addOutputsToMap = False
         arcpy.Copy_management(project_db, temp_db)
+        self.tool.output.change_layers_workspace(project_db, temp_db)
+        arcpy.RefreshActiveView()
         arcpy.env.addOutputsToMap = old_state
 
     def _commit_temporaries(self):
@@ -754,22 +498,25 @@ class Tbx(object):
         gc.collect()
 
         arcpy.AddMessage(
-            'Getätigte Änderungen werden in das Projekt übernommen...')
+            u'Getätigte Änderungen werden in das Projekt übernommen...'.encode('latin1'))
 
         old_state = arcpy.env.overwriteOutput
         arcpy.env.overwriteOutput = True
         changes = 0
         for project in self.folders.get_temporary_projects():
             for fgdb in self._temporary_gdbs:
-                project_db = self.folders.get_db(fgdb=fgdb, project=project)
+                project_db = self.folders.get_db(workspace=fgdb,
+                                                 project=project)
                 temp_db = self.folders.get_temporary_db(fgdb=fgdb,
                                                         project=project,
                                                         check=False)
                 # temporary dbs only exist, if changes were made (else nothing
                 # to do here)
                 if arcpy.Exists(temp_db):
+                    arcpy.Compact_management(project_db)
                     arcpy.Delete_management(project_db)
                     arcpy.Copy_management(temp_db, project_db)
+                    self.tool.output.change_layers_workspace(temp_db, project_db)
                     changes += 1
 
             arcpy.AddMessage(
@@ -790,7 +537,7 @@ class Tbx(object):
         self._commit_temporaries()
         self.tool.main(self.par, parameters, messages)
         self.clear_temporary_dbs()
-        self.tool.main(self.par, parameters, messages)
+        #self.tool.main(self.par, parameters, messages)
 
     def print_test_parameters(self):
         """
@@ -830,7 +577,7 @@ class Tbx(object):
         ### Category 2 ###
         param_3 = params.param_3.value
         """
-        params = self._getParameterInfo()
+        self._getParameterInfo()
         category = None
         for k, v in self.par._od.iteritems():
             if v.category and v.category != category:
@@ -861,211 +608,6 @@ class Tbx(object):
             new_file.write(src)
 
 
-class Output():
-    """
-    Add and update layers to the current ArcMap file.
-    """
-
-    module = {
-                "analysen" : "Analysen",
-                "bevoelkerung": "Wirkungsbereich 1 - Bewohner und Arbeitsplaetze",
-                "erreichbarkeit": "Wirkungsbereich 2 - Erreichbarkeit",
-                "verkehr": "Wirkungsbereich 3 - Verkehr im Umfeld",
-                "oekologie": "Wirkungsbereich 4 - Fläche und Ökologie",
-                "infrastruktur": "Wirkungsbereich 5 - Infrastrukturfolgekosten",
-                "einnahmen": "Wirkungsbereich 6 - Kommunale Steuereinnahmen",
-                "standortkonkurrenz": "Wirkungsbereich 7 - Standortkonkurrenz Lebensmitteleinzelhandel",
-                "projektdefinition": "Projektdefinition",
-                "hintergrundkarten": "Hintergrundkarten Projekt-Check"}
-
-
-
-    def __init__(self, folders, params):
-        self.folders = folders
-        self.params = params
-
-
-    def set_projectlayer(self, projektname):
-        """
-        Check and add project layer
-        """
-
-        current_mxd = arcpy.mapping.MapDocument("CURRENT")
-        current_dataframe = current_mxd.activeDataFrame
-
-        layer_exists = arcpy.mapping.ListLayers(
-                                                    current_mxd,
-                                                    projektname,
-                                                    current_dataframe)
-        if layer_exists:
-            is_grouplayer = layer_exists[0].isGroupLayer
-        else:
-            is_grouplayer = False
-
-        if not layer_exists or not is_grouplayer:
-            group_layer_template = self.folders.get_layer(layername = "__Projektname__", folder='toc', enhance = True)
-            addLayer = arcpy.mapping.Layer(group_layer_template)
-            addLayer.name = projektname
-            arcpy.mapping.AddLayer(current_dataframe, addLayer, "TOP")
-            arcpy.RefreshActiveView()
-            arcpy.RefreshTOC()
-
-
-    def get_projectlayer(self, projectname):
-        """
-        Returns project layer in table of contents
-        """
-        current_mxd = arcpy.mapping.MapDocument("CURRENT")
-        current_dataframe = current_mxd.activeDataFrame
-        layers = arcpy.mapping.ListLayers(current_mxd, projectname, current_dataframe)
-        projectlayer = []
-        for layer in layers:
-            if layer.isGroupLayer:
-                projectlayer = layer
-
-        return projectlayer
-
-    def set_headgrouplayer(self, project_layer, dataframe):
-        """
-        Check and add headgroup layer
-        """
-        if not arcpy.mapping.ListLayers(project_layer, self.module["projektdefinition"], dataframe):
-            group_layer_template = self.folders.get_layer(layername = self.module["projektdefinition"], folder='toc', enhance = True)
-            addLayer = arcpy.mapping.Layer(group_layer_template)
-            arcpy.mapping.AddLayerToGroup(dataframe, project_layer, addLayer, "BOTTOM")
-
-        if not arcpy.mapping.ListLayers(project_layer, self.module["analysen"], dataframe):
-            group_layer_template = self.folders.get_layer(layername = self.module["analysen"], folder='toc', enhance = True)
-            addLayer = arcpy.mapping.Layer(group_layer_template)
-            arcpy.mapping.AddLayerToGroup(dataframe, project_layer, addLayer, "BOTTOM")
-
-        if not arcpy.mapping.ListLayers(arcpy.mapping.MapDocument("CURRENT"), self.module["hintergrundkarten"], dataframe):
-            group_layer_template = self.folders.get_layer(layername = self.module["hintergrundkarten"], folder='toc', enhance = True)
-            addLayer = arcpy.mapping.Layer(group_layer_template)
-            arcpy.mapping.AddLayer(dataframe, addLayer, "BOTTOM")
-
-
-    def set_grouplayer(self, project_layer, group, dataframe, headgroup = ""):
-        """
-        Check and add subgroup layer
-        """
-        if not arcpy.mapping.ListLayers(project_layer, group, dataframe):
-            group_layer_template = self.folders.get_layer(layername = group,
-                folder='toc', enhance = True)
-            addLayer = arcpy.mapping.Layer(group_layer_template)
-            if headgroup == "":
-                target_headgroup = self.module["analysen"]
-            target_headgrouplayer = arcpy.mapping.ListLayers(project_layer, target_headgroup, dataframe)[0]
-            arcpy.mapping.AddLayerToGroup(dataframe, target_headgrouplayer, addLayer, "BOTTOM")
-            arcpy.RefreshActiveView()
-            arcpy.RefreshTOC()
-
-    def set_subgrouplayer(self, project_layer, group, subgroup, dataframe):
-        """
-        Check and add subgroup layer
-        """
-        group_layer = arcpy.mapping.ListLayers(project_layer, group, dataframe)[0]
-        if not arcpy.mapping.ListLayers(group_layer, subgroup, dataframe):
-            subgroup_layer_template = self.folders.get_layer(layername = subgroup,
-                folder='toc', enhance = True)
-            addLayer = arcpy.mapping.Layer(subgroup_layer_template)
-            target_grouplayer = arcpy.mapping.ListLayers(project_layer, group, dataframe)[0]
-            arcpy.mapping.AddLayerToGroup(dataframe, target_grouplayer, addLayer, "BOTTOM")
-            arcpy.RefreshActiveView()
-            arcpy.RefreshTOC()
-
-    def add_output(self, group, featureclass, template_layer, disable_other = True, subgroup=""):
-        """
-        Add output layer to group
-
-        Parameters
-        ----------
-        group : str
-            the layer group
-
-        featureclass : str
-            the full path of the feature class, which should be converted into a layer
-
-        template_layer : str
-            full path of the template layer
-
-        disable_other = boolean
-            if true, then all other layers will be turned off
-
-        subgroup = str
-            the subgroup of the layergroup
-        """
-
-        projektname = self.params._get_projectname()
-
-        # Layer-Gruppen hinuzfuegen, falls nicht vorhanden
-        current_mxd = arcpy.mapping.MapDocument("CURRENT")
-        current_dataframe = current_mxd.activeDataFrame
-
-        self.set_projectlayer(projektname)
-        project_layer = self.get_projectlayer(projektname)
-        self.set_headgrouplayer(project_layer, current_dataframe)
-        self.set_grouplayer(project_layer, group, current_dataframe)
-        if subgroup != "":
-            self.set_subgrouplayer(project_layer, group, subgroup, current_dataframe)
-
-        # Neuen Layer hinzufuegen
-        current_mxd = arcpy.mapping.MapDocument("CURRENT")
-        current_dataframe = current_mxd.activeDataFrame
-        target_grouplayer = arcpy.mapping.ListLayers(project_layer, group, current_dataframe)[0]
-        if subgroup != "":
-            target_subgrouplayer = arcpy.mapping.ListLayers(target_grouplayer, subgroup, current_dataframe)[0]
-        source_layer = arcpy.mapping.Layer(template_layer)
-        arcpy.AddMessage(source_layer)
-        arcpy.AddMessage(featureclass)
-        source_ws = arcpy.Describe(source_layer).path
-        target_ws = arcpy.Describe(featureclass).path
-        source_layer.findAndReplaceWorkspacePath(source_ws, target_ws)
-        if subgroup == "":
-            arcpy.mapping.AddLayerToGroup(current_dataframe, target_grouplayer, source_layer, "BOTTOM")
-        else:
-            arcpy.mapping.AddLayerToGroup(current_dataframe, target_subgrouplayer, source_layer, "BOTTOM")
-
-        # Auf Layer zentrieren
-        new_layer = arcpy.mapping.ListLayers(project_layer, source_layer.name, current_dataframe)[0]
-        ext = new_layer.getExtent()
-        current_dataframe.extent = ext
-        arcpy.RefreshActiveView()
-        arcpy.RefreshTOC()
-
-        if disable_other == True:
-            for lyr in arcpy.mapping.ListLayers(project_layer):
-                lyr.visible = False
-        new_layer.visible = True
-        if subgroup != "":
-            target_subgrouplayer.visible = True
-        target_grouplayer.visible = True
-        project_layer.visible = True
-        if group in [self.module["verkehr"], self.module["einnahmen"], self.module["erreichbarkeit"],
-                        self.module["infrastruktur"], self.module["oekologie"], self.module["standortkonkurrenz"],
-                        self.module["bevoelkerung"]]:
-            arcpy.mapping.ListLayers(project_layer, self.module["analysen"], current_dataframe)[0].visible = True
-        arcpy.RefreshActiveView()
-        arcpy.RefreshTOC()
-
-    def delete_output(self, layer):
-
-        projektname = self.params._get_projectname()
-        current_mxd = arcpy.mapping.MapDocument("CURRENT")
-        current_dataframe = current_mxd.activeDataFrame
-        project_layer = self.get_projectlayer(projektname)
-
-        if project_layer:
-            layer_exists = arcpy.mapping.ListLayers(project_layer, layer, current_dataframe)
-            if layer_exists:
-                arcpy.mapping.RemoveLayer(current_dataframe, layer_exists[0])
-
-        arcpy.RefreshActiveView()
-        arcpy.RefreshTOC()
-
-    def update_output(self, group, layername ):
-        """"""
-        projektname = self.params._get_projectname()
 
 if __name__ == '__main__':
     import doctest
