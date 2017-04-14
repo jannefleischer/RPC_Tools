@@ -28,7 +28,7 @@ class TbxProjektauswahl(Tbx):
     def _getParameterInfo(self):
         params = self.par
         # Bestehendes_Projekt_auswählen
-        p = params.active_project = arcpy.Parameter()
+        p = self.add_parameter('active_project')
         p.name = encode('aktives Projekt')
         p.displayName = encode('aktives Projekt auswählen')
         p.parameterType = 'Required'
@@ -48,4 +48,12 @@ class TbxProjektauswahl(Tbx):
             #params.active_project.filter.list = self.folders.get_projects()
             #if self.config.active_project:
                 #params.active_project.value = self.config.active_project
-        
+
+
+if __name__ == '__main__':
+    t=TbxProjektauswahl()
+    params = t.getParameterInfo()
+    print(t.print_test_parameters())
+    t.par.active_project.value = 'abc'
+    t.execute()
+

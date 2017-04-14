@@ -10,7 +10,7 @@ from rpctools.utils.params import Tool
 class TeilflaechenVerwalten(Tool):
 
     _param_projectname = 'projectname'
-    _dbname = 'FGDB_Definition_Projekt.gdb'    
+    _dbname = 'FGDB_Definition_Projekt.gdb'
 
 
     def run(self):

@@ -19,10 +19,10 @@ class TbxFlaechendefinition(Tbx):
     @property
     def teilflaechen_table(self):
         return self.folders.get_table('Teilflaechen_Plangebiet')
-    
+
     @property
     def teilflaechen(self):
-        """dict of key/value pairs of pretty names of teilflaechen as keys and 
+        """dict of key/value pairs of pretty names of teilflaechen as keys and
         (id, name, ha, ags) as values"""
         return self._teilflaechen
 
@@ -40,12 +40,12 @@ class TbxFlaechendefinition(Tbx):
         Returns
         -------
         teilflaechen : dict
-            key/value pairs of pretty names as keys and (id, name, ha, ags) as 
+            key/value pairs of pretty names as keys and (id, name, ha, ags) as
             values
         """
 
         columns = ['id_teilflaeche', 'Flaeche_ha', 'Name',
-                   'gemeinde_name', 'Nutzungsart', 'ags_bkg']        
+                   'gemeinde_name', 'Nutzungsart', 'ags_bkg']
         rows = self.query_table('Teilflaechen_Plangebiet', columns)
         teilflaechen = OrderedDict()
 
@@ -66,14 +66,14 @@ class TbxFlaechendefinition(Tbx):
     def get_nutzungsart_id(self, flaechen_id):
         """get the nutzungsart of the given flaeche (by id)"""
         row = self.query_table(
-            'Teilflaechen_Plangebiet', ['Nutzungsart'], 
+            'Teilflaechen_Plangebiet', ['Nutzungsart'],
             where = '"id_teilflaeche" = {}'.format(flaechen_id))[0]
         return row[0]
 
     def _getParameterInfo(self):
         # Projekt
         params = self.par
-        p = params.projectname = arcpy.Parameter()
+        p = self.add_parameter('projectname')
         p.name = u'Projekt'
         p.displayName = u'Projekt'
         p.parameterType = 'Required'
@@ -84,16 +84,16 @@ class TbxFlaechendefinition(Tbx):
         p.value = '' if len(projects) == 0 else p.filter.list[0]
 
         # Teilfläche
-        p = params.teilflaeche = arcpy.Parameter()
+        p = self.add_parameter('teilflaeche')
         p.name = encode(u'Teilfläche')
         p.displayName = encode(u'Teilfläche')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
         p.filter.list = []
-        
+
         self.update_teilflaechen(self._nutzungsart)
-        
+
         self.add_temporary_management('FGDB_Definition_Projekt.gdb')
 
         return params
@@ -102,8 +102,8 @@ class TbxFlaechendefinition(Tbx):
         if params.changed('projectname') or self.recently_opened:
             params.teilflaeche.value = ''
             self.update_teilflaechen(self._nutzungsart)
-            
-        return params    
+
+        return params
 
     def update_teilflaechen(self, nutzungsart=None):
         """update the parameter list of teilflaeche (opt. filter nutzungsart)"""
@@ -119,8 +119,8 @@ class TbxFlaechendefinition(Tbx):
             flaeche = list_teilflaechen[0]
         else:
             flaeche = ''
-        
-        self.par.teilflaeche.value = flaeche        
+
+        self.par.teilflaeche.value = flaeche
 
 class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
     """Toolbox to name Teilflächen"""
@@ -152,7 +152,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
     def _getParameterInfo(self):
         params = super(TbxTeilflaecheVerwalten, self)._getParameterInfo()
         # Name
-        p = params.name = arcpy.Parameter()
+        p = self.add_parameter('name')
         p.name = u'Name'
         p.displayName = u'Name'
         p.parameterType = 'Required'
@@ -160,7 +160,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
         p.datatype = u'GPString'
 
         # Nutzungsart
-        p = params.nutzungsart = arcpy.Parameter()
+        p = self.add_parameter('nutzungsart')
         p.name = encode(u'Nutzungsart')
         p.displayName = encode(u'Nutzungsart')
         p.parameterType = 'Required'
@@ -191,7 +191,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
 
             if params.changed('nutzungsart'):
                 nutzungsart_id = self.nutzungsarten[params.nutzungsart.value]
-                self.update_table('Teilflaechen_Plangebiet', 
+                self.update_table('Teilflaechen_Plangebiet',
                                   {'Nutzungsart': nutzungsart_id},
                                   where='id_teilflaeche={}'.format(flaechen_id))
                 # ToDo delete corresponding rows wohnen/gewerbe/einzelhandel
