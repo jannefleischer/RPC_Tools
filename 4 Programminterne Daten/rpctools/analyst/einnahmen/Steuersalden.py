@@ -133,8 +133,8 @@ class Steuersalden(Tool):
         for layername in saldos:
             self.output.add_output(
                 groupname=groupname,
-                featureclass=tbl_steuersalden,
                 template_layer=self.folders.get_layer(layername, folder),
+                featureclass=tbl_steuersalden,
                 disable_other=False,
                 subgroup=subgroup,
             )
