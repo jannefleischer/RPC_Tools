@@ -13,13 +13,16 @@
 # ---------------------------------------------------------------------------
 
 import sys
-from os.path import abspath, dirname, join, isdir
+from os.path import join, isdir
+import os
+import shutil
+import gc
 from rpctools.utils.params import Tool
 from rpctools.utils.spatial_lib import get_ags
 from rpctools.utils.spatial_lib import get_gemeindetyp
 from rpctools.utils.constants import Nutzungsart
+from rpctools.utils.encoding import encode
 import arcpy
-import os, shutil, gc
 
 
 class Projektverwaltung(Tool):
@@ -43,30 +46,33 @@ class Projektverwaltung(Tool):
             self.add_output_new_project()
 
         else:
-            _param_projectname = 'existing_project'
+            self._param_projectname = 'existing_project'
             self.projekt_loeschen()
             self.remove_project_from_output()
 
     def add_output_new_project(self):
-        group = self.output.module["projektdefinition"]
-        name = self.par.name.value
-        fc = self.folders.get_table(project = name, tablename = "Teilflaechen_Plangebiet")
+        fc = self.folders.get_table("Teilflaechen_Plangebiet")
         layer = self.folders.get_layer("Teilflächen des Plangebiets")
-        self.output.add_output(group, fc, layer)
+        self.output.add_output("projektdefinition", fc, layer)
 
     def add_diagramm(self):
         # Erstelle Diagramm Teilflaechen nach Hektar
         project_name = self.par.name.value
         out_graph_name = str(project_name) + ": Teilflächen nach Hektar"
-        input_template = r"C:\ProjektCheck\4 Programminterne Daten\templates\diagrams\Teilflaechen_Hektar.grf"
-        input_data = self.folders.get_table('Teilflaechen_Plangebiet', project=project_name, check=False)
+        input_template = self.folders.get_diagram_template(
+            'Teilflaechen_Hektar')
+        input_data = self.folders.get_table('Teilflaechen_Plangebiet',
+                                            check=False)
         # Create the graph
         graph = arcpy.Graph()
-        input_data = arcpy.mapping.ListLayers(arcpy.mapping.MapDocument("CURRENT"), "Teilflaechen_Plangebiet",
-                                                arcpy.mapping.MapDocument("CURRENT").activeDataFrame)[0]
+        mxd = arcpy.mapping.MapDocument("CURRENT")
+        input_data = arcpy.mapping.ListLayers(mxd, "Teilflaechen_Plangebiet",
+                                              mxd.activeDataFrame)[0]
         # Add a vertical bar series to the graph
-        graph.addSeriesBarVertical(dataSrc = input_data, fieldY = "Flaeche_ha", fieldLabel = "Name")
-        graph.graphPropsGeneral.title = str(project_name) + ": Teilflächen des Plangebiets (Bruttofläche)"
+        graph.addSeriesBarVertical(dataSrc=input_data,
+                                   fieldY="Flaeche_ha",
+                                   fieldLabel="Name")
+        graph.graphPropsGeneral.title = encode("{}: Teilflächen des Plangebiets (Bruttofläche)".format(project_name))
         arcpy.env.addOutputsToMap = True
         arcpy.MakeGraph_management(input_template, graph, out_graph_name)
         arcpy.env.addOutputsToMap = False
@@ -95,26 +101,17 @@ class Projektverwaltung(Tool):
 
             # Überprüfen, ob der Projektordner existiert
             if(isdir(projektPfad)):
-                print("Projektordner gefunden")
                 arcpy.AddMessage("Projektordner gefunden \n")
                 shutil.rmtree(projektPfad)
-                print("Projektordner gelöscht")
                 arcpy.AddMessage("Projektordner gelöscht \n")
             else:
-                print("Projektordner " + projektName + " nicht gefunden \n")
                 arcpy.AddMessage("Projektordner " + projektName + " nicht gefunden \n")
 
             arcpy.AddMessage("*********************************************************************************")
             arcpy.AddMessage("Das Projekt " + projektName + " wurde erfolgreich entfernt \n")
 
         except Exception as e:
-            print(e)
             arcpy.AddMessage(e)
-        finally:
-            try:
-                del cursor, delcursor
-            except:
-                print("")
 
     def projekt_kopieren(self):
         try:
@@ -137,10 +134,8 @@ class Projektverwaltung(Tool):
                 sys.exit()
 
             # output information to user
-            print("Succesfully copied")
             arcpy.AddMessage("Succesfully copied")
-            print("New Project registered at " + project_path)
-            arcpy.AddMessage("New Project registered at " + project_path)
+            arcpy.AddMessage("New Project registered at {}".format(project_path))
         except Exception as e:
             arcpy.AddMessage(e)
 
@@ -205,7 +200,7 @@ class Projektverwaltung(Tool):
         arcpy.AddField_management(tfl, "Name", "TEXT")
         arcpy.AddField_management(tfl, "Beginn_Nutzung", "LONG")
         arcpy.AddField_management(tfl, "Aufsiedlungsdauer", "LONG")
-        arcpy.AddField_management(tfl, "Flaeche_ha", "DOUBLE", "", "", "", "", "", "")
+        arcpy.AddField_management(tfl, "Flaeche_ha", "DOUBLE")
         arcpy.AddField_management(tfl, "umfang_meter", "FLOAT")
         arcpy.AddField_management(tfl, "Nutzungsart", "SHORT")
         arcpy.AddField_management(tfl, "ags_bkg", "TEXT")
@@ -220,11 +215,12 @@ class Projektverwaltung(Tool):
                                         "PYTHON_9.3", "")
 
         # Berechne Gauß-Krüger-Koordinaten
-        arcpy.AddGeometryAttributes_management(Input_Features = tfl,
-                                                Geometry_Properties = "CENTROID_INSIDE")
+        arcpy.AddGeometryAttributes_management(
+            Input_Features = tfl, Geometry_Properties="CENTROID_INSIDE")
 
         # Berechne Umfang der Flächen
-        arcpy.CalculateField_management(tfl, "umfang_meter", "!shape.length@METER!", "PYTHON_9.3")
+        arcpy.CalculateField_management(tfl, "umfang_meter",
+                                        "!shape.length@METER!", "PYTHON_9.3")
 
         cursor = arcpy.UpdateCursor(tfl)
         for i, row in enumerate(cursor):
@@ -243,7 +239,8 @@ class Projektverwaltung(Tool):
         gemeindetyp = get_gemeindetyp(ags_projekt)
 
         # loesche ggf. vorhandene zeilen in den Projektrahmendaten und fuege neue daten danach hinzu
-        projektrahmendaten = self.folders.get_table(tablename = "Projektrahmendaten", project=project_name)
+        projektrahmendaten = self.folders.get_table(tablename="Projektrahmendaten",
+                                                    project=project_name)
         arcpy.DeleteRows_management(projektrahmendaten)
 
         cursor = arcpy.InsertCursor(projektrahmendaten)
@@ -307,4 +304,3 @@ class Projektverwaltung(Tool):
 
         arcpy.AddMessage("Neues Projekt angelegt im Ordner {}\n".format(
             project_path))
-
