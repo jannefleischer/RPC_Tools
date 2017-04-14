@@ -166,7 +166,9 @@ class Wanderungssalden(Tool):
 
 
         #Ergebnis einfügen
-        fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "SvB_Zuzug", "SvB_Fortzug", "Wanderungsanteil_Ew", "Wanderungsanteil_SvB", "AGS"]
+        fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "SvB_Zuzug",
+                  "SvB_Fortzug", "Wanderungsanteil_Ew",
+                  "Wanderungsanteil_SvB", "AGS"]
         cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
         for gemeinde in cursor:
             gemeinde[0] = einwohner_projekt * gemeinde[5] * -1
@@ -183,7 +185,7 @@ class Wanderungssalden(Tool):
             gemeinde[5] = gemeinde[3] + gemeinde[4]
             cursor.updateRow(gemeinde)
 
-    #Pr?fen, ob Gewerbe und/oder Wohngebiete existieren
+        #Prüfen, ob Gewerbe und/oder Wohngebiete existieren
         wohnen_exists = False
         gewerbe_exists = False
 
@@ -201,51 +203,42 @@ class Wanderungssalden(Tool):
             if flaeche[0] == 2:
                 gewerbe_exists = True
 
+        groupname = "einnahmen"
+        tbl_wanderungssalden = self.folders.get_table("Wanderungssalden")
+        disable_other = False
 
-    #Einwohnersaldo-Layer hinzuf?gen
+        #Einwohnersaldo-Layer hinzufügen
         if wohnen_exists:
-            self.output.delete_output("Positive Wanderungssalden Einwohner")
-            self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project=projektname, tablename = "Wanderungssalden"),
-                                template_layer = self.folders.get_layer(layername = "Positive Wanderungssalden Einwohner", enhance = True, folder="einnahmen"),
-                                subgroup = "Wanderungssalden Einwohner"
-                                    )
-            self.output.delete_output("Negative Wanderungssalden Einwohner")
-            self.output.add_output(group = self.output.module["einnahmen"],
-                                    featureclass = self.folders.get_table(project=projektname, tablename = "Wanderungssalden"),
-                                    template_layer = self.folders.get_layer(layername = "Negative Wanderungssalden Einwohner", enhance = True, folder="einnahmen"),
-                                    disable_other = False,
-                                    subgroup = "Wanderungssalden Einwohner"
-                                    )
+            subgroup = "Wanderungssalden Einwohner"
+            lyrnames = ["Positive Wanderungssalden Einwohner",
+                        "Negative Wanderungssalden Einwohner"]
+            for layername in lyrnames:
+                self.output.replace_output(
+                    groupname, tbl_wanderungssalden, layername,
+                    folder, subgroup, disable_other)
 
-    #Gewerbesaldo-Layer hinzuf?gen
+        #Gewerbesaldo-Layer hinzufügen
         if gewerbe_exists:
-            self.output.delete_output("Positive Wanderungssalden Erwerbstätige")
-            self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project=projektname, tablename = "Wanderungssalden"),
-                                template_layer = self.folders.get_layer(layername = "Positive Wanderungssalden Erwerbstätige", enhance = True, folder="einnahmen"),
-                                disable_other = False,
-                                subgroup = "Wanderungssalden Erwerbstätige"
-                                )
-            self.output.delete_output("Negative Wanderungssalden Erwerbstätige")
-            self.output.add_output(group = self.output.module["einnahmen"],
-                                featureclass = self.folders.get_table(project=projektname, tablename = "Wanderungssalden"),
-                                template_layer = self.folders.get_layer(layername = "Negative Wanderungssalden Erwerbstätige", enhance = True, folder="einnahmen"),
-                                disable_other = False,
-                                subgroup = "Wanderungssalden Erwerbstätige"
-                                )
+            subgroup = "Wanderungssalden Erwerbstätige"
+            lyrnames = ["Positive Wanderungssalden Erwerbstätige",
+                        "Negative Wanderungssalden Erwerbstätige"]
+            for layername in lyrnames:
+                self.output.replace_output(
+                    groupname, tbl_wanderungssalden, layername,
+                    folder, subgroup, disable_other)
 
     #   Symbology anpassen
         mxd = arcpy.mapping.MapDocument("CURRENT")
-        df = mxd.activeDataFrame
+        negative_saldos = [
+            "Negativer Wanderungssalden Einwohner",
+            "Negativer Wanderungssalden Erwerbstätige",
+        ]
         projekt_layer = self.output.get_projectlayer(projektname)
-        if arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Einwohner"):
-            lyr = arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Einwohner")[0]
-            lyr.symbology.reclassify()
-        if arcpy.mapping.ListLayers(mxd, "Negative Wanderungssalden Erwerbstätige"):
-            lyr = arcpy.mapping.ListLayers(mxd, "Negative Wanderungssalden Erwerbstätige")[0]
-            lyr.symbology.reclassify()
+        for layername in negative_saldos:
+            self.output.reclassify_layer(projekt_layer, layername)
         arcpy.RefreshTOC()
+
+
 
 
 
