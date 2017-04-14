@@ -73,7 +73,8 @@ class Tool(object):
         self.mes = Message()
         self.parent_tbx = parent_tbx
         self.folders = ToolFolders(params=self.par)
-        self.output = Output(folders=self.folders, params=params)
+        self.output = Output(folders=self.folders, params=params,
+                             parent_tbx=parent_tbx)
 
     def main(self, par, parameters=None, messages=None):
         """
@@ -99,6 +100,11 @@ class Tool(object):
     def db(self):
         """ The full path to the default Database of the tool"""
         return self.folders.get_db()
+
+    @property
+    def projectname(self):
+        """Return the current projectname"""
+        return self.par._get_projectname()
 
     @abstractmethod
     def run(self):
@@ -489,8 +495,8 @@ class Tbx(object):
         old_state = arcpy.env.addOutputsToMap
         arcpy.env.addOutputsToMap = False
         arcpy.Copy_management(project_db, temp_db)
-        self.tool.output.change_layers_workspace(project_db, temp_db)
-        arcpy.RefreshActiveView()
+        #self.tool.output.change_layers_workspace(project_db, temp_db)
+        #arcpy.RefreshActiveView()
         arcpy.env.addOutputsToMap = old_state
 
     def _commit_temporaries(self):
@@ -513,9 +519,13 @@ class Tbx(object):
                 # temporary dbs only exist, if changes were made (else nothing
                 # to do here)
                 if arcpy.Exists(temp_db):
+                    self.tool.output.change_layers_workspace(project_db, temp_db)
                     arcpy.Compact_management(project_db)
                     arcpy.Delete_management(project_db)
                     arcpy.Copy_management(temp_db, project_db)
+                    #self.tool.output.change_layers_workspace(temp_db, project_db)
+                    # repair datasource of layers that reference the project_db
+                    # which was temporarily deleted
                     self.tool.output.change_layers_workspace(temp_db, project_db)
                     changes += 1
 
