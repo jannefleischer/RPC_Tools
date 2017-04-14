@@ -29,7 +29,9 @@ class Config(object):
     __metaclass__ = Singleton
 
     _default = {
-        'active_project': ''
+        'active_project': '',
+        'epsg': 31467,
+        'transformation': "DHDN_To_WGS_1984_5x",
     }
 
     _config = {}
