@@ -35,7 +35,7 @@ class TbxNutzungen(TbxFlaechendefinition):
 
 
         # Beginn der Aufsiedlung (Jahreszahl)
-        param = params.bezugsbeginn = arcpy.Parameter()
+        param = self.add_parameter('bezugsbeginn')
         param.name = u'Beginn_der_Aufsiedlung__Jahreszahl_'
         param.displayName = beginn_name or encode(u'Beginn der Aufsiedlung '
                                                   u'(Jahreszahl)')
@@ -51,7 +51,7 @@ class TbxNutzungen(TbxFlaechendefinition):
 
         # Dauer des Bezugs (Jahre, 1 = Bezug wird noch im Jahr des
         # Bezugsbeginns abgeschlossen)
-        param = params.dauer_aufsiedlung = arcpy.Parameter()
+        param = self.add_parameter('dauer_aufsiedlung')
         param.name = u'dauer_aufsiedlung'
         param.displayName = (u'Dauer des Bezugs (Jahre, 1 = Bezug wird noch '
                              u'im Jahr des Bezugsbeginns abgeschlossen)')
@@ -64,12 +64,12 @@ class TbxNutzungen(TbxFlaechendefinition):
         param.category = heading
 
         return params
-    
+
 
 class TbxNutzungenWohnen(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='a', name='Wohnen')
     _nutzungsart = Nutzungsart.WOHNEN
-    
+
     ew_je_we_range = [str(r / 10.0).replace('.', ',') for r in range(10, 50)]
 
     @property
@@ -89,7 +89,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
         heading = encode(u"2) Anzahl Wohneinheiten nach Gebäudetypen")
 
         # Anzahl WE in Einfamilienhäusern
-        param = params.we_efh = arcpy.Parameter()
+        param = self.add_parameter('we_efh')
         param.name = encode(u'Bewohner Einfamilienhaus')
         param.displayName = encode(u'Anzahl WE in Einfamilienhäusern')
         param.parameterType = 'Required'
@@ -101,7 +101,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
         param.category = heading
 
         # Anzahl WE in Doppelhäusern
-        param = params.we_zfh = arcpy.Parameter()
+        param = self.add_parameter('we_zfh')
         param.name = encode(u'Bewohner Doppelhaus')
         param.displayName = encode(u'Anzahl WE in Doppelhäusern')
         param.parameterType = 'Required'
@@ -114,7 +114,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
         param.category = heading
 
         # Anzahl WE in Reihenhäusern
-        param = params.we_rh = arcpy.Parameter()
+        param = self.add_parameter('we_rh')
         param.name = encode(u'Bewohner Reihenhaus')
         param.displayName = encode(u'Anzahl WE in Reihenhäusern')
         param.parameterType = 'Required'
@@ -127,7 +127,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
         param.category = heading
 
         # Anzahl WE in Mehrfamilienhäusern
-        param = params.we_mfh = arcpy.Parameter()
+        param = self.add_parameter('we_mfh')
         param.name = encode(u'Bewohner Mehrfamilienhaus')
         param.displayName = encode(u'Anzahl WE in Mehrfamilienhäusern')
         param.parameterType = 'Required'
@@ -138,12 +138,12 @@ class TbxNutzungenWohnen(TbxNutzungen):
         param.filter.list = [0, 500]
         param.category = heading
 
-        heading = ("3) Mittlere Anzahl Einwohner pro Wohneinheit " + 
+        heading = ("3) Mittlere Anzahl Einwohner pro Wohneinheit " +
                    "(3 Jahre nach Bezug)")
 
         # Mittlere Anzahl Einwohner pro WE in Einfamilienhäusern
         # (kurz nach dem Bezug)
-        param = params.ew_je_we_efh = arcpy.Parameter()
+        param = self.add_parameter('ew_je_we_efh')
         param.name = u'Bewohner Einfamilienhaus kndB'
         param.displayName = encode(u'in Einfamilienhäusern')
         param.parameterType = 'Required'
@@ -155,7 +155,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
 
         # Mittlere Anzahl Einwohner pro WE in Doppelhäusern
         # (kurz nach dem Bezug)
-        param = params.ew_je_we_zfh = arcpy.Parameter()
+        param = self.add_parameter('ew_je_we_zfh')
         param.name = u'Bewohner Doppelhäuser kndB'
         param.displayName = encode(u'in Doppelhäusern')
         param.parameterType = 'Required'
@@ -167,7 +167,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
 
         # Mittlere Anzahl Einwohner pro WE in Reihenhäusern
         # (kurz nach dem Bezug)
-        param = params.ew_je_we_rh = arcpy.Parameter()
+        param = self.add_parameter('ew_je_we_rh')
         param.name = u'Bewohner Reihenhaus kndB'
         param.displayName = encode(u'in Reihenhäusern')
         param.parameterType = 'Required'
@@ -179,7 +179,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
 
         # Mittlere Anzahl Einwohner pro WE in Mehrfamilienhäusern kurz nach
         # dem Bezug
-        param = params.ew_je_we_mfh = arcpy.Parameter()
+        param = self.add_parameter('ew_je_we_mfh')
         param.name = u'Bewohner Mehrfamilienhaus kndB'
         param.displayName = encode(u'in Mehrfamilienhäusern')
         param.parameterType = 'Required'
@@ -202,7 +202,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
 class TbxNutzungenGewerbe(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='b', name='Gewerbe')
     _nutzungsart = Nutzungsart.GEWERBE
-    
+
     # properties derived from base tables
     _gewerbegebietstypen = None
     _presets = None
@@ -211,58 +211,58 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     @property
     def Tool(self):
         return Nutzungen
-    
+
     @property
     def gewerbegebietstypen(self):
         """dictionary with names of gewerbegebiete as keys and ids as values"""
-        if self._gewerbegebietstypen is None:            
+        if self._gewerbegebietstypen is None:
             table = self.folders.get_base_table(
                 'FGDB_Definition_Projekt_Tool.gdb',
                 'Gewerbegebietstypen')
             self._gewerbegebietstypen = OrderedDict({u'<benutzerdefiniert>': 0})
             columns = ['Name_Gewerbegebietstyp', 'IDGewerbegebietstyp']
             cursor = arcpy.da.SearchCursor(table, columns)
-            for name, id_gewerbe in cursor: 
+            for name, id_gewerbe in cursor:
                 self._gewerbegebietstypen[name] = id_gewerbe
         return self._gewerbegebietstypen
 
     @property
-    def presets(self):    
-        """dictionary with gewerbetyp as keys and dictionaries 
-        (key / value-pairs: id branche / recommended value) as values"""        
-        if self._presets is None:            
+    def presets(self):
+        """dictionary with gewerbetyp as keys and dictionaries
+        (key / value-pairs: id branche / recommended value) as values"""
+        if self._presets is None:
             table = self.folders.get_base_table(
                 'FGDB_Definition_Projekt_Tool.gdb',
                 'Vorschlagswerte_Branchenstruktur')
             self._presets = {}
-            columns = ['IDGewerbegebietstyp', 
-                       'ID_Branche_ProjektCheck', 
+            columns = ['IDGewerbegebietstyp',
+                       'ID_Branche_ProjektCheck',
                        'Vorschlagswert_in_Prozent']
             cursor = arcpy.da.SearchCursor(table, columns)
-            for id_gewerbe, id_branche, value in cursor: 
+            for id_gewerbe, id_branche, value in cursor:
                 if id_gewerbe not in self._presets:
                     self._presets[id_gewerbe] = {}
                 self._presets[id_gewerbe][id_branche] = value
         return self._presets
-    
+
     @property
-    def dichtekennwerte(self):    
-        """dictionary with gewerbetyp as keys and dictionaries 
-        (key / value-pairs: id branche / jobs per ha) as values"""        
-        if self._dichtekennwerte is None:            
+    def dichtekennwerte(self):
+        """dictionary with gewerbetyp as keys and dictionaries
+        (key / value-pairs: id branche / jobs per ha) as values"""
+        if self._dichtekennwerte is None:
             table = self.folders.get_base_table(
                 'FGDB_Definition_Projekt_Tool.gdb',
                 'Dichtekennwerte_Gewerbe')
             self._dichtekennwerte = {}
-            columns = ['Gemeindetyp_ProjektCheck', 
-                       'ID_Branche_ProjektCheck', 
+            columns = ['Gemeindetyp_ProjektCheck',
+                       'ID_Branche_ProjektCheck',
                        'AP_pro_ha_brutto']
             cursor = arcpy.da.SearchCursor(table, columns)
-            for gemeindetyp, id_branche, jobs_per_ha in cursor: 
+            for gemeindetyp, id_branche, jobs_per_ha in cursor:
                 if gemeindetyp not in self._dichtekennwerte:
                     self._dichtekennwerte[gemeindetyp] = {}
                 self._dichtekennwerte[gemeindetyp][id_branche] = jobs_per_ha
-        return self._dichtekennwerte    
+        return self._dichtekennwerte
 
     def _getParameterInfo(self):
         params = super(TbxNutzungenGewerbe, self)._getParameterInfo()
@@ -274,24 +274,24 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         heading = u"2) Voraussichtlicher Anteil der Branchen an der Nettofläche"
 
         # Gebietstyp auswählen
-        param = params.gebietstyp = arcpy.Parameter()
+        param = self.add_parameter('gebietstyp')
         param.name = u'Gebietstyp'
         param.displayName = encode(u'Gebietstyp auswählen')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-          
+
         param.filter.list = self.gewerbegebietstypen.keys()
         param.value = param.filter.list[0]
         param.category = heading
-    
-        # remember params of 
+
+        # remember params of
         self.branche_params = []
 
         # Anteil der Arbeitsplätze im verarbeitenden Gewerbe in Prozent
         name = 'ant_jobs_verarb_gewerbe'
         self.branche_params.append(name)
-        param = params[name] = arcpy.Parameter()
+        param = self.add_parameter(name)
         param.name = u'verarbeitendes Gewerbe'
         param.displayName = encode(u'Verarbeitendes Gewerbe (in % der '
                                    u'Nettofläche)')
@@ -307,7 +307,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         # Anteil der Arbeitsplätze im Baugewerbe in Prozent
         name = 'ant_jobs_baugewerbe'
         self.branche_params.append(name)
-        param = params[name] = arcpy.Parameter()
+        param = self.add_parameter(name)
         param.name = u'Baugewerbe'
         param.displayName = encode(u'Baugewerbe (in % der Nettofläche)')
         param.parameterType = 'Required'
@@ -322,7 +322,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         # Anteil der Arbeitsplätze im Handel inkl. Kfz in Prozent
         name = 'ant_jobs_grosshandel'
         self.branche_params.append(name)
-        param = params[name] = arcpy.Parameter()
+        param = self.add_parameter(name)
         param.name = u'Handel'
         param.displayName = encode(u'Großhandel, Logistik, Kfz-Handel '
                                    u'(in % der Nettofläche)')
@@ -339,7 +339,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         # bzw. techn. Dienstleistungen in Prozent
         name = 'ant_jobs_freiwisstech'
         self.branche_params.append(name)
-        param = params[name] = arcpy.Parameter()
+        param = self.add_parameter(name)
         param.name = u'Finanzen'
         param.displayName = encode(u'Finanzen, Versicherungen, IuK, '
                                    u'wissensorientierte Dienstleistungen '
@@ -356,7 +356,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         # Anteil der Arbeitsplätze im Bereich sonstiger Diensteistungen
         name = 'ant_jobs_sonst_dl'
         self.branche_params.append(name)
-        param = params[name] = arcpy.Parameter()
+        param = self.add_parameter(name)
         param.name = u'Sonstige'
         param.displayName = encode(u'Sonstige unternehmensorientierte '
                                    u'Dienstleistungen (in % der Nettofläche)')
@@ -372,7 +372,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         # Öffentliche Verwaltung
         name = 'ant_oev'
         self.branche_params.append(name)
-        param = params[name] = arcpy.Parameter()
+        param = self.add_parameter(name)
         param.name = u'Öffentliche Verwaltung'
         param.displayName = encode(u'Öffentliche Verwaltung '
                                    u'(in % der Nettofläche)')
@@ -384,13 +384,13 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.filter.list = [0, 100]
         param.category = heading
         param.id_branche = Branche.OEFFENTLICH
-        
+
         self.add_dependency(self.branche_params, 100)
 
         heading = u'3) Voraussichtliche Anzahl an Arbeitsplätzen'
 
         # Arbeitsplatzzahl schätzen
-        param = params.auto_select = arcpy.Parameter()
+        param = self.add_parameter('auto_select')
         param.name = u'Arbeitsplatzzahl schätzen'
         param.displayName = encode(u'Vorgehen zur Schätzung der Zahl der '
                                    u'Arbeitsplätze nach Vollbezug')
@@ -403,7 +403,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.category = heading
 
         # Arbeitsplätze insgesamt
-        param = params.arbeitsplaetze_insgesamt = arcpy.Parameter()
+        param = self.add_parameter('arbeitsplaetze_insgesamt')
         param.name = u'Arbeitsplätze insgesamt'
         param.displayName = encode(u'Schätzung der Zahl der Arbeitsplätze '
                                    u'nach Vollbezug (Summe über alle '
@@ -414,10 +414,10 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.category = heading
         param.enabled = False
         param.filter.type = 'Range'
-        param.filter.list = [0, 2000]
+        param.filter.list = [0, 10000]
 
         return params
-    
+
     def set_gewerbe_presets(self, id_gewerbe):
         """set all branche values to db-presets of given gewerbe-id"""
         presets = self.presets[id_gewerbe]
@@ -430,7 +430,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
 
         reestimate_jobs = False
-        
+
         # set presets
         if self.par.changed('gebietstyp'):
             id_gewerbe = self.gewerbegebietstypen[params.gebietstyp.value]
@@ -445,33 +445,33 @@ class TbxNutzungenGewerbe(TbxNutzungen):
                 # set selection to "benutzerdefiniert" and recalc. jobs
                 self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
                 reestimate_jobs = True
-         
+
         auto_idx = self.par.auto_select.filter.list.index(
             self.par.auto_select.value)
-        
+
         if self.par.changed('auto_select'):
             # auto calc. entry
             if auto_idx == 0:
                 reestimate_jobs = True
                 params.arbeitsplaetze_insgesamt.enabled = False
             # manual entry
-            else:                
+            else:
                 params.arbeitsplaetze_insgesamt.enabled = True
-        
+
         if reestimate_jobs and auto_idx == 0:
             self.set_estimate_jobs()
             # ToDo write to gdb
-            
+
         return params
-    
+
     def set_estimate_jobs(self):
-        """calculate estimation of number of jobs and set value of corresponding 
+        """calculate estimation of number of jobs and set value of corresponding
         param 'arbeitsplaetze_insgesamt'"""
         flaeche = self.par.teilflaeche.value
         if not flaeche:
             return
         n_jobs = 0
-        
+
         flaechen_id, flaechenname, ha, ags = \
             self.teilflaechen[flaeche]
         gemeindetyp = get_gemeindetyp(ags)
@@ -480,7 +480,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             param = self.par[name]
             jobs_per_ha = kennwerte[param.id_branche]
             n_jobs += ha * (param.value / 100.) * jobs_per_ha
-        
+
         self.par.arbeitsplaetze_insgesamt.value = n_jobs
 
     def _updateMessages(self, params):

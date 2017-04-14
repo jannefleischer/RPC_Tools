@@ -25,7 +25,7 @@ class Nutzungen(Tool):
 
         projectname = self.par.projectname.value
         teilflaeche = self.par.teilflaeche.value
-        beginn_aufsiedlung = self.par.beginn_aufsiedlung.value
+        beginn_aufsiedlung = self.par.bezugsbeginn.value
         ### 1) Aufsiedlungszeitraum ###
         dauer_aufsiedlung = self.par.dauer_aufsiedlung.value
         ### 2) Wohnen - Anzahl Wohneinheiten nach Gebäudetypen ###
@@ -34,10 +34,10 @@ class Nutzungen(Tool):
         we_rh = self.par.we_rh.value
         we_mfh = self.par.we_mfh.value
         ### 3) Wohnen - Anteile Eigentum und Miete ###
-        ant_eigentum_efh = self.par.ant_eigentum_efh.value
-        ant_eigentum_zfh = self.par.ant_eigentum_zfh.value
-        ant_eigentum_rh = self.par.ant_eigentum_rh.value
-        ant_eigentum_mfh = self.par.ant_eigentum_mfh.value
+        #ant_eigentum_efh = self.par.ant_eigentum_efh.value
+        #ant_eigentum_zfh = self.par.ant_eigentum_zfh.value
+        #ant_eigentum_rh = self.par.ant_eigentum_rh.value
+        #ant_eigentum_mfh = self.par.ant_eigentum_mfh.value
         ### 4) Wohnen - Einwohner pro Wohneinheit ###
         ew_je_we_efh = self.par.ew_je_we_efh.value
         ew_je_we_zfh = self.par.ew_je_we_zfh.value
