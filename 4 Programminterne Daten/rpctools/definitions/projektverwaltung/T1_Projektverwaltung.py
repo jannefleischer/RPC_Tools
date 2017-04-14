@@ -17,15 +17,18 @@ from os.path import join, isdir
 import os
 import shutil
 import gc
+import arcpy
+
 from rpctools.utils.params import Tool
 from rpctools.utils.spatial_lib import get_ags
 from rpctools.utils.spatial_lib import get_gemeindetyp
 from rpctools.utils.constants import Nutzungsart
 from rpctools.utils.encoding import encode
-import arcpy
+
+from rpctools.definitions.diagram_teilflaechen import DiaTeilflaechen
 
 
-class Projektverwaltung(Tool):
+class Projektverwaltung(DiaTeilflaechen):
 
     _param_projectname = 'name'
     _dbname = 'FGDB_Definition_Projekt.gdb'
@@ -35,6 +38,7 @@ class Projektverwaltung(Tool):
         gc.collect()
 
         arcpy.AddMessage(self.par.action.value)
+        self.output.define_projection()
 
         if self.par.action.value == "Neues Projekt anlegen":
             self.projekt_anlegen()
@@ -51,33 +55,15 @@ class Projektverwaltung(Tool):
             self.remove_project_from_output()
 
     def add_output_new_project(self):
+        # add Teilflächen
         fc = self.folders.get_table("Teilflaechen_Plangebiet")
         layer = self.folders.get_layer("Teilflächen des Plangebiets")
-        self.output.add_output("projektdefinition", fc, layer)
+        self.output.add_output("projektdefinition", layer, fc)
 
-    def add_diagramm(self):
-        # Erstelle Diagramm Teilflaechen nach Hektar
-        project_name = self.par.name.value
-        out_graph_name = str(project_name) + ": Teilflächen nach Hektar"
-        input_template = self.folders.get_diagram_template(
-            'Teilflaechen_Hektar')
-        input_data = self.folders.get_table('Teilflaechen_Plangebiet',
-                                            check=False)
-        # Create the graph
-        graph = arcpy.Graph()
-        mxd = arcpy.mapping.MapDocument("CURRENT")
-        input_data = arcpy.mapping.ListLayers(mxd, "Teilflaechen_Plangebiet",
-                                              mxd.activeDataFrame)[0]
-        # Add a vertical bar series to the graph
-        graph.addSeriesBarVertical(dataSrc=input_data,
-                                   fieldY="Flaeche_ha",
-                                   fieldLabel="Name")
-        graph.graphPropsGeneral.title = encode("{}: Teilflächen des Plangebiets (Bruttofläche)".format(project_name))
-        arcpy.env.addOutputsToMap = True
-        arcpy.MakeGraph_management(input_template, graph, out_graph_name)
-        arcpy.env.addOutputsToMap = False
-        arcpy.RefreshActiveView()
-        arcpy.RefreshTOC()
+        # add OpenStreetmap
+        layer = self.folders.get_layer("OpenStreetMap")
+        self.output.add_output("hintergrundkarten", layer,
+                               zoom=False, in_project=False)
 
     def remove_project_from_output(self):
         """ToDo"""
@@ -176,9 +162,12 @@ class Projektverwaltung(Tool):
         project=project_name, check=False)
         if arcpy.Exists(tfl):
             arcpy.Delete_management(tfl)
-        espgcode_gk3 = 31467
-        sr = arcpy.SpatialReference(espgcode_gk3)
-        arcpy.Project_management(flaeche, tfl, sr)
+
+        # epsg-code or the
+        config = self.parent_tbx.config
+        sr = arcpy.SpatialReference(config.epsg)
+        transform_method = config.transformation
+        arcpy.Project_management(flaeche, tfl, sr, transform_method)
 
         gdbPfad = self.folders.get_db()
         arcpy.env.workspace = gdbPfad

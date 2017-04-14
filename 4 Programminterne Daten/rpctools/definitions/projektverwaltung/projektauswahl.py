@@ -10,4 +10,6 @@ class Projektauswahl(Projektverwaltung):
     def run(self):
         self.parent_tbx.config.active_project = self.par.active_project.value
         self.parent_tbx.config.write()
+        self.output.define_projection()
         self.add_output_new_project()
+        self.add_diagramm()

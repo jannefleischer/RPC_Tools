@@ -5,9 +5,10 @@ import os
 from collections import OrderedDict
 
 from rpctools.utils.params import Tool
+from rpctools.definitions.diagram_teilflaechen import DiaTeilflaechen
 
 
-class TeilflaechenVerwalten(Tool):
+class TeilflaechenVerwalten(DiaTeilflaechen):
 
     _param_projectname = 'projectname'
     _dbname = 'FGDB_Definition_Projekt.gdb'
@@ -16,4 +17,4 @@ class TeilflaechenVerwalten(Tool):
     def run(self):
         # atm there is nothing to do here, setting db is already done in toolbox
         # ToDo: add output layer
-        pass
+        self.add_diagramm()
