@@ -7,6 +7,34 @@ import arcpy
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 from rpctools.definitions.projektverwaltung.teilflaeche_verwalten import TeilflaechenVerwalten
+from rpctools.utils.constants import Nutzungsart
+
+
+class Teilflaeche(OrderedDict):
+    """Teilfläche with some attributes"""
+    def __init__(self, flaechen_id, name, ha, ags):
+        """
+        Parameters
+        ----------
+        flaechen_id : int
+        name : str
+        ha : float
+        ags : str
+        """
+        super(Teilflaeche, self).__init__()
+        self.flaechen_id = flaechen_id
+        self.name = name
+        self.ha = ha
+        self.ags = ags
+        # set the values as keys of the dict
+        self.update(((v, k) for (k, v) in self.__dict__.iteritems()
+                     if not k.startswith('_')))
+
+    @property
+    def where_clause(self):
+        """"""
+        where = '"id_teilflaeche" = {}'.format(self.flaechen_id)
+        return where
 
 
 class TbxFlaechendefinition(Tbx):
@@ -20,8 +48,25 @@ class TbxFlaechendefinition(Tbx):
     def teilflaechen_table(self):
         return self.folders.get_table('Teilflaechen_Plangebiet')
 
+    def get_teilflaeche(self, name):
+        # type: (str) -> Teilflaeche
+        """
+        return the teilflaeche
+
+        Parameters
+        ----------
+        name : str
+
+        Returns
+        -------
+        teilflaeche : Teilflaeche
+        """
+        teilflaeche = self.teilflaechen[name]
+        return teilflaeche
+
     @property
     def teilflaechen(self):
+        # type: () -> List[Teilflaeche]
         """dict of key/value pairs of pretty names of teilflaechen as keys and
         (id, name, ha, ags) as values"""
         return self._teilflaechen
@@ -59,7 +104,7 @@ class TbxFlaechendefinition(Tbx):
                 str(gemeinde),
                 '{} ha'.format(round(ha, 2))
             ])
-            teilflaechen[pretty] = flaechen_id, name, ha, ags
+            teilflaechen[pretty] = Teilflaeche(flaechen_id, name, ha, ags)
 
         return teilflaechen
 
@@ -103,7 +148,16 @@ class TbxFlaechendefinition(Tbx):
             params.teilflaeche.value = ''
             self.update_teilflaechen(self._nutzungsart)
 
+        if params.changed('teilflaeche'):
+            tfl = self.get_teilflaeche(params.teilflaeche.value)
+            self.update_teilflaechen_inputs(tfl.flaechen_id,
+                                            tfl.name)
+
         return params
+
+    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
+        """update all inputs based on currently selected teilflaeche"""
+
 
     def update_teilflaechen(self, nutzungsart=None):
         """update the parameter list of teilflaeche (opt. filter nutzungsart)"""
@@ -147,6 +201,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
             fields = ['nutzungsart', 'id']
             rows = arcpy.da.SearchCursor(table, fields)
             self._nutzungsarten = OrderedDict([r for r in rows])
+            del rows
         return self._nutzungsarten
 
     def _getParameterInfo(self):
@@ -175,15 +230,13 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
 
         flaeche = params.teilflaeche.value
         if flaeche:
-            flaechen_id, flaechenname, ha, ags = \
-                self.teilflaechen[params.teilflaeche.value]
-            if params.changed('projectname', 'teilflaeche'):
-                self.update_teilflaechen_inputs(flaechen_id, flaechenname)
+            tfl = self.get_teilflaeche(params.teilflaeche.value)
+            where_tfl = 'id_teilflaeche={}'.format(tfl.flaechen_id)
 
             if params.changed('name'):
                 self.update_table('Teilflaechen_Plangebiet',
                                   {'Name': params.name.value},
-                                  where='id_teilflaeche={}'.format(flaechen_id))
+                                  where=where_tfl)
                 # update teilflaechen but keep selected index
                 idx = self.par.selected_index('teilflaeche')
                 self.update_teilflaechen()
@@ -193,9 +246,23 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                 nutzungsart_id = self.nutzungsarten[params.nutzungsart.value]
                 self.update_table('Teilflaechen_Plangebiet',
                                   {'Nutzungsart': nutzungsart_id},
-                                  where='id_teilflaeche={}'.format(flaechen_id))
+                                  where=where_tfl)
+
                 # ToDo delete corresponding rows wohnen/gewerbe/einzelhandel
-                # if nutzungsart changed
+                # delete if Fläche is not Wohnen any more
+                if nutzungsart_id != Nutzungsart.WOHNEN:
+                    table = 'Wohnen_WE_in_Gebaeudetypen'
+                    self.delete_rows_in_table(
+                        table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
+                if nutzungsart_id != Nutzungsart.GEWERBE:
+                    table = ''
+                    #self.delete_rows_in_table(
+                        #table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
+                if nutzungsart_id != Nutzungsart.EINZELHANDEL:
+                    table = ''
+                    #self.delete_rows_in_table(
+                        #table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
+
 
         return params
 

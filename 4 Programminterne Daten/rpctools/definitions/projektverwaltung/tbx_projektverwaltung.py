@@ -25,6 +25,10 @@ class TbxProjektAnlegen(TbxProjektVerwaltung):
         return u'Projekt neu anlegen'
 
     @property
+    def category(self):
+        return u'Erstellen'
+
+    @property
     def Tool(self):
         return ProjektAnlegen
 
@@ -94,6 +98,10 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
         return u'Projekt kopieren'
 
     @property
+    def category(self):
+        return u'Erstellen'
+
+    @property
     def Tool(self):
         return ProjektKopieren
 
@@ -146,7 +154,7 @@ class TbxProjekteLoeschen(TbxProjektVerwaltung):
 
         # Bestehendes_Projekt_auswählen
         p = self.add_parameter('projekte')
-        p.name = encode('Projekt_auswählen')
+        p.name = encode('1-Projekt_auswählen')
         p.displayName = encode('Zu löschende Projekt auswählen')
         p.parameterType = 'Required'
         p.direction = 'Input'

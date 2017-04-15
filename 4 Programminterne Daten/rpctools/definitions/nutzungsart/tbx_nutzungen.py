@@ -43,6 +43,7 @@ class TbxNutzungen(TbxFlaechendefinition):
         param.direction = 'Input'
         param.datatype = u'Long'
         param.filter.type = 'Range'
+        # ToDo: Jahre an die Jahre der Projektdefinition anpassen
         param.filter.list = [2010, 2050]
         param.value = 2018
         param.category = heading
@@ -65,12 +66,86 @@ class TbxNutzungen(TbxFlaechendefinition):
 
         return params
 
+    def _updateParameters(self, params):
+        params = super(TbxNutzungen, self)._updateParameters(params)
+
+        flaeche = params.teilflaeche.value
+        if flaeche:
+            tfl = self.get_teilflaeche(params.teilflaeche.value)
+
+            if params.changed('bezugsbeginn', 'dauer_aufsiedlung'):
+                table = 'Teilflaechen_Plangebiet'
+                column_values = dict(
+                    Beginn_Nutzung=params.bezugsbeginn.value,
+                    Aufsiedlungsdauer=params.dauer_aufsiedlung.value)
+                self.update_table(table, column_values, tfl.where_clause)
+
+        return params
+
+    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
+        """update all inputs based on currently selected teilflaeche"""
+        columns = ['Beginn_Nutzung', 'Aufsiedlungsdauer']
+        pkey = dict(id_teilflaeche=flaechen_id)
+        rows = self.query_table('Teilflaechen_Plangebiet',
+                                columns,
+                                pkey=pkey)
+        for row in rows:
+            self.par.bezugsbeginn.value = row[0]
+            self.par.dauer_aufsiedlung.value = row[1]
+
+
+class Gebaeudetyp(object):
+    def __init__(self,
+                 typ_id,
+                 name,
+                 param_we,
+                 param_ew_je_we,
+                 display_name,
+                 default_ew_je_we):
+        """
+        Gebäudetyp
+
+        Parameters
+        ----------
+        typ_id : int
+        name : str
+        param_we : str
+        param_ew_je_we : str
+        display_name : str
+        default_ew_je_we : str
+        """
+        self.typ_id = typ_id
+        self.name = name
+        self.param_we = param_we
+        self.param_ew_je_we = param_ew_je_we
+        self.display_name = display_name
+        self.default_ew_je_we = default_ew_je_we
+
+
+class Gebaeudetypen(OrderedDict):
+    """ToDo: Get From BaseTable Wohnen_Gebaeudetypen"""
+    def __init__(self, folders):
+        super(Gebaeudetypen, self).__init__()
+        table = folders.get_base_table(
+            'FGDB_Definition_Projekt_Tool.gdb', 'Wohnen_Gebaeudetypen')
+        fields = ['IDGebaeudetyp', 'NameGebaeudetyp', 'param_we',
+                  'param_ew_je_we', 'display_name', 'default_ew_je_we']
+        rows = arcpy.da.SearchCursor(table, fields)
+        for row in rows:
+            self[row[0]] = Gebaeudetyp(*row)
+        del rows
+
+
 
 class TbxNutzungenWohnen(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='a', name='Wohnen')
     _nutzungsart = Nutzungsart.WOHNEN
 
-    ew_je_we_range = [str(r / 10.0).replace('.', ',') for r in range(10, 50)]
+    ew_je_we_range = [r / 10.0 for r in range(10, 50)]
+
+    def __init__(self):
+        super(TbxNutzungenWohnen, self).__init__()
+        self.gebaeudetypen = Gebaeudetypen(self.folders)
 
     @property
     def Tool(self):
@@ -88,112 +163,83 @@ class TbxNutzungenWohnen(TbxNutzungen):
 
         heading = encode(u"2) Anzahl Wohneinheiten nach Gebäudetypen")
 
-        # Anzahl WE in Einfamilienhäusern
-        param = self.add_parameter('we_efh')
-        param.name = encode(u'Bewohner Einfamilienhaus')
-        param.displayName = encode(u'Anzahl WE in Einfamilienhäusern')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'0'
-        param.filter.type = 'Range'
-        param.filter.list = [0, 500]
-        param.category = heading
-
-        # Anzahl WE in Doppelhäusern
-        param = self.add_parameter('we_zfh')
-        param.name = encode(u'Bewohner Doppelhaus')
-        param.displayName = encode(u'Anzahl WE in Doppelhäusern')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'0'
-        param.filter.type = 'Range'
-        param.filter.list = [0, 500]
-
-        param.category = heading
-
-        # Anzahl WE in Reihenhäusern
-        param = self.add_parameter('we_rh')
-        param.name = encode(u'Bewohner Reihenhaus')
-        param.displayName = encode(u'Anzahl WE in Reihenhäusern')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'0'
-        param.filter.type = 'Range'
-        param.filter.list = [0, 500]
-
-        param.category = heading
-
-        # Anzahl WE in Mehrfamilienhäusern
-        param = self.add_parameter('we_mfh')
-        param.name = encode(u'Bewohner Mehrfamilienhaus')
-        param.displayName = encode(u'Anzahl WE in Mehrfamilienhäusern')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = u'0'
-        param.filter.type = 'Range'
-        param.filter.list = [0, 500]
-        param.category = heading
+        for gt in self.gebaeudetypen.itervalues():
+            assert isinstance(gt, Gebaeudetyp)
+            # Anzahl WE in Gebäudetypen
+            param = self.add_parameter(gt.param_we)
+            param.name = encode(u'Bewohner {}'.format(gt.display_name))
+            param.displayName = encode(u'Anzahl WE in {}'.format(gt.display_name))
+            param.parameterType = 'Required'
+            param.direction = 'Input'
+            param.datatype = u'Long'
+            param.value = u'0'
+            param.filter.type = 'Range'
+            param.filter.list = [0, 500]
+            param.category = heading
 
         heading = ("3) Mittlere Anzahl Einwohner pro Wohneinheit " +
                    "(3 Jahre nach Bezug)")
 
-        # Mittlere Anzahl Einwohner pro WE in Einfamilienhäusern
-        # (kurz nach dem Bezug)
-        param = self.add_parameter('ew_je_we_efh')
-        param.name = u'Bewohner Einfamilienhaus kndB'
-        param.displayName = encode(u'in Einfamilienhäusern')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPDouble'
-        param.value = '3,2'
-        param.filter.list = self.ew_je_we_range
-        param.category = heading
-
-        # Mittlere Anzahl Einwohner pro WE in Doppelhäusern
-        # (kurz nach dem Bezug)
-        param = self.add_parameter('ew_je_we_zfh')
-        param.name = u'Bewohner Doppelhäuser kndB'
-        param.displayName = encode(u'in Doppelhäusern')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPString'
-        param.value = '3,0'
-        param.filter.list = self.ew_je_we_range
-        param.category = heading
-
-        # Mittlere Anzahl Einwohner pro WE in Reihenhäusern
-        # (kurz nach dem Bezug)
-        param = self.add_parameter('ew_je_we_rh')
-        param.name = u'Bewohner Reihenhaus kndB'
-        param.displayName = encode(u'in Reihenhäusern')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPString'
-        param.value = '3,0'
-        param.filter.list = self.ew_je_we_range
-        param.category = heading
-
-        # Mittlere Anzahl Einwohner pro WE in Mehrfamilienhäusern kurz nach
-        # dem Bezug
-        param = self.add_parameter('ew_je_we_mfh')
-        param.name = u'Bewohner Mehrfamilienhaus kndB'
-        param.displayName = encode(u'in Mehrfamilienhäusern')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPString'
-        param.value = '2,1'
-        param.filter.list = self.ew_je_we_range
-        param.category = heading
+        for gt in self.gebaeudetypen.itervalues():
+            assert isinstance(gt, Gebaeudetyp)
+            # Mittlere Anzahl Einwohner pro WE in Einfamilienhäusern
+            # (kurz nach dem Bezug)
+            param = self.add_parameter(gt.param_ew_je_we)
+            param.name = encode(u'EW_JE_WE {}'.format(gt.display_name))
+            param.displayName = encode(u'in {}'.format(gt.display_name))
+            param.parameterType = 'Required'
+            param.direction = 'Input'
+            param.datatype = u'GPDouble'
+            param.value = gt.default_ew_je_we
+            param.filter.list = self.ew_je_we_range
+            param.category = heading
 
         return params
 
     def _updateParameters(self, params):
         params = super(TbxNutzungenWohnen, self)._updateParameters(params)
+
+        flaeche = params.teilflaeche.value
+        if flaeche:
+            tfl = self.get_teilflaeche(params.teilflaeche.value)
+
+            for gt in self.gebaeudetypen.itervalues():
+                assert isinstance(gt, Gebaeudetyp)
+                if params.changed(gt.param_we, gt.param_ew_je_we):
+                    table = 'Wohnen_WE_in_Gebaeudetypen'
+                    pkey = dict(IDTeilflaeche=tfl.flaechen_id,
+                                IDGebaeudetyp=gt.typ_id)
+                    column_values = dict(
+                        Gebaeudetyp=gt.name,
+                        WE=params[gt.param_we].value,
+                        EW_je_WE=params[gt.param_ew_je_we].value,
+                    )
+                    r = self.upsert_row_in_table(table, column_values, pkey)
+
         return params
+
+    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
+        """update all inputs based on currently selected teilflaeche"""
+        super(TbxNutzungenWohnen, self).update_teilflaechen_inputs(
+            flaechen_id,flaechenname)
+        columns = ['IDGebaeudetyp', 'WE', 'EW_je_WE']
+        pkey = dict(IDTeilflaeche=flaechen_id)
+        rows = self.query_table('Wohnen_WE_in_Gebaeudetypen',
+                                columns,
+                                pkey=pkey)
+
+        # if there are no values defined yet, set to default values
+        if not rows:
+            for gt in self.gebaeudetypen.itervalues():
+                self.par[gt.param_we].value = 0
+                self.par[gt.param_ew_je_we].value = gt.default_ew_je_we
+
+        # otherwise, ubdate parameters from query
+        for row in rows:
+            gt = self.gebaeudetypen[row[0]]
+            assert isinstance(gt, Gebaeudetyp)
+            self.par[gt.param_we].value = row[1]
+            self.par[gt.param_ew_je_we].value = row[2]
 
     def _updateMessages(self, params):
         pass
@@ -472,14 +518,13 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             return
         n_jobs = 0
 
-        flaechen_id, flaechenname, ha, ags = \
-            self.teilflaechen[flaeche]
-        gemeindetyp = get_gemeindetyp(ags)
+        tfl = self.teilflaechen[flaeche]
+        gemeindetyp = get_gemeindetyp(tfl.ags)
         kennwerte = self.dichtekennwerte[gemeindetyp]
         for name in self.branche_params:
             param = self.par[name]
             jobs_per_ha = kennwerte[param.id_branche]
-            n_jobs += ha * (param.value / 100.) * jobs_per_ha
+            n_jobs += tfl.ha * (param.value / 100.) * jobs_per_ha
 
         self.par.arbeitsplaetze_insgesamt.value = n_jobs
 
