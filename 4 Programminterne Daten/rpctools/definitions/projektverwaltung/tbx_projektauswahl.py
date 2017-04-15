@@ -51,9 +51,9 @@ class TbxProjektauswahl(Tbx):
 
 
 if __name__ == '__main__':
-    t=TbxProjektauswahl()
+    t = TbxProjektauswahl()
     params = t.getParameterInfo()
-    print(t.print_test_parameters())
+    t.print_test_parameters()
     t.par.active_project.value = 'abc'
     t.execute()
 

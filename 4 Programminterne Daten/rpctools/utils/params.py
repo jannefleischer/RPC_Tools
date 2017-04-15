@@ -94,7 +94,12 @@ class Tool(object):
         if messages:
             self.mes = messages
         gc.collect()
+        # Set the progressor
+        arcpy.SetProgressor("step",
+                            "Executing Tool {}...".format(self.__class__),
+                            0, 100, 1)
         self.run()
+        arcpy.ResetProgressor()
 
     @property
     def db(self):
