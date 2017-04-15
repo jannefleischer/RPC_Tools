@@ -6,7 +6,7 @@ import os
 from abc import ABCMeta, abstractmethod, abstractproperty
 from rpctools.utils.config import Folders
 from rpctools.utils.config import Config
-from rpctools.utils.output import Output
+from rpctools.utils.output import Output, ArcpyEnv
 from rpctools.utils.message import Message
 from rpctools.utils.singleton import Singleton
 from rpctools.utils.param_module import Params
@@ -497,12 +497,8 @@ class Tbx(object):
         if arcpy.Exists(temp_db):
             arcpy.Delete_management(temp_db)
         # deactivate adding of temp. gdbs to table of contents
-        old_state = arcpy.env.addOutputsToMap
-        arcpy.env.addOutputsToMap = False
-        arcpy.Copy_management(project_db, temp_db)
-        #self.tool.output.change_layers_workspace(project_db, temp_db)
-        #arcpy.RefreshActiveView()
-        arcpy.env.addOutputsToMap = old_state
+        with ArcpyEnv(addOutputsToMap=False):
+            arcpy.Copy_management(project_db, temp_db)
 
     def _commit_temporaries(self):
         """transfer all changes made in temporary tables into project tables"""
@@ -511,32 +507,41 @@ class Tbx(object):
         arcpy.AddMessage(
             u'Getätigte Änderungen werden in das Projekt übernommen...'.encode('latin1'))
 
-        old_state = arcpy.env.overwriteOutput
-        arcpy.env.overwriteOutput = True
-        changes = 0
-        for project in self.folders.get_temporary_projects():
-            for fgdb in self._temporary_gdbs:
-                project_db = self.folders.get_db(workspace=fgdb,
-                                                 project=project)
-                temp_db = self.folders.get_temporary_db(fgdb=fgdb,
-                                                        project=project,
-                                                        check=False)
-                # temporary dbs only exist, if changes were made (else nothing
-                # to do here)
-                if arcpy.Exists(temp_db):
-                    self.tool.output.change_layers_workspace(project_db, temp_db)
-                    arcpy.Compact_management(project_db)
-                    arcpy.Delete_management(project_db)
-                    arcpy.Copy_management(temp_db, project_db)
-                    #self.tool.output.change_layers_workspace(temp_db, project_db)
-                    # repair datasource of layers that reference the project_db
-                    # which was temporarily deleted
-                    self.tool.output.change_layers_workspace(temp_db, project_db)
-                    changes += 1
+        with ArcpyEnv(overwriteOutput=True):
+            changes = 0
+            for project in self.folders.get_temporary_projects():
+                for fgdb in self._temporary_gdbs:
+                    project_db = self.folders.get_db(workspace=fgdb,
+                                                     project=project)
+                    temp_db = self.folders.get_temporary_db(fgdb=fgdb,
+                                                            project=project,
+                                                            check=False)
+                    # temporary dbs only exist,
+                    # if changes were made (else nothing to do here)
+                    if arcpy.Exists(temp_db):
+                        changes += self._replace_with_tempdb(temp_db,
+                                                             project_db)
+                arcpy.AddMessage(
+                    '{} Datenbank(en) wurden erfolgreich geändert'.format(changes))
 
-            arcpy.AddMessage(
-                '{} Datenbank(en) wurden erfolgreich geändert'.format(changes))
-        arcpy.env.overwriteOutput = old_state
+    def _replace_with_tempdb(self, temp_db, project_db):
+        """
+        replace project_db with temp_db
+
+        Parameters
+        ----------
+        temp_db : str
+        project_db : str
+        """
+        self.tool.output.change_layers_workspace(project_db, temp_db)
+        res = arcpy.Compact_management(project_db)
+        del res
+        arcpy.Delete_management(project_db)
+        arcpy.Copy_management(temp_db, project_db)
+        # repair datasource of layers that reference the project_db
+        # which was temporarily deleted
+        self.tool.output.change_layers_workspace(temp_db, project_db)
+        return 1
 
     def execute(self, parameters=None, messages=None):
         """

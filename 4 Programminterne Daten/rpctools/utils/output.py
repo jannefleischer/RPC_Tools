@@ -5,6 +5,62 @@ from collections import OrderedDict
 import arcpy
 
 
+class ArcpyEnv(object):
+    """
+    Context Manager to backup arcpy-environment values, set new one
+    and restore the backuped files later
+    """
+
+    def __init__(self, object_to_backup=arcpy.env, **kwargs):
+        """
+        Params
+        ------
+        object_to_backup : object, optional(Default=arcpy.env)
+        *kwargs : one or more key=value
+            the arcpy.env.attributes to backup
+
+        Examples
+        --------
+        >>> my_object = OrderedDict()
+        >>> my_object.aaa = 11
+        >>> my_object.bbb = 22
+        >>> with ArcpyEnv(bbb=99, aaa=22, object_to_backup=my_object):
+        ...     print(my_object.aaa)
+        ...     print(my_object.bbb)
+        ...     my_object.aaa = 77
+        ...     print(my_object.aaa)
+        22
+        99
+        77
+        >>> my_object.aaa
+        11
+        >>> my_object.bbb
+        22
+        >>> with ArcpyEnv(bbb=99, aaa=22, object_to_backup=my_object):
+        ...     my_object.aaa = 77
+        ...     raise ValueError('Error')
+        Traceback (most recent call last):
+            ...
+        ValueError: Error
+        >>> my_object.aaa
+        11
+        >>> my_object.bbb
+        22
+        """
+        self._object_to_backup = object_to_backup
+        self._kwargs = kwargs
+        self._backups = dict()
+
+    def __enter__(self):
+        for attr, value in self._kwargs.iteritems():
+            self._backups[attr] = getattr(self._object_to_backup, attr)
+            setattr(self._object_to_backup, attr, value)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        for attr, value in self._backups.iteritems():
+            setattr(self._object_to_backup, attr, value)
+
+
 class LayerGroup(OrderedDict):
     """"""
     def __init__(self, label='root'):
@@ -522,12 +578,8 @@ class Output(object):
         out_graph_name : str
             the name of the graph to create
         """
-        arcpy.env.addOutputsToMap = True
-        old_overwrite = arcpy.env.overwriteOutput
-        arcpy.env.overwriteOutput = True
-        arcpy.MakeGraph_management(input_template, graph, out_graph_name)
-        arcpy.env.addOutputsToMap = False
-        arcpy.env.overwriteOutput = old_overwrite
+        with ArcpyEnv(addOutputsToMap=True, overwriteOutput=True):
+            arcpy.MakeGraph_management(input_template, graph, out_graph_name)
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
 
