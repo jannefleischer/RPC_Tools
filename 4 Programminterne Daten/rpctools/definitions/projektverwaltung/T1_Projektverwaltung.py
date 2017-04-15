@@ -33,27 +33,6 @@ class Projektverwaltung(DiaTeilflaechen):
     _param_projectname = 'name'
     _dbname = 'FGDB_Definition_Projekt.gdb'
 
-    def run(self):
-        # prevent eventual locks
-        gc.collect()
-
-        arcpy.AddMessage(self.par.action.value)
-        self.output.define_projection()
-
-        if self.par.action.value == "Neues Projekt anlegen":
-            self.projekt_anlegen()
-            self.add_output_new_project()
-            self.add_diagramm()
-
-        elif self.par.action.value == "Bestehendes Projekt kopieren":
-            self.projekt_kopieren()
-            self.add_output_new_project()
-
-        else:
-            self._param_projectname = 'existing_project'
-            self.projekt_loeschen()
-            self.remove_project_from_output()
-
     def add_output_new_project(self):
         # add Teilflächen
         fc = self.folders.get_table("Teilflaechen_Plangebiet")
@@ -65,101 +44,126 @@ class Projektverwaltung(DiaTeilflaechen):
         self.output.add_output("hintergrundkarten", layer,
                                zoom=False, in_project=False)
 
-    def remove_project_from_output(self):
-        """ToDo"""
 
-    def projekt_loeschen(self):
-        projektName = self.par.existing_project.value
-        arcpy.AddMessage("Projektname: " + projektName)
-        # Mit dem Projektnamen zum neuen Projektpfad zusammenführen"
-        projektPfad = self.folders.get_projectpath(projektName)
-        arcpy.AddMessage("Suche Ordner: " + projektPfad)
+class ProjektAnlegen(Projektverwaltung):
+    """Projet neu anlegen"""
 
-        # entferne alle aktuellen Layer aus dem TOC (Locks aufheben)
-        arcpy.AddMessage("Loese aktive Layer aus MXD \n")
-        mxd = arcpy.mapping.MapDocument("CURRENT")
-        for df in arcpy.mapping.ListDataFrames(mxd):
-            for lyr in arcpy.mapping.ListLayers(mxd, "", df):
-                arcpy.mapping.RemoveLayer(df, lyr)
-        del mxd
-
-        try:
-
-            # Überprüfen, ob der Projektordner existiert
-            if(isdir(projektPfad)):
-                arcpy.AddMessage("Projektordner gefunden \n")
-                shutil.rmtree(projektPfad)
-                arcpy.AddMessage("Projektordner gelöscht \n")
-            else:
-                arcpy.AddMessage("Projektordner " + projektName + " nicht gefunden \n")
-
-            arcpy.AddMessage("*********************************************************************************")
-            arcpy.AddMessage("Das Projekt " + projektName + " wurde erfolgreich entfernt \n")
-
-        except Exception as e:
-            arcpy.AddMessage(e)
-
-    def projekt_kopieren(self):
-        try:
-            # get new Project Name as input
-            projectNameOld = self.par.existing_project.value
-            # allow the upload of a shapefile containg the projektgebiet
-            project_name = self.par.name.value
-
-            # copy template folder
-            template_path = self.folders.get_projectpath()
-            project_path = join(self.folders.PROJECT_BASE_PATH, project_name)
-
-            try:
-                shutil.copytree(template_path, project_path)
-            except Exception as e:
-                arcpy.AddMessage(e)
-                arcpy.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
-                arcpy.AddMessage("Es scheint bereits ein Projekt mit diesem Namen zu existieren")
-                arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein oder nutzen Sie die 'Projekt löschen' Funktion in der Toolbox")
-                sys.exit()
-
-            # output information to user
-            arcpy.AddMessage("Succesfully copied")
-            arcpy.AddMessage("New Project registered at {}".format(project_path))
-        except Exception as e:
-            arcpy.AddMessage(e)
+    def run(self):
+        """"""
+        gc.collect()
+        self.output.define_projection()
+        self.projekt_anlegen()
+        self.add_output_new_project()
+        self.add_diagramm()
 
     def projekt_anlegen(self):
+        """Projekt anlegen"""
         arcpy.env.overwriteOutput = True
 
         # get new Project input Data
-        project_name = self.par.name.value
+        project_name = self.projectname
         flaeche = self.par.shapefile.value
         beginn_betrachtung = self.par.begin.value
         ende_betrachtung = self.par.end.value
-        project_path = join(self.folders.PROJECT_BASE_PATH, project_name)
+        project_path = self.folders.get_projectpath(check=False)
 
-        # check if  a) all ags of teilflaechen are identical and
-        #           b) maximal distance of teilflaechen smaller than x
+        ags_projekt, gemeindename_projekt = self.get_gemeinde()
 
-        # to do (Stefaan)
-        ags_projekt = '02000000' # wird nebenbei bestimmt
-        gemeindename_projekt = "Hamburg"# nebenbei bestimmen
+        self.copy_template(project_path)
+
+        tfl, gdbPfad = self.copy_teilflaechen_to_gdb(project_name, flaeche)
+
+        self.calculate_teilflaechen_attributes(tfl,
+                                               beginn_betrachtung,
+                                               ags_projekt,
+                                               gemeindename_projekt)
 
 
-        # copy template folder
-        try:
-            shutil.copytree(self.folders.PROJECT_TEMPLATE, project_path)
-        except Exception as e:
-            arcpy.AddMessage(e)
-            print e
-            arcpy.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
-            arcpy.AddMessage("Es scheint bereits ein Projekt mit diesem " +
-                             "Namen zu existieren")
-            arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein oder " +
-                             "nutzen Sie die 'Projekt löschen' Funktion in " +
-                             "der Toolbox")
-            sys.exit()
+        self.set_projektrahmendaten(ags_projekt,
+                                    project_name,
+                                    beginn_betrachtung,
+                                    ende_betrachtung,
+                                    gemeindename_projekt)
 
-        # add layer teilflächen to gdb
+        self.add_minimap(project_path, gdbPfad)
+
+
+        # output information to user
+        arcpy.AddMessage("Basisdaten erfolgreich kopiert \n")
+
+        arcpy.AddMessage("Neues Projekt angelegt im Ordner {}\n".format(
+            project_path))
+
+    def set_projektrahmendaten(self,
+                               ags_projekt,
+                               project_name,
+                               beginn_betrachtung,
+                               ende_betrachtung,
+                               gemeindename_projekt):
+        """add project-data to Projektrahmendaten"""
+        arcpy.SetProgressorLabel('Projektrahmendaten berechnen')
+        arcpy.SetProgressorPosition(50)
+
+        gemeindetyp = get_gemeindetyp(ags_projekt)
+
+        # loesche ggf. vorhandene zeilen in den Projektrahmendaten und fuege neue daten danach hinzu
+        projektrahmendaten = self.folders.get_table(tablename="Projektrahmendaten",
+                                                    project=project_name)
+        arcpy.DeleteRows_management(projektrahmendaten)
+
+        cursor = arcpy.InsertCursor(projektrahmendaten)
+        row = cursor.newRow()
+        row.BEGINN_BETRACHTUNGSZEITRAUM = beginn_betrachtung
+        row.ENDE_BETRACHTUNGSZEITRAUM = ende_betrachtung
+        row.GEMEINDENAME = gemeindename_projekt
+        row.PROJEKTNAME = project_name
+        row.AGS = ags_projekt
+        row.GEMEINDETYP = gemeindetyp
+        cursor.insertRow(row)
+        del cursor, row
+
+    def calculate_teilflaechen_attributes(self,
+                                          tfl,
+                                          beginn_betrachtung,
+                                          ags_projekt,
+                                          gemeindename_projekt):
+        """Attribute berechnen"""
+        arcpy.SetProgressorLabel('Teilflächen-Attribute berechnen')
+        arcpy.SetProgressorPosition(40)
+
+        # Berechne ha der Teilflaechen
+        arcpy.CalculateField_management(tfl,
+                                        "Flaeche_ha",
+                                        "!SHAPE.AREA@HECTARES!",
+                                        "PYTHON_9.3", "")
+
+        # Berechne Gauß-Krüger-Koordinaten
+        arcpy.AddGeometryAttributes_management(
+            Input_Features=tfl, Geometry_Properties="CENTROID_INSIDE")
+
+        # Berechne Umfang der Flächen
+        arcpy.CalculateField_management(tfl, "umfang_meter",
+                                        "!shape.length@METER!", "PYTHON_9.3")
+
+        cursor = arcpy.UpdateCursor(tfl)
+        for i, row in enumerate(cursor):
+            row.setValue("id_teilflaeche", i + 1)
+            row.setValue("Nutzungsart", Nutzungsart.UNDEFINIERT)
+            row.setValue("Name", "Flaeche_" + str(i + 1))
+            row.setValue("Aufsiedlungsdauer", 1)
+            row.setValue("validiert", 0)
+            row.setValue("Beginn_Nutzung", beginn_betrachtung)
+            row.setValue("ags_bkg", ags_projekt)
+            row.setValue("gemeinde_name", gemeindename_projekt)
+            cursor.updateRow(row)
+
+    def copy_teilflaechen_to_gdb(self, project_name, flaeche):
+        """add layer teilflächen to gdb"""
+        arcpy.SetProgressorLabel('Teilflächen laden')
+        arcpy.SetProgressorPosition(30)
+
         tfl = self.folders.get_table('Teilflaechen_Plangebiet',
-        project=project_name, check=False)
+                                     project=project_name, check=False)
         if arcpy.Exists(tfl):
             arcpy.Delete_management(tfl)
 
@@ -196,55 +200,31 @@ class Projektverwaltung(DiaTeilflaechen):
         arcpy.AddField_management(tfl, "gemeinde_name", "TEXT")
         arcpy.AddField_management(tfl, "validiert", "SHORT")
         #arcpy.AddField_management(teilfaechen_plangebiet, "Bilanzsumme", "FLOAT")
+        return tfl, gdbPfad
 
-        # Berechne ha der Teilflaechen
-        arcpy.CalculateField_management(tfl,
-                                        "Flaeche_ha",
-                                        "!SHAPE.AREA@HECTARES!",
-                                        "PYTHON_9.3", "")
+    def copy_template(self, project_path):
+        """copy template folder"""
+        arcpy.SetProgressorLabel('Kopiere Template-Ordner')
+        arcpy.SetProgressorPosition(20)
 
-        # Berechne Gauß-Krüger-Koordinaten
-        arcpy.AddGeometryAttributes_management(
-            Input_Features = tfl, Geometry_Properties="CENTROID_INSIDE")
+        try:
+            shutil.copytree(self.folders.PROJECT_TEMPLATE, project_path)
+        except Exception as e:
+            arcpy.AddMessage(e)
+            print e
+            arcpy.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
+            arcpy.AddMessage("Es scheint bereits ein Projekt mit diesem " +
+                             "Namen zu existieren")
+            arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein oder " +
+                             "nutzen Sie die 'Projekt löschen' Funktion in " +
+                             "der Toolbox")
+            sys.exit()
 
-        # Berechne Umfang der Flächen
-        arcpy.CalculateField_management(tfl, "umfang_meter",
-                                        "!shape.length@METER!", "PYTHON_9.3")
+    def add_minimap(self, project_path, gdbPfad):
+        """Minimap erzeugen"""
+        arcpy.SetProgressorLabel('Minimap erzeugen')
+        arcpy.SetProgressorPosition(60)
 
-        cursor = arcpy.UpdateCursor(tfl)
-        for i, row in enumerate(cursor):
-            row.setValue("id_teilflaeche", i + 1)
-            row.setValue("Nutzungsart", Nutzungsart.UNDEFINIERT)
-            row.setValue("Name", "Flaeche_" + str(i + 1))
-            row.setValue("Aufsiedlungsdauer", 1)
-            row.setValue("validiert", 0)
-            row.setValue("Beginn_Nutzung", beginn_betrachtung)
-            row.setValue("ags_bkg", ags_projekt)
-            row.setValue("gemeinde_name", gemeindename_projekt)
-            cursor.updateRow(row)
-
-
-        # add project-data to Projektrahmendaten
-        gemeindetyp = get_gemeindetyp(ags_projekt)
-
-        # loesche ggf. vorhandene zeilen in den Projektrahmendaten und fuege neue daten danach hinzu
-        projektrahmendaten = self.folders.get_table(tablename="Projektrahmendaten",
-                                                    project=project_name)
-        arcpy.DeleteRows_management(projektrahmendaten)
-
-        cursor = arcpy.InsertCursor(projektrahmendaten)
-        row = cursor.newRow()
-        row.BEGINN_BETRACHTUNGSZEITRAUM = beginn_betrachtung
-        row.ENDE_BETRACHTUNGSZEITRAUM = ende_betrachtung
-        row.GEMEINDENAME = gemeindename_projekt
-        row.PROJEKTNAME = project_name
-        row.AGS = ags_projekt
-        row.GEMEINDETYP = gemeindetyp
-        cursor.insertRow(row)
-
-        del cursor, row
-
-        # Minimap erzeugen
         schrittmeldung = 'Erzeuge Uebersichtskarte \n'
         arcpy.AddMessage(schrittmeldung)
         print schrittmeldung
@@ -259,11 +239,15 @@ class Projektverwaltung(DiaTeilflaechen):
         mxdpfad = join(ausgabeordner_img, 'Definition_Projekt.mxd')
         mxd_template.saveACopy(mxdpfad)
 
+        arcpy.SetProgressorPosition(70)
+
         # Ersetze Datenquelle
         minimap_mxd = arcpy.mapping.MapDocument(mxdpfad)
         templatepath = join(template_folder, "template.gdb")
         resultpath = gdbPfad
         minimap_mxd.findAndReplaceWorkspacePaths(templatepath, resultpath)
+
+        arcpy.SetProgressorPosition(80)
 
         # Setze Viewport neu
         df = arcpy.mapping.ListDataFrames(minimap_mxd)[0]
@@ -277,6 +261,8 @@ class Projektverwaltung(DiaTeilflaechen):
         minimap_mxd.save()
         del mxd_template
 
+        arcpy.SetProgressorPosition(90)
+
         # Exportiere Ergebnis
         minimap = join(ausgabeordner_img, 'Minimap.jpg')
         arcpy.mapping.ExportToJPEG(
@@ -285,11 +271,125 @@ class Projektverwaltung(DiaTeilflaechen):
             "PAGE_LAYOUT",
             resolution=150)
 
+    def get_gemeinde(self):
+        """Verschneide Teilflächen mit Gemeinde"""
+        # to do (Stefaan)
+        arcpy.SetProgressorLabel('Verschneide Teilflächen mit Gemeinde')
+        arcpy.SetProgressorPosition(10)
 
-    # output information to user
-        print("Basisdaten erfolgreich kopiert")
-        arcpy.AddMessage("Basisdaten erfolgreich kopiert \n")
-        # print("Neues Projekt angelegt im Ordner " + projectPath)
+        ags_projekt = '02000000' # wird nebenbei bestimmt
+        gemeindename_projekt = "Hamburg"# nebenbei bestimmen
 
-        arcpy.AddMessage("Neues Projekt angelegt im Ordner {}\n".format(
-            project_path))
+        # check if  a) all ags of teilflaechen are identical ?!?!? and
+        #           b) maximal distance of teilflaechen smaller than x
+
+        return ags_projekt, gemeindename_projekt
+
+
+class ProjektKopieren(Projektverwaltung):
+    _param_projectname = 'name'
+
+    def run(self):
+        """"""
+        self.output.define_projection()
+        self.projekt_kopieren()
+        self.add_output_new_project()
+        self.add_diagramm()
+
+    def projekt_kopieren(self):
+        """"""
+        arcpy.SetProgressorLabel('Kopiere Projekt')
+        arcpy.SetProgressorPosition(10)
+
+        # get new Project Name as input
+        projectNameOld = self.par.existing_project.value
+
+        # copy template folder
+        template_path = self.folders.get_projectpath(projectNameOld)
+        project_path = self.folders.get_projectpath(check=False)
+
+        try:
+            shutil.copytree(template_path, project_path)
+        except Exception as e:
+            arcpy.AddMessage(e)
+            arcpy.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
+            arcpy.AddMessage("Es scheint bereits ein Projekt "
+                             "mit diesem Namen zu existieren")
+            arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein "
+                             "oder nutzen Sie die 'Projekt löschen' Funktion "
+                             "in der Toolbox")
+            sys.exit()
+
+        arcpy.SetProgressorPosition(70)
+
+        # output information to user
+        arcpy.AddMessage("Succesfully copied")
+        arcpy.AddMessage("New Project registered at {}".format(project_path))
+
+
+class ProjektLoeschen(Tool):
+
+    def run(self):
+        # prevent eventual locks
+        gc.collect()
+
+        arcpy.AddMessage(encode('Lösche Projekte'))
+
+        projects_to_delete = self.par.projekte.values
+        step = 100 / len(projects_to_delete)
+        pos = 0
+        for project in projects_to_delete:
+            pos += step
+            arcpy.SetProgressorPosition(pos)
+            arcpy.SetProgressorLabel(
+                encode('Lösche Projekt {}'.format(project)))
+            self.compact_gdbs(project)
+            self.remove_project_from_output(project)
+            self.projekt_loeschen(project)
+
+    def compact_gdbs(self, project):
+        """
+        compact all filegeodatabases to remove locks
+        """
+        projektPfad = self.folders.get_projectpath(project)
+        for root, dirs, files in os.walk(projektPfad):
+            for folder in dirs:
+                if folder.endswith(".gdb"):
+                    gdb = join(root, folder)
+                    arcpy.AddMessage('Compact {}'.format(gdb))
+                    res = arcpy.Compact_management(gdb)
+                    # del res could help to avoid schema locks
+                    del res
+                    gc.collect()
+                    arcpy.AddMessage('Delete {}'.format(gdb))
+                    res = arcpy.Delete_management(gdb)
+                    del res
+
+    def remove_project_from_output(self, project):
+        """Remove Layers under Project GroupLayer"""
+        # entferne alle aktuellen Layer aus dem TOC (Locks aufheben)
+        arcpy.AddMessage("Loese aktive Layer aus MXD \n")
+        mxd = arcpy.mapping.MapDocument("CURRENT")
+        for df in arcpy.mapping.ListDataFrames(mxd):
+            project_layer = self.output.get_projectlayer(project)
+            for lyr in arcpy.mapping.ListLayers(project_layer, "", df):
+                arcpy.mapping.RemoveLayer(df, lyr)
+        del mxd
+
+    def projekt_loeschen(self, projektName):
+        arcpy.AddMessage("Projektname: " + projektName)
+        # Mit dem Projektnamen zum neuen Projektpfad zusammenführen"
+        projektPfad = self.folders.get_projectpath(projektName)
+        arcpy.AddMessage("Suche Ordner: " + projektPfad)
+
+
+        # Überprüfen, ob der Projektordner existiert
+        if isdir(projektPfad):
+            arcpy.AddMessage("Projektordner gefunden \n")
+            shutil.rmtree(projektPfad)
+            arcpy.AddMessage("Projektordner gelöscht \n")
+        else:
+            arcpy.AddMessage("Projektordner " + projektName + " nicht gefunden \n")
+
+        arcpy.AddMessage("*********************************************************************************")
+        arcpy.AddMessage("Das Projekt " + projektName + " wurde erfolgreich entfernt \n")

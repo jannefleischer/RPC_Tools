@@ -19,7 +19,7 @@ class Wanderungssalden(Tool):
     def run(self):
 
         parameters = self.par
-        projektname = self.par.name.value
+        projektname = self.projectname
 
     # Pruefen, ob Wanderungssalden-Tabelle existiert; falls ja, dann loeschen
         layer_pfad = self.folders.get_db("FGDB_Einnahmen.gdb", projektname)

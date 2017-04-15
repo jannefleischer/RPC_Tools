@@ -1,87 +1,67 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-import arcpy
 import datetime
+import arcpy
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.definitions.projektverwaltung.T1_Projektverwaltung import Projektverwaltung
+from rpctools.definitions.projektverwaltung.T1_Projektverwaltung \
+     import ProjektLoeschen, ProjektAnlegen, ProjektKopieren
 
 
 class TbxProjektVerwaltung(Tbx):
     """Toolbox Projektverwaltung"""
 
-    @property
-    def label(self):
-        return u'Schritt 1: Projekte verwalten'
-
-    @property
-    def Tool(self):
-        return Projektverwaltung
-
     def __init__(self):
         super(TbxProjektVerwaltung, self).__init__()
         self.update_projects = False
 
+
+
+class TbxProjektAnlegen(TbxProjektVerwaltung):
+    """Toolbox Projekt anlegen"""
+
+    @property
+    def label(self):
+        return u'Projekt neu anlegen'
+
+    @property
+    def Tool(self):
+        return ProjektAnlegen
+
     def _getParameterInfo(self):
         params = self.par
 
-        # Was_möchten_Sie_tun_
-        p = params.action = arcpy.Parameter()
-        p.name = encode('Was_möchten_Sie_tun_')
-        p.displayName = encode('Was möchten Sie tun?')
-        p.parameterType = 'Required'
-        p.direction = 'Input'
-        p.datatype = 'GPString'
-        p.filter.list = ['Neues Projekt anlegen',
-                         'Bestehendes Projekt kopieren',
-                         encode('Bestehendes Projekt löschen')]
-        p.value = p.filter.list[0]
-
-        projects = self.folders.get_projects()
-
-        # Bestehendes_Projekt_auswählen
-        p = params.existing_project = arcpy.Parameter()
-        p.name = encode('Bestehendes_Projekt_auswählen')
-        p.displayName = encode('Bestehendes Projekt auswählen')
-        p.parameterType = 'Required'
-        p.direction = 'Input'
-        p.datatype = 'GPString'
-        p.filter.list = projects
-
         # Name_des_neuen_Projektes
-        p = params.name = arcpy.Parameter()
+        p = self.add_parameter('name')
         p.name = u'Name_des_neuen_Projektes'
         p.displayName = u'Name des neuen Projektes'
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'GPString'
-        p.value = u' '
+        p.value = u''
 
         # Shapefile_des_Plangebiets____shp_
-        p = params.shapefile = arcpy.Parameter()
+        p = self.add_parameter('shapefile')
         p.name = u'Flaechen_des_Plangebiets'
         p.displayName = u'(Teil-)Flächen des Plangebiets'
         p.parameterType = 'Required'
         p.direction = 'Input'
-        #p.datatype = u'DEShapefile'
-        p.datatype = u'GPFeatureLayer'
+        p.datatype = 'GPFeatureLayer'
         p.value = self.folders.TEMPLATE_FLAECHEN
 
         # Beginn_des_Betrachtungszeitraumes
-        p = params.begin = arcpy.Parameter()
+        p = self.add_parameter('begin')
         p.name = u'Beginn_des_Betrachtungszeitraumes'
         p.displayName = u'Beginn des Betrachtungszeitraumes'
         p.parameterType = 'Required'
         p.direction = 'Input'
-        p.datatype = u'GPLong'
+        p.datatype = 'GPLong'
         p.filter.type = 'Range'
         p.filter.list = [2010, 2050]
         p.value = datetime.datetime.now().year
 
         # Ende_des_Betrachtungszeitraumes
-        p = params.end = arcpy.Parameter()
+        p = self.add_parameter('end')
         p.name = u'Ende_des_Betrachtungszeitraumes'
         p.displayName = u'Ende des Betrachtungszeitraumes'
         p.parameterType = 'Required'
@@ -92,12 +72,53 @@ class TbxProjektVerwaltung(Tbx):
         #Eingaben zu Beginn deaktiviere/füllen
         params.end.filter.list = [2010, 2050]
         params.end.value = 2050
-        params.existing_project.enabled = False
-        params.name.enabled = False
-        params.shapefile.enabled = False
-        params.begin.enabled = False
-        params.end.enabled = False
-        params.existing_project.filter.list = [" "]
+
+        return params
+
+    def _updateParameters(self, params):
+        """Modify the values and properties of parameters before internal
+        validation is performed.  This method is called whenever a parameter
+        has been changed."""
+        if self.par.changed('begin', 'end'):
+            # Ende des Betrachtungszeitraumes prüfen
+            # und ggf. auf ein Jahr nach Beginn setzen
+            if params.end.value <= params.begin.value:
+                params.end.value = params.begin.value + 1
+
+
+class TbxProjektKopieren(TbxProjektVerwaltung):
+    """Toolbox Projekt anlegen"""
+
+    @property
+    def label(self):
+        return u'Projekt kopieren'
+
+    @property
+    def Tool(self):
+        return ProjektKopieren
+
+    def _getParameterInfo(self):
+        params = self.par
+
+        projects = self.folders.get_projects()
+
+        # Name_des_neuen_Projektes
+        p = self.add_parameter('name')
+        p.name = u'Name_des_neuen_Projektes'
+        p.displayName = u'Name des neuen Projektes'
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = 'GPString'
+        p.value = u''
+
+        # Bestehendes_Projekt_auswählen
+        p = self.add_parameter('existing_project')
+        p.name = encode('Bestehendes_Projekt_auswählen')
+        p.displayName = encode('Bestehendes Projekt auswählen')
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = 'GPString'
+        p.filter.list = projects
 
         return params
 
@@ -106,51 +127,54 @@ class TbxProjektVerwaltung(Tbx):
         validation is performed.  This method is called whenever a parameter
         has been changed."""
 
-        # Eingaben in Abhängigkeit von Vorhaben aktivieren/deaktivieren
-        if params.action.altered and not params.action.hasBeenValidated:
+        projects = self.folders.get_projects()
+        params.existing_project.filter.list = projects
 
-            projects = self.folders.get_projects()
 
-            if params.action.value == "Neues Projekt anlegen":
-                params.existing_project.enabled = False
-                params.name.enabled = True
-                params.shapefile.enabled = True
-                params.begin.enabled = True
-                params.end.enabled = True
-                params.existing_project.value = " "
-                params.existing_project.filter.list = [" "]
-                params.name.value = None
+class TbxProjekteLoeschen(TbxProjektVerwaltung):
+    """Toolbox Projekt loeschen"""
+    @property
+    def label(self):
+        return u'Projekte löschen'
 
-            elif params.action.value == "Bestehendes Projekt kopieren":
-                params.existing_project.enabled = True
-                params.name.enabled = True
-                params.shapefile.enabled = False
-                params.begin.enabled = False
-                params.end.enabled = False
-                if projects:
-                    params.existing_project.value = projects[0]
-                params.existing_project.filter.list = projects
-                params.name.value = None
+    @property
+    def Tool(self):
+        return ProjektLoeschen
 
-            # Löschen
-            else:
-                params.existing_project.enabled = True
-                params.name.enabled = False
-                params.shapefile.enabled = False
-                params.begin.enabled = False
-                params.end.enabled = False
-                if projects:
-                    params.existing_project.value = projects[0]
-                params.existing_project.filter.list = projects
-                params.name.value = " "
+    def _getParameterInfo(self):
+        projects = self.folders.get_projects()
 
-        # Ende des Betrachtungszeitraumes prüfen
-        # und ggf. auf ein Jahr nach Beginn setzen
-        if params.end.value <= params.begin.value:
-            params.end.value = params.begin.value + 1
+        # Bestehendes_Projekt_auswählen
+        p = self.add_parameter('projekte')
+        p.name = encode('Projekt_auswählen')
+        p.displayName = encode('Zu löschende Projekt auswählen')
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = 'GPString'
+        p.multiValue = True
+        p.filter.list = projects
+
+        return self.par
+
+    def _updateParameters(self, params):
+        """Modify the values and properties of parameters before internal
+        validation is performed.  This method is called whenever a parameter
+        has been changed."""
+
+        projects = self.folders.get_projects()
+        params.projekte.enabled = True
+        params.projekte.filter.list = projects
 
 
 if __name__ == '__main__':
-    t=TbxProjektVerwaltung()
+    t = TbxProjektAnlegen()
     params = t.getParameterInfo()
-    print(t.print_test_parameters())
+    t.print_tool_parameters()
+
+    t = TbxProjektKopieren()
+    params = t.getParameterInfo()
+    t.print_tool_parameters()
+
+    t = TbxProjekteLoeschen()
+    params = t.getParameterInfo()
+    t.print_tool_parameters()
