@@ -44,6 +44,9 @@ class TbxProjektauswahl(Tbx):
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
         has been changed."""
+        projects = self.folders.get_projects()
+        params.active_project.filter.list = projects
+
         #if self.recently_opened:
             #params.active_project.filter.list = self.folders.get_projects()
             #if self.config.active_project:

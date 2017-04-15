@@ -309,7 +309,9 @@ class ProjektKopieren(Projektverwaltung):
         project_path = self.folders.get_projectpath(check=False)
 
         try:
-            shutil.copytree(template_path, project_path)
+            def ignore_locks(path, filenames):
+                return [f for f in filenames if f.endswith('.lock')]
+            shutil.copytree(template_path, project_path, ignore=ignore_locks)
         except Exception as e:
             arcpy.AddMessage(e)
             arcpy.AddMessage("Es ist ein Fehler beim Kopieren aufgetreten.")
@@ -357,13 +359,18 @@ class ProjektLoeschen(Tool):
                 if folder.endswith(".gdb"):
                     gdb = join(root, folder)
                     arcpy.AddMessage('Compact {}'.format(gdb))
-                    res = arcpy.Compact_management(gdb)
-                    # del res could help to avoid schema locks
-                    del res
-                    gc.collect()
-                    arcpy.AddMessage('Delete {}'.format(gdb))
-                    res = arcpy.Delete_management(gdb)
-                    del res
+                    try:
+                        res = arcpy.Compact_management(gdb)
+                        # del res could help to avoid schema locks
+                        del res
+                        gc.collect()
+                        arcpy.AddMessage('Delete {}'.format(gdb))
+                        res = arcpy.Delete_management(gdb)
+                        del res
+                    except arcpy.ExecuteError:
+                        # .gdb-folder is no valid fgdb
+                        # try with shutil.rmtree instead
+                        shutil.rmtree(gdb, ignore_errors=True)
 
     def remove_project_from_output(self, project):
         """Remove Layers under Project GroupLayer"""
@@ -386,7 +393,7 @@ class ProjektLoeschen(Tool):
         # Überprüfen, ob der Projektordner existiert
         if isdir(projektPfad):
             arcpy.AddMessage("Projektordner gefunden \n")
-            shutil.rmtree(projektPfad)
+            shutil.rmtree(projektPfad, ignore_errors=True)
             arcpy.AddMessage("Projektordner gelöscht \n")
         else:
             arcpy.AddMessage("Projektordner " + projektName + " nicht gefunden \n")
