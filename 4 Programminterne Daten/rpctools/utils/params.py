@@ -399,18 +399,83 @@ class Tbx(object):
     def _updateMessages(self, parameters):
         """ to define in the subclass """
 
-    def update_table(self, table, column_values, fgdb='', where=None):
+    def update_table(self,
+                     table,
+                     column_values,
+                     where=None,
+                     pkey=None,
+                     fgdb=''):
         """
         Update rows in a FileGeodatabase with given values
 
         Parameters
         ----------
         table : str
-            full path to the table
+            table name
         column_values: dict,
             the columns and the values to update them with as key/value-pairs
         where: str, optional
             a where clause to pick single rows
+        pkey: dict, optional
+            the columns and the values of the primary key as key/value-pairs
+        fgdb : str, optional
+            the database name
+
+        Returns
+        -------
+        r : int
+            the number of updated rows
+        """
+        where = where or self.get_where_clause(pkey)
+        table_path = self._get_table_path(fgdb, table)
+        columns = column_values.keys()
+        cursor = arcpy.da.UpdateCursor(table_path, columns, where_clause=where)
+        r = 0
+        for row in cursor:
+            for i, column in enumerate(columns):
+                row[i] = column_values[column]
+            cursor.updateRow(row)
+            r += 1
+        del cursor
+        return r
+
+    def delete_rows_in_table(self,
+                             table,
+                             pkey,
+                             fgdb='',
+                             ):
+        """
+        Delete rows in a FileGeodatabase which match the where-clause
+
+        Parameters
+        ----------
+        table : str
+            full path to the table
+        pkey: dict
+            the columns and the values of the primary key as key/value-pairs
+        fgdb : str, optional
+            the database name
+
+        Returns
+        -------
+        r : int
+            the number of deleted rows
+        """
+        where = self.get_where_clause(pkey)
+        table_path = self._get_table_path(fgdb, table)
+        columns = pkey.keys()
+        cursor = arcpy.da.UpdateCursor(table_path, columns, where_clause=where)
+        r = 0
+        for row in cursor:
+            cursor.deleteRow()
+            r += 1
+        del cursor
+        return r
+
+    def _get_table_path(self, fgdb, table):
+        """
+        return the full table path in the temporary fgdb, and create the temp
+        table if it does not exist
         """
         dbname = os.path.basename(fgdb) or self.tool._dbname
         table = os.path.basename(table)
@@ -423,15 +488,78 @@ class Tbx(object):
             table_path = self.folders.get_temporary_table(table, fgdb=fgdb)
         else:
             table_path = self.folders.get_table(table, workspace=fgdb)
+        return table_path
+
+    def insert_row_in_table(self, table, column_values, fgdb=''):
+        """
+        insert new row
+        in a FileGeodatabase with given values
+
+        Parameters
+        ----------
+        table : str
+            full path to the table
+        column_values: dict,
+            the columns and the values to insert as key/value-pairs
+        fgdb : str, optional
+            the database name
+        """
+        table_path = self._get_table_path(fgdb, table)
         columns = column_values.keys()
-        cursor = arcpy.da.UpdateCursor(table_path, columns, where_clause=where)
-        for row in cursor:
-            for i, column in enumerate(columns):
-                row[i] = column_values[column]
-            cursor.updateRow(row)
+        values = column_values.values()
+        cursor = arcpy.da.InsertCursor(table_path, columns)
+        cursor.insertRow(values)
         del cursor
 
-    def query_table(self, table, columns, fgdb='', where=None):
+    def upsert_row_in_table(self, table, column_values, pkey, fgdb=''):
+        """
+        update a row, or - if it does not exist yet - insert the row
+        in a FileGeodatabase with given values
+
+        Parameters
+        ----------
+        table : str
+            full path to the table
+        column_values: dict,
+            the columns and the values to insert as key/value-pairs
+        pkey: dict,
+            the columns and the values of the primary key as key/value-pairs
+        fgdb : str, optional
+            the database name
+        """
+        where_clause = self.get_where_clause(pkey)
+        # try to update the row
+        r = self.update_table(table, column_values, where=where_clause,
+                              fgdb=fgdb)
+        # if there are no rows matching the primary key
+        if not r:
+            # insert new row
+            column_values.update(pkey)
+            self.insert_row_in_table(table, column_values, fgdb)
+
+    def get_where_clause(self, pkey):
+        """
+        convert a primary key dict to a where_clause
+
+        Parameters
+        ----------
+        pkey : dict
+            key-value-Pairs of columns and values
+
+        Returns
+        -------
+        where_clause : str
+        """
+        if pkey is None:
+            return None
+        where_clause = ' AND '.join(["{} = {}".format(k, v)
+                                     if not isinstance(v, (str, unicode))
+                                     else "{} = '{}'".format(k, v)
+                                     for (k, v) in pkey.iteritems()
+                                     ])
+        return where_clause
+
+    def query_table(self, table, columns, fgdb='', where=None, pkey=None):
         """
         get rows from a FileGeodatabase with given values
 
@@ -443,6 +571,7 @@ class Tbx(object):
             the requested columns
         where: str, optional
             a where clause to pick single rows
+        pkey: dict, optional
 
         Returns
         -------
@@ -450,6 +579,7 @@ class Tbx(object):
             the queried rows with values of requested columns in same order as
             in columns argument
         """
+        where = where or self.get_where_clause(pkey)
         table = os.path.basename(table)
         dbname = os.path.basename(fgdb) or self.tool._dbname
         table_path = self.folders.get_table(table, workspace=fgdb)
