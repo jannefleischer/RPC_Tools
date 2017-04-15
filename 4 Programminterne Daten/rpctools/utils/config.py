@@ -42,6 +42,15 @@ class Config(object):
 
         if exists(self.config_file):
             self.read()
+            # add missing Parameters
+            changed = False
+            for k, v in self._default.iteritems():
+                if k not in self._config:
+                    self._config[k] = v
+                    changed = True
+            if changed:
+                self.write()
+
         # write default config, if file doesn't exist yet
         else:
             self._config = self._default.copy()
@@ -80,6 +89,8 @@ class Config(object):
         else:
             self.__dict__[name] = value
 
+    def __repr__(self):
+        return repr(self._config)
 
 
 ########################################################################
@@ -444,3 +455,7 @@ class Folders(object):
                                            subfolder,
                                            filename)
         return diagram_path
+
+if __name__ == '__main__':
+    c = Config()
+    print(c)
