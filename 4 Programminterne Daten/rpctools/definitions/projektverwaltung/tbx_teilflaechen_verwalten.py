@@ -259,9 +259,9 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                     #self.delete_rows_in_table(
                         #table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
                 if nutzungsart_id != Nutzungsart.EINZELHANDEL:
-                    table = ''
-                    #self.delete_rows_in_table(
-                        #table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
+                    table = 'Einzelhandel_Verkaufsflaechen'
+                    self.delete_rows_in_table(
+                        table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
 
 
         return params

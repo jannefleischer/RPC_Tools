@@ -16,6 +16,8 @@ from rpctools.definitions.nutzungsart.nutzungen import Nutzungen
 from rpctools.utils.encoding import encode
 from rpctools.utils.constants import Branche, Gewerbegebietstyp
 from rpctools.utils.spatial_lib import get_gemeindetyp
+from rpctools.definitions.nutzungsart.buildingtypes import (
+    Gebaeudetyp, Gebaeudetypen, Sortiment, Sortimente)
 from collections import OrderedDict
 
 
@@ -27,7 +29,8 @@ class TbxNutzungen(TbxFlaechendefinition):
     def label(self):
         return self._label
 
-    def init_aufsiedlung(self, params, heading='', beginn_name=''):
+    def init_aufsiedlung(self, params, heading='', beginn_name='',
+                         default_zeitraum=5):
         """WORKAROUND: add the aufsiedlungs parameters outside of
         _getParameterInfo, strangely the subclasses of TbxNutzungen are
         not recognized as subclasses (so you can't call _getParameterInfo
@@ -59,7 +62,7 @@ class TbxNutzungen(TbxFlaechendefinition):
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
-        param.value = 5
+        param.value = default_zeitraum
         param.filter.type = 'Range'
         param.filter.list = [1, 20]
         param.category = heading
@@ -92,49 +95,6 @@ class TbxNutzungen(TbxFlaechendefinition):
         for row in rows:
             self.par.bezugsbeginn.value = row[0]
             self.par.dauer_aufsiedlung.value = row[1]
-
-
-class Gebaeudetyp(object):
-    def __init__(self,
-                 typ_id,
-                 name,
-                 param_we,
-                 param_ew_je_we,
-                 display_name,
-                 default_ew_je_we):
-        """
-        Gebäudetyp
-
-        Parameters
-        ----------
-        typ_id : int
-        name : str
-        param_we : str
-        param_ew_je_we : str
-        display_name : str
-        default_ew_je_we : str
-        """
-        self.typ_id = typ_id
-        self.name = name
-        self.param_we = param_we
-        self.param_ew_je_we = param_ew_je_we
-        self.display_name = display_name
-        self.default_ew_je_we = default_ew_je_we
-
-
-class Gebaeudetypen(OrderedDict):
-    """ToDo: Get From BaseTable Wohnen_Gebaeudetypen"""
-    def __init__(self, folders):
-        super(Gebaeudetypen, self).__init__()
-        table = folders.get_base_table(
-            'FGDB_Definition_Projekt_Tool.gdb', 'Wohnen_Gebaeudetypen')
-        fields = ['IDGebaeudetyp', 'NameGebaeudetyp', 'param_we',
-                  'param_ew_je_we', 'display_name', 'default_ew_je_we']
-        rows = arcpy.da.SearchCursor(table, fields)
-        for row in rows:
-            self[row[0]] = Gebaeudetyp(*row)
-        del rows
-
 
 
 class TbxNutzungenWohnen(TbxNutzungen):
@@ -234,10 +194,9 @@ class TbxNutzungenWohnen(TbxNutzungen):
                 self.par[gt.param_we].value = 0
                 self.par[gt.param_ew_je_we].value = gt.default_ew_je_we
 
-        # otherwise, ubdate parameters from query
+        # otherwise, update parameters from query
         for row in rows:
             gt = self.gebaeudetypen[row[0]]
-            assert isinstance(gt, Gebaeudetyp)
             self.par[gt.param_we].value = row[1]
             self.par[gt.param_ew_je_we].value = row[2]
 
@@ -535,86 +494,82 @@ class TbxNutzungenGewerbe(TbxNutzungen):
 class TbxNutzungenEinzelhandel(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='c', name='Einzelhandel')
     _nutzungsart = Nutzungsart.EINZELHANDEL
+    tablename = 'Einzelhandel_Verkaufsflaechen'
 
     @property
     def Tool(self):
         return Nutzungen
 
+    def __init__(self):
+        super(TbxNutzungenEinzelhandel, self).__init__()
+        self.sortimente = Sortimente(self.folders)
+
     def _getParameterInfo(self):
         params = super(TbxNutzungenEinzelhandel, self)._getParameterInfo()
         # workaround
         heading = '1) Voraussichtliche Eröffnung '
-        params = self.init_aufsiedlung(params, heading=heading)
+        beginn_name = 'Baubeginn'
+        params = self.init_aufsiedlung(params, heading=heading,
+                                       beginn_name=beginn_name,
+                                       default_zeitraum=1)
 
         heading = u'2) Verkaufsflächen'
 
-        # Lebensmittel (Verkaufsfläche in qm)
-        param = params.lebensmittel = arcpy.Parameter()
-        param.name = u'Lebensmittel'
-        param.displayName = encode(u'Lebensmittel (Verkaufsfläche in qm)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.value = 1200
-        param.filter.type = 'Range'
-        param.filter.list = [0, 20000]
-        param.category = heading
-
-        # Sonstiger periodischer Bedarf (Verkaufsfläche in qm)
-        param = params.periodischer_bedarf = arcpy.Parameter()
-        param.name = u'periodische Bedarf'
-        param.displayName = encode(u'Sonstiger periodischer Bedarf '
-                                   u'(Verkaufsfläche in qm)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.value = 1200
-        param.filter.type = 'Range'
-        param.filter.list = [0, 20000]
-        param.category = heading
-
-        # Aperiodischer Bedarf ohne Baumarkt und Möbel (Verkaufsfläche in qm)
-        param = params.aperiodischer_bedarf = arcpy.Parameter()
-        param.name = u'aperiodische Bedarf'
-        param.displayName = encode(u'Aperiodischer Bedarf ohne Baumarkt und '
-                                   u'Möbel (Verkaufsfläche in qm)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.value = 1200
-        param.filter.type = 'Range'
-        param.filter.list = [0, 20000]
-        param.category = heading
-
-        # Baumarkt (Verkaufsfläche in qm)
-        param = params.baumarkt = arcpy.Parameter()
-        param.name = u'Baumarkt'
-        param.displayName = encode(u'Baumarkt (Verkaufsfläche in qm)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.value = 1200
-        param.filter.type = 'Range'
-        param.filter.list = [0, 20000]
-        param.category = heading
-
-        # Möbel (Verkaufsfläche in qm)
-        param = params.moebel = arcpy.Parameter()
-        param.name = u'Möbel'
-        param.displayName = encode(u'Möbel (Verkaufsfläche in qm)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.value = 1200
-        param.filter.type = 'Range'
-        param.filter.list = [0, 20000]
-        param.category = heading
+        for srt in self.sortimente.itervalues():
+            assert isinstance(srt, Sortiment)
+            # Verkaufsfläche nach Sortiment
+            param = self.add_parameter(srt.param_vfl)
+            param.name = encode(srt.kurzname)
+            param.displayName = encode(u'{}  (Verkaufsfläche in qm)'.format(srt.name))
+            param.parameterType = 'Required'
+            param.direction = 'Input'
+            param.datatype = u'Long'
+            param.value = u'0'
+            param.filter.type = 'Range'
+            param.filter.list = [0, 20000]
+            param.category = heading
 
         return params
 
     def _updateParameters(self, params):
         params = super(TbxNutzungenEinzelhandel, self)._updateParameters(params)
+        flaeche = params.teilflaeche.value
+        if flaeche:
+            tfl = self.get_teilflaeche(params.teilflaeche.value)
+
+            for srt in self.sortimente.itervalues():
+                assert isinstance(srt, Sortiment)
+                if params.changed(srt.param_vfl):
+                    pkey = dict(IDTeilflaeche=tfl.flaechen_id,
+                                IDSortiment=srt.typ_id)
+                    column_values = dict(
+                        NameSortiment=srt.kurzname,
+                        Verkaufsflaeche_qm=params[srt.param_vfl].value,
+                    )
+                    r = self.upsert_row_in_table(
+                        self.tablename, column_values, pkey)
         return params
+
+
+    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
+        """update all inputs based on currently selected teilflaeche"""
+        super(TbxNutzungenEinzelhandel, self).update_teilflaechen_inputs(
+            flaechen_id,flaechenname)
+        columns = ['IDSortiment', 'Verkaufsflaeche_qm']
+        pkey = dict(IDTeilflaeche=flaechen_id)
+        rows = self.query_table(self.tablename,
+                                columns,
+                                pkey=pkey)
+
+        # if there are no values defined yet, set to default values
+        if not rows:
+            for srt in self.sortimente.itervalues():
+                self.par[srt.param_vfl].value = 0
+
+        # otherwise, update parameters from query
+        for row in rows:
+            srt = self.sortimente[row[0]]
+            self.par[srt.param_vfl].value = row[1]
 
     def _updateMessages(self, params):
         pass
