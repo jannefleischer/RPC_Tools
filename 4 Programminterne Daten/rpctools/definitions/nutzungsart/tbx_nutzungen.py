@@ -24,6 +24,7 @@ from collections import OrderedDict
 class TbxNutzungen(TbxFlaechendefinition):
     _label = u'Schritt 3{sub}: Nutzungen - {name} definieren'
     _nutzungsart = Nutzungsart.UNDEFINIERT
+    category = u'Schritt 3: Nutzungen definieren'
 
     @property
     def label(self):
@@ -99,7 +100,7 @@ class TbxNutzungen(TbxFlaechendefinition):
 
 class TbxNutzungenWohnen(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='a', name='Wohnen')
-    _nutzungsart = Nutzungsart.WOHNEN
+    _nutzungsart = Nutzungsart.WOHNEN.value
 
     ew_je_we_range = [r / 10.0 for r in range(10, 50)]
 
@@ -206,7 +207,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
 
 class TbxNutzungenGewerbe(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='b', name='Gewerbe')
-    _nutzungsart = Nutzungsart.GEWERBE
+    _nutzungsart = Nutzungsart.GEWERBE.value
 
     # properties derived from base tables
     _gewerbegebietstypen = None
@@ -493,7 +494,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
 
 class TbxNutzungenEinzelhandel(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='c', name='Einzelhandel')
-    _nutzungsart = Nutzungsart.EINZELHANDEL
+    _nutzungsart = Nutzungsart.EINZELHANDEL.value
     tablename = 'Einzelhandel_Verkaufsflaechen'
 
     @property

@@ -19,14 +19,11 @@ class TbxProjektVerwaltung(Tbx):
 
 class TbxProjektAnlegen(TbxProjektVerwaltung):
     """Toolbox Projekt anlegen"""
+    category = u'Erstellen'
 
     @property
     def label(self):
         return u'Projekt neu anlegen'
-
-    @property
-    def category(self):
-        return u'Erstellen'
 
     @property
     def Tool(self):
@@ -92,14 +89,11 @@ class TbxProjektAnlegen(TbxProjektVerwaltung):
 
 class TbxProjektKopieren(TbxProjektVerwaltung):
     """Toolbox Projekt anlegen"""
+    category = u'Erstellen'
 
     @property
     def label(self):
         return u'Projekt kopieren'
-
-    @property
-    def category(self):
-        return u'Erstellen'
 
     @property
     def Tool(self):

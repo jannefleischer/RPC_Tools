@@ -101,6 +101,7 @@ class TbxFlaechendefinition(Tbx):
             pretty = ' | '.join([
                 'Nr. {}'.format(flaechen_id),
                 name,
+                Nutzungsart(nutzungsart_id).name,
                 str(gemeinde),
                 '{} ha'.format(round(ha, 2))
             ])
@@ -248,12 +249,18 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                                   {'Nutzungsart': nutzungsart_id},
                                   where=where_tfl)
 
-                # ToDo delete corresponding rows wohnen/gewerbe/einzelhandel
+                # update teilflaechen but keep selected index
+                idx = self.par.selected_index('teilflaeche')
+                self.update_teilflaechen()
+                params.teilflaeche.value = params.teilflaeche.filter.list[idx]
+
+                # delete corresponding rows wohnen/gewerbe/einzelhandel
                 # delete if Fläche is not Wohnen any more
                 if nutzungsart_id != Nutzungsart.WOHNEN:
                     table = 'Wohnen_WE_in_Gebaeudetypen'
                     self.delete_rows_in_table(
                         table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
+                # ToDo: Gewerbe
                 if nutzungsart_id != Nutzungsart.GEWERBE:
                     table = ''
                     #self.delete_rows_in_table(
