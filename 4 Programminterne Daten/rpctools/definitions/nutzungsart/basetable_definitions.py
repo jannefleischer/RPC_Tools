@@ -83,3 +83,25 @@ class Sortimente(OrderedDict):
         for row in rows:
             self[row[0]] = Sortiment(*row)
         del rows
+
+
+class Branche(object):
+    def __init__(self, id, name, param_gewerbenutzung, default_gewerbenutzung):
+        self.id = id
+        self.name = name
+        self.param_gewerbenutzung = param_gewerbenutzung
+        self.default_gewerbenutzung = default_gewerbenutzung
+
+
+class Branchen(OrderedDict):
+    """Get From BaseTable Wohnen_Gebaeudetypen"""
+    def __init__(self, folders):
+        super(Branchen, self).__init__()
+        table = folders.get_base_table(
+            'FGDB_Definition_Projekt_Tool.gdb', 'Gewerbe_branchen')
+        fields = ['ID_Branche_ProjektCheck', 'Name_Branche_ProjektCheck',
+                  'param_gewerbenutzung', 'default_gewerbenutzung']
+        rows = arcpy.da.SearchCursor(table, fields)
+        for row in rows:
+            self[row[0]] = Branche(*row)
+        del rows

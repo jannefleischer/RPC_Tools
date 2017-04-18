@@ -16,8 +16,8 @@ from rpctools.definitions.nutzungsart.nutzungen import Nutzungen
 from rpctools.utils.encoding import encode
 from rpctools.utils.constants import Branche, Gewerbegebietstyp
 from rpctools.utils.spatial_lib import get_gemeindetyp
-from rpctools.definitions.nutzungsart.buildingtypes import (
-    Gebaeudetyp, Gebaeudetypen, Sortiment, Sortimente)
+from rpctools.definitions.nutzungsart.basetable_definitions import (
+    Gebaeudetyp, Gebaeudetypen, Sortiment, Sortimente, Branche, Branchen)
 from collections import OrderedDict
 
 
@@ -31,10 +31,10 @@ class TbxNutzungen(TbxFlaechendefinition):
 
     def init_aufsiedlung(self, params, heading='', beginn_name='',
                          default_zeitraum=5):
-        """WORKAROUND: add the aufsiedlungs parameters outside of
-        _getParameterInfo, strangely the subclasses of TbxNutzungen are
-        not recognized as subclasses (so you can't call _getParameterInfo
-        of TbxFlaechendefinition here"""
+        """WORKAROUND: add the "aufsiedlung" parameters outside of
+        _getParameterInfo, strangely instances of TbxNutzungen are
+        not recognized as subclasses TbxFlaechendefinition (so you can't call 
+        _getParameterInfo of TbxFlaechendefinition here)"""
 
 
         # Beginn der Aufsiedlung (Jahreszahl)
@@ -65,7 +65,7 @@ class TbxNutzungen(TbxFlaechendefinition):
         param.value = default_zeitraum
         param.filter.type = 'Range'
         param.filter.list = [1, 20]
-        param.category = heading
+        param.category = heading        
 
         return params
 
@@ -212,6 +212,11 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     _gewerbegebietstypen = None
     _presets = None
     _dichtekennwerte = None
+    tablename = 'Gewerbe_Anteile'
+
+    def __init__(self):
+        super(TbxNutzungenGewerbe, self).__init__()
+        self.branchen = Branchen(self.folders)
 
     @property
     def Tool(self):
@@ -290,106 +295,26 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.value = param.filter.list[0]
         param.category = heading
 
-        # remember params of
+        # remember params
         self.branche_params = []
-
-        # Anteil der Arbeitsplätze im verarbeitenden Gewerbe in Prozent
-        name = 'ant_jobs_verarb_gewerbe'
-        self.branche_params.append(name)
-        param = self.add_parameter(name)
-        param.name = u'verarbeitendes Gewerbe'
-        param.displayName = encode(u'Verarbeitendes Gewerbe (in % der '
-                                   u'Nettofläche)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.value = 40
-        param.filter.type = 'Range'
-        param.filter.list = [0, 100]
-        param.category = heading
-        param.id_branche = Branche.VERARBEITEND
-
-        # Anteil der Arbeitsplätze im Baugewerbe in Prozent
-        name = 'ant_jobs_baugewerbe'
-        self.branche_params.append(name)
-        param = self.add_parameter(name)
-        param.name = u'Baugewerbe'
-        param.displayName = encode(u'Baugewerbe (in % der Nettofläche)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.value = 10
-        param.filter.type = 'Range'
-        param.filter.list = [0, 100]
-        param.category = heading
-        param.id_branche = Branche.BAUGEWERBE
-
-        # Anteil der Arbeitsplätze im Handel inkl. Kfz in Prozent
-        name = 'ant_jobs_grosshandel'
-        self.branche_params.append(name)
-        param = self.add_parameter(name)
-        param.name = u'Handel'
-        param.displayName = encode(u'Großhandel, Logistik, Kfz-Handel '
-                                   u'(in % der Nettofläche)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.value = 5
-        param.filter.type = 'Range'
-        param.filter.list = [0, 100]
-        param.category = heading
-        param.id_branche = Branche.GROSSHANDEL
-
-        # Anteil der Arbeitsplätze im Bereich der freiberuflichen wissenschaftl
-        # bzw. techn. Dienstleistungen in Prozent
-        name = 'ant_jobs_freiwisstech'
-        self.branche_params.append(name)
-        param = self.add_parameter(name)
-        param.name = u'Finanzen'
-        param.displayName = encode(u'Finanzen, Versicherungen, IuK, '
-                                   u'wissensorientierte Dienstleistungen '
-                                   u'(in % der Nettofläche)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.value = 25
-        param.filter.type = 'Range'
-        param.filter.list = [0, 100]
-        param.category = heading
-        param.id_branche = Branche.FINANZEN
-
-        # Anteil der Arbeitsplätze im Bereich sonstiger Diensteistungen
-        name = 'ant_jobs_sonst_dl'
-        self.branche_params.append(name)
-        param = self.add_parameter(name)
-        param.name = u'Sonstige'
-        param.displayName = encode(u'Sonstige unternehmensorientierte '
-                                   u'Dienstleistungen (in % der Nettofläche)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.value = 10
-        param.filter.type = 'Range'
-        param.filter.list = [0, 100]
-        param.category = heading
-        param.id_branche = Branche.DIENSTLEISTUNGEN
-
-        # Öffentliche Verwaltung
-        name = 'ant_oev'
-        self.branche_params.append(name)
-        param = self.add_parameter(name)
-        param.name = u'Öffentliche Verwaltung'
-        param.displayName = encode(u'Öffentliche Verwaltung '
-                                   u'(in % der Nettofläche)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.value = 10
-        param.filter.type = 'Range'
-        param.filter.list = [0, 100]
-        param.category = heading
-        param.id_branche = Branche.OEFFENTLICH
-
+        
+        for branche in self.branchen.itervalues():
+            assert isinstance(branche, Branche)
+            param = self.add_parameter(branche.param_gewerbenutzung)
+            param.name = encode(encode(branche.name))
+            param.displayName = encode(
+                u'{} (in % der Nettofläche)'.format(branche.name))
+            param.parameterType = 'Required'
+            param.direction = 'Input'
+            param.datatype = u'Long'
+            param.value = branche.default_gewerbenutzung
+            param.filter.type = 'Range'
+            param.filter.list = [0, 100]
+            param.category = heading
+            param.id_branche = branche.id
+            
+            self.branche_params.append(branche.param_gewerbenutzung)
+        
         self.add_dependency(self.branche_params, 100)
 
         heading = u'3) Voraussichtliche Anzahl an Arbeitsplätzen'
@@ -434,22 +359,25 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     def _updateParameters(self, params):
         params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
 
-        reestimate_jobs = False
+        branche_changed = False
+
+        flaeche = params.teilflaeche.value
+        if not flaeche:
+            return params
 
         # set presets
         if self.par.changed('gebietstyp'):
             id_gewerbe = self.gewerbegebietstypen[params.gebietstyp.value]
             if id_gewerbe != Gewerbegebietstyp.BENUTZERDEFINIERT:
                 self.set_gewerbe_presets(id_gewerbe)
-                reestimate_jobs = True
-                # ToDo: write to db
+                branche_changed = True
         else:
             altered = False
             # check if one of the branchenanteile changed
             if any(map(self.par.changed, self.branche_params)):
                 # set selection to "benutzerdefiniert" and recalc. jobs
                 self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
-                reestimate_jobs = True
+                branche_changed = True
 
         auto_idx = self.par.auto_select.filter.list.index(
             self.par.auto_select.value)
@@ -457,15 +385,25 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         if self.par.changed('auto_select'):
             # auto calc. entry
             if auto_idx == 0:
-                reestimate_jobs = True
+                self.set_estimate_jobs()
                 params.arbeitsplaetze_insgesamt.enabled = False
             # manual entry
             else:
                 params.arbeitsplaetze_insgesamt.enabled = True
-
-        if reestimate_jobs and auto_idx == 0:
-            self.set_estimate_jobs()
+            
+        if branche_changed:
+            tfl = self.get_teilflaeche(params.teilflaeche.value)
+            if auto_idx == 0:
+                self.set_estimate_jobs()
+            for param_name in self.branche_params:
+                param = self.par[param_name]
+                table = self.tablename
+                pkey = { 'id_teilflaeche': tfl.flaechen_id,
+                         'id_branche': param.id_branche}
+                column_values = {'anteil': param.value}                
+                r = self.upsert_row_in_table(table, column_values, pkey)
             # ToDo write to gdb
+        
 
         return params
 
@@ -486,6 +424,28 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             n_jobs += tfl.ha * (param.value / 100.) * jobs_per_ha
 
         self.par.arbeitsplaetze_insgesamt.value = n_jobs
+        
+    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
+        """update all inputs based on currently selected teilflaeche"""
+        super(TbxNutzungenGewerbe, self).update_teilflaechen_inputs(
+            flaechen_id, flaechenname) 
+        columns = ['id_branche', 'anteil']
+        
+        pkey = {'id_teilflaeche': flaechen_id}
+        rows = self.query_table(self.tablename,
+                                columns,
+                                pkey=pkey)
+
+        # if there are no values defined yet, set to default values
+        if not rows:
+            for branche in self.branchen.itervalues():
+                self.par[branche.param_gewerbenutzung].value = \
+                    branche.default_gewerbenutzung
+
+        # otherwise, update parameters from query
+        for row in rows:
+            branche = self.branchen[row[0]]
+            self.par[branche.param_gewerbenutzung].value = row[1]
 
     def _updateMessages(self, params):
         pass
@@ -520,7 +480,7 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
             # Verkaufsfläche nach Sortiment
             param = self.add_parameter(srt.param_vfl)
             param.name = encode(srt.kurzname)
-            param.displayName = encode(u'{}  (Verkaufsfläche in qm)'.format(srt.name))
+            param.displayName = encode(u'{} (Verkaufsfläche in qm)'.format(srt.name))
             param.parameterType = 'Required'
             param.direction = 'Input'
             param.datatype = u'Long'
@@ -549,7 +509,6 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
                     r = self.upsert_row_in_table(
                         self.tablename, column_values, pkey)
         return params
-
 
     def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
         """update all inputs based on currently selected teilflaeche"""

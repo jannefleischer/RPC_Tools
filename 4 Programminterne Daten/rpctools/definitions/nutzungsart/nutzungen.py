@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from rpctools.utils.params import Tool
+import arcpy
 
 
 class Nutzungen(Tool):
