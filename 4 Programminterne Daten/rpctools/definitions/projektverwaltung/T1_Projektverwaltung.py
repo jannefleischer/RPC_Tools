@@ -18,6 +18,7 @@ import os
 import shutil
 import gc
 import arcpy
+import numpy as np
 
 from rpctools.utils.params import Tool
 from rpctools.utils.spatial_lib import get_ags
@@ -51,10 +52,16 @@ class ProjektAnlegen(Projektverwaltung):
     def run(self):
         """"""
         gc.collect()
-        self.output.define_projection()
-        self.projekt_anlegen()
-        self.add_output_new_project()
-        self.add_diagramm()
+        # self.output.define_projection()
+        prject_anlegen_successful = self.projekt_anlegen()
+        # test if self.projekt_anlegen() was successful
+        # if not: AddMessage and delete project again
+        if prject_anlegen_successful:
+            self.add_output_new_project()
+            self.add_diagramm()
+        else:
+            arcpy.AddMessage("Fehlerhaftes Projekt wird wieder entfernt...")
+            arcpy.Delete_management(self.folders.get_projectpath(check=False))
 
     def projekt_anlegen(self):
         """Projekt anlegen"""
@@ -67,12 +74,19 @@ class ProjektAnlegen(Projektverwaltung):
         ende_betrachtung = self.par.end.value
         project_path = self.folders.get_projectpath(check=False)
 
-        ags_projekt, gemeindename_projekt = self.get_gemeinde()
+
 
         self.copy_template(project_path)
 
         tfl, gdbPfad = self.copy_teilflaechen_to_gdb(project_name, flaeche)
+        toolbox = self.parent_tbx
+        max_dist = toolbox.config.max_area_distance
+        arcpy.AddMessage(max_dist)
+        ags_projekt, gemeindename_projekt, get_gemeinde_success = \
+            self.get_gemeinde(tfl, 'OBJECTID', max_dist)
 
+        if not get_gemeinde_success:
+            return False
         self.calculate_teilflaechen_attributes(tfl,
                                                beginn_betrachtung,
                                                ags_projekt,
@@ -96,6 +110,8 @@ class ProjektAnlegen(Projektverwaltung):
 
         self.parent_tbx.config.active_project = project_name
         self.parent_tbx.config.write()
+
+        return True
 
     def set_projektrahmendaten(self,
                                ags_projekt,
@@ -140,9 +156,6 @@ class ProjektAnlegen(Projektverwaltung):
                                         "!SHAPE.AREA@HECTARES!",
                                         "PYTHON_9.3", "")
 
-        # Berechne Gauß-Krüger-Koordinaten
-        arcpy.AddGeometryAttributes_management(
-            Input_Features=tfl, Geometry_Properties="CENTROID_INSIDE")
 
         # Berechne Umfang der Flächen
         arcpy.CalculateField_management(tfl, "umfang_meter",
@@ -274,19 +287,42 @@ class ProjektAnlegen(Projektverwaltung):
             "PAGE_LAYOUT",
             resolution=150)
 
-    def get_gemeinde(self):
+    def get_gemeinde(self, tfl, id_column, max_dist):
         """Verschneide Teilflächen mit Gemeinde"""
         # to do (Stefaan)
+        success = True
         arcpy.SetProgressorLabel('Verschneide Teilflächen mit Gemeinde')
         arcpy.SetProgressorPosition(10)
 
-        ags_projekt = '02000000' # wird nebenbei bestimmt
-        gemeindename_projekt = "Hamburg"# nebenbei bestimmen
+        # calculate Gauß-Krüger-Coordinates and append them to tfl
+        arcpy.AddGeometryAttributes_management(Input_Features=tfl,
+                                              Geometry_Properties="CENTROID_INSIDE")
 
-        # check if  a) all ags of teilflaechen are identical ?!?!? and
-        #           b) maximal distance of teilflaechen smaller than x
+        # Check if the distances between the centroids is smaller than max_dist
+        toolbox = self.parent_tbx
+        XY_INSIDE = toolbox.query_table("Teilflaechen_Plangebiet",
+                           ['INSIDE_X', 'INSIDE_Y'])
+        distances = []
+        for i in range(len(XY_INSIDE)):
+            for j in range(i):
+                dist = np.linalg.norm(np.subtract(XY_INSIDE[i], XY_INSIDE[j]))
+                distances.append(dist)
+        if max(distances) > max_dist:
+            arcpy.AddError("Der Abstand zwischen den Schwerpunkten der "
+                           "Teilflächen darf nicht größer "
+                           "als {} sein".format(max_dist))
+            success = False
 
-        return ags_projekt, gemeindename_projekt
+        # get AGS and Gemeindename and check if AGS is unique
+        ags_gen = get_ags(tfl, id_column)
+        ags_project = [ID[0] for ID in ags_gen.values()]
+        gen_project =  [ID[1] for ID in ags_gen.values()]
+        if len(np.unique(ags_project)) != 1:
+            arcpy.AddError("Die Teilflächen müssen in der selben Gemeinde"
+                             "liegen")
+            success = False
+
+        return ags_project[0], gen_project[0], success
 
 
 class ProjektKopieren(Projektverwaltung):

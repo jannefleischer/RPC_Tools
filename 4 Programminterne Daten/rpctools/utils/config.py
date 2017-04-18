@@ -31,6 +31,7 @@ class Config(object):
         'active_project': '',
         'epsg': 31467,
         'transformation': "DHDN_To_WGS_1984_5x",
+        'max_area_distance': 1000,
     }
 
     _config = {}
