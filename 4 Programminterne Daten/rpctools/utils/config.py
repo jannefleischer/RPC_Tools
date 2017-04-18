@@ -24,7 +24,6 @@ from rpctools.utils.encoding import encode
 TEST_TMP_PROJECT = '__unittest__'
 
 
-
 class Config(object):
     __metaclass__ = Singleton
 

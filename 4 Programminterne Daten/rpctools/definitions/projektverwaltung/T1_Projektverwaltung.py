@@ -94,6 +94,9 @@ class ProjektAnlegen(Projektverwaltung):
         arcpy.AddMessage("Neues Projekt angelegt im Ordner {}\n".format(
             project_path))
 
+        self.parent_tbx.config.active_project = project_name
+        self.parent_tbx.config.write()
+
     def set_projektrahmendaten(self,
                                ags_projekt,
                                project_name,
@@ -389,11 +392,14 @@ class ProjektLoeschen(Tool):
         projektPfad = self.folders.get_projectpath(projektName)
         arcpy.AddMessage("Suche Ordner: " + projektPfad)
 
-
         # Überprüfen, ob der Projektordner existiert
         if isdir(projektPfad):
             arcpy.AddMessage("Projektordner gefunden \n")
             shutil.rmtree(projektPfad, ignore_errors=True)
+            try:
+                arcpy.Delete_management(projektPfad)
+            except:
+                pass
             arcpy.AddMessage("Projektordner gelöscht \n")
         else:
             arcpy.AddMessage("Projektordner " + projektName + " nicht gefunden \n")

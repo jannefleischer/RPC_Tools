@@ -474,8 +474,9 @@ class Tbx(object):
 
     def _get_table_path(self, fgdb, table):
         """
-        return the full table path in the temporary fgdb, and create the temp
-        table if it does not exist
+        return the full table path,
+        return the temporary fgdb, if db is handled temporarly (creates the
+        temporary table if it does not exist yet)
         """
         dbname = os.path.basename(fgdb) or self.tool._dbname
         table = os.path.basename(table)
