@@ -22,25 +22,26 @@ class Salden_bearbeiten2(Tool):
         projektname = self.par.name.value
         saldo = self.par.saldo.value
         target_gemeinde = self.par.gemeinde.value
-
+        target_gemeinde_kurz = target_gemeinde.split("  ||")[0]
         workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
         wanderungssalden = os.path.join(workspace_projekt_einnahmen, 'Wanderungssalden')
         fields = ["GEN", "SvB_Saldo"]
-        cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
+        where_clause = '"GEN"' + "='" + target_gemeinde_kurz + "'"
+        cursor = arcpy.da.UpdateCursor(wanderungssalden, fields, where_clause)
         for gemeinde in cursor:
-            if gemeinde[0] == target_gemeinde.split("  ||")[0]:
-                gemeinde[1] = saldo
-                cursor.updateRow(gemeinde)
+            gemeinde[1] = saldo
+            cursor.updateRow(gemeinde)
 
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = mxd.activeDataFrame
-        projekt_layer = arcpy.mapping.ListLayers(mxd, projektname, df)[0]
-        if arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Erwerbstätige"):
-            lyr = arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Erwerbstätige")[0] # 5th layer in TOC
-            lyr.symbology.reclassify()
+        if arcpy.mapping.ListLayers(mxd, projektname, df):
+            projekt_layer = arcpy.mapping.ListLayers(mxd, projektname, df)[0]
+            if arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Erwerbstätige"):
+                lyr = arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Erwerbstätige")[0] # 5th layer in TOC
+                lyr.symbology.reclassify()
 
-        arcpy.RefreshActiveView()
-        arcpy.RefreshTOC()
+            arcpy.RefreshActiveView()
+            arcpy.RefreshTOC()
 
 
 

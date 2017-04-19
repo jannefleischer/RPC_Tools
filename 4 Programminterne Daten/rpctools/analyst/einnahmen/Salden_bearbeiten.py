@@ -34,13 +34,14 @@ class Salden_bearbeiten(Tool):
 
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = mxd.activeDataFrame
-        projekt_layer = arcpy.mapping.ListLayers(mxd, projektname, df)[0]
-        if arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Einwohner"):
-            lyr = arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Einwohner")[0] # 5th layer in TOC
-            lyr.symbology.reclassify()
+        if arcpy.mapping.ListLayers(mxd, projektname, df):
+            projekt_layer = arcpy.mapping.ListLayers(mxd, projektname, df)[0]
+            if arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Einwohner"):
+                lyr = arcpy.mapping.ListLayers(projekt_layer, "Negative Wanderungssalden Einwohner")[0] # 5th layer in TOC
+                lyr.symbology.reclassify()
 
-        arcpy.RefreshActiveView()
-        arcpy.RefreshTOC()
+            arcpy.RefreshActiveView()
+            arcpy.RefreshTOC()
 
 
 

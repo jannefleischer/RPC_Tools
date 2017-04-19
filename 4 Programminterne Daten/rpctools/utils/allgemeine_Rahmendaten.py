@@ -32,20 +32,22 @@ def Erwerbstaetige_referenz_plangebiet(self, projektname):
     pfad_flaechenanteile_branchen = self.folders.get_table(tablename='Gewerbe_Anteile', workspace="FGDB_Definition_Projekt.gdb", project=projektname)
     pfad_dichtekennwerte = self.folders.get_base_table(table = "Dichtekennwerte_Gewerbe", workspace="FGDB_Definition_Projekt_Tool.gdb")
 
-    cursor_teilflaechen = arcpy.da.SearchCursor(table_teilflaechen, ["id_teilflaeche", "Nutzungsart", "Flaeche_ha"])
+    where_clause_teilflaechen = '"Nutzungsart" = 2'
+    cursor_teilflaechen = arcpy.da.SearchCursor(table_teilflaechen, ["id_teilflaeche", "Nutzungsart", "Flaeche_ha"], where_clause_teilflaechen)
     for flaeche in cursor_teilflaechen:
-        if flaeche[1] == 2:
-            arcpy.AddMessage("Gewerbeflaeche vorhanden")
-            cursor_branchenanteile = arcpy.da.SearchCursor(pfad_flaechenanteile_branchen, ["IDTeilflaeche", "IDBranche", "anteil"])
-            for eintrag in cursor_branchenanteile:
-                if flaeche[0] == eintrag[0]:
-                    cursor_dichtekennwerte = arcpy.da.SearchCursor(pfad_dichtekennwerte, ["ID_Branche_ProjektCheck", "Gemeindetyp_ProjektCheck", "AP_pro_ha_brutto"])
-                    for dichtekennwert in cursor_dichtekennwerte:
-                        if dichtekennwert[0] == eintrag[1] and dichtekennwert[1] == gemeindetyp:
-                            erwerbstaetige += dichtekennwert[2] * flaeche[2] * eintrag[2] / 100
-            arcpy.AddMessage("Erwerbstaetige: " + str(erwerbstaetige))
+        where_clause_anteile ='"IDTeilflaeche"' + "=" + str(flaeche[0])
+        cursor_branchenanteile = arcpy.da.SearchCursor(pfad_flaechenanteile_branchen, ["IDTeilflaeche", "IDBranche", "anteil"], where_clause_anteile)
+        for eintrag in cursor_branchenanteile:
+            where_clause_dichtekennwerte = '"ID_Branche_ProjektCheck"' + "=" + str(eintrag[1]) + " AND " + '"Gemeindetyp_ProjektCheck"' + "=" + str(gemeindetyp)
+            cursor_dichtekennwerte = arcpy.da.SearchCursor(pfad_dichtekennwerte, ["ID_Branche_ProjektCheck", "Gemeindetyp_ProjektCheck", "AP_pro_ha_brutto"], where_clause_dichtekennwerte)
+            for dichtekennwert in cursor_dichtekennwerte:
+                erwerbstaetige += dichtekennwert[2] * flaeche[2] * eintrag[2] / 100
 
     return erwerbstaetige
+
+
+
+
 
 
 
