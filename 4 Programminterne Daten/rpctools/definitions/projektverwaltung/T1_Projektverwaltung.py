@@ -52,7 +52,7 @@ class ProjektAnlegen(Projektverwaltung):
     def run(self):
         """"""
         gc.collect()
-        # self.output.define_projection()
+        self.output.define_projection()
         prject_anlegen_successful = self.projekt_anlegen()
         # test if self.projekt_anlegen() was successful
         # if not: AddMessage and delete project again
