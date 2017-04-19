@@ -39,6 +39,7 @@ class Config(object):
     def __init__(self):
 
         self.config_file = Folders().CONFIG_FILE
+        self._callbacks = {}
 
         if exists(self.config_file):
             self.read()
@@ -85,13 +86,27 @@ class Config(object):
 
     def __setattr__(self, name, value):
         if name in self._config:
+            for callback in self._callbacks[name]:
+                print(callback)
+                callback(value)
             self._config[name] = value
         else:
             self.__dict__[name] = value
+        #if name in self._callbacks:
+            #for callback in self._callbacks[name]:
+                #callback(value)
 
     def __repr__(self):
         return repr(self._config)
-
+    
+    def on_change(self, attribute, callback):
+        if attribute not in self._callbacks:
+            self._callbacks[attribute] = []
+        self._callbacks[attribute].append(callback)
+        
+    def remove_listeners(attribute):
+        if attribute in self._callbacks:
+            self._callbacks.pop(attribute)
 
 ########################################################################
 class Folders(object):
@@ -114,6 +129,8 @@ class Folders(object):
         self._AUSGABE_PATH = 'Ergebnisausgabe'
         self._TEXTE = 'texte'
         self._MXDS = 'mxds'
+        self._DEFINITION_PYT_PATH = '1 Planungsprojekte definieren'
+        self._ANALYST_PYT_PATH = '1 Planungsprojekte definieren'
         # the params
         self._params = params
         self._invalid_paths = []
@@ -183,7 +200,7 @@ class Folders(object):
         path = join(self.INTERN, self._TEMPORARY_GDB_PATH)
         if not exists(path):
             mkdir(path)
-        return path
+        return path    
 
     @property
     def TEMPLATE_FLAECHEN(self):
@@ -222,6 +239,14 @@ class Folders(object):
     @property
     def CONFIG_FILE(self):
         return join(self.INTERN, self._config_file)
+    
+    @property
+    def ANALYST_PYT_PATH(self):
+        return self.join_and_check(self.BASE_PATH, self._ANALYST_PYT_PATH)
+
+    @property
+    def DEFINITION_PYT_PATH(self):
+        return self.join_and_check(self.BASE_PATH, self._DEFINITION_PYT_PATH)
 
     def get_projects(self):
         '''
