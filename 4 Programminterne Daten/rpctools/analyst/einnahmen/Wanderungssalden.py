@@ -171,7 +171,6 @@ class Wanderungssalden(Tool):
                   "SvB_Fortzug", "SvB_Saldo", "Wanderungsanteil_Ew",
                   "Wanderungsanteil_SvB", "AGS"]
         cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
-        arcpy.AddMessage(einwohner_projekt)
         for gemeinde in cursor:
             gemeinde[1] = einwohner_projekt * gemeinde[6] * -1
             if gemeinde[8] == ags_projekt:
