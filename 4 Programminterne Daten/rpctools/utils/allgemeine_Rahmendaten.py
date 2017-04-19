@@ -3,10 +3,10 @@ import rpctools.utils.config
 
 def Bewohner_referenz_plangebiet(self, projektname):
 
-    we_tabelle = Folders.get_table(self, tablename= "Wohnen_WE_in_Gebaeudetypen", workspace='FGDB_Definition_Projekt.gdb', project= projektname, check=True)
+    we_tabelle = self.folders.get_table(tablename= "Wohnen_WE_in_Gebaeudetypen", workspace='FGDB_Definition_Projekt.gdb', project= projektname, check=True)
     fields = ["WE", "EW_je_WE"]
     einwohnerzahl = 0
-    cursor = arcpy.SearchCursor(fields)
+    cursor = arcpy.SearchCursor(we_tabelle, fields)
     for flaeche in cursor:
         einwohnerzahl += flaeche[0] * flaeche[1]
 
@@ -30,7 +30,7 @@ def Erwerbstaetige_referenz_plangebiet(self, projektname):
         workspace="FGDB_Definition_Projekt.gdb",
         project=projektname)
     pfad_flaechenanteile_branchen = self.folders.get_table(tablename='Gewerbe_Flaechenanteile_Branchen', workspace="FGDB_Definition_Projekt.gdb", project=projektname)
-    pfad_dichtekennwerte = self.folders.get_base_table(tablename = "Dichtekennwerte_Gewerbe", workspace="FGDB_Definition_Projekt_Tool.gdb")
+    pfad_dichtekennwerte = self.folders.get_base_table(table = "Dichtekennwerte_Gewerbe", workspace="FGDB_Definition_Projekt_Tool.gdb")
 
     cursor_teilflaechen = arcpy.da.SearchCursor(table_teilflaechen, ["id_teilflaeche", "Nutzungsart", "Flaeche_ha"])
     for flaeche in cursor_teilflaechen:
@@ -42,6 +42,7 @@ def Erwerbstaetige_referenz_plangebiet(self, projektname):
                     for dichtekennwert in cursor_dichtekennwerte:
                         if dichtekennwert[0] == eintrag[1] and dichtekennwert[1] == gemeindetyp:
                             erwerbstaetige += dichtekennwert[2] * flaeche[2] * eintrag[2] / 100
+
 
     return erwerbstaetige
 
