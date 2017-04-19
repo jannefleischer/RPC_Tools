@@ -61,6 +61,8 @@ class TbxFlaechendefinition(Tbx):
         -------
         teilflaeche : Teilflaeche
         """
+        if name not in self.teilflaechen:
+            return None
         teilflaeche = self.teilflaechen[name]
         return teilflaeche
 
@@ -142,14 +144,20 @@ class TbxFlaechendefinition(Tbx):
         self.add_temporary_management('FGDB_Definition_Projekt.gdb')
 
         return params
+    
+    def commit_tfl_changes(self):
+        """Commit Teilflaechen Changes"""
 
     def _updateParameters(self, params):
         if params.changed('projectname') or self.recently_opened:
             params.teilflaeche.value = ''
             self.update_teilflaechen(self._nutzungsart)
 
-        if params.changed('teilflaeche'):
+        if params.changed('teilflaeche') and self.par.teilflaeche.filter.list:
+            if not self.recently_opened:
+                self.commit_tfl_changes()
             tfl = self.get_teilflaeche(params.teilflaeche.value)
+            params._current_tfl = tfl
             self.update_teilflaechen_inputs(tfl.flaechen_id,
                                             tfl.name)
 
@@ -171,8 +179,13 @@ class TbxFlaechendefinition(Tbx):
         # select first one
         if list_teilflaechen:
             flaeche = list_teilflaechen[0]
+            tfl = self.get_teilflaeche(flaeche)
+            self.par._current_tfl = tfl
+            self.par.teilflaeche.enabled = True
         else:
-            flaeche = ''
+            flaeche = u'keine entsprechenden Flächen vorhanden'
+            for param in self.par:
+                param.enabled = False
 
         self.par.teilflaeche.value = flaeche
 
@@ -255,9 +268,10 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                     self.delete_rows_in_table(
                         table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
                 if nutzungsart_id != Nutzungsart.GEWERBE:
-                    table = ''
-                    #self.delete_rows_in_table(
-                        #table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
+                    tables = ['Gewerbe_Anteile', 'Gewerbe_Arbeitsplaetze']
+                    for table in tables:
+                        self.delete_rows_in_table(
+                            table, pkey=dict(IDTeilflaeche=tfl.flaechen_id))
                 if nutzungsart_id != Nutzungsart.EINZELHANDEL:
                     table = 'Einzelhandel_Verkaufsflaechen'
                     self.delete_rows_in_table(

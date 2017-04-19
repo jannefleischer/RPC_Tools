@@ -28,6 +28,11 @@ class TbxNutzungen(TbxFlaechendefinition):
     @property
     def label(self):
         return self._label
+    
+    def execute(self, parameters, messages):
+        """"""
+        self.commit_tfl_changes()
+        super(TbxNutzungen, self).execute(parameters, messages)
 
     def init_aufsiedlung(self, params, heading='', beginn_name='',
                          default_zeitraum=5):
@@ -65,25 +70,19 @@ class TbxNutzungen(TbxFlaechendefinition):
         param.value = default_zeitraum
         param.filter.type = 'Range'
         param.filter.list = [1, 20]
-        param.category = heading        
+        param.category = heading
 
         return params
 
-    def _updateParameters(self, params):
-        params = super(TbxNutzungen, self)._updateParameters(params)
-
-        flaeche = params.teilflaeche.value
-        if flaeche:
-            tfl = self.get_teilflaeche(params.teilflaeche.value)
-
-            if params.changed('bezugsbeginn', 'dauer_aufsiedlung'):
-                table = 'Teilflaechen_Plangebiet'
-                column_values = dict(
-                    Beginn_Nutzung=params.bezugsbeginn.value,
-                    Aufsiedlungsdauer=params.dauer_aufsiedlung.value)
-                self.update_table(table, column_values, tfl.where_clause)
-
-        return params
+    def commit_tfl_changes(self):
+        """"""
+        super(TbxNutzungen, self).commit_tfl_changes()
+        tfl = self.par._current_tfl
+        table = 'Teilflaechen_Plangebiet'
+        column_values = dict(
+            Beginn_Nutzung=self.par.bezugsbeginn.value,
+            Aufsiedlungsdauer=self.par.dauer_aufsiedlung.value)
+        self.update_table(table, column_values, tfl.where_clause)
 
     def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
         """update all inputs based on currently selected teilflaeche"""
@@ -156,32 +155,10 @@ class TbxNutzungenWohnen(TbxNutzungen):
 
         return params
 
-    def _updateParameters(self, params):
-        params = super(TbxNutzungenWohnen, self)._updateParameters(params)
-
-        flaeche = params.teilflaeche.value
-        if flaeche:
-            tfl = self.get_teilflaeche(params.teilflaeche.value)
-
-            for gt in self.gebaeudetypen.itervalues():
-                assert isinstance(gt, Gebaeudetyp)
-                if params.changed(gt.param_we, gt.param_ew_je_we):
-                    table = 'Wohnen_WE_in_Gebaeudetypen'
-                    pkey = dict(IDTeilflaeche=tfl.flaechen_id,
-                                IDGebaeudetyp=gt.typ_id)
-                    column_values = dict(
-                        Gebaeudetyp=gt.name,
-                        WE=params[gt.param_we].value,
-                        EW_je_WE=params[gt.param_ew_je_we].value,
-                    )
-                    r = self.upsert_row_in_table(table, column_values, pkey)
-
-        return params
-
     def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
         """update all inputs based on currently selected teilflaeche"""
         super(TbxNutzungenWohnen, self).update_teilflaechen_inputs(
-            flaechen_id,flaechenname)
+            flaechen_id, flaechenname)
         columns = ['IDGebaeudetyp', 'WE', 'EW_je_WE']
         pkey = dict(IDTeilflaeche=flaechen_id)
         rows = self.query_table('Wohnen_WE_in_Gebaeudetypen',
@@ -193,12 +170,28 @@ class TbxNutzungenWohnen(TbxNutzungen):
             for gt in self.gebaeudetypen.itervalues():
                 self.par[gt.param_we].value = 0
                 self.par[gt.param_ew_je_we].value = gt.default_ew_je_we
-
+            
         # otherwise, update parameters from query
         for row in rows:
             gt = self.gebaeudetypen[row[0]]
             self.par[gt.param_we].value = row[1]
             self.par[gt.param_ew_je_we].value = row[2]
+
+    def commit_tfl_changes(self):
+        """"""
+        super(TbxNutzungenWohnen, self).commit_tfl_changes()
+        tfl = self.par._current_tfl
+        for gt in self.gebaeudetypen.itervalues():
+            assert isinstance(gt, Gebaeudetyp)
+            table = 'Wohnen_WE_in_Gebaeudetypen'
+            pkey = dict(IDTeilflaeche=tfl.flaechen_id,
+                        IDGebaeudetyp=gt.typ_id)
+            column_values = dict(
+                Gebaeudetyp=gt.name,
+                WE=self.par[gt.param_we].value,
+                EW_je_WE=self.par[gt.param_ew_je_we].value,
+            )
+            r = self.upsert_row_in_table(table, column_values, pkey)
 
     def _updateMessages(self, params):
         pass
@@ -296,7 +289,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.category = heading
 
         # remember params
-        self.branche_params = []
+        sum_params = []
         
         for branche in self.branchen.itervalues():
             assert isinstance(branche, Branche)
@@ -311,11 +304,9 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             param.filter.type = 'Range'
             param.filter.list = [0, 100]
             param.category = heading
-            param.id_branche = branche.id
-            
-            self.branche_params.append(branche.param_gewerbenutzung)
+            sum_params.append(branche.param_gewerbenutzung)
         
-        self.add_dependency(self.branche_params, 100)
+        self.add_dependency(sum_params, 100)
 
         heading = u'3) Voraussichtliche Anzahl an Arbeitsplätzen'
 
@@ -351,18 +342,19 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     def set_gewerbe_presets(self, id_gewerbe):
         """set all branche values to db-presets of given gewerbe-id"""
         presets = self.presets[id_gewerbe]
-        for param_name in self.branche_params:
-            param = self.par[param_name]
-            preset = presets[param.id_branche]
+        for branche in self.branchen.itervalues():
+            param = self.par[branche.param_gewerbenutzung]
+            preset = presets[branche.id]
             param.value = preset
 
     def _updateParameters(self, params):
         params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
 
-        branche_changed = False
+        re_estimate = False
 
         flaeche = params.teilflaeche.value
-        if not flaeche:
+        tfl = self.get_teilflaeche(flaeche)
+        if not tfl:
             return params
 
         # set presets
@@ -370,14 +362,16 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             id_gewerbe = self.gewerbegebietstypen[params.gebietstyp.value]
             if id_gewerbe != Gewerbegebietstyp.BENUTZERDEFINIERT:
                 self.set_gewerbe_presets(id_gewerbe)
-                branche_changed = True
+                re_estimate = True
         else:
             altered = False
             # check if one of the branchenanteile changed
-            if any(map(self.par.changed, self.branche_params)):
+            if any(map(self.par.changed,
+                       [branche.param_gewerbenutzung
+                        for branche in self.branchen.values()])):
                 # set selection to "benutzerdefiniert" and recalc. jobs
                 self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
-                branche_changed = True
+                re_estimate = True
 
         auto_idx = self.par.auto_select.filter.list.index(
             self.par.auto_select.value)
@@ -385,27 +379,34 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         if self.par.changed('auto_select'):
             # auto calc. entry
             if auto_idx == 0:
-                self.set_estimate_jobs()
+                re_estimate = True
                 params.arbeitsplaetze_insgesamt.enabled = False
             # manual entry
             else:
                 params.arbeitsplaetze_insgesamt.enabled = True
             
-        if branche_changed:
-            tfl = self.get_teilflaeche(params.teilflaeche.value)
-            if auto_idx == 0:
-                self.set_estimate_jobs()
-            for param_name in self.branche_params:
-                param = self.par[param_name]
-                table = self.tablename
-                pkey = { 'id_teilflaeche': tfl.flaechen_id,
-                         'id_branche': param.id_branche}
-                column_values = {'anteil': param.value}                
-                r = self.upsert_row_in_table(table, column_values, pkey)
-            # ToDo write to gdb
-        
-
+        if re_estimate and auto_idx == 0:
+            self.set_estimate_jobs()
+                
         return params
+
+    def commit_tfl_changes(self):
+        """"""
+        super(TbxNutzungenGewerbe, self).commit_tfl_changes()
+        tfl = self.par._current_tfl
+        for branche in self.branchen.itervalues():
+            param = self.par[branche.param_gewerbenutzung]
+            table = self.tablename
+            pkey = {'IDTeilflaeche': tfl.flaechen_id,
+                    'IDBranche': branche.id}
+            column_values = {'anteil': param.value}
+            r = self.upsert_row_in_table(table, column_values, pkey)
+            
+        table_jobs = 'Gewerbe_Arbeitsplaetze'
+        pkey = {'IDTeilflaeche': tfl.flaechen_id}
+        param = self.par.arbeitsplaetze_insgesamt
+        column_values = {'Arbeitsplaetze': param.value}
+        r = self.upsert_row_in_table(table_jobs, column_values, pkey)
 
     def set_estimate_jobs(self):
         """calculate estimation of number of jobs and set value of corresponding
@@ -418,9 +419,9 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         tfl = self.teilflaechen[flaeche]
         gemeindetyp = get_gemeindetyp(tfl.ags)
         kennwerte = self.dichtekennwerte[gemeindetyp]
-        for name in self.branche_params:
-            param = self.par[name]
-            jobs_per_ha = kennwerte[param.id_branche]
+        for branche in self.branchen.itervalues():
+            param = self.par[branche.param_gewerbenutzung]
+            jobs_per_ha = kennwerte[branche.id]
             n_jobs += tfl.ha * (param.value / 100.) * jobs_per_ha
 
         self.par.arbeitsplaetze_insgesamt.value = n_jobs
@@ -429,23 +430,24 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         """update all inputs based on currently selected teilflaeche"""
         super(TbxNutzungenGewerbe, self).update_teilflaechen_inputs(
             flaechen_id, flaechenname) 
-        columns = ['id_branche', 'anteil']
+        columns = ['IDBranche', 'anteil']
         
-        pkey = {'id_teilflaeche': flaechen_id}
+        pkey = {'IDTeilflaeche': flaechen_id}
         rows = self.query_table(self.tablename,
                                 columns,
                                 pkey=pkey)
-
         # if there are no values defined yet, set to default values
         if not rows:
             for branche in self.branchen.itervalues():
                 self.par[branche.param_gewerbenutzung].value = \
                     branche.default_gewerbenutzung
-
-        # otherwise, update parameters from query
-        for row in rows:
-            branche = self.branchen[row[0]]
-            self.par[branche.param_gewerbenutzung].value = row[1]
+        # update parameters from query else
+        else: 
+            for row in rows:
+                branche = self.branchen[row[0]]
+                self.par[branche.param_gewerbenutzung].value = row[1]
+                
+        self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
 
     def _updateMessages(self, params):
         pass
@@ -491,25 +493,6 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
 
         return params
 
-    def _updateParameters(self, params):
-        params = super(TbxNutzungenEinzelhandel, self)._updateParameters(params)
-        flaeche = params.teilflaeche.value
-        if flaeche:
-            tfl = self.get_teilflaeche(params.teilflaeche.value)
-
-            for srt in self.sortimente.itervalues():
-                assert isinstance(srt, Sortiment)
-                if params.changed(srt.param_vfl):
-                    pkey = dict(IDTeilflaeche=tfl.flaechen_id,
-                                IDSortiment=srt.typ_id)
-                    column_values = dict(
-                        NameSortiment=srt.kurzname,
-                        Verkaufsflaeche_qm=params[srt.param_vfl].value,
-                    )
-                    r = self.upsert_row_in_table(
-                        self.tablename, column_values, pkey)
-        return params
-
     def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
         """update all inputs based on currently selected teilflaeche"""
         super(TbxNutzungenEinzelhandel, self).update_teilflaechen_inputs(
@@ -529,6 +512,21 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         for row in rows:
             srt = self.sortimente[row[0]]
             self.par[srt.param_vfl].value = row[1]
+            
+    def commit_tfl_changes(self):
+        """"""
+        super(TbxNutzungenEinzelhandel, self).commit_tfl_changes()
+        tfl = self.par._current_tfl
+        for srt in self.sortimente.itervalues():
+            assert isinstance(srt, Sortiment)
+            pkey = dict(IDTeilflaeche=tfl.flaechen_id,
+                        IDSortiment=srt.typ_id)
+            column_values = dict(
+                NameSortiment=srt.kurzname,
+                Verkaufsflaeche_qm=self.par[srt.param_vfl].value,
+            )
+            r = self.upsert_row_in_table(
+                self.tablename, column_values, pkey)
 
     def _updateMessages(self, params):
         pass

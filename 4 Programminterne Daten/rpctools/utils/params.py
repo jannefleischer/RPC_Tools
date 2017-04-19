@@ -688,7 +688,6 @@ class Tbx(object):
         self._commit_temporaries()
         self.tool.main(self.par, parameters, messages)
         self.clear_temporary_dbs()
-        #self.tool.main(self.par, parameters, messages)
 
     def print_test_parameters(self):
         """
