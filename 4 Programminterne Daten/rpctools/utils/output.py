@@ -199,7 +199,6 @@ class Output(object):
         Check and add project layer
         """
         projektname = projektname or self.params._get_projectname()
-
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
 
@@ -211,7 +210,6 @@ class Output(object):
             is_grouplayer = layer_exists[0].isGroupLayer
         else:
             is_grouplayer = False
-
         if not layer_exists or not is_grouplayer:
             group_layer_template = self.folders.get_layer(
                 layername="__Projektname__", folder='toc', enhance=True)
@@ -377,7 +375,10 @@ class Output(object):
         current_dataframe = current_mxd.activeDataFrame
 
         # Layer-Gruppen hinuzfuegen, falls nicht vorhanden
+        self.set_projectlayer(projektname)
+        project_layer = self.get_projectlayer(projektname)
         self.set_backgroundgrouplayer(current_dataframe)
+        self.set_headgrouplayer(project_layer, current_dataframe)
 
         # Template Layer laden
         source_layer = arcpy.mapping.Layer(template_layer)
@@ -392,9 +393,6 @@ class Output(object):
 
         # Untergruppen hinzufügen
         if in_project:
-            self.set_projectlayer(projektname)
-            project_layer = self.get_projectlayer(projektname)
-            self.set_headgrouplayer(project_layer, current_dataframe)
             self.set_grouplayer(group, project_layer, current_dataframe)
             if subgroup != "":
                 self.set_subgrouplayer(group, subgroup,
@@ -484,16 +482,12 @@ class Output(object):
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
 
-    def update_output(self, group, layername):
-        """ToDo - oder ist das was replace_output tun soll?"""
-        projektname = self.params._get_projectname()
-
 
     def replace_output(self,
                        groupname,
                        fc,
                        layername,
-                       folder,
+                       folder = '',
                        subgroup='',
                        disable_other=False):
         """
