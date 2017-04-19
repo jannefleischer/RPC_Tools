@@ -233,8 +233,8 @@ class Wanderungssalden(Tool):
     #   Symbology anpassen
         mxd = arcpy.mapping.MapDocument("CURRENT")
         negative_saldos = [
-            "Negativer Wanderungssalden Einwohner",
-            "Negativer Wanderungssalden Erwerbstätige",
+            "Negative Wanderungssalden Einwohner",
+            "Negative Wanderungssalden Erwerbstätige",
         ]
         projekt_layer = self.output.get_projectlayer(projektname)
         for layername in negative_saldos:

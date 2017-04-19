@@ -6,7 +6,7 @@ def Bewohner_referenz_plangebiet(self, projektname):
     we_tabelle = self.folders.get_table(tablename= "Wohnen_WE_in_Gebaeudetypen", workspace='FGDB_Definition_Projekt.gdb', project= projektname, check=True)
     fields = ["WE", "EW_je_WE"]
     einwohnerzahl = 0
-    cursor = arcpy.SearchCursor(we_tabelle, fields)
+    cursor = arcpy.da.SearchCursor(we_tabelle, fields)
     for flaeche in cursor:
         einwohnerzahl += flaeche[0] * flaeche[1]
 
