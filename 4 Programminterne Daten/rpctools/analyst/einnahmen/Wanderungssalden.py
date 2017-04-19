@@ -147,13 +147,14 @@ class Wanderungssalden(Tool):
         fields = ["Gewichtete_Ew", "Wanderungsanteil_Ew", "Gewichtete_SvB", "Wanderungsanteil_SvB"]
         cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
         for gemeinde in cursor:
+
             gemeinde[1] = gemeinde[0] / gewichtete_ew_gesamt
             gemeinde[3] = gemeinde[2] / gewichtete_SvB_gesamt
             cursor.updateRow(gemeinde)
 
         # Berechnung der Einwohner und SvB im Plangebiet
-        einwohner_projekt = rahmendaten.Bewohner_referenz_plangebiet(projektname)
-        erwerbstaetige_projekt = rahmendaten.Erwerbstaetige_referenz_plangebiet(projektname)
+        einwohner_projekt = rahmendaten.Bewohner_referenz_plangebiet(self, projektname)
+        erwerbstaetige_projekt = rahmendaten.Erwerbstaetige_referenz_plangebiet(self, projektname)
 
         # Bestimme AGS der Projektgemeinde
         pfad_rahmendaten = self.folders.get_table(
@@ -167,21 +168,22 @@ class Wanderungssalden(Tool):
 
         #Ergebnis einfügen
         fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "SvB_Zuzug",
-                  "SvB_Fortzug", "Wanderungsanteil_Ew",
+                  "SvB_Fortzug", "SvB_Saldo", "Wanderungsanteil_Ew",
                   "Wanderungsanteil_SvB", "AGS"]
         cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
+        arcpy.AddMessage(einwohner_projekt)
         for gemeinde in cursor:
-            gemeinde[0] = einwohner_projekt * gemeinde[5] * -1
-            if gemeinde[7] == ags_projekt:
-                gemeinde[1] = einwohner_projekt
+            gemeinde[1] = einwohner_projekt * gemeinde[6] * -1
+            if gemeinde[8] == ags_projekt:
+                gemeinde[0] = einwohner_projekt
             else:
-                gemeinde[1] = 0
+                gemeinde[0] = 0
             gemeinde[2] = gemeinde[0] + gemeinde[1]
-            gemeinde[3] = erwerbstaetige_projekt * gemeinde[6] * -1
-            if gemeinde[7] == ags_projekt:
-                gemeinde[1] = erwerbstaetige_projekt
+            gemeinde[4] = erwerbstaetige_projekt * gemeinde[6] * -1
+            if gemeinde[8] == ags_projekt:
+                gemeinde[3] = erwerbstaetige_projekt
             else:
-                gemeinde[1] = 0
+                gemeinde[3] = 0
             gemeinde[5] = gemeinde[3] + gemeinde[4]
             cursor.updateRow(gemeinde)
 
@@ -205,6 +207,7 @@ class Wanderungssalden(Tool):
 
         groupname = "einnahmen"
         tbl_wanderungssalden = self.folders.get_table("Wanderungssalden")
+        folder = "einnahmen"
         disable_other = False
 
         #Einwohnersaldo-Layer hinzufügen
