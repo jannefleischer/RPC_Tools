@@ -10,15 +10,14 @@ folders = Folders()
 config = Config()
 
 class ButtonClass16(object):
-    # Nutzungen auf Teilfl&#228;chen definieren
     """Implementation for rpc_tools.button_3 (Button)"""
     def __init__(self):
         self.enabled = True
         self.checked = False
+        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
+                                 'Projektdefinition.pyt')
     def onClick(self):
-        projektverwaltung = os.path.join(folders.DEFINITION_PYT_PATH,
-                                         'Projektdefinition.pyt')
-        pythonaddins.GPToolDialog(projektverwaltung, 'TbxTeilflaecheVerwalten')
+        pythonaddins.GPToolDialog(self.path, 'TbxTeilflaecheVerwalten')
 
 class ButtonClass17(object):
     """Implementation for rpc_tools.button_4 (Button)"""
@@ -49,10 +48,10 @@ class ProjektAnlegen(object):
     def __init__(self):
         self.enabled = True
         self.checked = False
+        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
+                                 'Projektverwaltung.pyt')
     def onClick(self):
-        projektverwaltung = os.path.join(folders.DEFINITION_PYT_PATH,
-                                         'Projektverwaltung.pyt')
-        pythonaddins.GPToolDialog(projektverwaltung, 'TbxProjektAnlegen')
+        pythonaddins.GPToolDialog(self.path, 'TbxProjektAnlegen')
 
 class ProjektAuswahl(object):
     """Implementation for rpc_tools.projekt_auswahl (ComboBox)"""
@@ -97,17 +96,17 @@ class ProjektKopieren(object):
     def __init__(self):
         self.enabled = True
         self.checked = False
+        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
+                                 'Projektverwaltung.pyt')
     def onClick(self):
-        projektverwaltung = os.path.join(folders.DEFINITION_PYT_PATH,
-                                         'Projektverwaltung.pyt')
-        pythonaddins.GPToolDialog(projektverwaltung, 'TbxProjektKopieren')
+        pythonaddins.GPToolDialog(self.path, 'TbxProjektKopieren')
 
 class ProjektLoeschen(object):
     """Implementation for rpc_tools.projekt_loeschen (Button)"""
     def __init__(self):
         self.enabled = True
         self.checked = False
+        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
+                                 'Projektverwaltung.pyt')
     def onClick(self):
-        projektverwaltung = os.path.join(folders.DEFINITION_PYT_PATH,
-                                         'Projektverwaltung.pyt')
-        pythonaddins.GPToolDialog(projektverwaltung, 'TbxProjekteLoeschen')
+        pythonaddins.GPToolDialog(self.path, 'TbxProjekteLoeschen')
