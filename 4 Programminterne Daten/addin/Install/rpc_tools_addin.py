@@ -3,6 +3,8 @@ import pythonaddins
 import os
 
 from rpctools.utils.config import Folders, Config
+from rpctools.definitions.projektverwaltung.tbx_projektauswahl import \
+     TbxProjektauswahl
 
 folders = Folders()
 config = Config()
@@ -59,13 +61,17 @@ class ProjektAuswahl(object):
         self.enabled = True
         self.dropdownWidth = 'WWWWWW'
         self.width = 'WWWWWW'
+        self.tbx = TbxProjektauswahl()
+        self.tbx.getParameterInfo()
         config.on_change('active_project', lambda active: self.refresh())
         self.refresh()
 
     def onSelChange(self, selection):
         if selection != config.active_project:
-            config.active_project = selection
-            config.write()
+            #config.active_project = selection
+            #config.write()
+            self.tbx.par.active_project.value = selection
+            self.tbx.execute()
         self.value = selection
 
     def onEditChange(self, text):
