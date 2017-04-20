@@ -52,11 +52,13 @@ class ProjektAnlegen(Projektverwaltung):
     def run(self):
         """"""
         gc.collect()
-        # self.output.define_projection()
+        #self.output.define_projection()
         prject_anlegen_successful = self.projekt_anlegen()
         # test if self.projekt_anlegen() was successful
         # if not: AddMessage and delete project again
         if prject_anlegen_successful:
+            self.parent_tbx.config.active_project = self.projectname
+            self.parent_tbx.config.write()
             self.add_output_new_project()
             self.add_diagramm()
         else:
@@ -69,13 +71,12 @@ class ProjektAnlegen(Projektverwaltung):
 
         # get new Project input Data
         project_name = self.projectname
+
         flaeche = self.par.shapefile.value
         beginn_betrachtung = self.par.begin.value
         ende_betrachtung = self.par.end.value
         project_path = self.folders.get_projectpath(check=False)
-
-
-
+        
         self.copy_template(project_path)
 
         tfl, gdbPfad = self.copy_teilflaechen_to_gdb(project_name, flaeche)
@@ -107,9 +108,6 @@ class ProjektAnlegen(Projektverwaltung):
 
         arcpy.AddMessage("Neues Projekt angelegt im Ordner {}\n".format(
             project_path))
-
-        self.parent_tbx.config.active_project = project_name
-        self.parent_tbx.config.write()
 
         return True
 
@@ -295,13 +293,13 @@ class ProjektAnlegen(Projektverwaltung):
         arcpy.SetProgressorPosition(10)
 
         # calculate Gauß-Krüger-Coordinates and append them to tfl
-        arcpy.AddGeometryAttributes_management(Input_Features=tfl,
-                                              Geometry_Properties="CENTROID_INSIDE")
+        arcpy.AddGeometryAttributes_management(
+            Input_Features=tfl, Geometry_Properties="CENTROID_INSIDE")
 
         # Check if the distances between the centroids is smaller than max_dist
         toolbox = self.parent_tbx
         XY_INSIDE = toolbox.query_table("Teilflaechen_Plangebiet",
-                           ['INSIDE_X', 'INSIDE_Y'])
+                                        ['INSIDE_X', 'INSIDE_Y'])
         distances = []
         for i in range(len(XY_INSIDE)):
             for j in range(i):

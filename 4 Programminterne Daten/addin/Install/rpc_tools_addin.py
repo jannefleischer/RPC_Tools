@@ -59,7 +59,7 @@ class ProjektAuswahl(object):
         self.enabled = True
         self.dropdownWidth = 'WWWWWW'
         self.width = 'WWWWWW'
-        config.on_change('active_project', self.refresh)
+        config.on_change('active_project', lambda active: self.refresh())
         self.refresh()
 
     def onSelChange(self, selection):
@@ -78,11 +78,11 @@ class ProjektAuswahl(object):
     def onEnter(self):
         pass
 
-    def refresh(self, active=None):
-        self.items = sorted(folders.get_projects())
+    def refresh(self):
+        projects = folders.get_projects()
+        self.items = sorted(projects)
         active = config.active_project
-        print(active)
-        if active not in self.items:
+        if active not in projects:
             active = ''
         self.value = active
 

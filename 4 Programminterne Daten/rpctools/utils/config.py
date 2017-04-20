@@ -86,10 +86,10 @@ class Config(object):
 
     def __setattr__(self, name, value):
         if name in self._config:
-            for callback in self._callbacks[name]:
-                print(callback)
-                callback(value)
             self._config[name] = value
+            if name in self._callbacks:
+                for callback in self._callbacks[name]:
+                    callback(value)
         else:
             self.__dict__[name] = value
         #if name in self._callbacks:
