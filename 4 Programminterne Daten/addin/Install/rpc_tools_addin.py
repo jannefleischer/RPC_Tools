@@ -8,12 +8,15 @@ folders = Folders()
 config = Config()
 
 class ButtonClass16(object):
+    # Nutzungen auf Teilfl&#228;chen definieren
     """Implementation for rpc_tools.button_3 (Button)"""
     def __init__(self):
         self.enabled = True
         self.checked = False
     def onClick(self):
-        pass
+        projektverwaltung = os.path.join(folders.DEFINITION_PYT_PATH,
+                                         'Projektdefinition.pyt')
+        pythonaddins.GPToolDialog(projektverwaltung, 'TbxTeilflaecheVerwalten')
 
 class ButtonClass17(object):
     """Implementation for rpc_tools.button_4 (Button)"""
@@ -54,28 +57,29 @@ class ProjektAuswahl(object):
     def __init__(self):
         self.editable = True
         self.enabled = True
-        self.items = folders.get_projects()
         self.dropdownWidth = 'WWWWWW'
         self.width = 'WWWWWW'
         config.on_change('active_project', self.refresh)
-        
+        self.refresh()
+
     def onSelChange(self, selection):
         if selection != config.active_project:
             config.active_project = selection
             config.write()
-        
+        self.value = selection
+
     def onEditChange(self, text):
         pass
-    
+
     def onFocus(self, focused):
         if focused:
             self.refresh()
-            
+
     def onEnter(self):
         pass
-    
+
     def refresh(self, active=None):
-        self.items = folders.get_projects()
+        self.items = sorted(folders.get_projects())
         active = config.active_project
         print(active)
         if active not in self.items:
