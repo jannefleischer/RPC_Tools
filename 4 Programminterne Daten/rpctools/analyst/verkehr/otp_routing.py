@@ -9,8 +9,9 @@ import numpy as np
 from collections import OrderedDict
 from scipy.sparse import csc_matrix
 from pyproj import Proj, transform
-from  scipy.sparse.csgraph import dijkstra
-
+from scipy.sparse.csgraph import dijkstra
+from rpctools.utils.config import Folders
+from rpctools.utils.params import Tool
 
 
 class Route(object):
@@ -343,9 +344,10 @@ class Link(object):
 
 
 class OTPRouter(object):
-    def __init__(self, epsg=31467):
+    def __init__(self, workspace, epsg=31467):
         self.url = r'https://rpcrouting.ggr-planung.de/otp/routers/hvv_car/plan'
-        self.ws = r'C:\Dev\RPC_Tools\4 Programminterne Daten\templates\Template\FGDB_Verkehr.gdb'
+        self.ws = workspace
+        #self.ws = r'F:\Projekte SH\RPC Tools\4 Programminterne Daten\templates\Template\FGDB_Verkehr.gdb'
         self.router = 'hvv_car'
         self.epsg = epsg
         self.p1 = Proj(init='epsg:4326')
@@ -481,11 +483,6 @@ class OTPRouter(object):
         node = self.nodes.get_node(node_id)
         transfer_node = self.transfer_nodes.get_node(node, route)
         transfer_node.dist = route_dist_vector[idx]
-        print('Route {}: node {} {} {} at {} meters'.format(route_id,
-                                                      transfer_node.node_id,
-                                                      transfer_node.lat,
-                                                      transfer_node.lon,
-                                                      transfer_node.dist))
         return transfer_node
 
     def get_max_nodes(self, dist_vector):
@@ -506,11 +503,11 @@ class OTPRouter(object):
         mat = csc_matrix((data, (row, col)), shape=(N, N))
         source_nodes = self.routes.source_nodes
         dist_matrix = dijkstra(mat,
-                                    directed=True,
-                                    return_predecessors=False,
-                                    indices=self.routes.source_nodes,
-                                    #limit=meters,
-                                    )
+                               directed=True,
+                               return_predecessors=False,
+                               indices=self.routes.source_nodes,
+                               #limit=meters,
+                               )
         dist_vector = dist_matrix.min(axis=0)
         self.set_link_distance(dist_vector)
         dist_vector[dist_vector > meters] = np.NINF
@@ -597,31 +594,69 @@ class OTPRouter(object):
 
 
 
-if __name__ == '__main__':
-    o = OTPRouter()
-    source = Point(lat=53.5, lon=9.589)
-    source_id = 0
-    destinations = o.create_circle(source, dist=1000, n_segments=36)
-    for d, (lon, lat) in enumerate(destinations):
-        destination = Point(lat, lon)
-        print d,
-        json = o.get_routing_request(source, destination)
-        o.decode_coords(json, route_id=d, source_id=source_id)
 
-    max_d = d
-    source = Point(lat=53.502, lon=9.587)
-    source_id = 1
-    for d, (lon, lat) in enumerate(destinations):
-        destination = Point(lat, lon)
-        json = o.get_routing_request(source, destination)
-        o.decode_coords(json, route_id=d+max_d, source_id=source_id)
+class Routing(Tool):
+    _dbname = 'FGDB_Verkehr.gdb'
+    _param_projectname = 'project'
 
-    o.nodes.transform()
-    o.nodes_to_graph()
-    o.transfer_nodes.calc_initial_weight()
-    o.calc_vertex_weights()
-    o.create_polyline_features()
-    o.create_node_features()
-    o.create_transfer_node_features()
+
+    def run(self):
+
+        columns = ['id_teilflaeche', 'INSIDE_X', 'INSIDE_Y']
+        toolbox = self.parent_tbx
+        outer_circle = toolbox.par.outer.value
+        inner_circle = toolbox.par.inner.value
+        n_segments = toolbox.par.dests.value
+        # get centroid coordinates
+        tfl = self.folders.get_table("Teilflaechen_Plangebiet", workspace='FGDB_Definition_Projekt.gdb')
+        tmp_table = os.path.join(arcpy.env.scratchGDB, "Teilflaechen_Plangebiet")
+        # create tmp_table for transforming from gauss-krüger to 4326
+        if arcpy.Exists(tmp_table):
+            arcpy.Delete_management(tmp_table)
+        arcpy.Copy_management(tfl, tmp_table)
+        arcpy.AddGeometryAttributes_management(
+            Input_Features=tmp_table, Geometry_Properties="CENTROID_INSIDE",
+            Coordinate_System=4326)
+        cursor = arcpy.da.SearchCursor(tmp_table, columns)
+        XY_INSIDE = [row for row in cursor]
+        del cursor
+        arcpy.Delete_management(tmp_table)
+        workspace = self.folders.get_db()
+        o = OTPRouter(workspace)
+
+        r_id = 0
+        for centroid in XY_INSIDE:
+            source_id, x_coord, y_coord = centroid
+            # ? lat = y lon = x
+            source = Point(lat=y_coord, lon=x_coord)
+            destinations = o.create_circle(source, dist=outer_circle, n_segments=n_segments)
+            for (lon, lat) in destinations:
+                destination = Point(lat, lon)
+                print r_id,
+                json = o.get_routing_request(source, destination)
+                o.decode_coords(json, route_id=r_id, source_id=source_id)
+                r_id += 1
+
+
+        o.nodes.transform()
+        o.nodes_to_graph(meters=inner_circle)
+        o.transfer_nodes.calc_initial_weight()
+        o.calc_vertex_weights()
+        o.create_polyline_features()
+        o.create_node_features()
+        o.create_transfer_node_features()
+
+        # Add Layers
+        lyr_links = self.folders.get_layer('links', 'Verkehr')
+        fc_links = self.folders.get_table('links')
+        self.output.add_output('verkehr', lyr_links, fc_links)
+
+        lyr_nodes = self.folders.get_layer('nodes', 'Verkehr')
+        fc_nodes = self.folders.get_table('nodes')
+        self.output.add_output('verkehr', lyr_nodes, fc_nodes)
+
+        lyr_zielpunkte = self.folders.get_layer('Zielpunkte', 'Verkehr')
+        fc_zielpunkte = self.folders.get_table('Zielpunkte')
+        self.output.add_output('verkehr', lyr_zielpunkte, fc_zielpunkte)
 
 
