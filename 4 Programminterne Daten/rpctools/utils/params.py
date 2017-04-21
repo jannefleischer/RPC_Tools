@@ -305,8 +305,12 @@ class Tbx(object):
             #self._create_temporary_copies()
         self._updateParameters(self.par)
 
-    def _set_active_project(self):
+    def _set_active_project(self):        
         active_project = self.config.active_project
+        # fix active project if it was set to test project by a tool
+        # (may happen while testing)
+        if active_project == self.folders._TEST_TMP_PROJECT:
+            active_project = self.config.active_project = ''
         project_param = self.par[self.par._param_projectname]
         project_param.filter.list = []
         project_param.value = active_project
