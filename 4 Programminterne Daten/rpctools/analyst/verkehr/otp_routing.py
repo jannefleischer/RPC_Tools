@@ -601,35 +601,43 @@ class Routing(Tool):
 
 
     def run(self):
-
-        columns = ['id_teilflaeche', 'INSIDE_X', 'INSIDE_Y']
         toolbox = self.parent_tbx
+        # tbx settings
         outer_circle = toolbox.par.outer.value
         inner_circle = toolbox.par.inner.value
         n_segments = toolbox.par.dests.value
-        # get centroid coordinates
-        tfl = self.folders.get_table("Teilflaechen_Plangebiet", workspace='FGDB_Definition_Projekt.gdb')
-        tmp_table = os.path.join(arcpy.env.scratchGDB, "Teilflaechen_Plangebiet")
+
         # create tmp_table for transforming from gauss-krüger to 4326
+        tfl = self.folders.get_table("Teilflaechen_Plangebiet",
+                                     workspace='FGDB_Definition_Projekt.gdb')
+        tmp_table = os.path.join(arcpy.env.scratchGDB,
+                                 "Teilflaechen_Plangebiet")
         if arcpy.Exists(tmp_table):
             arcpy.Delete_management(tmp_table)
-        arcpy.Copy_management(tfl, tmp_table)
+        arcpy.Copy_management(tfl, tmp_table)   # create tmp table
         arcpy.AddGeometryAttributes_management(
             Input_Features=tmp_table, Geometry_Properties="CENTROID_INSIDE",
             Coordinate_System=4326)
+
+        # get centroid coordinates
+        columns = ['id_teilflaeche', 'INSIDE_X', 'INSIDE_Y']
         cursor = arcpy.da.SearchCursor(tmp_table, columns)
         XY_INSIDE = [row for row in cursor]
         del cursor
         arcpy.Delete_management(tmp_table)
+
+        # calculate routes
         workspace = self.folders.get_db()
         o = OTPRouter(workspace)
-
         r_id = 0
         for centroid in XY_INSIDE:
             source_id, x_coord, y_coord = centroid
             # ? lat = y lon = x
-            source = Point(lat=y_coord, lon=x_coord)
-            destinations = o.create_circle(source, dist=outer_circle, n_segments=n_segments)
+            source = Point(lat=y_coord, lon=x_coord)    # centroid
+            # calculate segments around centroid
+            destinations = o.create_circle(source, dist=outer_circle,
+                                           n_segments=n_segments)
+            # calculate the routes to the segments
             for (lon, lat) in destinations:
                 destination = Point(lat, lon)
                 print r_id,
@@ -646,17 +654,19 @@ class Routing(Tool):
         o.create_node_features()
         o.create_transfer_node_features()
 
+
         # Add Layers
-        lyr_links = self.folders.get_layer('links', 'Verkehr')
-        fc_links = self.folders.get_table('links')
-        self.output.add_output('verkehr', lyr_links, fc_links)
+        lyr_zielpunkte = self.folders.get_layer('Zielpunkte', 'Verkehr')
+        fc_zielpunkte = self.folders.get_table('Zielpunkte')
+        self.output.add_output('verkehr', lyr_zielpunkte, fc_zielpunkte)
 
         lyr_nodes = self.folders.get_layer('nodes', 'Verkehr')
         fc_nodes = self.folders.get_table('nodes')
         self.output.add_output('verkehr', lyr_nodes, fc_nodes)
 
-        lyr_zielpunkte = self.folders.get_layer('Zielpunkte', 'Verkehr')
-        fc_zielpunkte = self.folders.get_table('Zielpunkte')
-        self.output.add_output('verkehr', lyr_zielpunkte, fc_zielpunkte)
+        lyr_links = self.folders.get_layer('links', 'Verkehr')
+        fc_links = self.folders.get_table('links')
+        self.output.add_output('verkehr', lyr_links, fc_links)
+
 
 
