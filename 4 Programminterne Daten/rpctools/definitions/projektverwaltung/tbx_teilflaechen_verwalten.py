@@ -61,7 +61,7 @@ class TbxFlaechendefinition(Tbx):
         -------
         teilflaeche : Teilflaeche
         """
-        if name not in self.teilflaechen:
+        if not self.teilflaechen or name not in self.teilflaechen:
             return None
         teilflaeche = self.teilflaechen[name]
         return teilflaeche
@@ -242,8 +242,8 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
         params = super(TbxTeilflaecheVerwalten, self)._updateParameters(params)
 
         flaeche = params.teilflaeche.value
-        if flaeche:
-            tfl = self.get_teilflaeche(params.teilflaeche.value)
+        tfl = self.get_teilflaeche(params.teilflaeche.value)
+        if tfl:
             where_tfl = 'id_teilflaeche={}'.format(tfl.flaechen_id)
 
             if params.changed('name'):
