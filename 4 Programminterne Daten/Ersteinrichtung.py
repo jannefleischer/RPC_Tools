@@ -22,6 +22,13 @@ import arcpy
 def install_packages(python_path):
 
     arcpy.AddMessage("\n"+ "Verwendeter Python-Pfad: " + python_path + "\n")
+    arcpy.AddMessage(sys.version)
+    arcpy.AddMessage(sys.platform)
+    platform = 'win32'
+    if sys.maxsize > 2**32:
+        platform = 'win_amd64'
+    platform = 'win32'
+
 
     #Creating list with missing packages
     used_packages = OrderedDict()
@@ -33,14 +40,14 @@ def install_packages(python_path):
 
     used_packages['functools32']='functools32-3.2.3.post2-py27-none-any.whl'
 
-    used_packages['numpy'] = 'numpy-1.12.1+mkl-cp27-cp27m-win32.whl'
+    used_packages['numpy'] = 'numpy-1.12.1+mkl-cp27-cp27m-{}.whl'.format(platform)
     used_packages['cycler'] = 'cycler-0.10.0-py2.py3-none-any.whl'
     used_packages['dateutil']='python_dateutil-2.6.0-py2.py3-none-any.whl'
     used_packages['pytz']='pytz-2017.2-py2.py3-none-any.whl'
 
-    used_packages['matplotlib']='matplotlib-2.0.0-cp27-cp27m-win32.whl'
+    used_packages['matplotlib']='matplotlib-2.0.0-cp27-cp27m-{}.whl'.format(platform)
 
-    used_packages['pyodbc']='pyodbc-4.0.16-cp27-cp27m-win32.whl'
+    used_packages['pyodbc']='pyodbc-4.0.16-cp27-cp27m-{}.whl'.format(platform)
 
     used_packages['jdcal'] = 'jdcal-1.3-py2.py3-none-any.whl'
     used_packages['et-xmlfile'] = 'et_xmlfile-1.0.1-py2.py3-none-any.whl'
@@ -65,15 +72,15 @@ def install_packages(python_path):
     used_packages['requests']='requests-2.13.0-py2.py3-none-any.whl'
 
     used_packages['babel']='Babel-2.4.0-py2-none-any.whl'
-    used_packages['markupsafe']='MarkupSafe-1.0-cp27-cp27m-win32.whl'
+    used_packages['markupsafe']='MarkupSafe-1.0-cp27-cp27m-{}.whl'.format(platform)
     used_packages['jinja2']='Jinja2-2.9.6-py2.py3-none-any.whl'
 
     used_packages['sphinx']='Sphinx-1.5.5-py2.py3-none-any.whl'
     used_packages['numpydoc']='numpydoc-0.6.0-py2-none-any.whl'
     used_packages['enum']='enum-0.4.6-py2-none-any.whl'
 
-    used_packages['pypiwin32'] = 'pypiwin32-219-cp27-none-win32.whl'
-    used_packages['pyproj'] = 'pyproj-1.9.5.1-cp27-cp27m-win32.whl'
+    used_packages['pypiwin32-219'] = 'pypiwin32-219-cp27-none-{}.whl'.format(platform)
+    used_packages['pyproj'] = 'pyproj-1.9.5.1-cp27-cp27m-{}.whl'.format(platform)
 
 
     missing = OrderedDict()
@@ -135,4 +142,5 @@ def install_packages(python_path):
 
 
 if __name__ == '__main__':
-    install_packages('C:\\Python27\\ArcGIS10.4')
+    install_packages('C:\\Python27-ArcGIS\\ArcGIS10.4')
+    #install_packages('C:\\Python27-ArcGIS\\ArcGISx6410.4')
