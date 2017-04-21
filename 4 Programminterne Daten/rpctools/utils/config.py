@@ -21,8 +21,6 @@ import json
 from rpctools.utils.singleton import Singleton
 from rpctools.utils.encoding import encode
 
-TEST_TMP_PROJECT = '__unittest__'
-
 
 class Config(object):
     __metaclass__ = Singleton
@@ -125,7 +123,7 @@ class Folders(object):
         self._TEMPLATE_LAYERFOLDER = 'layers'
         self._TEMPLATE_DIAGRAMFOLDER = 'diagrams'
         self._TOCFOLDER = 'toc'
-        self._TEST_TMP_PROJECT = TEST_TMP_PROJECT
+        self._TEST_TMP_PROJECT = '__unittest__'
         self._AUSGABE_PATH = 'Ergebnisausgabe'
         self._TEXTE = 'texte'
         self._MXDS = 'mxds'

@@ -5,7 +5,8 @@ import pytest
 import os
 import shutil
 
-from rpctools.utils.config import TEST_TMP_PROJECT
+from rpctools.utils.config import Folders
+TEST_TMP_PROJECT = Folders()._TEST_TMP_PROJECT
 
 @pytest.fixture(scope='session')
 def mocked_map_document():
