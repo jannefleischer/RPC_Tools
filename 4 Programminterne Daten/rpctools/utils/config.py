@@ -33,6 +33,9 @@ class Config(object):
     }
 
     _config = {}
+    
+    # write changed config instantly to file
+    _write_instantly = True
 
     def __init__(self):
 
@@ -85,6 +88,8 @@ class Config(object):
     def __setattr__(self, name, value):
         if name in self._config:
             self._config[name] = value
+            if self._write_instantly:
+                self.write()
             if name in self._callbacks:
                 for callback in self._callbacks[name]:
                     callback(value)

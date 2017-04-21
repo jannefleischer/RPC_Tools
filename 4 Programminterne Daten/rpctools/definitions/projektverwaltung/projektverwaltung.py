@@ -58,7 +58,6 @@ class ProjektAnlegen(Projektverwaltung):
         # if not: AddMessage and delete project again
         if prject_anlegen_successful:
             self.parent_tbx.config.active_project = self.projectname
-            self.parent_tbx.config.write()
             self.add_output_new_project()
             self.add_diagramm()
         else:
@@ -390,7 +389,6 @@ class ProjektLoeschen(Tool):
         if config.active_project in projects_to_delete:
             projects = self.folders.get_projects()
             config.active_project = projects[0] if len(projects) > 0 else ''
-            config.write()
 
     def compact_gdbs(self, project):
         """
