@@ -43,6 +43,7 @@ class TbxFlaechendefinition(Tbx):
     _nutzungsart = None
     # the available teilflaechen are stored here
     _teilflaechen = None
+    _nutzungsarten = None
 
     @property
     def teilflaechen_table(self):
@@ -72,6 +73,22 @@ class TbxFlaechendefinition(Tbx):
         """dict of key/value pairs of pretty names of teilflaechen as keys and
         (id, name, ha, ags) as values"""
         return self._teilflaechen
+    
+    @property
+    def nutzungsart_table(self):
+        return self.folders.get_table('Nutzungsart')
+
+    @property
+    def nutzungsarten(self):
+        # only fetch once, won't change because it's a base definition
+        if self._nutzungsarten is None:
+            table = self.folders.get_base_table(
+                'FGDB_Definition_Projekt_Tool.gdb', 'Nutzungsarten')
+            fields = ['nutzungsart', 'id']
+            rows = arcpy.da.SearchCursor(table, fields)
+            self._nutzungsarten = OrderedDict([r for r in rows])
+            del rows
+        return self._nutzungsarten
 
     def _get_teilflaechen(self, nutzungsart=None):
         """
@@ -95,16 +112,20 @@ class TbxFlaechendefinition(Tbx):
                    'gemeinde_name', 'Nutzungsart', 'ags_bkg']
         rows = self.query_table('Teilflaechen_Plangebiet', columns)
         teilflaechen = OrderedDict()
+        inverted_nutzungsarten = {v: k for k, v in
+                                  self.nutzungsarten.iteritems()}
 
         for flaechen_id, ha, name, gemeinde, nutzungsart_id, ags in rows:
             # ignore other nutzungsart_ids, if filtering is requested
             if nutzungsart is not None and nutzungsart != nutzungsart_id:
                 continue
+            n = inverted_nutzungsarten[nutzungsart_id]
             pretty = ' | '.join([
                 'Nr. {}'.format(flaechen_id),
                 name,
                 str(gemeinde),
-                '{} ha'.format(round(ha, 2))
+                '{} ha'.format(round(ha, 2)),
+                'Nutzungsart: {}'.format(n)
             ])
             teilflaechen[pretty] = Teilflaeche(flaechen_id, name, ha, ags)
 
@@ -169,29 +190,36 @@ class TbxFlaechendefinition(Tbx):
 
     def update_teilflaechen(self, nutzungsart=None):
         """update the parameter list of teilflaeche (opt. filter nutzungsart)"""
+        # currently selected flaeche
+        idx = self.par.selected_index('teilflaeche')
+        
         if not self.par.projectname.value:
             list_teilflaechen = []
         else:
             self._teilflaechen = self._get_teilflaechen(nutzungsart=nutzungsart)
             list_teilflaechen = self.teilflaechen.keys()
         self.par.teilflaeche.filter.list = list_teilflaechen
-
-        # select first one
-        if list_teilflaechen:
-            flaeche = list_teilflaechen[0]
-            tfl = self.get_teilflaeche(flaeche)
-            self.par._current_tfl = tfl
-            self.par.teilflaeche.enabled = True
-        else:
-            flaeche = u'keine entsprechenden Flächen vorhanden'
-            for param in self.par:
-                param.enabled = False
-
+    
+        # a flaeche was selected and is in list, select it again
+        if idx >= 0:
+            flaeche = self.par.teilflaeche.filter.list[idx]
+        
+        # flaeche not in list -> select first one
+        else: 
+            if list_teilflaechen:
+                flaeche = list_teilflaechen[0]
+                tfl = self.get_teilflaeche(flaeche)
+                self.par._current_tfl = tfl
+                self.par.teilflaeche.enabled = True
+            else:
+                flaeche = u'keine entsprechenden Flächen vorhanden'
+                for param in self.par:
+                    param.enabled = False
+            
         self.par.teilflaeche.value = flaeche
 
 class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
-    """Toolbox to name Teilflächen"""
-    _nutzungsarten = None
+    """Toolbox to name Teilflächen and define their 'nutzungen'"""
 
     @property
     def label(self):
@@ -200,22 +228,6 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
     @property
     def Tool(self):
         return TeilflaechenVerwalten
-
-    @property
-    def nutzungsart_table(self):
-        return self.folders.get_table('Nutzungsart')
-
-    @property
-    def nutzungsarten(self):
-        # only fetch once, won't change because it's a base definition
-        if self._nutzungsarten is None:
-            table = self.folders.get_base_table(
-                'FGDB_Definition_Projekt_Tool.gdb', 'Nutzungsarten')
-            fields = ['nutzungsart', 'id']
-            rows = arcpy.da.SearchCursor(table, fields)
-            self._nutzungsarten = OrderedDict([r for r in rows])
-            del rows
-        return self._nutzungsarten
 
     def _getParameterInfo(self):
         params = super(TbxTeilflaecheVerwalten, self)._getParameterInfo()
@@ -250,10 +262,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                 self.update_table('Teilflaechen_Plangebiet',
                                   {'Name': params.name.value},
                                   where=where_tfl)
-                # update teilflaechen but keep selected index
-                idx = self.par.selected_index('teilflaeche')
                 self.update_teilflaechen()
-                params.teilflaeche.value = params.teilflaeche.filter.list[idx]
 
             if params.changed('nutzungsart'):
                 nutzungsart_id = self.nutzungsarten[params.nutzungsart.value]
@@ -276,6 +285,8 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                     table = 'Einzelhandel_Verkaufsflaechen'
                     self.delete_rows_in_table(
                         table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
+                
+                self.update_teilflaechen()
 
 
         return params

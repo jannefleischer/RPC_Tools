@@ -188,6 +188,8 @@ class Params(object):
     def selected_index(self, name):
         """get the index of the current selection of given list-parameter"""
         param = self._od[name]
+        if param.value not in param.filter.list:
+            return -1
         index = param.filter.list.index(param.value)
         return index
 

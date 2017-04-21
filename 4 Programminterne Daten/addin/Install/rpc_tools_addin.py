@@ -67,8 +67,6 @@ class ProjektAuswahl(object):
 
     def onSelChange(self, selection):
         if selection != config.active_project:
-            #config.active_project = selection
-            #config.write()
             self.tbx.par.active_project.value = selection
             self.tbx.execute()
         self.value = selection
