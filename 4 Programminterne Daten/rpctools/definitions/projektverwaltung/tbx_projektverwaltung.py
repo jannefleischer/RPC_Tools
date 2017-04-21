@@ -4,7 +4,7 @@ import datetime
 import arcpy
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.definitions.projektverwaltung.T1_Projektverwaltung \
+from rpctools.definitions.projektverwaltung.projektverwaltung \
      import ProjektLoeschen, ProjektAnlegen, ProjektKopieren
 
 
@@ -14,7 +14,6 @@ class TbxProjektVerwaltung(Tbx):
     def __init__(self):
         super(TbxProjektVerwaltung, self).__init__()
         self.update_projects = False
-
 
 
 class TbxProjektAnlegen(TbxProjektVerwaltung):

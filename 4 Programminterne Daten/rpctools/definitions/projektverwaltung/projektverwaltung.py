@@ -385,6 +385,12 @@ class ProjektLoeschen(Tool):
             self.compact_gdbs(project)
             self.remove_project_from_output(project)
             self.projekt_loeschen(project)
+        config = self.parent_tbx.config
+        # change active project, if it was deleted
+        if config.active_project in projects_to_delete:
+            projects = self.folders.get_projects()
+            config.active_project = projects[0] if len(projects) > 0 else ''
+            config.write()
 
     def compact_gdbs(self, project):
         """
@@ -420,10 +426,10 @@ class ProjektLoeschen(Tool):
                 arcpy.mapping.RemoveLayer(df, lyr)
         del mxd
 
-    def projekt_loeschen(self, projektName):
-        arcpy.AddMessage("Projektname: " + projektName)
+    def projekt_loeschen(self, project_name):
+        arcpy.AddMessage("Projektname: " + project_name)
         # Mit dem Projektnamen zum neuen Projektpfad zusammenführen"
-        projektPfad = self.folders.get_projectpath(projektName)
+        projektPfad = self.folders.get_projectpath(project_name)
         arcpy.AddMessage("Suche Ordner: " + projektPfad)
 
         # Überprüfen, ob der Projektordner existiert
@@ -436,7 +442,7 @@ class ProjektLoeschen(Tool):
                 pass
             arcpy.AddMessage("Projektordner gelöscht \n")
         else:
-            arcpy.AddMessage("Projektordner " + projektName + " nicht gefunden \n")
+            arcpy.AddMessage("Projektordner " + project_name + " nicht gefunden \n")
 
         arcpy.AddMessage("*********************************************************************************")
-        arcpy.AddMessage("Das Projekt " + projektName + " wurde erfolgreich entfernt \n")
+        arcpy.AddMessage("Das Projekt " + project_name + " wurde erfolgreich entfernt \n")

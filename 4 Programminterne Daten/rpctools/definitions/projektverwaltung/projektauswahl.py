@@ -1,5 +1,5 @@
 from rpctools.utils.params import Tool
-from rpctools.definitions.projektverwaltung.T1_Projektverwaltung \
+from rpctools.definitions.projektverwaltung.projektverwaltung \
      import Projektverwaltung
 
 
