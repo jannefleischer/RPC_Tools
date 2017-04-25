@@ -68,7 +68,6 @@ class TbxKostenaufteilungsregeln(Tbx):
         param_2.direction = 'Input'
         param_2.datatype = u'GPString'
 
-
         # Kostenübernahme_Gemeinde_____
         param_3 = params.gemeinden = arcpy.Parameter()
         param_3.name = u'Kosten\xfcbernahme_Gemeinde_____'

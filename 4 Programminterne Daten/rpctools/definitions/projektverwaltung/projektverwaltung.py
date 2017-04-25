@@ -35,6 +35,12 @@ class Projektverwaltung(DiaTeilflaechen):
     _dbname = 'FGDB_Definition_Projekt.gdb'
 
     def add_output_new_project(self):
+        # add Erschliessungsnetz
+        fc = self.folders.get_table("Erschliessungsnetz",
+                                    workspace="FGDB_Kosten.gdb")
+        layer = self.folders.get_layer("Erschließungsnetz")
+        self.output.add_output("projektdefinition", layer, fc)
+        
         # add Teilflächen
         fc = self.folders.get_table("Teilflaechen_Plangebiet")
         layer = self.folders.get_layer("Teilflächen des Plangebiets")
@@ -52,7 +58,7 @@ class ProjektAnlegen(Projektverwaltung):
     def run(self):
         """"""
         gc.collect()
-        self.output.define_projection()
+        #self.output.define_projection()
         prject_anlegen_successful = self.projekt_anlegen()
         # test if self.projekt_anlegen() was successful
         # if not: AddMessage and delete project again
@@ -81,7 +87,6 @@ class ProjektAnlegen(Projektverwaltung):
         tfl, gdbPfad = self.copy_teilflaechen_to_gdb(project_name, flaeche)
         toolbox = self.parent_tbx
         max_dist = toolbox.config.max_area_distance
-        arcpy.AddMessage(max_dist)
         ags_projekt, gemeindename_projekt, get_gemeinde_success = \
             self.get_gemeinde(tfl, 'OBJECTID', max_dist)
 

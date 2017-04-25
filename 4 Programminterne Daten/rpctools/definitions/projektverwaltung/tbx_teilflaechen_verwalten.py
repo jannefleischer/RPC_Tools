@@ -6,7 +6,8 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.definitions.projektverwaltung.teilflaeche_verwalten import TeilflaechenVerwalten
+from rpctools.definitions.projektverwaltung.teilflaeche_verwalten import (
+    TeilflaechenVerwalten)
 from rpctools.utils.constants import Nutzungsart
 
 

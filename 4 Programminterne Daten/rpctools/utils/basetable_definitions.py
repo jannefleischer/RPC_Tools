@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 from collections import OrderedDict
 import arcpy
 
@@ -104,4 +103,23 @@ class Branchen(OrderedDict):
         rows = arcpy.da.SearchCursor(table, fields)
         for row in rows:
             self[row[0]] = Branche(*row)
+        del rows
+
+
+class Netzart(object):
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+
+
+class Netzarten(OrderedDict):
+    """Get From BaseTable Wohnen_Gebaeudetypen"""
+    def __init__(self, folders):
+        super(Netzarten, self).__init__()
+        table = folders.get_base_table(
+            'FGDB_Definition_Projekt_Tool.gdb', 'Netzarten')
+        fields = ['id', 'netzart']
+        rows = arcpy.da.SearchCursor(table, fields)
+        for row in rows:
+            self[row[0]] = Netzart(*row)
         del rows

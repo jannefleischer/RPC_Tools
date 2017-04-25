@@ -16,7 +16,7 @@ from rpctools.definitions.nutzungsart.nutzungen import Nutzungen
 from rpctools.utils.encoding import encode
 from rpctools.utils.constants import Branche, Gewerbegebietstyp
 from rpctools.utils.spatial_lib import get_gemeindetyp
-from rpctools.definitions.nutzungsart.basetable_definitions import (
+from rpctools.utils.basetable_definitions import (
     Gebaeudetyp, Gebaeudetypen, Sortiment, Sortimente, Branche, Branchen)
 from collections import OrderedDict
 
