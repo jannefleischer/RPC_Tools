@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import arcpy
 import pythonaddins
 import os
@@ -110,7 +111,30 @@ class NetzlinieTool(object):
         
     def onRectangle(self, rectangle_geometry):
         pass
+    
 
+class NetzlinieLoeschen(object):
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        layers = projekt_auswahl.tbx.tool.output.get_layers(
+            u'Erschließungsnetz', projectname=config.active_project)
+        if not layers:
+            return
+        # ToDo: loop necessary?
+        layer = layers[0]
+        # check if anything is selected
+        sth_selected = len(arcpy.Describe(layer).FIDset) > 0
+        message = 'OK'
+        if not sth_selected:
+            message = pythonaddins.MessageBox(
+                u'Es sind keine Features ausgewählt.\n'
+                u'Sollen alle angelegten Netzlinien gelöscht werden?',
+                'Achtung', 1)
+        if message == 'OK':
+            arcpy.DeleteFeatures_management(layer)
+    
 
 class ProjektAnlegen(object):
     """Implementation for rpc_tools.neues_projekt (Button)"""
