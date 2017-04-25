@@ -13,8 +13,7 @@ folders = Folders()
 config = Config()
     
 
-class ButtonClass16(object):
-    """Implementation for rpc_tools.button_3 (Button)"""
+class NutzungenDefinieren(object):
     def __init__(self):
         self.enabled = True
         self.checked = False
@@ -24,29 +23,32 @@ class ButtonClass16(object):
         pythonaddins.GPToolDialog(self.path, 'TbxTeilflaecheVerwalten')
         
 
-class ButtonClass17(object):
-    """Implementation for rpc_tools.button_4 (Button)"""
+class Wohnen(object):
     def __init__(self):
         self.enabled = True
         self.checked = False
+        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
+                                 'Projektdefinition.pyt')
     def onClick(self):
-        pass
+        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenWohnen')
 
-class ButtonClass18(object):
-    """Implementation for rpc_tools.button_5 (Button)"""
+class Gewerbe(object):
     def __init__(self):
         self.enabled = True
         self.checked = False
+        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
+                                 'Projektdefinition.pyt')
     def onClick(self):
-        pass
+        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenGewerbe')
 
-class ButtonClass19(object):
-    """Implementation for rpc_tools.button_6 (Button)"""
+class Einzelhandel(object):
     def __init__(self):
         self.enabled = True
         self.checked = False
+        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
+                                 'Projektdefinition.pyt')
     def onClick(self):
-        pass
+        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenEinzelhandel')
     
     
 class NetzartAuswahl(object):
@@ -118,8 +120,9 @@ class NetzlinieLoeschen(object):
         self.enabled = True
         self.checked = False
     def onClick(self):
+        active = config.active_project
         layers = projekt_auswahl.tbx.tool.output.get_layers(
-            u'Erschließungsnetz', projectname=config.active_project)
+            u'Erschließungsnetz', projectname=active)
         if not layers:
             return
         # ToDo: loop necessary?
@@ -129,8 +132,9 @@ class NetzlinieLoeschen(object):
         message = 'OK'
         if not sth_selected:
             message = pythonaddins.MessageBox(
-                u'Es sind keine Features ausgewählt.\n'
-                u'Sollen alle angelegten Netzlinien gelöscht werden?',
+                u'Es sind keine Netzlinien im Projekt {} '.format(active) + 
+                u'ausgewählt.\nSollen alle in diesem Projekt '
+                u'angelegten Netzlinien gelöscht werden?',
                 'Achtung', 1)
         if message == 'OK':
             arcpy.DeleteFeatures_management(layer)

@@ -5,10 +5,10 @@
         <Button caption="Neues Projekt" category="ProjektCheck" class="ProjektAnlegen" id="rpc_tools.neues_projekt" image="Images\1002-add2.png" message="" tip=""><Help heading="" /></Button>
         <Button caption="Projekt kopieren" category="ProjektCheck" class="ProjektKopieren" id="rpc_tools.projekt_kopieren" image="Images\1002-add.png" message="" tip=""><Help heading="" /></Button>
         <Button caption="Projekt l&#246;schen" category="ProjektCheck" class="ProjektLoeschen" id="rpc_tools.projekt_loeschen" image="Images\1001-cancel.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Nutzungen auf Teilfl&#228;chen definieren" category="ProjektCheck" class="ButtonClass16" id="rpc_tools.button_3" image="" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Wohnen" category="ProjektCheck" class="Wohnen" id="rpc_tools.button_4" image="Images\011000-home.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Gewerbe" category="ProjektCheck" class="ButtonClass18" id="rpc_tools.button_5" image="Images\506700-factory.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Einzelhandel" category="ProjektCheck" class="ButtonClass19" id="rpc_tools.button_6" image="Images\650000-grocery-shop.png" message="" tip=""><Help heading="" /></Button>
+        <Button caption="Nutzungen auf Teilfl&#228;chen definieren" category="ProjektCheck" class="NutzungenDefinieren" id="rpc_tools.nutzungen_definieren" image="" message="" tip=""><Help heading="" /></Button>
+        <Button caption="Wohnen" category="ProjektCheck" class="Wohnen" id="rpc_tools.wohnen" image="Images\011000-home.png" message="" tip=""><Help heading="" /></Button>
+        <Button caption="Gewerbe" category="ProjektCheck" class="Gewerbe" id="rpc_tools.gewerbe" image="Images\506700-factory.png" message="" tip=""><Help heading="" /></Button>
+        <Button caption="Einzelhandel" category="ProjektCheck" class="Einzelhandel" id="rpc_tools.einzelhandel" image="Images\650000-grocery-shop.png" message="" tip=""><Help heading="" /></Button>
         <ComboBox caption="Netzart" category="ProjektCheck" class="NetzartAuswahl" id="rpc_tools.netzart_auswahl" itemSizeString="WWWWWW" message="" rows="4" sizeString="WWWWWW" tip=""><Help heading="" /></ComboBox>
         <Tool caption="Linie hinzu" category="ProjektCheck" class="NetzlinieTool" id="rpc_tools.netzlinie_tool" image="Images\KML_Line16.png" message="" tip=""><Help heading="" /></Tool>
         <Button caption="Linie l&#246;schen" category="ProjektCheck" class="NetzlinieLoeschen" id="rpc_tools.netzlinie_loeschen" image="Images\1001-cancel.png" message="" tip="Die in der Karte selektierten Netzlinien werden gel&#246;scht. Sind keine Linien gew&#228;hlt, k&#246;nnen alle gleichzeitig entfernt werden"><Help heading="" /></Button>
@@ -21,8 +21,8 @@
         </Toolbars>
     <Menus>
         <Menu caption="Verwalten" category="ProjektCheck" id="rpc_tools.menu" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.neues_projekt" /><Button refID="rpc_tools.projekt_kopieren" /><Button refID="rpc_tools.projekt_loeschen" /></Items></Menu>
-        <Menu caption="Detailangaben zu Nutzungen auf Teilfl&#228;chen" category="ProjektCheck" id="rpc_tools.nutzungen_menu" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.button_4" /><Button refID="rpc_tools.button_5" /><Button refID="rpc_tools.button_6" /></Items></Menu>
-        <Menu caption="Definieren" category="ProjektCheck" id="rpc_tools.menu_1_1" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.button_3" /><Menu refID="rpc_tools.nutzungen_menu" /></Items></Menu>
+        <Menu caption="Detailangaben zu Nutzungen auf Teilfl&#228;chen" category="ProjektCheck" id="rpc_tools.nutzungen_menu" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.wohnen" /><Button refID="rpc_tools.gewerbe" /><Button refID="rpc_tools.einzelhandel" /></Items></Menu>
+        <Menu caption="Definieren" category="ProjektCheck" id="rpc_tools.menu_1_1" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.nutzungen_definieren" /><Menu refID="rpc_tools.nutzungen_menu" /></Items></Menu>
         <Menu caption="Bewohner und Arbeitspl&#228;tze" category="ProjektCheck" id="rpc_tools.menu_3" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
         <Menu caption="Erreichbarkeit" category="ProjektCheck" id="rpc_tools.menu_4" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
         <Menu caption="Verkehr im Umfeld" category="ProjektCheck" id="rpc_tools.menu_5" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
