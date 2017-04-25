@@ -294,7 +294,8 @@ class Tbx(object):
             self.clear_temporary_dbs()
             self.recently_opened = True
             # updating projects messes up the initial project management
-            if self.update_projects:
+            if (self.update_projects and
+                self.par._get_param_project() is not None):
                 self._set_active_project()
         else:
             self.recently_opened = False

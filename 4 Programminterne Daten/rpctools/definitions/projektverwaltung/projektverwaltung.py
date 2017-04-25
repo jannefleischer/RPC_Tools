@@ -264,8 +264,10 @@ class ProjektAnlegen(Projektverwaltung):
 
         # Setze Viewport neu
         df = arcpy.mapping.ListDataFrames(minimap_mxd)[0]
-        gebietLayer = arcpy.mapping.ListLayers(minimap_mxd, "Teilflaechen_Plangebiet", df)[0]
-        arcpy.SelectLayerByAttribute_management(gebietLayer, "NEW_SELECTION", "\"OBJECTID\" > 0")
+        gebietLayer = arcpy.mapping.ListLayers(
+            minimap_mxd, "Teilflaechen_Plangebiet", df)[0]
+        arcpy.SelectLayerByAttribute_management(
+            gebietLayer, "NEW_SELECTION", "\"OBJECTID\" > 0")
         df.extent = gebietLayer.getSelectedExtent(False)
         arcpy.SelectLayerByAttribute_management(gebietLayer, "CLEAR_SELECTION")
         df.scale = df.scale * 1.4

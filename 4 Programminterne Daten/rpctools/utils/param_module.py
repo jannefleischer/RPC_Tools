@@ -148,6 +148,12 @@ class Params(object):
         # setze die Werte
         for i, key in enumerate(self._od):
             self[key]._arc_object = parameters[i]
+            
+    def _get_param_project(self):
+        """return the parameter holding the project name,
+        return None if project parameter is not used"""
+        param_projectname = getattr(self, self._param_projectname, None)
+        return param_projectname
 
     def _get_projectname(self):
         """
@@ -166,7 +172,7 @@ class Params(object):
         >>> params._get_projectname()
         'Projekt_Name'
         """
-        param_projectname = getattr(self, self._param_projectname, None)
+        param_projectname = self._get_param_project()
         if param_projectname:
             return param_projectname.value
         return ''
