@@ -179,7 +179,8 @@ class Output(object):
         root = self.module
         analysen = root.add("analysen", "Analysen")
         pd = root.add("projektdefinition", "Projektdefinition")
-        background = root.add('hintergrundkarten', 'Hintergrundkarten Projekt-Check')
+        background = root.add('hintergrundkarten',
+                              'Hintergrundkarten Projekt-Check')
 
         analysen.add("bevoelkerung",
                      "Wirkungsbereich 1 - Bewohner und Arbeitsplaetze")
@@ -192,7 +193,8 @@ class Output(object):
         analysen.add("einnahmen",
                      "Wirkungsbereich 6 - Kommunale Steuereinnahmen")
         analysen.add("standortkonkurrenz",
-                     "Wirkungsbereich 7 - Standortkonkurrenz Lebensmitteleinzelhandel")
+                     "Wirkungsbereich 7 - Standortkonkurrenz "
+                     "Lebensmitteleinzelhandel")
 
     def set_projectlayer(self, projektname=None):
         """
@@ -238,6 +240,29 @@ class Output(object):
                 projectlayer = layer
 
         return projectlayer
+    
+    def get_layers(self, layername, projectname=None):
+        """
+        Return all layers with given name that are grouped in given project 
+        (respectively in currently set project)
+        
+        Parameters
+        ----------
+        layername : str
+        projectname : str, optional
+        
+        Returns
+        ----------
+        layers : list
+              all layers found in project
+        """
+
+        # Neuen Layer hinzufuegen
+        project_layer = self.get_projectlayer(projectname=projectname)
+        if not project_layer:
+            return []
+        layers = arcpy.mapping.ListLayers(project_layer, layername)
+        return layers
 
     def set_headgrouplayer(self, project_layer=None, dataframe=None):
         """
