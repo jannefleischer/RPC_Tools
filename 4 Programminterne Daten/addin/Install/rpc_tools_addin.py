@@ -132,7 +132,7 @@ class NetzlinieLoeschen(object):
         message = 'OK'
         if not sth_selected:
             message = pythonaddins.MessageBox(
-                u'Es sind keine Netzlinien im Projekt {} '.format(active) + 
+                u'Es sind keine Netzlinien im Projekt "{}" '.format(active) + 
                 u'ausgewählt.\nSollen alle in diesem Projekt '
                 u'angelegten Netzlinien gelöscht werden?',
                 'Achtung', 1)
