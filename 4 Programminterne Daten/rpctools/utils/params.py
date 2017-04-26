@@ -409,7 +409,7 @@ class Tbx(object):
                      column_values,
                      where=None,
                      pkey=None,
-                     fgdb=''):
+                     workspace=''):
         """
         Update rows in a FileGeodatabase with given values
 
@@ -423,16 +423,18 @@ class Tbx(object):
             a where clause to pick single rows
         pkey: dict, optional
             the columns and the values of the primary key as key/value-pairs
-        fgdb : str, optional
+        workspace : str, optional
             the database name
 
         Returns
         -------
         r : int
-            the number of updated rows
+            the number of updated rows, -1 if table does not exist
         """
         where = where or self.get_where_clause(pkey)
-        table_path = self._get_table_path(fgdb, table)
+        table_path = self._get_table_path(workspace, table)
+        if not table_path:
+            return -1
         columns = column_values.keys()
         cursor = arcpy.da.UpdateCursor(table_path, columns, where_clause=where)
         r = 0
@@ -447,7 +449,7 @@ class Tbx(object):
     def delete_rows_in_table(self,
                              table,
                              pkey,
-                             fgdb='',
+                             workspace='',
                              ):
         """
         Delete rows in a FileGeodatabase which match the where-clause
@@ -458,7 +460,7 @@ class Tbx(object):
             full path to the table
         pkey: dict
             the columns and the values of the primary key as key/value-pairs
-        fgdb : str, optional
+        workspace : str, optional
             the database name
 
         Returns
@@ -467,7 +469,9 @@ class Tbx(object):
             the number of deleted rows
         """
         where = self.get_where_clause(pkey)
-        table_path = self._get_table_path(fgdb, table)
+        table_path = self._get_table_path(workspace, table)
+        if not table_path:
+            return
         columns = pkey.keys()
         cursor = arcpy.da.UpdateCursor(table_path, columns, where_clause=where)
         r = 0
@@ -477,26 +481,32 @@ class Tbx(object):
         del cursor
         return r
 
-    def _get_table_path(self, fgdb, table):
+    def _get_table_path(self, workspace, table):
         """
         return the full table path,
         return the temporary fgdb, if db is handled temporarly (creates the
-        temporary table if it does not exist yet)
+        temporary table if it does not exist yet),
+        return None if table does not exist
         """
-        dbname = os.path.basename(fgdb) or self.tool._dbname
+        dbname = os.path.basename(workspace) or self.tool._dbname
         table = os.path.basename(table)
         # if table is in temp. management -> write to temporary table instead
         if dbname in self._temporary_gdbs:
-            temp_db = self.folders.get_temporary_db(fgdb=fgdb, check=False)
+            temp_db = self.folders.get_temporary_db(workspace=workspace,
+                                                    check=False)
             # create on demand
             if not arcpy.Exists(temp_db):
-                self._create_temporary_copy(fgdb)
-            table_path = self.folders.get_temporary_table(table, fgdb=fgdb)
+                self._create_temporary_copy(workspace)
+            table_path = self.folders.get_temporary_table(table,
+                                                          workspace=workspace)
         else:
-            table_path = self.folders.get_table(table, workspace=fgdb)
+            table_path = self.folders.get_table(table, workspace=workspace)
+    
+        if not arcpy.Exists(table_path):
+            table_path = None
         return table_path
 
-    def insert_row_in_table(self, table, column_values, fgdb=''):
+    def insert_row_in_table(self, table, column_values, workspace=''):
         """
         insert new row
         in a FileGeodatabase with given values
@@ -510,14 +520,16 @@ class Tbx(object):
         fgdb : str, optional
             the database name
         """
-        table_path = self._get_table_path(fgdb, table)
+        table_path = self._get_table_path(workspace, table)
+        if not table_path:
+            return
         columns = column_values.keys()
         values = column_values.values()
         cursor = arcpy.da.InsertCursor(table_path, columns)
         cursor.insertRow(values)
         del cursor
 
-    def upsert_row_in_table(self, table, column_values, pkey, fgdb=''):
+    def upsert_row_in_table(self, table, column_values, pkey, workspace=''):
         """
         update a row, or - if it does not exist yet - insert the row
         in a FileGeodatabase with given values
@@ -530,18 +542,20 @@ class Tbx(object):
             the columns and the values to insert as key/value-pairs
         pkey: dict,
             the columns and the values of the primary key as key/value-pairs
-        fgdb : str, optional
+        workspace : str, optional
             the database name
         """
         where_clause = self.get_where_clause(pkey)
         # try to update the row
         r = self.update_table(table, column_values, where=where_clause,
-                              fgdb=fgdb)
+                              workspace=workspace)
+        if r < 0:
+            return
         # if there are no rows matching the primary key
         if not r:
             # insert new row
             column_values.update(pkey)
-            self.insert_row_in_table(table, column_values, fgdb)
+            self.insert_row_in_table(table, column_values, workspace)
 
     def get_where_clause(self, pkey):
         """
@@ -565,7 +579,8 @@ class Tbx(object):
                                      ])
         return where_clause
 
-    def query_table(self, table, columns, fgdb='', where=None, pkey=None):
+    def query_table(self, table, columns, workspace='',
+                    where=None, pkey=None, project=''):
         """
         get rows from a FileGeodatabase with given values
 
@@ -578,6 +593,10 @@ class Tbx(object):
         where: str, optional
             a where clause to pick single rows
         pkey: dict, optional
+        workspace : str, optional
+            the database name
+        project : str, optional
+            the project (set project is taken if not given)
 
         Returns
         -------
@@ -587,13 +606,18 @@ class Tbx(object):
         """
         where = where or self.get_where_clause(pkey)
         table = os.path.basename(table)
-        dbname = os.path.basename(fgdb) or self.tool._dbname
-        table_path = self.folders.get_table(table, workspace=fgdb)
+        dbname = os.path.basename(workspace) or self.tool._dbname
+        table_path = self.folders.get_table(table, workspace=workspace,
+                                            project=project)
+        if not arcpy.Exists(table_path):
+            return []
         if dbname in self._temporary_gdbs:
-            temp_db = self.folders.get_temporary_db(fgdb=fgdb, check=False)
+            temp_db = self.folders.get_temporary_db(workspace=workspace,
+                                                    check=False)
             # only query temp. db if it exists (created on demand in update)
             if arcpy.Exists(temp_db):
-                table_path = self.folders.get_temporary_table(table, fgdb=fgdb)
+                table_path = self.folders.get_temporary_table(
+                    table, workspace=workspace)
         cursor = arcpy.da.SearchCursor(table_path, columns, where_clause=where)
         rows = [row for row in cursor]
         del cursor
@@ -609,7 +633,7 @@ class Tbx(object):
             if arcpy.Exists(path):
                 arcpy.Delete_management(path)
 
-    def add_temporary_management(self, fgdb=''):
+    def add_temporary_management(self, workspace=''):
         """
         add a FileGeoDatabase to be managed temporarly,
         all updates on their tables happen inside the temporary database,
@@ -618,18 +642,19 @@ class Tbx(object):
 
         Parameters
         ----------
-        fgdb : str
+        workspace : str
             name of the FileGeoDatabase
         """
-        if fgdb not in self._temporary_gdbs:
-            self._temporary_gdbs.append(fgdb)
+        if workspace not in self._temporary_gdbs:
+            self._temporary_gdbs.append(workspace)
 
-    def _create_temporary_copy(self, fgdb=''):
+    def _create_temporary_copy(self, workspace=''):
         """
         make a copy of a project fgdbs in the given temporary table
         """
-        project_db = self.folders.get_db(workspace=fgdb)
-        temp_db = self.folders.get_temporary_db(fgdb=fgdb, check=False)
+        project_db = self.folders.get_db(workspace=workspace)
+        temp_db = self.folders.get_temporary_db(workspace=workspace,
+                                                check=False)
         if arcpy.Exists(temp_db):
             arcpy.Delete_management(temp_db)
         # deactivate adding of temp. gdbs to table of contents
@@ -649,7 +674,7 @@ class Tbx(object):
                 for fgdb in self._temporary_gdbs:
                     project_db = self.folders.get_db(workspace=fgdb,
                                                      project=project)
-                    temp_db = self.folders.get_temporary_db(fgdb=fgdb,
+                    temp_db = self.folders.get_temporary_db(workspace=fgdb,
                                                             project=project,
                                                             check=False)
                     # temporary dbs only exist,

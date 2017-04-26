@@ -294,16 +294,17 @@ class Folders(object):
             mkdir(path)
         return path
 
-    def get_temporary_db(self, project=None, fgdb='', check=True):
-        dbname = basename(fgdb) or self.dbname
+    def get_temporary_db(self, project=None, workspace='', check=True):
+        dbname = basename(workspace) or self.dbname
         return self.join_and_check(
             self.get_temporary_projectpath(project=project),
             dbname, check=check)
 
-    def get_temporary_table(self, table_name, fgdb='',
+    def get_temporary_table(self, table_name, workspace='',
                             project=None, check=True):
         return self.join_and_check(
-            self.get_temporary_db(fgdb=fgdb, project=project, check=True),
+            self.get_temporary_db(workspace=workspace, project=project,
+                                  check=True),
             table_name, check=check)
 
     @property
