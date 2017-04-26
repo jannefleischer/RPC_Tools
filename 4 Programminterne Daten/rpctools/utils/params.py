@@ -463,25 +463,18 @@ class Tbx(object):
     def copy_column(self, table, in_column, out_column, workspace=''):
         """
         copy all values of a column to another column in the same
-        FileGeodatabase
+        FileGeodatabase (create column if not exists, overwrite else)
 
         Parameters
         ----------
         table : str
             table name
-        column_values: dict,
-            the columns and the values to update them with as key/value-pairs
-        where: str, optional
-            a where clause to pick single rows
-        pkey: dict, optional
-            the columns and the values of the primary key as key/value-pairs
+        in_column : str
+            name of the column to copy
+        out_column : str
+            name of the column to copy to
         workspace : str, optional
             the database name
-
-        Returns
-        -------
-        r : int
-            the number of updated rows, -1 if table does not exist
         """
         table_path = self._get_table_path(workspace, table)
         if not table_path:
