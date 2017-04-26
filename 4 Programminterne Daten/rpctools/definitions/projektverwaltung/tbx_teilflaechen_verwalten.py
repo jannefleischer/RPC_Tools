@@ -45,6 +45,7 @@ class TbxFlaechendefinition(Tbx):
     # the available teilflaechen are stored here
     _teilflaechen = None
     _nutzungsarten = None
+    _recently_opened = True
 
     @property
     def teilflaechen_table(self):
@@ -169,20 +170,25 @@ class TbxFlaechendefinition(Tbx):
     
     def commit_tfl_changes(self):
         """Commit Teilflaechen Changes"""
+        
+    def _open(self, params):
+        self.update_teilflaechen(self._nutzungsart)
+        self._recently_opened = True
 
     def _updateParameters(self, params):
-        if params.changed('projectname') or self.recently_opened:
-            params.teilflaeche.value = ''
-            self.update_teilflaechen(self._nutzungsart)
+        if params.changed('projectname'):
+            self._open(params)
 
         if params.changed('teilflaeche') and self.par.teilflaeche.filter.list:
-            if not self.recently_opened:
+            # don't commit after toolbox just opened (else the defaults overwrite
+            # the actual settings)
+            if not self._recently_opened:
                 self.commit_tfl_changes()
             tfl = self.get_teilflaeche(params.teilflaeche.value)
             params._current_tfl = tfl
             self.update_teilflaechen_inputs(tfl.flaechen_id,
                                             tfl.name)
-
+        self._recently_opened = False
         return params
 
     def update_teilflaechen_inputs(self, flaechen_id, flaechenname):

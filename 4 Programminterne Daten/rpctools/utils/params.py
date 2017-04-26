@@ -229,8 +229,6 @@ class Tbx(object):
         # project db only on execution of tool
         self._temporary_gdbs = []
 
-        self.recently_opened = False
-
     def reload_tool(self):
         """reload the tool's module"""
         tool_module_name = self.Tool.__module__
@@ -289,22 +287,30 @@ class Tbx(object):
         """
 
         self.par._update_parameters(parameters)
-        # if a toolbox is opened, remove ALL temporary databases
+        
         if self.par.toolbox_opened():
-            self.clear_temporary_dbs()
-            self.recently_opened = True
-            # updating projects messes up the initial project management
-            if (self.update_projects and
-                self.par._get_param_project() is not None):
-                self._set_active_project()
-        else:
-            self.recently_opened = False
+            self.open()
         # updating projects messes up the initial project management
         if self.update_projects:
             self._update_project_list()
         self._update_dependencies(self.par)
             #self._create_temporary_copies()
         self._updateParameters(self.par)
+        
+    def open(self):
+        """
+        called on open of toolbox (custom function, no ArcGIS method)
+        not called if there is only one parameter, won't work then
+        """
+        # if a toolbox is opened, remove ALL temporary databases
+        self.clear_temporary_dbs()
+        # set the active project on open (do not do this in project management
+        # toolboxes, updating projects messes them up, that's what the boolean
+        # self.update_projects is for)
+        if (self.update_projects and
+            self.par._get_param_project() is not None):            
+            self._set_active_project()
+        self._open(self.par)
 
     def _set_active_project(self):        
         active_project = self.config.active_project
@@ -371,6 +377,14 @@ class Tbx(object):
         """check if dependent params were altered and set them to target sum"""
         for dependency in self._dependencies:
             dependency.update(params)
+            
+    def _open(self, params):
+        """
+        do something, if toolbox was recently opened (only works, if toolbox
+        owns more than one parameter)
+        
+        To define in the subclass
+        """
 
     def _updateParameters(self, params):
         """
