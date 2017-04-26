@@ -459,6 +459,45 @@ class Tbx(object):
             r += 1
         del cursor
         return r
+    
+    def copy_column(self, table, in_column, out_column, workspace=''):
+        """
+        copy all values of a column to another column in the same
+        FileGeodatabase
+
+        Parameters
+        ----------
+        table : str
+            table name
+        column_values: dict,
+            the columns and the values to update them with as key/value-pairs
+        where: str, optional
+            a where clause to pick single rows
+        pkey: dict, optional
+            the columns and the values of the primary key as key/value-pairs
+        workspace : str, optional
+            the database name
+
+        Returns
+        -------
+        r : int
+            the number of updated rows, -1 if table does not exist
+        """
+        table_path = self._get_table_path(workspace, table)
+        if not table_path:
+            return
+        in_field = arcpy.ListFields(table_path, in_column)
+        if not in_field:
+            raise Exception('Column {} does not exist in {}'.format(in_column))
+        out_field = arcpy.ListFields(table_path, out_column)
+        if not out_field:
+            arcpy.AddField_management(table_path, out_column, in_field[0].type)  
+        cursor = arcpy.da.UpdateCursor(table_path, [in_column, out_column])
+        for row in cursor:
+            row[1] = row[0]
+            cursor.updateRow(row)
+        del cursor
+        
 
     def delete_rows_in_table(self,
                              table,
