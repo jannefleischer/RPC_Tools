@@ -11,6 +11,7 @@ from rpctools.utils.message import Message
 from rpctools.utils.singleton import Singleton
 from rpctools.utils.param_module import Params
 from rpctools.utils.arcpy_parameter import Parameter
+import pandas as pd
 import arcpy
 
 
@@ -631,8 +632,45 @@ class Tbx(object):
                                      for (k, v) in pkey.iteritems()
                                      ])
         return where_clause
+    
+    def table_to_dataframe(self, table, columns=[], workspace='',
+                           where=None, pkey=None, project=''):
+        """
+        get rows from a FileGeodatabase with given values as a pandas dataframe
 
-    def query_table(self, table, columns, workspace='',
+        Parameters
+        ----------
+        table : str
+            full path to the table
+        columns: list, optional
+            the requested columns, if not given or empty: return all columns
+        where: str, optional
+            a where clause to pick single rows
+        pkey: dict, optional
+        workspace : str, optional
+            the database name
+        project : str, optional
+            the project (set project is taken if not given)
+
+        Returns
+        -------
+        rows : dataframe
+            pandas dataframe with all requested rows and columns
+        """
+    
+        table_path = self.folders.get_table(table, workspace=workspace,
+                                            project=project)
+        
+        if not columns and arcpy.Exists(table_path):
+            columns = [f.name for f in arcpy.ListFields(table_path)]
+            
+        rows = self.query_table(table, columns=columns, workspace=workspace,
+                                where=where, pkey=pkey, project=project)
+        
+        dataframe = pd.DataFrame.from_records(rows, columns=columns)
+        return dataframe
+        
+    def query_table(self, table, columns=[], workspace='',
                     where=None, pkey=None, project=''):
         """
         get rows from a FileGeodatabase with given values
@@ -641,8 +679,8 @@ class Tbx(object):
         ----------
         table : str
             full path to the table
-        columns: list,
-            the requested columns
+        columns: list, optional
+            the requested columns, if not given or empty: return all columns
         where: str, optional
             a where clause to pick single rows
         pkey: dict, optional
@@ -664,6 +702,8 @@ class Tbx(object):
                                             project=project)
         if not arcpy.Exists(table_path):
             return []
+        if not columns:
+            columns = [f.name for f in arcpy.ListFields(table_path)]
         if dbname in self._temporary_gdbs:
             temp_db = self.folders.get_temporary_db(workspace=workspace,
                                                     check=False)
@@ -718,12 +758,15 @@ class Tbx(object):
         """transfer all changes made in temporary tables into project tables"""
         gc.collect()
 
-        arcpy.AddMessage(
-            u'Getätigte Änderungen werden in das Projekt übernommen...'.encode('latin1'))
+        temp_projects = self.folders.get_temporary_projects()
+        if temp_projects:
+            arcpy.AddMessage(
+                u'Getätigte Änderungen werden in das Projekt übernommen...'
+                .encode('latin1'))
 
         with ArcpyEnv(overwriteOutput=True):
             changes = 0
-            for project in self.folders.get_temporary_projects():
+            for project in temp_projects:
                 for fgdb in self._temporary_gdbs:
                     project_db = self.folders.get_db(workspace=fgdb,
                                                      project=project)
@@ -839,8 +882,6 @@ class Tbx(object):
 
         with open(new_fn, 'w') as new_file:
             new_file.write(src)
-
-
 
 if __name__ == '__main__':
     import doctest
