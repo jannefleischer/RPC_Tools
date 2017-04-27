@@ -300,7 +300,6 @@ class Tbx(object):
     def open(self):
         """
         called on open of toolbox (custom function, no ArcGIS method)
-        not called if there is only one parameter, won't work then
         """
         # if a toolbox is opened, remove ALL temporary databases
         self.clear_temporary_dbs()
@@ -308,9 +307,11 @@ class Tbx(object):
         # toolboxes, updating projects messes them up, that's what the boolean
         # self.update_projects is for)
         if (self.update_projects and
-            self.par._get_param_project() is not None):            
+            self.par._get_param_project() is not None):
             self._set_active_project()
-        self._open(self.par)
+            # don't call _open of subclass if there is only one parameter
+            if len(self.par) > 1:
+                self._open(self.par)
 
     def _set_active_project(self):        
         active_project = self.config.active_project
@@ -412,7 +413,11 @@ class Tbx(object):
         if params and self.folders._invalid_paths:
             invalid = ', '.join(self.folders._invalid_paths)
             params[0].setErrorMessage(
-                'Pfade oder Tabellen existieren nicht: {}'.format(invalid))
+                u'Es fehlen für die Berechnungen benötigte Daten.'
+                u'Möglicherweise wurden vorausgesetzte Schritte noch '
+                u'nicht korrekt durchgeführt.\n\r '
+                u'Folgende Pfade oder Tabellen wurden nicht gefunden: {}'
+                .format(invalid))
         self._updateMessages(self.par)
 
     def _updateMessages(self, parameters):

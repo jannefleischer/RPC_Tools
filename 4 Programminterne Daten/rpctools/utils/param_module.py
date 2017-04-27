@@ -187,10 +187,7 @@ class Params(object):
         return change
 
     def toolbox_opened(self):
-        """return True if toolbox was opened just before last update
-        always False, if there is only parameter or less"""
-        if len(self) <= 1:
-            return False
+        """return True if toolbox was opened just before last update"""
         opened = not any([p.hasBeenValidated for p in self])
         return opened
 
