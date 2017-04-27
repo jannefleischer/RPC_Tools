@@ -27,7 +27,7 @@
         <Menu caption="Erreichbarkeit" category="ProjektCheck" id="rpc_tools.menu_4" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
         <Menu caption="Verkehr im Umfeld" category="ProjektCheck" id="rpc_tools.menu_5" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
         <Menu caption="Fl&#228;che und &#214;kologie" category="ProjektCheck" id="rpc_tools.menu_6" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
-        <Menu caption="Infrastrukturfolgekosten" category="ProjektCheck" id="rpc_tools.menu_7" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.netz_button" /></Items></Menu>
+        <Menu caption="Infrastrukturfolgekosten" category="ProjektCheck" id="rpc_tools.menu_7" isRootMenu="false" isShortcutMenu="true" separator="true"><Items></Items></Menu>
         <Menu caption="Kommunale Steuereinnahmen" category="ProjektCheck" id="rpc_tools.menu_8" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
         <Menu caption="Standortkonkurrenz" category="ProjektCheck" id="rpc_tools.menu_9" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
         <Menu caption="Analysieren" category="ProjektCheck" id="rpc_tools.menu_2" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Menu refID="rpc_tools.menu_3" /><Menu refID="rpc_tools.menu_4" /><Menu refID="rpc_tools.menu_5" /><Menu refID="rpc_tools.menu_6" /><Menu refID="rpc_tools.menu_7" /><Menu refID="rpc_tools.menu_8" /><Menu refID="rpc_tools.menu_9" /></Items></Menu>
