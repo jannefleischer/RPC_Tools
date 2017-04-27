@@ -633,9 +633,12 @@ class Tbx(object):
         return where_clause
     
     def table_to_dataframe(self, table_name, columns=[], workspace='',
-                           where=None, pkey=None, project=''):
+                           where=None, pkey=None, project='',
+                           is_base_table=False):
         """
-        get rows from a FileGeodatabase with given values as a pandas dataframe
+        get rows from a FileGeodatabase as a pandas dataframe,
+        defaults to a Workspace in the Project Folder, if base table is
+        requested workspace is required
 
         Parameters
         ----------
@@ -650,6 +653,8 @@ class Tbx(object):
             the database name
         project : str, optional
             the project (set project is taken if not given)
+        is_base_table : bool, optional, default = False
+            if True a base table is queried, else a project table
 
         Returns
         -------
@@ -659,22 +664,27 @@ class Tbx(object):
         # getting the fields is duplicate to the code in query_tables(...)
         # but the dataframe needs the column names as well and query_tables
         # should not return those
-        table_path = self.folders.get_table(table_name, workspace=workspace,
-                                            project=project)        
+        if is_base_table:
+            table_path = self.folders.get_base_table(workspace, table_name)
+        else: 
+            table_path = self.folders.get_table(table_name, workspace=workspace,
+                                                project=project)        
         if not columns and arcpy.Exists(table_path):
             columns = [f.name for f in arcpy.ListFields(table_path)]
             
         rows = self.query_table(table_name, columns=columns,
-                                workspace=workspace,
-                                where=where, pkey=pkey, project=project)
+                                workspace=workspace, where=where, pkey=pkey,
+                                project=project, is_base_table=is_base_table)
         
         dataframe = pd.DataFrame.from_records(rows, columns=columns)
         return dataframe
         
     def query_table(self, table_name, columns=[], workspace='',
-                    where=None, pkey=None, project=''):
+                    where=None, pkey=None, project='', is_base_table=False):
         """
-        get rows from a table in a Workspace in the Project Folder
+        get rows from a table, defaults to a Workspace in the Project Folder,
+        if base table is requested workspace is required
+        
 
         Parameters
         ----------
@@ -686,9 +696,11 @@ class Tbx(object):
             a where clause to pick single rows
         pkey: dict, optional
         workspace : str, optional
-            the database name
+            the database name, required if base table
         project : str, optional
             the project (set project is taken if not given)
+        is_base_table : bool, optional, default = False
+            if True a base table is queried, else a project table
 
         Returns
         -------
@@ -696,40 +708,28 @@ class Tbx(object):
             the queried rows with values of requested columns in same order as
             in columns argument
         """
-        table_name = os.path.basename(table_name)
-        dbname = os.path.basename(workspace) or self.tool._dbname
-        table_path = self.folders.get_table(table_name, workspace=workspace,
-                                            project=project)
-        if dbname in self._temporary_gdbs:
-            temp_db = self.folders.get_temporary_db(workspace=workspace,
-                                                    check=False)
-            # only query temp. db if it exists (created on demand in update)
-            if arcpy.Exists(temp_db):
-                table_path = self.folders.get_temporary_table(
-                    table_name, workspace=workspace)
-        rows = self._query_table(table_path, columns=columns, where=where, 
-                                 pkey=pkey)
-        return rows
-    
-    def query_base_table(self, workspace, table_name, columns=[]):
-        """
-        get rows from a FileGeodatabase
-
-        Parameters
-        ----------
-        workspace : str
-            the database name
-        table_name : str
-            name of the table
-
-        Returns
-        -------
-        rows : list of lists
-            the queried rows with values of requested columns in same order as
-            in columns argument
-        """
-        table_path = self.folders.get_base_table(workspace, table_name)
-        rows = self._query_table(table_path, columns=columns)
+        # base table
+        if is_base_table:
+            if not workspace:
+                raise Exception('Querying a base table requires the '
+                                'specification of a workspace!')
+            table_path = self.folders.get_base_table(workspace, table_name)
+            rows = self._query_table(table_path, columns=columns)
+        # project table (with temp. management)
+        else: 
+            table_name = os.path.basename(table_name)
+            dbname = os.path.basename(workspace) or self.tool._dbname
+            table_path = self.folders.get_table(table_name, workspace=workspace,
+                                                project=project)
+            if dbname in self._temporary_gdbs:
+                temp_db = self.folders.get_temporary_db(workspace=workspace,
+                                                        check=False)
+                # only query temp. db if it exists (created on demand in update)
+                if arcpy.Exists(temp_db):
+                    table_path = self.folders.get_temporary_table(
+                        table_name, workspace=workspace)
+            rows = self._query_table(table_path, columns=columns, where=where, 
+                                     pkey=pkey)
         return rows
     
     def _query_table(self, table_path, columns=[], where=None, pkey=None):
