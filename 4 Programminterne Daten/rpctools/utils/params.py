@@ -303,6 +303,8 @@ class Tbx(object):
         """
         # if a toolbox is opened, remove ALL temporary databases
         self.clear_temporary_dbs()
+        # reset the invalid paths
+        self.folders._invalid_paths = []
         # set the active project on open (do not do this in project management
         # toolboxes, updating projects messes them up, that's what the boolean
         # self.update_projects is for)
@@ -413,7 +415,7 @@ class Tbx(object):
         if params and self.folders._invalid_paths:
             invalid = ', '.join(self.folders._invalid_paths)
             params[0].setErrorMessage(
-                u'Es fehlen für die Berechnungen benötigte Daten.'
+                u'Es fehlen für die Berechnungen benötigte Daten. '
                 u'Möglicherweise wurden vorausgesetzte Schritte noch '
                 u'nicht korrekt durchgeführt.\n\r '
                 u'Folgende Pfade oder Tabellen wurden nicht gefunden: {}'
