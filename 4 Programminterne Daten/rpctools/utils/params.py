@@ -427,18 +427,18 @@ class Tbx(object):
         """ to define in the subclass """
 
     def update_table(self,
-                     table,
+                     table_name,
                      column_values,
                      where=None,
                      pkey=None,
                      workspace=''):
         """
-        Update rows in a FileGeodatabase with given values
+        Update rows of a table in a Workspace in the Project Folder
 
         Parameters
         ----------
-        table : str
-            table name
+        table_name : str
+            name of the table
         column_values: dict,
             the columns and the values to update them with as key/value-pairs
         where: str, optional
@@ -454,7 +454,7 @@ class Tbx(object):
             the number of updated rows, -1 if table does not exist
         """
         where = where or self.get_where_clause(pkey)
-        table_path = self._get_table_path(workspace, table)
+        table_path = self._get_table_path(workspace, table_name)
         if not table_path:
             return -1
         columns = column_values.keys()
@@ -560,21 +560,20 @@ class Tbx(object):
             table_path = None
         return table_path
 
-    def insert_row_in_table(self, table, column_values, workspace=''):
+    def insert_row_in_table(self, table_name, column_values, workspace=''):
         """
-        insert new row
-        in a FileGeodatabase with given values
+        insert new row into a table in a Workspace in the Project Folder
 
         Parameters
         ----------
-        table : str
-            full path to the table
+        table_name : str
+            name of the table
         column_values: dict,
             the columns and the values to insert as key/value-pairs
         fgdb : str, optional
             the database name
         """
-        table_path = self._get_table_path(workspace, table)
+        table_path = self._get_table_path(workspace, table_name)
         if not table_path:
             return
         columns = column_values.keys()
@@ -583,15 +582,15 @@ class Tbx(object):
         cursor.insertRow(values)
         del cursor
 
-    def upsert_row_in_table(self, table, column_values, pkey, workspace=''):
+    def upsert_row_in_table(self, table_name, column_values, pkey, workspace=''):
         """
         update a row, or - if it does not exist yet - insert the row
-        in a FileGeodatabase with given values
+        into a table in a Workspace in the Project Folder
 
         Parameters
         ----------
-        table : str
-            full path to the table
+        table_name : str
+            name of the table
         column_values: dict,
             the columns and the values to insert as key/value-pairs
         pkey: dict,
@@ -601,7 +600,7 @@ class Tbx(object):
         """
         where_clause = self.get_where_clause(pkey)
         # try to update the row
-        r = self.update_table(table, column_values, where=where_clause,
+        r = self.update_table(table_name, column_values, where=where_clause,
                               workspace=workspace)
         if r < 0:
             return
@@ -609,7 +608,7 @@ class Tbx(object):
         if not r:
             # insert new row
             column_values.update(pkey)
-            self.insert_row_in_table(table, column_values, workspace)
+            self.insert_row_in_table(table_name, column_values, workspace)
 
     def get_where_clause(self, pkey):
         """
@@ -633,15 +632,15 @@ class Tbx(object):
                                      ])
         return where_clause
     
-    def table_to_dataframe(self, table, columns=[], workspace='',
+    def table_to_dataframe(self, table_name, columns=[], workspace='',
                            where=None, pkey=None, project=''):
         """
         get rows from a FileGeodatabase with given values as a pandas dataframe
 
         Parameters
         ----------
-        table : str
-            full path to the table
+        table_name : str
+            name of the table
         columns: list, optional
             the requested columns, if not given or empty: return all columns
         where: str, optional
@@ -657,27 +656,89 @@ class Tbx(object):
         rows : dataframe
             pandas dataframe with all requested rows and columns
         """
-    
-        table_path = self.folders.get_table(table, workspace=workspace,
-                                            project=project)
-        
+        # getting the fields is duplicate to the code in query_tables(...)
+        # but the dataframe needs the column names as well and query_tables
+        # should not return those
+        table_path = self.folders.get_table(table_name, workspace=workspace,
+                                            project=project)        
         if not columns and arcpy.Exists(table_path):
             columns = [f.name for f in arcpy.ListFields(table_path)]
             
-        rows = self.query_table(table, columns=columns, workspace=workspace,
+        rows = self.query_table(table_name, columns=columns,
+                                workspace=workspace,
                                 where=where, pkey=pkey, project=project)
         
         dataframe = pd.DataFrame.from_records(rows, columns=columns)
         return dataframe
         
-    def query_table(self, table, columns=[], workspace='',
+    def query_table(self, table_name, columns=[], workspace='',
                     where=None, pkey=None, project=''):
         """
-        get rows from a FileGeodatabase with given values
+        get rows from a table in a Workspace in the Project Folder
 
         Parameters
         ----------
-        table : str
+        table_name : str
+            name of the table
+        columns: list, optional
+            the requested columns, if not given or empty: return all columns
+        where: str, optional
+            a where clause to pick single rows
+        pkey: dict, optional
+        workspace : str, optional
+            the database name
+        project : str, optional
+            the project (set project is taken if not given)
+
+        Returns
+        -------
+        rows : list of lists
+            the queried rows with values of requested columns in same order as
+            in columns argument
+        """
+        table_name = os.path.basename(table_name)
+        dbname = os.path.basename(workspace) or self.tool._dbname
+        table_path = self.folders.get_table(table_name, workspace=workspace,
+                                            project=project)
+        if dbname in self._temporary_gdbs:
+            temp_db = self.folders.get_temporary_db(workspace=workspace,
+                                                    check=False)
+            # only query temp. db if it exists (created on demand in update)
+            if arcpy.Exists(temp_db):
+                table_path = self.folders.get_temporary_table(
+                    table_name, workspace=workspace)
+        rows = self._query_table(table_path, columns=columns, where=where, 
+                                 pkey=pkey)
+        return rows
+    
+    def query_base_table(self, workspace, table_name, columns=[]):
+        """
+        get rows from a FileGeodatabase
+
+        Parameters
+        ----------
+        workspace : str
+            the database name
+        table_name : str
+            name of the table
+
+        Returns
+        -------
+        rows : list of lists
+            the queried rows with values of requested columns in same order as
+            in columns argument
+        """
+        table_path = self.folders.get_base_table(workspace, table_name)
+        rows = self._query_table(table_path, columns=columns)
+        return rows
+    
+    def _query_table(self, table_path, columns=[], where=None, pkey=None):
+        """
+        get rows from a FileGeodatabase (full path required)
+
+        Parameters
+        ----------
+        table_path : str
             full path to the table
         columns: list, optional
             the requested columns, if not given or empty: return all columns
@@ -696,25 +757,14 @@ class Tbx(object):
             in columns argument
         """
         where = where or self.get_where_clause(pkey)
-        table = os.path.basename(table)
-        dbname = os.path.basename(workspace) or self.tool._dbname
-        table_path = self.folders.get_table(table, workspace=workspace,
-                                            project=project)
         if not arcpy.Exists(table_path):
             return []
         if not columns:
             columns = [f.name for f in arcpy.ListFields(table_path)]
-        if dbname in self._temporary_gdbs:
-            temp_db = self.folders.get_temporary_db(workspace=workspace,
-                                                    check=False)
-            # only query temp. db if it exists (created on demand in update)
-            if arcpy.Exists(temp_db):
-                table_path = self.folders.get_temporary_table(
-                    table, workspace=workspace)
         cursor = arcpy.da.SearchCursor(table_path, columns, where_clause=where)
         rows = [row for row in cursor]
         del cursor
-        return rows
+        return rows        
 
     def clear_temporary_dbs(self):
         """remove all temporary gdbs"""
@@ -811,7 +861,7 @@ class Tbx(object):
         messages : the message-object of ArcGIS
 
         """
-        self._commit_temporaries()
+        #self._commit_temporaries()
         self.tool.main(self.par, parameters, messages)
         self.clear_temporary_dbs()
 
