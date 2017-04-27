@@ -861,7 +861,7 @@ class Tbx(object):
         messages : the message-object of ArcGIS
 
         """
-        #self._commit_temporaries()
+        self._commit_temporaries()
         self.tool.main(self.par, parameters, messages)
         self.clear_temporary_dbs()
 
