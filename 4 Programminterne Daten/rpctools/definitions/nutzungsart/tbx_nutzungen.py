@@ -12,7 +12,8 @@ from rpctools.utils.constants import Nutzungsart
 from rpctools.utils.encoding import encode
 from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten import \
      TbxFlaechendefinition
-from rpctools.definitions.nutzungsart.nutzungen import Nutzungen
+from rpctools.definitions.nutzungsart.nutzungen import (
+    Nutzungen, NutzungenWohnen)
 from rpctools.utils.encoding import encode
 from rpctools.utils.constants import Branche, Gewerbegebietstyp
 from rpctools.utils.spatial_lib import get_gemeindetyp
@@ -108,13 +109,13 @@ class TbxNutzungenWohnen(TbxNutzungen):
 
     @property
     def Tool(self):
-        return Nutzungen
+        return NutzungenWohnen
 
     def _getParameterInfo(self):
         params = super(TbxNutzungenWohnen, self)._getParameterInfo()
         # workaround
         heading = "1) Bezugszeitraum"
-        beginn_name="Beginn des Bezugs (Jahreszahl)"
+        beginn_name = "Beginn des Bezugs (Jahreszahl)"
         params = self.init_aufsiedlung(params, heading=heading,
                                        beginn_name=beginn_name)
 
@@ -532,8 +533,12 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         pass
 
 if __name__ == '__main__':
-    t = TbxNutzungenGewerbe()
+    t = TbxNutzungenWohnen()
     params = t.getParameterInfo()
+    t.tool.main(params, None)
+    #df = t.table_to_dataframe('Teilflaechen_Plangebiet',
+                              #workspace='FGDB_Definition_Projekt.gdb')
+    #t.table_to_dataframe('Wohnen_WE_in_Gebaeudetypen', columns=None)
     #t.print_test_parameters()
     #t.print_tool_parameters()
     t.updateParameters(params)

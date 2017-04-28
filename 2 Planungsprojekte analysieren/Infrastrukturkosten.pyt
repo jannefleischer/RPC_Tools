@@ -16,5 +16,5 @@ class Toolbox(object):
         self.label = u'Infrastrukturkosten'
         self.alias = ''
         self.tools = [TbxFlaechenbilanz,
-                    TbxInfrastrukturkostenermittlung,
+                      TbxInfrastrukturkostenermittlung,
                       TbxKostenaufteilungsregeln]

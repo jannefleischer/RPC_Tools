@@ -13,8 +13,7 @@ class TbxSaldenbearbeiten(Tbx):
     """ superclass for wanderungssalden einwohner/gewerbe"""
     _nutzungsart = None
     _saldo_field = None
-    _display_name = None
-
+    
     def _getParameterInfo(self):
 
         par = self.par
