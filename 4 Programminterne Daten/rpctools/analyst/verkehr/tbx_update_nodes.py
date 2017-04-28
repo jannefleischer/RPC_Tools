@@ -10,7 +10,7 @@ from rpctools.analyst.verkehr.UpdateNodes import UpdateNodes
 
 
 class TbxUpdateNodes(Tbx):
-
+    _opened_for_first_time = True
     @property
     def label(self):
         return encode(u'Verkehrsgewichtung')
@@ -101,11 +101,12 @@ class TbxUpdateNodes(Tbx):
                 params.new_weight.value = int(round(old_weight * 100, 0))
 
 
-        if self.par.changed('new_weight'):
+        if self.par.changed('new_weight') and not self._opened_for_first_time:
             man_weight = params.new_weight.value
             self.update_table('Zielpunkte',
                               {'Manuelle_Gewichtung': man_weight}, where=where)
 
+        self._opened_for_first_time = False
         return
 
 

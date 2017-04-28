@@ -13,11 +13,6 @@ class UpdateNodes(Tool):
 
     def run(self):
         toolbox = self.parent_tbx
-        # add new column
-        nodes_path = self.folders.get_table('Zielpunkte', workspace='',
-                                            project='', check=True)
-        arcpy.AddField_management(nodes_path, 'Neue_Gewichte',
-                                  field_type='DOUBLE')
         # get input data
         input_data = toolbox.query_table('Zielpunkte',
                                           ['node_id', 'Manuelle_Gewichtung',
@@ -70,4 +65,15 @@ class UpdateNodes(Tool):
                 where = 'node_id = {}'.format(id_node)
                 toolbox.update_table('Zielpunkte',
                                   {'Neue_Gewichte': weight}, where=where)
-        pass
+
+        # update the layers
+        mxd = arcpy.mapping.MapDocument("CURRENT")
+        df = arcpy.mapping.ListDataFrames(mxd, "*")[0]
+        layers = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
+        for layer in layers:
+            arcpy.mapping.RemoveLayer(df, layer)
+
+
+        lyr_zielpunkte_gew = self.folders.get_layer('Zielpunkte_gewichtet', 'Verkehr')
+        fc_zielpunkte_gew = self.folders.get_table('Zielpunkte')
+        self.output.add_output('verkehr', lyr_zielpunkte_gew, fc_zielpunkte_gew)

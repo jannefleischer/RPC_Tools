@@ -660,7 +660,8 @@ class Routing(Tool):
         nodes_path = self.folders.get_table('Zielpunkte', workspace='', project='',
                                    check=True)
         arcpy.AddField_management(nodes_path, 'Manuelle_Gewichtung')
-
+        arcpy.AddField_management(nodes_path, 'Neue_Gewichte',
+                                  field_type='DOUBLE')
 
         # Add Layers
         lyr_zielpunkte = self.folders.get_layer('Zielpunkte', 'Verkehr')
