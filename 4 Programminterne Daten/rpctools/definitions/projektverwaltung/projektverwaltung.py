@@ -35,11 +35,11 @@ class Projektverwaltung(DiaTeilflaechen):
     _dbname = 'FGDB_Definition_Projekt.gdb'
 
     def add_output_new_project(self):
-        # add Erschliessungsnetz
-        fc = self.folders.get_table("Erschliessungsnetz",
-                                    workspace="FGDB_Kosten.gdb")
-        layer = self.folders.get_layer("Erschließungsnetz")
-        self.output.add_output("projektdefinition", layer, fc, zoom=False)
+        ## add Erschliessungsnetz
+        #fc = self.folders.get_table("Erschliessungsnetz",
+                                    #workspace="FGDB_Kosten.gdb")
+        #layer = self.folders.get_layer("Erschließungsnetz")
+        #self.output.add_output("projektdefinition", layer, fc, zoom=False)
 
         # add Teilflächen
         fc = self.folders.get_table("Teilflaechen_Plangebiet")

@@ -549,8 +549,7 @@ class OTPRouter(object):
     def create_transfer_node_features(self):
         """Create the point-features from the transfer nodes"""
         sr = arcpy.SpatialReference(self.epsg)
-        fields = ['node_id', 'Gewicht_Bewohnerverkehr',
-                  'Gewicht_Beschäftigte', 'Gewicht_Kunden',
+        fields = ['node_id', 'Gewicht',
                   'SHAPE@']
         fc = os.path.join(self.ws, 'Zielpunkte')
         self.truncate(fc)
@@ -560,8 +559,6 @@ class OTPRouter(object):
                 node.create_geom()
                 if node.geom:
                     rows.insertRow((node.node_id,
-                                    node.weight,
-                                    node.weight,
                                     node.weight,
                                     node.geom))
 
@@ -595,12 +592,9 @@ class OTPRouter(object):
                                     node.geom))
 
 
-
-
 class Routing(Tool):
     _dbname = 'FGDB_Verkehr.gdb'
     _param_projectname = 'project'
-
 
     def run(self):
         toolbox = self.parent_tbx
@@ -646,7 +640,6 @@ class Routing(Tool):
                 json = o.get_routing_request(source, destination)
                 o.decode_coords(json, route_id=r_id, source_id=source_id)
                 r_id += 1
-
 
         o.nodes.transform()
         o.nodes_to_graph(meters=inner_circle)

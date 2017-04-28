@@ -16,7 +16,7 @@ class UpdateNodes(Tool):
         # get input data
         input_data = toolbox.query_table('Zielpunkte',
                                           ['node_id', 'Manuelle_Gewichtung',
-                                           'Gewicht_Bewohnerverkehr'])
+                                           'Gewicht'])
         node_id = [tup[0] for tup in input_data]
         man_weights = [tup[1] for tup in input_data]
         old_weights = [tup[2] for tup in input_data]
