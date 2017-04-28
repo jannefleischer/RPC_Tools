@@ -240,17 +240,17 @@ class Output(object):
                 projectlayer = layer
 
         return projectlayer
-    
+
     def get_layers(self, layername, projectname=None):
         """
-        Return all layers with given name that are grouped in given project 
+        Return all layers with given name that are grouped in given project
         (respectively in currently set project)
-        
+
         Parameters
         ----------
         layername : str
         projectname : str, optional
-        
+
         Returns
         ----------
         layers : list
@@ -398,6 +398,9 @@ class Output(object):
         group = self.module.get_label(groupname)
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
+        current_dataframe.geographicTransformations = ['DHDN_To_WGS_1984_5x',
+                                                       'DHDN_To_ETRS_1989_5']
+
 
         # Layer-Gruppen hinuzfuegen, falls nicht vorhanden
         self.set_projectlayer(projektname)

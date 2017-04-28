@@ -11,12 +11,15 @@ from rpctools.analyst.verkehr.tbx_Routingsdurchfuehren import TbxRoutingsdurchfu
 from rpctools.analyst.verkehr.tbx_Basisdatenbearbeiten import TbxBasisdatenbearbeiten
 from rpctools.analyst.verkehr.tbx_VerkehrsmengenErmitteln import TbxVerkehrsmengenErmitteln
 from rpctools.analyst.verkehr.tbx_opt_routing import TbxRouting
+from rpctools.analyst.verkehr.tbx_update_nodes import TbxUpdateNodes
+
 
 class Toolbox(object):
     def __init__(self):
         self.label = u'Verkehr'
         self.alias = ''
         self.tools = [TbxRouting,
+                      TbxUpdateNodes,
                       TbxBasisdatenbearbeiten,
                       TbxVerkehrsmengenErmitteln,
                       TbxRoutingsdurchfuehren]

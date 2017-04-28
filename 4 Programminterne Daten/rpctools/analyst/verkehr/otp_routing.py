@@ -502,6 +502,7 @@ class OTPRouter(object):
         N = len(self.nodes)
         mat = csc_matrix((data, (row, col)), shape=(N, N))
         source_nodes = self.routes.source_nodes
+        arcpy.AddMessage(str(source_nodes))
         dist_matrix = dijkstra(mat,
                                directed=True,
                                return_predecessors=False,
@@ -509,6 +510,7 @@ class OTPRouter(object):
                                #limit=meters,
                                )
         dist_vector = dist_matrix.min(axis=0)
+        arcpy.AddMessage(str(dist_vector))
         self.set_link_distance(dist_vector)
         dist_vector[dist_vector > meters] = np.NINF
         self.get_max_nodes(dist_vector)
@@ -653,6 +655,11 @@ class Routing(Tool):
         o.create_polyline_features()
         o.create_node_features()
         o.create_transfer_node_features()
+
+        # Empty column for manual changes of weigths
+        nodes_path = self.folders.get_table('Zielpunkte', workspace='', project='',
+                                   check=True)
+        arcpy.AddField_management(nodes_path, 'Manuelle_Gewichtung')
 
 
         # Add Layers

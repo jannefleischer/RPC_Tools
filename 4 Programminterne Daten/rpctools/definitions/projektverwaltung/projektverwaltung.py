@@ -40,7 +40,7 @@ class Projektverwaltung(DiaTeilflaechen):
                                     workspace="FGDB_Kosten.gdb")
         layer = self.folders.get_layer("Erschließungsnetz")
         self.output.add_output("projektdefinition", layer, fc, zoom=False)
-        
+
         # add Teilflächen
         fc = self.folders.get_table("Teilflaechen_Plangebiet")
         layer = self.folders.get_layer("Teilflächen des Plangebiets")
@@ -81,7 +81,7 @@ class ProjektAnlegen(Projektverwaltung):
         beginn_betrachtung = self.par.begin.value
         ende_betrachtung = self.par.end.value
         project_path = self.folders.get_projectpath(check=False)
-        
+
         self.copy_template(project_path)
 
         tfl, gdbPfad = self.copy_teilflaechen_to_gdb(project_name, flaeche)
@@ -187,9 +187,23 @@ class ProjektAnlegen(Projektverwaltung):
 
         # epsg-code or the
         config = self.parent_tbx.config
-        sr = arcpy.SpatialReference(config.epsg)
-        transform_method = config.transformation
-        arcpy.Project_management(flaeche, tfl, sr, transform_method)
+        sr1 = arcpy.Describe(flaeche).spatialReference
+        sr2 = arcpy.SpatialReference(config.epsg)
+        possible_transformations = arcpy.ListTransformations(sr1, sr2)
+        if not possible_transformations:
+            temp_path = self.folders.get_temporary_projectpath()
+            temp_shapefile = os.path.join(temp_path, 'tempfile.shp')
+            sr0 = arcpy.SpatialReference(4326)
+            possible_transformations = arcpy.ListTransformations(sr1, sr0)
+            transform_method = possible_transformations[0]
+            arcpy.Project_management(flaeche, temp_shapefile, sr0, transform_method)
+            possible_transformations = arcpy.ListTransformations(sr0, sr2)
+            transform_method = possible_transformations[0]
+            arcpy.Project_management(temp_shapefile, tfl, sr2, transform_method)
+            arcpy.Delete_management(temp_shapefile)
+        else:
+            transform_method = possible_transformations[0]
+            arcpy.Project_management(flaeche, tfl, sr2, transform_method)
 
         gdbPfad = self.folders.get_db()
         arcpy.env.workspace = gdbPfad
