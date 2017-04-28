@@ -12,6 +12,7 @@ from rpctools.utils.singleton import Singleton
 from rpctools.utils.param_module import Params
 from rpctools.utils.arcpy_parameter import Parameter
 import pandas as pd
+import numpy as np
 import arcpy
 
 
@@ -229,6 +230,7 @@ class Tbx(object):
         # updates to these tables are written to temp. tables and written to
         # project db only on execution of tool
         self._temporary_gdbs = []
+        self._is_executing = False
 
     def reload_tool(self):
         """reload the tool's module"""
@@ -453,8 +455,35 @@ class Tbx(object):
         r : int
             the number of updated rows, -1 if table does not exist
         """
+        table_path = self._get_table_path(table_name, workspace=workspace)
+        return self._update_table(table_path, column_values, where=where, 
+                                  pkey=pkey)
+    
+    def _update_table(self,
+                     table_path,
+                     column_values,
+                     where=None,
+                     pkey=None):
+        """
+        Update rows of a table
+
+        Parameters
+        ----------
+        table_path : str
+            full path to the table
+        column_values: dict,
+            the columns and the values to update them with as key/value-pairs
+        where: str, optional
+            a where clause to pick single rows
+        pkey: dict, optional
+            the columns and the values of the primary key as key/value-pairs
+
+        Returns
+        -------
+        r : int
+            the number of updated rows, -1 if table does not exist
+        """
         where = where or self.get_where_clause(pkey)
-        table_path = self._get_table_path(workspace, table_name)
         if not table_path:
             return -1
         columns = column_values.keys()
@@ -466,7 +495,7 @@ class Tbx(object):
             cursor.updateRow(row)
             r += 1
         del cursor
-        return r
+        return r    
     
     def copy_column(self, table, in_column, out_column, workspace=''):
         """
@@ -484,7 +513,7 @@ class Tbx(object):
         workspace : str, optional
             the database name
         """
-        table_path = self._get_table_path(workspace, table)
+        table_path = self._get_table_path(table, workspace=workspace)
         if not table_path:
             return
         in_field = arcpy.ListFields(table_path, in_column)
@@ -523,7 +552,7 @@ class Tbx(object):
             the number of deleted rows
         """
         where = self.get_where_clause(pkey)
-        table_path = self._get_table_path(workspace, table)
+        table_path = self._get_table_path(table, workspace=workspace)
         if not table_path:
             return
         columns = pkey.keys()
@@ -535,26 +564,28 @@ class Tbx(object):
         del cursor
         return r
 
-    def _get_table_path(self, workspace, table):
+    def _get_table_path(self, table_name, workspace=''):
         """
         return the full table path,
         return the temporary fgdb, if db is handled temporarly (creates the
         temporary table if it does not exist yet),
         return None if table does not exist
         """
-        dbname = os.path.basename(workspace) or self.tool._dbname
-        table = os.path.basename(table)
+        workspace = os.path.basename(workspace) or self.tool._dbname
+        table_name = os.path.basename(table_name)
         # if table is in temp. management -> write to temporary table instead
-        if dbname in self._temporary_gdbs:
+        # don't do this while executing toolbox, temp. management is meant for
+        # undoing user inputs in toolboxes
+        if not self._is_executing and workspace in self._temporary_gdbs:
             temp_db = self.folders.get_temporary_db(workspace=workspace,
                                                     check=False)
             # create on demand
             if not arcpy.Exists(temp_db):
                 self._create_temporary_copy(workspace)
-            table_path = self.folders.get_temporary_table(table,
+            table_path = self.folders.get_temporary_table(table_name,
                                                           workspace=workspace)
         else:
-            table_path = self.folders.get_table(table, workspace=workspace)
+            table_path = self.folders.get_table(table_name, workspace=workspace)
     
         if not arcpy.Exists(table_path):
             table_path = None
@@ -570,17 +601,30 @@ class Tbx(object):
             name of the table
         column_values: dict,
             the columns and the values to insert as key/value-pairs
-        fgdb : str, optional
+        workspace : str, optional
             the database name
         """
-        table_path = self._get_table_path(workspace, table_name)
+        table_path = self._get_table_path(table_name, workspace=workspace)
         if not table_path:
             return
+        self._insert_row_in_table(table_path, column_values)
+        
+    def _insert_row_in_table(self, table_path, column_values):
+        """
+        insert new row into a table
+
+        Parameters
+        ----------
+        table_path : str
+            full path to the table
+        column_values: dict,
+            the columns and the values to insert as key/value-pairs
+        """
         columns = column_values.keys()
         values = column_values.values()
         cursor = arcpy.da.InsertCursor(table_path, columns)
         cursor.insertRow(values)
-        del cursor
+        del cursor    
 
     def upsert_row_in_table(self, table_name, column_values, pkey, workspace=''):
         """
@@ -609,7 +653,7 @@ class Tbx(object):
             # insert new row
             column_values.update(pkey)
             self.insert_row_in_table(table_name, column_values, workspace)
-
+            
     def get_where_clause(self, pkey):
         """
         convert a primary key dict to a where_clause
@@ -677,7 +721,58 @@ class Tbx(object):
                                 project=project, is_base_table=is_base_table)
         
         dataframe = pd.DataFrame.from_records(rows, columns=columns)
-        return dataframe
+        return dataframe    
+
+
+    def dataframe_to_table(self, table_name, dataframe, pkeys, workspace='',
+                           upsert=False):
+        """
+        Update a table in a Workspace in the Project Folder with values inside a
+        pandas dataframe, all columns inside the dataframe will be written to
+        the table (for this purpose all columns in the dataframe have to have a
+        matching column in the table).
+        Supports optional upserting (insert if not exists)
+
+        Parameters
+        ----------
+        table_name : str
+            name of the table
+        column_values: dict,
+            the columns and the values to update them with as key/value-pairs
+        pkeys: list of str
+            the names of the primary keys
+        workspace : str, optional
+            the database name
+        upsert : bool, optional, default = False
+            if True insert rows that do not exist yet, else ignored
+        
+        Examples
+        --------
+        dataframe = pd.DataFrame([[1, 1.4], [2, 2.0]],
+                                 columns=['OBJECTID', 'Korrekturfaktor_EW'])
+        dataframe_to_table('Wohnen_WE_in_Gebaeudetypen',
+                           dataframe, ['OBJECTID'], upsert=False)
+        """
+        #where = '"{pkey}"='.format(pkey=pkey)
+        #where += (' or ' + where).join(
+            #dataframe[pkey].values.astype(str))
+        table_name = os.path.basename(table_name)
+        table_path = self._get_table_path(table_name, workspace=workspace)
+        columns_incl_pkeys = dataframe.columns.values
+        # columns without the pkeys
+        columns = np.setdiff1d(columns_incl_pkeys, pkeys)
+        for row in dataframe.iterrows():
+            # row is a tuple with index at 0 and the columns at 1 
+            pkey_values = dict(zip(pkeys, row[1][pkeys].values))
+            column_values = dict(zip(columns, row[1][columns].values))
+            where = self.get_where_clause(pkey_values)
+            updated = self._update_table(
+                table_path, column_values, pkey=pkey_values)
+            # row does not exist yet
+            if upsert and updated == 0:
+                # Todo: insert row with values including the primary keys?
+                #column_values.update(pkey_values)
+                self._insert_row_in_table(table_path, column_values)    
         
     def query_table(self, table_name, columns=[], workspace='',
                     where=None, pkey=None, project='', is_base_table=False):
@@ -718,10 +813,10 @@ class Tbx(object):
         # project table (with temp. management)
         else: 
             table_name = os.path.basename(table_name)
-            dbname = os.path.basename(workspace) or self.tool._dbname
+            workspace = os.path.basename(workspace) or self.tool._dbname
             table_path = self.folders.get_table(table_name, workspace=workspace,
                                                 project=project)
-            if dbname in self._temporary_gdbs:
+            if workspace in self._temporary_gdbs:
                 temp_db = self.folders.get_temporary_db(workspace=workspace,
                                                         check=False)
                 # only query temp. db if it exists (created on demand in update)
@@ -745,10 +840,6 @@ class Tbx(object):
         where: str, optional
             a where clause to pick single rows
         pkey: dict, optional
-        workspace : str, optional
-            the database name
-        project : str, optional
-            the project (set project is taken if not given)
 
         Returns
         -------
@@ -861,10 +952,16 @@ class Tbx(object):
         messages : the message-object of ArcGIS
 
         """
-        self._commit_temporaries()
-        self.tool.main(self.par, parameters, messages)
-        self.clear_temporary_dbs()
-
+        self._is_executing = True
+        try: 
+            self._commit_temporaries()
+            self.tool.main(self.par, parameters, messages)
+            self.clear_temporary_dbs()
+        except Exception as e:
+            raise e
+        finally: 
+            self._is_executing = False
+        
     def print_test_parameters(self):
         """
         Print the parameters to use in tests
