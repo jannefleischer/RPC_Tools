@@ -217,6 +217,9 @@ class ProjektAnlegen(Projektverwaltung):
         arcpy.AddField_management(tfl, "ags_bkg", "TEXT")
         arcpy.AddField_management(tfl, "gemeinde_name", "TEXT")
         arcpy.AddField_management(tfl, "validiert", "SHORT")
+        arcpy.AddField_management(tfl, "WE_gesamt", "LONG")
+        arcpy.AddField_management(tfl, "AP_gesamt", "LONG")
+        arcpy.AddField_management(tfl, "VF_gesamt", "LONG")
         #arcpy.AddField_management(teilfaechen_plangebiet, "Bilanzsumme", "FLOAT")
         return tfl, gdbPfad
 
