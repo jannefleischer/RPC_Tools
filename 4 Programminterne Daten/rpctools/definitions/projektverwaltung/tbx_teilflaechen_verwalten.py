@@ -206,9 +206,12 @@ class TbxFlaechendefinition(Tbx):
             self._teilflaechen = self._get_teilflaechen(nutzungsart=nutzungsart)
             list_teilflaechen = self.teilflaechen.keys()
         self.par.teilflaeche.filter.list = list_teilflaechen
-    
+        
+        if not list_teilflaechen:
+            flaeche = ''
+            
         # a flaeche was selected and is in list, select it again
-        if idx >= 0:
+        elif idx >= 0:
             flaeche = self.par.teilflaeche.filter.list[idx]
         
         # flaeche not in list -> select first one
