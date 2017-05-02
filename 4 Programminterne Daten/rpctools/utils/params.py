@@ -894,7 +894,7 @@ class Tbx(object):
             if arcpy.Exists(path):
                 arcpy.Delete_management(path)
 
-    def add_temporary_management(self, workspace=''):
+    def add_temporary_management(self, workspace):
         """
         add a FileGeoDatabase to be managed temporarly,
         all updates on their tables happen inside the temporary database,

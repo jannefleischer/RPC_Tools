@@ -34,12 +34,12 @@ class NutzungenWohnen(Tool):
         cor_factor_col = 'Korrekturfaktor_EW'
         we_col = 'WE'
         pkey =  'OBJECTID'
-        flaechen_id = 'IDTeilflaeche'
+        flaechen_col = 'IDTeilflaeche'
         
         wohnen_ew_df = tbx.table_to_dataframe(
             wohnen_we_table, columns=[pkey, ew_col, geb_typ_col,
                                       cor_factor_col, we_col,
-                                      flaechen_id])
+                                      flaechen_col])
         
         ### Korrekturfaktoren ###    
         arcpy.AddMessage('Berechne Korrekturfaktoren...')
@@ -63,20 +63,20 @@ class NutzungenWohnen(Tool):
         # empty now, but easier to allocate all fields this way
         wohnen_struct_df = tbx.table_to_dataframe(wohnen_struct_table)
         # calc. structure grouped by flaechen id
-        grouped = wohnen_ew_df.groupby(flaechen_id)
+        grouped = wohnen_ew_df.groupby(flaechen_col)
         end = tbx.query_table(project_table,
                               columns=['Ende_Betrachtungszeitraum'])[0][0]
         for g in grouped:
             wohnen_ew_group = g[1]
-            fid = wohnen_ew_group[flaechen_id].unique()[0]
+            flaechen_id = wohnen_ew_group[flaechen_col].unique()[0]
             begin, duration = tbx.query_table(
                 flaechen_table,
                 columns=['Beginn_Nutzung', 'Aufsiedlungsdauer'],
-                where='id_teilflaeche={}'.format(fid))[0]
+                where='id_teilflaeche={}'.format(flaechen_id))[0]
             flaechen_template = pd.DataFrame()
             geb_types = wohnen_ew_group[geb_typ_col].values
             flaechen_template[geb_typ_col] = geb_types            
-            flaechen_template[flaechen_id] = fid
+            flaechen_template[flaechen_col] = flaechen_id
             flaechen_template['Wohnungen'] = (
                 wohnen_ew_group[we_col].values.astype(float) / duration)
             for j in range(begin, end + 1):

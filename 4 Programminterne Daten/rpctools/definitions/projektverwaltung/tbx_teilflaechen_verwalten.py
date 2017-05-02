@@ -49,7 +49,8 @@ class TbxFlaechendefinition(Tbx):
 
     @property
     def teilflaechen_table(self):
-        return self.folders.get_table('Teilflaechen_Plangebiet')
+        return self.folders.get_table('Teilflaechen_Plangebiet',
+                                      workspace='FGDB_Definition_Projekt.gdb')
 
     def get_teilflaeche(self, name):
         # type: (str) -> Teilflaeche
@@ -78,7 +79,8 @@ class TbxFlaechendefinition(Tbx):
     
     @property
     def nutzungsart_table(self):
-        return self.folders.get_table('Nutzungsart')
+        return self.folders.get_table('Nutzungsart',
+                                      workspace='FGDB_Definition_Projekt.gdb')
 
     @property
     def nutzungsarten(self):
@@ -112,7 +114,8 @@ class TbxFlaechendefinition(Tbx):
 
         columns = ['id_teilflaeche', 'Flaeche_ha', 'Name',
                    'gemeinde_name', 'Nutzungsart', 'ags_bkg']
-        rows = self.query_table('Teilflaechen_Plangebiet', columns)
+        rows = self.query_table('Teilflaechen_Plangebiet', columns,
+                                workspace='FGDB_Definition_Projekt.gdb')
         teilflaechen = OrderedDict()
         inverted_nutzungsarten = {v: k for k, v in
                                   self.nutzungsarten.iteritems()}
@@ -137,7 +140,8 @@ class TbxFlaechendefinition(Tbx):
         """get the nutzungsart of the given flaeche (by id)"""
         row = self.query_table(
             'Teilflaechen_Plangebiet', ['Nutzungsart'],
-            where = '"id_teilflaeche" = {}'.format(flaechen_id))[0]
+            where = '"id_teilflaeche" = {}'.format(flaechen_id),
+            workspace='FGDB_Definition_Projekt.gdb')[0]
         return row[0]
 
     def _getParameterInfo(self):
@@ -300,7 +304,6 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                         table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
                 
                 self.update_teilflaechen()
-
 
         return params
 
