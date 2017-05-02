@@ -42,7 +42,6 @@ class TbxNutzungen(TbxFlaechendefinition):
         not recognized as subclasses TbxFlaechendefinition (so you can't call 
         _getParameterInfo of TbxFlaechendefinition here)"""
 
-
         # Beginn der Aufsiedlung (Jahreszahl)
         param = self.add_parameter('bezugsbeginn')
         param.name = u'Beginn_der_Aufsiedlung__Jahreszahl_'
@@ -182,17 +181,23 @@ class TbxNutzungenWohnen(TbxNutzungen):
         """"""
         super(TbxNutzungenWohnen, self).commit_tfl_changes()
         tfl = self.par._current_tfl
+        we_sum = 0
         for gt in self.gebaeudetypen.itervalues():
             assert isinstance(gt, Gebaeudetyp)
             table = 'Wohnen_WE_in_Gebaeudetypen'
             pkey = dict(IDTeilflaeche=tfl.flaechen_id,
                         IDGebaeudetyp=gt.typ_id)
+            we = self.par[gt.param_we].value
             column_values = dict(
                 Gebaeudetyp=gt.name,
-                WE=self.par[gt.param_we].value,
+                WE=we,
                 EW_je_WE=self.par[gt.param_ew_je_we].value,
             )
             r = self.upsert_row_in_table(table, column_values, pkey)
+            we_sum += we
+        self.update_table('Teilflaechen_Plangebiet',
+                          column_values={'WE_gesamt': we_sum}, 
+                          where='id_teilflaeche={}'.format(tfl.flaechen_id))
 
     def _updateMessages(self, params):
         pass
@@ -396,18 +401,22 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         super(TbxNutzungenGewerbe, self).commit_tfl_changes()
         tfl = self.par._current_tfl
         for branche in self.branchen.itervalues():
-            param = self.par[branche.param_gewerbenutzung]
+            job_param = self.par[branche.param_gewerbenutzung]
             table = self.tablename
             pkey = {'IDTeilflaeche': tfl.flaechen_id,
                     'IDBranche': branche.id}
-            column_values = {'anteil': param.value}
+            column_values = {'anteil': job_param.value}
             r = self.upsert_row_in_table(table, column_values, pkey)
             
         table_jobs = 'Gewerbe_Arbeitsplaetze'
         pkey = {'IDTeilflaeche': tfl.flaechen_id}
-        param = self.par.arbeitsplaetze_insgesamt
-        column_values = {'Arbeitsplaetze': param.value}
+        job_param = self.par.arbeitsplaetze_insgesamt
+        column_values = {'Arbeitsplaetze': job_param.value}
         r = self.upsert_row_in_table(table_jobs, column_values, pkey)
+        # write number of jobs into flaechen table as well 
+        self.update_table('Teilflaechen_Plangebiet',
+                          column_values={'AP_gesamt': job_param.value}, 
+                          where='id_teilflaeche={}'.format(tfl.flaechen_id))
 
     def set_estimate_jobs(self):
         """calculate estimation of number of jobs and set value of corresponding
@@ -518,16 +527,23 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         """"""
         super(TbxNutzungenEinzelhandel, self).commit_tfl_changes()
         tfl = self.par._current_tfl
+        sqm_sum = 0
         for srt in self.sortimente.itervalues():
             assert isinstance(srt, Sortiment)
             pkey = dict(IDTeilflaeche=tfl.flaechen_id,
                         IDSortiment=srt.typ_id)
+            sqm = self.par[srt.param_vfl].value
             column_values = dict(
                 NameSortiment=srt.kurzname,
-                Verkaufsflaeche_qm=self.par[srt.param_vfl].value,
+                Verkaufsflaeche_qm=sqm,
             )
             r = self.upsert_row_in_table(
                 self.tablename, column_values, pkey)
+            sqm_sum += sqm
+        
+        self.update_table('Teilflaechen_Plangebiet',
+                          column_values={'VF_gesamt': sqm_sum}, 
+                          where='id_teilflaeche={}'.format(tfl.flaechen_id))
 
     def _updateMessages(self, params):
         pass
@@ -535,7 +551,8 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
 if __name__ == '__main__':
     t = TbxNutzungenWohnen()
     params = t.getParameterInfo()
-    t.tool.main(params, None)
+    t.par.projectname.value = t.config.active_project
+    t.tool.main(t.par, None)
     #df = t.table_to_dataframe('Teilflaechen_Plangebiet',
                               #workspace='FGDB_Definition_Projekt.gdb')
     #t.table_to_dataframe('Wohnen_WE_in_Gebaeudetypen', columns=None)

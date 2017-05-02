@@ -276,12 +276,15 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
 
             if params.changed('nutzungsart'):
                 nutzungsart_id = self.nutzungsarten[params.nutzungsart.value]
+                # set nutzungsart in gdb and clear sums
                 self.update_table('Teilflaechen_Plangebiet',
-                                  {'Nutzungsart': nutzungsart_id},
+                                  {'Nutzungsart': nutzungsart_id,
+                                   'WE_gesamt': 0,
+                                   'AP_gesamt': 0,
+                                   'VF_gesamt': 0},
                                   where=where_tfl)
 
-                # ToDo delete corresponding rows wohnen/gewerbe/einzelhandel
-                # delete if Fläche is not Wohnen any more
+                # delete corresponding rows wohnen/gewerbe/einzelhandel
                 if nutzungsart_id != Nutzungsart.WOHNEN:
                     table = 'Wohnen_WE_in_Gebaeudetypen'
                     self.delete_rows_in_table(
