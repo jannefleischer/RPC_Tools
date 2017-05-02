@@ -20,6 +20,9 @@ class Bewohner(Tool):
         flaechen_col = 'IDTeilflaeche'
         alter_we_col = 'AlterWE'
         geb_typ_col = 'IDGebaeudetyp'
+        id_aclass_col = 'IDAltersklasse'
+        aclass_col = 'Altersklasse'
+        year_col = 'Jahr'
         
         arcpy.AddMessage('Berechne Bewohnerzahl...')
         
@@ -37,19 +40,21 @@ class Bewohner(Tool):
         if len(wohnen_struct_df) == 0:
             arcpy.AddError('Keine Definitionen gefunden.')
             return
+        
         join = wohnen_struct_df.merge(ew_base_df, how='inner',
                                       on=[alter_we_col, geb_typ_col])
-        grouped = join.groupby(['Jahr', 'IDAltersklasse', 'Altersklasse'])
+        grouped = join.groupby([year_col, id_aclass_col, aclass_col])
         group_template = bewohner_df.copy()
         group_template[flaechen_col] = [flaechen_id]
+        
         for g in grouped:
             group = g[1]
             entry = group_template.copy()
             n_bewohner = (group['Einwohner'] * group['Wohnungen']).sum()
             entry['Bewohner'] = [n_bewohner]
-            entry['IDAltersklasse'] = group['IDAltersklasse'].unique()
-            entry['Altersklasse'] = group['Altersklasse'].unique()
-            entry['Jahr'] = group['Jahr'].unique()
+            entry[id_aclass_col] = group[id_aclass_col].unique()
+            entry[aclass_col] = group[aclass_col].unique()
+            entry[year_col] = group[year_col].unique()
             bewohner_df = bewohner_df.append(entry)            
         
         arcpy.AddMessage('Schreibe Bewohnerzahl...')        
