@@ -531,18 +531,23 @@ class Tbx(object):
 
     def delete_rows_in_table(self,
                              table,
-                             pkey,
+                             where=None,
+                             pkey=None,
                              workspace='',
                              ):
         """
-        Delete rows in a FileGeodatabase which match the where-clause
+        Delete rows in a FileGeodatabase which match the where-clause or the 
+        primary key (if no pkey or where clause are given, all rows will be
+        deleted!)
 
         Parameters
         ----------
         table : str
             full path to the table
-        pkey: dict
+        pkey: dict, optional
             the columns and the values of the primary key as key/value-pairs
+        where: str, optional
+            a where clause to delete specific rows
         workspace : str, optional
             the database name
 
@@ -551,11 +556,11 @@ class Tbx(object):
         r : int
             the number of deleted rows
         """
-        where = self.get_where_clause(pkey)
+        where = where or self.get_where_clause(pkey)
         table_path = self._get_table_path(table, workspace=workspace)
         if not table_path:
             return
-        columns = pkey.keys()
+        columns = pkey.keys() if pkey else '*'
         cursor = arcpy.da.UpdateCursor(table_path, columns, where_clause=where)
         r = 0
         for row in cursor:
@@ -772,7 +777,29 @@ class Tbx(object):
             if upsert and updated == 0:
                 # Todo: insert row with values including the primary keys?
                 #column_values.update(pkey_values)
-                self._insert_row_in_table(table_path, column_values)    
+                self._insert_row_in_table(table_path, column_values)
+        
+    def insert_dataframe_in_table(self, table_name, dataframe, workspace=''):
+        """
+        Insert all rows of a pandas dataframe into a table in a Workspace in the
+        Project Folder (column names have to match)
+
+        Parameters
+        ----------
+        table_name : str
+            name of the table
+        column_values: dict,
+            the columns and the values to update them with as key/value-pairs
+        workspace : str, optional
+            the database name
+
+        """
+        table_name = os.path.basename(table_name)
+        table_path = self._get_table_path(table_name, workspace=workspace)
+        columns = dataframe.columns.values
+        for row in dataframe.iterrows():
+            column_values = dict(zip(columns, row[1][columns].values))
+            self._insert_row_in_table(table_path, column_values)    
         
     def query_table(self, table_name, columns=[], workspace='',
                     where=None, pkey=None, project='', is_base_table=False):
