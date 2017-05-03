@@ -47,13 +47,13 @@ class Bewohner(Tool):
             arcpy.AddError('Keine Definitionen gefunden.')
             return
         
-        #  corresponding SQL: Einwohner_pro_WE INNER JOIN 
+        # corresponding SQL: Einwohner_pro_WE INNER JOIN 
         # Wohnen_Struktur_und_Alterung_WE ON 
         # (Einwohner_pro_WE.AlterWE = Wohnen_Struktur_und_Alterung_WE.AlterWE) 
         # AND (Einwohner_pro_WE.IDGebaeudetyp = 
         # Wohnen_Struktur_und_Alterung_WE.IDGebaeudetyp)
         joined = wohnen_struct_df.merge(ew_base_df, how='inner',
-                                      on=[alter_we_col, geb_typ_col])
+                                        on=[alter_we_col, geb_typ_col])
         
         # GROUP BY Wohnen_Struktur_und_Alterung_WE.IDTeilflaeche, 
         # Wohnen_Struktur_und_Alterung_WE.Jahr, Einwohner_pro_WE.IDAltersklasse, 

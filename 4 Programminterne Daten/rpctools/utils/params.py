@@ -611,24 +611,27 @@ class Tbx(object):
         """
         table_path = self._get_table_path(table_name, workspace=workspace)
         if not table_path:
-            return
-        self._insert_row_in_table(table_path, column_values)
+            return    
+        columns = column_values.keys()
+        values = column_values.values()        
+        self._insert_rows_in_table(table_path, columns, [values])
         
-    def _insert_row_in_table(self, table_path, column_values):
+    def _insert_rows_in_table(self, table_path, columns, rows):
         """
-        insert new row into a table
+        insert rows into a table
 
         Parameters
         ----------
         table_path : str
             full path to the table
-        column_values: dict,
-            the columns and the values to insert as key/value-pairs
+        columns: list of str,
+            the columns
+        rows: list of lists,
+            the rows to insert as key/value-pairs
         """
-        columns = column_values.keys()
-        values = column_values.values()
         cursor = arcpy.da.InsertCursor(table_path, columns)
-        cursor.insertRow(values)
+        for row in rows:
+            cursor.insertRow(row)
         del cursor    
 
     def upsert_row_in_table(self, table_name, column_values, pkey, workspace=''):
@@ -769,7 +772,8 @@ class Tbx(object):
         for row in dataframe.iterrows():
             # row is a tuple with index at 0 and the columns at 1 
             pkey_values = dict(zip(pkeys, row[1][pkeys].values))
-            column_values = dict(zip(columns, row[1][columns].values))
+            values = row[1][columns].values
+            column_values = dict(zip(columns, values))
             where = self.get_where_clause(pkey_values)
             updated = self._update_table(
                 table_path, column_values, pkey=pkey_values)
@@ -777,7 +781,7 @@ class Tbx(object):
             if upsert and updated == 0:
                 # Todo: insert row with values including the primary keys?
                 #column_values.update(pkey_values)
-                self._insert_row_in_table(table_path, column_values)
+                self._insert_rows_in_table(table_path, columns, [values])
         
     def insert_dataframe_in_table(self, table_name, dataframe, workspace=''):
         """
@@ -797,9 +801,8 @@ class Tbx(object):
         table_name = os.path.basename(table_name)
         table_path = self._get_table_path(table_name, workspace=workspace)
         columns = dataframe.columns.values
-        for row in dataframe.iterrows():
-            column_values = dict(zip(columns, row[1][columns].values))
-            self._insert_row_in_table(table_path, column_values)    
+        values = [row[1][columns].values for row in dataframe.iterrows()]
+        self._insert_rows_in_table(table_path, columns, values)
         
     def query_table(self, table_name, columns=[], workspace='',
                     where=None, pkey=None, project='', is_base_table=False):
