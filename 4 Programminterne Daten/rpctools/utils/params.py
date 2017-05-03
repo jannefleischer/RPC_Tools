@@ -983,14 +983,14 @@ class Tbx(object):
 
         """
         self._is_executing = True
-        try: 
-            self._commit_temporaries()
-            self.tool.main(self.par, parameters, messages)
-            self.clear_temporary_dbs()
-        except Exception as e:
-            raise e
-        finally: 
-            self._is_executing = False
+        #try: 
+        self._commit_temporaries()
+        self.tool.main(self.par, parameters, messages)
+        self.clear_temporary_dbs()
+        #except Exception as e:
+            #raise e
+        #finally: 
+        self._is_executing = False
         
     def print_test_parameters(self):
         """
