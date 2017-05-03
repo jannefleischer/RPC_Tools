@@ -11,9 +11,7 @@ class Nutzungen(Tool):
     def run(self):
         """"""
 
-class NutzungenWohnen(Tool):
-    _param_projectname = 'projectname'
-    _dbname = 'FGDB_Definition_Projekt.gdb'
+class NutzungenWohnen(Nutzungen):
 
     def run(self):
         """"""
@@ -21,13 +19,13 @@ class NutzungenWohnen(Tool):
         
     def commit(self):        
         tbx = self.parent_tbx
-        
+    
+        # table and column names        
         wohnen_we_table = 'Wohnen_WE_in_Gebaeudetypen'
         geb_typ_table = 'Wohnen_Gebaeudetypen'
         flaechen_table = 'Teilflaechen_Plangebiet'
         wohnen_struct_table = 'Wohnen_Struktur_und_Alterung_WE'
-        project_table = 'Projektrahmendaten'
-        
+        project_table = 'Projektrahmendaten'        
         geb_typ_col = 'IDGebaeudetyp'
         ew_col = 'EW_je_WE'
         reference_col = 'Ew_pro_WE_Referenz'
@@ -35,18 +33,21 @@ class NutzungenWohnen(Tool):
         we_col = 'WE'
         pkey =  'OBJECTID'
         flaechen_col = 'IDTeilflaeche'
-        
+    
+        # get all required tables as dataframes
         wohnen_ew_df = tbx.table_to_dataframe(
             wohnen_we_table, columns=[pkey, ew_col, geb_typ_col,
                                       cor_factor_col, we_col,
                                       flaechen_col])
         
-        ### Korrekturfaktoren ###    
-        arcpy.AddMessage('Berechne Korrekturfaktoren...')
-        
         geb_typ_df = tbx.table_to_dataframe(
             geb_typ_table, workspace='FGDB_Definition_Projekt_Tool.gdb',
             columns=[geb_typ_col, reference_col], is_base_table=True)
+        
+        ### Korrekturfaktoren ###
+        
+        arcpy.AddMessage('Berechne Korrekturfaktoren...')
+        
         
         join = pd.merge(wohnen_ew_df, geb_typ_df, on=geb_typ_col)
         join[cor_factor_col] = (join[ew_col] /
@@ -56,7 +57,8 @@ class NutzungenWohnen(Tool):
                                join[[pkey, cor_factor_col]],
                                [pkey])
         
-        ### structure and age ###
+        ### Structure and age ###
+        
         arcpy.AddMessage('Berechne Wohneinheiten...')
         # empty the table
         tbx.delete_rows_in_table(wohnen_struct_table)
@@ -91,8 +93,3 @@ class NutzungenWohnen(Tool):
         
         arcpy.AddMessage('Schreibe Wohneinheiten...')
         tbx.insert_dataframe_in_table(wohnen_struct_table, wohnen_struct_df)
-        
-class Calculations():
-    @staticmethod
-    def calc_correction_factors(dataframe, reference):
-        pass
