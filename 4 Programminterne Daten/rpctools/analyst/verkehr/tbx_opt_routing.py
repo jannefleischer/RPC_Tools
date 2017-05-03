@@ -80,6 +80,7 @@ class TbxRouting(Tbx):
 if __name__ == "__main__":
     t = TbxRouting()
     t.getParameterInfo()
+    t.par.project.value = t.config.active_project
     t.execute()
 
     print 'done'

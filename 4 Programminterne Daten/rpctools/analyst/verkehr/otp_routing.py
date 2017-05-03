@@ -643,10 +643,12 @@ class Routing(Tool):
 
         o.nodes.transform()
         o.nodes_to_graph(meters=inner_circle)
+
         o.transfer_nodes.calc_initial_weight()
         o.calc_vertex_weights()
         o.create_polyline_features()
         o.create_node_features()
+        print o.transfer_nodes.keys()
         o.create_transfer_node_features()
 
         # Empty column for manual changes of weigths
@@ -668,6 +670,5 @@ class Routing(Tool):
         lyr_links = self.folders.get_layer('links', 'Verkehr')
         fc_links = self.folders.get_table('links')
         self.output.add_output('verkehr', lyr_links, fc_links)
-
 
 
