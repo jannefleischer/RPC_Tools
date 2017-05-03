@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
-#
 
 import requests
 import polyline
 import arcpy
-import os
-import numpy as np
+from cPickle import dump, load
 from collections import OrderedDict
 from scipy.sparse import csc_matrix
 from pyproj import Proj, transform
 from scipy.sparse.csgraph import dijkstra
 from rpctools.utils.config import Folders
-from rpctools.utils.params import Tool
-
+import numpy as np
+import os
 
 class Route(object):
     """Route to a destination"""
@@ -103,6 +101,12 @@ class TransferNodes(OrderedDict):
         """calculate the initial weight based upon the number of routes"""
         for tn in self.itervalues():
             tn.calc_initial_weight()
+        self.assign_weights_to_routes()
+
+    def assign_weights_to_routes(self):
+        """
+        adjust weights to 100% and assign to routes that pass the transfer node
+        """
         total_weights = self.total_weights
         for tn in self.itervalues():
             tn.weight /= total_weights
@@ -216,7 +220,6 @@ class Point(object):
         self.node_id = node_id
         self.x = x
         self.y = y
-        self.geom = None
 
     def __repr__(self):
         return '{},{}'.format(self.lat, self.lon)
@@ -224,10 +227,10 @@ class Point(object):
     def __hash__(self):
         return hash((self.lat, self.lon))
 
-    def create_geom(self):
+    def get_geom(self):
         """Create geometry from coordinates"""
         geom = arcpy.Point(self.x, self.y)
-        self.geom = geom
+        return geom
 
 
 
@@ -241,7 +244,6 @@ class TransferNode(Point):
         self.y = node.y
         self.routes = Routes()
         self.weight = 0.0
-        self.geom = None
 
     @property
     def n_routes(self):
@@ -307,7 +309,6 @@ class Link(object):
         self.link_id = vertex_id
         self.routes = set()
         self.weight = 0.0
-        self.geom = None
         self.distance_from_source = 9999999
 
     def __repr__(self):
@@ -331,7 +332,7 @@ class Link(object):
         """add route_id to route"""
         self.routes.add(route_id)
 
-    def create_geom(self):
+    def get_geom(self):
         """Create polyline from geometry"""
         if self.length:
             n1 = self.node1
@@ -340,7 +341,21 @@ class Link(object):
             geom = arcpy.Polyline(
                 arcpy.Array([arcpy.Point(coords[1], coords[0])
                              for coords in coord_list]))
-            self.geom = geom
+            return geom
+
+
+class Area(object):
+    """Teilfläche"""
+    def __init__(self, source_id):
+        self.source_id = source_id
+        self.trips = 1
+        
+        
+class Areas(OrderedDict):
+    """All Areas"""
+    def add_area(self, source_id):
+        """"""
+        self[source_id] = Area(source_id)
 
 
 class OTPRouter(object):
@@ -356,6 +371,27 @@ class OTPRouter(object):
         self.polylines = []
         self.routes = Routes()
         self.transfer_nodes = TransferNodes()
+        self.areas = Areas()
+        
+    def dump(self, filename):
+        """write myself to dumpfile"""
+        with open(filename, 'wb') as f:
+            dump(self, f, protocol=-1)
+            
+    @classmethod
+    def from_dump(cls, filename, workspace=''):
+        """"""
+        with open(filename, 'rb') as f:
+            self = load(f)
+        if workspace:
+            self.ws = workspace
+        return self
+            
+    def __repr__(self):
+        """A string representation"""
+        text = 'OTPRouter with {n} nodes, {r} routes and {t} transfer nodes'
+        return text.format(n=len(self.nodes), r=len(self.routes), t=len(
+            self.transfer_nodes))
 
     def get_routing_request(self, source, destination, mode='CAR'):
         """
@@ -399,6 +435,8 @@ class OTPRouter(object):
         coord_list = polyline.decode(points)
         route = self.routes.get_route(route_id, source_id)
         self.nodes.add_points(coord_list, route)
+        if source_id not in self.areas:
+            self.areas.add_area(source_id)
 
     def coord_list2polyline(self, coord_list):
         """
@@ -522,7 +560,6 @@ class OTPRouter(object):
             dist = dist_vector[node_id]
             link.distance_from_source = dist
 
-
     def calc_vertex_weights(self):
         """calc weight of link"""
         for link in self.nodes.links:
@@ -530,7 +567,9 @@ class OTPRouter(object):
             for route_id in link.routes:
                 route = self.routes[route_id]
                 route_weight = route.weight
-                link.weight += route_weight
+                area = self.areas[route.source_id]
+                route_trips = route_weight * area.trips
+                link.weight += route_trips
 
     def create_polyline_features(self):
         """Create the polyline-features from the links"""
@@ -541,10 +580,10 @@ class OTPRouter(object):
         self.truncate(fc)
         with arcpy.da.InsertCursor(fc, fields) as rows:
             for link in self.nodes.links:
-                link.create_geom()
-                if link.geom:
+                geom = link.get_geom()
+                if geom:
                     rows.insertRow((link.link_id, link.weight,
-                                    link.distance_from_source, link.geom))
+                                    link.distance_from_source, geom))
 
     def create_transfer_node_features(self):
         """Create the point-features from the transfer nodes"""
@@ -556,11 +595,11 @@ class OTPRouter(object):
 
         with arcpy.da.InsertCursor(fc, fields) as rows:
             for node in self.transfer_nodes.itervalues():
-                node.create_geom()
-                if node.geom:
+                geom = node.get_geom()
+                if geom:
                     rows.insertRow((node.node_id,
                                     node.weight,
-                                    node.geom))
+                                    geom))
 
     def truncate(self, fc):
         """
@@ -586,89 +625,7 @@ class OTPRouter(object):
         self.truncate(fc)
         with arcpy.da.InsertCursor(fc, fields) as rows:
             for node in self.nodes:
-                node.create_geom()
-                if node.geom:
+                geom = node.get_geom()
+                if geom:
                     rows.insertRow((node.node_id,
-                                    node.geom))
-
-
-class Routing(Tool):
-    _dbname = 'FGDB_Verkehr.gdb'
-    _param_projectname = 'project'
-
-    def run(self):
-        toolbox = self.parent_tbx
-        # tbx settings
-        outer_circle = toolbox.par.outer.value
-        inner_circle = toolbox.par.inner.value
-        n_segments = toolbox.par.dests.value
-
-        # create tmp_table for transforming from gauss-krüger to 4326
-        tfl = self.folders.get_table("Teilflaechen_Plangebiet",
-                                     workspace='FGDB_Definition_Projekt.gdb')
-        tmp_table = os.path.join(arcpy.env.scratchGDB,
-                                 "Teilflaechen_Plangebiet")
-        if arcpy.Exists(tmp_table):
-            arcpy.Delete_management(tmp_table)
-        arcpy.Copy_management(tfl, tmp_table)   # create tmp table
-        arcpy.AddGeometryAttributes_management(
-            Input_Features=tmp_table, Geometry_Properties="CENTROID_INSIDE",
-            Coordinate_System=4326)
-
-        # get centroid coordinates
-        columns = ['id_teilflaeche', 'INSIDE_X', 'INSIDE_Y']
-        cursor = arcpy.da.SearchCursor(tmp_table, columns)
-        XY_INSIDE = [row for row in cursor]
-        del cursor
-        arcpy.Delete_management(tmp_table)
-
-        # calculate routes
-        workspace = self.folders.get_db()
-        o = OTPRouter(workspace)
-        r_id = 0
-        for centroid in XY_INSIDE:
-            source_id, x_coord, y_coord = centroid
-            # ? lat = y lon = x
-            source = Point(lat=y_coord, lon=x_coord)    # centroid
-            # calculate segments around centroid
-            destinations = o.create_circle(source, dist=outer_circle,
-                                           n_segments=n_segments)
-            # calculate the routes to the segments
-            for (lon, lat) in destinations:
-                destination = Point(lat, lon)
-                print r_id,
-                json = o.get_routing_request(source, destination)
-                o.decode_coords(json, route_id=r_id, source_id=source_id)
-                r_id += 1
-
-        o.nodes.transform()
-        o.nodes_to_graph(meters=inner_circle)
-
-        o.transfer_nodes.calc_initial_weight()
-        o.calc_vertex_weights()
-        o.create_polyline_features()
-        o.create_node_features()
-        print o.transfer_nodes.keys()
-        o.create_transfer_node_features()
-
-        # Empty column for manual changes of weigths
-        nodes_path = self.folders.get_table('Zielpunkte', workspace='', project='',
-                                   check=True)
-        arcpy.AddField_management(nodes_path, 'Manuelle_Gewichtung')
-        arcpy.AddField_management(nodes_path, 'Neue_Gewichte',
-                                  field_type='DOUBLE')
-
-        # Add Layers
-        lyr_zielpunkte = self.folders.get_layer('Zielpunkte', 'Verkehr')
-        fc_zielpunkte = self.folders.get_table('Zielpunkte')
-        self.output.add_output('verkehr', lyr_zielpunkte, fc_zielpunkte)
-
-        lyr_nodes = self.folders.get_layer('nodes', 'Verkehr')
-        fc_nodes = self.folders.get_table('nodes')
-        self.output.add_output('verkehr', lyr_nodes, fc_nodes)
-
-        lyr_links = self.folders.get_layer('links', 'Verkehr')
-        fc_links = self.folders.get_table('links')
-        self.output.add_output('verkehr', lyr_links, fc_links)
-
-
+                                    geom))

@@ -5,6 +5,7 @@ import arcpy
 import numpy as np
 from rpctools.utils.config import Folders
 from rpctools.utils.params import Tool
+from rpctools.analyst.verkehr.otp_router import OTPRouter
 
 
 class UpdateNodes(Tool):
@@ -12,6 +13,9 @@ class UpdateNodes(Tool):
     _param_projectname = 'project'
 
     def run(self):
+
+        otp_router = OTPRouter.from_dump(self.folders.get_otp_pickle_filename())
+            
         toolbox = self.parent_tbx
         # get input data
         input_data = toolbox.query_table('Zielpunkte',
@@ -46,25 +50,26 @@ class UpdateNodes(Tool):
             total_weight = total_man_weight + total_old_weight_not_set
             old_weights_not_set = np.array(old_weights_not_set) / total_weight
             man_weights = np.array(man_weights) / total_weight
-
-        # write data to the new table
-        if old_weights_not_set.tolist() != None:
-            for i in range(len(old_weights_not_set)):
-                weight = old_weights_not_set[i]
-                id_node = node_id_not_set[i]
+            
+        transfer_nodes = otp_router.transfer_nodes
+        
+        def set_new_weights(weights, node_ids):
+            """"""
+            # write data to the new table
+            for i, weight in enumerate(weights):
+                id_node = node_ids[i]
                 print id_node, weight
+                transfer_nodes[id_node].weight = weight
                 where = 'node_id = {}'.format(id_node)
                 toolbox.update_table('Zielpunkte',
                                   {'Neue_Gewichte': weight}, where=where)
 
-        if man_weights.tolist() != None:
-            for i in range(len(man_weights)):
-                weight = man_weights[i]
-                id_node = node_id[i]
-                print id_node, weight
-                where = 'node_id = {}'.format(id_node)
-                toolbox.update_table('Zielpunkte',
-                                  {'Neue_Gewichte': weight}, where=where)
+        set_new_weights(old_weights_not_set, node_id_not_set)
+        set_new_weights(man_weights, node_id)
+        
+        transfer_nodes.assign_weights_to_routes()
+        otp_router.calc_vertex_weights()
+        otp_router.create_polyline_features()        
 
         # update the layers
         mxd = arcpy.mapping.MapDocument("CURRENT")
@@ -77,3 +82,8 @@ class UpdateNodes(Tool):
         lyr_zielpunkte_gew = self.folders.get_layer('Zielpunkte_gewichtet', 'Verkehr')
         fc_zielpunkte_gew = self.folders.get_table('Zielpunkte')
         self.output.add_output('verkehr', lyr_zielpunkte_gew, fc_zielpunkte_gew)
+        
+        lyr_links = self.folders.get_layer('links', 'Verkehr')
+        fc_links = self.folders.get_table('links')
+        self.output.add_output('verkehr', lyr_links, fc_links)
+        

@@ -137,7 +137,8 @@ class Folders(object):
         # the params
         self._params = params
         self._invalid_paths = []
-        self._config_file = 'config.txt'
+        self._CONFIG_FILE = 'config.txt'
+        self._OTP_PICKLE_FILE = 'otpgraph.pickle'
 
     def join_and_check(self, *args, **kwargs):
         """
@@ -241,7 +242,7 @@ class Folders(object):
 
     @property
     def CONFIG_FILE(self):
-        return join(self.INTERN, self._config_file)
+        return join(self.INTERN, self._CONFIG_FILE)
     
     @property
     def ANALYST_PYT_PATH(self):
@@ -286,6 +287,11 @@ class Folders(object):
         return self.join_and_check(self.PROJECT_BASE_PATH,
                                    projectname,
                                    check=check)
+    
+    def get_otp_pickle_filename(self, project=None, check=True):
+        return self.join_and_check(
+            self.get_projectpath(project=project, check=check),
+            self._OTP_PICKLE_FILE)
 
     def get_temporary_projectpath(self, project=None):
         projectname = project or self.project

@@ -6,7 +6,7 @@ import arcpy
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 
-from rpctools.analyst.verkehr.otp_routing import Routing
+from rpctools.analyst.verkehr.routing import Routing
 
 
 class TbxRouting(Tbx):
