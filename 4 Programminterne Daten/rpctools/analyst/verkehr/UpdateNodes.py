@@ -78,7 +78,6 @@ class UpdateNodes(Tool):
         for layer in layers:
             arcpy.mapping.RemoveLayer(df, layer)
 
-
         lyr_zielpunkte_gew = self.folders.get_layer('Zielpunkte_gewichtet', 'Verkehr')
         fc_zielpunkte_gew = self.folders.get_table('Zielpunkte')
         self.output.add_output('verkehr', lyr_zielpunkte_gew, fc_zielpunkte_gew)

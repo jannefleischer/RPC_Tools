@@ -176,6 +176,8 @@ class ProjektAnlegen(Projektverwaltung):
             row.setValue("WE_gesamt", 0)
             row.setValue("AP_gesamt", 0)
             row.setValue("VF_gesamt", 0)
+            row.setValue("Wege", 0)
+            row.setValue("PKW_Wege", 0)
             cursor.updateRow(row)
 
     def copy_teilflaechen_to_gdb(self, project_name, flaeche):

@@ -8,9 +8,48 @@ class Nutzungen(Tool):
     _param_projectname = 'projectname'
     _dbname = 'FGDB_Definition_Projekt.gdb'
 
-    def run(self):
+    def run(self):        
         """"""
-
+        
+class NutzungenEinzelhandel(Nutzungen):
+    
+    def run(self):
+        besucher_sqm_col = 'Besucher_je_qm_Vfl'
+        pkw_perc_col = 'Anteil_Pkw_Fahrer'
+        id_sort_col = 'IDSortiment'
+        vfl_col = 'Verkaufsflaeche_qm'
+        wege_je_besucher_col = 'Wege_je_Besucher'
+        id_flaeche_col = 'IDTeilflaeche'
+        flaechen_table = 'Teilflaechen_Plangebiet'
+        wege_col = 'Wege'
+        pkw_col = 'PKW_Wege'
+        
+        vfl_tablename = self.parent_tbx.tablename
+        sortimente_tablename = 'Einzelhandel_Sortimente'        
+        
+        vfl_table_df = self.parent_tbx.table_to_dataframe(vfl_tablename)
+        sortimente_df = self.parent_tbx.table_to_dataframe(
+            sortimente_tablename, workspace='FGDB_Definition_Projekt_Tool.gdb',
+            is_base_table=True)
+        sortimente_df.rename(
+            columns={'ID_Sortiment_ProjektCheck': id_sort_col}, inplace=True)        
+        joined = vfl_table_df.merge(sortimente_df, on=id_sort_col,
+                                    how='inner')
+        
+        joined[wege_col] = (joined[vfl_col] *
+                            joined[besucher_sqm_col] *
+                            joined[wege_je_besucher_col])
+        joined[pkw_col] = joined[wege_col] * joined[pkw_perc_col] / 100
+        
+        grouped = joined.groupby(by=id_flaeche_col)
+        for g in grouped:
+            self.parent_tbx.update_table(
+                flaechen_table,
+                column_values={pkw_col: g[1][pkw_col].values.sum(),
+                               wege_col: g[1][wege_col].values.sum()}
+            )
+            
+        
 class NutzungenWohnen(Nutzungen):
 
     def run(self):
