@@ -571,10 +571,10 @@ class OTPRouter(object):
         fc : str
             the table to truncate
         """
-        arcpy.TruncateTable_management(in_table=fc)
-        #with arcpy.da.UpdateCursor(fc, "OID@") as rows:
-            #for row in rows:
-                #row.deleteRow()
+        #arcpy.TruncateTable_management(in_table=fc)
+        with arcpy.da.UpdateCursor(fc, "OID@") as rows:
+            for row in rows:
+                rows.deleteRow()
 
 
     def create_node_features(self):
