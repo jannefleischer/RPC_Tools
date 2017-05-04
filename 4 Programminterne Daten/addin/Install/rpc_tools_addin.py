@@ -7,27 +7,10 @@ from collections import OrderedDict
 from rpctools.utils.config import Folders, Config
 from rpctools.definitions.projektverwaltung.tbx_projektauswahl import \
      TbxProjektauswahl
-from rpctools.utils.basetable_definitions import Netzarten
 
 folders = Folders()
 config = Config()
     
-
-class AnliegerstrasseAeussere(object):
-    """Implementation for rpc_tools.anliegerstrasse_aeussere (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class AnliegerstrasseInnere(object):
-    """Implementation for rpc_tools.anliegerstrasse_innere (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
 
 class ArbeitsplaetzeSchaetzen(object):
     """Implementation for rpc_tools.arbeitsplaetze_schaetzen (Button)"""
@@ -141,30 +124,6 @@ class InfrastrukturmengenBilanzieren(object):
     def onClick(self):
         pass
 
-class KanalMischsystem(object):
-    """Implementation for rpc_tools.kanal_mischsystem (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class KanalNurSchmutzwasser(object):
-    """Implementation for rpc_tools.kanal_nur_schmutzwasser (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class KanalTrennsystem(object):
-    """Implementation for rpc_tools.kanal_trennsystem (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
 class KanalisationKostenaufteilung(object):
     """Implementation for rpc_tools.kanalisation_kostenaufteilung (Button)"""
     def __init__(self):
@@ -245,22 +204,6 @@ class PunktuelleMassnahmeLoeschen(object):
     def onClick(self):
         pass
 
-class SammelstrasseAeussere(object):
-    """Implementation for rpc_tools.sammelstrasse_aeussere (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class SammelstrasseInnere(object):
-    """Implementation for rpc_tools.sammelstrasse_innere (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
 class SkizzeBeenden(object):
     """Implementation for rpc_tools.skizze_beenden (Tool)"""
     def __init__(self):
@@ -308,25 +251,9 @@ class StrasseInnereKostenaufteilung(object):
         self.checked = False
     def onClick(self):
         pass
-
-class Stromleitung(object):
-    """Implementation for rpc_tools.stromleitung (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
+    
 class TrinkwasserKostenaufteilung(object):
     """Implementation for rpc_tools.trinkwasser_kostenaufteilung (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class Trinkwasserleitung(object):
-    """Implementation for rpc_tools.trinkwasserleitung (Button)"""
     def __init__(self):
         self.enabled = True
         self.checked = False
@@ -377,96 +304,7 @@ class Einzelhandel(object):
                                  'Projektdefinition.pyt')
     def onClick(self):
         pythonaddins.GPToolDialog(self.path, 'TbxNutzungenEinzelhandel')
-    
-    
-class NetzartAuswahl(object):
-    """Implementation for rpc_tools.netzart_auswahl (ComboBox)"""
-    def __init__(self):
-        self.netzarten = Netzarten(folders)
-        self._id_map = OrderedDict([(netzart.name, netzart.id)
-                                    for netzart in self.netzarten.values()])
-        self.items = self._id_map.keys()
-        self.editable = True
-        self.enabled = True
-        self.dropdownWidth = 'WWWWWW'
-        self.width = 'WWWWWW'
-        self.value = self.items[0]
-        
-    def get_selected_id(self):
-        return self._id_map[self.value]
-    
-    def onSelChange(self, selection):
-        self.value = selection
-        
-
-class NetzlinieTool(object):
-    """Implementation for rpc_tools.netzlinie_tool (Tool)"""
-    def __init__(self):
-        self.enabled = True
-        self.shape = "Line" # Can set to "Line", "Circle" or "Rectangle" for interactive shape drawing and to activate the onLine/Polygon/Circle event sinks.
-        
-    def onMouseDown(self, x, y, button, shift):
-        print('hallo')
-    def onMouseDownMap(self, x, y, button, shift):
-        pass
-    def onMouseUp(self, x, y, button, shift):
-        pass
-    def onMouseUpMap(self, x, y, button, shift):
-        pass
-    def onMouseMove(self, x, y, button, shift):
-        pass
-    def onMouseMoveMap(self, x, y, button, shift):
-        pass
-    def onDblClick(self):
-        pass
-    def onKeyDown(self, keycode, shift):
-        pass
-    def onKeyUp(self, keycode, shift):
-        pass
-    def deactivate(self):
-        pass
-    def onCircle(self, circle_geometry):
-        pass
-    def onLine(self, line_geometry):
-        print line_geometry    
-        project=config.active_project
-        gdb = folders.get_table('Erschliessungsnetz', 
-                                workspace='FGDB_Kosten.gdb',
-                                project=project)
-        cursor = arcpy.da.InsertCursor(gdb, ["SHAPE@", 'netz_id'])
-        selected_id = netzart_auswahl.get_selected_id()
-        cursor.insertRow([line_geometry, selected_id])
-        del(cursor)
-        arcpy.RefreshActiveView()
-        
-    def onRectangle(self, rectangle_geometry):
-        pass
-    
-
-class NetzabschnittLoeschen(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        active = config.active_project
-        layers = projekt_auswahl.tbx.tool.output.get_layers(
-            u'Erschließungsnetz', projectname=active)
-        if not layers:
-            return
-        # ToDo: loop necessary?
-        layer = layers[0]
-        # check if anything is selected
-        sth_selected = len(arcpy.Describe(layer).FIDset) > 0
-        message = 'OK'
-        if not sth_selected:
-            message = pythonaddins.MessageBox(
-                u'Es sind keine Netzlinien im Projekt "{}" '.format(active) + 
-                u'ausgewählt.\nSollen alle in diesem Projekt '
-                u'angelegten Netzlinien gelöscht werden?',
-                'Achtung', 1)
-        if message == 'OK':
-            arcpy.DeleteFeatures_management(layer)
-    
+                
 
 class ProjektAnlegen(object):
     """Implementation for rpc_tools.neues_projekt (Button)"""
@@ -559,6 +397,117 @@ class BewohnerSchaetzen(object):
                                  'Bewohner_Arbeitsplaetze.pyt')
     def onClick(self):
         pythonaddins.GPToolDialog(self.path, 'TbxBewohner')
+
+
+### DRAWING TOOLS ###
+
+
+def commit_line(line_geometry, element_id, netz_id):
+    project=config.active_project
+    gdb = folders.get_table('Erschliessungsnetze_Linienelemente', 
+                            workspace='FGDB_Kosten.gdb',
+                            project=project)
+    cursor = arcpy.da.InsertCursor(gdb, ["SHAPE@", 'IDNetzelement', 'IDNetz'])
+    cursor.insertRow([line_geometry, element_id, netz_id])
+    del(cursor)
+    arcpy.RefreshActiveView()
+
+
+class DrawingTool(object):
+    # has to match the column 'IDNetzelement' of base-table 
+    # Netze_und_Netzelemente (defined in subclasses)
+    _id_netzelement = None
+    
+    def __init__(self):
+        self.enabled = True
+        netz_table = folders.get_base_table('FGDB_Kosten_Tool.gdb',
+                                            'Netze_und_Netzelemente')
+        self.netz_ids = {}
+        cursor = arcpy.da.SearchCursor(netz_table, ['IDNetzelement', 'IDNetz'])
+        self.netz_ids = dict([row for row in cursor])        
+
+
+class LineTool(DrawingTool):
+    
+    def __init__(self):
+        super(LineTool, self).__init__()
+        self.shape = "Line"
+        
+    def onLine(self, line_geometry):
+        commit_line(line_geometry,
+                    self._id_netzelement,
+                    self.netz_ids[self._id_netzelement])
+
+
+class AnliegerstrasseInnere(LineTool):
+    """Implementation for rpc_tools.anliegerstrasse_innere (Tool)"""
+    _id_netzelement = 11
+    
+
+class SammelstrasseInnere(LineTool):
+    """Implementation for rpc_tools.sammelstrasse_innere (Tool)"""
+    _id_netzelement = 12
+
+
+class AnliegerstrasseAeussere(LineTool):
+    """Implementation for rpc_tools.anliegerstrasse_aeussere (Tool)"""
+    _id_netzelement = 14
+
+
+class SammelstrasseAeussere(LineTool):
+    """Implementation for rpc_tools.sammelstrasse_aeussere (Tool)"""
+    _id_netzelement = 15
+    
+
+class KanalTrennsystem(LineTool):
+    """Implementation for rpc_tools.kanal_trennsystem (Tool)"""
+    _id_netzelement = 21
+
+
+class KanalMischsystem(LineTool):
+    """Implementation for rpc_tools.kanal_mischsystem (Tool)"""
+    _id_netzelement = 22
+
+
+class KanalNurSchmutzwasser(LineTool):
+    """Implementation for rpc_tools.kanal_nur_schmutzwasser (Tool)"""
+    _id_netzelement = 23
+
+
+class Trinkwasserleitung(LineTool):
+    """Implementation for rpc_tools.trinkwasserleitung (Tool)"""
+    _id_netzelement = 31
+    
+
+class Stromleitung(LineTool):
+    """Implementation for rpc_tools.stromleitung (Tool)"""
+    _id_netzelement = 41
+
+
+class NetzabschnittLoeschen(object):
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        active = config.active_project
+        layers = projekt_auswahl.tbx.tool.output.get_layers(
+            u'Erschließungsnetz', projectname=active)
+        if not layers:
+            return
+        # ToDo: loop necessary?
+        layer = layers[0]
+        # check if anything is selected
+        sth_selected = len(arcpy.Describe(layer).FIDset) > 0
+        message = 'OK'
+        if not sth_selected:
+            message = pythonaddins.MessageBox(
+                u'Es sind keine Netzlinien im Projekt "{}" '.format(active) + 
+                u'ausgewählt.\nSollen alle in diesem Projekt '
+                u'angelegten Netzlinien gelöscht werden?',
+                'Achtung', 1)
+        if message == 'OK':
+            arcpy.DeleteFeatures_management(layer)
+        
         
 if __name__ == "__main__":
-    t = BewohnerSchaetzen()
+    t = Stromleitung()
