@@ -156,54 +156,6 @@ class KostenkennwerteKontrollieren(object):
     def onClick(self):
         pass
 
-class LagePunktuelleMassnahmeElektrizitaet(object):
-    """Implementation for rpc_tools.lage_punktuelle_massnahme_elektrizitaet (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class LagePunktuelleMassnahmeKanalisation(object):
-    """Implementation for rpc_tools.lage_punktuelle_massnahme_kanalisation (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class LagePunktuelleMassnahmeStrasseAeussere(object):
-    """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_aeussere (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class LagePunktuelleMassnahmeStrasseInnere(object):
-    """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_innere (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class LagePunktuelleMassnahmeTrinkwasser(object):
-    """Implementation for rpc_tools.lage_punktuelle_massnahme_trinkwasser (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class PunktuelleMassnahmeLoeschen(object):
-    """Implementation for rpc_tools.punktuelle_massnahme_loeschen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
 class SkizzeBeenden(object):
     """Implementation for rpc_tools.skizze_beenden (Tool)"""
     def __init__(self):
@@ -402,17 +354,6 @@ class BewohnerSchaetzen(object):
 ### DRAWING TOOLS ###
 
 
-def commit_line(line_geometry, element_id, netz_id):
-    project=config.active_project
-    gdb = folders.get_table('Erschliessungsnetze_Linienelemente', 
-                            workspace='FGDB_Kosten.gdb',
-                            project=project)
-    cursor = arcpy.da.InsertCursor(gdb, ["SHAPE@", 'IDNetzelement', 'IDNetz'])
-    cursor.insertRow([line_geometry, element_id, netz_id])
-    del(cursor)
-    arcpy.RefreshActiveView()
-
-
 class DrawingTool(object):
     # has to match the column 'IDNetzelement' of base-table 
     # Netze_und_Netzelemente (defined in subclasses)
@@ -424,19 +365,45 @@ class DrawingTool(object):
                                             'Netze_und_Netzelemente')
         self.netz_ids = {}
         cursor = arcpy.da.SearchCursor(netz_table, ['IDNetzelement', 'IDNetz'])
-        self.netz_ids = dict([row for row in cursor])        
+        self.netz_ids = dict([row for row in cursor])
+        
+    @staticmethod
+    def commit_geometry(table, shape, element_id, netz_id):
+        project=config.active_project
+        gdb = folders.get_table(table, 
+                                workspace='FGDB_Kosten.gdb',
+                                project=project)
+        cursor = arcpy.da.InsertCursor(gdb, ["SHAPE@", 'IDNetzelement', 'IDNetz'])
+        cursor.insertRow([shape, element_id, netz_id])
+        del(cursor)
+        arcpy.RefreshActiveView()    
 
 
 class LineTool(DrawingTool):
+    table = 'Erschliessungsnetze_Linienelemente'
     
     def __init__(self):
         super(LineTool, self).__init__()
         self.shape = "Line"
         
     def onLine(self, line_geometry):
-        commit_line(line_geometry,
-                    self._id_netzelement,
-                    self.netz_ids[self._id_netzelement])
+        self.commit_geometry(self.table, line_geometry,
+                             self._id_netzelement,
+                             self.netz_ids[self._id_netzelement])
+
+
+class PointTool(DrawingTool):
+    table = 'Erschliessungsnetze_Punktelemente'
+    
+    def __init__(self):
+        super(PointTool, self).__init__()
+        self.shape = "NONE"
+        
+    def onMouseDownMap(self, x, y, button, shift):
+        point_geometry = arcpy.Point(x, y)
+        self.commit_geometry(self.table, point_geometry,
+                             self._id_netzelement,
+                             self.netz_ids[self._id_netzelement])
 
 
 class AnliegerstrasseInnere(LineTool):
@@ -449,6 +416,11 @@ class SammelstrasseInnere(LineTool):
     _id_netzelement = 12
 
 
+class LagePunktuelleMassnahmeStrasseInnere(PointTool):
+    """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_innere (Tool)"""
+    _id_netzelement = 13
+
+
 class AnliegerstrasseAeussere(LineTool):
     """Implementation for rpc_tools.anliegerstrasse_aeussere (Tool)"""
     _id_netzelement = 14
@@ -457,6 +429,11 @@ class AnliegerstrasseAeussere(LineTool):
 class SammelstrasseAeussere(LineTool):
     """Implementation for rpc_tools.sammelstrasse_aeussere (Tool)"""
     _id_netzelement = 15
+    
+    
+class LagePunktuelleMassnahmeStrasseAeussere(PointTool):
+    """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_aeussere (Tool)"""
+    _id_netzelement = 16
     
 
 class KanalTrennsystem(LineTool):
@@ -474,40 +451,67 @@ class KanalNurSchmutzwasser(LineTool):
     _id_netzelement = 23
 
 
+class LagePunktuelleMassnahmeKanalisation(PointTool):
+    """Implementation for rpc_tools.lage_punktuelle_massnahme_kanalisation (Tool)"""
+    _id_netzelement = 24
+
+
 class Trinkwasserleitung(LineTool):
     """Implementation for rpc_tools.trinkwasserleitung (Tool)"""
     _id_netzelement = 31
-    
+
+
+class LagePunktuelleMassnahmeTrinkwasser(PointTool):
+    """Implementation for rpc_tools.lage_punktuelle_massnahme_trinkwasser (Tool)"""
+    _id_netzelement = 32
+
 
 class Stromleitung(LineTool):
     """Implementation for rpc_tools.stromleitung (Tool)"""
     _id_netzelement = 41
 
 
+class LagePunktuelleMassnahmeElektrizitaet(PointTool):
+    """Implementation for rpc_tools.lage_punktuelle_massnahme_elektrizitaet (Tool)"""
+    _id_netzelement = 42
+
+
+def delete_selected_elements(layer_name, ): 
+    active = config.active_project
+    layers = projekt_auswahl.tbx.tool.output.get_layers(
+        layer_name, projectname=active)
+    if not layers:
+        return
+    # ToDo: loop necessary?
+    layer = layers[0]
+    # check if anything is selected
+    sth_selected = len(arcpy.Describe(layer).FIDset) > 0
+    message = 'OK'
+    if not sth_selected:
+        message = pythonaddins.MessageBox(
+            u'Es sind keine Elemente im Layer "{layer}" des Projektes "{proj}" '
+            .format(layer=layer_name, proj=active) + 
+            u'ausgewählt.\n\nSollen alle in diesem Layer '
+            u'angelegten Elemente aus dem Projekt gelöscht werden?',
+            'Achtung', 1)
+    if message == 'OK':
+        arcpy.DeleteFeatures_management(layer)
+            
 class NetzabschnittLoeschen(object):
     def __init__(self):
         self.enabled = True
         self.checked = False
     def onClick(self):
-        active = config.active_project
-        layers = projekt_auswahl.tbx.tool.output.get_layers(
-            u'Erschließungsnetz', projectname=active)
-        if not layers:
-            return
-        # ToDo: loop necessary?
-        layer = layers[0]
-        # check if anything is selected
-        sth_selected = len(arcpy.Describe(layer).FIDset) > 0
-        message = 'OK'
-        if not sth_selected:
-            message = pythonaddins.MessageBox(
-                u'Es sind keine Netzlinien im Projekt "{}" '.format(active) + 
-                u'ausgewählt.\nSollen alle in diesem Projekt '
-                u'angelegten Netzlinien gelöscht werden?',
-                'Achtung', 1)
-        if message == 'OK':
-            arcpy.DeleteFeatures_management(layer)
-        
-        
+        delete_selected_elements(u'Erschließungsnetz')
+
+class PunktuelleMassnahmeLoeschen(object):
+    """Implementation for rpc_tools.punktuelle_massnahme_loeschen (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        delete_selected_elements(u'Erschließungsnetz - punktuelle Maßnahmen')
+    
+
 if __name__ == "__main__":
     t = Stromleitung()

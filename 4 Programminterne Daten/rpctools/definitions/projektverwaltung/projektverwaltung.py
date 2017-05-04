@@ -40,6 +40,13 @@ class Projektverwaltung(DiaTeilflaechen):
                                     workspace="FGDB_Kosten.gdb")
         layer = self.folders.get_layer("Erschließungsnetz")
         self.output.add_output("projektdefinition", layer, fc, zoom=False)
+        
+        ## add Erschliessungsnetz
+        fc = self.folders.get_table("Erschliessungsnetze_Punktelemente",
+                                    workspace="FGDB_Kosten.gdb")
+        layer = self.folders.get_layer("Erschließungsnetz - "
+                                       "punktuelle Maßnahmen")
+        self.output.add_output("projektdefinition", layer, fc, zoom=False)
 
         # add Teilflächen
         fc = self.folders.get_table("Teilflaechen_Plangebiet")
