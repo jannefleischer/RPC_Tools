@@ -290,8 +290,9 @@ class Folders(object):
     
     def get_otp_pickle_filename(self, project=None, check=True):
         return self.join_and_check(
-            self.get_projectpath(project=project, check=check),
-            self._OTP_PICKLE_FILE)
+            self.get_projectpath(project=project),
+            self._OTP_PICKLE_FILE, 
+            check=check)
 
     def get_temporary_projectpath(self, project=None):
         projectname = project or self.project
