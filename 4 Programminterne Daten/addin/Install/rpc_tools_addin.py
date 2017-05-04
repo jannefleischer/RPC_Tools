@@ -20,14 +20,6 @@ class ArbeitsplaetzeSchaetzen(object):
     def onClick(self):
         pass
 
-class Beschaeftigtensalden(object):
-    """Implementation for rpc_tools.beschaeftigtensalden (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
 class BeschreibungPunktuelleMassnahmeElektrizitaet(object):
     """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet (Button)"""
     def __init__(self):
@@ -62,22 +54,6 @@ class BeschreibungPunktuelleMassnahmeStrasseInnere(object):
 
 class BeschreibungPunktuelleMassnahmeTrinkwasser(object):
     """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class EinnahmeverschiebungenSchaetzen(object):
-    """Implementation for rpc_tools.einnahmeverschiebungen_schaetzen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class Einwohnersalden(object):
-    """Implementation for rpc_tools.einwohnersalden (Button)"""
     def __init__(self):
         self.enabled = True
         self.checked = False
@@ -212,51 +188,9 @@ class TrinkwasserKostenaufteilung(object):
     def onClick(self):
         pass
 
-class WanderungssaldenSchaetzen(object):
-    """Implementation for rpc_tools.wanderungssalden_schaetzen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
 
-class NutzungenDefinieren(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
-                                 'Projektdefinition.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxTeilflaecheVerwalten')
-        
+### PROJECT MANAGEMENT ###
 
-class Wohnen(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
-                                 'Projektdefinition.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenWohnen')
-
-class Gewerbe(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
-                                 'Projektdefinition.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenGewerbe')
-
-class Einzelhandel(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
-                                 'Projektdefinition.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenEinzelhandel')
-                
 
 class ProjektAnlegen(object):
     """Implementation for rpc_tools.neues_projekt (Button)"""
@@ -340,17 +274,6 @@ class RefreshLayers(object):
         projekt_auswahl.activate_project()
 
 
-class BewohnerSchaetzen(object):
-    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.ANALYST_PYT_PATH,
-                                 'Bewohner_Arbeitsplaetze.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxBewohner')
-
-
 ### DRAWING TOOLS ###
 
 
@@ -367,19 +290,21 @@ class DrawingTool(object):
         cursor = arcpy.da.SearchCursor(netz_table, ['IDNetzelement', 'IDNetz'])
         self.netz_ids = dict([row for row in cursor])
         
-    @staticmethod
-    def commit_geometry(table, shape, element_id, netz_id):
+    def commit_geometry(self, table, shape, element_id):
+        netz_id = self.netz_ids[element_id]
         project=config.active_project
         gdb = folders.get_table(table, 
                                 workspace='FGDB_Kosten.gdb',
                                 project=project)
-        cursor = arcpy.da.InsertCursor(gdb, ["SHAPE@", 'IDNetzelement', 'IDNetz'])
+        cursor = arcpy.da.InsertCursor(
+            gdb, ["SHAPE@", 'IDNetzelement', 'IDNetz'])
         cursor.insertRow([shape, element_id, netz_id])
         del(cursor)
         arcpy.RefreshActiveView()    
 
 
 class LineTool(DrawingTool):
+    _id_netzelement = None
     table = 'Erschliessungsnetze_Linienelemente'
     
     def __init__(self):
@@ -387,12 +312,11 @@ class LineTool(DrawingTool):
         self.shape = "Line"
         
     def onLine(self, line_geometry):
-        self.commit_geometry(self.table, line_geometry,
-                             self._id_netzelement,
-                             self.netz_ids[self._id_netzelement])
+        self.commit_geometry(self.table, line_geometry, self._id_netzelement)
 
 
 class PointTool(DrawingTool):
+    _id_netzelement = None
     table = 'Erschliessungsnetze_Punktelemente'
     
     def __init__(self):
@@ -401,9 +325,7 @@ class PointTool(DrawingTool):
         
     def onMouseDownMap(self, x, y, button, shift):
         point_geometry = arcpy.Point(x, y)
-        self.commit_geometry(self.table, point_geometry,
-                             self._id_netzelement,
-                             self.netz_ids[self._id_netzelement])
+        self.commit_geometry(self.table, point_geometry, self._id_netzelement)
 
 
 class AnliegerstrasseInnere(LineTool):
@@ -476,7 +398,7 @@ class LagePunktuelleMassnahmeElektrizitaet(PointTool):
     _id_netzelement = 42
 
 
-def delete_selected_elements(layer_name, ): 
+def delete_selected_elements(layer_name): 
     active = config.active_project
     layers = projekt_auswahl.tbx.tool.output.get_layers(
         layer_name, projectname=active)
@@ -496,13 +418,15 @@ def delete_selected_elements(layer_name, ):
             'Achtung', 1)
     if message == 'OK':
         arcpy.DeleteFeatures_management(layer)
-            
+
+
 class NetzabschnittLoeschen(object):
     def __init__(self):
         self.enabled = True
         self.checked = False
     def onClick(self):
         delete_selected_elements(u'Erschließungsnetz')
+
 
 class PunktuelleMassnahmeLoeschen(object):
     """Implementation for rpc_tools.punktuelle_massnahme_loeschen (Button)"""
@@ -511,7 +435,109 @@ class PunktuelleMassnahmeLoeschen(object):
         self.checked = False
     def onClick(self):
         delete_selected_elements(u'Erschließungsnetz - punktuelle Maßnahmen')
-    
+        
+
+### NUTZUNGEN ###
+
+
+class NutzungenDefinieren(object):
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
+                                 'Projektdefinition.pyt')
+    def onClick(self):
+        pythonaddins.GPToolDialog(self.path, 'TbxTeilflaecheVerwalten')
+        
+
+class Wohnen(object):
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
+                                 'Projektdefinition.pyt')
+    def onClick(self):
+        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenWohnen')
+
+class Gewerbe(object):
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
+                                 'Projektdefinition.pyt')
+    def onClick(self):
+        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenGewerbe')
+
+class Einzelhandel(object):
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
+                                 'Projektdefinition.pyt')
+    def onClick(self):
+        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenEinzelhandel')
+
+
+### BEWOHNER ARBEISTPLAETZE ###
+
+
+class BewohnerSchaetzen(object):
+    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.path = os.path.join(folders.ANALYST_PYT_PATH,
+                                 'Bewohner_Arbeitsplaetze.pyt')
+    def onClick(self):
+        pythonaddins.GPToolDialog(self.path, 'TbxBewohner')
+
+
+### EINNAHMEN ###
+
+
+class WanderungssaldenSchaetzen(object):
+    """Implementation for rpc_tools.wanderungssalden_schaetzen (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.path = os.path.join(folders.ANALYST_PYT_PATH,
+                                 'Einnahmen.pyt')
+    def onClick(self):
+        pythonaddins.GPToolDialog(self.path, 'TbxWanderungssalden')
+
+
+class Einwohnersalden(object):
+    """Implementation for rpc_tools.einwohnersalden (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.path = os.path.join(folders.ANALYST_PYT_PATH,
+                                 'Einnahmen.pyt')
+    def onClick(self):
+        pythonaddins.GPToolDialog(self.path, 'TbxEWSaldenbearbeiten')
+
+
+class Beschaeftigtensalden(object):
+    """Implementation for rpc_tools.beschaeftigtensalden (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.path = os.path.join(folders.ANALYST_PYT_PATH,
+                                 'Einnahmen.pyt')
+    def onClick(self):
+        pythonaddins.GPToolDialog(self.path, 'TbxGewSaldenbearbeiten')
+
+
+class EinnahmeverschiebungenSchaetzen(object):
+    """Implementation for rpc_tools.einnahmeverschiebungen_schaetzen (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.path = os.path.join(folders.ANALYST_PYT_PATH,
+                                 'Einnahmen.pyt')
+    def onClick(self):
+        pythonaddins.GPToolDialog(self.path, 'TbxSteuersalden')
+
 
 if __name__ == "__main__":
     t = Stromleitung()
