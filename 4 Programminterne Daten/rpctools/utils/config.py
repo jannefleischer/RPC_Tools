@@ -133,7 +133,7 @@ class Folders(object):
         self._TEXTE = 'texte'
         self._MXDS = 'mxds'
         self._DEFINITION_PYT_PATH = '1 Planungsprojekte definieren'
-        self._ANALYST_PYT_PATH = '1 Planungsprojekte definieren'
+        self._ANALYST_PYT_PATH = '2 Planungsprojekte analysieren'
         # the params
         self._params = params
         self._invalid_paths = []

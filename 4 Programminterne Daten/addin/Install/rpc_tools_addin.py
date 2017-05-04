@@ -13,6 +13,334 @@ folders = Folders()
 config = Config()
     
 
+class AnliegerstrasseAeussere(object):
+    """Implementation for rpc_tools.anliegerstrasse_aeussere (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class AnliegerstrasseInnere(object):
+    """Implementation for rpc_tools.anliegerstrasse_innere (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class ArbeitsplaetzeSchaetzen(object):
+    """Implementation for rpc_tools.arbeitsplaetze_schaetzen (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class Beschaeftigtensalden(object):
+    """Implementation for rpc_tools.beschaeftigtensalden (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class BeschreibungPunktuelleMassnahmeElektrizitaet(object):
+    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class BeschreibungPunktuelleMassnahmeKanalisation(object):
+    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_kanalisation (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class BeschreibungPunktuelleMassnahmeStrasseAeussere(object):
+    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_strasse_auessere (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class BeschreibungPunktuelleMassnahmeStrasseInnere(object):
+    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_strasse_innere (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class BeschreibungPunktuelleMassnahmeTrinkwasser(object):
+    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class EinnahmeverschiebungenSchaetzen(object):
+    """Implementation for rpc_tools.einnahmeverschiebungen_schaetzen (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class Einwohnersalden(object):
+    """Implementation for rpc_tools.einwohnersalden (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class ElektrizitaetKostenaufteilung(object):
+    """Implementation for rpc_tools.elektrizitaet_kostenaufteilung (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class GesamtkostenErmitteln(object):
+    """Implementation for rpc_tools.gesamtkosten_ermitteln (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class HebesaetzeGewerbesteuer(object):
+    """Implementation for rpc_tools.hebesaetze_gewerbesteuer (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class HebesaetzeGrundsteuerB(object):
+    """Implementation for rpc_tools.hebesaetze_grundsteuer_b (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class InfrastrukturmengenBilanzieren(object):
+    """Implementation for rpc_tools.infrastrukturmengen_bilanzieren (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class KanalMischsystem(object):
+    """Implementation for rpc_tools.kanal_mischsystem (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class KanalNurSchmutzwasser(object):
+    """Implementation for rpc_tools.kanal_nur_schmutzwasser (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class KanalTrennsystem(object):
+    """Implementation for rpc_tools.kanal_trennsystem (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class KanalisationKostenaufteilung(object):
+    """Implementation for rpc_tools.kanalisation_kostenaufteilung (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class KostenNachKostentraegernAuswerten(object):
+    """Implementation for rpc_tools.kosten_nach_kostentraegern_auswerten (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class KostenProWEBzwAPVergleichen(object):
+    """Implementation for rpc_tools.kosten_pro_we_bzw_ap_vergleichen (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class KostenkennwerteKontrollieren(object):
+    """Implementation for rpc_tools.kostenkennwerte_kontrollieren (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class LagePunktuelleMassnahmeElektrizitaet(object):
+    """Implementation for rpc_tools.lage_punktuelle_massnahme_elektrizitaet (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class LagePunktuelleMassnahmeKanalisation(object):
+    """Implementation for rpc_tools.lage_punktuelle_massnahme_kanalisation (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class LagePunktuelleMassnahmeStrasseAeussere(object):
+    """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_aeussere (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class LagePunktuelleMassnahmeStrasseInnere(object):
+    """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_innere (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class LagePunktuelleMassnahmeTrinkwasser(object):
+    """Implementation for rpc_tools.lage_punktuelle_massnahme_trinkwasser (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class PunktuelleMassnahmeLoeschen(object):
+    """Implementation for rpc_tools.punktuelle_massnahme_loeschen (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class SammelstrasseAeussere(object):
+    """Implementation for rpc_tools.sammelstrasse_aeussere (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class SammelstrasseInnere(object):
+    """Implementation for rpc_tools.sammelstrasse_innere (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class SkizzeBeenden(object):
+    """Implementation for rpc_tools.skizze_beenden (Tool)"""
+    def __init__(self):
+        self.enabled = True
+        self.shape = "NONE" # Can set to "Line", "Circle" or "Rectangle" for interactive shape drawing and to activate the onLine/Polygon/Circle event sinks.
+    def onMouseDown(self, x, y, button, shift):
+        pass
+    def onMouseDownMap(self, x, y, button, shift):
+        pass
+    def onMouseUp(self, x, y, button, shift):
+        pass
+    def onMouseUpMap(self, x, y, button, shift):
+        pass
+    def onMouseMove(self, x, y, button, shift):
+        pass
+    def onMouseMoveMap(self, x, y, button, shift):
+        pass
+    def onDblClick(self):
+        pass
+    def onKeyDown(self, keycode, shift):
+        pass
+    def onKeyUp(self, keycode, shift):
+        pass
+    def deactivate(self):
+        pass
+    def onCircle(self, circle_geometry):
+        pass
+    def onLine(self, line_geometry):
+        pass
+    def onRectangle(self, rectangle_geometry):
+        pass
+
+class StrasseAeussereKostenaufteilung(object):
+    """Implementation for rpc_tools.strasse_aeussere_kostenaufteilung (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class StrasseInnereKostenaufteilung(object):
+    """Implementation for rpc_tools.strasse_innere_kostenaufteilung (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class Stromleitung(object):
+    """Implementation for rpc_tools.stromleitung (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class TrinkwasserKostenaufteilung(object):
+    """Implementation for rpc_tools.trinkwasser_kostenaufteilung (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class Trinkwasserleitung(object):
+    """Implementation for rpc_tools.trinkwasserleitung (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
+class WanderungssaldenSchaetzen(object):
+    """Implementation for rpc_tools.wanderungssalden_schaetzen (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        pass
+
 class NutzungenDefinieren(object):
     def __init__(self):
         self.enabled = True
@@ -78,7 +406,7 @@ class NetzlinieTool(object):
         self.shape = "Line" # Can set to "Line", "Circle" or "Rectangle" for interactive shape drawing and to activate the onLine/Polygon/Circle event sinks.
         
     def onMouseDown(self, x, y, button, shift):
-        pass
+        print('hallo')
     def onMouseDownMap(self, x, y, button, shift):
         pass
     def onMouseUp(self, x, y, button, shift):
@@ -115,7 +443,7 @@ class NetzlinieTool(object):
         pass
     
 
-class NetzlinieLoeschen(object):
+class NetzabschnittLoeschen(object):
     def __init__(self):
         self.enabled = True
         self.checked = False
@@ -214,10 +542,23 @@ class ProjektLoeschen(object):
     def onClick(self):
         pythonaddins.GPToolDialog(self.path, 'TbxProjekteLoeschen')
 
-
 class RefreshLayers(object):
     def __init__(self):
         self.enabled = True
         self.checked = False
     def onClick(self):
         projekt_auswahl.activate_project()
+
+
+class BewohnerSchaetzen(object):
+    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.path = os.path.join(folders.ANALYST_PYT_PATH,
+                                 'Bewohner_Arbeitsplaetze.pyt')
+    def onClick(self):
+        pythonaddins.GPToolDialog(self.path, 'TbxBewohner')
+        
+if __name__ == "__main__":
+    t = BewohnerSchaetzen()
