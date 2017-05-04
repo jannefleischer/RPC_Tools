@@ -212,24 +212,21 @@ class TbxFlaechendefinition(Tbx):
         self.par.teilflaeche.filter.list = list_teilflaechen
         
         if not list_teilflaechen:
-            flaeche = ''
+            flaeche = u'keine entsprechenden Flächen vorhanden'
+            for param in self.par:
+                param.enabled = False
             
         # a flaeche was selected and is in list, select it again
         elif idx >= 0:
             flaeche = self.par.teilflaeche.filter.list[idx]
         
         # flaeche not in list -> select first one
-        else: 
-            if list_teilflaechen:
-                flaeche = list_teilflaechen[0]
-                tfl = self.get_teilflaeche(flaeche)
-                self.par._current_tfl = tfl
-                self.par.teilflaeche.enabled = True
-            else:
-                flaeche = u'keine entsprechenden Flächen vorhanden'
-                for param in self.par:
-                    param.enabled = False
-            
+        elif list_teilflaechen:
+            flaeche = list_teilflaechen[0]
+            tfl = self.get_teilflaeche(flaeche)
+            self.par._current_tfl = tfl
+            self.par.teilflaeche.enabled = True
+        
         self.par.teilflaeche.value = flaeche
 
 class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
