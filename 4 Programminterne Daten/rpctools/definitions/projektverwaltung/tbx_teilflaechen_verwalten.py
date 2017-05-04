@@ -285,7 +285,9 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                                   {'Nutzungsart': nutzungsart_id,
                                    'WE_gesamt': 0,
                                    'AP_gesamt': 0,
-                                   'VF_gesamt': 0},
+                                   'VF_gesamt': 0,
+                                   "Wege_gesamt": 0,
+                                   "Wege_MIV": 0},
                                   where=where_tfl)
 
                 # delete corresponding rows wohnen/gewerbe/einzelhandel

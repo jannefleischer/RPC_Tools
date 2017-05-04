@@ -176,8 +176,8 @@ class ProjektAnlegen(Projektverwaltung):
             row.setValue("WE_gesamt", 0)
             row.setValue("AP_gesamt", 0)
             row.setValue("VF_gesamt", 0)
-            row.setValue("Wege", 0)
-            row.setValue("PKW_Wege", 0)
+            row.setValue("Wege_gesamt", 0)
+            row.setValue("Wege_MIV", 0)
             cursor.updateRow(row)
 
     def copy_teilflaechen_to_gdb(self, project_name, flaeche):
@@ -239,6 +239,8 @@ class ProjektAnlegen(Projektverwaltung):
         arcpy.AddField_management(tfl, "WE_gesamt", "LONG")
         arcpy.AddField_management(tfl, "AP_gesamt", "LONG")
         arcpy.AddField_management(tfl, "VF_gesamt", "LONG")
+        arcpy.AddField_management(tfl, "Wege_gesamt", "LONG")
+        arcpy.AddField_management(tfl, "Wege_MIV", "LONG")
         #arcpy.AddField_management(teilfaechen_plangebiet, "Bilanzsumme", "FLOAT")
         return tfl, gdbPfad
 

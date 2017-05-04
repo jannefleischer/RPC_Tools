@@ -13,7 +13,7 @@ from rpctools.utils.encoding import encode
 from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten import \
      TbxFlaechendefinition
 from rpctools.definitions.nutzungsart.nutzungen import (
-    Nutzungen, NutzungenWohnen, NutzungenEinzelhandel)
+    NutzungenGewerbe, NutzungenWohnen, NutzungenEinzelhandel)
 from rpctools.utils.encoding import encode
 from rpctools.utils.constants import Branche, Gewerbegebietstyp
 from rpctools.utils.spatial_lib import get_gemeindetyp
@@ -219,7 +219,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
 
     @property
     def Tool(self):
-        return Nutzungen
+        return NutzungenGewerbe
 
     @property
     def gewerbegebietstypen(self):
@@ -549,7 +549,7 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         pass
 
 if __name__ == '__main__':
-    t = TbxNutzungenEinzelhandel()
+    t = TbxNutzungenGewerbe()
     params = t.getParameterInfo()
     t.par.projectname.value = t.config.active_project
     t.tool.main(t.par, None)
