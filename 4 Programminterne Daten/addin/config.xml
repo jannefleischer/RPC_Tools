@@ -28,10 +28,10 @@
         <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeTrinkwasser" id="rpc_tools.lage_punktuelle_massnahme_trinkwasser" image="Images\664100-office-button.png" message="" tip=""><Help heading="" /></Tool>
         <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeTrinkwasser" id="rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser" image="" message="" tip=""><Help heading="" /></Button>
         <Tool caption="Stromleitung hinzuf&#252;gen" category="ProjektCheck" class="Stromleitung" id="rpc_tools.stromleitung" image="Images\Stromleitung.png" message="" tip=""><Help heading="" /></Tool>
-        <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeElektrizitaet" id="rpc_tools.lage_punktuelle_massnahme_elektrizitaet" image="" message="" tip=""><Help heading="" /></Tool>
+        <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeElektrizitaet" id="rpc_tools.lage_punktuelle_massnahme_elektrizitaet" image="Images\664100-office-button.png" message="" tip=""><Help heading="" /></Tool>
         <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeElektrizitaet" id="rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet" image="Images\GenericTag16.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Netzabschnitt" category="ProjektCheck" class="NetzabschnittLoeschen" id="rpc_tools.netzabschnitt_loeschen" image="Images\ArcScanRasterPaintingDrawLineTool16.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Punktuelle Ma&#223;nahme" category="ProjektCheck" class="PunktuelleMassnahmeLoeschen" id="rpc_tools.punktuelle_massnahme_loeschen" image="Images\ElementMarker16x11.png" message="" tip=""><Help heading="" /></Button>
+        <Button caption="Ausgew&#228;hlte Netzelemente l&#246;schen" category="ProjektCheck" class="NetzabschnittLoeschen" id="rpc_tools.netzabschnitt_loeschen" image="Images\ArcScanRasterPaintingDrawLineTool16.png" message="" tip=""><Help heading="" /></Button>
+        <Button caption="Ausgew&#228;hlte punktuelle Ma&#223;nahmen l&#246;schen" category="ProjektCheck" class="PunktuelleMassnahmeLoeschen" id="rpc_tools.punktuelle_massnahme_loeschen" image="Images\ElementMarker16x11.png" message="" tip=""><Help heading="" /></Button>
         <Button caption="Infrastrukturmengen bilanzieren" category="ProjektCheck" class="InfrastrukturmengenBilanzieren" id="rpc_tools.infrastrukturmengen_bilanzieren" image="Images\400000-ruler.png" message="" tip=""><Help heading="" /></Button>
         <Button caption="Kostenkennwerte kontrollieren" category="ProjektCheck" class="KostenkennwerteKontrollieren" id="rpc_tools.kostenkennwerte_kontrollieren" image="Images\3003-coin_1.png" message="" tip=""><Help heading="" /></Button>
         <Button caption="Gesamtkosten ermitteln" category="ProjektCheck" class="GesamtkostenErmitteln" id="rpc_tools.gesamtkosten_ermitteln" image="Images\450000-chart.png" message="" tip=""><Help heading="" /></Button>
@@ -49,7 +49,6 @@
         <Button caption="Hebes&#228;tze Gewerbesteuer" category="ProjektCheck" class="HebesaetzeGewerbesteuer" id="rpc_tools.hebesaetze_gewerbesteuer" image="Images\506700-factory_1.png" message="" tip=""><Help heading="" /></Button>
         <Button caption="Einnahmeverschiebungen sch&#228;tzen" category="ProjektCheck" class="EinnahmeverschiebungenSchaetzen" id="rpc_tools.einnahmeverschiebungen_schaetzen" image="Images\3002-coins.png" message="" tip=""><Help heading="" /></Button>
         <Tool caption="Skizze beenden" category="ProjektCheck" class="SkizzeBeenden" id="rpc_tools.skizze_beenden" image="Images\Analyze16.png" message="" tip="Mit Klicken dieses Buttons beenden Sie die Eingabe von Punkten, Netzelemente oder Fl&#228;chen."><Help heading="" /></Tool>
-        <Button caption="Linie l&#246;schen" category="ProjektCheck" class="NetzlinieLoeschen" id="rpc_tools.netzlinie_loeschen" image="Images\1001-cancel_1.png" message="" tip="Die in der Karte selektierten Netzlinien werden gel&#246;scht. Sind keine Linien gew&#228;hlt, k&#246;nnen alle gleichzeitig entfernt werden"><Help heading="" /></Button>
         </Commands>
     <Extensions>
         </Extensions>

@@ -473,6 +473,16 @@ class Output(object):
                                          current_dataframe)[0].visible = True
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
+        
+    def layer_exists(self, layername):
+        projektname = self.params._get_projectname()
+        current_mxd = arcpy.mapping.MapDocument("CURRENT")
+        current_dataframe = current_mxd.activeDataFrame
+        project_layer = arcpy.mapping.ListLayers(current_dataframe, projektname)
+        if not project_layer or not arcpy.mapping.ListLayers(project_layer[0],
+                                                             layername):
+            return False
+        return True
 
     def add_or_replace_layer(self,
                              target_grouplayer,

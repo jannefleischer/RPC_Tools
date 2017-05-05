@@ -7,6 +7,8 @@ from collections import OrderedDict
 from rpctools.utils.config import Folders, Config
 from rpctools.definitions.projektverwaltung.tbx_projektauswahl import \
      TbxProjektauswahl
+from rpctools.analyst.infrastrukturkosten.tbx_infrastruktur import \
+     TbxInfrastruktur
 
 folders = Folders()
 config = Config()
@@ -289,8 +291,15 @@ class DrawingTool(object):
         self.netz_ids = {}
         cursor = arcpy.da.SearchCursor(netz_table, ['IDNetzelement', 'IDNetz'])
         self.netz_ids = dict([row for row in cursor])
+        self.cursor = 3
+        self.tbx = TbxInfrastruktur()
+        self.tbx.getParameterInfo()
         
     def commit_geometry(self, table, shape, element_id):
+        self.tbx.par.projectname.value = config.active_project
+        if not self.tbx.tool.output.layer_exists(
+            'Wirkungsbereich 5 - Infrastrukturfolgekosten'):
+            self.tbx.tool.add_output()
         netz_id = self.netz_ids[element_id]
         project=config.active_project
         gdb = folders.get_table(table, 
@@ -435,7 +444,7 @@ class PunktuelleMassnahmeLoeschen(object):
         self.checked = False
     def onClick(self):
         delete_selected_elements(u'Erschließungsnetz - punktuelle Maßnahmen')
-        
+
 
 ### NUTZUNGEN ###
 
@@ -540,4 +549,5 @@ class EinnahmeverschiebungenSchaetzen(object):
 
 
 if __name__ == "__main__":
-    t = Stromleitung()
+    t = DrawingTool()
+    t.commit_geometry(None, None, None)
