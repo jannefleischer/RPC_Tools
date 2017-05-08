@@ -214,6 +214,7 @@ class Tbx(object):
 
         # ggf. später reload entfernen???
         Tool = self.reload_tool()
+        #Tool = self.Tool
 
         # the parameters
         self.par = Params(param_projectname=Tool._param_projectname,
@@ -839,7 +840,7 @@ class Tbx(object):
                 raise Exception('Querying a base table requires the '
                                 'specification of a workspace!')
             table_path = self.folders.get_base_table(workspace, table_name)
-            rows = self._query_table(table_path, columns=columns)
+            rows = self._query_table(table_path, columns=columns, where=where)
         # project table (with temp. management)
         else: 
             table_name = os.path.basename(table_name)

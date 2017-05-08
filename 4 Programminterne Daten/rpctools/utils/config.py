@@ -41,6 +41,7 @@ class Config(object):
 
         self.config_file = Folders().CONFIG_FILE
         self._callbacks = {}
+        self.active_measure = ''
 
         if exists(self.config_file):
             self.read()
