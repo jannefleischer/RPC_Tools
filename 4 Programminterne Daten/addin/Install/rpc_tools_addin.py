@@ -295,7 +295,8 @@ class DrawingTool(object):
         self.tbx = TbxInfrastruktur()
         self.tbx.getParameterInfo()
         
-    def commit_geometry(self, table, shape, element_id):
+    def commit_geometry(self, table, shape, element_id, additional_columns={}):
+        """insert geometry with spec. id into given table """
         self.tbx.par.projectname.value = config.active_project
         if not self.tbx.tool.output.layer_exists(
             'Wirkungsbereich 5 - Infrastrukturfolgekosten'):
@@ -305,9 +306,12 @@ class DrawingTool(object):
         gdb = folders.get_table(table, 
                                 workspace='FGDB_Kosten.gdb',
                                 project=project)
+        columns = (["SHAPE@", 'IDNetzelement', 'IDNetz'] +
+                   additional_columns.keys())
         cursor = arcpy.da.InsertCursor(
-            gdb, ["SHAPE@", 'IDNetzelement', 'IDNetz'])
-        cursor.insertRow([shape, element_id, netz_id])
+            gdb, columns)
+        cursor.insertRow([shape, element_id, netz_id] +
+                         additional_columns.values())
         del(cursor)
         arcpy.RefreshActiveView()    
 
@@ -334,7 +338,14 @@ class PointTool(DrawingTool):
         
     def onMouseDownMap(self, x, y, button, shift):
         point_geometry = arcpy.Point(x, y)
-        self.commit_geometry(self.table, point_geometry, self._id_netzelement)
+        desc = u'unbenannt @({x}, {y})'.format(x=x, y=y)
+        self.commit_geometry(self.table, point_geometry, self._id_netzelement,
+                             additional_columns={'Kosten_EH_EUR': 0,
+                                                 'Kosten_BU_EUR': 0,
+                                                 'Kosten_EN_EUR': 0,
+                                                 'Lebensdauer': 20,
+                                                 'Bezeichnung': desc,
+                                                 })
 
 
 class AnliegerstrasseInnere(LineTool):
@@ -457,7 +468,7 @@ class NutzungenDefinieren(object):
                                  'Projektdefinition.pyt')
     def onClick(self):
         pythonaddins.GPToolDialog(self.path, 'TbxTeilflaecheVerwalten')
-        
+
 
 class Wohnen(object):
     def __init__(self):
@@ -468,6 +479,7 @@ class Wohnen(object):
     def onClick(self):
         pythonaddins.GPToolDialog(self.path, 'TbxNutzungenWohnen')
 
+
 class Gewerbe(object):
     def __init__(self):
         self.enabled = True
@@ -476,6 +488,7 @@ class Gewerbe(object):
                                  'Projektdefinition.pyt')
     def onClick(self):
         pythonaddins.GPToolDialog(self.path, 'TbxNutzungenGewerbe')
+
 
 class Einzelhandel(object):
     def __init__(self):

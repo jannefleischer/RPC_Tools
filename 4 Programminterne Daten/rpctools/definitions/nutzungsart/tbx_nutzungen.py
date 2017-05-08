@@ -356,7 +356,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     def _updateParameters(self, params):
         params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
 
-        re_estimate = False
+        altered = False
 
         flaeche = params.teilflaeche.value
         tfl = self.get_teilflaeche(flaeche)
@@ -368,16 +368,15 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             id_gewerbe = self.gewerbegebietstypen[params.gebietstyp.value]
             if id_gewerbe != Gewerbegebietstyp.BENUTZERDEFINIERT:
                 self.set_gewerbe_presets(id_gewerbe)
-                re_estimate = True
+                altered = True
         else:
-            altered = False
             # check if one of the branchenanteile changed
             if any(map(self.par.changed,
                        [branche.param_gewerbenutzung
                         for branche in self.branchen.values()])):
                 # set selection to "benutzerdefiniert" and recalc. jobs
                 self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
-                re_estimate = True
+                altered = True
 
         auto_idx = self.par.auto_select.filter.list.index(
             self.par.auto_select.value)
@@ -385,13 +384,13 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         if self.par.changed('auto_select'):
             # auto calc. entry
             if auto_idx == 0:
-                re_estimate = True
+                #re_estimate = True
                 params.arbeitsplaetze_insgesamt.enabled = False
             # manual entry
             else:
                 params.arbeitsplaetze_insgesamt.enabled = True
             
-        if re_estimate:  #and auto_idx == 0:
+        if altered:  #and auto_idx == 0:
             n_jobs = self.estimate_jobs()
             if auto_idx == 0:
                 params.arbeitsplaetze_insgesamt.value = n_jobs
