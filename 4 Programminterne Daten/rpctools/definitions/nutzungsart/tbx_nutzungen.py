@@ -391,8 +391,10 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             else:
                 params.arbeitsplaetze_insgesamt.enabled = True
             
-        if re_estimate and auto_idx == 0:
-            self.set_estimate_jobs()
+        if re_estimate:  #and auto_idx == 0:
+            n_jobs = self.estimate_jobs()
+            if auto_idx == 0:
+                params.arbeitsplaetze_insgesamt.value = n_jobs
                 
         return params
 
@@ -405,7 +407,8 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             table = self.tablename
             pkey = {'IDTeilflaeche': tfl.flaechen_id,
                     'IDBranche': branche.id}
-            column_values = {'anteil': job_param.value}
+            column_values = {'anteil': job_param.value,
+                             'anzahl_jobs_schaetzung': branche.estimated_jobs}
             r = self.upsert_row_in_table(table, column_values, pkey)
             
         table_jobs = 'Gewerbe_Arbeitsplaetze'
@@ -418,13 +421,13 @@ class TbxNutzungenGewerbe(TbxNutzungen):
                           column_values={'AP_gesamt': job_param.value}, 
                           where='id_teilflaeche={}'.format(tfl.flaechen_id))
 
-    def set_estimate_jobs(self):
-        """calculate estimation of number of jobs and set value of corresponding
-        param 'arbeitsplaetze_insgesamt'"""
+    def estimate_jobs(self):
+        """calculate estimation of number of jobs
+        sets estimated jobs to branchen"""
         flaeche = self.par.teilflaeche.value
         if not flaeche:
             return
-        n_jobs = 0
+        jobs_sum = 0
 
         tfl = self.teilflaechen[flaeche]
         gemeindetyp = get_gemeindetyp(tfl.ags)
@@ -432,9 +435,11 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         for branche in self.branchen.itervalues():
             param = self.par[branche.param_gewerbenutzung]
             jobs_per_ha = kennwerte[branche.id]
-            n_jobs += tfl.ha * (param.value / 100.) * jobs_per_ha
-
-        self.par.arbeitsplaetze_insgesamt.value = n_jobs
+            jobs_branche = tfl.ha * (param.value / 100.) * jobs_per_ha
+            branche.estimated_jobs = jobs_branche
+            jobs_sum += jobs_branche
+        
+        return jobs_sum
         
     def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
         """update all inputs based on currently selected teilflaeche"""
@@ -549,7 +554,7 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         pass
 
 if __name__ == '__main__':
-    t = TbxNutzungenGewerbe()
+    t = TbxNutzungenWohnen()
     params = t.getParameterInfo()
     t.par.projectname.value = t.config.active_project
     t.tool.main(t.par, None)

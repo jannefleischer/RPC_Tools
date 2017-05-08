@@ -11,6 +11,18 @@ class Nutzungen(Tool):
     def run(self):        
         """"""
         
+    def update_wege(self, flaechen_id, ways, ways_miv): 
+        wege_col = 'Wege_gesamt'
+        wege_miv_col = 'Wege_MIV'
+        flaechen_table = 'Teilflaechen_Plangebiet'
+        flaechen_id_col = 'id_teilflaeche'
+        self.parent_tbx.update_table(
+            flaechen_table,
+            column_values={wege_miv_col: ways_miv.sum(),
+                           wege_col: ways.sum()}, 
+            where='{} = {}'.format(flaechen_id_col, flaechen_id)
+        )            
+        
 class NutzungenWohnen(Nutzungen):
 
     def run(self):
@@ -35,8 +47,6 @@ class NutzungenWohnen(Nutzungen):
         pkw_perc_col = 'Anteil_Pkw_Fahrer'
         pkey =  'OBJECTID'
         id_flaeche_col = 'IDTeilflaeche'
-        wege_col = 'Wege_gesamt'
-        wege_miv_col = 'Wege_MIV'
     
         # get all required tables as dataframes
         wohnen_we_df = tbx.table_to_dataframe(
@@ -74,12 +84,7 @@ class NutzungenWohnen(Nutzungen):
             n_ew = group[ew_col] * group[we_col]
             n_ways = n_ew * group[wege_je_ew_col]
             n_ways_miv = n_ways * group[pkw_perc_col] / 100
-            self.parent_tbx.update_table(
-                flaechen_table,
-                column_values={wege_miv_col: n_ways_miv.sum(),
-                               wege_col: n_ways.sum()}, 
-                where='id_teilflaeche = {}'.format(flaechen_id)
-            )            
+            self.update_wege(flaechen_id, n_ways.sum(), n_ways_miv.sum())
         
         ### Structure and age ###
         
@@ -123,43 +128,34 @@ class NutzungenGewerbe(Nutzungen):
         self.calculate_ways()
         
     def calculate_ways(self):
-        pass
-        #pkw_perc_col = 'Anteil_Pkw_Fahrer'
-        #id_sort_col = 'ID_Branche_ProjektCheck'
-        #wege_je_besch_col = 'Wege_je_Beschäftigten'
-        #id_flaeche_col = 'IDTeilflaeche'
-        #flaechen_table = 'Teilflaechen_Plangebiet'
-        #dichte_table = 'Dichtekennwerte_Gewerbe'
-        #wege_col = 'Wege_gesamt'
-        #wege_miv_col = 'Wege_MIV'
+        pkw_perc_col = 'Anteil_Pkw_Fahrer'
+        id_branche_col = 'ID_Branche_ProjektCheck'
+        wege_je_besch_col = u'Wege_je_Beschäftigten'
+        flaechen_table = 'Teilflaechen_Plangebiet'
+        branchen_table = 'Gewerbe_Branchen'
+        id_flaeche_col = 'IDTeilflaeche'
+        n_jobs_col = 'anzahl_jobs_schaetzung'
         
-        #arcpy.AddMessage('Berechne Anzahl der Wege...')
+        arcpy.AddMessage('Berechne Anzahl der Wege...')
         
-        #vfl_tablename = self.parent_tbx.tablename
-        #sortimente_tablename = 'Einzelhandel_Sortimente'        
+        gew_tablename = self.parent_tbx.tablename
         
-        #vfl_table_df = self.parent_tbx.table_to_dataframe(vfl_tablename)
-        #dichte_table_df = self.parent_tbx.table_to_dataframe(
-            #dichte_table, workspace='FGDB_Definition_Projekt_Tool.gdb',
-            #is_base_table=True)
+        gew_table_df = self.parent_tbx.table_to_dataframe(gew_tablename)
+        gew_table_df.rename(columns={'IDBranche': id_branche_col}, inplace=True)
+        branchen_table_df = self.parent_tbx.table_to_dataframe(
+            branchen_table, workspace='FGDB_Definition_Projekt_Tool.gdb',
+            is_base_table=True)
         
-        #joined = vfl_table_df.merge(sortimente_df, on=id_sort_col,
-                                    #how='inner')
+        joined = gew_table_df.merge(branchen_table_df, on=id_branche_col,
+                                    how='inner')
         
-        #joined[wege_col] = (joined[vfl_col] *
-                            #joined[besucher_sqm_col] *
-                            #joined[wege_je_besucher_col])
-        #joined[wege_miv_col] = joined[wege_col] * joined[pkw_perc_col] / 100
-        
-        #grouped = joined.groupby(by=id_flaeche_col)
-        #for g in grouped:
-            #flaechen_id = g[1][id_flaeche_col].unique()[0]
-            #self.parent_tbx.update_table(
-                #flaechen_table,
-                #column_values={wege_miv_col: g[1][wege_miv_col].values.sum(),
-                               #wege_col: g[1][wege_col].values.sum()}, 
-                #where='id_teilflaeche = {}'.format(flaechen_id)
-            #)
+        grouped = joined.groupby(by=id_flaeche_col)
+        for g in grouped:
+            group = g[1]
+            flaechen_id = group[id_flaeche_col].unique()[0]
+            n_ways = group[n_jobs_col] * group[wege_je_besch_col]
+            n_ways_miv = n_ways * group[pkw_perc_col] / 100
+            self.update_wege(flaechen_id, n_ways.sum(), n_ways_miv.sum())
 
         
 class NutzungenEinzelhandel(Nutzungen):
@@ -174,9 +170,6 @@ class NutzungenEinzelhandel(Nutzungen):
         vfl_col = 'Verkaufsflaeche_qm'
         wege_je_besucher_col = 'Wege_je_Besucher'
         id_flaeche_col = 'IDTeilflaeche'
-        flaechen_table = 'Teilflaechen_Plangebiet'
-        wege_col = 'Wege_gesamt'
-        wege_miv_col = 'Wege_MIV'
         
         arcpy.AddMessage('Berechne Anzahl der Wege...')
         
@@ -193,17 +186,12 @@ class NutzungenEinzelhandel(Nutzungen):
         joined = vfl_table_df.merge(sortimente_df, on=id_sort_col,
                                     how='inner')
         
-        joined[wege_col] = (joined[vfl_col] *
-                            joined[besucher_sqm_col] *
-                            joined[wege_je_besucher_col])
-        joined[wege_miv_col] = joined[wege_col] * joined[pkw_perc_col] / 100
-        
         grouped = joined.groupby(by=id_flaeche_col)
         for g in grouped:
-            flaechen_id = g[1][id_flaeche_col].unique()[0]
-            self.parent_tbx.update_table(
-                flaechen_table,
-                column_values={wege_miv_col: g[1][wege_miv_col].values.sum(),
-                               wege_col: g[1][wege_col].values.sum()}, 
-                where='id_teilflaeche = {}'.format(flaechen_id)
-            )
+            group = g[1]
+            flaechen_id = group[id_flaeche_col].unique()[0]
+            n_ways = (group[vfl_col] *
+                      group[besucher_sqm_col] *
+                      group[wege_je_besucher_col])
+            n_ways_miv = n_ways * group[pkw_perc_col] / 100
+            self.update_wege(flaechen_id, n_ways.sum(), n_ways_miv.sum())
