@@ -270,25 +270,38 @@ class DrawingTool(object):
         self.tbx = TbxInfrastruktur()
         self.tbx.getParameterInfo()
         
-    def commit_geometry(self, table, shape, element_id, additional_columns={}):
-        """insert geometry with spec. id into given table """
+    def show_output(self, redraw=False):
         self.tbx.par.projectname.value = config.active_project
-        if not self.tbx.tool.output.layer_exists(
+        if redraw or not self.tbx.tool.output.layer_exists(
             'Wirkungsbereich 5 - Infrastrukturfolgekosten'):
-            self.tbx.tool.add_output()
+            self.tbx.tool.add_output()        
+        
+    def commit_geometry(self, tablename, shape, element_id, additional_columns={}):
+        """insert geometry with spec. id into given table """
+        self.show_output()
         netz_id = self.netz_ids[element_id]
         project=config.active_project
-        gdb = folders.get_table(table, 
-                                workspace='FGDB_Kosten.gdb',
-                                project=project)
+        table = folders.get_table(tablename, 
+                                  workspace='FGDB_Kosten.gdb',
+                                  project=project)
         columns = (["SHAPE@", 'IDNetzelement', 'IDNetz'] +
                    additional_columns.keys())
         cursor = arcpy.da.InsertCursor(
-            gdb, columns)
+            table, columns)
         cursor.insertRow([shape, element_id, netz_id] +
                          additional_columns.values())
         del(cursor)
-        arcpy.RefreshActiveView()    
+        arcpy.RefreshActiveView()
+        
+    def get_ids(self, tablename): 
+        project=config.active_project
+        table = folders.get_table(tablename, 
+                                  workspace='FGDB_Kosten.gdb',
+                                  project=project)    
+        cursor = arcpy.da.SearchCursor(table, ['OBJECTID'])
+        ids = [row[0] for row in cursor]
+        del(cursor) 
+        return ids
 
 
 class LineTool(DrawingTool):
@@ -313,7 +326,8 @@ class PointTool(DrawingTool):
         
     def onMouseDownMap(self, x, y, button, shift):
         point_geometry = arcpy.Point(x, y)
-        desc = u'unbenannt @({x}, {y})'.format(x=x, y=y)
+        max_id = max(self.get_ids(self.table))
+        desc = u'Maßnahme {id} ({x}, {y})'.format(id=max_id, x=x, y=y)
         self.commit_geometry(
             self.table, point_geometry, self._id_netzelement,
             additional_columns={
@@ -394,6 +408,11 @@ class Stromleitung(LineTool):
 class LagePunktuelleMassnahmeElektrizitaet(PointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_elektrizitaet (Tool)"""
     _id_netzelement = 42
+
+
+class ErschliessungsnetzeAnzeigen(DrawingTool):
+    def onClick(self):
+        self.show_output(redraw=True)
 
 
 def delete_selected_elements(layer_name): 
@@ -540,5 +559,5 @@ class EinnahmeverschiebungenSchaetzen(object):
 
 
 if __name__ == "__main__":
-    t = DrawingTool()
-    t.commit_geometry(None, None, None)
+    t = PointTool()
+    t.get_ids(t.table)
