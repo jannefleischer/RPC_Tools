@@ -15,6 +15,8 @@ class MassnahmeBeschreiben(Tool):
 
 
 class TbxMassnahmeBeschreiben(Tbx):
+    table = 'Erschliessungsnetze_Punktelemente'
+    missing_msg = u'keine Maßnahmen vorhanden'
 
     @property
     def label(self):
@@ -24,9 +26,10 @@ class TbxMassnahmeBeschreiben(Tbx):
     def Tool(self):
         return MassnahmeBeschreiben
 
-    def _getParameterInfo(self):
-        # Projekt
+    def _getParameterInfo(self):        
         params = self.par
+        self.current_massnahme_id = None
+        
         p = self.add_parameter('projectname')
         p.name = u'Projekt'
         p.displayName = u'Projekt'
@@ -60,7 +63,7 @@ class TbxMassnahmeBeschreiben(Tbx):
     
         p = self.add_parameter('desc')
         p.name = encode(u'Bezeichnung der Maßnahme')
-        p.displayName = encode(u'Bezeichnung der Maßnahme')
+        p.displayName = encode(u'Bezeichnung der Maßnahme ändern')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
@@ -107,6 +110,10 @@ class TbxMassnahmeBeschreiben(Tbx):
         self.update_netzelement()
         self._recently_opened = True
         
+    def execute(self, parameters, messages):
+        self.commit_massnahme_changes()
+        super(TbxMassnahmeBeschreiben, self).execute(parameters, messages)
+        
     def get_punctual_elements(self):
         table = 'Netze_und_Netzelemente'
         columns = ('Netzelement', 'IDNetzelement')
@@ -118,51 +125,97 @@ class TbxMassnahmeBeschreiben(Tbx):
         return elements
         
     def update_netzelement(self):
+        idx = self.par.selected_index('massnahmen')
         netzelement = self.par.netzelement.value
         id_netzelement = self.elements[netzelement]
-        massnahmen = self.get_massnahmen(id_netzelement)
-        self.par.massnahmen.filter.list = massnahmen
+        names, self.massnahmen_ids = self.get_massnahmen(id_netzelement)
+        self.par.massnahmen.filter.list = names
+        if not names:
+            massnahme = self.missing_msg
+        else:
+            idx = max([0, idx])
+            massnahme = names[idx]
+        self.par.massnahmen.value = massnahme
+        self.current_massnahme_id = self.get_selected_massnahme_id()
+        self.update_massnahme()
         
     def get_massnahmen(self, id_netzelement):
-        table = 'Erschliessungsnetze_Punktelemente'
-        massnahmen = self.query_table(
-            table, columns=['Bezeichnung'],
+        rows = self.query_table(
+            self.table, columns=['Bezeichnung', 'OBJECTID'],
             where='IDNetzelement = {}'.format(id_netzelement))
-        return [m[0] for m in massnahmen]
+        if not rows:
+            return [], []
+        names, ids = zip(*rows)
+        return list(names), list(ids)
+    
+    def get_selected_massnahme_id(self): 
+        idx = self.par.selected_index('massnahmen')
+        id = self.massnahmen_ids[idx] if idx >= 0 else None
+        return id
         
     def update_massnahme(self):
         massnahme = self.par.massnahmen.value
-        self.par.desc.value = massnahme
-        table = 'Erschliessungsnetze_Punktelemente'
-        values = self.query_table(
-            table, columns=['Kosten_EH_EUR', 'Kosten_BU_EUR',
-                            'Kosten_EN_EUR', 'Lebensdauer'],
-            where="Bezeichnung = '{}'".format(massnahme))[0]
-        self.par.kosten_eh.value = values[0]
-        self.par.kosten_bu.value = values[1]
-        self.par.kosten_en.value = values[2]
-        self.par.lebensdauer.values = values[3]
+        enabled = True
+        if massnahme == self.missing_msg:
+            enabled = False
+            self.par.desc.value = ''
+        else: 
+            self.par.desc.value = massnahme
+            id = self.get_selected_massnahme_id()
+            values = self.query_table(
+                self.table, columns=['Kosten_EH_EUR', 'Kosten_BU_EUR',
+                                     'Kosten_EN_EUR', 'Lebensdauer'],
+                where="OBJECTID = {}".format(id))[0]
+            self.par.kosten_eh.value = values[0]
+            self.par.kosten_bu.value = values[1]
+            self.par.kosten_en.value = values[2]
+            self.par.lebensdauer.values = values[3]
+        self.par.massnahmen.enabled = enabled
+        self.par.desc.enabled = enabled
+        self.par.kosten_eh.enabled = enabled
+        self.par.kosten_bu.enabled = enabled
+        self.par.kosten_en.enabled = enabled
+        self.par.lebensdauer.enabled = enabled
 
     def _updateParameters(self, params):
         if params.changed('projectname'):
             self._open(params)
+            
+        if params.changed('netzelement', 'massnahmen', 'desc'):
+            if not self._recently_opened:
+                self.commit_massnahme_changes()
 
         if params.changed('netzelement') and self.par.netzelement.filter.list:
             self.update_netzelement()
-            
-        if params.changed('massnahmen') and self.par.massnahmen.filter.list:
-            # don't commit after toolbox just opened (else the defaults overwrite
-            # the actual settings)
-            if not self._recently_opened:
-                self.commit_changes()
-            self.update_massnahme() 
-            
-        self._recently_opened = False
-        return params    
 
-    def commit_changes(self):
-        pass
+        elif params.changed('massnahmen') and self.par.massnahmen.filter.list:
+            self.current_massnahme_id = self.get_selected_massnahme_id()
+            self.update_massnahme()
+
+        elif params.changed('desc'):
+            self.update_netzelement()
+            
+        
+        self._recently_opened = False
+        return params
+    
+    def commit_massnahme_changes(self):
+        id = self.current_massnahme_id
+        if id is None:
+            return
+        self.update_table(
+            self.table,
+            {'Bezeichnung': self.par.desc.value,
+             'Kosten_EH_EUR': self.par.kosten_eh.value,
+             'Kosten_BU_EUR': self.par.kosten_bu.value,
+             'Kosten_EN_EUR': self.par.kosten_en.value,
+             'Lebensdauer': self.par.lebensdauer.value
+             },
+            where="OBJECTID = {}".format(id)
+        )
     
 if __name__ == '__main__':
     t = TbxMassnahmeBeschreiben()
     params = t.getParameterInfo()
+    t.execute()
+    t.get_massnahmen(13)
