@@ -238,6 +238,9 @@ class DrawingTool(object):
         del(cursor)
         arcpy.RefreshActiveView()
         
+    def show_output(self, redraw=False):
+        infrastrukturmengen_bilanzieren.show_output(redraw=False)
+        
     def get_ids(self, tablename): 
         project=config.active_project
         table = folders.get_table(tablename, 
@@ -290,10 +293,10 @@ class Beschreibung(object):
         self.enabled = True
         self.checked = False
         self.path = os.path.join(folders.ANALYST_PYT_PATH,
-                                 'infrastrukturkosten.pyt')
+                                 'Infrastrukturkosten.pyt')
     def onClick(self):
         config.active_measure_id = self._id_netzelement
-        pythonaddins.GPToolDialog(self.path, 'TbxMassnahmeBeschreiben')
+        pythonaddins.GPToolDialog(self.path, 'TbxMassnahmenBeschreiben')
 
 
 class AnliegerstrasseInnere(LineTool):
@@ -445,7 +448,8 @@ class InfrastrukturmengenBilanzieren(object):
             self.tbx.tool.add_output()
             
     def onClick(self):
-        pass
+        self.tbx.par.projectname.value = config.active_project
+        self.tbx.execute()
 
 
 class ErschliessungsnetzeAnzeigen(object):
