@@ -7,8 +7,8 @@ from collections import OrderedDict
 from rpctools.utils.config import Folders, Config
 from rpctools.definitions.projektverwaltung.tbx_projektauswahl import \
      TbxProjektauswahl
-from rpctools.analyst.infrastrukturkosten.tbx_infrastruktur import \
-     TbxInfrastruktur
+from rpctools.analyst.infrastrukturkosten.tbx_infrastrukturmengenbilanz import \
+     TbxInfrastrukturmengenBilanz
 
 folders = Folders()
 config = Config()
@@ -48,14 +48,6 @@ class HebesaetzeGewerbesteuer(object):
 
 class HebesaetzeGrundsteuerB(object):
     """Implementation for rpc_tools.hebesaetze_grundsteuer_b (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class InfrastrukturmengenBilanzieren(object):
-    """Implementation for rpc_tools.infrastrukturmengen_bilanzieren (Button)"""
     def __init__(self):
         self.enabled = True
         self.checked = False
@@ -228,14 +220,6 @@ class DrawingTool(object):
         cursor = arcpy.da.SearchCursor(netz_table, ['IDNetzelement', 'IDNetz'])
         self.netz_ids = dict([row for row in cursor])
         self.cursor = 3
-        self.tbx = TbxInfrastruktur()
-        self.tbx.getParameterInfo()
-        
-    def show_output(self, redraw=False):
-        self.tbx.par.projectname.value = config.active_project
-        if redraw or not self.tbx.tool.output.layer_exists(
-            'Wirkungsbereich 5 - Infrastrukturfolgekosten'):
-            self.tbx.tool.add_output()        
         
     def commit_geometry(self, tablename, shape, element_id, additional_columns={}):
         """insert geometry with spec. id into given table """
@@ -407,11 +391,6 @@ class BeschreibungPunktuelleMassnahmeElektrizitaet(Beschreibung):
     _id_netzelement = 42
 
 
-class ErschliessungsnetzeAnzeigen(DrawingTool):
-    def onClick(self):
-        self.show_output(redraw=True)
-
-
 def delete_selected_elements(layer_name): 
     active = config.active_project
     layers = projekt_auswahl.tbx.tool.output.get_layers(
@@ -449,6 +428,33 @@ class PunktuelleMassnahmeLoeschen(object):
         self.checked = False
     def onClick(self):
         delete_selected_elements(u'Erschließungsnetz - punktuelle Maßnahmen')
+        
+
+class InfrastrukturmengenBilanzieren(object):
+    """Implementation for rpc_tools.infrastrukturmengen_bilanzieren (Button)"""
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.tbx = TbxInfrastrukturmengenBilanz()
+        self.tbx.getParameterInfo()
+        
+    def show_output(self, redraw=False):
+        self.tbx.par.projectname.value = config.active_project
+        if redraw or not self.tbx.tool.output.layer_exists(
+            'Wirkungsbereich 5 - Infrastrukturfolgekosten'):
+            self.tbx.tool.add_output()
+            
+    def onClick(self):
+        pass
+
+
+class ErschliessungsnetzeAnzeigen(object):
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        infrastrukturmengen_bilanzieren.show_output(redraw=True)
+
 
 
 ### NUTZUNGEN ###

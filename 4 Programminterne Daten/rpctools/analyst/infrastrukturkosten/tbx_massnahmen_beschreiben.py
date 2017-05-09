@@ -7,7 +7,7 @@ from rpctools.utils.encoding import encode
 from collections import OrderedDict
 
 
-class MassnahmeBeschreiben(Tool):
+class MassnahmenBeschreiben(Tool):
     _param_projectname = 'projectname'
     _dbname = 'FGDB_Kosten.gdb'
     
@@ -15,17 +15,17 @@ class MassnahmeBeschreiben(Tool):
         """"""
 
 
-class TbxMassnahmeBeschreiben(Tbx):
+class TbxMassnahmenBeschreiben(Tbx):
     table = 'Erschliessungsnetze_Punktelemente'
     missing_msg = u'keine Maßnahmen vorhanden'
 
     @property
     def label(self):
-        return encode(u'Schritt ?: Maßnahme beschreiben')
+        return encode(u'Schritt ?: Maßnahmen beschreiben')
 
     @property
     def Tool(self):
-        return MassnahmeBeschreiben
+        return MassnahmenBeschreiben
 
     def _getParameterInfo(self):        
         params = self.par
@@ -118,7 +118,7 @@ class TbxMassnahmeBeschreiben(Tbx):
         
     def execute(self, parameters, messages):
         self.commit_massnahme_changes()
-        super(TbxMassnahmeBeschreiben, self).execute(parameters, messages)
+        super(TbxMassnahmenBeschreiben, self).execute(parameters, messages)
         
     def get_punctual_elements(self):
         table = 'Netze_und_Netzelemente'
@@ -221,7 +221,7 @@ class TbxMassnahmeBeschreiben(Tbx):
         )
     
 if __name__ == '__main__':
-    t = TbxMassnahmeBeschreiben()
+    t = TbxMassnahmenBeschreiben()
     params = t.getParameterInfo()
     t.execute()
     t.get_massnahmen(13)
