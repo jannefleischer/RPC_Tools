@@ -6,6 +6,7 @@ from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 from collections import OrderedDict
 
+
 class MassnahmeBeschreiben(Tool):
     _param_projectname = 'projectname'
     _dbname = 'FGDB_Kosten.gdb'
@@ -107,6 +108,11 @@ class TbxMassnahmeBeschreiben(Tbx):
         return params
         
     def _open(self, params):
+        id_netzelement = self.config.active_measure_id
+        if id_netzelement is not None:
+            element_name = self.elements.keys()[
+                self.elements.values().index(id_netzelement)]
+            self.par.netzelement.value = element_name
         self.update_netzelement()
         self._recently_opened = True
         

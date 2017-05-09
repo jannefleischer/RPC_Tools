@@ -22,46 +22,6 @@ class ArbeitsplaetzeSchaetzen(object):
     def onClick(self):
         pass
 
-class BeschreibungPunktuelleMassnahmeElektrizitaet(object):
-    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class BeschreibungPunktuelleMassnahmeKanalisation(object):
-    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_kanalisation (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class BeschreibungPunktuelleMassnahmeStrasseAeussere(object):
-    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_strasse_auessere (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class BeschreibungPunktuelleMassnahmeStrasseInnere(object):
-    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_strasse_innere (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class BeschreibungPunktuelleMassnahmeTrinkwasser(object):
-    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
 class ElektrizitaetKostenaufteilung(object):
     """Implementation for rpc_tools.elektrizitaet_kostenaufteilung (Button)"""
     def __init__(self):
@@ -243,6 +203,7 @@ class ProjektLoeschen(object):
     def onClick(self):
         pythonaddins.GPToolDialog(self.path, 'TbxProjekteLoeschen')
 
+
 class RefreshLayers(object):
     def __init__(self):
         self.enabled = True
@@ -251,7 +212,7 @@ class RefreshLayers(object):
         projekt_auswahl.activate_project()
 
 
-### DRAWING TOOLS ###
+### NETZERSCHLIESSUNG ###
 
 
 class DrawingTool(object):
@@ -340,6 +301,17 @@ class PointTool(DrawingTool):
         )
 
 
+class Beschreibung(object):
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+        self.path = os.path.join(folders.ANALYST_PYT_PATH,
+                                 'infrastrukturkosten.pyt')
+    def onClick(self):
+        config.active_measure_id = self._id_netzelement
+        pythonaddins.GPToolDialog(self.path, 'TbxMassnahmeBeschreiben')
+
+
 class AnliegerstrasseInnere(LineTool):
     """Implementation for rpc_tools.anliegerstrasse_innere (Tool)"""
     _id_netzelement = 11
@@ -352,6 +324,11 @@ class SammelstrasseInnere(LineTool):
 
 class LagePunktuelleMassnahmeStrasseInnere(PointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_innere (Tool)"""
+    _id_netzelement = 13
+
+
+class BeschreibungPunktuelleMassnahmeStrasseInnere(Beschreibung):
+    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_strasse_innere (Button)"""
     _id_netzelement = 13
 
 
@@ -368,7 +345,12 @@ class SammelstrasseAeussere(LineTool):
 class LagePunktuelleMassnahmeStrasseAeussere(PointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_aeussere (Tool)"""
     _id_netzelement = 16
-    
+
+
+class BeschreibungPunktuelleMassnahmeStrasseAeussere(Beschreibung):
+    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_strasse_auessere (Button)"""
+    _id_netzelement = 16
+
 
 class KanalTrennsystem(LineTool):
     """Implementation for rpc_tools.kanal_trennsystem (Tool)"""
@@ -390,6 +372,11 @@ class LagePunktuelleMassnahmeKanalisation(PointTool):
     _id_netzelement = 24
 
 
+class BeschreibungPunktuelleMassnahmeKanalisation(Beschreibung):
+    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_kanalisation (Button)"""
+    _id_netzelement = 24
+
+
 class Trinkwasserleitung(LineTool):
     """Implementation for rpc_tools.trinkwasserleitung (Tool)"""
     _id_netzelement = 31
@@ -400,6 +387,11 @@ class LagePunktuelleMassnahmeTrinkwasser(PointTool):
     _id_netzelement = 32
 
 
+class BeschreibungPunktuelleMassnahmeTrinkwasser(Beschreibung):
+    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser (Button)"""
+    _id_netzelement = 32
+
+
 class Stromleitung(LineTool):
     """Implementation for rpc_tools.stromleitung (Tool)"""
     _id_netzelement = 41
@@ -407,6 +399,11 @@ class Stromleitung(LineTool):
 
 class LagePunktuelleMassnahmeElektrizitaet(PointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_elektrizitaet (Tool)"""
+    _id_netzelement = 42
+
+
+class BeschreibungPunktuelleMassnahmeElektrizitaet(Beschreibung):
+    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet (Button)"""
     _id_netzelement = 42
 
 
