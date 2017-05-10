@@ -384,7 +384,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         if self.par.changed('auto_select'):
             # auto calc. entry
             if auto_idx == 0:
-                #re_estimate = True
+                altered = True
                 params.arbeitsplaetze_insgesamt.enabled = False
             # manual entry
             else:
@@ -553,9 +553,10 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         pass
 
 if __name__ == '__main__':
-    t = TbxNutzungenWohnen()
+    t = TbxNutzungenGewerbe()
     params = t.getParameterInfo()
     t.par.projectname.value = t.config.active_project
+    t.tool.calculate_ways()
     t.tool.update_wege_projekt()
     t.tool.main(t.par, None)
     #df = t.table_to_dataframe('Teilflaechen_Plangebiet',

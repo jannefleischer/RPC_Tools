@@ -157,6 +157,7 @@ class NutzungenGewerbe(Nutzungen):
         wege_je_besch_col = u'Wege_je_Beschäftigten'
         flaechen_table = 'Teilflaechen_Plangebiet'
         branchen_table = 'Gewerbe_Branchen'
+        arbeitsplaetze_table = 'Gewerbe_Arbeitsplaetze'
         id_flaeche_col = 'IDTeilflaeche'
         n_jobs_col = 'anzahl_jobs_schaetzung'
         
@@ -166,22 +167,31 @@ class NutzungenGewerbe(Nutzungen):
         
         gew_table_df = self.parent_tbx.table_to_dataframe(gew_tablename)
         gew_table_df.rename(columns={'IDBranche': id_branche_col}, inplace=True)
+        
         branchen_table_df = self.parent_tbx.table_to_dataframe(
             branchen_table, workspace='FGDB_Definition_Projekt_Tool.gdb',
             is_base_table=True)
+        
+        arbeitsplaetze_table_df = self.parent_tbx.table_to_dataframe(
+            arbeitsplaetze_table)
         
         joined = gew_table_df.merge(branchen_table_df, on=id_branche_col,
                                     how='inner')
         
         grouped = joined.groupby(by=id_flaeche_col)
-        for g in grouped:
-            group = g[1]
-            flaechen_id = group[id_flaeche_col].unique()[0]
-            n_ways = group[n_jobs_col] * group[wege_je_besch_col]
-            n_ways_miv = n_ways * group[pkw_perc_col] / 100
+        for flaechen_id, group_data in grouped:
+            # the number of jobs as calculated resp. manually input in toolbox
+            idx = arbeitsplaetze_table_df[id_flaeche_col] == flaechen_id
+            preset = arbeitsplaetze_table_df.loc[idx]['Arbeitsplaetze'].values[0]
+            # the calculated number of jobs 
+            estimated = group_data[n_jobs_col]
+            # difference between calculated and preset values
+            cor_factor = preset / estimated.sum()
+            n_ways = estimated * cor_factor * group_data[wege_je_besch_col]
+            n_ways_miv = n_ways * group_data[pkw_perc_col] / 100
             self.update_wege_flaeche(flaechen_id, n_ways.sum(), n_ways_miv.sum())
 
-        
+
 class NutzungenEinzelhandel(Nutzungen):
     
     def run(self):
