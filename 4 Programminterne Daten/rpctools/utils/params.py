@@ -314,13 +314,13 @@ class Tbx(object):
         # self.update_projects is for)
         if (self.update_projects and
             self.par._get_param_project() is not None):
-            self._set_active_project()
+            self.set_active_project()
             # don't call _open of subclass if there is only one parameter
             if len(self.par) > 1:
                 self._open(self.par)
 
-    def _set_active_project(self):        
-        active_project = self.config.active_project
+    def set_active_project(self, projectname=None):
+        active_project = projectname or self.config.active_project
         # fix active project if it was set to test project by a tool
         # (may happen while testing)
         if active_project == self.folders._TEST_TMP_PROJECT:
@@ -425,6 +425,9 @@ class Tbx(object):
                 u'Folgende Pfade oder Tabellen wurden nicht gefunden: {}'
                 .format(invalid))
         self._updateMessages(self.par)
+        
+    def validate_inputs(self):
+        return ''
 
     def _updateMessages(self, parameters):
         """ to define in the subclass """

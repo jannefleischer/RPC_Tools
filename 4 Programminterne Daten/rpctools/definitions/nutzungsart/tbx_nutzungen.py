@@ -199,9 +199,6 @@ class TbxNutzungenWohnen(TbxNutzungen):
                           column_values={'WE_gesamt': we_sum}, 
                           where='id_teilflaeche={}'.format(tfl.flaechen_id))
 
-    def _updateMessages(self, params):
-        pass
-
 
 class TbxNutzungenGewerbe(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='b', name='Gewerbe')
@@ -474,9 +471,6 @@ class TbxNutzungenGewerbe(TbxNutzungen):
 
         self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
 
-    def _updateMessages(self, params):
-        pass
-
 
 class TbxNutzungenEinzelhandel(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='c', name='Einzelhandel')
@@ -559,9 +553,7 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         self.update_table('Teilflaechen_Plangebiet',
                           column_values={'VF_gesamt': sqm_sum}, 
                           where='id_teilflaeche={}'.format(tfl.flaechen_id))
-
-    def _updateMessages(self, params):
-        pass
+        
 
 if __name__ == '__main__':
     t = TbxNutzungenGewerbe()

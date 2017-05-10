@@ -3,6 +3,8 @@ import arcpy
 import pythonaddins
 import os
 from collections import OrderedDict
+from abc import ABCMeta, abstractproperty
+from imp import load_source
 
 from rpctools.utils.config import Folders, Config
 from rpctools.definitions.projektverwaltung.tbx_projektauswahl import \
@@ -121,15 +123,40 @@ class TrinkwasserKostenaufteilung(object):
 ### PROJECT MANAGEMENT ###
 
 
-class ProjektAnlegen(object):
-    """Implementation for rpc_tools.neues_projekt (Button)"""
-    def __init__(self):
+class ToolboxButton(object):
+    __metaclass__ = ABCMeta
+    _path = None
+    _pyt_file = None
+    _toolbox_name = None
+    
+    def __init__(self):    
         self.enabled = True
         self.checked = False
-        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
-                                 'Projektverwaltung.pyt')
+        self.path = os.path.join(self._path, self._pyt_file)
+        self._tbx = None
+        
+    @property
+    def tbx(self):
+        if not self._tbx:
+            tbx_module = load_source(self._toolbox_name, self.path)
+            self._tbx = getattr(tbx_module, self._toolbox_name)()
+            self._tbx.getParameterInfo()
+        return self._tbx
+    
     def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxProjektAnlegen')
+        self.tbx.set_active_project()
+        msg = self.tbx.validate_inputs()
+        if not msg:
+            pythonaddins.GPToolDialog(self.path, self._toolbox_name)
+        else:
+            pythonaddins.MessageBox(msg, 'Fehler', 0)
+
+
+class ProjektAnlegen(ToolboxButton):
+    """Implementation for rpc_tools.neues_projekt (Button)"""
+    _path = folders.DEFINITION_PYT_PATH
+    _pyt_file = 'Projektverwaltung.pyt'
+    _toolbox_name = 'TbxProjektAnlegen'
         
 
 class ProjektAuswahl(object):
@@ -474,14 +501,10 @@ class NutzungenDefinieren(object):
         pythonaddins.GPToolDialog(self.path, 'TbxTeilflaecheVerwalten')
 
 
-class Wohnen(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
-                                 'Projektdefinition.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenWohnen')
+class Wohnen(ToolboxButton):
+    _path = folders.DEFINITION_PYT_PATH
+    _pyt_file = 'Projektdefinition.pyt'
+    _toolbox_name = 'TbxNutzungenWohnen'
 
 
 class Gewerbe(object):

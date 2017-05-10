@@ -23,8 +23,8 @@ class Toolbox(object):
         self.alias = ''
         self.tools = [TbxVorberechnungen,
                       TbxEinrichtungen,
-					  TbxZentraleOrteOEPNV,
-					  TbxErreichbarkeitOEPNV,
-					  TbxErgebnisausgabe]
+                      TbxZentraleOrteOEPNV,
+                      TbxErreichbarkeitOEPNV,
+                      TbxErgebnisausgabe]
 
 
