@@ -274,7 +274,8 @@ class PointTool(DrawingTool):
         
     def onMouseDownMap(self, x, y, button, shift):
         point_geometry = arcpy.Point(x, y)
-        max_id = max(self.get_ids(self.table))
+        ids = self.get_ids(self.table)
+        max_id = max(ids) if ids else 0
         desc = u'Maßnahme {id} ({x}, {y})'.format(id=max_id, x=x, y=y)
         self.commit_geometry(
             self.table, point_geometry, self._id_netzelement,
@@ -458,7 +459,6 @@ class ErschliessungsnetzeAnzeigen(object):
         self.checked = False
     def onClick(self):
         infrastrukturmengen_bilanzieren.show_output(redraw=True)
-
 
 
 ### NUTZUNGEN ###
