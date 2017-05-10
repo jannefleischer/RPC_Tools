@@ -11,7 +11,7 @@ class Nutzungen(Tool):
     def run(self):        
         """"""
         
-    def update_wege_flaeche(self, flaechen_id, ways, ways_miv): 
+    def update_wege_flaeche(self, flaechen_id, ways, ways_miv):
         wege_col = 'Wege_gesamt'
         wege_miv_col = 'Wege_MIV'
         flaechen_table = 'Teilflaechen_Plangebiet'
@@ -185,8 +185,9 @@ class NutzungenGewerbe(Nutzungen):
             preset = arbeitsplaetze_table_df.loc[idx]['Arbeitsplaetze'].values[0]
             # the calculated number of jobs 
             estimated = group_data[n_jobs_col]
+            estimated_sum = estimated.sum()
             # difference between calculated and preset values
-            cor_factor = preset / estimated.sum()
+            cor_factor = preset / estimated_sum if estimated_sum > 0 else 0
             n_ways = estimated * cor_factor * group_data[wege_je_besch_col]
             n_ways_miv = n_ways * group_data[pkw_perc_col] / 100
             self.update_wege_flaeche(flaechen_id, n_ways.sum(), n_ways_miv.sum())

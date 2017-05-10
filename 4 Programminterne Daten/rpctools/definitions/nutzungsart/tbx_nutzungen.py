@@ -460,7 +460,11 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             for row in rows:
                 branche = self.branchen[row[0]]
                 self.par[branche.param_gewerbenutzung].value = row[1]
-                
+            table_jobs = 'Gewerbe_Arbeitsplaetze'
+            n_jobs = self.query_table(
+                table_jobs, columns=['Arbeitsplaetze'], pkey=pkey)[0][0]
+            self.par.arbeitsplaetze_insgesamt.value = n_jobs
+
         self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
 
     def _updateMessages(self, params):
