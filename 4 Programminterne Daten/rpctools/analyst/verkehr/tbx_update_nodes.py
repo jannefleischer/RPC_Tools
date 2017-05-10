@@ -31,7 +31,8 @@ class TbxUpdateNodes(Tbx):
 
         weight = self.query_table('Zielpunkte',
                                   ['Gewicht'],
-                                  where='node_id = {}'.format(params.choose_node.value))[0]
+                                  where='node_id = {}'.format(
+                                      params.choose_node.value))[0]
         params.new_weight.value = 0
         return
 
