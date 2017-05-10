@@ -349,8 +349,8 @@ class Area(object):
     def __init__(self, source_id):
         self.source_id = source_id
         self.trips = 1
-        
-        
+
+
 class Areas(OrderedDict):
     """All Areas"""
     def add_area(self, source_id):
@@ -360,10 +360,10 @@ class Areas(OrderedDict):
 
 class OTPRouter(object):
     def __init__(self, workspace, epsg=31467):
-        self.url = r'https://rpcrouting.ggr-planung.de/otp/routers/hvv_car/plan'
+        self.url = r'https://projektcheck.ggr-planung.de/otp/routers/deutschland/plan'
         self.ws = workspace
         #self.ws = r'F:\Projekte SH\RPC Tools\4 Programminterne Daten\templates\Template\FGDB_Verkehr.gdb'
-        self.router = 'hvv_car'
+        self.router = 'deutschland'
         self.epsg = epsg
         self.p1 = Proj(init='epsg:4326')
         self.p2 = Proj(init='epsg:{}'.format(self.epsg))
@@ -372,12 +372,12 @@ class OTPRouter(object):
         self.routes = Routes()
         self.transfer_nodes = TransferNodes()
         self.areas = Areas()
-        
+
     def dump(self, filename):
         """write myself to dumpfile"""
         with open(filename, 'wb') as f:
             dump(self, f, protocol=-1)
-            
+
     @classmethod
     def from_dump(cls, filename, workspace=''):
         """"""
@@ -386,7 +386,7 @@ class OTPRouter(object):
         if workspace:
             self.ws = workspace
         return self
-            
+
     def __repr__(self):
         """A string representation"""
         text = 'OTPRouter with {n} nodes, {r} routes and {t} transfer nodes'
