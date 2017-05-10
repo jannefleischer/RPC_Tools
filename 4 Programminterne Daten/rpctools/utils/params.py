@@ -845,15 +845,7 @@ class Tbx(object):
         else: 
             table_name = os.path.basename(table_name)
             workspace = os.path.basename(workspace) or self.tool._dbname
-            table_path = self.folders.get_table(table_name, workspace=workspace,
-                                                project=project)
-            if workspace in self._temporary_gdbs:
-                temp_db = self.folders.get_temporary_db(workspace=workspace,
-                                                        check=False)
-                # only query temp. db if it exists (created on demand in update)
-                if arcpy.Exists(temp_db):
-                    table_path = self.folders.get_temporary_table(
-                        table_name, workspace=workspace)
+            table_path = self._get_table_path(table_name, workspace)            
             rows = self._query_table(table_path, columns=columns, where=where, 
                                      pkey=pkey)
         return rows
