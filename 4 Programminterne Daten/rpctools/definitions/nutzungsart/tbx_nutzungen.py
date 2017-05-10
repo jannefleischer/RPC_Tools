@@ -461,8 +461,15 @@ class TbxNutzungenGewerbe(TbxNutzungen):
                 branche = self.branchen[row[0]]
                 self.par[branche.param_gewerbenutzung].value = row[1]
             table_jobs = 'Gewerbe_Arbeitsplaetze'
-            n_jobs = self.query_table(
-                table_jobs, columns=['Arbeitsplaetze'], pkey=pkey)[0][0]
+            auto_idx = self.par.auto_select.filter.list.index(
+                self.par.auto_select.value)
+            # custom settings -> load from db
+            if auto_idx == 1:                
+                n_jobs = self.query_table(
+                    table_jobs, columns=['Arbeitsplaetze'], pkey=pkey)[0][0]
+            # auto calc. -> estimate jobs
+            else:
+                n_jobs = self.estimate_jobs()
             self.par.arbeitsplaetze_insgesamt.value = n_jobs
 
         self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
