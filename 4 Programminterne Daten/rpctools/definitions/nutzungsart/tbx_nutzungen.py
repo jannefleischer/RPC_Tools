@@ -556,6 +556,7 @@ if __name__ == '__main__':
     t = TbxNutzungenWohnen()
     params = t.getParameterInfo()
     t.par.projectname.value = t.config.active_project
+    t.tool.update_wege_projekt()
     t.tool.main(t.par, None)
     #df = t.table_to_dataframe('Teilflaechen_Plangebiet',
                               #workspace='FGDB_Definition_Projekt.gdb')

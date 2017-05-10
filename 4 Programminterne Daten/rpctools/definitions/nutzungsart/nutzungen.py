@@ -11,7 +11,7 @@ class Nutzungen(Tool):
     def run(self):        
         """"""
         
-    def update_wege(self, flaechen_id, ways, ways_miv): 
+    def update_wege_flaeche(self, flaechen_id, ways, ways_miv): 
         wege_col = 'Wege_gesamt'
         wege_miv_col = 'Wege_MIV'
         flaechen_table = 'Teilflaechen_Plangebiet'
@@ -21,15 +21,38 @@ class Nutzungen(Tool):
             column_values={wege_miv_col: ways_miv.sum(),
                            wege_col: ways.sum()}, 
             where='{} = {}'.format(flaechen_id_col, flaechen_id)
-        )            
+        )
+        
+    def update_wege_projekt(self):
+        '''updates the table "Wege_je_Nutzung" by summing up the calculated
+        ways for all areas with Nutzungsart defined for toolbox'''
+        flaechen_table = 'Teilflaechen_Plangebiet'
+        flaechen_id_col = 'id_teilflaeche'
+        wege_table = 'Wege_je_Nutzung'
+        
+        nutzungsart = self.parent_tbx._nutzungsart
+        flaechen_df = self.parent_tbx.table_to_dataframe(
+            flaechen_table, columns=['Wege_gesamt', 'Wege_MIV'],
+            where='Nutzungsart={}'.format(nutzungsart))
+        ways_sum = flaechen_df['Wege_gesamt'].sum()
+        ways_miv_sum = flaechen_df['Wege_MIV'].sum()
+        pkw_anteil = (float(ways_miv_sum) / ways_sum) * 100 if ways_sum > 0 else 0
+        self.parent_tbx.upsert_row_in_table(
+            wege_table, 
+            {'Wege_gesamt': ways_sum,
+             'PKW_Anteil': pkw_anteil},
+            {'Nutzungsart': nutzungsart}, 
+            workspace='FGDB_Verkehr.gdb')
+        
         
 class NutzungenWohnen(Nutzungen):
 
     def run(self):
         """"""
-        self.calculate_we()
+        self.calculate_we_ways()
+        self.update_wege_projekt()
         
-    def calculate_we(self):        
+    def calculate_we_ways(self):        
         tbx = self.parent_tbx
     
         # table and column names        
@@ -84,7 +107,7 @@ class NutzungenWohnen(Nutzungen):
             n_ew = group[ew_col] * group[we_col]
             n_ways = n_ew * group[wege_je_ew_col]
             n_ways_miv = n_ways * group[pkw_perc_col] / 100
-            self.update_wege(flaechen_id, n_ways.sum(), n_ways_miv.sum())
+            self.update_wege_flaeche(flaechen_id, n_ways.sum(), n_ways_miv.sum())
         
         ### Structure and age ###
         
@@ -126,6 +149,7 @@ class NutzungenGewerbe(Nutzungen):
     
     def run(self):
         self.calculate_ways()
+        self.update_wege_projekt()
         
     def calculate_ways(self):
         pkw_perc_col = 'Anteil_Pkw_Fahrer'
@@ -155,13 +179,14 @@ class NutzungenGewerbe(Nutzungen):
             flaechen_id = group[id_flaeche_col].unique()[0]
             n_ways = group[n_jobs_col] * group[wege_je_besch_col]
             n_ways_miv = n_ways * group[pkw_perc_col] / 100
-            self.update_wege(flaechen_id, n_ways.sum(), n_ways_miv.sum())
+            self.update_wege_flaeche(flaechen_id, n_ways.sum(), n_ways_miv.sum())
 
         
 class NutzungenEinzelhandel(Nutzungen):
     
     def run(self):
         self.calculate_ways()
+        self.update_wege_projekt()
         
     def calculate_ways(self): 
         besucher_sqm_col = 'Besucher_je_qm_Vfl'
@@ -194,4 +219,4 @@ class NutzungenEinzelhandel(Nutzungen):
                       group[besucher_sqm_col] *
                       group[wege_je_besucher_col])
             n_ways_miv = n_ways * group[pkw_perc_col] / 100
-            self.update_wege(flaechen_id, n_ways.sum(), n_ways_miv.sum())
+            self.update_wege_flaeche(flaechen_id, n_ways.sum(), n_ways_miv.sum())
