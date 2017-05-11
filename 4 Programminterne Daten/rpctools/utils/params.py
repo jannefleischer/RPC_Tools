@@ -848,7 +848,7 @@ class Tbx(object):
         else: 
             table_name = os.path.basename(table_name)
             workspace = os.path.basename(workspace) or self.tool._dbname
-            table_path = self._get_table_path(table_name, workspace)            
+            table_path = self._get_table_path(table_name, workspace)
             rows = self._query_table(table_path, columns=columns, where=where, 
                                      pkey=pkey)
         return rows
@@ -874,7 +874,7 @@ class Tbx(object):
             in columns argument
         """
         where = where or self.get_where_clause(pkey)
-        if not arcpy.Exists(table_path):
+        if not table_path or not arcpy.Exists(table_path):
             return []
         if not columns:
             columns = [f.name for f in arcpy.ListFields(table_path)]
