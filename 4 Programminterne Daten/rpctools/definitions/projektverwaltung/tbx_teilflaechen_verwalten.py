@@ -204,8 +204,8 @@ class TbxFlaechendefinition(Tbx):
                 self.nutzungsarten.values().index(self._nutzungsart)]
             msg = (u'Keine Teilflächen mit der '
                    u'Nutzungsart "{}" definiert.'.format(nutzung))
-            return msg
-        return ''
+            return False, msg
+        return True, ''
 
     def update_teilflaechen(self, nutzungsart=None):
         """update the parameter list of teilflaeche (opt. filter nutzungsart)"""
@@ -238,8 +238,8 @@ class TbxFlaechendefinition(Tbx):
         self.par.teilflaeche.value = flaeche
         
     def _updateMessages(self, params):
-        msg = self.validate_inputs()
-        if msg:
+        valid, msg = self.validate_inputs()
+        if not valid:
             self.par.projectname.setErrorMessage(msg)
 
 class TbxTeilflaecheVerwalten(TbxFlaechendefinition):

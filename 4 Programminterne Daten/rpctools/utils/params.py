@@ -427,7 +427,7 @@ class Tbx(object):
         self._updateMessages(self.par)
         
     def validate_inputs(self):
-        return ''
+        return True, ''
 
     def _updateMessages(self, parameters):
         """ to define in the subclass """

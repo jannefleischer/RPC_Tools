@@ -40,7 +40,10 @@ class TbxNutzungen(TbxFlaechendefinition):
         """WORKAROUND: add the "aufsiedlung" parameters outside of
         _getParameterInfo, strangely instances of TbxNutzungen are
         not recognized as subclasses TbxFlaechendefinition (so you can't call 
-        _getParameterInfo of TbxFlaechendefinition here)"""
+        _getParameterInfo of TbxFlaechendefinition here)
+        Note: thats because of the reloads, as long as reloading is done in
+        pyt-files, the subclasses which are  directly derived from the reloaded
+        classes are not recognized as their subclasses"""
 
         # Beginn der Aufsiedlung (Jahreszahl)
         param = self.add_parameter('bezugsbeginn')

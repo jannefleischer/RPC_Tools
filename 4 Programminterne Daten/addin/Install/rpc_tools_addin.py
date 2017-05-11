@@ -14,15 +14,6 @@ from rpctools.analyst.infrastrukturkosten.tbx_infrastrukturmengenbilanz import \
 
 folders = Folders()
 config = Config()
-    
-
-class ArbeitsplaetzeSchaetzen(object):
-    """Implementation for rpc_tools.arbeitsplaetze_schaetzen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
 
 class ElektrizitaetKostenaufteilung(object):
     """Implementation for rpc_tools.elektrizitaet_kostenaufteilung (Button)"""
@@ -140,6 +131,7 @@ class ToolboxButton(object):
         
     @property
     def tbx(self):
+        """the instanciated toolbox (load on demand only)"""
         if not self._tbx:
             tbx_module = load_source(self._toolbox_name, self.path)
             self._tbx = getattr(tbx_module, self._toolbox_name)()
@@ -147,14 +139,17 @@ class ToolboxButton(object):
         return self._tbx
     
     def onClick(self):
+        """call toolbox on click"""
+        # validate active project
         self.tbx.set_active_project()
-        msg = self.tbx.validate_inputs()
-        if not msg:
-            # let the GUI build and instance of the toolbox and show it
+        valid, msg = self.tbx.validate_inputs()
+        # call toolbox
+        if valid:
+            # let the GUI build an instance of the toolbox to show it
             # (regular call of updateParameters etc. included)
             if self._do_show:
                 pythonaddins.GPToolDialog(self.path, self._toolbox_name)
-            # execute main function of Tool only
+            # execute main function of Tool only (no updates etc. possible)
             else:
                 self.tbx.execute()
         else:
@@ -180,6 +175,8 @@ class ProjektAuswahl(object):
         self.width = 'WWWWWW'
         self.tbx = TbxProjektauswahl()
         self.tbx.getParameterInfo()
+        # connect the change of the active project to a refresh of the project- 
+        # list (esp. to auto. select the active project)
         config.on_change('active_project', lambda active: self.refresh())
         self.refresh()
 
@@ -193,18 +190,13 @@ class ProjektAuswahl(object):
             project = self.value
         self.tbx.par.active_project.value = project
         self.tbx.execute()
-
-    def onEditChange(self, text):
-        pass
-
+        
     def onFocus(self, focused):
         if focused:
             self.refresh()
-
-    def onEnter(self):
-        pass
-
+            
     def refresh(self):
+        """refresh the list of available projects and select the active one"""
         projects = folders.get_projects()
         self.items = sorted(projects)
         active = config.active_project
@@ -218,7 +210,7 @@ class ProjektKopieren(ToolboxButton):
     _path = folders.DEFINITION_PYT_PATH
     _pyt_file = 'Projektverwaltung.pyt'
     _toolbox_name = 'TbxProjektKopieren'
-        
+
 
 class ProjektLoeschen(ToolboxButton):
     """Implementation for rpc_tools.projekt_loeschen (Button)"""
@@ -235,7 +227,7 @@ class RefreshLayers(object):
         projekt_auswahl.activate_project()
 
 
-### NETZERSCHLIESSUNG ###
+### NETZERSCHLIESSUNG / INFRASTRUKTUR ###
 
 
 class DrawingTool(object):
@@ -284,7 +276,6 @@ class DrawingTool(object):
 
 
 class LineTool(DrawingTool):
-    _id_netzelement = None
     table = 'Erschliessungsnetze_Linienelemente'
     
     def __init__(self):
@@ -296,7 +287,6 @@ class LineTool(DrawingTool):
 
 
 class PointTool(DrawingTool):
-    _id_netzelement = None
     table = 'Erschliessungsnetze_Punktelemente'
     
     def __init__(self):
@@ -523,6 +513,13 @@ class BewohnerSchaetzen(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Bewohner_Arbeitsplaetze.pyt'
     _toolbox_name = 'TbxBewohner'
+    
+
+class ArbeitsplaetzeSchaetzen(ToolboxButton):
+    """Implementation for rpc_tools.arbeitsplaetze_schaetzen (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Bewohner_Arbeitsplaetze.pyt'
+    _toolbox_name = 'TbxArbeitsplaetze'
 
 
 ### EINNAHMEN ###
