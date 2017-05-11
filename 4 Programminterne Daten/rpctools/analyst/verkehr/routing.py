@@ -30,19 +30,44 @@ class Routing(Tool):
             Input_Features=tmp_table, Geometry_Properties="CENTROID_INSIDE",
             Coordinate_System=4326)
 
-        # get centroid coordinates
-        columns = ['id_teilflaeche', 'INSIDE_X', 'INSIDE_Y']
+        # get data from Teilflaechen_Plangebiet table
+        columns = ['id_teilflaeche', 'INSIDE_X', 'INSIDE_Y', 'Wege_gesamt',
+                   'Nutzungsart']
         cursor = arcpy.da.SearchCursor(tmp_table, columns)
-        XY_INSIDE = [row for row in cursor]
+        data_tfl = [row for row in cursor]
         del cursor
         arcpy.Delete_management(tmp_table)
+        # get data from Wege_je_nutzung table
+        data_wjn = toolbox.query_table('Wege_je_nutzung',
+                                       columns=['Nutzungsart', 'Wege_gesamt',
+                                                'PKW_Anteil'])
+
+        def calc_trips(data_tfl, data_wjn):
+            for i in range(len(data_wjn)):
+                tou = data_wjn[i][0]  # type of use
+                # trips * %cars
+                trips_by_car = data_wjn[i][1] * data_wjn[i][2] / 100
+                tfl_id_with_tou = []
+                total_trips_for_tou = 0
+                for j in range(len(data_tfl)):
+                    source_id, x_coord, y_coord, trips, tfl_use = data_tfl[j]
+                    if tou == tfl_use:
+                        tfl_id_with_tou.append(j)
+                        total_trips_for_tou += trips
+                for tfl_id in tfl_id_with_tou:
+                    source_id, x_coord, y_coord, trips, tfl_use = data_tfl[tfl_id]
+                    trips = trips_by_car * trips / total_trips_for_tou
+                    data_tfl[tfl_id] = (source_id, x_coord, y_coord, trips, tfl_use)
+            return data_tfl
+
+        data_tfl = calc_trips(data_tfl, data_wjn)
 
         # calculate routes
         workspace = self.folders.get_db()
         o = OTPRouter(workspace)
         r_id = 0
-        for centroid in XY_INSIDE:
-            source_id, x_coord, y_coord = centroid
+        for single_tfl in data_tfl:
+            source_id, x_coord, y_coord, trips, tfl_use = single_tfl
 
             o.areas.add_area(source_id, trips=trips)
             # ? lat = y lon = x
