@@ -43,6 +43,8 @@ class Routing(Tool):
         r_id = 0
         for centroid in XY_INSIDE:
             source_id, x_coord, y_coord = centroid
+
+            o.areas.add_area(source_id, trips=trips)
             # ? lat = y lon = x
             source = Point(lat=y_coord, lon=x_coord)    # centroid
             # calculate segments around centroid
@@ -65,7 +67,7 @@ class Routing(Tool):
         o.create_node_features()
         print o.transfer_nodes.keys()
         o.create_transfer_node_features()
-        
+
         o.dump(self.folders.get_otp_pickle_filename(check=False))
 
         # Empty column for manual changes of weigths

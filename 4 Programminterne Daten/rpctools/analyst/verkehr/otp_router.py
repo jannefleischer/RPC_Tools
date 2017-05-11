@@ -346,16 +346,16 @@ class Link(object):
 
 class Area(object):
     """Teilfläche"""
-    def __init__(self, source_id):
+    def __init__(self, source_id, trips=1):
         self.source_id = source_id
-        self.trips = 1
+        self.trips = trips
 
 
 class Areas(OrderedDict):
     """All Areas"""
-    def add_area(self, source_id):
+    def add_area(self, source_id, trips=1):
         """"""
-        self[source_id] = Area(source_id)
+        self[source_id] = Area(source_id, trips)
 
 
 class OTPRouter(object):
