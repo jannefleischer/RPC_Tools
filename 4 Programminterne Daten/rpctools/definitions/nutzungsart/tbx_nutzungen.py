@@ -406,8 +406,11 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             table = self.tablename
             pkey = {'IDTeilflaeche': tfl.flaechen_id,
                     'IDBranche': branche.id}
-            column_values = {'anteil': job_param.value,
-                             'anzahl_jobs_schaetzung': branche.estimated_jobs}
+            column_values = {
+                'anteil': job_param.value,
+                'anzahl_jobs_schaetzung': branche.estimated_jobs,
+                'dichtekennwert_ap_pro_ha_brutto': branche.jobs_per_ha
+            }
             r = self.upsert_row_in_table(table, column_values, pkey)
             
         table_jobs = 'Gewerbe_Arbeitsplaetze'
@@ -433,8 +436,8 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         kennwerte = self.dichtekennwerte[gemeindetyp]
         for branche in self.branchen.itervalues():
             param = self.par[branche.param_gewerbenutzung]
-            jobs_per_ha = kennwerte[branche.id]
-            jobs_branche = tfl.ha * (param.value / 100.) * jobs_per_ha
+            branche.jobs_per_ha = kennwerte[branche.id]
+            jobs_branche = tfl.ha * (param.value / 100.) * branche.jobs_per_ha
             branche.estimated_jobs = jobs_branche
             jobs_sum += jobs_branche
         

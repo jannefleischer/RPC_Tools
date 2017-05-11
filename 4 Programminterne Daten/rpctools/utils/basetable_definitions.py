@@ -91,6 +91,7 @@ class Branche(object):
         self.param_gewerbenutzung = param_gewerbenutzung
         self.default_gewerbenutzung = default_gewerbenutzung
         self.estimated_jobs = 0
+        self.jobs_per_ha = 0
 
 
 class Branchen(OrderedDict):
