@@ -7,16 +7,12 @@ import sys
 from rpctools.definitions.projektverwaltung import tbx_teilflaechen_verwalten
 reload(tbx_teilflaechen_verwalten)
 
-
-from rpctools.definitions.nutzungsart import (tbx_flaechenbilanz,
-                                              tbx_nutzungen)
-reload(tbx_flaechenbilanz)
+from rpctools.definitions.nutzungsart import (tbx_nutzungen)
 reload(tbx_nutzungen)
 
 from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten \
      import TbxTeilflaecheVerwalten
 
-#from rpctools.definitions.nutzungsart.tbx_flaechenbilanz import TbxFlaechenbilanz
 from rpctools.definitions.nutzungsart.tbx_nutzungen import (
     TbxNutzungenWohnen, TbxNutzungenGewerbe, TbxNutzungenEinzelhandel)
 
@@ -26,7 +22,6 @@ class Toolbox(object):
         self.label = u'Projekte definieren'
         self.alias = ''
         self.tools = [TbxTeilflaecheVerwalten,
-                      #TbxFlaechenbilanz,
                       TbxNutzungenWohnen,
                       TbxNutzungenGewerbe,
                       TbxNutzungenEinzelhandel]
