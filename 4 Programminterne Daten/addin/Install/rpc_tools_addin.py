@@ -120,14 +120,17 @@ class TrinkwasserKostenaufteilung(object):
         pass
 
 
-### PROJECT MANAGEMENT ###
-
-
 class ToolboxButton(object):
+    """super class for buttons calling toolboxes on click"""
     __metaclass__ = ABCMeta
+    # path to pyt file
     _path = None
+    # the pyt importing the required toolbox
     _pyt_file = None
+    # the class name of the toolbox (as imported in the pyt file)
     _toolbox_name = None
+    # show the toolbox on click (if False, just execute the Tool)
+    _do_show = True
     
     def __init__(self):    
         self.enabled = True
@@ -147,9 +150,18 @@ class ToolboxButton(object):
         self.tbx.set_active_project()
         msg = self.tbx.validate_inputs()
         if not msg:
-            pythonaddins.GPToolDialog(self.path, self._toolbox_name)
+            # let the GUI build and instance of the toolbox and show it
+            # (regular call of updateParameters etc. included)
+            if self._do_show:
+                pythonaddins.GPToolDialog(self.path, self._toolbox_name)
+            # execute main function of Tool only
+            else:
+                self.tbx.execute()
         else:
             pythonaddins.MessageBox(msg, 'Fehler', 0)
+
+
+### PROJECT MANAGEMENT ###
 
 
 class ProjektAnlegen(ToolboxButton):
@@ -201,26 +213,18 @@ class ProjektAuswahl(object):
         self.value = active
         
 
-class ProjektKopieren(object):
+class ProjektKopieren(ToolboxButton):
     """Implementation for rpc_tools.projekt_kopieren (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
-                                 'Projektverwaltung.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxProjektKopieren')
+    _path = folders.DEFINITION_PYT_PATH
+    _pyt_file = 'Projektverwaltung.pyt'
+    _toolbox_name = 'TbxProjektKopieren'
         
 
-class ProjektLoeschen(object):
+class ProjektLoeschen(ToolboxButton):
     """Implementation for rpc_tools.projekt_loeschen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
-                                 'Projektverwaltung.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxProjekteLoeschen')
+    _path = folders.DEFINITION_PYT_PATH
+    _pyt_file = 'Projektverwaltung.pyt'
+    _toolbox_name = 'TbxProjekteLoeschen'
 
 
 class RefreshLayers(object):
@@ -316,15 +320,16 @@ class PointTool(DrawingTool):
         )
 
 
-class Beschreibung(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.ANALYST_PYT_PATH,
-                                 'Infrastrukturkosten.pyt')
+class Beschreibung(ToolboxButton):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxMassnahmenBeschreiben'
+    
     def onClick(self):
+        # no way to directly tell the toolbox the id of the measure
+        # -> take the Config-singleton as a container to pass it
         config.active_measure_id = self._id_netzelement
-        pythonaddins.GPToolDialog(self.path, 'TbxMassnahmenBeschreiben')
+        super(Beschreibung, self).onClick()
 
 
 class AnliegerstrasseInnere(LineTool):
@@ -461,23 +466,18 @@ class PunktuelleMassnahmeLoeschen(object):
         delete_selected_elements(u'Erschließungsnetz - punktuelle Maßnahmen')
         
 
-class InfrastrukturmengenBilanzieren(object):
+class InfrastrukturmengenBilanzieren(ToolboxButton):
     """Implementation for rpc_tools.infrastrukturmengen_bilanzieren (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.tbx = TbxInfrastrukturmengenBilanz()
-        self.tbx.getParameterInfo()
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxInfrastrukturmengenBilanz'
+    _do_show = False
         
     def show_output(self, redraw=False):
-        self.tbx.par.projectname.value = config.active_project
+        self.tbx.set_active_project()
         if redraw or not self.tbx.tool.output.layer_exists(
             'Wirkungsbereich 5 - Infrastrukturfolgekosten'):
             self.tbx.tool.add_output()
-            
-    def onClick(self):
-        self.tbx.par.projectname.value = config.active_project
-        self.tbx.execute()
 
 
 class ErschliessungsnetzeAnzeigen(object):
@@ -491,14 +491,10 @@ class ErschliessungsnetzeAnzeigen(object):
 ### NUTZUNGEN ###
 
 
-class NutzungenDefinieren(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
-                                 'Projektdefinition.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxTeilflaecheVerwalten')
+class NutzungenDefinieren(ToolboxButton):
+    _path = folders.DEFINITION_PYT_PATH
+    _pyt_file = 'Projektdefinition.pyt'
+    _toolbox_name = 'TbxTeilflaecheVerwalten'
 
 
 class Wohnen(ToolboxButton):
@@ -507,85 +503,57 @@ class Wohnen(ToolboxButton):
     _toolbox_name = 'TbxNutzungenWohnen'
 
 
-class Gewerbe(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
-                                 'Projektdefinition.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenGewerbe')
+class Gewerbe(ToolboxButton):
+    _path = folders.DEFINITION_PYT_PATH
+    _pyt_file = 'Projektdefinition.pyt'
+    _toolbox_name = 'TbxNutzungenGewerbe'
 
 
-class Einzelhandel(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.DEFINITION_PYT_PATH,
-                                 'Projektdefinition.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxNutzungenEinzelhandel')
+class Einzelhandel(ToolboxButton):
+    _path = folders.DEFINITION_PYT_PATH
+    _pyt_file = 'Projektdefinition.pyt'
+    _toolbox_name = 'TbxNutzungenEinzelhandel'
 
 
 ### BEWOHNER ARBEISTPLAETZE ###
 
 
-class BewohnerSchaetzen(object):
+class BewohnerSchaetzen(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.ANALYST_PYT_PATH,
-                                 'Bewohner_Arbeitsplaetze.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxBewohner')
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Bewohner_Arbeitsplaetze.pyt'
+    _toolbox_name = 'TbxBewohner'
 
 
 ### EINNAHMEN ###
 
 
-class WanderungssaldenSchaetzen(object):
+class WanderungssaldenSchaetzen(ToolboxButton):
     """Implementation for rpc_tools.wanderungssalden_schaetzen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.ANALYST_PYT_PATH,
-                                 'Einnahmen.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxWanderungssalden')
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Einnahmen.pyt'
+    _toolbox_name = 'TbxWanderungssalden'
 
 
-class Einwohnersalden(object):
+class Einwohnersalden(ToolboxButton):
     """Implementation for rpc_tools.einwohnersalden (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.ANALYST_PYT_PATH,
-                                 'Einnahmen.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxEWSaldenbearbeiten')
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Einnahmen.pyt'
+    _toolbox_name = 'TbxEWSaldenbearbeiten'
 
 
-class Beschaeftigtensalden(object):
+class Beschaeftigtensalden(ToolboxButton):
     """Implementation for rpc_tools.beschaeftigtensalden (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.ANALYST_PYT_PATH,
-                                 'Einnahmen.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxGewSaldenbearbeiten')
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Einnahmen.pyt'
+    _toolbox_name = 'TbxGewSaldenbearbeiten'
 
 
-class EinnahmeverschiebungenSchaetzen(object):
+class EinnahmeverschiebungenSchaetzen(ToolboxButton):
     """Implementation for rpc_tools.einnahmeverschiebungen_schaetzen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-        self.path = os.path.join(folders.ANALYST_PYT_PATH,
-                                 'Einnahmen.pyt')
-    def onClick(self):
-        pythonaddins.GPToolDialog(self.path, 'TbxSteuersalden')
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Einnahmen.pyt'
+    _toolbox_name = 'TbxSteuersalden'
 
 
 if __name__ == "__main__":
