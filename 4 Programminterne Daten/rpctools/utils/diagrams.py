@@ -1,5 +1,6 @@
 import subprocess
 import os
+from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 plt.rcdefaults()
 import numpy as np
@@ -15,6 +16,13 @@ class Dummy(Tool):
 
 
 class Diagram(Tbx):
+    
+    def __init__(self, title='Titel'):
+        """
+        title : str
+        """
+        super(Diagram, self).__init__()
+        self.title = title
         
     def show(self):
         plt.show()
@@ -46,60 +54,28 @@ class Diagram(Tbx):
         return Dummy
     
     def run(self, projectname=''):
+        clsname = type(self).__name__
+        module = self.__module__
         subprocess.Popen(
             [os.path.join(sys.exec_prefix, 'python.exe'),
-            __file__, type(self).__name__, projectname], shell=True)
-    
+            '-m' , module, '-p', projectname, '-c', clsname], shell=True)
 
-class InfrastrukturBilanzKosten(Diagram):
+def show_diagram(my_globals):
+    """
+    Show diagram in a subprocess
     
-    def _create(self):
-        _point_table = 'Erschliessungsnetze_Punktelemente'
+    Parameters
+    ----------
+    my_globals: dict
+        a dict with the globals of the calling module
         
-        point_df = self.table_to_dataframe(
-            _point_table, workspace='FGDB_Kosten.gdb')
-        base_df = self.table_to_dataframe(
-            'Netze_und_Netzelemente', workspace='FGDB_Kosten_Tool.gdb',
-            columns=['IDNetz', 'Netz'], 
-            is_base_table=True
-        )
-        base_df.drop_duplicates(inplace=True)
-
-        joined = point_df.merge(base_df, on='IDNetz', how='right')
-        joined.fillna(0, inplace=True)
-        grouped = joined.groupby(by='IDNetz')
-        columns = ['Netz', 'Kosten_EH_EUR']
-        categories = []
-        costs = []
-        for id_netz, grouped_df in grouped:
-            categories.append(grouped_df['Netz'].values[0])
-            costs.append(grouped_df['Kosten_EH_EUR'].sum())
-            
-        fig, ax = plt.subplots()
-        y_pos = np.arange(len(categories))
-        ax.barh(y_pos, costs, align='center')
-        ax.set_yticks(y_pos)
-        ax.set_yticklabels(categories)
-        
-        #plt.rcdefaults()
-        #fig, ax = plt.subplots()
-    
-        ## Example data
-        #people = ('Tom', 'Dick', 'Harry', 'Slim', 'Jim')
-        #y_pos = np.arange(len(people))
-        #performance = 3 + 10 * np.random.rand(len(people))
-        #error = np.random.rand(len(people))
-    
-        #ax.barh(y_pos, performance, xerr=error, align='center',
-                #color='green', ecolor='black')
-        #ax.set_yticks(y_pos)
-        #ax.set_yticklabels(people)
-        #ax.invert_yaxis()  # labels read top-to-bottom
-        #ax.set_xlabel('Performance')
-        #ax.set_title('How fast do you want to go today?')
-        
-
-if __name__ == "__main__":
-    diagram = globals()[sys.argv[1]]()
-    diagram.create(sys.argv[2])
-    diagram.show()
+    """
+    parser = ArgumentParser()
+    parser.add_argument('-p', '--projektname', dest='projektname',
+                        help='Projektname')
+    parser.add_argument('-c', '--clsname', dest='clsname',
+                        help='Klassenname')
+    options = parser.parse_args()
+    diagram = my_globals[options.clsname]()
+    diagram.create(options.projektname)
+    diagram.show()    
