@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
-
+import sys
 import datetime
 import arcpy
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
+import pandas as pd
+import numpy as np
+from matplotlib import pyplot as plt
+from rpctools.utils.diagrams import InfrastrukturBilanzKosten
 
 
 class InfrastrukturmengenBilanz(Tool):    
@@ -50,6 +54,7 @@ class InfrastrukturmengenBilanz(Tool):
                 }
             )
             
+        
     def calculate_costs(self): 
         point_df = self.parent_tbx.table_to_dataframe(self._point_table)
         base_df = self.parent_tbx.table_to_dataframe(
@@ -61,16 +66,20 @@ class InfrastrukturmengenBilanz(Tool):
 
         joined = point_df.merge(base_df, on='IDNetz')
         grouped = joined.groupby(by='IDNetz')
-        self.parent_tbx.delete_rows_in_table(self._cost_table)
+        columns = ['Netz', 'Kosten_EH_EUR']
+        categories = []
+        costs = []
         for id_netz, grouped_df in grouped:
-            self.parent_tbx.insert_row_in_table(
-                self._cost_table,
-                column_values={
-                    'Kosten': grouped_df['Kosten_EH_EUR'].sum(), 
-                    'Netz': grouped_df['Netz'].unique()[0],
-                    'IDNetz': id_netz
-                }
-            )        
+            categories.append(id_netz)
+            costs.append(grouped_df['Kosten_EH_EUR'].sum())
+            
+        fig, ax = plt.subplots()
+        y_pos = np.arange(len(categories))
+        ax.barh(y_pos, costs, align='center')
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(categories)
+        plt.show(block=False)
+        
 
     def add_diagramms(self):
         project_name = self.projectname
@@ -101,10 +110,11 @@ class InfrastrukturmengenBilanz(Tool):
         
     
     def run(self):
-        self.calculate_lengths()
-        self.calculate_costs()
-        self.add_output()
-        self.add_diagramms()
+        #self.calculate_lengths()
+        #self.calculate_costs()
+        #self.add_output()
+        #self.add_diagramms()
+        InfrastrukturBilanzKosten().run()
 
 
 class TbxInfrastrukturmengenBilanz(Tbx):
@@ -118,7 +128,6 @@ class TbxInfrastrukturmengenBilanz(Tbx):
         return InfrastrukturmengenBilanz
 
     def _getParameterInfo(self):
-        projects = self.folders.get_projects()
 
         # Bestehendes_Projekt_auswählen
         p = self.add_parameter('projectname')
