@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 plt.rcdefaults()
 import numpy as np
 import matplotlib.pyplot as plt
-from rpctools.utils.diagrams import Diagram, show_diagram
+from rpctools.utils.diagrams import Diagram
 
 
 class InfrastrukturBilanzKosten(Diagram):
@@ -31,29 +31,16 @@ class InfrastrukturBilanzKosten(Diagram):
             categories.append(grouped_df['Netz'].values[0])
             costs.append(grouped_df['Kosten_EH_EUR'].sum())
             
-        fig, ax = plt.subplots()
+        figure, ax = plt.subplots()
         y_pos = np.arange(len(categories))
         ax.barh(y_pos, costs, align='center')
         ax.set_yticks(y_pos)
         ax.set_yticklabels(categories)
         
-        #plt.rcdefaults()
-        #fig, ax = plt.subplots()
-    
-        ## Example data
-        #people = ('Tom', 'Dick', 'Harry', 'Slim', 'Jim')
-        #y_pos = np.arange(len(people))
-        #performance = 3 + 10 * np.random.rand(len(people))
-        #error = np.random.rand(len(people))
-    
-        #ax.barh(y_pos, performance, xerr=error, align='center',
-                #color='green', ecolor='black')
-        #ax.set_yticks(y_pos)
-        #ax.set_yticklabels(people)
-        #ax.invert_yaxis()  # labels read top-to-bottom
-        #ax.set_xlabel('Performance')
-        #ax.set_title('How fast do you want to go today?')
+        return figure
         
 
 if __name__ == "__main__":
-    show_diagram(globals())
+    diagram = InfrastrukturBilanzKosten()
+    diagram.create(projectname='1')
+    diagram.show()
