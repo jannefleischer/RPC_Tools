@@ -31,10 +31,11 @@ class Diagram(Tbx):
         else: 
             plt.show()
         
-    def create(self, projectname=''):
+    def create(self, **kwargs):
+        projectname = kwargs['projectname'] if 'projectname' in kwargs else None
         self._getParameterInfo()
         self.set_active_project(projectname=projectname)
-        self.figure = self._create()
+        self.figure = self._create(**kwargs)
         
     def _create(self):
         """"""

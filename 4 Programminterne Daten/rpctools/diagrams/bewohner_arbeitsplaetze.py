@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+
+import matplotlib.pyplot as plt
+plt.rcdefaults()
+import numpy as np
+import matplotlib.pyplot as plt
+from rpctools.utils.diagrams import Diagram
+import matplotlib.ticker as mticker
+import pandas as pd
+
+
+class BewohnerEntwicklung(Diagram):
+    def _create(self, **kwargs):
+        title = (u"{}: Geschätzte Einwohnerentwicklung".format(
+            self.par._get_projectname()))
+        
+        flaechen_id = kwargs['flaechen_id']
+        
+        table = 'Bewohner_nach_Altersgruppe_und_Jahr'
+        workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
+        table_df = self.table_to_dataframe(
+            table, workspace=workspace,
+            where='IDTeilflaeche={}'.format(flaechen_id))
+        groups = table_df['Altersklasse'].unique()
+        colors = plt.cm.hot(np.linspace(0, 1, len(groups)))
+        transformed = pd.DataFrame(columns=groups)
+        # group by Altersklasse to keep order
+        grouped = table_df.groupby(by='Altersklasse')
+        for name, group_data in grouped:
+            group_data.sort('Jahr', inplace=True)
+            transformed[name] = group_data['Bewohner'].values
+        transformed.plot(kind='bar', stacked=True, figsize=(15, 8), colors=['g','g','y','y','b', 'b'])
+
+
+if __name__ == "__main__":
+    diagram = BewohnerEntwicklung()
+    diagram.create(projectname='1', flaechen_id=1)
+    diagram.show()

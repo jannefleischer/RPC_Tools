@@ -87,6 +87,13 @@ class Bewohner(Tool):
 class TbxBewohner(TbxFlaechendefinition):
     _nutzungsart = Nutzungsart.WOHNEN
     
+    def _getParameterInfo(self):
+        params = super(TbxBewohner, self)._getParameterInfo()
+        # TbxFlaechendefinition adds workspace to temp. management, not required
+        # here (no settings are made)
+        self.remove_temporary_management()
+        return params
+    
     @property
     def Tool(self):
         return Bewohner

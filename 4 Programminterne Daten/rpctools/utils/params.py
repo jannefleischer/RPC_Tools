@@ -907,6 +907,12 @@ class Tbx(object):
         """
         if workspace not in self._temporary_gdbs:
             self._temporary_gdbs.append(workspace)
+            
+    def remove_temporary_management(self):
+        """
+        remove ALL FileGeoDatabases from temporary management
+        """
+        self._temporary_gdbs = []
 
     def _create_temporary_copy(self, workspace=''):
         """
