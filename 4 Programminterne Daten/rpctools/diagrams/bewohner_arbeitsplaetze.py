@@ -22,14 +22,19 @@ class BewohnerEntwicklung(Diagram):
             table, workspace=workspace,
             where='IDTeilflaeche={}'.format(flaechen_id))
         groups = table_df['Altersklasse'].unique()
-        colors = plt.cm.hot(np.linspace(0, 1, len(groups)))
+        colors = plt.cm.viridis_r(np.linspace(0, 1, len(groups)))
         transformed = pd.DataFrame(columns=groups)
         # group by Altersklasse to keep order
         grouped = table_df.groupby(by='Altersklasse')
         for name, group_data in grouped:
             group_data.sort('Jahr', inplace=True)
             transformed[name] = group_data['Bewohner'].values
-        transformed.plot(kind='bar', stacked=True, figsize=(15, 8), colors=['g','g','y','y','b', 'b'])
+        xticks = table_df['Jahr'].unique()
+        xticks.sort()
+        ax = transformed.plot(kind='bar', stacked=True, figsize=(15, 8),
+                              color=colors, title=title)
+        ax.set_xticklabels(xticks, rotation=45)
+        return ax
 
 
 if __name__ == "__main__":
