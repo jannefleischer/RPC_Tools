@@ -9,5 +9,8 @@ if __name__ == "__main__":
     options = parser.parse_args()
     with open(options.file, 'r') as f:
         figure = load(f)
+    # workaround in older matplotlib versions, 
+    # callbacks are not correctly pickled/unpickled
+    figure.callbacks.callbacks = {}
     plt.show()
     
