@@ -45,8 +45,8 @@ class TbxRouting(Tbx):
         p.direction = 'Input'
         p.datatype = 'GPLong'
         p.filter.type = 'Range'
-        p.filter.list = [0, 2000]
-        p.value = 1000
+        p.filter.list = [0, 4000]
+        p.value = 3000
 
         # inner radius
         p = self.add_parameter('inner')
@@ -56,8 +56,8 @@ class TbxRouting(Tbx):
         p.direction = 'Input'
         p.datatype = 'GPLong'
         p.filter.type = 'Range'
-        p.filter.list = [0, 1000]
-        p.value = 600
+        p.filter.list = [0, 1500]
+        p.value = 1000
 
         # number of destinations
         p = self.add_parameter('dests')
@@ -68,7 +68,7 @@ class TbxRouting(Tbx):
         p.datatype = 'GPLong'
         p.filter.type = 'Range'
         p.filter.list = [0, 360]
-        p.value = 36
+        p.value = 18
 
         return params
 
