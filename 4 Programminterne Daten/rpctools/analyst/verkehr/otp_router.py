@@ -24,7 +24,6 @@ class Route(object):
         self.route_id = route_id
         self.source_id = source_id
         self.node_ids = np.array([], dtype='i4')
-
     @property
     def source_node(self):
         if not len(self.node_ids):
@@ -67,9 +66,19 @@ class Routes(OrderedDict):
         return np.unique(np.array([n.source_node
                          for n in self.itervalues()], dtype='i4'))
 
+    def get_n_routes_for_area(self, source_id):
+        return len([route.source_id
+                    for route in self.itervalues()
+                    if route.source_id == source_id])
+
 
 class TransferNodes(OrderedDict):
     """TransferNodes-object"""
+
+
+    def __init__(self, areas):
+        super(TransferNodes, self).__init__()
+        self.areas = areas
 
     def get_node(self, node, route):
         """
@@ -87,7 +96,7 @@ class TransferNodes(OrderedDict):
         """
         transfer_node = self.get(node.node_id)
         if transfer_node is None:
-            transfer_node = TransferNode(node)
+            transfer_node = TransferNode(node, self.areas)
             self[node.node_id] = transfer_node
         transfer_node.routes[route.route_id] = route
         return transfer_node
@@ -96,6 +105,16 @@ class TransferNodes(OrderedDict):
     def total_weights(self):
         """Total weights of all transfer nodes"""
         return float(sum((tn.weight for tn in self.itervalues())))
+
+    def get_total_area_weights(self, source_id):
+        """Total weights of all transfer nodes"""
+        total_weight = 0.0
+        for tn in self.itervalues():
+            for route in tn.routes.itervalues():
+                if route.source_id == source_id:
+                    total_weight += tn.weight
+                    break
+        return total_weight
 
     def calc_initial_weight(self):
         """calculate the initial weight based upon the number of routes"""
@@ -108,11 +127,28 @@ class TransferNodes(OrderedDict):
         adjust weights to 100% and assign to routes that pass the transfer node
         """
         total_weights = self.total_weights
+        print('-------------------', total_weights)
+        n_areas = len(self.areas)
+        total_weights_areas = {}
+        n_routes_areas = {}
         for tn in self.itervalues():
             tn.weight /= total_weights
-            route_weight = tn.weight / tn.n_routes
             for route in tn.routes.itervalues():
-                route.weight = route_weight
+                n_routes = n_routes_areas.get(route.source_id, 0)
+                n_routes_areas[route.source_id] = n_routes + 1
+        for area in self.areas.itervalues():
+            total_weights_areas[area.source_id] = \
+                self.get_total_area_weights(area.source_id)
+
+        for tn in self.itervalues():
+            for route in tn.routes.itervalues():
+                n_routes_for_area = tn.get_n_routes_for_area(route.source_id)
+                total_weight_area = total_weights_areas[route.source_id]
+                arcpy.AddMessage(
+                    'area: {}, tn: {}, tn_weight: {}, total_weight: {}, n_routes: {}'.format(
+                    route.source_id, tn.node_id, tn.weight, total_weight_area, n_routes_for_area
+                ))
+                route.weight = tn.weight / total_weight_area / n_routes_for_area
 
 
 class Nodes(object):
@@ -236,7 +272,7 @@ class Point(object):
 
 class TransferNode(Point):
     """"""
-    def __init__(self, node):
+    def __init__(self, node, areas):
         self.lat = node.lat
         self.lon = node.lon
         self.node_id = node.node_id
@@ -244,10 +280,17 @@ class TransferNode(Point):
         self.y = node.y
         self.routes = Routes()
         self.weight = 0.0
+        self.areas = areas
 
     @property
     def n_routes(self):
         return len(self.routes)
+
+    def get_n_routes_for_area(self, source_id):
+        return sum([1 for route in self.routes.itervalues()
+                   if route.source_id == source_id])
+
+
 
     def calc_initial_weight(self):
         """calculate the initial weight based upon the number of routes"""
@@ -370,8 +413,8 @@ class OTPRouter(object):
         self.nodes = Nodes(epsg)
         self.polylines = []
         self.routes = Routes()
-        self.transfer_nodes = TransferNodes()
         self.areas = Areas()
+        self.transfer_nodes = TransferNodes(self.areas)
 
     def dump(self, filename):
         """write myself to dumpfile"""
