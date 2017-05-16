@@ -17,7 +17,10 @@ if __name__ == "__main__":
     # workaround in older matplotlib versions, 
     # callbacks are not correctly pickled/unpickled
     axes.figure.callbacks.callbacks = {}
-    #axes.figure.canvas.set_window_title(options.title)
+    # override default name as it takes title by default but can't handle
+    # Umlaute
+    axes.figure.canvas.get_default_filename = lambda: 'Diagramm.png'
+    axes.figure.canvas.set_window_title(options.title)
     plt.show()
     os.remove(options.file)
     
