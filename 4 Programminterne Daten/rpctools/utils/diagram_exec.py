@@ -21,6 +21,7 @@ if __name__ == "__main__":
     # Umlaute
     axes.figure.canvas.get_default_filename = lambda: 'Diagramm.png'
     axes.figure.canvas.set_window_title(options.title)
+    axes.title.set_position([.5, 1.05])
     plt.show()
     os.remove(options.file)
     

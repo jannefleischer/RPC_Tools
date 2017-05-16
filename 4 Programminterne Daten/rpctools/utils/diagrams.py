@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('ps')
+#matplotlib.use('ps')
 import matplotlib.pyplot as plt
 import subprocess
 import os

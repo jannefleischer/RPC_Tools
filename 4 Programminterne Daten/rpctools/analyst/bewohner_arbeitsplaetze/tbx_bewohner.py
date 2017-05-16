@@ -91,7 +91,7 @@ class Bewohner(Tool):
         
     def diagram(self, tfl):
         diagram = BewohnerEntwicklung()
-        diagram.create(flaechen_id=tfl.flaechen_id)
+        diagram.create(flaechen_id=tfl.flaechen_id, flaechen_name=tfl.name)
         diagram.show()
 
 

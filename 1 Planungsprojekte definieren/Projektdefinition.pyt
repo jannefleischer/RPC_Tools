@@ -7,8 +7,8 @@ import sys
 from rpctools.definitions.projektverwaltung import tbx_teilflaechen_verwalten
 reload(tbx_teilflaechen_verwalten)
 
-from rpctools.definitions.nutzungsart import (tbx_nutzungen)
-reload(tbx_nutzungen)
+#from rpctools.definitions.nutzungsart import (tbx_nutzungen)
+#reload(tbx_nutzungen)
 
 from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten \
      import TbxTeilflaecheVerwalten

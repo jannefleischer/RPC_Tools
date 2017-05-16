@@ -5,6 +5,8 @@ from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten import \
 from rpctools.utils.params import Tool
 from rpctools.utils.constants import Nutzungsart
 from rpctools.utils.spatial_lib import get_gemeindetyp
+from rpctools.diagrams.bewohner_arbeitsplaetze import (ArbeitsplatzEntwicklung,
+                                                       BranchenAnteile)
 import pandas as pd
 import arcpy
 
@@ -20,6 +22,7 @@ class Arbeitsplaetze(Tool):
                          .format(tfl.name))
         self.calculate_growth(tfl)
         self.calculate_percentages(tfl)
+        self.diagram(tfl)
         
     def calculate_growth(self, tfl): ### Structure and age ###
         flaechen_table = 'Teilflaechen_Plangebiet'
@@ -92,6 +95,14 @@ class Arbeitsplaetze(Tool):
         perc_res_df['IDTeilflaeche'] = flaechen_id
         
         tbx.insert_dataframe_in_table(perc_res_table, perc_res_df)
+        
+    def diagram(self, tfl):
+        diagram = ArbeitsplatzEntwicklung()
+        diagram.create(flaechen_id=tfl.flaechen_id, flaechen_name=tfl.name)
+        diagram.show()
+        diagram = BranchenAnteile()
+        diagram.create(flaechen_id=tfl.flaechen_id, flaechen_name=tfl.name)
+        diagram.show()
         
 
 class TbxArbeitsplaetze(TbxFlaechendefinition):
