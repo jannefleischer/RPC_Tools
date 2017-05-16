@@ -76,9 +76,9 @@ class TransferNodes(OrderedDict):
     """TransferNodes-object"""
 
 
-    def __init__(self, areas):
-        super(TransferNodes, self).__init__()
-        self.areas = areas
+    #def __init__(self, areas):
+        #super(TransferNodes, self).__init__()
+        #self.areas = areas
 
     def get_node(self, node, route):
         """
@@ -97,7 +97,7 @@ class TransferNodes(OrderedDict):
         transfer_node = self.get(node.node_id)
         if transfer_node is None:
             transfer_node = TransferNode(node, self.areas)
-            self[node.node_id] = transfer_node
+            self[transfer_node.node_id] = transfer_node
         transfer_node.routes[route.route_id] = route
         return transfer_node
 
@@ -290,8 +290,6 @@ class TransferNode(Point):
         return sum([1 for route in self.routes.itervalues()
                    if route.source_id == source_id])
 
-
-
     def calc_initial_weight(self):
         """calculate the initial weight based upon the number of routes"""
         self.weight = float(self.n_routes)
@@ -414,7 +412,8 @@ class OTPRouter(object):
         self.polylines = []
         self.routes = Routes()
         self.areas = Areas()
-        self.transfer_nodes = TransferNodes(self.areas)
+        self.transfer_nodes = TransferNodes()
+        self.transfer_nodes.areas = self.areas
 
     def dump(self, filename):
         """write myself to dumpfile"""

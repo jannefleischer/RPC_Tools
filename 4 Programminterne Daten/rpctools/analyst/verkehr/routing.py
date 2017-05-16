@@ -93,7 +93,10 @@ class Routing(Tool):
         o.create_node_features()
         print o.transfer_nodes.keys()
         o.create_transfer_node_features()
-
+        for tn in o.transfer_nodes.iterkeys():
+            print "####"
+            print tn
+            print "####"
         o.dump(self.folders.get_otp_pickle_filename(check=False))
 
         # Empty column for manual changes of weigths
