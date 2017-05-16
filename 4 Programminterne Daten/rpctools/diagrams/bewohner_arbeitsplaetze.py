@@ -11,7 +11,7 @@ import pandas as pd
 
 class BewohnerEntwicklung(Diagram):
     def _create(self, **kwargs):
-        title = (u"{}: Geschätzte Einwohnerentwicklung".format(
+        self.title = (u"{}: Geschätzte Einwohnerentwicklung".format(
             self.par._get_projectname()))
         
         flaechen_id = kwargs['flaechen_id']
@@ -32,9 +32,9 @@ class BewohnerEntwicklung(Diagram):
         xticks = table_df['Jahr'].unique()
         xticks.sort()
         ax = transformed.plot(kind='bar', stacked=True, figsize=(15, 8),
-                              color=colors, title=title)
+                              color=colors, title=self.title)
         ax.set_xticklabels(xticks, rotation=45)
-        return ax
+        return ax.figure
 
 
 if __name__ == "__main__":

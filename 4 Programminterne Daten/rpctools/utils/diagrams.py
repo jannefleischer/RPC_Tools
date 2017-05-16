@@ -1,12 +1,16 @@
+import matplotlib
+matplotlib.use('ps')
+import matplotlib.pyplot as plt
 import subprocess
 import os
 from argparse import ArgumentParser
-import matplotlib.pyplot as plt
 from abc import ABCMeta, abstractmethod
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils import diagram_exec
+from rpctools.utils.encoding import encode
 import sys
 import pickle
+
 
 class Dummy(Tool):
     
@@ -15,13 +19,17 @@ class Dummy(Tool):
 
 
 class Diagram(Tbx):
-    
-    def __init__(self, title='Titel'):
+    # USE THIS PLT, NEVER IMPORT MATPLOTLIB SOMEWHERE ELSE!!!!
+    # (matplotlib needs to be set to PS, as tkinter causes errors and
+    # crashes within arcmap)
+    plt = plt
+    def __init__(self, title='Diagramm'):
         """
         title : str
         """
         super(Diagram, self).__init__()
         self.title = title
+        self.figure = None
         
     def show(self, external=True):
         filename = os.path.join(self.folders.TEMPORARY_GDB_PATH, 
@@ -30,7 +38,7 @@ class Diagram(Tbx):
         if external:
             self.show_external(self.figure, filename)
         else: 
-            plt.show()
+            self.plt.show()
         
     def create(self, **kwargs):
         projectname = kwargs['projectname'] if 'projectname' in kwargs else None
@@ -60,8 +68,11 @@ class Diagram(Tbx):
         return Dummy
     
     def show_external(self, plot, filename):
+        if plot is None:
+            return
         with open(filename,'wb') as f:
             pickle.dump(plot, f)
-        subprocess.Popen(
-            [os.path.join(sys.exec_prefix, 'python.exe'),
-             '-m' , diagram_exec.__name__, '-f', filename], shell=True)
+            subprocess.Popen(
+                [os.path.join(sys.exec_prefix, 'python.exe'),
+                 '-m' , diagram_exec.__name__, '-f', filename,
+                 '-t', encode(self.title)], shell=True)

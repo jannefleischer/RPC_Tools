@@ -8,6 +8,7 @@ from rpctools.diagrams.bewohner_arbeitsplaetze import BewohnerEntwicklung
 import pandas as pd
 import arcpy
 
+
 class Bewohner(Tool):
     _param_projectname = 'projectname'
     _dbname = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
@@ -97,13 +98,6 @@ class Bewohner(Tool):
 class TbxBewohner(TbxFlaechendefinition):
     _nutzungsart = Nutzungsart.WOHNEN
     
-    def _getParameterInfo(self):
-        params = super(TbxBewohner, self)._getParameterInfo()
-        # TbxFlaechendefinition adds workspace to temp. management, not required
-        # here (no settings are made)
-        self.remove_temporary_management()
-        return params
-    
     @property
     def Tool(self):
         return Bewohner
@@ -111,6 +105,13 @@ class TbxBewohner(TbxFlaechendefinition):
     @property
     def label(self):
         return u'Bewohnerzahl schätzen'
+    
+    def _getParameterInfo(self):
+        params = super(TbxBewohner, self)._getParameterInfo()
+        # TbxFlaechendefinition adds workspace to temp. management, not required
+        # here (no settings are made)
+        self.remove_temporary_management()
+        return params    
     
 if __name__ == '__main__':
     t = TbxBewohner()

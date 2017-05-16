@@ -6,7 +6,6 @@ from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 import pandas as pd
 import numpy as np
-from matplotlib import pyplot as plt
 from rpctools.diagrams.infrastruktur import Netzlaenge, MassnahmenKosten
 
 
@@ -19,7 +18,6 @@ class InfrastrukturmengenBilanz(Tool):
         kosten_diagram = MassnahmenKosten()
         kosten_diagram.create()
         kosten_diagram.show()
-        
 
 
 class TbxInfrastrukturmengenBilanz(Tbx):
