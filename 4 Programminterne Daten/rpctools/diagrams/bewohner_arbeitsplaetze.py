@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-
-import matplotlib.pyplot as plt
-plt.rcdefaults()
 import numpy as np
-import matplotlib.pyplot as plt
 from rpctools.utils.diagrams import Diagram
 import matplotlib.ticker as mticker
 import pandas as pd
@@ -34,7 +30,7 @@ class BewohnerEntwicklung(Diagram):
         ax = transformed.plot(kind='bar', stacked=True, figsize=(15, 8),
                               color=colors, title=self.title)
         ax.set_xticklabels(xticks, rotation=45)
-        return ax.figure
+        return ax
 
 
 if __name__ == "__main__":

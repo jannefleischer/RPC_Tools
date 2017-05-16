@@ -19,6 +19,9 @@ class Dummy(Tool):
 
 
 class Diagram(Tbx):
+    '''
+    superclass to plot diagrams with matplotlib
+    '''
     # USE THIS PLT, NEVER IMPORT MATPLOTLIB SOMEWHERE ELSE!!!!
     # (matplotlib needs to be set to PS, as tkinter causes errors and
     # crashes within arcmap)
@@ -32,6 +35,17 @@ class Diagram(Tbx):
         self.figure = None
         
     def show(self, external=True):
+        '''
+        show the created plot in current process or externally in own process
+        
+        if not shown in external process, ArcMap will crash
+        
+        Parameters
+        ----------
+        external: bool, optional
+            show the plot in an external process
+            defaults to True
+        '''
         filename = os.path.join(self.folders.TEMPORARY_GDB_PATH, 
                                 '{}diagram.pickle'.format(
                                     self.__class__.__name__))
@@ -41,13 +55,25 @@ class Diagram(Tbx):
             self.plt.show()
         
     def create(self, **kwargs):
+        '''
+        create a plot
+        
+        Parameters
+        ----------
+        projectname: str, optional
+            the name of the project the data the plot is based on belongs to
+            defaults to the active project
+            
+        kwargs: other optional parameters the subclassing diagram needs
+        '''
         projectname = kwargs['projectname'] if 'projectname' in kwargs else None
         self._getParameterInfo()
         self.set_active_project(projectname=projectname)
         self.figure = self._create(**kwargs)
         
     def _create(self):
-        """"""
+        """to be implemented by subclasses,
+        has to return the axes-object of the plot"""
         
     @property
     def label(self):

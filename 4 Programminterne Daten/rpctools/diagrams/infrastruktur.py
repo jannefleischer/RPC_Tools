@@ -42,7 +42,7 @@ class Netzlaenge(Diagram):
         ax.set_xlabel(x_label)
         ax.xaxis.grid(True, which='major')
         
-        return figure
+        return ax
     
 
 class MassnahmenKosten(Diagram):
@@ -81,7 +81,7 @@ class MassnahmenKosten(Diagram):
         ax.xaxis.set_major_formatter(mticker.FormatStrFormatter(u'%d €'))
         ax.xaxis.grid(True, which='major')
         
-        return figure
+        return ax
 
 if __name__ == "__main__":
     netz_diagram = Netzlaenge()
