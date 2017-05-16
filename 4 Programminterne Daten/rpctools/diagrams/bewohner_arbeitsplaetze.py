@@ -18,7 +18,7 @@ class BewohnerEntwicklung(Diagram):
             table, workspace=workspace,
             where='IDTeilflaeche={}'.format(flaechen_id))
         groups = table_df['Altersklasse'].unique()
-        colors = plt.cm.viridis_r(np.linspace(0, 1, len(groups)))
+        colors = self.plt.cm.viridis_r(np.linspace(0, 1, len(groups)))
         transformed = pd.DataFrame(columns=groups)
         
         grouped = table_df.groupby(by='Altersklasse')

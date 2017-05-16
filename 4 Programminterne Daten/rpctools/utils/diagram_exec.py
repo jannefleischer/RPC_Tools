@@ -16,9 +16,8 @@ if __name__ == "__main__":
         axes = load(f)
     # workaround in older matplotlib versions, 
     # callbacks are not correctly pickled/unpickled
-    figure = axes.figure
-    figure.callbacks.callbacks = {}
-    figure.canvas.set_window_title(options.title)
+    axes.figure.callbacks.callbacks = {}
+    #axes.figure.canvas.set_window_title(options.title)
     plt.show()
     os.remove(options.file)
     

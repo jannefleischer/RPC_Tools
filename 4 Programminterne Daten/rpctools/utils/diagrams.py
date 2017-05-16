@@ -98,7 +98,7 @@ class Diagram(Tbx):
             return
         with open(filename,'wb') as f:
             pickle.dump(plot, f)
-            subprocess.Popen(
-                [os.path.join(sys.exec_prefix, 'python.exe'),
-                 '-m' , diagram_exec.__name__, '-f', filename,
-                 '-t', encode(self.title)], shell=True)
+        subprocess.Popen(
+            [os.path.join(sys.exec_prefix, 'python.exe'),
+             '-m' , diagram_exec.__name__, '-f', filename,
+             '-t', encode(self.title)], shell=True)
