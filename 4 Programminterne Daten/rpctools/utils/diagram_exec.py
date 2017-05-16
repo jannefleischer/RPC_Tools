@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 from pickle import load
+import os
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -13,4 +14,5 @@ if __name__ == "__main__":
     # callbacks are not correctly pickled/unpickled
     figure.callbacks.callbacks = {}
     plt.show()
+    os.remove(options.file)
     

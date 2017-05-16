@@ -25,7 +25,8 @@ class Diagram(Tbx):
         
     def show(self, external=True):
         filename = os.path.join(self.folders.TEMPORARY_GDB_PATH, 
-                                'diagram.pickle')
+                                '{}diagram.pickle'.format(
+                                    self.__class__.__name__))
         if external:
             self.show_external(self.figure, filename)
         else: 

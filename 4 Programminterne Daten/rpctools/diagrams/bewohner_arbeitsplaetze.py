@@ -24,7 +24,7 @@ class BewohnerEntwicklung(Diagram):
         groups = table_df['Altersklasse'].unique()
         colors = plt.cm.viridis_r(np.linspace(0, 1, len(groups)))
         transformed = pd.DataFrame(columns=groups)
-        # group by Altersklasse to keep order
+        
         grouped = table_df.groupby(by='Altersklasse')
         for name, group_data in grouped:
             group_data.sort('Jahr', inplace=True)

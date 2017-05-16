@@ -10,9 +10,9 @@ import matplotlib.ticker as mticker
 
 class Netzlaenge(Diagram):
     
-    def _create(self):
+    def _create(self, **kwargs):
         line_table = 'Erschliessungsnetze_Linienelemente'
-        title = (u"{}: Länge der zusätzlichen Infrastrukturnetze"
+        title = (u"{}: Länge der zusätzlichen Infrastrukturnetze "
                  u"(ohne punktuelle Maßnahmen)".format(
                      self.par._get_projectname()))
         x_label = u"Meter zusätzliche Netzlänge (ohne punktuelle Maßnahmen)"
@@ -36,7 +36,7 @@ class Netzlaenge(Diagram):
             categories.append(grouped_df['Netz'].values[0])
             lengths.append(grouped_df['SHAPE_Length'].sum())
             
-        figure, ax = plt.subplots()
+        figure, ax = plt.subplots(figsize=(8, 4))
         y_pos = np.arange(len(categories))
         ax.barh(y_pos, lengths, height=0.3, align='center')
         ax.set_yticks(y_pos)
@@ -50,7 +50,7 @@ class Netzlaenge(Diagram):
 
 class MassnahmenKosten(Diagram):
     
-    def _create(self):
+    def _create(self, **kwargs):
         point_table = 'Erschliessungsnetze_Punktelemente'
         title = u"{}: Kosten der punktuellen Maßnahmen".format(
             self.par._get_projectname())
@@ -74,7 +74,7 @@ class MassnahmenKosten(Diagram):
             categories.append(grouped_df['Netz'].values[0])
             costs.append(grouped_df['Kosten_EH_EUR'].sum())
             
-        figure, ax = plt.subplots()
+        figure, ax = plt.subplots(figsize=(8, 4))
         y_pos = np.arange(len(categories))
         ax.barh(y_pos, costs, height=0.3, align='center')
         ax.set_yticks(y_pos)
@@ -87,6 +87,9 @@ class MassnahmenKosten(Diagram):
         return figure
 
 if __name__ == "__main__":
-    diagram = MassnahmenKosten()
-    diagram.create(projectname='1')
-    diagram.show()
+    netz_diagram = Netzlaenge()
+    netz_diagram.create()
+    netz_diagram.show()
+    kosten_diagram = MassnahmenKosten()
+    kosten_diagram.create()
+    kosten_diagram.show()
