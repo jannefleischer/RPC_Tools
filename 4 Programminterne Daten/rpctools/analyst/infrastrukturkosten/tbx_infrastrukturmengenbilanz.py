@@ -10,7 +10,24 @@ from rpctools.diagrams.infrastruktur import Netzlaenge, MassnahmenKosten
 
 
 class InfrastrukturmengenBilanz(Tool):
+    _param_projectname = 'projectname'
+    _dbname = 'FGDB_Kosten.gdb'
+    _group_layer = "infrastruktur"
+    _line_layer = "Erschließungsnetz"
+    _point_layer = "Erschließungsnetz - punktuelle Maßnahmen" 
+    _line_table = 'Erschliessungsnetze_Linienelemente'
+    _point_table = 'Erschliessungsnetze_Punktelemente'    
     
+    def add_output(self):
+        # add Erschliessungsnetz
+        fc = self.folders.get_table(self._line_table)
+        layer = self.folders.get_layer(self._line_layer)
+        self.output.add_output(self._group_layer, layer, fc, zoom=False)
+        
+        fc = self.folders.get_table(self._point_table)
+        layer = self.folders.get_layer(self._point_layer)
+        self.output.add_output(self._group_layer, layer, fc, zoom=False)
+        
     def run(self):
         netz_diagram = Netzlaenge()
         netz_diagram.create()
