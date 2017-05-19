@@ -82,9 +82,11 @@ class TbxNutzungen(TbxFlaechendefinition):
         super(TbxNutzungen, self).commit_tfl_changes()
         tfl = self.par._current_tfl
         table = 'Teilflaechen_Plangebiet'
+        dauer = self.par.dauer_aufsiedlung.value \
+            if 'dauer_aufsiedlung' in self.par else 1
         column_values = dict(
             Beginn_Nutzung=self.par.bezugsbeginn.value,
-            Aufsiedlungsdauer=self.par.dauer_aufsiedlung.value)
+            Aufsiedlungsdauer=dauer)
         self.update_table(table, column_values, tfl.where_clause)
 
     def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
@@ -96,7 +98,8 @@ class TbxNutzungen(TbxFlaechendefinition):
                                 pkey=pkey)
         for row in rows:
             self.par.bezugsbeginn.value = row[0]
-            self.par.dauer_aufsiedlung.value = row[1]
+            if 'dauer_aufsiedlung' in self.par:
+                self.par.dauer_aufsiedlung.value = row[1]
 
 
 class TbxNutzungenWohnen(TbxNutzungen):
@@ -495,10 +498,12 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         params = super(TbxNutzungenEinzelhandel, self)._getParameterInfo()
         # workaround
         heading = '1) Voraussichtliche Eröffnung '
-        beginn_name = 'Baubeginn'
+        beginn_name = encode(u'Eröffnung')
         params = self.init_aufsiedlung(params, heading=heading,
                                        beginn_name=beginn_name,
                                        default_zeitraum=1)
+        # no duration needed as the shops are assumed to be finished instantly
+        self.remove_parameter('dauer_aufsiedlung')
 
         heading = u'2) Verkaufsflächen'
 

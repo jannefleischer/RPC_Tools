@@ -267,6 +267,16 @@ class Tbx(object):
         """
         parameter = self.par[param_name] = Parameter()
         return parameter
+    
+    def remove_parameter(self, param_name): 
+        """
+        Remove a (patched) arcpy-parameter from toolbox
+
+        Parameters
+        ----------
+        param_name : str
+        """
+        del self.par[param_name]
 
     def getParameterInfo(self):
         """
