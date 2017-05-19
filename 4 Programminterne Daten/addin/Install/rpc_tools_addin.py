@@ -243,10 +243,12 @@ class DrawingTool(object):
         cursor = arcpy.da.SearchCursor(netz_table, ['IDNetzelement', 'IDNetz'])
         self.netz_ids = dict([row for row in cursor])
         self.cursor = 3
+        
+    def onClick(self):
+        self.show_output()
 
     def commit_geometry(self, tablename, shape, element_id, additional_columns={}):
-        """insert geometry with spec. id into given table """
-        self.show_output()
+        """insert geometry with spec. id into given table """        
         netz_id = self.netz_ids[element_id]
         project=config.active_project
         table = folders.get_table(tablename,
@@ -583,10 +585,15 @@ class Anbindungspunkt(ToolboxButton):
         self.enabled = True
         self.shape = 'NONE'
         self.cursor = 3
+        
+    def onClick(self, coord=None):
+        if coord is None:
+            return
+        config.active_coord = coord
+        super(Anbindungspunkt, self).onClick()
 
     def onMouseDownMap(self, x, y, button, shift):
-        config.active_coord = (x, y)
-        self.onClick()
+        self.onClick((x, y))
         
         
 ### Standortkonkurrenz ###
