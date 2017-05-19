@@ -84,8 +84,8 @@ class SkizzeBeenden(object):
     def __init__(self):
         self.enabled = True
         self.shape = "NONE" # Can set to "Line", "Circle" or "Rectangle" for interactive shape drawing and to activate the onLine/Polygon/Circle event sinks.
-        
-        
+
+
 class StrasseAeussereKostenaufteilung(object):
     """Implementation for rpc_tools.strasse_aeussere_kostenaufteilung (Button)"""
     def __init__(self):
@@ -101,7 +101,7 @@ class StrasseInnereKostenaufteilung(object):
         self.checked = False
     def onClick(self):
         pass
-    
+
 class TrinkwasserKostenaufteilung(object):
     """Implementation for rpc_tools.trinkwasser_kostenaufteilung (Button)"""
     def __init__(self):
@@ -122,13 +122,13 @@ class ToolboxButton(object):
     _toolbox_name = None
     # show the toolbox on click (if False, just execute the Tool)
     _do_show = True
-    
-    def __init__(self):    
+
+    def __init__(self):
         self.enabled = True
         self.checked = False
         self.path = os.path.join(self._path, self._pyt_file)
         self._tbx = None
-        
+
     @property
     def tbx(self):
         """the instanciated toolbox (load on demand only)"""
@@ -137,7 +137,7 @@ class ToolboxButton(object):
             self._tbx = getattr(tbx_module, self._toolbox_name)()
             self._tbx.getParameterInfo()
         return self._tbx
-    
+
     def onClick(self):
         """call toolbox on click"""
         # validate active project
@@ -164,7 +164,7 @@ class ProjektAnlegen(ToolboxButton):
     _path = folders.DEFINITION_PYT_PATH
     _pyt_file = 'Projektverwaltung.pyt'
     _toolbox_name = 'TbxProjektAnlegen'
-        
+
 
 class ProjektAuswahl(object):
     """Implementation for rpc_tools.projekt_auswahl (ComboBox)"""
@@ -175,7 +175,7 @@ class ProjektAuswahl(object):
         self.width = 'WWWWWW'
         self.tbx = TbxProjektauswahl()
         self.tbx.getParameterInfo()
-        # connect the change of the active project to a refresh of the project- 
+        # connect the change of the active project to a refresh of the project-
         # list (esp. to auto. select the active project)
         config.on_change('active_project', lambda active: self.refresh())
         self.refresh()
@@ -184,17 +184,17 @@ class ProjektAuswahl(object):
         if selection != config.active_project:
             self.activate_project(project=selection)
         self.value = selection
-        
+
     def activate_project(self, project=None):
         if project is None:
             project = self.value
         self.tbx.par.active_project.value = project
         self.tbx.execute()
-        
+
     def onFocus(self, focused):
         if focused:
             self.refresh()
-            
+
     def refresh(self):
         """refresh the list of available projects and select the active one"""
         projects = folders.get_projects()
@@ -203,7 +203,7 @@ class ProjektAuswahl(object):
         if active not in projects:
             active = ''
         self.value = active
-        
+
 
 class ProjektKopieren(ToolboxButton):
     """Implementation for rpc_tools.projekt_kopieren (Button)"""
@@ -231,10 +231,10 @@ class RefreshLayers(object):
 
 
 class DrawingTool(object):
-    # has to match the column 'IDNetzelement' of base-table 
+    # has to match the column 'IDNetzelement' of base-table
     # Netze_und_Netzelemente (defined in subclasses)
     _id_netzelement = None
-    
+
     def __init__(self):
         self.enabled = True
         netz_table = folders.get_base_table('FGDB_Kosten_Tool.gdb',
@@ -243,13 +243,13 @@ class DrawingTool(object):
         cursor = arcpy.da.SearchCursor(netz_table, ['IDNetzelement', 'IDNetz'])
         self.netz_ids = dict([row for row in cursor])
         self.cursor = 3
-        
+
     def commit_geometry(self, tablename, shape, element_id, additional_columns={}):
         """insert geometry with spec. id into given table """
         self.show_output()
         netz_id = self.netz_ids[element_id]
         project=config.active_project
-        table = folders.get_table(tablename, 
+        table = folders.get_table(tablename,
                                   workspace='FGDB_Kosten.gdb',
                                   project=project)
         columns = (["SHAPE@", 'IDNetzelement', 'IDNetz'] +
@@ -260,39 +260,39 @@ class DrawingTool(object):
                          additional_columns.values())
         del(cursor)
         arcpy.RefreshActiveView()
-        
+
     def show_output(self, redraw=False):
         infrastrukturmengen_bilanzieren.show_output(redraw=False)
-        
-    def get_ids(self, tablename): 
+
+    def get_ids(self, tablename):
         project=config.active_project
-        table = folders.get_table(tablename, 
+        table = folders.get_table(tablename,
                                   workspace='FGDB_Kosten.gdb',
-                                  project=project)    
+                                  project=project)
         cursor = arcpy.da.SearchCursor(table, ['OBJECTID'])
         ids = [row[0] for row in cursor]
-        del(cursor) 
+        del(cursor)
         return ids
 
 
 class LineTool(DrawingTool):
     table = 'Erschliessungsnetze_Linienelemente'
-    
+
     def __init__(self):
         super(LineTool, self).__init__()
         self.shape = "Line"
-        
+
     def onLine(self, line_geometry):
         self.commit_geometry(self.table, line_geometry, self._id_netzelement)
 
 
 class PointTool(DrawingTool):
     table = 'Erschliessungsnetze_Punktelemente'
-    
+
     def __init__(self):
         super(PointTool, self).__init__()
         self.shape = "NONE"
-        
+
     def onMouseDownMap(self, x, y, button, shift):
         point_geometry = arcpy.Point(x, y)
         ids = self.get_ids(self.table)
@@ -314,7 +314,7 @@ class Beschreibung(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Infrastrukturkosten.pyt'
     _toolbox_name = 'TbxMassnahmenBeschreiben'
-    
+
     def onClick(self):
         # no way to directly tell the toolbox the id of the measure
         # -> take the Config-singleton as a container to pass it
@@ -325,7 +325,7 @@ class Beschreibung(ToolboxButton):
 class AnliegerstrasseInnere(LineTool):
     """Implementation for rpc_tools.anliegerstrasse_innere (Tool)"""
     _id_netzelement = 11
-    
+
 
 class SammelstrasseInnere(LineTool):
     """Implementation for rpc_tools.sammelstrasse_innere (Tool)"""
@@ -350,8 +350,8 @@ class AnliegerstrasseAeussere(LineTool):
 class SammelstrasseAeussere(LineTool):
     """Implementation for rpc_tools.sammelstrasse_aeussere (Tool)"""
     _id_netzelement = 15
-    
-    
+
+
 class LagePunktuelleMassnahmeStrasseAeussere(PointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_aeussere (Tool)"""
     _id_netzelement = 16
@@ -417,7 +417,7 @@ class BeschreibungPunktuelleMassnahmeElektrizitaet(Beschreibung):
     _id_netzelement = 42
 
 
-def delete_selected_elements(layer_name): 
+def delete_selected_elements(layer_name):
     active = config.active_project
     layers = projekt_auswahl.tbx.tool.output.get_layers(
         layer_name, projectname=active)
@@ -431,7 +431,7 @@ def delete_selected_elements(layer_name):
     if not sth_selected:
         message = pythonaddins.MessageBox(
             u'Es sind keine Elemente im Layer "{layer}" des Projektes "{proj}" '
-            .format(layer=layer_name, proj=active) + 
+            .format(layer=layer_name, proj=active) +
             u'ausgewählt.\n\nSollen alle in diesem Layer '
             u'angelegten Elemente aus dem Projekt gelöscht werden?',
             'Achtung', 1)
@@ -454,7 +454,7 @@ class PunktuelleMassnahmeLoeschen(object):
         self.checked = False
     def onClick(self):
         delete_selected_elements(u'Erschließungsnetz - punktuelle Maßnahmen')
-        
+
 
 class InfrastrukturmengenBilanzieren(ToolboxButton):
     """Implementation for rpc_tools.infrastrukturmengen_bilanzieren (Button)"""
@@ -462,7 +462,7 @@ class InfrastrukturmengenBilanzieren(ToolboxButton):
     _pyt_file = 'Infrastrukturkosten.pyt'
     _toolbox_name = 'TbxInfrastrukturmengenBilanz'
     _do_show = False
-        
+
     def show_output(self, redraw=False):
         self.tbx.set_active_project()
         if redraw or not self.tbx.tool.output.layer_exists(
@@ -513,7 +513,7 @@ class BewohnerSchaetzen(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Bewohner_Arbeitsplaetze.pyt'
     _toolbox_name = 'TbxBewohner'
-    
+
 
 class ArbeitsplaetzeSchaetzen(ToolboxButton):
     """Implementation for rpc_tools.arbeitsplaetze_schaetzen (Button)"""
@@ -551,6 +551,25 @@ class EinnahmeverschiebungenSchaetzen(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Einnahmen.pyt'
     _toolbox_name = 'TbxSteuersalden'
+
+
+class Anbindungspunkt(ToolboxButton):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Verkehrserzeugung.pyt'
+    _toolbox_name = 'TbxSetSource'
+
+    def __init__(self):
+        super(Anbindungspunkt, self).__init__()
+        self.enabled = True
+        self.shape = 'NONE'
+        self.cursor = 3
+
+    def onMouseDownMap(self, x, y, button, shift):
+        config.active_coord = (x, y)
+        self.onClick()
+
+
+
 
 
 if __name__ == "__main__":

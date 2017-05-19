@@ -31,7 +31,7 @@ class Routing(Tool):
             Coordinate_System=4326)
 
         # get data from Teilflaechen_Plangebiet table
-        columns = ['id_teilflaeche', 'INSIDE_X', 'INSIDE_Y', 'Wege_gesamt',
+        columns = ['id_teilflaeche', 'SOURCE_X', 'SOURCE_Y', 'Wege_gesamt',
                    'Nutzungsart']
         cursor = arcpy.da.SearchCursor(tmp_table, columns)
         data_tfl = [row for row in cursor]
@@ -73,6 +73,7 @@ class Routing(Tool):
             o.areas.add_area(source_id, trips=trips)
             # ? lat = y lon = x
             source = Point(lat=y_coord, lon=x_coord)    # centroid
+            source.get_geom
             # calculate segments around centroid
             destinations = o.create_circle(source, dist=outer_circle,
                                            n_segments=n_segments)
@@ -93,10 +94,7 @@ class Routing(Tool):
         o.create_node_features()
         print o.transfer_nodes.keys()
         o.create_transfer_node_features()
-        for tn in o.transfer_nodes.iterkeys():
-            print "####"
-            print tn
-            print "####"
+
         o.dump(self.folders.get_otp_pickle_filename(check=False))
 
         # Empty column for manual changes of weigths

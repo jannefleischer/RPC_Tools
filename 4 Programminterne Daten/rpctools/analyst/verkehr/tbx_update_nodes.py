@@ -13,7 +13,7 @@ class TbxUpdateNodes(Tbx):
     _opened_for_first_time = True
     @property
     def label(self):
-        return encode(u'Verkehrsgewichtung')
+        return encode(u'Schritt 4: Zielknoten neu gewichten')
 
     @property
     def Tool(self):

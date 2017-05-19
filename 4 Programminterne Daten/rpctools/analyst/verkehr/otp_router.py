@@ -63,8 +63,8 @@ class Routes(OrderedDict):
         -------
         np.array()
         """
-        return np.unique(np.array([n.source_node
-                         for n in self.itervalues()], dtype='i4'))
+        return np.unique(np.array([route.source_node
+                         for route in self.itervalues()], dtype='i4'))
 
     def get_n_routes_for_area(self, source_id):
         return len([route.source_id

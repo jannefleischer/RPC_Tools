@@ -91,7 +91,7 @@ class ProjektAnlegen(Projektverwaltung):
                                                ags_projekt,
                                                gemeindename_projekt)
 
-
+        self.set_source_xy()
         self.set_projektrahmendaten(ags_projekt,
                                     project_name,
                                     beginn_betrachtung,
@@ -235,6 +235,7 @@ class ProjektAnlegen(Projektverwaltung):
         arcpy.AddField_management(tfl, "VF_gesamt", "LONG")
         arcpy.AddField_management(tfl, "Wege_gesamt", "LONG")
         arcpy.AddField_management(tfl, "Wege_MIV", "LONG")
+
         #arcpy.AddField_management(teilfaechen_plangebiet, "Bilanzsumme", "FLOAT")
         return tfl, gdbPfad
 
@@ -319,11 +320,17 @@ class ProjektAnlegen(Projektverwaltung):
         # calculate Gauß-Krüger-Coordinates and append them to tfl
         arcpy.AddGeometryAttributes_management(
             Input_Features=tfl, Geometry_Properties="CENTROID_INSIDE")
+        arcpy.AddField_management(tfl, "SOURCE_X", "DOUBLE")
+        arcpy.AddField_management(tfl, "SOURCE_Y", "DOUBLE")
+
 
         # Check if the distances between the centroids is smaller than max_dist
         toolbox = self.parent_tbx
         XY_INSIDE = toolbox.query_table("Teilflaechen_Plangebiet",
                                         ['INSIDE_X', 'INSIDE_Y'])
+        INSIDE_X = [row[0] for row in XY_INSIDE]
+        INSIDE_Y = [row[1] for row in XY_INSIDE]
+        arcpy.AddMessage(XY_INSIDE)
         distances = []
         for i in range(len(XY_INSIDE)):
             for j in range(i):
@@ -345,6 +352,20 @@ class ProjektAnlegen(Projektverwaltung):
             success = False
 
         return ags_project[0], gen_project[0], success
+
+
+    def set_source_xy(self):
+        """"""
+        toolbox = self.parent_tbx
+        XY_INSIDE = toolbox.query_table("Teilflaechen_Plangebiet",
+                                        ['id_teilflaeche',
+                                         'INSIDE_X', 'INSIDE_Y'])
+        for row in XY_INSIDE:
+
+            toolbox.update_table("Teilflaechen_Plangebiet",
+                                {'SOURCE_X': row[1],
+                                 'SOURCE_Y': row[2]},
+                                pkey={'id_teilflaeche': row[0]})
 
 
 class ProjektKopieren(Projektverwaltung):

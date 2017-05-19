@@ -33,7 +33,7 @@ class Config(object):
     }
 
     _config = {}
-    
+
     # write changed config instantly to file
     _write_instantly = True
 
@@ -42,7 +42,7 @@ class Config(object):
         self.config_file = Folders().CONFIG_FILE
         self._callbacks = {}
         self.active_measure_id = None
-
+        self.active_coord = (0, 0)
         if exists(self.config_file):
             self.read()
             # add missing Parameters
@@ -102,12 +102,12 @@ class Config(object):
 
     def __repr__(self):
         return repr(self._config)
-    
+
     def on_change(self, attribute, callback):
         if attribute not in self._callbacks:
             self._callbacks[attribute] = []
         self._callbacks[attribute].append(callback)
-        
+
     def remove_listeners(attribute):
         if attribute in self._callbacks:
             self._callbacks.pop(attribute)
@@ -205,7 +205,7 @@ class Folders(object):
         path = join(self.INTERN, self._TEMPORARY_GDB_PATH)
         if not exists(path):
             mkdir(path)
-        return path    
+        return path
 
     @property
     def TEMPLATE_FLAECHEN(self):
@@ -244,7 +244,7 @@ class Folders(object):
     @property
     def CONFIG_FILE(self):
         return join(self.INTERN, self._CONFIG_FILE)
-    
+
     @property
     def ANALYST_PYT_PATH(self):
         return self.join_and_check(self.BASE_PATH, self._ANALYST_PYT_PATH)
@@ -288,11 +288,11 @@ class Folders(object):
         return self.join_and_check(self.PROJECT_BASE_PATH,
                                    projectname,
                                    check=check)
-    
+
     def get_otp_pickle_filename(self, project=None, check=True):
         return self.join_and_check(
             self.get_projectpath(project=project),
-            self._OTP_PICKLE_FILE, 
+            self._OTP_PICKLE_FILE,
             check=check)
 
     def get_temporary_projectpath(self, project=None):
