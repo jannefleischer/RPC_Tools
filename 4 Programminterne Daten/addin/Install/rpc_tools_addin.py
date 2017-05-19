@@ -589,9 +589,6 @@ class Anbindungspunkt(ToolboxButton):
         self.onClick()
 
 
-
-
-
 if __name__ == "__main__":
     t = PointTool()
     t.get_ids(t.table)
