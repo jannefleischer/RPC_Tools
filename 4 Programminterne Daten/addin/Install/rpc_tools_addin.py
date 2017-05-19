@@ -602,8 +602,8 @@ class Anbindungspunkt(ToolboxButton):
 class BestandOSMEinlesen(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
-    _toolbox_name = 'TbxStandortkonkurrenz'
-    _do_show = False
+    _toolbox_name = 'TbxOSMMarktEinlesen'
+    _do_show = True
 
     
 class BestandEinlesen(object):

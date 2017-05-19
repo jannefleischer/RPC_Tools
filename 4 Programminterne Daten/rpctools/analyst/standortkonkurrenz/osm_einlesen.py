@@ -10,16 +10,12 @@ from collections import OrderedDict
 from pyproj import Proj, transform
 import urllib
 import arcpy
-from rpctools.utils.config import Config 
 
-config = Config()
 
 class Point(object):
     """A Point object"""
-    __slots__ = ['lat', 'lon', 'x', 'y', 'node_id', 'geom', 'epsg']
-    def __init__(self, lat, lon, node_id=None, x=None, y=None, epsg=4326):
-        self.lat = lat
-        self.lon = lon
+    __slots__ = ['x', 'y', 'node_id', 'geom', 'epsg']
+    def __init__(self, x, y, node_id=None, epsg=4326):
         self.node_id = node_id
         self.x = x
         self.y = y
@@ -27,10 +23,10 @@ class Point(object):
         self.epsg = Proj(init='epsg:{}'.format(epsg))
 
     def __repr__(self):
-        return '{},{}'.format(self.lat, self.lon)
+        return '{},{}'.format(self.x, self.y)
 
     def __hash__(self):
-        return hash((self.lat, self.lon))
+        return hash((self.x, self.y))
 
     def create_geom(self):
         """Create geometry from coordinates"""
@@ -39,7 +35,8 @@ class Point(object):
 
     def transform(self, target_srid):
         target_srs = Proj(init='epsg:{}'.format(target_srid))
-        self.x, self.y = transform(self.epsg, target_srs, self.lon, self.lat)
+        x, y = transform(self.epsg, target_srs, self.x, self.y)
+        return Point(x, y, epsg=target_srid)
 
 
 class Supermarket(Point):
@@ -60,16 +57,14 @@ class Supermarket(Point):
 
 
 class OSMShopsReader(object):
-    def __init__(self, workspace, epsg=31467):
-
+    def __init__(self, epsg=31467):
+        self.geoserver_epsg = 3035
         self.url = r'https://geoserver.ggr-planung.de/geoserver/projektcheck/wfs?'
         self.wfs_params = dict(service='WFS',
                                request='GetFeature',
                                version='2.0.0',
                                typeNames='projektcheck:supermaerkte',
                                outputFormat='application/json')
-
-        self.ws = workspace
         self.epsg = epsg
 
     def get_shops(self, point, distance=20000, count=1000):
@@ -87,9 +82,10 @@ class OSMShopsReader(object):
         json
         """
         query = 'DWithin(geom,POINT({y} {x}),{m},meters)'
-        srsname = 'EPSG:{}'.format(config.epsg)
-        params = dict(CQL_FILTER=query.format(x=point.x,
-                                              y=point.y,
+        transformed = point.transform(self.geoserver_epsg)
+        srsname = 'EPSG:{}'.format(self.epsg)
+        params = dict(CQL_FILTER=query.format(x=transformed.x,
+                                              y=transformed.y,
                                               m=distance),
                       srsname=srsname,
                       count=str(count))
@@ -100,9 +96,13 @@ class OSMShopsReader(object):
             new_params.append(param)
         param_str = '&'.join(new_params)
         r = requests.get(self.url, params=param_str)
-        return r.json()
+        try:
+            json = r.json()
+        except ValueError:
+            return []
+        return self._decode_json(json)
 
-    def decode_json(self, json):
+    def _decode_json(self, json):
         """
         Parse the geometry from a json
 
@@ -145,49 +145,12 @@ class OSMShopsReader(object):
         """
         arcpy.TruncateTable_management(in_table=fc)
 
-    def create_supermarket_features(self,
-                                    supermarkets,
-                                    name_fc='supermaerkte'):
-        """Create the point-features for supermarkets"""
-        sr = arcpy.SpatialReference(self.epsg)
-        fields = ['id_markt',
-                  'name',
-                  'kette',
-                  'shop',
-                  'typ',
-                  'SHAPE@']
-        fc = os.path.join(self.ws, name_fc)
-        self.truncate(fc)
-        with arcpy.da.InsertCursor(fc, fields) as rows:
-            for markt in supermarkets:
-                markt.create_geom()
-                if markt.geom:
-                    rows.insertRow((markt.node_id,
-                                    markt.name,
-                                    markt.kette,
-                                    markt.shop,
-                                    markt.typ,
-                                    markt.geom))
-
-
-
-
-#class Routing(Tool):
-    #_dbname = 'FGDB_Standortkonkurrenz.gdb'
-
-
-    #def run(self):
-        #toolbox = self.parent_tbx
-        ## tbx settings
-
-
 
 if __name__ == '__main__':
-    o = OSMShopsReader(workspace='')
-    source = Point(lat=54, lon=10)
-    source.transform(3035)
-    json = o.get_shops(source)
-    supermarkets = o.decode_json(json)
+    o = OSMShopsReader()
+    source = Point(54, 10, epsg=4326)
+    #source = source.transform(3035)
+    supermarkets = o.get_shops(source)
     o.create_supermarket_features(supermarkets)
 
 
