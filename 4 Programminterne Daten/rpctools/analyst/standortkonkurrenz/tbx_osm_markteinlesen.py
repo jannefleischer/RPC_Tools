@@ -7,22 +7,24 @@ import shutil
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 
-from rpctools.analyst.standortkonkurrenz.T1_Lebensmittelmaerkte_einlesen \
-     import MarktEinlesen
 
 class OSMMarktEinlesen(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte'
+    
+    def run(self):
+        pass
+
 
 class TbxOSMMarktEinlesen(Tbx):
 
     @property
     def label(self):
-        return encode(u'Schritt 1: Märkte einlesen')
+        return encode(u'Marktstandorte online aus OpenStreetMap abfragen')
 
     @property
     def Tool(self):
-        return MarktEinlesen
+        return OSMMarktEinlesen
 
     def _getParameterInfo(self):
 
@@ -45,3 +47,8 @@ class TbxOSMMarktEinlesen(Tbx):
         return params
 
 
+if __name__ == '__main__':
+    t = TbxOSMMarktEinlesen()
+    t._getParameterInfo()
+    t.set_active_project()
+    t.execute()
