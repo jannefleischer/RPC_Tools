@@ -587,7 +587,40 @@ class Anbindungspunkt(ToolboxButton):
     def onMouseDownMap(self, x, y, button, shift):
         config.active_coord = (x, y)
         self.onClick()
+        
+        
+### Standortkonkurrenz ###
+    
+class BestandEinlesen(object):
+    pass
 
+
+class BestandMarktHinzu(object):
+    pass
+
+
+class BestandMarktEntfernen(object):
+    pass
+
+
+class BestandMarktBearbeiten(object):
+    pass
+
+
+class PlanfallMarktErweitern(object):
+    pass
+
+
+class PlanfallMarktHinzu(object):
+    pass
+
+
+class PlanfallMarktEntfernen(object):
+    pass
+
+
+class PlanfallMarktBearbeiten(object):
+    pass
 
 if __name__ == "__main__":
     t = PointTool()

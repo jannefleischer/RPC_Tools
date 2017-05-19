@@ -1,92 +1,419 @@
-<ESRI.Configuration xmlns="http://schemas.esri.com/Desktop/AddIns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><Name>ProjektCheck</Name><AddInID>{9b0f33ed-0bf7-41aa-8957-a7ad885b6d31}</AddInID><Description>New Addin</Description><Version>0.1</Version><Image /><Author>Untitled</Author><Company>Untitled</Company><Date>04/28/2017</Date><Targets><Target name="Desktop" version="10.1" /></Targets><AddIn language="PYTHON" library="rpc_tools_addin.py" namespace="rpc_tools"><ArcMap>
-    <Commands>
-        <ComboBox caption="Projekt" category="ProjektCheck" class="ProjektAuswahl" id="rpc_tools.projekt_auswahl" itemSizeString="WWWWWW" message="" rows="4" sizeString="WWWWWW" tip="Nur dieses Projekt k&#246;nnen Sie editieren und analysieren. Weitere Projekte k&#246;nnen angezeigt bleiben."><Help heading="" /></ComboBox>
-        <Button caption="Layer aktualisieren" category="ProjektCheck" class="RefreshLayers" id="rpc_tools.refresh_layers" image="Images\5000-web.png" message="" tip="F&#252;gt die von den ProjektCheck-Tools verwendeten Layer des derzeit gew&#228;hlten Projekts dem Inhaltsverzeichnis hinzu bzw. aktualisiert sie."><Help heading="" /></Button>
-        <Button caption="Neues Projekt" category="ProjektCheck" class="ProjektAnlegen" id="rpc_tools.neues_projekt" image="Images\1002-add2_1.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Projekt kopieren" category="ProjektCheck" class="ProjektKopieren" id="rpc_tools.projekt_kopieren" image="Images\1002-add_1.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Projekt l&#246;schen" category="ProjektCheck" class="ProjektLoeschen" id="rpc_tools.projekt_loeschen" image="Images\1001-cancel_1.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Nutzungen auf Teilfl&#228;chen definieren" category="ProjektCheck" class="NutzungenDefinieren" id="rpc_tools.nutzungen_definieren" image="Images\013500-filter_1.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Wohnen" category="ProjektCheck" class="Wohnen" id="rpc_tools.wohnen" image="Images\011000-home_1.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Gewerbe" category="ProjektCheck" class="Gewerbe" id="rpc_tools.gewerbe" image="Images\506700-factory_1.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Einzelhandel" category="ProjektCheck" class="Einzelhandel" id="rpc_tools.einzelhandel" image="Images\650000-grocery-shop_1.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Bewohnerzahl sch&#228;tzen" category="ProjektCheck" class="BewohnerSchaetzen" id="rpc_tools.bewohner_schaetzen" image="Images\4502-users_3.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Arbeitspl&#228;tze sch&#228;tzen" category="ProjektCheck" class="ArbeitsplaetzeSchaetzen" id="rpc_tools.arbeitsplaetze_schaetzen" image="Images\281500-worker_2.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Erschlie&#223;ungsnetze anzeigen" category="ProjektCheck" class="ErschliessungsnetzeAnzeigen" id="rpc_tools.erschliessungsnetze_anzeigen" image="Images\GenericRefresh16.png" message="" tip=""><Help heading="" /></Button>
-        <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="AnliegerstrasseInnere" id="rpc_tools.anliegerstrasse_innere" image="Images\Driving_Leg16.png" message="" tip=""><Help heading="" /></Tool>
-        <Tool caption="Sammelstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="SammelstrasseInnere" id="rpc_tools.sammelstrasse_innere" image="Images\Driving_Distance16.png" message="" tip=""><Help heading="" /></Tool>
-        <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeStrasseInnere" id="rpc_tools.lage_punktuelle_massnahme_strasse_innere" image="Images\664100-office-button.png" message="" tip=""><Help heading="" /></Tool>
-        <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeStrasseInnere" id="rpc_tools.beschreibung_punktuelle_massnahme_strasse_innere" image="Images\GenericTag16.png" message="" tip=""><Help heading="" /></Button>
-        <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="AnliegerstrasseAeussere" id="rpc_tools.anliegerstrasse_aeussere" image="Images\Driving_Leg16_1.png" message="" tip=""><Help heading="" /></Tool>
-        <Tool caption="Sammelstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="SammelstrasseAeussere" id="rpc_tools.sammelstrasse_aeussere" image="Images\Driving_Distance16_1.png" message="" tip=""><Help heading="" /></Tool>
-        <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeStrasseAeussere" id="rpc_tools.lage_punktuelle_massnahme_strasse_aeussere" image="Images\664100-office-button.png" message="" tip=""><Help heading="" /></Tool>
-        <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeStrasseAeussere" id="rpc_tools.beschreibung_punktuelle_massnahme_strasse_auessere" image="Images\GenericTag16.png" message="" tip=""><Help heading="" /></Button>
-        <Tool caption="Kanal (Trennsystem) hinzuf&#252;gen" category="ProjektCheck" class="KanalTrennsystem" id="rpc_tools.kanal_trennsystem" image="Images\Kanal Trennsystem.png" message="" tip=""><Help heading="" /></Tool>
-        <Tool caption="Kanal (Mischsystem) hinzuf&#252;gen" category="ProjektCheck" class="KanalMischsystem" id="rpc_tools.kanal_mischsystem" image="Images\Kanal Mischsystem.png" message="" tip=""><Help heading="" /></Tool>
-        <Tool caption="Kanal (nur Schmutzwasser) hinzuf&#252;gen" category="ProjektCheck" class="KanalNurSchmutzwasser" id="rpc_tools.kanal_nur_schmutzwasser" image="Images\Kanal nur Schmutzwasser.png" message="" tip=""><Help heading="" /></Tool>
-        <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeKanalisation" id="rpc_tools.lage_punktuelle_massnahme_kanalisation" image="Images\664100-office-button.png" message="" tip=""><Help heading="" /></Tool>
-        <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeKanalisation" id="rpc_tools.beschreibung_punktuelle_massnahme_kanalisation" image="Images\GenericTag16.png" message="" tip=""><Help heading="" /></Button>
-        <Tool caption="Trinkwasserleitung hinzuf&#252;gen" category="ProjektCheck" class="Trinkwasserleitung" id="rpc_tools.trinkwasserleitung" image="Images\Trinkwasserleitung.png" message="" tip=""><Help heading="" /></Tool>
-        <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeTrinkwasser" id="rpc_tools.lage_punktuelle_massnahme_trinkwasser" image="Images\664100-office-button.png" message="" tip=""><Help heading="" /></Tool>
-        <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeTrinkwasser" id="rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser" image="" message="" tip=""><Help heading="" /></Button>
-        <Tool caption="Stromleitung hinzuf&#252;gen" category="ProjektCheck" class="Stromleitung" id="rpc_tools.stromleitung" image="Images\Stromleitung.png" message="" tip=""><Help heading="" /></Tool>
-        <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeElektrizitaet" id="rpc_tools.lage_punktuelle_massnahme_elektrizitaet" image="Images\664100-office-button.png" message="" tip=""><Help heading="" /></Tool>
-        <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeElektrizitaet" id="rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet" image="Images\GenericTag16.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Ausgew&#228;hlte Netzelemente l&#246;schen" category="ProjektCheck" class="NetzabschnittLoeschen" id="rpc_tools.netzabschnitt_loeschen" image="Images\ArcScanRasterPaintingDrawLineTool16.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Ausgew&#228;hlte punktuelle Ma&#223;nahmen l&#246;schen" category="ProjektCheck" class="PunktuelleMassnahmeLoeschen" id="rpc_tools.punktuelle_massnahme_loeschen" image="Images\ElementMarker16x11.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Infrastrukturmengen bilanzieren" category="ProjektCheck" class="InfrastrukturmengenBilanzieren" id="rpc_tools.infrastrukturmengen_bilanzieren" image="Images\400000-ruler.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Kostenkennwerte kontrollieren" category="ProjektCheck" class="KostenkennwerteKontrollieren" id="rpc_tools.kostenkennwerte_kontrollieren" image="Images\3003-coin_1.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Gesamtkosten ermitteln" category="ProjektCheck" class="GesamtkostenErmitteln" id="rpc_tools.gesamtkosten_ermitteln" image="Images\450000-chart.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Stra&#223;e (innere Erschlie&#223;ung)" category="ProjektCheck" class="StrasseInnereKostenaufteilung" id="rpc_tools.strasse_innere_kostenaufteilung" image="" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Stra&#223;e (&#228;u&#223;ere Erschlie&#223;ung)" category="ProjektCheck" class="StrasseAeussereKostenaufteilung" id="rpc_tools.strasse_aeussere_kostenaufteilung" image="" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Kanalisation" category="ProjektCheck" class="KanalisationKostenaufteilung" id="rpc_tools.kanalisation_kostenaufteilung" image="" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Trinkwasser" category="ProjektCheck" class="TrinkwasserKostenaufteilung" id="rpc_tools.trinkwasser_kostenaufteilung" image="" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Elektrizit&#228;t" category="ProjektCheck" class="ElektrizitaetKostenaufteilung" id="rpc_tools.elektrizitaet_kostenaufteilung" image="" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Kosten nach Kostentr&#228;gern auswerten" category="ProjektCheck" class="KostenNachKostentraegernAuswerten" id="rpc_tools.kosten_nach_kostentraegern_auswerten" image="Images\450500-pie-chart.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Kosten pro WE bzw. AP vergleichen" category="ProjektCheck" class="KostenProWEBzwAPVergleichen" id="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" image="Images\GraphVerticalBar16.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Wanderungssalden sch&#228;tzen" category="ProjektCheck" class="WanderungssaldenSchaetzen" id="rpc_tools.wanderungssalden_schaetzen" image="Images\017000-breafcase_1.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Einwohner" category="ProjektCheck" class="Einwohnersalden" id="rpc_tools.einwohnersalden" image="Images\4502-users_3.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Besch&#228;ftigte" category="ProjektCheck" class="Beschaeftigtensalden" id="rpc_tools.beschaeftigtensalden" image="Images\281500-worker_3.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Hebes&#228;tze Grundsteuer B" category="ProjektCheck" class="HebesaetzeGrundsteuerB" id="rpc_tools.hebesaetze_grundsteuer_b" image="Images\011000-home_1.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Hebes&#228;tze Gewerbesteuer" category="ProjektCheck" class="HebesaetzeGewerbesteuer" id="rpc_tools.hebesaetze_gewerbesteuer" image="Images\506700-factory_1.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="initiales Routing" category="ProjektCheck" class="InitialRouting" id="rpc_tools.initial_routing" image="Images\RouteFastest16.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Einstellungen des Verkehrsaufkommens" category="ProjektCheck" class="RoutingSettings" id="rpc_tools.routing_settings" image="Images\settings-4-16.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="gewichtetes Routing" category="ProjektCheck" class="WeightedRouting" id="rpc_tools.weighted_routing" image="Images\Route16.png" message="" tip=""><Help heading="" /></Button>
-        <Button caption="Einnahmeverschiebungen sch&#228;tzen" category="ProjektCheck" class="EinnahmeverschiebungenSchaetzen" id="rpc_tools.einnahmeverschiebungen_schaetzen" image="Images\Route16.png" message="" tip=""><Help heading="" /></Button>
-        <Tool caption="Skizze beenden" category="ProjektCheck" class="SkizzeBeenden" id="rpc_tools.skizze_beenden" image="Images\Analyze16.png" message="" tip="Mit Klicken dieses Buttons beenden Sie die Eingabe von Punkten, Netzelemente oder Fl&#228;chen."><Help heading="" /></Tool>
-        <Tool caption="Anbindungspunkt setzen" category="ProjektCheck" class="Anbindungspunkt" id="rpc_tools.anbindungspunkt" image="Images\CadastralFeatureSelect16.png" message="" tip="Setzen Sie auf der Karte einen Punkt zur Anbindung der Teilfl&#228;che an das Stra&#223;ennetz"><Help heading="" /></Tool>
-        </Commands>
-    <Extensions>
-        </Extensions>
-    <Toolbars>
-        <Toolbar caption="ProjektCheck" category="ProjektCheck" id="rpc_tools.toolbar" showInitially="true"><Items><ComboBox refID="rpc_tools.projekt_auswahl" /><Button refID="rpc_tools.refresh_layers" /><Menu refID="rpc_tools.menu_verwalten" /><Menu refID="rpc_tools.menu_definieren" /><Menu refID="rpc_tools.menu_analysieren" /><Tool refID="rpc_tools.skizze_beenden" /></Items></Toolbar>
-        </Toolbars>
-    <Menus>
-        <Menu caption="Verwalten" category="ProjektCheck" id="rpc_tools.menu_verwalten" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.neues_projekt" /><Button refID="rpc_tools.projekt_kopieren" /><Button refID="rpc_tools.projekt_loeschen" /></Items></Menu>
-        <Menu caption="Detailangaben zu Nutzungen auf Teilfl&#228;chen" category="ProjektCheck" id="rpc_tools.nutzungen_menu_detailangaben_nutzungen" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.wohnen" /><Button refID="rpc_tools.gewerbe" /><Button refID="rpc_tools.einzelhandel" /></Items></Menu>
-        <Menu caption="Definieren" category="ProjektCheck" id="rpc_tools.menu_definieren" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.nutzungen_definieren" /><Menu refID="rpc_tools.nutzungen_menu_detailangaben_nutzungen" /></Items></Menu>
-        <Menu caption="Bewohner und Arbeitspl&#228;tze" category="ProjektCheck" id="rpc_tools.menu_bewohner_und_arbeitsplaetze" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.bewohner_schaetzen" /><Button refID="rpc_tools.arbeitsplaetze_schaetzen" /></Items></Menu>
-        <Menu caption="Erreichbarkeit" category="ProjektCheck" id="rpc_tools.menu_erreichbarkeit" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
-        <Menu caption="Verkehr im Umfeld" category="ProjektCheck" id="rpc_tools.menu_verkehr_im_umfeld" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.initial_routing" /><Button refID="rpc_tools.routing_settings" /><Tool refID="rpc_tools.anbindungspunkt" /><Button refID="rpc_tools.weighted_routing" /> </Items></Menu>
-        <Menu caption="Fl&#228;che und &#214;kologie" category="ProjektCheck" id="rpc_tools.menu_flaeche_und_oekologie" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
-        <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_strasse_innere" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Tool refID="rpc_tools.lage_punktuelle_massnahme_strasse_innere" /><Button refID="rpc_tools.beschreibung_punktuelle_massnahme_strasse_innere" /></Items></Menu>
-        <Menu caption="Stra&#223;e (innere Erschlie&#223;ung)" category="ProjektCheck" id="rpc_tools.strasse_innere_erschliessung" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Tool refID="rpc_tools.anliegerstrasse_innere" /><Tool refID="rpc_tools.sammelstrasse_innere" /><Menu refID="rpc_tools.punktuelle_massnahme_strasse_innere" /></Items></Menu>
-        <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_strasse_aeussere" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Tool refID="rpc_tools.lage_punktuelle_massnahme_strasse_aeussere" /><Button refID="rpc_tools.beschreibung_punktuelle_massnahme_strasse_auessere" /></Items></Menu>
-        <Menu caption="Stra&#223;e (&#228;u&#223;ere Erschlie&#223;ung)" category="ProjektCheck" id="rpc_tools.strasse_aeussere_erschliessung" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Tool refID="rpc_tools.anliegerstrasse_aeussere" /><Tool refID="rpc_tools.sammelstrasse_aeussere" /><Menu refID="rpc_tools.punktuelle_massnahme_strasse_aeussere" /></Items></Menu>
-        <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_kanalisation" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Tool refID="rpc_tools.lage_punktuelle_massnahme_kanalisation" /><Button refID="rpc_tools.beschreibung_punktuelle_massnahme_kanalisation" /></Items></Menu>
-        <Menu caption="Kanalisation" category="ProjektCheck" id="rpc_tools.kanalisation" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.kanal_trennsystem" /><Tool refID="rpc_tools.kanal_mischsystem" /><Tool refID="rpc_tools.kanal_nur_schmutzwasser" /><Menu refID="rpc_tools.punktuelle_massnahme_kanalisation" /></Items></Menu>
-        <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_trinkwasser" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Tool refID="rpc_tools.lage_punktuelle_massnahme_trinkwasser" /><Button refID="rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser" /></Items></Menu>
-        <Menu caption="Trinkwasser" category="ProjektCheck" id="rpc_tools.trinkwasser" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Tool refID="rpc_tools.trinkwasserleitung" /><Menu refID="rpc_tools.punktuelle_massnahme_trinkwasser" /></Items></Menu>
-        <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_elektrizitaet" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Tool refID="rpc_tools.lage_punktuelle_massnahme_elektrizitaet" /><Button refID="rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet" /></Items></Menu>
-        <Menu caption="Elektrizit&#228;t" category="ProjektCheck" id="rpc_tools.elektrizitaet" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Tool refID="rpc_tools.stromleitung" /><Menu refID="rpc_tools.punktuelle_massnahme_elektrizitaet" /></Items></Menu>
-        <Menu caption="Netzelement l&#246;schen" category="ProjektCheck" id="rpc_tools.loeschen_erschliessung" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.netzabschnitt_loeschen" /><Button refID="rpc_tools.punktuelle_massnahme_loeschen" /></Items></Menu>
-        <Menu caption="Erschlie&#223;ungsnetze skizzieren" category="ProjektCheck" id="rpc_tools.erschliessungsnetze_skizzieren" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Menu refID="rpc_tools.strasse_innere_erschliessung" /><Menu refID="rpc_tools.strasse_aeussere_erschliessung" /><Menu refID="rpc_tools.kanalisation" /><Menu refID="rpc_tools.trinkwasser" /><Menu refID="rpc_tools.elektrizitaet" /><Menu refID="rpc_tools.loeschen_erschliessung" /><Button refID="rpc_tools.erschliessungsnetze_anzeigen"/></Items></Menu>
-        <Menu caption="Kostenaufteilung festlegen" category="ProjektCheck" id="rpc_tools.menu_kostenaufteilung" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.strasse_innere_kostenaufteilung" /><Button refID="rpc_tools.strasse_aeussere_kostenaufteilung" /><Button refID="rpc_tools.kanalisation_kostenaufteilung" /><Button refID="rpc_tools.trinkwasser_kostenaufteilung" /><Button refID="rpc_tools.elektrizitaet_kostenaufteilung" /></Items></Menu>
-        <Menu caption="Infrastrukturfolgekosten" category="ProjektCheck" id="rpc_tools.menu_infrastrukturkosten" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Menu refID="rpc_tools.erschliessungsnetze_skizzieren" /><Button refID="rpc_tools.infrastrukturmengen_bilanzieren" /><Button refID="rpc_tools.kostenkennwerte_kontrollieren" /><Button refID="rpc_tools.gesamtkosten_ermitteln" /><Menu refID="rpc_tools.menu_kostenaufteilung" /><Button refID="rpc_tools.kosten_nach_kostentraegern_auswerten" /><Button refID="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" /></Items></Menu>
-        <Menu caption="Wanderungssalden bearbeiten" category="ProjektCheck" id="rpc_tools.wanderungssalden_bearbeiten" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.einwohnersalden" /><Button refID="rpc_tools.beschaeftigtensalden" /></Items></Menu>
-        <Menu caption="Kommunaler Finanzausgleich" category="ProjektCheck" id="rpc_tools.kommunaler_finanzausgleich" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
-        <Menu caption="Fiskalische Strukturdaten kontrollieren" category="ProjektCheck" id="rpc_tools.menu_fiskalische_strukturdaten" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.hebesaetze_grundsteuer_b" /><Button refID="rpc_tools.hebesaetze_gewerbesteuer" /><Menu refID="rpc_tools.kommunaler_finanzausgleich" /></Items></Menu>
-        <Menu caption="Kommunale Steuereinnahmen" category="ProjektCheck" id="rpc_tools.menu_kommunale_steuereinnahmen" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Button refID="rpc_tools.wanderungssalden_schaetzen" /><Menu refID="rpc_tools.wanderungssalden_bearbeiten" /><Menu refID="rpc_tools.menu_fiskalische_strukturdaten" /><Button refID="rpc_tools.einnahmeverschiebungen_schaetzen" /></Items></Menu>
-        <Menu caption="Standortkonkurrenz" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true"><Items /></Menu>
-        <Menu caption="Analysieren" category="ProjektCheck" id="rpc_tools.menu_analysieren" isRootMenu="false" isShortcutMenu="true" separator="true"><Items><Menu refID="rpc_tools.menu_bewohner_und_arbeitsplaetze" /><Menu refID="rpc_tools.menu_erreichbarkeit" /><Menu refID="rpc_tools.menu_verkehr_im_umfeld" /><Menu refID="rpc_tools.menu_flaeche_und_oekologie" /><Menu refID="rpc_tools.menu_infrastrukturkosten" /><Menu refID="rpc_tools.menu_kommunale_steuereinnahmen" /><Menu refID="rpc_tools.menu_standortkonkurrenz" /></Items></Menu>
-        </Menus>
-    </ArcMap></AddIn></ESRI.Configuration>
+<ESRI.Configuration xmlns="http://schemas.esri.com/Desktop/AddIns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Name>ProjektCheck</Name>
+    <AddInID>{9b0f33ed-0bf7-41aa-8957-a7ad885b6d31}</AddInID>
+    <Description>New Addin</Description>
+    <Version>0.1</Version>
+    <Image />
+    <Author>Untitled</Author>
+    <Company>Untitled</Company>
+    <Date>04/28/2017</Date>
+    <Targets>
+        <Target name="Desktop" version="10.1" />
+    </Targets>
+    <AddIn language="PYTHON" library="rpc_tools_addin.py" namespace="rpc_tools">
+        <ArcMap>
+            <Commands>
+                <ComboBox caption="Projekt" category="ProjektCheck" class="ProjektAuswahl" id="rpc_tools.projekt_auswahl" itemSizeString="WWWWWW" message="" rows="4" sizeString="WWWWWW" tip="Nur dieses Projekt k&#246;nnen Sie editieren und analysieren. Weitere Projekte k&#246;nnen angezeigt bleiben.">
+                    <Help heading="" />
+                </ComboBox>
+                <Button caption="Layer aktualisieren" category="ProjektCheck" class="RefreshLayers" id="rpc_tools.refresh_layers" image="Images\5000-web.png" message="" tip="F&#252;gt die von den ProjektCheck-Tools verwendeten Layer des derzeit gew&#228;hlten Projekts dem Inhaltsverzeichnis hinzu bzw. aktualisiert sie.">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Neues Projekt" category="ProjektCheck" class="ProjektAnlegen" id="rpc_tools.neues_projekt" image="Images\1002-add2_1.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Projekt kopieren" category="ProjektCheck" class="ProjektKopieren" id="rpc_tools.projekt_kopieren" image="Images\1002-add_1.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Projekt l&#246;schen" category="ProjektCheck" class="ProjektLoeschen" id="rpc_tools.projekt_loeschen" image="Images\1001-cancel_1.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Nutzungen auf Teilfl&#228;chen definieren" category="ProjektCheck" class="NutzungenDefinieren" id="rpc_tools.nutzungen_definieren" image="Images\013500-filter_1.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Wohnen" category="ProjektCheck" class="Wohnen" id="rpc_tools.wohnen" image="Images\011000-home_1.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Gewerbe" category="ProjektCheck" class="Gewerbe" id="rpc_tools.gewerbe" image="Images\506700-factory_1.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Einzelhandel" category="ProjektCheck" class="Einzelhandel" id="rpc_tools.einzelhandel" image="Images\650000-grocery-shop_1.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Bewohnerzahl sch&#228;tzen" category="ProjektCheck" class="BewohnerSchaetzen" id="rpc_tools.bewohner_schaetzen" image="Images\4502-users_3.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Arbeitspl&#228;tze sch&#228;tzen" category="ProjektCheck" class="ArbeitsplaetzeSchaetzen" id="rpc_tools.arbeitsplaetze_schaetzen" image="Images\281500-worker_2.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Erschlie&#223;ungsnetze anzeigen" category="ProjektCheck" class="ErschliessungsnetzeAnzeigen" id="rpc_tools.erschliessungsnetze_anzeigen" image="Images\GenericRefresh16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="AnliegerstrasseInnere" id="rpc_tools.anliegerstrasse_innere" image="Images\Driving_Leg16.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Sammelstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="SammelstrasseInnere" id="rpc_tools.sammelstrasse_innere" image="Images\Driving_Distance16.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeStrasseInnere" id="rpc_tools.lage_punktuelle_massnahme_strasse_innere" image="Images\664100-office-button.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeStrasseInnere" id="rpc_tools.beschreibung_punktuelle_massnahme_strasse_innere" image="Images\GenericTag16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="AnliegerstrasseAeussere" id="rpc_tools.anliegerstrasse_aeussere" image="Images\Driving_Leg16_1.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Sammelstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="SammelstrasseAeussere" id="rpc_tools.sammelstrasse_aeussere" image="Images\Driving_Distance16_1.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeStrasseAeussere" id="rpc_tools.lage_punktuelle_massnahme_strasse_aeussere" image="Images\664100-office-button.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeStrasseAeussere" id="rpc_tools.beschreibung_punktuelle_massnahme_strasse_auessere" image="Images\GenericTag16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Tool caption="Kanal (Trennsystem) hinzuf&#252;gen" category="ProjektCheck" class="KanalTrennsystem" id="rpc_tools.kanal_trennsystem" image="Images\Kanal Trennsystem.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Kanal (Mischsystem) hinzuf&#252;gen" category="ProjektCheck" class="KanalMischsystem" id="rpc_tools.kanal_mischsystem" image="Images\Kanal Mischsystem.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Kanal (nur Schmutzwasser) hinzuf&#252;gen" category="ProjektCheck" class="KanalNurSchmutzwasser" id="rpc_tools.kanal_nur_schmutzwasser" image="Images\Kanal nur Schmutzwasser.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeKanalisation" id="rpc_tools.lage_punktuelle_massnahme_kanalisation" image="Images\664100-office-button.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeKanalisation" id="rpc_tools.beschreibung_punktuelle_massnahme_kanalisation" image="Images\GenericTag16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Tool caption="Trinkwasserleitung hinzuf&#252;gen" category="ProjektCheck" class="Trinkwasserleitung" id="rpc_tools.trinkwasserleitung" image="Images\Trinkwasserleitung.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeTrinkwasser" id="rpc_tools.lage_punktuelle_massnahme_trinkwasser" image="Images\664100-office-button.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeTrinkwasser" id="rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Tool caption="Stromleitung hinzuf&#252;gen" category="ProjektCheck" class="Stromleitung" id="rpc_tools.stromleitung" image="Images\Stromleitung.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeElektrizitaet" id="rpc_tools.lage_punktuelle_massnahme_elektrizitaet" image="Images\664100-office-button.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeElektrizitaet" id="rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet" image="Images\GenericTag16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Ausgew&#228;hlte Netzelemente l&#246;schen" category="ProjektCheck" class="NetzabschnittLoeschen" id="rpc_tools.netzabschnitt_loeschen" image="Images\ArcScanRasterPaintingDrawLineTool16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Ausgew&#228;hlte punktuelle Ma&#223;nahmen l&#246;schen" category="ProjektCheck" class="PunktuelleMassnahmeLoeschen" id="rpc_tools.punktuelle_massnahme_loeschen" image="Images\ElementMarker16x11.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Infrastrukturmengen bilanzieren" category="ProjektCheck" class="InfrastrukturmengenBilanzieren" id="rpc_tools.infrastrukturmengen_bilanzieren" image="Images\400000-ruler.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Kostenkennwerte kontrollieren" category="ProjektCheck" class="KostenkennwerteKontrollieren" id="rpc_tools.kostenkennwerte_kontrollieren" image="Images\3003-coin_1.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Gesamtkosten ermitteln" category="ProjektCheck" class="GesamtkostenErmitteln" id="rpc_tools.gesamtkosten_ermitteln" image="Images\450000-chart.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Stra&#223;e (innere Erschlie&#223;ung)" category="ProjektCheck" class="StrasseInnereKostenaufteilung" id="rpc_tools.strasse_innere_kostenaufteilung" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Stra&#223;e (&#228;u&#223;ere Erschlie&#223;ung)" category="ProjektCheck" class="StrasseAeussereKostenaufteilung" id="rpc_tools.strasse_aeussere_kostenaufteilung" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Kanalisation" category="ProjektCheck" class="KanalisationKostenaufteilung" id="rpc_tools.kanalisation_kostenaufteilung" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Trinkwasser" category="ProjektCheck" class="TrinkwasserKostenaufteilung" id="rpc_tools.trinkwasser_kostenaufteilung" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Elektrizit&#228;t" category="ProjektCheck" class="ElektrizitaetKostenaufteilung" id="rpc_tools.elektrizitaet_kostenaufteilung" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Kosten nach Kostentr&#228;gern auswerten" category="ProjektCheck" class="KostenNachKostentraegernAuswerten" id="rpc_tools.kosten_nach_kostentraegern_auswerten" image="Images\450500-pie-chart.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Kosten pro WE bzw. AP vergleichen" category="ProjektCheck" class="KostenProWEBzwAPVergleichen" id="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" image="Images\GraphVerticalBar16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Wanderungssalden sch&#228;tzen" category="ProjektCheck" class="WanderungssaldenSchaetzen" id="rpc_tools.wanderungssalden_schaetzen" image="Images\017000-breafcase_1.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Einwohner" category="ProjektCheck" class="Einwohnersalden" id="rpc_tools.einwohnersalden" image="Images\4502-users_3.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Besch&#228;ftigte" category="ProjektCheck" class="Beschaeftigtensalden" id="rpc_tools.beschaeftigtensalden" image="Images\281500-worker_3.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Hebes&#228;tze Grundsteuer B" category="ProjektCheck" class="HebesaetzeGrundsteuerB" id="rpc_tools.hebesaetze_grundsteuer_b" image="Images\011000-home_1.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Hebes&#228;tze Gewerbesteuer" category="ProjektCheck" class="HebesaetzeGewerbesteuer" id="rpc_tools.hebesaetze_gewerbesteuer" image="Images\506700-factory_1.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="initiales Routing" category="ProjektCheck" class="InitialRouting" id="rpc_tools.initial_routing" image="Images\RouteFastest16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Einstellungen des Verkehrsaufkommens" category="ProjektCheck" class="RoutingSettings" id="rpc_tools.routing_settings" image="Images\settings-4-16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="gewichtetes Routing" category="ProjektCheck" class="WeightedRouting" id="rpc_tools.weighted_routing" image="Images\Route16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Einnahmeverschiebungen sch&#228;tzen" category="ProjektCheck" class="EinnahmeverschiebungenSchaetzen" id="rpc_tools.einnahmeverschiebungen_schaetzen" image="Images\Route16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Tool caption="Skizze beenden" category="ProjektCheck" class="SkizzeBeenden" id="rpc_tools.skizze_beenden" image="Images\Analyze16.png" message="" tip="Mit Klicken dieses Buttons beenden Sie die Eingabe von Punkten, Netzelemente oder Fl&#228;chen.">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Anbindungspunkt setzen" category="ProjektCheck" class="Anbindungspunkt" id="rpc_tools.anbindungspunkt" image="Images\CadastralFeatureSelect16.png" message="" tip="Setzen Sie auf der Karte einen Punkt zur Anbindung der Teilfl&#228;che an das Stra&#223;ennetz">
+                    <Help heading="" />
+                </Tool>
+                <Button caption="Bestand einlesen" category="ProjektCheck" class="BestandEinlesen" id="rpc_tools.bestand_einlesen" image="Images\CadastralJobLoad16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Tool caption="Markt setzen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Markt bearbeiten" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Markt entfernen" category="ProjektCheck" class="BestandMarktEntfernen" id="rpc_tools.bestand_entfernen" image="" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="bestehenden Markt erweitern" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_erweitern" image="" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="geplanten Markt setzen" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_hinzu" image="" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="geplanten Markt bearbeiten" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="geplanten Markt entfernen" category="ProjektCheck" class="PlanfallMarktEntfernen" id="rpc_tools.planfall_entfernen" image="" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+            </Commands>
+            <Extensions>
+            </Extensions>
+            <Toolbars>
+                <Toolbar caption="ProjektCheck" category="ProjektCheck" id="rpc_tools.toolbar" showInitially="true">
+                    <Items>
+                        <ComboBox refID="rpc_tools.projekt_auswahl" />
+                        <Button refID="rpc_tools.refresh_layers" />
+                        <Menu refID="rpc_tools.menu_verwalten" />
+                        <Menu refID="rpc_tools.menu_definieren" />
+                        <Menu refID="rpc_tools.menu_analysieren" />
+                        <Tool refID="rpc_tools.skizze_beenden" />
+                    </Items>
+                </Toolbar>
+            </Toolbars>
+            <Menus>
+                <Menu caption="Verwalten" category="ProjektCheck" id="rpc_tools.menu_verwalten" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.neues_projekt" />
+                        <Button refID="rpc_tools.projekt_kopieren" />
+                        <Button refID="rpc_tools.projekt_loeschen" />
+                    </Items>
+                </Menu>
+                <Menu caption="Detailangaben zu Nutzungen auf Teilfl&#228;chen" category="ProjektCheck" id="rpc_tools.nutzungen_menu_detailangaben_nutzungen" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.wohnen" />
+                        <Button refID="rpc_tools.gewerbe" />
+                        <Button refID="rpc_tools.einzelhandel" />
+                    </Items>
+                </Menu>
+                <Menu caption="Definieren" category="ProjektCheck" id="rpc_tools.menu_definieren" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.nutzungen_definieren" />
+                        <Menu refID="rpc_tools.nutzungen_menu_detailangaben_nutzungen" />
+                    </Items>
+                </Menu>
+                <Menu caption="Bewohner und Arbeitspl&#228;tze" category="ProjektCheck" id="rpc_tools.menu_bewohner_und_arbeitsplaetze" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.bewohner_schaetzen" />
+                        <Button refID="rpc_tools.arbeitsplaetze_schaetzen" />
+                    </Items>
+                </Menu>
+                <Menu caption="Erreichbarkeit" category="ProjektCheck" id="rpc_tools.menu_erreichbarkeit" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items />
+                </Menu>
+                <Menu caption="Verkehr im Umfeld" category="ProjektCheck" id="rpc_tools.menu_verkehr_im_umfeld" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.initial_routing" />
+                        <Button refID="rpc_tools.routing_settings" />
+                        <Tool refID="rpc_tools.anbindungspunkt" />
+                        <Button refID="rpc_tools.weighted_routing" />
+                    </Items>
+                </Menu>
+                <Menu caption="Fl&#228;che und &#214;kologie" category="ProjektCheck" id="rpc_tools.menu_flaeche_und_oekologie" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items />
+                </Menu>
+                <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_strasse_innere" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.lage_punktuelle_massnahme_strasse_innere" />
+                        <Button refID="rpc_tools.beschreibung_punktuelle_massnahme_strasse_innere" />
+                    </Items>
+                </Menu>
+                <Menu caption="Stra&#223;e (innere Erschlie&#223;ung)" category="ProjektCheck" id="rpc_tools.strasse_innere_erschliessung" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.anliegerstrasse_innere" />
+                        <Tool refID="rpc_tools.sammelstrasse_innere" />
+                        <Menu refID="rpc_tools.punktuelle_massnahme_strasse_innere" />
+                    </Items>
+                </Menu>
+                <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_strasse_aeussere" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.lage_punktuelle_massnahme_strasse_aeussere" />
+                        <Button refID="rpc_tools.beschreibung_punktuelle_massnahme_strasse_auessere" />
+                    </Items>
+                </Menu>
+                <Menu caption="Stra&#223;e (&#228;u&#223;ere Erschlie&#223;ung)" category="ProjektCheck" id="rpc_tools.strasse_aeussere_erschliessung" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.anliegerstrasse_aeussere" />
+                        <Tool refID="rpc_tools.sammelstrasse_aeussere" />
+                        <Menu refID="rpc_tools.punktuelle_massnahme_strasse_aeussere" />
+                    </Items>
+                </Menu>
+                <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_kanalisation" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.lage_punktuelle_massnahme_kanalisation" />
+                        <Button refID="rpc_tools.beschreibung_punktuelle_massnahme_kanalisation" />
+                    </Items>
+                </Menu>
+                <Menu caption="Kanalisation" category="ProjektCheck" id="rpc_tools.kanalisation" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.kanal_trennsystem" />
+                        <Tool refID="rpc_tools.kanal_mischsystem" />
+                        <Tool refID="rpc_tools.kanal_nur_schmutzwasser" />
+                        <Menu refID="rpc_tools.punktuelle_massnahme_kanalisation" />
+                    </Items>
+                </Menu>
+                <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_trinkwasser" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.lage_punktuelle_massnahme_trinkwasser" />
+                        <Button refID="rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser" />
+                    </Items>
+                </Menu>
+                <Menu caption="Trinkwasser" category="ProjektCheck" id="rpc_tools.trinkwasser" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.trinkwasserleitung" />
+                        <Menu refID="rpc_tools.punktuelle_massnahme_trinkwasser" />
+                    </Items>
+                </Menu>
+                <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_elektrizitaet" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.lage_punktuelle_massnahme_elektrizitaet" />
+                        <Button refID="rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet" />
+                    </Items>
+                </Menu>
+                <Menu caption="Elektrizit&#228;t" category="ProjektCheck" id="rpc_tools.elektrizitaet" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.stromleitung" />
+                        <Menu refID="rpc_tools.punktuelle_massnahme_elektrizitaet" />
+                    </Items>
+                </Menu>
+                <Menu caption="Netzelement l&#246;schen" category="ProjektCheck" id="rpc_tools.loeschen_erschliessung" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.netzabschnitt_loeschen" />
+                        <Button refID="rpc_tools.punktuelle_massnahme_loeschen" />
+                    </Items>
+                </Menu>
+                <Menu caption="Erschlie&#223;ungsnetze skizzieren" category="ProjektCheck" id="rpc_tools.erschliessungsnetze_skizzieren" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Menu refID="rpc_tools.strasse_innere_erschliessung" />
+                        <Menu refID="rpc_tools.strasse_aeussere_erschliessung" />
+                        <Menu refID="rpc_tools.kanalisation" />
+                        <Menu refID="rpc_tools.trinkwasser" />
+                        <Menu refID="rpc_tools.elektrizitaet" />
+                        <Menu refID="rpc_tools.loeschen_erschliessung" />
+                        <Button refID="rpc_tools.erschliessungsnetze_anzeigen"/>
+                    </Items>
+                </Menu>
+                <Menu caption="Kostenaufteilung festlegen" category="ProjektCheck" id="rpc_tools.menu_kostenaufteilung" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.strasse_innere_kostenaufteilung" />
+                        <Button refID="rpc_tools.strasse_aeussere_kostenaufteilung" />
+                        <Button refID="rpc_tools.kanalisation_kostenaufteilung" />
+                        <Button refID="rpc_tools.trinkwasser_kostenaufteilung" />
+                        <Button refID="rpc_tools.elektrizitaet_kostenaufteilung" />
+                    </Items>
+                </Menu>
+                <Menu caption="Infrastrukturfolgekosten" category="ProjektCheck" id="rpc_tools.menu_infrastrukturkosten" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Menu refID="rpc_tools.erschliessungsnetze_skizzieren" />
+                        <Button refID="rpc_tools.infrastrukturmengen_bilanzieren" />
+                        <Button refID="rpc_tools.kostenkennwerte_kontrollieren" />
+                        <Button refID="rpc_tools.gesamtkosten_ermitteln" />
+                        <Menu refID="rpc_tools.menu_kostenaufteilung" />
+                        <Button refID="rpc_tools.kosten_nach_kostentraegern_auswerten" />
+                        <Button refID="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" />
+                    </Items>
+                </Menu>
+                <Menu caption="Wanderungssalden bearbeiten" category="ProjektCheck" id="rpc_tools.wanderungssalden_bearbeiten" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.einwohnersalden" />
+                        <Button refID="rpc_tools.beschaeftigtensalden" />
+                    </Items>
+                </Menu>
+                <Menu caption="Kommunaler Finanzausgleich" category="ProjektCheck" id="rpc_tools.kommunaler_finanzausgleich" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items />
+                </Menu>
+                <Menu caption="Fiskalische Strukturdaten kontrollieren" category="ProjektCheck" id="rpc_tools.menu_fiskalische_strukturdaten" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.hebesaetze_grundsteuer_b" />
+                        <Button refID="rpc_tools.hebesaetze_gewerbesteuer" />
+                        <Menu refID="rpc_tools.kommunaler_finanzausgleich" />
+                    </Items>
+                </Menu>
+                <Menu caption="Kommunale Steuereinnahmen" category="ProjektCheck" id="rpc_tools.menu_kommunale_steuereinnahmen" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.wanderungssalden_schaetzen" />
+                        <Menu refID="rpc_tools.wanderungssalden_bearbeiten" />
+                        <Menu refID="rpc_tools.menu_fiskalische_strukturdaten" />
+                        <Button refID="rpc_tools.einnahmeverschiebungen_schaetzen" />
+                    </Items>
+                </Menu>
+                <Menu caption="Nullfall" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.bestand_einlesen" />
+                        <Tool refID="rpc_tools.bestand_hinzu" />
+                        <Tool refID="rpc_tools.bestand_bearbeiten" />
+                        <Tool refID="rpc_tools.bestand_entfernen" />
+                    </Items>
+                </Menu>
+                <Menu caption="Planfall" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_planfall" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.planfall_erweitern" />
+                        <Tool refID="rpc_tools.planfall_hinzu" />
+                        <Tool refID="rpc_tools.planfall_bearbeiten" />
+                        <Tool refID="rpc_tools.planfall_entfernen" />
+                    </Items>
+                </Menu>
+                <Menu caption="Standortkonkurrenz" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Menu refID="rpc_tools.menu_standortkonkurrenz_nullfall" />
+                        <Menu refID="rpc_tools.menu_standortkonkurrenz_planfall" />
+                    </Items>
+                </Menu>
+                <Menu caption="Analysieren" category="ProjektCheck" id="rpc_tools.menu_analysieren" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Menu refID="rpc_tools.menu_bewohner_und_arbeitsplaetze" />
+                        <Menu refID="rpc_tools.menu_erreichbarkeit" />
+                        <Menu refID="rpc_tools.menu_verkehr_im_umfeld" />
+                        <Menu refID="rpc_tools.menu_flaeche_und_oekologie" />
+                        <Menu refID="rpc_tools.menu_infrastrukturkosten" />
+                        <Menu refID="rpc_tools.menu_kommunale_steuereinnahmen" />
+                        <Menu refID="rpc_tools.menu_standortkonkurrenz" />
+                    </Items>
+                </Menu>
+            </Menus>
+        </ArcMap>
+    </AddIn>
+</ESRI.Configuration>
