@@ -9,7 +9,10 @@ from collections import OrderedDict
 #from rpctools.analyst.verkehr.otp_routing import Point
 from pyproj import Proj, transform
 import urllib
+import arcpy
+from rpctools.utils.config import Config 
 
+config = Config()
 
 class Point(object):
     """A Point object"""
@@ -84,8 +87,7 @@ class OSMShopsReader(object):
         json
         """
         query = 'DWithin(geom,POINT({y} {x}),{m},meters)'
-        srsname = 'EPSG:{}'.format(self.epsg)
-        srsname = 'EPSG:{}'.format(4326)
+        srsname = 'EPSG:{}'.format(config.epsg)
         params = dict(CQL_FILTER=query.format(x=point.x,
                                               y=point.y,
                                               m=distance),

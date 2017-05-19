@@ -551,6 +551,26 @@ class EinnahmeverschiebungenSchaetzen(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Einnahmen.pyt'
     _toolbox_name = 'TbxSteuersalden'
+    
+    
+### VERKEHR ###
+    
+class InitialRouting(ToolboxButton):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Verkehrserzeugung.pyt'
+    _toolbox_name = 'TbxRouting'
+
+
+class RoutingSettings(ToolboxButton):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Verkehrserzeugung.pyt'
+    _toolbox_name = 'TbxSettings'
+
+
+class WeightedRouting(ToolboxButton):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Verkehrserzeugung.pyt'
+    _toolbox_name = 'TbxUpdateNodes'
 
 
 class Anbindungspunkt(ToolboxButton):
