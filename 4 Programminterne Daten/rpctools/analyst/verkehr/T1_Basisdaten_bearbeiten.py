@@ -23,7 +23,7 @@ from rpctools.utils.encoding import encode
 
 class Basisdatenbearbeiten(Tool):
     ws_definition = 'FGDB_Definition_Projekt.gdb'
-    _dbname = 'FGDB_Verkehr.gdb'
+    _workspace = 'FGDB_Verkehr.gdb'
 
     def delete_feature_classes(self, deletelist):
         """

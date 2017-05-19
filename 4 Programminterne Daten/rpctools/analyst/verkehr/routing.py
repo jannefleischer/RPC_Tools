@@ -8,7 +8,7 @@ from rpctools.analyst.verkehr.otp_router import Point, OTPRouter
 
 
 class Routing(Tool):
-    _dbname = 'FGDB_Verkehr.gdb'
+    _workspace = 'FGDB_Verkehr.gdb'
     _param_projectname = 'project'
 
     def run(self):

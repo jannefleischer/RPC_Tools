@@ -6,7 +6,7 @@ import pandas as pd
 
 class Nutzungen(Tool):
     _param_projectname = 'projectname'
-    _dbname = 'FGDB_Definition_Projekt.gdb'
+    _workspace = 'FGDB_Definition_Projekt.gdb'
 
     def run(self):        
         """"""

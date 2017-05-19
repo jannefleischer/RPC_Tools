@@ -5,7 +5,7 @@ from rpctools.definitions.projektverwaltung.projektverwaltung \
 
 class Projektauswahl(Projektverwaltung):
     _param_projectname = 'active_project'
-    _dbname = 'FGDB_Definition_Projekt.gdb'
+    _workspace = 'FGDB_Definition_Projekt.gdb'
 
     def run(self):
         self.parent_tbx.config.active_project = self.par.active_project.value

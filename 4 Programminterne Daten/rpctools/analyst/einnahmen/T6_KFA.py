@@ -29,7 +29,7 @@ import rpctools.utils.tempmdb_lib as mdb
 
 class KFA(Tool):
 
-    _dbname = 'FGDB_Einnahmen.gdb'
+    _workspace = 'FGDB_Einnahmen.gdb'
 
     def run(self):
         parameters = self.par

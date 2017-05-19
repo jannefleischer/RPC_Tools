@@ -22,7 +22,7 @@ import arcpy, os
 
 class Flaechenbilanz(Tool):
 
-    _dbname = 'FGDB_Definition_Projekt.gdb'
+    _workspace = 'FGDB_Definition_Projekt.gdb'
 
     @property
     def teilflaechen_table(self):

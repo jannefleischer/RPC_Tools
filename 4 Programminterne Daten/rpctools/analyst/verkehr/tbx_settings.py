@@ -5,7 +5,7 @@ from rpctools.utils.constants import Nutzungsart as nart
 import arcpy
 
 class Settings(Tool):
-    _dbname = 'FGDB_Verkehr.gdb'
+    _workspace = 'FGDB_Verkehr.gdb'
     _param_projectname = 'project'
 
     def run(self):

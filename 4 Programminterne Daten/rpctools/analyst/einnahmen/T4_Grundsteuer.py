@@ -36,7 +36,7 @@ import rpctools.utils.population_lib as population_lib
 
 class Grundsteuer(Tool):
 
-    _dbname = 'FGDB_Einnahmen.gdb'
+    _workspace = 'FGDB_Einnahmen.gdb'
 
     def run(self):
         parameters = self.par

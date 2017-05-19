@@ -11,7 +11,7 @@ from rpctools.diagrams.infrastruktur import Netzlaenge, MassnahmenKosten
 
 class InfrastrukturmengenBilanz(Tool):
     _param_projectname = 'projectname'
-    _dbname = 'FGDB_Kosten.gdb'
+    _workspace = 'FGDB_Kosten.gdb'
     _group_layer = "infrastruktur"
     _line_layer = "Erschließungsnetz"
     _point_layer = "Erschließungsnetz - punktuelle Maßnahmen" 

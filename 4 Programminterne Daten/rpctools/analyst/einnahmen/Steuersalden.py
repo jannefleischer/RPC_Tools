@@ -12,7 +12,7 @@ class Steuersalden(Tool):
     """Steuersalden-Tool"""
 
     _param_projectname = 'name'
-    _dbname = 'FGDB_Einnahmen.gdb'
+    _workspace = 'FGDB_Einnahmen.gdb'
 
     def run(self):
         """run Steuersalden Tool"""

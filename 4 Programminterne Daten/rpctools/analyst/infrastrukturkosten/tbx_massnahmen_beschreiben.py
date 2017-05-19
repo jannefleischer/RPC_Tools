@@ -9,7 +9,7 @@ from collections import OrderedDict
 
 class MassnahmenBeschreiben(Tool):
     _param_projectname = 'projectname'
-    _dbname = 'FGDB_Kosten.gdb'
+    _workspace = 'FGDB_Kosten.gdb'
     
     def run(self):
         """"""
@@ -103,7 +103,7 @@ class TbxMassnahmenBeschreiben(Tbx):
         p.filter.type = 'Range'
         p.filter.list = [0, 100]
 
-        self.add_temporary_management(self.folders.dbname)
+        self.add_temporary_management(self.folders.workspace)
         
         return params
         

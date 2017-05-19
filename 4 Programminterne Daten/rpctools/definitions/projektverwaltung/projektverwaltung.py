@@ -32,7 +32,7 @@ from rpctools.definitions.diagram_teilflaechen import DiaTeilflaechen
 class Projektverwaltung(DiaTeilflaechen):
 
     _param_projectname = 'name'
-    _dbname = 'FGDB_Definition_Projekt.gdb'
+    _workspace = 'FGDB_Definition_Projekt.gdb'
 
     def add_output_new_project(self):
         # add Teilflächen

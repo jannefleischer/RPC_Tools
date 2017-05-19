@@ -28,7 +28,7 @@ import rpctools.utils.tempmdb_lib as mdb
 
 class KRU(Tool):
 
-    _dbname = 'FGDB_Einnahmen.gdb'
+    _workspace = 'FGDB_Einnahmen.gdb'
 
     def run(self):
 

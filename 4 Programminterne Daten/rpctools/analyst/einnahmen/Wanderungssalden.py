@@ -14,7 +14,7 @@ import rpctools.utils.allgemeine_Rahmendaten as rahmendaten
 class Wanderungssalden(Tool):
 
     _param_projectname = 'name'
-    _dbname = 'FGDB_Einnahmen.gdb'
+    _workspace = 'FGDB_Einnahmen.gdb'
 
     def run(self):
 

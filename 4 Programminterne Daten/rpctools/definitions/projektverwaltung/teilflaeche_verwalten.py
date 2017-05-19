@@ -11,7 +11,7 @@ from rpctools.definitions.diagram_teilflaechen import DiaTeilflaechen
 class TeilflaechenVerwalten(DiaTeilflaechen):
 
     _param_projectname = 'projectname'
-    _dbname = 'FGDB_Definition_Projekt.gdb'
+    _workspace = 'FGDB_Definition_Projekt.gdb'
 
 
     def run(self):

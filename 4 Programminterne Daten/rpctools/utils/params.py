@@ -60,7 +60,7 @@ class Tool(object):
 
     _param_projectname = 'projectname'
     """The parameter that holds the projectname"""
-    _dbname = None
+    _workspace = None
     """the name of the default database of the tool"""
 
     def __init__(self, params, parent_tbx):
@@ -218,7 +218,7 @@ class Tbx(object):
 
         # the parameters
         self.par = Params(param_projectname=Tool._param_projectname,
-                          dbname=Tool._dbname)
+                          workspace=Tool._workspace)
         # define the folders
         self.folders = Folders(params=self.par)
         self.projects = []
@@ -590,7 +590,7 @@ class Tbx(object):
         temporary table if it does not exist yet),
         return None if table does not exist
         """
-        workspace = os.path.basename(workspace) or self.tool._dbname
+        workspace = os.path.basename(workspace) or self.tool._workspace
         table_name = os.path.basename(table_name)
         # if table is in temp. management -> write to temporary table instead
         # don't do this while executing toolbox, temp. management is meant for
@@ -857,7 +857,7 @@ class Tbx(object):
         # project table (with temp. management)
         else: 
             table_name = os.path.basename(table_name)
-            workspace = os.path.basename(workspace) or self.tool._dbname
+            workspace = os.path.basename(workspace) or self.tool._workspace
             table_path = self._get_table_path(table_name, workspace)
             rows = self._query_table(table_path, columns=columns, where=where, 
                                      pkey=pkey)

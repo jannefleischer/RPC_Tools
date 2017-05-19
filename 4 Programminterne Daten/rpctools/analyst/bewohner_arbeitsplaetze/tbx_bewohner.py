@@ -11,7 +11,7 @@ import arcpy
 
 class Bewohner(Tool):
     _param_projectname = 'projectname'
-    _dbname = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
+    _workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
 
     def run(self):    
         # table and column names

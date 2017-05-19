@@ -15,7 +15,7 @@ class Params(object):
 
     def __init__(self,
                  param_projectname='name',
-                 dbname='',
+                 workspace='',
                  *args,
                  **kwargs):
         """
@@ -23,7 +23,7 @@ class Params(object):
         ----------
         param_projectname : str (optional, default='name')
             the name of the project_name-Parameter
-        param_dbname : str (optional)
+        param_workspace : str (optional)
             the name of the Default Database for the Tool
 
         Examples
@@ -81,7 +81,7 @@ class Params(object):
         """
         self._od = OrderedDict(*args, **kwargs)
         self._param_projectname = param_projectname
-        self._dbname = dbname
+        self._workspace = workspace
 
     def __getattr__(self, name):
         if name in self.__dict__:

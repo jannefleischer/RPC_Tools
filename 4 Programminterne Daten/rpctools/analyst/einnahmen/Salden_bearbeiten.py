@@ -14,7 +14,7 @@ import rpctools.utils.population_lib as pop
 class Salden_bearbeiten(Tool):
 
     _param_projectname = 'name'
-    _dbname = 'FGDB_Einnahmen.gdb'
+    _workspace = 'FGDB_Einnahmen.gdb'
 
     def run(self):
 

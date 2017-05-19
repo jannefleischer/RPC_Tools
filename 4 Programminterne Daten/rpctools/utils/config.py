@@ -170,10 +170,10 @@ class Folders(object):
         return projectname
 
     @property
-    def dbname(self):
+    def workspace(self):
         """The default database name"""
-        dbname = self._params._dbname
-        return dbname
+        workspace = self._params._workspace
+        return workspace
 
     @property
     def INTERN(self):
@@ -303,10 +303,10 @@ class Folders(object):
         return path
 
     def get_temporary_db(self, project=None, workspace='', check=True):
-        dbname = basename(workspace) or self.dbname
+        workspace = basename(workspace) or self.workspace
         return self.join_and_check(
             self.get_temporary_projectpath(project=project),
-            dbname, check=check)
+            workspace, check=check)
 
     def get_temporary_table(self, table_name, workspace='',
                             project=None, check=True):
@@ -341,9 +341,9 @@ class Folders(object):
         projectdb : str
             the full path of the Workspace
         """
-        dbname = basename(workspace) or self.dbname
+        workspace = basename(workspace) or self.workspace
         projectname = project or self.project
-        return self.join_and_check(self.get_projectpath(projectname), dbname,
+        return self.join_and_check(self.get_projectpath(projectname), workspace,
                                    check=check)
 
     def get_table(self, tablename, workspace='', project='', check=True):
@@ -363,9 +363,9 @@ class Folders(object):
         table : str
             the full path to a table in the Workspace
         """
-        dbname = basename(workspace) or self.dbname
+        workspace = basename(workspace) or self.workspace
         projectname = project or self.project
-        table = self.join_and_check(self.get_db(dbname, projectname),
+        table = self.join_and_check(self.get_db(workspace, projectname),
                                     tablename,
                                     check=check)
         return table
@@ -404,8 +404,8 @@ class Folders(object):
         base_table : str
             the full path to the table in the Base Workspace
         """
-        dbname = basename(workspace)
-        table = self.join_and_check(self.get_basedb(dbname), table,
+        workspace = basename(workspace)
+        table = self.join_and_check(self.get_basedb(workspace), table,
                                     check=check)
         return table
 

@@ -13,7 +13,7 @@ import arcpy
 
 class Arbeitsplaetze(Tool):
     _param_projectname = 'projectname'
-    _dbname = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
+    _workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
 
     def run(self):
         """"""
