@@ -72,8 +72,9 @@ class Routing(Tool):
                 continue
             o.areas.add_area(source_id, trips=trips)
             # ? lat = y lon = x
-            source = Point(lat=y_coord, lon=x_coord)    # centroid
-            source.get_geom
+            source = Point.from_xy(y=y_coord, x=x_coord,
+                                   srid_proj=o.p2, srid_geogr=o.p1)    # centroid
+
             # calculate segments around centroid
             destinations = o.create_circle(source, dist=outer_circle,
                                            n_segments=n_segments)

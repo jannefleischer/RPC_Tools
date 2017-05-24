@@ -257,6 +257,13 @@ class Point(object):
         self.x = x
         self.y = y
 
+    @classmethod
+    def from_xy(cls, x, y, srid_proj, srid_geogr, node_id=None):
+        """"""
+        lon, lat = transform(srid_proj, srid_geogr, x, y)
+        self = cls(lat=lat, lon=lon, node_id=node_id, x=x, y=y)
+        return self
+
     def __repr__(self):
         return '{},{}'.format(self.lat, self.lon)
 
@@ -531,8 +538,11 @@ class OTPRouter(object):
             the number of segments of the (nearly) circle
 
         """
-        source_x, source_y = transform(self.p1, self.p2,
-                                       source.lon, source.lat)
+        if source.x is None:
+            source_x, source_y = transform(self.p1, self.p2,
+                                           source.lon, source.lat)
+        else:
+            source_x, source_y = source.x, source.y
         angel = np.linspace(0, np.pi*2, n_segments)
         x = source_x + dist * np.cos(angel)
         y = source_y + dist * np.sin(angel)
