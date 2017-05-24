@@ -81,7 +81,7 @@ class Routing(Tool):
             # calculate the routes to the segments
             for (lon, lat) in destinations:
                 destination = Point(lat, lon)
-                print r_id,
+                arcpy.AddMessage('suche Routen {}'.format(r_id))
                 json = o.get_routing_request(source, destination)
                 o.decode_coords(json, route_id=r_id, source_id=source_id)
                 r_id += 1

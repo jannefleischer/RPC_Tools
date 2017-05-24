@@ -34,6 +34,8 @@ class TbxSetSource(TbxFlaechendefinition):
         x, y = self.config.active_coord
         params.x_source.value = x
         params.y_source.value = y
+        params.x_source.enabled = False
+        params.y_source.enabled = False
 
     def _getParameterInfo(self):
         params = super(TbxSetSource, self)._getParameterInfo()

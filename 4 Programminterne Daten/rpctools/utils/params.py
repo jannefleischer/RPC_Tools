@@ -267,8 +267,8 @@ class Tbx(object):
         """
         parameter = self.par[param_name] = Parameter()
         return parameter
-    
-    def remove_parameter(self, param_name): 
+
+    def remove_parameter(self, param_name):
         """
         Remove a (patched) arcpy-parameter from toolbox
 
@@ -301,7 +301,7 @@ class Tbx(object):
         """
 
         self.par._update_parameters(parameters)
-        
+
         if self.par.toolbox_opened():
             self.open()
         # updating projects messes up the initial project management
@@ -310,7 +310,7 @@ class Tbx(object):
         self._update_dependencies(self.par)
             #self._create_temporary_copies()
         self._updateParameters(self.par)
-        
+
     def open(self):
         """
         called on open of toolbox (custom function, no ArcGIS method)
@@ -394,12 +394,12 @@ class Tbx(object):
         """check if dependent params were altered and set them to target sum"""
         for dependency in self._dependencies:
             dependency.update(params)
-            
+
     def _open(self, params):
         """
         do something, if toolbox was recently opened (only works, if toolbox
         owns more than one parameter)
-        
+
         To define in the subclass
         """
 
@@ -435,7 +435,7 @@ class Tbx(object):
                 u'Folgende Pfade oder Tabellen wurden nicht gefunden: {}'
                 .format(invalid))
         self._updateMessages(self.par)
-        
+
     def validate_inputs(self):
         return True, ''
 
@@ -470,9 +470,9 @@ class Tbx(object):
             the number of updated rows, -1 if table does not exist
         """
         table_path = self._get_table_path(table_name, workspace=workspace)
-        return self._update_table(table_path, column_values, where=where, 
+        return self._update_table(table_path, column_values, where=where,
                                   pkey=pkey)
-    
+
     def _update_table(self,
                      table_path,
                      column_values,
@@ -509,8 +509,8 @@ class Tbx(object):
             cursor.updateRow(row)
             r += 1
         del cursor
-        return r    
-    
+        return r
+
     def copy_column(self, table, in_column, out_column, workspace=''):
         """
         copy all values of a column to another column in the same
@@ -535,13 +535,13 @@ class Tbx(object):
             raise Exception('Column {} does not exist in {}'.format(in_column))
         out_field = arcpy.ListFields(table_path, out_column)
         if not out_field:
-            arcpy.AddField_management(table_path, out_column, in_field[0].type)  
+            arcpy.AddField_management(table_path, out_column, in_field[0].type)
         cursor = arcpy.da.UpdateCursor(table_path, [in_column, out_column])
         for row in cursor:
             row[1] = row[0]
             cursor.updateRow(row)
         del cursor
-        
+
 
     def delete_rows_in_table(self,
                              table,
@@ -550,7 +550,7 @@ class Tbx(object):
                              workspace='',
                              ):
         """
-        Delete rows in a FileGeodatabase which match the where-clause or the 
+        Delete rows in a FileGeodatabase which match the where-clause or the
         primary key (if no pkey or where clause are given, all rows will be
         deleted!)
 
@@ -605,7 +605,7 @@ class Tbx(object):
                                                           workspace=workspace)
         else:
             table_path = self.folders.get_table(table_name, workspace=workspace)
-    
+
         if not arcpy.Exists(table_path):
             table_path = None
         return table_path
@@ -625,11 +625,11 @@ class Tbx(object):
         """
         table_path = self._get_table_path(table_name, workspace=workspace)
         if not table_path:
-            return    
+            return
         columns = column_values.keys()
-        values = column_values.values()        
+        values = column_values.values()
         self._insert_rows_in_table(table_path, columns, [values])
-        
+
     def _insert_rows_in_table(self, table_path, columns, rows):
         """
         insert rows into a table
@@ -646,7 +646,7 @@ class Tbx(object):
         cursor = arcpy.da.InsertCursor(table_path, columns)
         for row in rows:
             cursor.insertRow(row)
-        del cursor    
+        del cursor
 
     def upsert_row_in_table(self, table_name, column_values, pkey, workspace=''):
         """
@@ -675,7 +675,7 @@ class Tbx(object):
             # insert new row
             column_values.update(pkey)
             self.insert_row_in_table(table_name, column_values, workspace)
-            
+
     def get_where_clause(self, pkey):
         """
         convert a primary key dict to a where_clause
@@ -697,7 +697,7 @@ class Tbx(object):
                                      for (k, v) in pkey.iteritems()
                                      ])
         return where_clause
-    
+
     def table_to_dataframe(self, table_name, columns=[], workspace='',
                            where=None, pkey=None, project='',
                            is_base_table=False):
@@ -732,18 +732,18 @@ class Tbx(object):
         # should not return those
         if is_base_table:
             table_path = self.folders.get_base_table(workspace, table_name)
-        else: 
+        else:
             table_path = self.folders.get_table(table_name, workspace=workspace,
-                                                project=project)        
+                                                project=project)
         if not columns and arcpy.Exists(table_path):
             columns = [f.name for f in arcpy.ListFields(table_path)]
-            
+
         rows = self.query_table(table_name, columns=columns,
                                 workspace=workspace, where=where, pkey=pkey,
                                 project=project, is_base_table=is_base_table)
-        
+
         dataframe = pd.DataFrame.from_records(rows, columns=columns)
-        return dataframe    
+        return dataframe
 
 
     def dataframe_to_table(self, table_name, dataframe, pkeys, workspace='',
@@ -767,7 +767,7 @@ class Tbx(object):
             the database name
         upsert : bool, optional, default = False
             if True insert rows that do not exist yet, else ignored
-        
+
         Examples
         --------
         dataframe = pd.DataFrame([[1, 1.4], [2, 2.0]],
@@ -784,7 +784,7 @@ class Tbx(object):
         # columns without the pkeys
         columns = np.setdiff1d(columns_incl_pkeys, pkeys)
         for row in dataframe.iterrows():
-            # row is a tuple with index at 0 and the columns at 1 
+            # row is a tuple with index at 0 and the columns at 1
             pkey_values = dict(zip(pkeys, row[1][pkeys].values))
             values = row[1][columns].values
             column_values = dict(zip(columns, values))
@@ -796,7 +796,7 @@ class Tbx(object):
                 # Todo: insert row with values including the primary keys?
                 #column_values.update(pkey_values)
                 self._insert_rows_in_table(table_path, columns, [values])
-        
+
     def insert_dataframe_in_table(self, table_name, dataframe, workspace=''):
         """
         Insert all rows of a pandas dataframe into a table in a Workspace in the
@@ -817,13 +817,13 @@ class Tbx(object):
         columns = dataframe.columns.values
         values = [row[1][columns].values for row in dataframe.iterrows()]
         self._insert_rows_in_table(table_path, columns, values)
-        
+
     def query_table(self, table_name, columns=[], workspace='',
                     where=None, pkey=None, project='', is_base_table=False):
         """
         get rows from a table, defaults to a Workspace in the Project Folder,
         if base table is requested workspace is required
-        
+
 
         Parameters
         ----------
@@ -855,14 +855,14 @@ class Tbx(object):
             table_path = self.folders.get_base_table(workspace, table_name)
             rows = self._query_table(table_path, columns=columns, where=where)
         # project table (with temp. management)
-        else: 
+        else:
             table_name = os.path.basename(table_name)
             workspace = os.path.basename(workspace) or self.tool._workspace
             table_path = self._get_table_path(table_name, workspace)
-            rows = self._query_table(table_path, columns=columns, where=where, 
+            rows = self._query_table(table_path, columns=columns, where=where,
                                      pkey=pkey)
         return rows
-    
+
     def _query_table(self, table_path, columns=[], where=None, pkey=None):
         """
         get rows from a FileGeodatabase (full path required)
@@ -891,7 +891,7 @@ class Tbx(object):
         cursor = arcpy.da.SearchCursor(table_path, columns, where_clause=where)
         rows = [row for row in cursor]
         del cursor
-        return rows        
+        return rows
 
     def clear_temporary_dbs(self):
         """remove all temporary gdbs"""
@@ -917,7 +917,7 @@ class Tbx(object):
         """
         if workspace not in self._temporary_gdbs:
             self._temporary_gdbs.append(workspace)
-            
+
     def remove_temporary_management(self):
         """
         remove ALL FileGeoDatabases from temporary management
@@ -995,15 +995,15 @@ class Tbx(object):
 
         """
         self._is_executing = True
-        #try: 
+        #try:
         self._commit_temporaries()
         self.tool.main(self.par, parameters, messages)
         self.clear_temporary_dbs()
         #except Exception as e:
             #raise e
-        #finally: 
+        #finally:
         self._is_executing = False
-        
+
     def print_test_parameters(self):
         """
         Print the parameters to use in tests

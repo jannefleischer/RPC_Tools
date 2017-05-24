@@ -459,7 +459,8 @@ class OTPRouter(object):
         params = dict(routerId=self.router,
                       fromPlace=source,
                       toPlace=destination,
-                      mode=mode)
+                      mode=mode,
+                      maxPreTransitTime=1200)
         r = requests.get(self.url, params=params)
         return r.json()
 
@@ -484,6 +485,10 @@ class OTPRouter(object):
         coord_list = polyline.decode(points)
         route = self.routes.get_route(route_id, source_id)
         self.nodes.add_points(coord_list, route)
+        arcpy.AddMessage('Area {}, Route {}, first_point: {}'.format(
+            source_id,
+            route_id,
+            coord_list[0]))
         if source_id not in self.areas:
             self.areas.add_area(source_id)
 
