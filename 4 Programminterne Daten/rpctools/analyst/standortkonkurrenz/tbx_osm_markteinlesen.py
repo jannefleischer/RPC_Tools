@@ -3,6 +3,7 @@ import os
 import sys
 import arcpy
 import shutil
+import re
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
@@ -20,10 +21,10 @@ class OSMMarktEinlesen(Tool):
         fc = self.folders.get_table('Maerkte')
         layer = self.folders.get_layer('Märkte Nullfall')
         self.output.add_output(group_layer, layer, fc, zoom=False)
-        
+
         fc = self.folders.get_table('Maerkte')
         layer = self.folders.get_layer('Märkte Planfall')
-        self.output.add_output(group_layer, layer, fc, zoom=False)    
+        self.output.add_output(group_layer, layer, fc, zoom=False)
 
 
     def add_markets(self, supermarkets):
@@ -39,12 +40,52 @@ class OSMMarktEinlesen(Tool):
                 markt.create_geom()
                 if markt.geom:
                     rows.insertRow((markt.name, 1, 1, markt.geom))
-    
+
+
+    def set_chains(self):
+        """
+        Assign chains to supermarkets
+
+        """
+
+        ws_markets = self.folders.get_db('FGDB_Standortkonkurrenz_Supermaerkte.gdb')
+        ws_chains = self.folders.get_basedb('FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
+
+        table_markets = os.path.join(ws_markets, "Maerkte")
+        fields = ["name", "id_kette", "id_betriebstyp_nullfall", "id_betriebstyp_planfall"]
+        market_cursor = arcpy.da.UpdateCursor(table_markets, fields)
+
+        table_chains = os.path.join(ws_chains, "Ketten_Zuordnung")
+        fields = ["regex", "id_kette", "id_betriebstyp", "prioritaet"]
+
+        for market in market_cursor:
+            match_found = False
+            chain_cursor = arcpy.da.SearchCursor(table_chains, fields, sql_clause=(None, 'ORDER BY prioritaet DESC'))
+            for chain in chain_cursor:
+                chain_expression = re.compile(chain[0])
+                if market[0] is not None:
+                    arcpy.AddMessage(market[0])
+                    arcpy.AddMessage(chain[0])
+                    match_result = chain_expression.search(market[0])
+                else:
+                    match_result = None
+                if match_result and not match_found:
+                    match_found = True
+                    market[1] = chain[1]
+                    market[2] = chain[2]
+                    market[3] = chain[2]
+            if not match_found:
+                market[1] = 0
+                market[2] = 0
+                market[3] = 0
+            market_cursor.updateRow(market)
+
+
     def run(self):
         tbx = self.parent_tbx
         flaechen_df = tbx.table_to_dataframe(
             'Teilflaechen_Plangebiet',
-            columns=['INSIDE_X', 'INSIDE_Y'], 
+            columns=['INSIDE_X', 'INSIDE_Y'],
             workspace='FGDB_Definition_Projekt.gdb')
         x = flaechen_df['INSIDE_X'].mean()
         y = flaechen_df['INSIDE_Y'].mean()
@@ -58,6 +99,7 @@ class OSMMarktEinlesen(Tool):
         arcpy.AddMessage(u'Supermärkte werden in die Datenbank übertragen...'
                          .format(len(markets)))
         self.add_markets(markets)
+        self.set_chains()
         self.add_output()
 
 
@@ -83,7 +125,7 @@ class TbxOSMMarktEinlesen(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.filter.list = []
-    
+
         param = self.add_parameter('radius')
         param.name = encode(u'Radius')
         param.displayName = encode(u'maximale Entfernung der '
@@ -94,7 +136,7 @@ class TbxOSMMarktEinlesen(Tbx):
         param.filter.type = 'Range'
         param.filter.list = [0, 20000]
         param.value = 5000
-        
+
         param = self.add_parameter('count')
         param.name = encode(u'Anzahl')
         param.displayName = encode(u'maximale Anzahl an '
@@ -105,10 +147,10 @@ class TbxOSMMarktEinlesen(Tbx):
         param.filter.type = 'Range'
         param.filter.list = [0, 5000]
         param.value = 1000
-        
+
         return params
 
-    def _updateParameters(self, params):   
+    def _updateParameters(self, params):
 
         return params
 

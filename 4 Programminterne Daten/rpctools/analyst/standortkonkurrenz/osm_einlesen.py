@@ -147,42 +147,6 @@ class OSMShopsReader(object):
         arcpy.TruncateTable_management(in_table=fc)
 
 
-    def set_chains(self):
-        """
-        Assign chains to supermarkets
-
-        """
-        projectname = self.projectname
-        ws_markets = self.folders.get_db('FGDB_Standortkonkurrenz_Supermaerkte.gdb', projectname)
-        ws_chains = self.folders.get_basedb('FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
-        
-        table_markets = os.path.join(ws_markets, "Maerkte")
-        fields = ["name", "id_kette", "id_betriebstyp_nullfall", "id_betriebstyp_planfall"]
-        market_cursor = arcpy.da.UpdateCursor(table_markets, fields)
-        
-        table_chains = os.path.join(ws_chains, "Ketten_Zuordnung")
-        fields = ["regex", "id_kette", "id_betriebstyp"]
-        chain_cursor = arcpy.da.SearchCursor(table_chains, fields, sql_clause=(None, 'ORDER BY prioritaet')) 
-               
-        for market in market_cursor:
-            match_found = False
-            
-            for chain in chain_cursor:
-                chain_expression = re.compile(chain[0])
-                if chain_expression.match(market[0]) not None:
-                    match_found = True
-                    market[1] = chain[1]
-                    market[2] = chain[2]
-                    market[3] = chain[2]
-                    market_cursor.updateRow(market)
-                    break
-                
-            if not match_found:
-                market[1] = 0
-                market[2] = 0
-                market[3] = 0
-                 
-            
 
 if __name__ == '__main__':
     o = OSMShopsReader()
@@ -190,7 +154,7 @@ if __name__ == '__main__':
     #source = source.transform(3035)
     supermarkets = o.get_shops(source)
     o.create_supermarket_features(supermarkets)
-    o.set_chains()
+
 
 
 
