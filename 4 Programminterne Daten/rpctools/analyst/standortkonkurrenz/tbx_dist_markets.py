@@ -2,6 +2,7 @@
 import arcpy
 import os
 import pandas as pd
+import json
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
@@ -22,13 +23,51 @@ class DistMarkets(Tool):
         x, y = get_project_centroid(self.projectname)
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
         
-        zensus_points = zensus.cutout_area(centroid, square_size)
-        self.zensus_to_db(zensus_points)
+        #arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
+        #zensus_points = zensus.cutout_area(centroid, square_size)
+        #arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
+        #self.zensus_to_db(zensus_points)
+        arcpy.AddMessage(u'Berechne Entfernungen der Märkte '
+                         u'zu den Siedlungszellen...')
+        markets = self.parent_tbx.table_to_dataframe('Maerkte')
+        epsg = self.parent_tbx.config.epsg
         
         routing = DistanceRouting()
+        destinations = self.get_cells()
+        dest_ids = [d.id for d in destinations]
+        for id, market in markets.iterrows():
+            arcpy.AddMessage(' - {}'.format(market['name']))
+            market_id = market['id']
+            x, y = market['SHAPE']
+            origin = Point(x, y, id=market_id, epsg=epsg)
+            distances = routing.get_distances(origin, destinations)
+            self.distances_to_db(market_id, destinations, distances)
+            
         
-        fn = routing.request_dist_raster(centroid)
-        print()
+    def distances_to_db(self, market_id, destinations, distances):
+        df = pd.DataFrame()
+        shapes = []
+        ids = []
+        for i, dest in enumerate(destinations):
+            ids.append(dest.id)
+            shapes.append(arcpy.Point(dest.x, dest.y))
+        df['distanz'] = distances
+        df['id_siedlungszelle'] = ids
+        df['SHAPE'] = shapes
+        df['id_markt'] = market_id
+        self.parent_tbx.dataframe_to_table('Distanzen', df,
+                                           pkeys=['id_markt'], 
+                                           upsert=True)
+        
+    def get_cells(self):
+        cells = []
+        epsg = self.parent_tbx.config.epsg
+        df = self.parent_tbx.table_to_dataframe('Siedlungszellen')
+        for id, cell in df.iterrows():
+            x, y = cell['SHAPE']
+            dest = Point(x, y, id=cell['id'], epsg=epsg)
+            cells.append(dest)
+        return cells
         
     def zensus_to_db(self, zensus_points):
         df = pd.DataFrame()
@@ -44,7 +83,7 @@ class DistMarkets(Tool):
             shapes.append(t.geom)
             ews.append(point.ew)
             
-        df['id'] = range(len(shapes))
+        df['id'] = range(1, len(shapes) + 1)
         df['SHAPE'] = shapes
         df['ew'] = ews
         

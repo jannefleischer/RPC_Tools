@@ -24,9 +24,14 @@ class DistanceRouting(object):
         except:
             pass
         
-    def request_dist_raster(self, point):
-        t = point.transform(self.epsg) if point.epsg != self.epsg \
-            else point
+    def get_distances(self, origin, destinations):
+        dist_raster = self._request_dist_raster(origin)
+        distances = self._get_distances(destinations, dist_raster)
+        return distances
+        
+    def _request_dist_raster(self, origin):
+        t = origin.transform(self.epsg) if origin.epsg != self.epsg \
+            else origin
         params = {
             'batch': True,
             'routerId': self.ROUTER,
@@ -42,18 +47,19 @@ class DistanceRouting(object):
         r = requests.get(url, stream=True)
         out_raster = os.path.join(
             self.tmp_folder,
-            self.RASTER_FILE_PATTERN.format(id=point.id))
+            self.RASTER_FILE_PATTERN.format(id=origin.id))
         if r.status_code == 200:
             with open(out_raster, 'wb') as f:
                 r.raw.decode_content = True
                 shutil.copyfileobj(r.raw, f)
         return out_raster
     
-    def apply_distances(self, points, raster):
+    def _get_distances(self, points, raster):
+        distances = []
         for point in points:
             t = point.transform(self.epsg) if point.epsg != self.epsg \
                 else point
             res = arcpy.GetCellValue_management(raster,
                                                 '{x} {y}'.format(x=t.x, y=t.y))
-            point.distance = res.getOutput(0)
-        return points
+            distances.append(res.getOutput(0))
+        return distances

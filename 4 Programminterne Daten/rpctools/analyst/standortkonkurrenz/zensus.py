@@ -8,10 +8,9 @@ import arcpy
 
 
 class ZensusCell(Point):
-    def __init__(self, x, y, epsg=4326, ew=0, id=None, distance=sys.maxint):
+    def __init__(self, x, y, epsg=4326, ew=0, id=None):
         super(ZensusCell, self).__init__(x, y, id, epsg=epsg)
         self.ew = ew
-        self.distance = distance
 
 
 class Zensus(object):
