@@ -23,10 +23,10 @@ class DistMarkets(Tool):
         x, y = get_project_centroid(self.projectname)
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
         
-        #arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
-        #zensus_points = zensus.cutout_area(centroid, square_size)
-        #arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
-        #self.zensus_to_db(zensus_points)
+        arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
+        zensus_points = zensus.cutout_area(centroid, square_size)
+        arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
+        self.zensus_to_db(zensus_points)
         arcpy.AddMessage(u'Berechne Entfernungen der Märkte '
                          u'zu den Siedlungszellen...')
         markets = self.parent_tbx.table_to_dataframe('Maerkte')
