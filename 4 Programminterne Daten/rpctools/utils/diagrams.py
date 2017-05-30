@@ -5,20 +5,14 @@ import subprocess
 import os
 from argparse import ArgumentParser
 from abc import ABCMeta, abstractmethod
-from rpctools.utils.params import Tbx, Tool
+from rpctools.utils.params import DummyTbx
 from rpctools.utils import diagram_exec
 from rpctools.utils.encoding import encode
 import sys
 import pickle
 
 
-class Dummy(Tool):
-    
-    def run(self):
-        pass
-
-
-class Diagram(Tbx):
+class Diagram(DummyTbx):
     '''
     superclass to plot diagrams with matplotlib
     '''
@@ -74,25 +68,7 @@ class Diagram(Tbx):
     def _create(self):
         """to be implemented by subclasses,
         has to return the axes-object of the plot"""
-        
-    @property
-    def label(self):
-        return ''
-    
-    def _getParameterInfo(self):
-        p = self.add_parameter('projectname')
-        p.name = 'Projekt'
-        p.displayName = 'Projekt'
-        p.parameterType = 'Required'
-        p.direction = 'Input'
-        p.datatype = 'GPString'
-        p.filter.list = []
-        return self.par
-    
-    @property
-    def Tool(self):
-        return Dummy
-    
+
     def show_external(self, plot, filename):
         if plot is None:
             return

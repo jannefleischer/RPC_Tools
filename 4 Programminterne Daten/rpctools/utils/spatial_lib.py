@@ -1,6 +1,19 @@
 import arcpy
 from rpctools.utils.params import Folders
-from os.path import join
+from rpctools.utils.params import DummyTbx
+
+def get_project_centroid(projectname):
+    """get the centroid of the defined areas of the given project
+    (projection is defined by project)"""
+    tbx = DummyTbx()
+    tbx.set_active_project(projectname)
+    flaechen_df = tbx.table_to_dataframe(
+        'Teilflaechen_Plangebiet',
+        columns=['INSIDE_X', 'INSIDE_Y'], 
+        workspace='FGDB_Definition_Projekt.gdb')
+    x = flaechen_df['INSIDE_X'].mean()
+    y = flaechen_df['INSIDE_Y'].mean()
+    return x, y
 
 def get_ags(features, id_column):
     """

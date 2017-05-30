@@ -1071,6 +1071,40 @@ class Tbx(object):
 
         with open(new_fn, 'w') as new_file:
             new_file.write(src)
+            
+
+class DummyTool(Tool):
+    
+    def run(self):
+        pass
+
+
+class DummyTbx(Tbx):
+    """dummy toolbox to be able to access functions of toolboxes outside of
+    a 'real' toolbox, not for the purpose to be shown in ArcGIS 
+    """
+    
+    def __init__(self):
+        super(DummyTbx, self).__init__()
+        self._getParameterInfo()
+
+    def _getParameterInfo(self):
+        p = self.add_parameter('projectname')
+        p.name = 'Projekt'
+        p.displayName = 'Projekt'
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = 'GPString'
+        p.filter.list = []
+        return self.par
+    
+    @property
+    def Tool(self):
+        return DummyTool
+    
+    @property
+    def label(self):
+        return ''
 
 if __name__ == '__main__':
     import doctest

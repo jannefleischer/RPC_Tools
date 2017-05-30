@@ -140,6 +140,7 @@ class Folders(object):
         self._invalid_paths = []
         self._CONFIG_FILE = 'config.txt'
         self._OTP_PICKLE_FILE = 'otpgraph.pickle'
+        self._ZENUS_FILE = r'ZensusGrid\Zensus2011GridWGS84_int.tif'
 
     def join_and_check(self, *args, **kwargs):
         """
@@ -182,6 +183,10 @@ class Folders(object):
     @property
     def BASE_DBS(self):
         return self.join_and_check(self.INTERN, self._BASE_DBS)
+    
+    @property
+    def ZENSUS_FILE(self):
+        return self.join_and_check(self.BASE_DBS, self._ZENUS_FILE)
 
     @property
     def MXDS(self):

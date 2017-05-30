@@ -15,13 +15,14 @@ import arcpy
 
 class Point(object):
     """A Point object"""
-    __slots__ = ['x', 'y', 'node_id', 'geom', 'epsg']
-    def __init__(self, x, y, node_id=None, epsg=4326):
-        self.node_id = node_id
+    __slots__ = ['x', 'y', 'id', 'geom', 'epsg', 'proj']
+    def __init__(self, x, y, id=None, epsg=4326):
+        self.id = id
         self.x = x
         self.y = y
         self.geom = None
-        self.epsg = Proj(init='epsg:{}'.format(epsg))
+        self.epsg = epsg
+        self.proj = Proj(init='epsg:{}'.format(epsg))
 
     def __repr__(self):
         return '{},{}'.format(self.x, self.y)
@@ -36,7 +37,7 @@ class Point(object):
 
     def transform(self, target_srid):
         target_srs = Proj(init='epsg:{}'.format(target_srid))
-        x, y = transform(self.epsg, target_srs, self.x, self.y)
+        x, y = transform(self.proj, target_srs, self.x, self.y)
         return Point(x, y, epsg=target_srid)
 
 
