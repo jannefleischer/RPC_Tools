@@ -19,10 +19,10 @@ class DistMarkets(Tool):
     def run(self):
         square_size = self.par.square_size.value * 1000
         zensus = Zensus()
-        
+
         x, y = get_project_centroid(self.projectname)
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
-        
+
         arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
         zensus_points, bbox = zensus.cutout_area(centroid, square_size)
         arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
@@ -31,7 +31,7 @@ class DistMarkets(Tool):
                          u'zu den Siedlungszellen...')
         markets = self.parent_tbx.table_to_dataframe('Maerkte')
         epsg = self.parent_tbx.config.epsg
-        
+
         routing = DistanceRouting()
         destinations = self.get_cells()
         dest_ids = [d.id for d in destinations]
@@ -42,7 +42,7 @@ class DistMarkets(Tool):
             origin = Point(x, y, id=market_id, epsg=epsg)
             distances = routing.get_distances(origin, destinations, bbox)
             self.distances_to_db(market_id, destinations, distances)
-        
+
     def distances_to_db(self, market_id, destinations, distances):
         self.parent_tbx.delete_rows_in_table(
             'Distanzen', where='id_markt={}'.format(market_id))
@@ -57,7 +57,7 @@ class DistMarkets(Tool):
         column_values['SHAPE'] = shapes
         column_values['id_markt'] = [market_id] * len(destinations)
         self.parent_tbx.insert_rows_in_table('Distanzen', column_values)
-        
+
     def get_cells(self):
         cells = []
         epsg = self.parent_tbx.config.epsg
@@ -67,7 +67,7 @@ class DistMarkets(Tool):
             dest = Point(x, y, id=cell['id'], epsg=epsg)
             cells.append(dest)
         return cells
-        
+
     def zensus_to_db(self, zensus_points):
         df = pd.DataFrame()
         epsg = self.parent_tbx.config.epsg
@@ -81,11 +81,11 @@ class DistMarkets(Tool):
             t.create_geom()
             shapes.append(t.geom)
             ews.append(point.ew)
-            
+
         df['id'] = range(1, len(shapes) + 1)
         df['SHAPE'] = shapes
         df['ew'] = ews
-        
+
         self.parent_tbx.insert_dataframe_in_table('Siedlungszellen', df)
         #addLayer = arcpy.mapping.Layer(self.folders.get_table('Siedlungszellen'))
         #mxd = arcpy.mapping.MapDocument("CURRENT")
