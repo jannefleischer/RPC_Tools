@@ -1,9 +1,10 @@
 import arcpy
 from rpctools.utils.params import Folders
 from rpctools.utils.params import DummyTbx
+from os.path import join
 
 def clip_raster(in_file, out_file, bbox):
-    
+
     desc = arcpy.Describe(in_file)
     sr = desc.spatialReference
     srid = sr.factoryCode
@@ -25,7 +26,7 @@ def get_project_centroid(projectname):
     tbx.set_active_project(projectname)
     flaechen_df = tbx.table_to_dataframe(
         'Teilflaechen_Plangebiet',
-        columns=['INSIDE_X', 'INSIDE_Y'], 
+        columns=['INSIDE_X', 'INSIDE_Y'],
         workspace='FGDB_Definition_Projekt.gdb')
     x = flaechen_df['INSIDE_X'].mean()
     y = flaechen_df['INSIDE_Y'].mean()
@@ -73,7 +74,7 @@ def get_gemeindetyp(ags):
     table = folders.get_base_table('FGDB_Basisdaten_deutschland.gdb',
                                    'bkg_gemeinden')
     columns = ['Gemeindetyp', 'AGS']
-    cursor = arcpy.da.SearchCursor(table, columns, 
+    cursor = arcpy.da.SearchCursor(table, columns,
                                    where_clause="AGS='{}'".format(ags))
     return cursor.next()[0]
 
