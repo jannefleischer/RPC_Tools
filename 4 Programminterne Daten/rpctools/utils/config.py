@@ -185,7 +185,7 @@ class Folders(object):
         return self.join_and_check(self.INTERN, self._BASE_DBS)
     
     @property
-    def ZENSUS_FILE(self):
+    def ZENSUS_RASTER_FILE(self):
         return self.join_and_check(self.BASE_DBS, self._ZENUS_FILE)
 
     @property

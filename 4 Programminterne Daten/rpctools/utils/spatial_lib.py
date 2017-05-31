@@ -2,6 +2,23 @@ import arcpy
 from rpctools.utils.params import Folders
 from rpctools.utils.params import DummyTbx
 
+def clip_raster(in_file, out_file, bbox):
+    
+    desc = arcpy.Describe(in_file)
+    sr = desc.spatialReference
+    srid = sr.factoryCode
+    p1, p2 = bbox
+    srid = sr.factoryCode
+    p1 = p1.transform(srid)
+    p2 = p2.transform(srid)
+    arcpy.Clip_management(
+        in_file,
+        "{x_min} {y_min} {x_max} {y_max}".format(
+            x_min=p1.x, y_min=p1.y,
+            x_max=p2.x, y_max=p2.y),
+        out_file)
+    return srid
+
 def get_project_centroid(projectname):
     """get the centroid of the defined areas of the given project
     (projection is defined by project)"""

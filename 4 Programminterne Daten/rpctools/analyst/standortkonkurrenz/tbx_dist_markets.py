@@ -24,9 +24,9 @@ class DistMarkets(Tool):
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
         
         arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
-        zensus_points = zensus.cutout_area(centroid, square_size)
-        arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
-        self.zensus_to_db(zensus_points)
+        zensus_points, bbox = zensus.cutout_area(centroid, square_size)
+        #arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
+        #self.zensus_to_db(zensus_points)
         arcpy.AddMessage(u'Berechne Entfernungen der Märkte '
                          u'zu den Siedlungszellen...')
         markets = self.parent_tbx.table_to_dataframe('Maerkte')
@@ -40,8 +40,9 @@ class DistMarkets(Tool):
             market_id = market['id']
             x, y = market['SHAPE']
             origin = Point(x, y, id=market_id, epsg=epsg)
-            distances = routing.get_distances(origin, destinations)
+            distances = routing.get_distances(origin, destinations, bbox)
             self.distances_to_db(market_id, destinations, distances)
+            
             
         
     def distances_to_db(self, market_id, destinations, distances):

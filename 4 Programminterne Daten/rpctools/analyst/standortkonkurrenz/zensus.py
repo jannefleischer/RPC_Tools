@@ -1,4 +1,5 @@
 from rpctools.utils.config import Folders
+from rpctools.utils.spatial_lib import clip_raster
 from rpctools.analyst.standortkonkurrenz.osm_einlesen import Point
 
 import os
@@ -33,7 +34,7 @@ class Zensus(object):
         """
 
         zensus_points = []
-        zensus_file = self.folders.ZENSUS_FILE
+        zensus_raster = self.folders.ZENSUS_RASTER_FILE
         # p1 and p2 build square around centroid
         p1 = Point(centroid.x - size / 2,
                    centroid.y - size / 2,
@@ -41,22 +42,19 @@ class Zensus(object):
         p2 = Point(centroid.x + size / 2,
                    centroid.y + size / 2,
                    epsg=centroid.epsg)
-        desc = arcpy.Describe(zensus_file)
-        sr = desc.spatialReference
-        srid = sr.factoryCode
-        p1 = p1.transform(srid)
-        p2 = p2.transform(srid)
+        
+        bbox = (p1, p2)
         
         out_raster = os.path.join(self.tmp_folder, 'zensus_cutout.tif')
+        
+        srid = clip_raster(zensus_raster, out_raster, bbox)
+        
         out_shp = os.path.join(self.tmp_folder,
                                'zensus_cutout.shp')
         #cellsize = float(arcpy.GetRasterProperties_management(
             #zensus_file, 'CELLSIZEX').getOutput(0).replace(',', '.'))
-        arcpy.Clip_management(
-            zensus_file,
-            "{x_min} {y_min} {x_max} {y_max}".format(
-                x_min=p1.x, y_min=p1.y, x_max=p2.x, y_max=p2.y),
-            out_raster)
+        
+        
         arcpy.RasterToPoint_conversion(out_raster, out_shp)
         
         desc = arcpy.Describe(out_shp)
@@ -65,4 +63,4 @@ class Zensus(object):
             p = ZensusCell(x, y, epsg=srid, ew=value)
             zensus_points.append(p)
             
-        return zensus_points
+        return zensus_points, bbox
