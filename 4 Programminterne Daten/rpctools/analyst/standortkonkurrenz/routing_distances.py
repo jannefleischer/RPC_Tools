@@ -21,7 +21,7 @@ class RasterManagement(object):
         desc = arcpy.Describe(raster_file)
         e = desc.Extent
         self.srid = desc.spatialReference.factoryCode
-        self.raster_origin = Point(e.XMin, e.YMin, epsg=self.srid)
+        self.raster_origin = Point(e.XMin, e.YMax, epsg=self.srid)
         self.cellWidth = float(arcpy.GetRasterProperties_management(
             raster_file, 'CELLSIZEX').getOutput(0).replace(',', '.'))
         self.cellHeight = float(arcpy.GetRasterProperties_management(
@@ -34,13 +34,13 @@ class RasterManagement(object):
         for point in points:
             t = point.transform(self.srid) if point.epsg != self.srid \
                 else point
-            mapped_x = int((t.x - self.raster_origin.x) / self.cellWidth)
-            mapped_y = int((t.y - self.raster_origin.y) / self.cellHeight)
+            mapped_x = int(abs(t.x - self.raster_origin.x) / self.cellWidth)
+            mapped_y = int(abs(t.y - self.raster_origin.y) / self.cellHeight)
             self.point_raster_map[point.id] = (mapped_x, mapped_y)
             
     def get_value(self, point):
         mapped_x, mapped_y = self.point_raster_map[point.id]
-        return self.raster_values[mapped_x, mapped_y]
+        return self.raster_values[mapped_y][mapped_x]
 
 class DistanceRouting(object):
     URL = r'https://projektcheck.ggr-planung.de/otp/surfaces'

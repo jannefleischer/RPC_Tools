@@ -14,6 +14,7 @@ from rpctools.utils.arcpy_parameter import Parameter
 import pandas as pd
 import numpy as np
 import arcpy
+import gc
 
 
 class ToolFolders(Folders):
@@ -213,8 +214,8 @@ class Tbx(object):
     def __init__(self):
 
         # ggf. später reload entfernen???
-        Tool = self.reload_tool()
-        #Tool = self.Tool
+        #Tool = self.reload_tool()
+        Tool = self.Tool
 
         # the parameters
         self.par = Params(param_projectname=Tool._param_projectname,
@@ -570,6 +571,7 @@ class Tbx(object):
         r : int
             the number of deleted rows
         """
+        gc.collect()
         where = where or self.get_where_clause(pkey)
         table_path = self._get_table_path(table, workspace=workspace)
         if not table_path:
@@ -610,7 +612,7 @@ class Tbx(object):
             table_path = None
         return table_path
 
-    def insert_row_in_table(self, table_name, column_values, workspace=''):
+    def insert_rows_in_table(self, table_name, column_values, workspace=''):
         """
         insert new row into a table in a Workspace in the Project Folder
 
@@ -628,7 +630,13 @@ class Tbx(object):
             return
         columns = column_values.keys()
         values = column_values.values()
-        self._insert_rows_in_table(table_path, columns, [values])
+        try:
+            # transpose list of values
+            rows = zip(*values)
+        except:
+            rows = values
+            
+        self._insert_rows_in_table(table_path, columns, rows)
 
     def _insert_rows_in_table(self, table_path, columns, rows):
         """
@@ -674,7 +682,7 @@ class Tbx(object):
         if not r:
             # insert new row
             column_values.update(pkey)
-            self.insert_row_in_table(table_name, column_values, workspace)
+            self.insert_rows_in_table(table_name, column_values, workspace)
 
     def get_where_clause(self, pkey):
         """

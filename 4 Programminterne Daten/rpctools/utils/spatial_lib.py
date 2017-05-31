@@ -8,7 +8,6 @@ def clip_raster(in_file, out_file, bbox):
     sr = desc.spatialReference
     srid = sr.factoryCode
     p1, p2 = bbox
-    srid = sr.factoryCode
     p1 = p1.transform(srid)
     p2 = p2.transform(srid)
     arcpy.Clip_management(

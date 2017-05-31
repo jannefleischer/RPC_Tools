@@ -25,8 +25,8 @@ class DistMarkets(Tool):
         
         arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
         zensus_points, bbox = zensus.cutout_area(centroid, square_size)
-        #arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
-        #self.zensus_to_db(zensus_points)
+        arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
+        self.zensus_to_db(zensus_points)
         arcpy.AddMessage(u'Berechne Entfernungen der Märkte '
                          u'zu den Siedlungszellen...')
         markets = self.parent_tbx.table_to_dataframe('Maerkte')
@@ -42,23 +42,21 @@ class DistMarkets(Tool):
             origin = Point(x, y, id=market_id, epsg=epsg)
             distances = routing.get_distances(origin, destinations, bbox)
             self.distances_to_db(market_id, destinations, distances)
-            
-            
         
     def distances_to_db(self, market_id, destinations, distances):
-        df = pd.DataFrame()
+        self.parent_tbx.delete_rows_in_table(
+            'Distanzen', where='id_markt={}'.format(market_id))
+        column_values = {}
         shapes = []
         ids = []
-        for i, dest in enumerate(destinations):
+        for dest in destinations:
             ids.append(dest.id)
             shapes.append(arcpy.Point(dest.x, dest.y))
-        df['distanz'] = distances
-        df['id_siedlungszelle'] = ids
-        df['SHAPE'] = shapes
-        df['id_markt'] = market_id
-        self.parent_tbx.dataframe_to_table('Distanzen', df,
-                                           pkeys=['id_markt'], 
-                                           upsert=True)
+        column_values['distanz'] = distances
+        column_values['id_siedlungszelle'] = ids
+        column_values['SHAPE'] = shapes
+        column_values['id_markt'] = [market_id] * len(destinations)
+        self.parent_tbx.insert_rows_in_table('Distanzen', column_values)
         
     def get_cells(self):
         cells = []
@@ -89,10 +87,10 @@ class DistMarkets(Tool):
         df['ew'] = ews
         
         self.parent_tbx.insert_dataframe_in_table('Siedlungszellen', df)
-        addLayer = arcpy.mapping.Layer(self.folders.get_table('Siedlungszellen'))
-        mxd = arcpy.mapping.MapDocument("CURRENT")
-        df = arcpy.mapping.ListDataFrames(mxd)[0]
-        arcpy.mapping.AddLayer(df, addLayer)
+        #addLayer = arcpy.mapping.Layer(self.folders.get_table('Siedlungszellen'))
+        #mxd = arcpy.mapping.MapDocument("CURRENT")
+        #df = arcpy.mapping.ListDataFrames(mxd)[0]
+        #arcpy.mapping.AddLayer(df, addLayer)
 
 
 class TbxDistMarkets(Tbx):

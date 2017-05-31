@@ -59,7 +59,7 @@ class Arbeitsplaetze(Tool):
                            else 1)
             year = begin + progress
             
-            tbx.insert_row_in_table(
+            tbx.insert_rows_in_table(
                 jobs_year_table,
                 column_values={
                     'Jahr': year,
