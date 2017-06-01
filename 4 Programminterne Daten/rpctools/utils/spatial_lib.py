@@ -1,6 +1,7 @@
 import arcpy
 from rpctools.utils.params import Folders
 from rpctools.utils.params import DummyTbx
+import numpy as np
 from os.path import join
 
 def clip_raster(in_file, out_file, bbox):
@@ -78,13 +79,30 @@ def get_gemeindetyp(ags):
                                    where_clause="AGS='{}'".format(ags))
     return cursor.next()[0]
 
-if __name__ == '__main__':
+def assign_groessenklassen():
+    '''assign the groessenklassen to the gemeinde table based on their
+    number of inhabitants'''
     folders = Folders()
-    project = folders.get_projects()[0]
-    teilflaechen_table = folders.get_table(
-        'Teilflaechen_Plangebiet',
-        workspace='FGDB_Definition_Projekt.gdb',
-        project=project)
-    ags = get_ags(teilflaechen_table, 'id_teilflaeche')
-    typ = get_gemeindetyp(ags.values()[0][0])
-    print(ags)
+    tbx = DummyTbx()
+    workspace = 'FGDB_Basisdaten_deutschland.gdb'
+    gr_table = folders.get_base_table(workspace, 'Gemeindegroessenklassen')
+    gr_df = tbx.table_to_dataframe('Gemeindegroessenklassen',
+                                   workspace=workspace,
+                                   is_base_table=True)
+    # set nan values to max integer (for highest groessenklasse)
+    gr_df.loc[np.isnan(gr_df['bis']), 'bis'] = sys.maxint
+    gem_columns = ['Einwohner', 'groessenklasse']
+    gem_table = folders.get_base_table(workspace, 'bkg_gemeinden')
+    
+    cursor = arcpy.da.UpdateCursor(gem_table, gem_columns)
+    for ew, gr_klasse in cursor:
+        higher = ew >= gr_df['von']
+        lower = ew < gr_df['bis']
+        # take the id where both borders match
+        match = gr_df['groessenklasse'][np.logical_and(higher, lower)].values
+        assert len(match) == 1
+        gr_klasse = match[0]
+        cursor.updateRow((ew, gr_klasse))
+
+if __name__ == '__main__':
+    assign_groessenklassen()
