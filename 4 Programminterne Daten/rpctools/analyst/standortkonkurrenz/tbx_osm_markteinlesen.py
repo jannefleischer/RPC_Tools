@@ -32,15 +32,16 @@ class OSMMarktEinlesen(Tool):
         tablename = 'Maerkte'
         sr = arcpy.SpatialReference(self.parent_tbx.config.epsg)
         columns = ['name', 'id_betriebstyp_nullfall', 'id_betriebstyp_planfall',
-                   'SHAPE@']
+                   'SHAPE@', 'id']
         table = self.folders.get_table(tablename)
         arcpy.TruncateTable_management(table)
         with arcpy.da.InsertCursor(table, columns) as rows:
-            for markt in supermarkets:
+            for i, markt in enumerate(supermarkets):
+                if markt.name is None:
+                    continue
                 markt.create_geom()
                 if markt.geom:
-                    rows.insertRow((markt.name, 1, 1, markt.geom))
-
+                    rows.insertRow((markt.name, 1, 1, markt.geom, i))
 
     def set_chains(self):
         """
@@ -48,8 +49,10 @@ class OSMMarktEinlesen(Tool):
 
         """
 
-        ws_markets = self.folders.get_db('FGDB_Standortkonkurrenz_Supermaerkte.gdb')
-        ws_chains = self.folders.get_basedb('FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
+        ws_markets = self.folders.get_db(
+            'FGDB_Standortkonkurrenz_Supermaerkte.gdb')
+        ws_chains = self.folders.get_basedb(
+            'FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
 
         table_markets = os.path.join(ws_markets, "Maerkte")
         fields = ["name", "id_kette", "id_betriebstyp_nullfall", "id_betriebstyp_planfall"]
@@ -57,29 +60,35 @@ class OSMMarktEinlesen(Tool):
 
         table_chains = os.path.join(ws_chains, "Ketten_Zuordnung")
         fields = ["regex", "id_kette", "id_betriebstyp", "prioritaet"]
-
+        
         for market in market_cursor:
             match_found = False
-            chain_cursor = arcpy.da.SearchCursor(table_chains, fields, sql_clause=(None, 'ORDER BY prioritaet DESC'))
+            deleted = False
+            chain_cursor = arcpy.da.SearchCursor(
+                table_chains, fields,
+                sql_clause=(None, 'ORDER BY prioritaet DESC'))
             for chain in chain_cursor:
-                chain_expression = re.compile(chain[0])
                 if market[0] is not None:
-                    arcpy.AddMessage(market[0])
-                    arcpy.AddMessage(chain[0])
-                    match_result = chain_expression.search(market[0])
+                    match_result = re.match(chain[0], market[0])
                 else:
                     match_result = None
                 if match_result and not match_found:
                     match_found = True
-                    market[1] = chain[1]
-                    market[2] = chain[2]
-                    market[3] = chain[2]
+                    if market[2] == -1:
+                        cursor.deleteRow()
+                        deleted = True
+                    else: 
+                        market[1] = chain[1]
+                        market[2] = chain[2]
+                        market[3] = chain[2]
+                    break
+            if deleted:
+                continue
             if not match_found:
                 market[1] = 0
-                market[2] = 0
-                market[3] = 0
+                market[2] = 1
+                market[3] = 1
             market_cursor.updateRow(market)
-
 
     def run(self):
         tbx = self.parent_tbx

@@ -214,8 +214,8 @@ class Tbx(object):
     def __init__(self):
 
         # ggf. später reload entfernen???
-        #Tool = self.reload_tool()
-        Tool = self.Tool
+        Tool = self.reload_tool()
+        #Tool = self.Tool
 
         # the parameters
         self.par = Params(param_projectname=Tool._param_projectname,
