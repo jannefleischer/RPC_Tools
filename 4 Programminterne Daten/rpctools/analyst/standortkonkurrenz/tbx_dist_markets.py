@@ -27,6 +27,10 @@ class DistMarkets(Tool):
         zensus_points, bbox = zensus.cutout_area(centroid, square_size)
         arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
         self.zensus_to_db(zensus_points)
+        active_project = self.parent_tbx.config.active_project
+        zensus.add_kk(zensus_points, active_project)
+        # TODO: Update instead of rewrite
+        self.zensus_to_db(zensus_points)
         arcpy.AddMessage(u'Berechne Entfernungen der Märkte '
                          u'zu den Siedlungszellen...')
         markets = self.parent_tbx.table_to_dataframe('Maerkte')
@@ -73,6 +77,9 @@ class DistMarkets(Tool):
         epsg = self.parent_tbx.config.epsg
         shapes = []
         ews = []
+        kk_indices = []
+        kks = []
+        cell_ids = []
         self.parent_tbx.delete_rows_in_table('Siedlungszellen')
         for point in zensus_points:
             if point.ew <= 0:
@@ -81,12 +88,18 @@ class DistMarkets(Tool):
             t.create_geom()
             shapes.append(t.geom)
             ews.append(point.ew)
+            kk_indices.append(point.kk_index)
+            kks.append(point.kk)
+            cell_ids.append(point.id)
 
-        df['id'] = range(1, len(shapes) + 1)
+        df['id'] = cell_ids
         df['SHAPE'] = shapes
         df['ew'] = ews
+        df['kk_index'] = kk_indices
+        df['kk'] = kks
 
         self.parent_tbx.insert_dataframe_in_table('Siedlungszellen', df)
+
         #addLayer = arcpy.mapping.Layer(self.folders.get_table('Siedlungszellen'))
         #mxd = arcpy.mapping.MapDocument("CURRENT")
         #df = arcpy.mapping.ListDataFrames(mxd)[0]
