@@ -41,7 +41,7 @@ class OSMMarktEinlesen(Tool):
                     continue
                 markt.create_geom()
                 if markt.geom:
-                    rows.insertRow((markt.name, 1, 1, markt.geom, i))
+                    rows.insertRow((markt.name, 1, 1, markt.geom, i+1))
 
     def set_chains(self):
         """
