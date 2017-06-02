@@ -53,6 +53,7 @@ class ArbeitsplatzEntwicklung(Diagram):
         ax = table_df.plot(x='Jahr', y='AP', kind='line', title=self.title,
                            color='r', legend=False, figsize=(10, 5), grid=False)
         ax.set_ylabel(u'Arbeitsplätze (Orientierungswerte)')
+        ax.set_ylim(bottom=0)
         ax.yaxis.grid(True, which='major')
         
         return ax
@@ -100,9 +101,9 @@ if __name__ == "__main__":
     #diagram = BewohnerEntwicklung()
     #diagram.create(projectname='1', flaechen_id=1, flaechen_name=u'Testfläche')
     #diagram.show()
-    #diagram = ArbeitsplatzEntwicklung()
+    diagram = ArbeitsplatzEntwicklung()
+    diagram.create(projectname='Test2', flaechen_id=1, flaechen_name=u'Testfläche')
+    diagram.show()
+    #diagram = BranchenAnteile()
     #diagram.create(projectname='Test', flaechen_id=2, flaechen_name=u'Testfläche')
     #diagram.show()
-    diagram = BranchenAnteile()
-    diagram.create(projectname='Test', flaechen_id=2, flaechen_name=u'Testfläche')
-    diagram.show()

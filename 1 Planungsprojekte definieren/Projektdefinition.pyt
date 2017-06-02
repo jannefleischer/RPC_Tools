@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
 # reload
 import sys
-#sys.dont_write_bytecode=True
-#import wingdbstub
-
-from rpctools.definitions.projektverwaltung import tbx_teilflaechen_verwalten
-reload(tbx_teilflaechen_verwalten)
-
-#from rpctools.definitions.nutzungsart import (tbx_nutzungen)
-#reload(tbx_nutzungen)
 
 from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten \
      import TbxTeilflaecheVerwalten
