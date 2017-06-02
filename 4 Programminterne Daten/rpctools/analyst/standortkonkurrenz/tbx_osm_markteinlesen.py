@@ -43,7 +43,7 @@ class OSMMarktEinlesen(Tool):
                 if markt.geom:
                     rows.insertRow((markt.name, 1, 1, markt.geom, i+1))
 
-    def set_community_size(self):
+    def set_ags(self):
         """
         Assign community size to supermarkets
         """
@@ -137,7 +137,7 @@ class OSMMarktEinlesen(Tool):
                          .format(len(markets)))
         self.markets_to_db(markets)
         self.set_chains()
-        self.set_community_size()
+        self.set_ags()
         self.add_output()
 
 
