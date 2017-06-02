@@ -43,6 +43,34 @@ class OSMMarktEinlesen(Tool):
                 if markt.geom:
                     rows.insertRow((markt.name, 1, 1, markt.geom, i+1))
 
+    def set_community_size(self):
+        """
+        Assign community size to supermarkets
+        """
+        ws_markets = self.folders.get_db(
+                    'FGDB_Standortkonkurrenz_Supermaerkte.gdb')
+        path_markets = os.path.join(ws_markets, "Maerkte")
+        path_markets_tmp = os.path.join(ws_markets, "Maerkte_tmp")
+        ws_communities = self.folders.get_basedb(
+            'FGDB_Basisdaten_deutschland.gdb')
+        path_communities = os.path.join(ws_communities, 'bkg_gemeinden')
+        fieldmappings = arcpy.FieldMappings()
+        fieldmappings.addTable(path_communities)
+        fields_to_add = ['AGS']
+        for field in fieldmappings.fields:
+            if field.name not in fields_to_add:
+                fieldmappings.removeFieldMap(
+                    fieldmappings.findFieldMapIndex(field.name))
+        fieldmappings.addTable(path_markets)
+        arcpy.SpatialJoin_analysis(target_features=path_markets,
+                                join_features=path_communities,
+                                  out_feature_class=path_markets_tmp,
+                                  field_mapping=fieldmappings,
+                                  match_option='WITHIN')
+        arcpy.Delete_management(path_markets)
+        arcpy.Rename_management(path_markets_tmp, path_markets)
+
+
     def set_chains(self):
         """
         Assign chains to supermarkets
@@ -60,7 +88,7 @@ class OSMMarktEinlesen(Tool):
 
         table_chains = os.path.join(ws_chains, "Ketten_Zuordnung")
         fields = ["regex", "id_kette", "id_betriebstyp", "prioritaet"]
-        
+
         for market in market_cursor:
             match_found = False
             deleted = False
@@ -77,7 +105,7 @@ class OSMMarktEinlesen(Tool):
                     if market[2] == -1:
                         cursor.deleteRow()
                         deleted = True
-                    else: 
+                    else:
                         market[1] = chain[1]
                         market[2] = chain[2]
                         market[3] = chain[2]
@@ -109,6 +137,7 @@ class OSMMarktEinlesen(Tool):
                          .format(len(markets)))
         self.markets_to_db(markets)
         self.set_chains()
+        self.set_community_size()
         self.add_output()
 
 
