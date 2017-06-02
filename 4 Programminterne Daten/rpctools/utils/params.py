@@ -331,12 +331,15 @@ class Tbx(object):
                 self._open(self.par)
 
     def set_active_project(self, projectname=None):
+        project_param = self.par._param_projectname
+        if not project_param or not self.par._od.has_key(project_param):
+            return
         active_project = projectname or self.config.active_project
         # fix active project if it was set to test project by a tool
         # (may happen while testing)
         if active_project == self.folders._TEST_TMP_PROJECT:
             active_project = self.config.active_project = ''
-        project_param = self.par[self.par._param_projectname]
+        project_param = self.par[project_param]
         project_param.filter.list = []
         project_param.value = active_project
         project_param.enabled = False
