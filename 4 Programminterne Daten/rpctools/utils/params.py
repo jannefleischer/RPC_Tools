@@ -634,7 +634,7 @@ class Tbx(object):
             # transpose list of values
             rows = zip(*values)
         except:
-            rows = values
+            rows = [values]
             
         self._insert_rows_in_table(table_path, columns, rows)
 
