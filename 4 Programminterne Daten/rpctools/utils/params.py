@@ -213,9 +213,7 @@ class Tbx(object):
 
     def __init__(self):
 
-        # ggf. später reload entfernen???
-        Tool = self.reload_tool()
-        #Tool = self.Tool
+        Tool = self.Tool
 
         # the parameters
         self.par = Params(param_projectname=Tool._param_projectname,
@@ -233,19 +231,6 @@ class Tbx(object):
         # project db only on execution of tool
         self._temporary_gdbs = []
         self._is_executing = False
-
-    def reload_tool(self):
-        """reload the tool's module"""
-        tool_module_name = self.Tool.__module__
-        reload(sys.modules[tool_module_name])
-        tool_name = self.Tool.__name__
-        tool_module = __import__(tool_module_name,
-                                 globals(),
-                                 locals(),
-                                 [tool_name],
-                                 -1)
-        Tool = getattr(tool_module, tool_name)
-        return Tool
 
     @abstractmethod
     def _getParameterInfo(self):
