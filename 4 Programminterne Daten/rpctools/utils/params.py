@@ -767,8 +767,8 @@ class Tbx(object):
         ----------
         table_name : str
             name of the table
-        column_values: dict,
-            the columns and the values to update them with as key/value-pairs
+        dataframe: DataFrame,
+            the dataframe to upload
         pkeys: list of str
             the names of the primary keys
         workspace : str, optional
@@ -789,8 +789,14 @@ class Tbx(object):
         table_name = os.path.basename(table_name)
         table_path = self._get_table_path(table_name, workspace=workspace)
         columns_incl_pkeys = dataframe.columns.values
+        desc = arcpy.Describe(table_path)
+        fields = [field.name for field in desc.fields]
+        
         # columns without the pkeys
         columns = np.setdiff1d(columns_incl_pkeys, pkeys)
+        # intersection of fields between dataframe and available fields
+        # (prevent writing columns of df that don't exist in db)
+        columns = np.intersect1d(columns, fields)
         for row in dataframe.iterrows():
             # row is a tuple with index at 0 and the columns at 1
             pkey_values = dict(zip(pkeys, row[1][pkeys].values))
