@@ -27,7 +27,7 @@ class OSMMarktEinlesen(Tool):
         self.output.add_output(group_layer, layer, fc, zoom=False)
 
 
-    def add_markets(self, supermarkets):
+    def markets_to_db(self, supermarkets):
         """Create the point-features for supermarkets"""
         tablename = 'Maerkte'
         sr = arcpy.SpatialReference(self.parent_tbx.config.epsg)
@@ -107,7 +107,7 @@ class OSMMarktEinlesen(Tool):
         arcpy.AddMessage(u'{} Märkte gefunden'.format(len(markets)))
         arcpy.AddMessage(u'Supermärkte werden in die Datenbank übertragen...'
                          .format(len(markets)))
-        self.add_markets(markets)
+        self.markets_to_db(markets)
         self.set_chains()
         self.add_output()
 
