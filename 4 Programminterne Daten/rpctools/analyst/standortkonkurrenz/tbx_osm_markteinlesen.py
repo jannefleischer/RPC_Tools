@@ -69,7 +69,8 @@ class OSMMarktEinlesen(Tool):
                                   match_option='WITHIN')
         arcpy.Delete_management(path_markets)
         arcpy.Rename_management(path_markets_tmp, path_markets)
-
+        arcpy.DeleteField_management(in_table=path_markets,
+                                     drop_field=['Join_Count', 'TARGET_FID'])
 
     def set_chains(self):
         """
