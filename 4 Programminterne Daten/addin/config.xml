@@ -25,7 +25,7 @@
                 <Button caption="Projekt kopieren" category="ProjektCheck" class="ProjektKopieren" id="rpc_tools.projekt_kopieren" image="Images\1002-add_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Projekt l&#246;schen" category="ProjektCheck" class="ProjektLoeschen" id="rpc_tools.projekt_loeschen" image="Images\1001-cancel_1.png" message="" tip="">
+                <Button caption="Projekte l&#246;schen" category="ProjektCheck" class="ProjektLoeschen" id="rpc_tools.projekt_loeschen" image="Images\1001-cancel_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Nutzungen auf Teilfl&#228;chen definieren" category="ProjektCheck" class="NutzungenDefinieren" id="rpc_tools.nutzungen_definieren" image="Images\013500-filter_1.png" message="" tip="">
