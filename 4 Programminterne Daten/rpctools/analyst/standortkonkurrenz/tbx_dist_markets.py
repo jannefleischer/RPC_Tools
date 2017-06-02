@@ -10,6 +10,8 @@ from rpctools.utils.spatial_lib import get_project_centroid
 from rpctools.analyst.standortkonkurrenz.zensus import Zensus
 from rpctools.analyst.standortkonkurrenz.routing_distances import DistanceRouting
 from rpctools.analyst.standortkonkurrenz.osm_einlesen import Point
+from rpctools.utils.config import Folders
+from rpctools.analyst.standortkonkurrenz.sales import Sales
 
 
 class DistMarkets(Tool):
@@ -17,6 +19,8 @@ class DistMarkets(Tool):
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
 
     def run(self):
+        folders = Folders(self.par)
+        tbx = self.parent_tbx
         square_size = self.par.square_size.value * 1000
         zensus = Zensus()
 
@@ -46,6 +50,74 @@ class DistMarkets(Tool):
             origin = Point(x, y, id=market_id, epsg=epsg)
             distances = routing.get_distances(origin, destinations, bbox)
             self.distances_to_db(market_id, destinations, distances)
+
+
+        sales = Sales(dataframes)
+
+    def distance_dataframe(self):
+        """
+        Create dataframes for Sales object
+        """
+        path_distances = folders.get_table('Distanzen')
+        # Dataframe for distances
+        df_distances = tbx.table_to_dataframe(path_distances)
+        df_distances = df_distances.pivot(index='id_markt',
+                                                  columns='id_siedlungszelle',
+                                                  values='distanz')
+        return df_distances
+
+    def markets_dataframe(self):
+        """
+        Create dataframes for Sales object
+        """
+        path_markets = folders.get_table('Maerkte')
+        # dataframe for communities
+        df_communities = tbx.table_to_dataframe(
+            table_name='bkg_gemeinden',
+            columns=['AGS', 'groessenklasse'],
+            workspace='FGDB_Basisdaten_deutschland.gdb',
+            is_base_table=True)
+        # dataframe for exponential parameters
+        df_exponential_parameters = tbx.table_to_dataframe(
+            table_name='Exponentialfaktoren',
+            columns=['gem_groessenklasse', 'id_kette', 'id_betriebstyp',
+                     'exponent', 'exp_faktor'],
+            workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
+            is_base_table=True)
+        # adapt column names of df_exponential_parameters to df_markets
+        # for merge
+        df_exponential_parameters.columns = ['groessenklasse', 'id_kette',
+                                             'id_betriebstyp_nullfall',
+                                             'exponent', 'exp_faktor']
+        # dataframe for markets
+        df_markets = tbx.table_to_dataframe(path_markets)
+        # add groessenklassen column
+        df_markets = df_markets.merge(df_communities, on='AGS')
+        # add faktor and hochzahl
+        df_markets_merged = df_markets.merge(df_exponential_parameters,
+                                      on=['groessenklasse', 'id_kette',
+                                             'id_betriebstyp_nullfall',])
+        successful_merged = list(df_markets_merged['OBJECTID'])
+        df_markets_not_merged = df_markets[df_markets['OBJECTID'].isin(successful_merged)==False]
+
+        """
+        TODO:
+        id_kette = 0 setzen
+        df_markets_not_merged mit id_kette == 0 versuchen zu mergen
+        id_kette auf richtigen wert zurücketzen
+        """
+
+        return df_markets
+
+    def zensus_dataframe(self):
+        """
+        Create dataframes for Sales object
+        """
+        path_zensus_cells = folders.get_table('Siedlungszellen')
+        # Dataframe for zensus cells
+        df_zensus_cells = tbx.table_to_dataframe(path_zensus_cells)
+        return df_zensus_cells
+
 
     def distances_to_db(self, market_id, destinations, distances):
         self.parent_tbx.delete_rows_in_table(
