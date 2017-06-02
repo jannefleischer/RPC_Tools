@@ -11,13 +11,22 @@ class EditMarkets(Tool):
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
 
     def run(self):
-        # ToDo: remove marked markets
-        pass
+        markets_df = self.parent_tbx.markets_df
+        delete_df = markets_df.loc[markets_df['do_delete'] == True]
+        update_df = markets_df.loc[markets_df['do_delete'] == False]
+        if len(delete_df) > 0:
+            arcpy.AddMessage(u'Lösche Märkte')
+        for idx, market in delete_df.iterrows():
+            arcpy.AddMessage(u' - {}'.format(market['pretty']))
+            self.parent_tbx.delete_rows_in_table(
+                'Maerkte', where='id={}'.format(market['id']))
+        arcpy.AddMessage(u'Schreibe Änderungen in Datenbank...')
+        self.parent_tbx.dataframe_to_table('Maerkte', update_df,
+                                           ['id'], upsert=False)
 
 
 class TbxEditMarkets(Tbx):
-    _deletion_flag = u' - WIRD GELÖSCHT'
-
+    
     @property
     def label(self):
         return encode(u'Märkte bearbeiten')
@@ -93,28 +102,26 @@ class TbxEditMarkets(Tbx):
         param.datatype = u'GPString'
         param.filter.list = pretty_names
     
-        param = self.add_parameter('marked_for_deletion')
+        param = self.add_parameter('do_delete')
         param.name = encode(u'Löschen')
         param.displayName = encode(u'Markt löschen')
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'
-        
-        self.add_temporary_management(
-            'FGDB_Standortkonkurrenz_Supermaerkte.gdb')
 
         return self.par
     
     def _open(self, params):
-        self.markets_df = self.table_to_dataframe('Maerkte')        
-        self.markets_df['marked_for_deletion'] = False
+        self.markets_df = self.table_to_dataframe('Maerkte')
+        self.markets_df['do_delete'] = False
+        self.markets_df.sort(columns='id', inplace=True)
         
         pretty_names = []
         for idx, market in self.markets_df.iterrows():
             pretty = self.get_pretty_market_name(market)
             pretty_names.append(pretty)
         self.markets_df['pretty'] = pretty_names
-        self.update_market_names()
+        self.update_market_list()
         self.set_selected_market_inputs()
         
     def get_pretty_market_name(self, market):
@@ -126,6 +133,8 @@ class TbxEditMarkets(Tbx):
         pretty = u'"{name}" ({id}) - {typ} ({chain})'.format(
             id=market['id'], name=market['name'], typ=typ_name, 
             chain=chain_name)
+        if market['do_delete']:
+            pretty += u' - WIRD GELÖSCHT'
         return pretty
     
     def set_selected_market_inputs(self):
@@ -138,17 +147,19 @@ class TbxEditMarkets(Tbx):
             self.types_df['id_betriebstyp'] ==
             market['id_betriebstyp_nullfall'].values[0]]
         self.par.type_name.value = typ_pretty.values[0]
-        do_delete = self._deletion_flag in market['pretty']
-        self.par.marked_for_deletion.value = True if do_delete else False
+        do_delete = market['do_delete'].values[0]
+        # strange: can't assign the bool of do_delete directly, arcpy is
+        # ignoring it
+        self.par.do_delete.value = True if do_delete else False
     
     def update_market_db(self):
         pass
     
-    def update_market_names(self):
+    def update_market_list(self):
         idx = self.par.market_name.filter.list.index(
             self.par.market_name.value) if self.par.market_name.value else 0
-        pretty = self.markets_df['pretty'].values
-        self.par.market_name.filter.list = sorted(pretty)
+        pretty = self.markets_df['pretty'].values.tolist()
+        self.par.market_name.filter.list = pretty
         self.par.market_name.value = pretty[idx] if idx >= 0 else pretty[0]
         
     def _updateParameters(self, params):
@@ -164,29 +175,23 @@ class TbxEditMarkets(Tbx):
                 self.types_df['pretty'] == self.par.type_name.value].values[0]
             self.markets_df.loc[market_idx, 'id_betriebstyp_nullfall'] = id_typ
             
-        elif self.par.changed('marked_for_deletion'):            
-            if self.par.marked_for_deletion.value:
-                self.markets_df.loc[market_idx, 'pretty'] += self._deletion_flag
-            else:
-                self.markets_df.loc[market_idx, 'pretty'] = self.markets_df.loc[
-                    market_idx, 'pretty'].values[0].replace(self._deletion_flag, '')
+        elif self.par.changed('do_delete'):
+            do_delete = self.par.do_delete.value
+            self.markets_df.loc[market_idx, 'do_delete'] = do_delete
         
         # update the pretty names of the markets
-        
+            
         if (self.par.changed('chain') or
-            self.par.changed('type_name')):
+            self.par.changed('type_name') or
+            self.par.changed('do_delete')):
             i = np.where(market_idx == True)[0][0]
             pretty = self.get_pretty_market_name(
                 self.markets_df.iloc[i])
             self.markets_df.loc[market_idx, 'pretty'] = pretty
-            
-        if (self.par.changed('chain') or
-            self.par.changed('type_name') or
-            self.par.changed('marked_for_deletion')):
-            self.update_market_names()
+            self.update_market_list()
             
         if self.par.changed('market_name'):
-            pass
+            self.set_selected_market_inputs()
         return params
 
 

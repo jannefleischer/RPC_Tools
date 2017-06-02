@@ -570,6 +570,7 @@ if __name__ == '__main__':
     t = TbxNutzungenGewerbe()
     params = t.getParameterInfo()
     t.par.projectname.value = t.config.active_project
+    t.commit_tfl_changes()
     t.tool.calculate_ways()
     t.tool.update_wege_projekt()
     t.tool.main(t.par, None)
