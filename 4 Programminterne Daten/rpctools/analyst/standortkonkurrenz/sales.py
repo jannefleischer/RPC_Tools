@@ -15,13 +15,28 @@ class Sales(object):
 
         self.distances = df_distances
         self.markets = df_markets
-        self.tbx = DummyTbx()        
+        self.tbx = DummyTbx()
         
-    def calculate_attractivity(self):
-        df_markets = self.prepare_markets(self.markets, self.NULLFALL)
-        print()
+    def calculate_nullfall(self):
+        self._calculate_sales(self.NULLFALL)
 
-    def prepare_markets(self, df_markets, setting):
+    def calculate_planfall(self):
+        self._calculate_sales(self.PLANFALL)
+        
+    def _calculate_sales(self, setting):
+        df_markets = self._prepare_markets(self.markets, setting)
+        for index, market in df_markets.iterrows():
+            print()
+        print()
+        
+    def get_dist_matrix(self):
+        # Dataframe for distances
+        dist_matrix = self.distances.pivot(index='id_markt',
+                                           columns='id_siedlungszelle',
+                                           values='distanz')
+        return dist_matrix    
+
+    def _prepare_markets(self, df_markets, setting):
         """
         setting - nullfall or planfall
         """

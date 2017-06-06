@@ -37,17 +37,10 @@ class Zensus(object):
 
         zensus_points = []
         zensus_raster = self.folders.ZENSUS_RASTER_FILE
-        # p1 and p2 build square around centroid
-        p1 = Point(centroid.x - size / 2,
-                   centroid.y - size / 2,
-                   epsg=centroid.epsg)
-        p2 = Point(centroid.x + size / 2,
-                   centroid.y + size / 2,
-                   epsg=centroid.epsg)
-
-        bbox = (p1, p2)
 
         out_raster = os.path.join(self.tmp_folder, 'zensus_cutout.tif')
+        
+        bbox = self.get_bbox(centroid, size)
 
         srid = clip_raster(zensus_raster, out_raster, bbox)
 
@@ -66,6 +59,19 @@ class Zensus(object):
             zensus_points.append(p)
 
         return zensus_points, bbox
+    
+    def get_bbox(self, centroid, size):
+        # p1 and p2 build square around centroid
+        p1 = Point(centroid.x - size / 2,
+                   centroid.y - size / 2,
+                   epsg=centroid.epsg)
+        p2 = Point(centroid.x + size / 2,
+                   centroid.y + size / 2,
+                   epsg=centroid.epsg)
+
+        bbox = (p1, p2)
+        
+        return bbox
 
     def add_kk(self, zensus_points, project):
         base_kk = 2280

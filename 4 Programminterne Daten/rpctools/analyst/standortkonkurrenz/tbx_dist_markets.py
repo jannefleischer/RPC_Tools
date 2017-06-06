@@ -18,6 +18,9 @@ from rpctools.analyst.standortkonkurrenz.sales import Sales
 class DistMarkets(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
+    # ToDo: set this in toolbox?
+    recalculate = False
+    
     def run(self):
         folders = Folders(self.par)
         tbx = self.parent_tbx
@@ -26,46 +29,48 @@ class DistMarkets(Tool):
 
         x, y = get_project_centroid(self.projectname)
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
-
-        arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
-        zensus_points, bbox = zensus.cutout_area(centroid, square_size)
-        arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
-        self.zensus_to_db(zensus_points)
-        active_project = self.parent_tbx.config.active_project
-        zensus.add_kk(zensus_points, active_project)
-        # TODO: Update instead of rewrite
-        self.zensus_to_db(zensus_points)
+        
+        if self.recalculate or len(tbx.query_table('Siedlungszellen')) == 0:            
+            arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
+            zensus_points, bbox = zensus.cutout_area(centroid, square_size)
+            arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
+            self.zensus_to_db(zensus_points)
+            active_project = self.parent_tbx.config.active_project
+            zensus.add_kk(zensus_points, active_project)
+            # TODO: Update instead of rewrite
+            self.zensus_to_db(zensus_points)
+        else:
+            bbox = zensus.get_bbox(centroid, square_size)
+            arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
+                             'Neuberechnung wird übersprungen')
         arcpy.AddMessage(u'Berechne Entfernungen der Märkte '
                          u'zu den Siedlungszellen...')
+        
         markets = self.parent_tbx.table_to_dataframe('Maerkte')
         epsg = self.parent_tbx.config.epsg
 
         routing = DistanceRouting()
         destinations = self.get_cells()
         dest_ids = [d.id for d in destinations]
-        for id, market in markets.iterrows():
+        already_calculated = np.unique(tbx.table_to_dataframe(
+            'Distanzen', columns=['id_markt'])['id_markt'])
+        for index, market in markets.iterrows():
             arcpy.AddMessage(' - {}'.format(market['name']))
-            market_id = market['id']
-            x, y = market['SHAPE']
-            origin = Point(x, y, id=market_id, epsg=epsg)
-            distances = routing.get_distances(origin, destinations, bbox)
-            self.distances_to_db(market_id, destinations, distances)
+            if self.recalculate or market['id'] not in already_calculated:
+                market_id = market['id']
+                x, y = market['SHAPE']
+                origin = Point(x, y, id=market_id, epsg=epsg)
+                distances = routing.get_distances(origin, destinations, bbox,
+                                                  recalculate=self.recalculate)
+                self.distances_to_db(market_id, destinations, distances)
+            else:
+                arcpy.AddMessage('   bereits berechnet, wird übersprungen')
 
         df_markets = tbx.table_to_dataframe('Maerkte')
-        distance_matrix = self.get_dist_matrix()
-        sales = Sales(distance_matrix, df_markets)
-        sales.calculate_attractivity()
-
-    def get_dist_matrix(self):
-        """
-        Create dataframes for Sales object
-        """
-        # Dataframe for distances
         df_distances = self.parent_tbx.table_to_dataframe('Distanzen')
-        dist_matrix = df_distances.pivot(index='id_markt',
-                                         columns='id_siedlungszelle',
-                                         values='distanz')
-        return dist_matrix
+        sales = Sales(df_distances, df_markets)
+        sales_nullfall = sales.calculate_nullfall()
+        sales_planfall = sales.calculate_planfall()
 
     def zensus_dataframe(self):
         """
@@ -129,11 +134,6 @@ class DistMarkets(Tool):
         df['kk'] = kks
 
         self.parent_tbx.insert_dataframe_in_table('Siedlungszellen', df)
-
-        #addLayer = arcpy.mapping.Layer(self.folders.get_table('Siedlungszellen'))
-        #mxd = arcpy.mapping.MapDocument("CURRENT")
-        #df = arcpy.mapping.ListDataFrames(mxd)[0]
-        #arcpy.mapping.AddLayer(df, addLayer)
 
 
 class TbxDistMarkets(Tbx):
