@@ -6,28 +6,68 @@ from rpctools.utils.params import DummyTbx
 import arcpy
 import os
 import numpy as np
+import pandas as pd
 
 class Sales(object):
     NULLFALL = 0
     PLANFALL = 1
 
-    def __init__(self, df_distances, df_markets):
+    def __init__(self, df_distances, df_markets, df_zensus):
 
         self.distances = df_distances
         self.markets = df_markets
+        self.zensus = df_zensus
         self.tbx = DummyTbx()
         
     def calculate_nullfall(self):
-        self._calculate_sales(self.NULLFALL)
+        return self._calculate_sales(self.NULLFALL)
 
     def calculate_planfall(self):
-        self._calculate_sales(self.PLANFALL)
+        return self._calculate_sales(self.PLANFALL)
         
     def _calculate_sales(self, setting):
         df_markets = self._prepare_markets(self.markets, setting)
+        df_markets.set_index('id', inplace=True) 
+        #df_markets.sort(columns='id', inplace=True)
+        #dist_matrix = self.get_dist_matrix().sort()
+        ## dist_matrix and df_markets should have same market-ids
+        #assert (df_markets['id'] != dist_matrix.index).sum() == 0
+        
+        ## Hochzahl * Reisezeit
+        #attraction_matrix = dist_matrix.mul(df_markets['exponent'].values[0],
+                                            #axis=0)
+                                            
+        # no exp. over whole matrix -> row-wise instead
+        
+        df_kk = pd.DataFrame()
+        df_kk['id_siedlungszelle'] = self.zensus['id']
+        df_kk['kk'] = self.zensus['kk']
+        kk_merged = self.distances.merge(df_kk, on='id_siedlungszelle')
+        
+        kk_matrix = kk_merged.pivot(index='id_markt',
+                                    columns='id_siedlungszelle',
+                                    values='kk')
+        
+        dist_matrix = kk_merged.pivot(index='id_markt',
+                                      columns='id_siedlungszelle',
+                                      values='distanz')
+        
+        n_cells = len(np.unique(self.distances['id_siedlungszelle']))
+        
+        attraction_matrix = pd.DataFrame(data=np.zeros(dist_matrix.shape),
+                                         index=dist_matrix.index, 
+                                         columns=dist_matrix.columns)
+        
         for index, market in df_markets.iterrows():
-            print()
-        print()
+            distances = dist_matrix.loc[index]
+            factor = market['exp_faktor']
+            exponent = market['exponent']
+            attraction_matrix.loc[index] = factor * np.exp(distances * exponent)
+        
+        probabilities = attraction_matrix / attraction_matrix.sum(axis=0)
+        kk_flow = probabilities * kk_matrix
+        
+        return kk_flow
         
     def get_dist_matrix(self):
         # Dataframe for distances
@@ -43,6 +83,9 @@ class Sales(object):
         base_ws = 'FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb'
         betriebstyp_col = 'id_betriebstyp_nullfall' \
             if setting == self.NULLFALL else 'id_betriebstyp_planfall'
+        
+        # ignore markets that don't exist yet resp. are closed
+        df_markets = df_markets[df_markets[betriebstyp_col] != 0]
     
         df_communities = self.tbx.table_to_dataframe(
             table_name='bkg_gemeinden',

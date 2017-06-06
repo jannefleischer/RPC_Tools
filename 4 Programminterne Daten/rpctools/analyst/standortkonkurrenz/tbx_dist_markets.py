@@ -53,38 +53,84 @@ class DistMarkets(Tool):
         destinations = self.get_cells()
         dest_ids = [d.id for d in destinations]
         already_calculated = np.unique(tbx.table_to_dataframe(
-            'Distanzen', columns=['id_markt'])['id_markt'])
+            'Beziehungen_Maerkte_Zellen', columns=['id_markt'])['id_markt'])
         for index, market in markets.iterrows():
             arcpy.AddMessage(' - {}'.format(market['name']))
             if self.recalculate or market['id'] not in already_calculated:
                 market_id = market['id']
                 x, y = market['SHAPE']
                 origin = Point(x, y, id=market_id, epsg=epsg)
-                distances = routing.get_distances(origin, destinations, bbox,
-                                                  recalculate=self.recalculate)
+                distances = routing.get_distances(origin, destinations, bbox)
                 self.distances_to_db(market_id, destinations, distances)
             else:
                 arcpy.AddMessage('   bereits berechnet, wird übersprungen')
 
         df_markets = tbx.table_to_dataframe('Maerkte')
-        df_distances = self.parent_tbx.table_to_dataframe('Distanzen')
-        sales = Sales(df_distances, df_markets)
-        sales_nullfall = sales.calculate_nullfall()
-        sales_planfall = sales.calculate_planfall()
+        df_zensus = self.parent_tbx.table_to_dataframe('Siedlungszellen')
+        df_distances = self.parent_tbx.table_to_dataframe(
+            'Beziehungen_Maerkte_Zellen', 
+            columns=['id_markt', 'id_siedlungszelle', 'distanz'])
+        sales = Sales(df_distances, df_markets, df_zensus)
+        arcpy.AddMessage('Berechne Nullfall...')
+        kk_nullfall = sales.calculate_nullfall()
+        arcpy.AddMessage('Berechne Planfall...')
+        kk_planfall = sales.calculate_planfall()
+        arcpy.AddMessage(u'Berechne Kenngrößen...')
+        self.sales_to_db(kk_nullfall, kk_planfall)
 
-    def zensus_dataframe(self):
-        """
-        Create dataframes for Sales object
-        """
-        path_zensus_cells = folders.get_table('Siedlungszellen')
-        # Dataframe for zensus cells
-        df_zensus_cells = tbx.table_to_dataframe(path_zensus_cells)
-        return df_zensus_cells
+    def sales_to_db(self, kk_nullfall, kk_planfall):
+        sales_nullfall = kk_nullfall.sum(axis=1)
+        sales_planfall = kk_nullfall.sum(axis=1)
+        df_markets = pd.DataFrame()
+        df_markets['id'] = sales_nullfall.index
+        df_markets['umsatz_nullfall'] = sales_nullfall.values
+        df_markets['umsatz_planfall'] = sales_planfall.values
+        self.parent_tbx.dataframe_to_table('Maerkte', df_markets, pkeys=['id'])
+        
+        # inverse the pivoted tables
+        kk_nullfall['id_markt'] = kk_nullfall.index
+        kk_planfall['id_markt'] = kk_planfall.index
+        df_nullfall = pd.melt(kk_nullfall,
+                              value_name='kk_strom_nullfall',
+                              id_vars='id_markt')
+        df_planfall = pd.melt(kk_planfall,
+                              value_name='kk_strom_planfall',
+                              id_vars='id_markt')
+        
+        # join the results to the cell table
+        cells = self.parent_tbx.table_to_dataframe('Beziehungen_Maerkte_Zellen')
+        del cells['kk_strom_nullfall']
+        del cells['kk_strom_planfall']
+        cells = cells.merge(df_nullfall, on=['id_siedlungszelle', 'id_markt'])
+        cells = cells.merge(df_planfall, on=['id_siedlungszelle', 'id_markt'])
+        
+        cells.sort(['id_markt', 'id_siedlungszelle'], inplace=True)
+        
+        
+        # should be identical, but take both anyway
+        sum_null = cells.groupby('id_siedlungszelle',
+                                 as_index=False)['kk_strom_nullfall'].sum()
+        sum_plan = cells.groupby('id_siedlungszelle',
+                                 as_index=False)['kk_strom_planfall'].sum()
+        cells = cells.merge(sum_null, on=['id_siedlungszelle'],
+                            suffixes=('', '_sum'))
+        cells = cells.merge(sum_plan, on=['id_siedlungszelle'], 
+                            suffixes=('', '_sum'))
+        cells['kk_bindung_nullfall'] = cells['kk_strom_nullfall'] * 100 / cells['kk_strom_nullfall_sum']
+        cells['kk_bindung_planfall'] = cells['kk_strom_planfall'] * 100 / cells['kk_strom_planfall_sum']
 
+        # deletion of old entries and inserting is faster than updating
+        self.parent_tbx.delete_rows_in_table('Beziehungen_Maerkte_Zellen')
+        #column_values = {}
+        #for col in cells.columns:
+            #column_values[col] = cells[col].values
+        arcpy.AddMessage(u'Schreibe Kenngrößen in Datenbank...')
+        self.parent_tbx.insert_dataframe_in_table('Beziehungen_Maerkte_Zellen',
+                                                  cells)
 
     def distances_to_db(self, market_id, destinations, distances):
         self.parent_tbx.delete_rows_in_table(
-            'Distanzen', where='id_markt={}'.format(market_id))
+            'Beziehungen_Maerkte_Zellen', where='id_markt={}'.format(market_id))
         column_values = {}
         shapes = []
         ids = []
@@ -95,7 +141,8 @@ class DistMarkets(Tool):
         column_values['id_siedlungszelle'] = ids
         column_values['SHAPE'] = shapes
         column_values['id_markt'] = [market_id] * len(destinations)
-        self.parent_tbx.insert_rows_in_table('Distanzen', column_values)
+        self.parent_tbx.insert_rows_in_table('Beziehungen_Maerkte_Zellen',
+                                             column_values)
 
     def get_cells(self):
         cells = []
