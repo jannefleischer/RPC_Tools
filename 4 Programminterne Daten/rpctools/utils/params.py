@@ -816,7 +816,12 @@ class Tbx(object):
         """
         table_name = os.path.basename(table_name)
         table_path = self._get_table_path(table_name, workspace=workspace)
-        columns = dataframe.columns.values
+        desc = arcpy.Describe(table_path)
+        fields = [field.name for field in desc.fields]
+        
+        # intersection of fields between dataframe and available fields
+        # (prevent writing columns of df that don't exist in db)
+        columns = np.intersect1d(dataframe.columns.values, fields)
         values = [row[1][columns].values for row in dataframe.iterrows()]
         self._insert_rows_in_table(table_path, columns, values)
 
