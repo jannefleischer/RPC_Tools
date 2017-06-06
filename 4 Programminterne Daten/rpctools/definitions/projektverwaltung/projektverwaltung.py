@@ -330,7 +330,6 @@ class ProjektAnlegen(Projektverwaltung):
                                         ['INSIDE_X', 'INSIDE_Y'])
         INSIDE_X = [row[0] for row in XY_INSIDE]
         INSIDE_Y = [row[1] for row in XY_INSIDE]
-        arcpy.AddMessage(XY_INSIDE)
         distances = []
         for i in range(len(XY_INSIDE)):
             for j in range(i):

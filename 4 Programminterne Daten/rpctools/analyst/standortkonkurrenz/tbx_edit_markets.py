@@ -115,6 +115,8 @@ class TbxEditMarkets(Tbx):
         self.markets_df = self.table_to_dataframe('Maerkte')
         self.markets_df['do_delete'] = False
         self.markets_df.sort(columns='id', inplace=True)
+        if len(self.markets_df) == 0:
+            return
         
         pretty_names = []
         for idx, market in self.markets_df.iterrows():
@@ -152,9 +154,14 @@ class TbxEditMarkets(Tbx):
         # ignoring it
         self.par.do_delete.value = True if do_delete else False
     
-    def update_market_db(self):
-        pass
-    
+    def validate_inputs(self):
+        if len(self.markets_df) == 0:
+            msg = (u'Es sind keine Märkte vorhanden. '
+                   u'Bitte lesen Sie zunächst Märkte ein oder fügen Sie '
+                   u'sie manuell hinzu.')
+            return False, msg
+        return True, ''
+        
     def update_market_list(self):
         idx = self.par.market_name.filter.list.index(
             self.par.market_name.value) if self.par.market_name.value else 0
@@ -163,6 +170,8 @@ class TbxEditMarkets(Tbx):
         self.par.market_name.value = pretty[idx] if idx >= 0 else pretty[0]
         
     def _updateParameters(self, params):
+        if len(self.markets_df) == 0:
+            return
         market_idx = self.markets_df['pretty'] == self.par.market_name.value
         
         if self.par.changed('chain'):
@@ -194,6 +203,10 @@ class TbxEditMarkets(Tbx):
             self.set_selected_market_inputs()
         return params
 
+    def _updateMessages(self, params):
+        valid, msg = self.validate_inputs()
+        if not valid:
+            self.par.projectname.setErrorMessage(msg)
 
 if __name__ == '__main__':
     t = TbxEditMarkets()
