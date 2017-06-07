@@ -193,31 +193,31 @@
                 <Tool caption="Anbindungspunkt setzen" category="ProjektCheck" class="Anbindungspunkt" id="rpc_tools.anbindungspunkt" image="Images\CadastralFeatureSelect16.png" message="" tip="Setzen Sie auf der Karte einen Punkt zur Anbindung der Teilfl&#228;che an das Stra&#223;ennetz">
                     <Help heading="" />
                 </Tool>                
-                <Button caption="Standortabfrage an OpenStreetMap" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm_einlesen" image="Images\Openstreetmap_logo.svg.png" message="" tip="">
+                <Button caption="OpenStreetMap" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm_einlesen" image="Images\Openstreetmap_logo.svg.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Bestand aus Datei einlesen" category="ProjektCheck" class="BestandEinlesen" id="rpc_tools.bestand_einlesen" image="Images\CadastralJobLoad16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Markt setzen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="" message="" tip="">
+                <Tool caption="Markt setzen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Markt bearbeiten" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="" message="" tip="">
+                <Tool caption="Markt bearbeiten" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Markt entfernen" category="ProjektCheck" class="BestandMarktEntfernen" id="rpc_tools.bestand_entfernen" image="" message="" tip="">
+                <Tool caption="Markt entfernen" category="ProjektCheck" class="BestandMarktEntfernen" id="rpc_tools.bestand_entfernen" image="Images\GreenPinRemove16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
                 <Tool caption="bestehenden Markt erweitern" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_erweitern" image="" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="geplanten Markt setzen" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_hinzu" image="" message="" tip="">
+                <Tool caption="geplanten Markt setzen" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_hinzu" image="Images\GreenPin16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="geplanten Markt bearbeiten" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="" message="" tip="">
+                <Tool caption="geplanten Markt bearbeiten" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="geplanten Markt entfernen" category="ProjektCheck" class="PlanfallMarktEntfernen" id="rpc_tools.planfall_entfernen" image="" message="" tip="">
+                <Tool caption="geplanten Markt entfernen" category="ProjektCheck" class="PlanfallMarktEntfernen" id="rpc_tools.planfall_entfernen" image="Images\GreenPinRemove16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
             </Commands>
@@ -412,10 +412,15 @@
                         <Button refID="rpc_tools.bilanzen_hinweise" />
                     </Items>
                 </Menu>
-                <Menu caption="Nullfall" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="Bestand einlesen" category="ProjektCheck" id="rpc_tools.menu_bestand_einlesen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.bestand_osm_einlesen" />
                         <Button refID="rpc_tools.bestand_einlesen" />
+                    </Items>
+                </Menu>
+                <Menu caption="Nullfall" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Menu refID="rpc_tools.menu_bestand_einlesen" />
                         <Tool refID="rpc_tools.bestand_hinzu" />
                         <Tool refID="rpc_tools.bestand_bearbeiten" />
                         <Tool refID="rpc_tools.bestand_entfernen" />
