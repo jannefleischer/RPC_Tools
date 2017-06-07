@@ -15,7 +15,6 @@ class OSMMarktEinlesen(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
 
-
     def add_output(self):
         group_layer = ("standortkonkurrenz")
         fc = self.folders.get_table('Maerkte')

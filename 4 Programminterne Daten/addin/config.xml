@@ -49,6 +49,9 @@
                 <Button caption="Erschlie&#223;ungsnetze anzeigen" category="ProjektCheck" class="ErschliessungsnetzeAnzeigen" id="rpc_tools.erschliessungsnetze_anzeigen" image="Images\eye-2-16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
+                <Button caption="M&#228;rkte anzeigen" category="ProjektCheck" class="MaerkteAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
                 <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="AnliegerstrasseInnere" id="rpc_tools.anliegerstrasse_innere" image="Images\Driving_Leg16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
@@ -193,10 +196,10 @@
                 <Tool caption="Anbindungspunkt setzen" category="ProjektCheck" class="Anbindungspunkt" id="rpc_tools.anbindungspunkt" image="Images\CadastralFeatureSelect16.png" message="" tip="Setzen Sie auf der Karte einen Punkt zur Anbindung der Teilfl&#228;che an das Stra&#223;ennetz">
                     <Help heading="" />
                 </Tool>                
-                <Button caption="OpenStreetMap" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm_einlesen" image="Images\Openstreetmap_logo.svg.png" message="" tip="">
+                <Button caption="OpenStreetMap" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Bestand aus Datei einlesen" category="ProjektCheck" class="BestandEinlesen" id="rpc_tools.bestand_einlesen" image="Images\CadastralJobLoad16.png" message="" tip="">
+                <Button caption="Bestand aus Datei einlesen" category="ProjektCheck" class="BestandEinlesen" id="rpc_tools.bestand_datei" image="Images\CadastralJobLoad16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Tool caption="Markt setzen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
@@ -414,8 +417,8 @@
                 </Menu>
                 <Menu caption="Bestand einlesen" category="ProjektCheck" id="rpc_tools.menu_bestand_einlesen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
-                        <Button refID="rpc_tools.bestand_osm_einlesen" />
-                        <Button refID="rpc_tools.bestand_einlesen" />
+                        <Button refID="rpc_tools.bestand_osm" />
+                        <Button refID="rpc_tools.bestand_datei" />
                     </Items>
                 </Menu>
                 <Menu caption="Nullfall" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
@@ -436,6 +439,7 @@
                 </Menu>
                 <Menu caption="Standortkonkurrenz" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
+                        <Button refID="rpc_tools.maerkte_anzeigen" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_nullfall" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_planfall" />
                     </Items>

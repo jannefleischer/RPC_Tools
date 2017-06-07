@@ -87,7 +87,7 @@ class DistMarkets(Tool):
         df_markets['umsatz_planfall'] = sales_planfall.values
         self.parent_tbx.dataframe_to_table('Maerkte', df_markets, pkeys=['id'])
         
-        # inverse the pivoted tables
+        # invert the pivoted tables
         kk_nullfall['id_markt'] = kk_nullfall.index
         kk_planfall['id_markt'] = kk_planfall.index
         df_nullfall = pd.melt(kk_nullfall,

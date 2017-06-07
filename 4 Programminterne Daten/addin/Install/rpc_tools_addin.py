@@ -279,7 +279,7 @@ class RefreshLayers(object):
 ### NETZERSCHLIESSUNG / INFRASTRUKTUR ###
 
 
-class DrawingTool(object):
+class InfrastructureDrawingTool(object):
     # has to match the column 'IDNetzelement' of base-table
     # Netze_und_Netzelemente (defined in subclasses)
     _id_netzelement = None
@@ -326,22 +326,22 @@ class DrawingTool(object):
         return ids
 
 
-class LineTool(DrawingTool):
+class InfrastructureLineTool(InfrastructureDrawingTool):
     table = 'Erschliessungsnetze_Linienelemente'
 
     def __init__(self):
-        super(LineTool, self).__init__()
+        super(InfrastructureLineTool, self).__init__()
         self.shape = "Line"
 
     def onLine(self, line_geometry):
         self.commit_geometry(self.table, line_geometry, self._id_netzelement)
 
 
-class PointTool(DrawingTool):
+class InfrastructurePointTool(InfrastructureDrawingTool):
     table = 'Erschliessungsnetze_Punktelemente'
 
     def __init__(self):
-        super(PointTool, self).__init__()
+        super(InfrastructurePointTool, self).__init__()
         self.shape = "NONE"
 
     def onMouseDownMap(self, x, y, button, shift):
@@ -373,17 +373,17 @@ class Beschreibung(ToolboxButton):
         super(Beschreibung, self).onClick()
 
 
-class AnliegerstrasseInnere(LineTool):
+class AnliegerstrasseInnere(InfrastructureLineTool):
     """Implementation for rpc_tools.anliegerstrasse_innere (Tool)"""
     _id_netzelement = 11
 
 
-class SammelstrasseInnere(LineTool):
+class SammelstrasseInnere(InfrastructureLineTool):
     """Implementation for rpc_tools.sammelstrasse_innere (Tool)"""
     _id_netzelement = 12
 
 
-class LagePunktuelleMassnahmeStrasseInnere(PointTool):
+class LagePunktuelleMassnahmeStrasseInnere(InfrastructurePointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_innere (Tool)"""
     _id_netzelement = 13
 
@@ -393,17 +393,17 @@ class BeschreibungPunktuelleMassnahmeStrasseInnere(Beschreibung):
     _id_netzelement = 13
 
 
-class AnliegerstrasseAeussere(LineTool):
+class AnliegerstrasseAeussere(InfrastructureLineTool):
     """Implementation for rpc_tools.anliegerstrasse_aeussere (Tool)"""
     _id_netzelement = 14
 
 
-class SammelstrasseAeussere(LineTool):
+class SammelstrasseAeussere(InfrastructureLineTool):
     """Implementation for rpc_tools.sammelstrasse_aeussere (Tool)"""
     _id_netzelement = 15
 
 
-class LagePunktuelleMassnahmeStrasseAeussere(PointTool):
+class LagePunktuelleMassnahmeStrasseAeussere(InfrastructurePointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_aeussere (Tool)"""
     _id_netzelement = 16
 
@@ -413,22 +413,22 @@ class BeschreibungPunktuelleMassnahmeStrasseAeussere(Beschreibung):
     _id_netzelement = 16
 
 
-class KanalTrennsystem(LineTool):
+class KanalTrennsystem(InfrastructureLineTool):
     """Implementation for rpc_tools.kanal_trennsystem (Tool)"""
     _id_netzelement = 21
 
 
-class KanalMischsystem(LineTool):
+class KanalMischsystem(InfrastructureLineTool):
     """Implementation for rpc_tools.kanal_mischsystem (Tool)"""
     _id_netzelement = 22
 
 
-class KanalNurSchmutzwasser(LineTool):
+class KanalNurSchmutzwasser(InfrastructureLineTool):
     """Implementation for rpc_tools.kanal_nur_schmutzwasser (Tool)"""
     _id_netzelement = 23
 
 
-class LagePunktuelleMassnahmeKanalisation(PointTool):
+class LagePunktuelleMassnahmeKanalisation(InfrastructurePointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_kanalisation (Tool)"""
     _id_netzelement = 24
 
@@ -438,12 +438,12 @@ class BeschreibungPunktuelleMassnahmeKanalisation(Beschreibung):
     _id_netzelement = 24
 
 
-class Trinkwasserleitung(LineTool):
+class Trinkwasserleitung(InfrastructureLineTool):
     """Implementation for rpc_tools.trinkwasserleitung (Tool)"""
     _id_netzelement = 31
 
 
-class LagePunktuelleMassnahmeTrinkwasser(PointTool):
+class LagePunktuelleMassnahmeTrinkwasser(InfrastructurePointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_trinkwasser (Tool)"""
     _id_netzelement = 32
 
@@ -453,12 +453,12 @@ class BeschreibungPunktuelleMassnahmeTrinkwasser(Beschreibung):
     _id_netzelement = 32
 
 
-class Stromleitung(LineTool):
+class Stromleitung(InfrastructureLineTool):
     """Implementation for rpc_tools.stromleitung (Tool)"""
     _id_netzelement = 41
 
 
-class LagePunktuelleMassnahmeElektrizitaet(PointTool):
+class LagePunktuelleMassnahmeElektrizitaet(InfrastructurePointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_elektrizitaet (Tool)"""
     _id_netzelement = 42
 
@@ -653,14 +653,26 @@ class Anbindungspunkt(ToolboxButton):
         
         
 ### Standortkonkurrenz ###
-        
-        
+
 class BestandOSMEinlesen(ToolboxButton):
+    """Implementation for rpc_tools.bestand_osm (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxOSMMarktEinlesen'
     _do_show = True
+    
+    def show_output(self):
+        self.tbx.set_active_project()
+        self.tbx.tool.add_output()
 
+        
+class MaerkteAnzeigen(object):
+    def __init__(self):
+        self.enabled = True
+        self.checked = False
+    def onClick(self):
+        bestand_osm.show_output()
+        
     
 class BestandEinlesen(object):
     pass
@@ -674,8 +686,25 @@ class BestandMarktEntfernen(object):
     pass
 
 
-class BestandMarktBearbeiten(object):
-    pass
+class BestandMarktBearbeiten(ToolboxButton):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
+    _toolbox_name = 'TbxEditMarkets'
+
+    def __init__(self):
+        super(BestandMarktBearbeiten, self).__init__()
+        self.enabled = True
+        self.shape = 'NONE'
+        self.cursor = 3
+        
+    def onClick(self, coord=None):
+        if coord is None:
+            return
+        config.active_coord = coord
+        super(BestandMarktBearbeiten, self).onClick()
+
+    def onMouseDownMap(self, x, y, button, shift):
+        self.onClick((x, y))
 
 
 class PlanfallMarktErweitern(object):
@@ -694,5 +723,5 @@ class PlanfallMarktBearbeiten(object):
     pass
 
 if __name__ == "__main__":
-    t = PointTool()
+    t = InfrastructurePointTool()
     t.get_ids(t.table)

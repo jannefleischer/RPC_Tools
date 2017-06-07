@@ -108,7 +108,8 @@ class TbxEditMarkets(Tbx):
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'
-
+        
+        self.markets_df = []
         return self.par
     
     def _open(self, params):
@@ -117,6 +118,10 @@ class TbxEditMarkets(Tbx):
         self.markets_df.sort(columns='id', inplace=True)
         if len(self.markets_df) == 0:
             return
+
+        x, y = self.config.active_coord
+        if x and y:
+            print()
         
         pretty_names = []
         for idx, market in self.markets_df.iterrows():
@@ -155,7 +160,7 @@ class TbxEditMarkets(Tbx):
         self.par.do_delete.value = True if do_delete else False
     
     def validate_inputs(self):
-        if len(self.markets_df) == 0:
+        if len(self.table_to_dataframe('Maerkte', columns=['id'])) == 0:
             msg = (u'Es sind keine Märkte vorhanden. '
                    u'Bitte lesen Sie zunächst Märkte ein oder fügen Sie '
                    u'sie manuell hinzu.')
