@@ -85,7 +85,7 @@ def get_ags(features, id_column):
     arcpy.SpatialJoin_analysis(features, gemeinden, tmp_table,
                                match_option='HAVE_THEIR_CENTER_IN')
 
-    cursor = arcpy.da.SearchCursor(tmp_table, [id_column, 'AGS', 'GEN'])
+    cursor = arcpy.da.SearchCursor(tmp_table, [id_column, 'AGS_0', 'GEN'])
     ags_res = {}
     for row in cursor:
         ags_res[row[0]] = row[1], row[2]

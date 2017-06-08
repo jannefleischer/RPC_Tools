@@ -7,6 +7,7 @@ import re
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
+from rpctools.utils.spatial_lib import get_ags
 from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
                                                               Point)
 
@@ -46,30 +47,12 @@ class OSMMarktEinlesen(Tool):
         """
         Assign community size to supermarkets
         """
-        ws_markets = self.folders.get_db(
-                    'FGDB_Standortkonkurrenz_Supermaerkte.gdb')
-        path_markets = os.path.join(ws_markets, "Maerkte")
-        path_markets_tmp = os.path.join(ws_markets, "Maerkte_tmp")
-        ws_communities = self.folders.get_basedb(
-            'FGDB_Basisdaten_deutschland.gdb')
-        path_communities = os.path.join(ws_communities, 'bkg_gemeinden')
-        fieldmappings = arcpy.FieldMappings()
-        fieldmappings.addTable(path_communities)
-        fields_to_add = ['AGS']
-        for field in fieldmappings.fields:
-            if field.name not in fields_to_add:
-                fieldmappings.removeFieldMap(
-                    fieldmappings.findFieldMapIndex(field.name))
-        fieldmappings.addTable(path_markets)
-        arcpy.SpatialJoin_analysis(target_features=path_markets,
-                                join_features=path_communities,
-                                  out_feature_class=path_markets_tmp,
-                                  field_mapping=fieldmappings,
-                                  match_option='WITHIN')
-        arcpy.Delete_management(path_markets)
-        arcpy.Rename_management(path_markets_tmp, path_markets)
-        arcpy.DeleteField_management(in_table=path_markets,
-                                     drop_field=['Join_Count', 'TARGET_FID'])
+        markets = self.folders.get_table('Maerkte')
+        ags = get_ags(markets, 'id')
+        for id, ags_market in ags.iteritems():
+            self.parent_tbx.update_table('Maerkte',
+                                         column_values={'AGS': ags_market[0]},
+                                         where='id={}'.format(id))
 
     def set_chains(self):
         """
