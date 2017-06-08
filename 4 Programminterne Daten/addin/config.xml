@@ -217,6 +217,9 @@
                 <Tool caption="geplanten Markt bearbeiten/entfernen" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
+                <Tool caption="Projektwirkung sch&#228;tzen" category="ProjektCheck" class="StandortkonkurrenzProjektwirkung" id="rpc_tools.standortkonkurrenz_projektwirkung" image="Images\GenericCalculator16.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
             </Commands>
             <Extensions>
             </Extensions>
@@ -434,6 +437,7 @@
                         <Button refID="rpc_tools.maerkte_anzeigen" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_nullfall" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_planfall" />
+                        <Button refID="rpc_tools.standortkonkurrenz_projektwirkung" />
                     </Items>
                 </Menu>
                 <Menu caption="Analysieren" category="ProjektCheck" id="rpc_tools.menu_analysieren" isRootMenu="false" isShortcutMenu="true" separator="true">

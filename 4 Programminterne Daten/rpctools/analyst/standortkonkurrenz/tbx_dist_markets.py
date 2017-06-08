@@ -57,13 +57,14 @@ class DistMarkets(Tool):
         for index, market in markets.iterrows():
             arcpy.AddMessage(' - {}'.format(market['name']))
             if self.recalculate or market['id'] not in already_calculated:
+                arcpy.AddMessage('   wird berechnet')
                 market_id = market['id']
                 x, y = market['SHAPE']
                 origin = Point(x, y, id=market_id, epsg=epsg)
                 distances = routing.get_distances(origin, destinations, bbox)
                 self.distances_to_db(market_id, destinations, distances)
             else:
-                arcpy.AddMessage('   bereits berechnet, wird übersprungen')
+                arcpy.AddMessage(u'   bereits berechnet, wird übersprungen')
 
         df_markets = tbx.table_to_dataframe('Maerkte')
         df_zensus = self.parent_tbx.table_to_dataframe('Siedlungszellen')
@@ -187,8 +188,7 @@ class TbxDistMarkets(Tbx):
 
     @property
     def label(self):
-        return encode(u'Entfernung zwischen Supermarkt und '
-                      u'Rasterzellen berechnen')
+        return encode(u'Projektwirkung schätzen')
 
     @property
     def Tool(self):

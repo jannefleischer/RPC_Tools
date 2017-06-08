@@ -735,6 +735,12 @@ class PlanfallMarktErweitern(object):
     pass
 
 
+class StandortkonkurrenzProjektwirkung(ToolboxButton):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
+    _toolbox_name = 'TbxDistMarkets'
+    
+
 if __name__ == "__main__":
     t = InfrastructurePointTool()
     t.get_ids(t.table)

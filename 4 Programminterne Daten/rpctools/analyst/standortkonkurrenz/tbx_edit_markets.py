@@ -3,7 +3,7 @@ import arcpy
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.utils.spatial_lib import get_closest_point
+from rpctools.utils.spatial_lib import get_closest_point, get_ags
 import numpy as np
 import pandas as pd
 
@@ -131,6 +131,8 @@ class TbxEditMarkets(Tbx):
         '''return the markets in db as a dataframe, filtered by existance
         in nullfall and planfall (dependent on setting of this toolbox)'''
         df_markets = self.table_to_dataframe('Maerkte')
+        if len(df_markets) == 0:
+            return df_markets
         id_nullfall = df_markets['id_betriebstyp_nullfall']
         id_planfall = df_markets['id_betriebstyp_planfall']
         nullfall_idx = (id_nullfall == id_planfall) & (id_nullfall > 0)
@@ -159,6 +161,11 @@ class TbxEditMarkets(Tbx):
         # market exists in planfall
         new_market['id_betriebstyp_planfall'] = 1
         self.insert_dataframe_in_table('Maerkte', new_market)
+        ags = get_ags(self.folders.get_table('Maerkte'), 'id')
+        new_ags = ags[new_id][0]
+        new_market['AGS'] = new_ags
+        self.update_table('Maerkte', column_values={'AGS': new_ags},
+                          where='id={}'.format(new_id))
     
     def _open(self, params):
         self.markets_df = self.get_markets()
@@ -296,6 +303,7 @@ if __name__ == '__main__':
     t = TbxEditMarketsPlanfall()
     t._getParameterInfo()
     t.set_active_project()
+    t.add_market_to_db('Test add', (3544252, 5925427))
     t._open(None)
     t._updateParameters(None)
     t.execute()
