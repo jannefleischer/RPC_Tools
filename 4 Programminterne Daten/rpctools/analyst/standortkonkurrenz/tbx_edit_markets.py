@@ -48,13 +48,20 @@ class TbxEditMarkets(Tbx):
         param.datatype = u'GPString'
         param.filter.list = []
     
-        param = self.add_parameter('market_name')
-        param.name = encode(u'Markt')
+        param = self.add_parameter('markets')
+        param.name = encode(u'Märkte')
         param.displayName = encode(u'Markt auswählen')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.filter.list = []
+        
+        param = self.add_parameter('name')
+        param.name = encode(u'Name')
+        param.displayName = encode(u'Name des Marktes')
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPString'
         
         # Handelsketten
         
@@ -148,11 +155,12 @@ class TbxEditMarkets(Tbx):
         return pretty
     
     def set_selected_market_inputs(self):
-        market_idx = self.markets_df['pretty'] == self.par.market_name.value
+        market_idx = self.markets_df['pretty'] == self.par.markets.value
         market = self.markets_df.loc[market_idx]
+        self.par.name.value = market['name'].values[0]
         chain_name = self.chains_df['name'][
             self.chains_df['id_kette'] == market['id_kette'].values[0]]
-        self.par.chain.value = chain_name.values[0]
+        self.par.chain.value = chain_name.values[0]        
         typ_pretty = self.types_df['pretty'][
             self.types_df['id_betriebstyp'] ==
             market['id_betriebstyp_nullfall'].values[0]]
@@ -172,18 +180,21 @@ class TbxEditMarkets(Tbx):
         
     def update_market_list(self, idx=None):
         if idx is None:
-            idx = self.par.market_name.filter.list.index(
-                self.par.market_name.value) if self.par.market_name.value else 0
+            idx = self.par.markets.filter.list.index(
+                self.par.markets.value) if self.par.markets.value else 0
         pretty = self.markets_df['pretty'].values.tolist()
-        self.par.market_name.filter.list = pretty
-        self.par.market_name.value = pretty[idx] if idx >= 0 else pretty[0]
+        self.par.markets.filter.list = pretty
+        self.par.markets.value = pretty[idx] if idx >= 0 else pretty[0]
         
     def _updateParameters(self, params):
         if len(self.markets_df) == 0:
             return
-        market_idx = self.markets_df['pretty'] == self.par.market_name.value
-        
-        if self.par.changed('chain'):
+        market_idx = self.markets_df['pretty'] == self.par.markets.value
+
+        if self.par.changed('name'):
+            self.markets_df.loc[market_idx, 'name'] = self.par.name.value
+            
+        elif self.par.changed('chain'):
             id_chain = self.chains_df['id_kette'][
                 self.chains_df['name'] == self.par.chain.value].values[0]
             self.markets_df.loc[market_idx, 'id_kette'] = id_chain
@@ -199,7 +210,8 @@ class TbxEditMarkets(Tbx):
         
         # update the pretty names of the markets
             
-        if (self.par.changed('chain') or
+        if (self.par.changed('name') or 
+            self.par.changed('chain') or
             self.par.changed('type_name') or
             self.par.changed('do_delete')):
             i = np.where(market_idx == True)[0][0]
@@ -208,7 +220,7 @@ class TbxEditMarkets(Tbx):
             self.markets_df.loc[market_idx, 'pretty'] = pretty
             self.update_market_list()
             
-        if self.par.changed('market_name'):
+        if self.par.changed('markets'):
             self.set_selected_market_inputs()
         return params
 
