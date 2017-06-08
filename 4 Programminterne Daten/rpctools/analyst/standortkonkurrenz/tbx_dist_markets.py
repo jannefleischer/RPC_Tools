@@ -81,7 +81,7 @@ class DistMarkets(Tool):
 
     def sales_to_db(self, kk_nullfall, kk_planfall):
         sales_nullfall = kk_nullfall.sum(axis=1)
-        sales_planfall = kk_nullfall.sum(axis=1)
+        sales_planfall = kk_planfall.sum(axis=1)
         df_markets = pd.DataFrame()
         df_markets['id'] = sales_nullfall.index
         df_markets['umsatz_nullfall'] = sales_nullfall.values

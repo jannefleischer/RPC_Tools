@@ -87,8 +87,6 @@ class Sales(object):
         account competition through other markets of the same brand
         """
         cut_off_time = self.cut_off_time
-        #betriebstyp_col = 'id_betriebstyp_nullfall' \
-            #if setting == self.NULLFALL else 'id_betriebstyp_planfall'
         dist_matrix = dist_matrix.T
         results = pd.DataFrame(data=1., index=dist_matrix.index,
                                columns=dist_matrix.columns)
