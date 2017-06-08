@@ -11,6 +11,12 @@ import pandas as pd
 class Sales(object):
     NULLFALL = 0
     PLANFALL = 1
+    # time to separate same markets into 'Umfeld' and 'Abstand'
+    # example: cut_off_time = 5 min
+    #          nearest market = 4 min drive -> 'Umfeld'
+    #          second market = 7 min drive -> 'Umfeld'
+    #          third market = 12 min drive -> 'Abstand'
+    cut_off_time = 5
 
     def __init__(self, df_distances, df_markets, df_zensus):
 
@@ -80,7 +86,7 @@ class Sales(object):
         """
         account competition through other markets of the same brand
         """
-        cut_off_time = 5
+        cut_off_time = self.cut_off_time
         #betriebstyp_col = 'id_betriebstyp_nullfall' \
             #if setting == self.NULLFALL else 'id_betriebstyp_planfall'
         dist_matrix = dist_matrix.T
