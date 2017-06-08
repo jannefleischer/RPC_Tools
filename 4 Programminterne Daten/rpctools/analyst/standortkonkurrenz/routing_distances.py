@@ -25,7 +25,7 @@ def filter_raster(array, threshold=120):
             new_array[y][x] = np.sum(neighbours) / len(neighbours)
     return new_array
 
-def filter_raster_nd(array):
+def filter_raster_nd(array, threshold=120):
     kernel = np.ones((3, 3))
     mean_filtered = filters.convolve(array, kernel, mode='nearest')
     thresh_exceeded = array > threshold
