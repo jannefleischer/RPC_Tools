@@ -7,10 +7,13 @@ from rpctools.utils.spatial_lib import get_closest_point
 import numpy as np
 import pandas as pd
 
+NULLFALL = 0
+PLANFALL = 1
+
 
 class EditMarkets(Tool):
     _param_projectname = 'projectname'
-    _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
+    _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'    
 
     def run(self):
         markets_df = self.parent_tbx.markets_df
@@ -29,10 +32,12 @@ class EditMarkets(Tool):
 
 
 class TbxEditMarkets(Tbx):
+    setting = None
+    _label = ''
     
     @property
     def label(self):
-        return encode(u'Märkte bearbeiten')
+        return self._label
 
     @property
     def Tool(self):
@@ -122,8 +127,23 @@ class TbxEditMarkets(Tbx):
         self.markets_df = []
         return self.par
     
-    def add_market_to_db(self, name, coords): 
+    def get_markets(self):
+        '''return the markets in db as a dataframe, filtered by existance
+        in nullfall and planfall (dependent on setting of this toolbox)'''
         df_markets = self.table_to_dataframe('Maerkte')
+        id_nullfall = df_markets['id_betriebstyp_nullfall']
+        id_planfall = df_markets['id_betriebstyp_planfall']
+        nullfall_idx = (id_nullfall == id_planfall) & (id_nullfall > 0)
+        if self.setting == NULLFALL:
+            return df_markets[nullfall_idx]
+        else:
+            return df_markets[np.logical_not(nullfall_idx)]
+    
+    def add_market_to_db(self, name, coords):
+        '''add a market to the database located in given coordinates
+        (if maket becomes planfall or nullfall depends on setting of toolbox)
+        '''
+        df_markets = self.get_markets()
         if len(df_markets) == 0:
             new_id = 1
         else: 
@@ -133,12 +153,15 @@ class TbxEditMarkets(Tbx):
         new_market['id'] = new_id
         new_market['name'] = name
         new_market['SHAPE'] = [coords]
-        new_market['id_betriebstyp_nullfall'] = 1
+        if self.setting == NULLFALL:
+            # market exists in nullfall
+            new_market['id_betriebstyp_nullfall'] = 1
+        # market exists in planfall
         new_market['id_betriebstyp_planfall'] = 1
         self.insert_dataframe_in_table('Maerkte', new_market)
     
     def _open(self, params):
-        self.markets_df = self.table_to_dataframe('Maerkte')
+        self.markets_df = self.get_markets()
         self.markets_df['do_delete'] = False
         self.markets_df.sort(columns='id', inplace=True)
         if len(self.markets_df) == 0:
@@ -158,11 +181,13 @@ class TbxEditMarkets(Tbx):
         self.set_selected_market_inputs()
         
     def get_pretty_market_name(self, market):
+        betriebstyp_col = 'id_betriebstyp_nullfall' \
+            if self.setting == NULLFALL else 'id_betriebstyp_planfall'
         chain_name = self.chains_df['name'][
-            self.chains_df['id_kette'] == market['id_kette']].values[0]
+            self.chains_df['id_kette'] == market['id_kette']].values[0]        
         typ_name = self.types_df['name'][
             self.types_df['id_betriebstyp'] == \
-            market['id_betriebstyp_nullfall']].values[0]
+            market[betriebstyp_col]].values[0]
         pretty = u'"{name}" ({id}) - {typ} ({chain})'.format(
             id=market['id'], name=market['name'], typ=typ_name, 
             chain=chain_name)
@@ -171,6 +196,8 @@ class TbxEditMarkets(Tbx):
         return pretty
     
     def set_selected_market_inputs(self):
+        betriebstyp_col = 'id_betriebstyp_nullfall' \
+            if self.setting == NULLFALL else 'id_betriebstyp_planfall'
         market_idx = self.markets_df['pretty'] == self.par.markets.value
         market = self.markets_df.loc[market_idx]
         self.par.name.value = market['name'].values[0]
@@ -179,7 +206,7 @@ class TbxEditMarkets(Tbx):
         self.par.chain.value = chain_name.values[0]        
         typ_pretty = self.types_df['pretty'][
             self.types_df['id_betriebstyp'] ==
-            market['id_betriebstyp_nullfall'].values[0]]
+            market[betriebstyp_col].values[0]]
         self.par.type_name.value = typ_pretty.values[0]
         do_delete = market['do_delete'].values[0]
         # strange: can't assign the bool of do_delete directly, arcpy is
@@ -188,9 +215,13 @@ class TbxEditMarkets(Tbx):
     
     def validate_inputs(self):
         if len(self.table_to_dataframe('Maerkte', columns=['id'])) == 0:
-            msg = (u'Es sind keine Märkte vorhanden. '
-                   u'Bitte lesen Sie zunächst Märkte ein oder fügen Sie '
-                   u'sie manuell hinzu.')
+            if self.setting == NULLFALL:
+                msg = (u'Es sind keine Märkte im Bestand vorhanden. '
+                       u'Bitte lesen Sie zunächst Märkte ein oder fügen Sie '
+                       u'sie dem Bestand manuell hinzu.')
+            else:
+                msg = (u'Es sind keine geplanten Märkte vorhanden. '
+                       u'Bitte fügen Sie sie manuell hinzu.')                
             return False, msg
         return True, ''
         
@@ -218,7 +249,11 @@ class TbxEditMarkets(Tbx):
         elif self.par.changed('type_name'):
             id_typ = self.types_df['id_betriebstyp'][
                 self.types_df['pretty'] == self.par.type_name.value].values[0]
-            self.markets_df.loc[market_idx, 'id_betriebstyp_nullfall'] = id_typ
+            # only change nullfall type when toolbox is set to nullfall
+            # in case of planfall it stays 0
+            if self.setting == NULLFALL:
+                self.markets_df.loc[market_idx, 'id_betriebstyp_nullfall'] = id_typ
+            # ToDo: set different type for planfall if nullfall is edited?
             self.markets_df.loc[market_idx, 'id_betriebstyp_planfall'] = id_typ
             
         elif self.par.changed('do_delete'):
@@ -246,8 +281,19 @@ class TbxEditMarkets(Tbx):
         if not valid:
             self.par.projectname.setErrorMessage(msg)
 
+
+class TbxEditMarketsNullfall(TbxEditMarkets):
+    setting = NULLFALL
+    _label = encode(u'Märkte im Bestand bearbeiten')
+
+
+class TbxEditMarketsPlanfall(TbxEditMarkets):
+    setting = PLANFALL
+    _label = encode(u'geplante Märkte bearbeiten')
+
+
 if __name__ == '__main__':
-    t = TbxEditMarkets()
+    t = TbxEditMarketsPlanfall()
     t._getParameterInfo()
     t.set_active_project()
     t._open(None)

@@ -678,13 +678,13 @@ class BestandEinlesen(object):
     pass
 
 
-class BestandMarktBearbeiten(ToolboxButton):
+class MarktBearbeiten(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
-    _toolbox_name = 'TbxEditMarkets'
+    _toolbox_name = None
 
     def __init__(self):
-        super(BestandMarktBearbeiten, self).__init__()
+        super(MarktBearbeiten, self).__init__()
         self.enabled = True
         self.shape = 'NONE'
         self.cursor = 3
@@ -693,35 +693,47 @@ class BestandMarktBearbeiten(ToolboxButton):
         if coord is None:
             return
         config.active_coord = coord
-        super(BestandMarktBearbeiten, self).onClick()
+        super(MarktBearbeiten, self).onClick()
 
     def onMouseDownMap(self, x, y, button, shift):
         self.onClick((x, y))
 
 
-class BestandMarktHinzu(BestandMarktBearbeiten):
-    '''does the same thing as BestandMarktBearbeiten except adding a market at
+class MarktHinzu(MarktBearbeiten):
+    '''does the same thing as MarktBearbeiten except adding a market at
     click position before opening toolbox'''
+    _new_market_name = ''
     def onClick(self, coord=None):
         if not coord:
             return
         tbx = self.tbx
         tbx.set_active_project()
-        tbx.add_market_to_db('unbenannter Markt im Bestand', coord)
+        tbx.add_market_to_db(self._new_market_name, coord)
         arcpy.RefreshActiveView()
-        super(BestandMarktHinzu, self).onClick(coord=coord)
+        super(MarktHinzu, self).onClick(coord=coord)
+
+
+class BestandMarktBearbeiten(MarktBearbeiten):
+    _toolbox_name = 'TbxEditMarketsNullfall'
+
+
+class PlanfallMarktBearbeiten(MarktBearbeiten):
+    _toolbox_name = 'TbxEditMarketsPlanfall'
+
+
+class BestandMarktHinzu(MarktHinzu):
+    _toolbox_name = 'TbxEditMarketsNullfall'
+    _new_market_name = 'unbenannter Markt im Bestand'
+
+
+class PlanfallMarktHinzu(MarktHinzu):
+    _toolbox_name = 'TbxEditMarketsPlanfall'
+    _new_market_name = 'unbenannter geplanter Markt'    
 
 
 class PlanfallMarktErweitern(object):
     pass
 
-
-class PlanfallMarktHinzu(object):
-    pass
-
-
-class PlanfallMarktBearbeiten(object):
-    pass
 
 if __name__ == "__main__":
     t = InfrastructurePointTool()
