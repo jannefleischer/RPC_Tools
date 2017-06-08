@@ -202,7 +202,7 @@
                 <Button caption="Bestand aus Datei einlesen" category="ProjektCheck" class="BestandEinlesen" id="rpc_tools.bestand_datei" image="Images\CadastralJobLoad16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Markt setzen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
+                <Tool caption="Markt hinzuf&#252;gen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
                 <Tool caption="Markt bearbeiten/entfernen" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
@@ -211,7 +211,7 @@
                 <Tool caption="bestehenden Markt erweitern" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_erweitern" image="" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="geplanten Markt setzen" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_hinzu" image="Images\GreenPin16.png" message="" tip="">
+                <Tool caption="geplanten Markt hinzuf&#252;gen" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_hinzu" image="Images\GreenPin16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
                 <Tool caption="geplanten Markt bearbeiten/entfernen" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">

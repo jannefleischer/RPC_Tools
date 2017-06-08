@@ -678,10 +678,6 @@ class BestandEinlesen(object):
     pass
 
 
-class BestandMarktHinzu(object):
-    pass
-
-
 class BestandMarktBearbeiten(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
@@ -701,6 +697,19 @@ class BestandMarktBearbeiten(ToolboxButton):
 
     def onMouseDownMap(self, x, y, button, shift):
         self.onClick((x, y))
+
+
+class BestandMarktHinzu(BestandMarktBearbeiten):
+    '''does the same thing as BestandMarktBearbeiten except adding a market at
+    click position before opening toolbox'''
+    def onClick(self, coord=None):
+        if not coord:
+            return
+        tbx = self.tbx
+        tbx.set_active_project()
+        tbx.add_market_to_db('unbenannter Markt im Bestand', coord)
+        arcpy.RefreshActiveView()
+        super(BestandMarktHinzu, self).onClick(coord=coord)
 
 
 class PlanfallMarktErweitern(object):
