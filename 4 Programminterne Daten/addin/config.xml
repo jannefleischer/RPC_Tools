@@ -205,10 +205,7 @@
                 <Tool caption="Markt setzen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Markt bearbeiten" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
-                    <Help heading="" />
-                </Tool>
-                <Tool caption="Markt entfernen" category="ProjektCheck" class="BestandMarktEntfernen" id="rpc_tools.bestand_entfernen" image="Images\GreenPinRemove16.png" message="" tip="">
+                <Tool caption="Markt bearbeiten/entfernen" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
                 <Tool caption="bestehenden Markt erweitern" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_erweitern" image="" message="" tip="">
@@ -217,10 +214,7 @@
                 <Tool caption="geplanten Markt setzen" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_hinzu" image="Images\GreenPin16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="geplanten Markt bearbeiten" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
-                    <Help heading="" />
-                </Tool>
-                <Tool caption="geplanten Markt entfernen" category="ProjektCheck" class="PlanfallMarktEntfernen" id="rpc_tools.planfall_entfernen" image="Images\GreenPinRemove16.png" message="" tip="">
+                <Tool caption="geplanten Markt bearbeiten/entfernen" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
             </Commands>
@@ -426,7 +420,6 @@
                         <Menu refID="rpc_tools.menu_bestand_einlesen" />
                         <Tool refID="rpc_tools.bestand_hinzu" />
                         <Tool refID="rpc_tools.bestand_bearbeiten" />
-                        <Tool refID="rpc_tools.bestand_entfernen" />
                     </Items>
                 </Menu>
                 <Menu caption="Planfall" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_planfall" isRootMenu="false" isShortcutMenu="true" separator="true">
@@ -434,7 +427,6 @@
                         <Tool refID="rpc_tools.planfall_erweitern" />
                         <Tool refID="rpc_tools.planfall_hinzu" />
                         <Tool refID="rpc_tools.planfall_bearbeiten" />
-                        <Tool refID="rpc_tools.planfall_entfernen" />
                     </Items>
                 </Menu>
                 <Menu caption="Standortkonkurrenz" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true">

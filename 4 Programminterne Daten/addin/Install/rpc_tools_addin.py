@@ -682,10 +682,6 @@ class BestandMarktHinzu(object):
     pass
 
 
-class BestandMarktEntfernen(object):
-    pass
-
-
 class BestandMarktBearbeiten(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
@@ -712,10 +708,6 @@ class PlanfallMarktErweitern(object):
 
 
 class PlanfallMarktHinzu(object):
-    pass
-
-
-class PlanfallMarktEntfernen(object):
     pass
 
 

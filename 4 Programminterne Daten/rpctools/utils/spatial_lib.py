@@ -4,6 +4,30 @@ from rpctools.utils.params import DummyTbx
 import numpy as np
 from os.path import join
 
+def get_closest_point(point, points):
+    """get the point out of given points that is closest to the given point,
+    points are be passed as tuples of x, y (z optional) coordinates
+    
+    Parameters
+    ----------
+    point : tuple
+        x, y (, z) coordinates of point
+    points : list of tuples
+        x, y (, z) coordinates of points to pick closest one to point from
+
+    Returns
+    -------
+    index : int
+        index of closest point in points
+    point : tuple
+        x, y of closest point
+    """
+    points = [np.array(p) for p in points]
+    diff = np.array(points) - np.array(point)
+    distances = np.apply_along_axis(np.linalg.norm, 1, diff)
+    closest_idx = distances.argmin()
+    return closest_idx, tuple(points[closest_idx])
+
 def clip_raster(in_file, out_file, bbox):
 
     desc = arcpy.Describe(in_file)

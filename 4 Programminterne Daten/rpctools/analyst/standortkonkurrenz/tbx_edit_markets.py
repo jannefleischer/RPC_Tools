@@ -3,6 +3,7 @@ import arcpy
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
+from rpctools.utils.spatial_lib import get_closest_point
 import numpy as np
 
 
@@ -23,6 +24,7 @@ class EditMarkets(Tool):
         arcpy.AddMessage(u'Schreibe Änderungen in Datenbank...')
         self.parent_tbx.dataframe_to_table('Maerkte', update_df,
                                            ['id'], upsert=False)
+        arcpy.RefreshActiveView()
 
 
 class TbxEditMarkets(Tbx):
@@ -104,7 +106,7 @@ class TbxEditMarkets(Tbx):
     
         param = self.add_parameter('do_delete')
         param.name = encode(u'Löschen')
-        param.displayName = encode(u'Markt löschen')
+        param.displayName = encode(u'Markt entfernen')
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'
@@ -120,15 +122,16 @@ class TbxEditMarkets(Tbx):
             return
 
         x, y = self.config.active_coord
+        closest_idx = None
         if x and y:
-            print()
+            closest_idx, c = get_closest_point((x, y), self.markets_df['SHAPE'])
         
         pretty_names = []
         for idx, market in self.markets_df.iterrows():
             pretty = self.get_pretty_market_name(market)
             pretty_names.append(pretty)
         self.markets_df['pretty'] = pretty_names
-        self.update_market_list()
+        self.update_market_list(closest_idx)
         self.set_selected_market_inputs()
         
     def get_pretty_market_name(self, market):
@@ -141,7 +144,7 @@ class TbxEditMarkets(Tbx):
             id=market['id'], name=market['name'], typ=typ_name, 
             chain=chain_name)
         if market['do_delete']:
-            pretty += u' - WIRD GELÖSCHT'
+            pretty += u' - WIRD ENTFERNT'
         return pretty
     
     def set_selected_market_inputs(self):
@@ -167,9 +170,10 @@ class TbxEditMarkets(Tbx):
             return False, msg
         return True, ''
         
-    def update_market_list(self):
-        idx = self.par.market_name.filter.list.index(
-            self.par.market_name.value) if self.par.market_name.value else 0
+    def update_market_list(self, idx=None):
+        if idx is None:
+            idx = self.par.market_name.filter.list.index(
+                self.par.market_name.value) if self.par.market_name.value else 0
         pretty = self.markets_df['pretty'].values.tolist()
         self.par.market_name.filter.list = pretty
         self.par.market_name.value = pretty[idx] if idx >= 0 else pretty[0]
