@@ -5,6 +5,7 @@ from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 from rpctools.utils.spatial_lib import get_closest_point
 import numpy as np
+import pandas as pd
 
 
 class EditMarkets(Tool):
@@ -121,6 +122,21 @@ class TbxEditMarkets(Tbx):
         self.markets_df = []
         return self.par
     
+    def add_market_to_db(self, name, coords): 
+        df_markets = self.table_to_dataframe('Maerkte')
+        if len(df_markets) == 0:
+            new_id = 1
+        else: 
+            new_id = df_markets['id'].max() + 1
+        columns = df_markets.columns
+        new_market = pd.DataFrame(np.zeros((1, len(columns))), columns=columns)
+        new_market['id'] = new_id
+        new_market['name'] = name
+        new_market['SHAPE'] = [coords]
+        new_market['id_betriebstyp_nullfall'] = 1
+        new_market['id_betriebstyp_planfall'] = 1
+        self.insert_dataframe_in_table('Maerkte', new_market)
+    
     def _open(self, params):
         self.markets_df = self.table_to_dataframe('Maerkte')
         self.markets_df['do_delete'] = False
@@ -203,6 +219,7 @@ class TbxEditMarkets(Tbx):
             id_typ = self.types_df['id_betriebstyp'][
                 self.types_df['pretty'] == self.par.type_name.value].values[0]
             self.markets_df.loc[market_idx, 'id_betriebstyp_nullfall'] = id_typ
+            self.markets_df.loc[market_idx, 'id_betriebstyp_planfall'] = id_typ
             
         elif self.par.changed('do_delete'):
             do_delete = self.par.do_delete.value
