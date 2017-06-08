@@ -8,6 +8,30 @@ import shutil
 import requests
 import sys
 import time
+import numpy as np
+from scipy.ndimage import filters
+
+def filter_raster(array, threshold=120):
+    y_dim, x_dim = np.shape(array)
+    new_array = np.copy(array)
+    for x in range(1, x_dim - 1):
+        for y in range(1, y_dim -1):
+            if array[y][x] < threshold:
+                continue
+            neighbours = [array[y - 1][x - 1], array[y][x - 1],
+                          array[y + 1][x - 1], array[y - 1][x],
+                          array[y + 1][x], array[y - 1][x + 1],
+                          array[y][x + 1], array[y + 1][x + 1]]
+            new_array[y][x] = np.sum(neighbours) / len(neighbours)
+    return new_array
+
+def filter_raster_nd(array):
+    kernel = np.ones((3, 3))
+    mean_filtered = filters.convolve(array, kernel, mode='nearest')
+    thresh_exceeded = array > threshold
+    res = array.copy()
+    res[thresh_exceeded] = mean_filtered[thresh_exceeded]
+    return res
 
 
 class RasterManagement(object):
@@ -26,7 +50,8 @@ class RasterManagement(object):
             raster_file, 'CELLSIZEX').getOutput(0).replace(',', '.'))
         self.cellHeight = float(arcpy.GetRasterProperties_management(
             raster_file, 'CELLSIZEY').getOutput(0).replace(',', '.'))
-        self.raster_values = arcpy.RasterToNumPyArray(raster_file)
+        self.raster_values = filter_raster(arcpy.RasterToNumPyArray(raster_file))
+        x = 'for debug'
 
     def register_points(self, points):
         if self.raster_values is None:
