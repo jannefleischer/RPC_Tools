@@ -143,9 +143,10 @@ class TbxEditMarkets(Tbx):
     
     def add_market_to_db(self, name, coords):
         '''add a market to the database located in given coordinates
-        (if maket becomes planfall or nullfall depends on setting of toolbox)
+        (if market becomes planfall or nullfall depends on setting of toolbox)
         '''
-        df_markets = self.get_markets()
+        # take ALL markets (planfall and nullfall) to get correct max id
+        df_markets = self.table_to_dataframe('Maerkte')
         if len(df_markets) == 0:
             new_id = 1
         else: 
