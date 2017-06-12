@@ -53,12 +53,14 @@ class ProjektAnlegen(Projektverwaltung):
         # if not: AddMessage and delete project again
         if success:
             self.parent_tbx.config.active_project = self.projectname
-            self.show_output()
+            self.output.show()
+            #self.output.show_diagrams()
             #diagram = DiaTeilflaechen()
             #self.add_diagramm()
         else:
             arcpy.AddMessage("Fehlerhaftes Projekt wird wieder entfernt...")
             arcpy.Delete_management(self.folders.get_projectpath(check=False))
+        
 
     def projekt_anlegen(self):
         """Projekt anlegen"""
@@ -370,8 +372,8 @@ class ProjektKopieren(Projektverwaltung):
         """"""
         self.output.define_projection()
         self.projekt_kopieren()
-        self.show_output()
-        self.add_diagramm()
+        self.output.show()
+        #self.add_diagramm()
 
     def projekt_kopieren(self):
         """"""

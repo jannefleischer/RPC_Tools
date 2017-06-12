@@ -66,7 +66,7 @@ class Diagram(DummyTbx):
         self.set_active_project(projectname=projectname)
         self.figure = self._create(**kwargs)
         
-    def _create(self):
+    def _create(self, **kwargs):
         """to be implemented by subclasses,
         has to return the axes-object of the plot"""
 

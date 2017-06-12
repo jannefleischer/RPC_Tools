@@ -57,7 +57,8 @@ class ArbeitsplatzEntwicklung(Diagram):
         ax.yaxis.grid(True, which='major')
         
         return ax
-    
+
+
 class BranchenAnteile(Diagram):
     def _create(self, **kwargs):
         flaechen_id = kwargs['flaechen_id']

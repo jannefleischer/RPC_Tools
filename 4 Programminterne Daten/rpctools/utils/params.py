@@ -439,9 +439,6 @@ class Tbx(object):
 
     def validate_inputs(self):
         return True, ''
-    
-    def show_outputs(self):
-        self.tool.output.show()
 
     def _updateMessages(self, parameters):
         """ to define in the subclass """
@@ -1025,7 +1022,6 @@ class Tbx(object):
             #raise e
         #finally:
         self._is_executing = False
-        self.show_outputs()
 
     def print_test_parameters(self):
         """

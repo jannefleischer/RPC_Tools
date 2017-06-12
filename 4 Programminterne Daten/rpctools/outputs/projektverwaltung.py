@@ -4,8 +4,9 @@ from rpctools.utils.output import Output
 
 
 class ProjektverwaltungOutput(Output):
+    _workspace = 'FGDB_Definition_Projekt.gdb'
 
-    def add_outputs(self):
+    def define_outputs(self):
         # add Teilflächen
         fc = "Teilflaechen_Plangebiet"
         layer = "Teilflächen des Plangebiets"

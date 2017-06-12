@@ -4,8 +4,9 @@ from rpctools.utils.output import Output
 
 
 class MarketsOutput(Output):
-
-    def add_outputs(self):
+    _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
+    
+    def define_outputs(self):
         group_layer = ("standortkonkurrenz")
         fc = 'Maerkte'
         layer_nullfall = 'Märkte Nullfall'

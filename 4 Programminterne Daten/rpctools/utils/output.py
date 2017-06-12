@@ -189,18 +189,19 @@ class Output(object):
     """
     _workspace = None
     
-    def __init__(self, params=None, workspace=None):
+    def __init__(self, params=None):
         self.config = Config()
         self.params = params
         # no params object given -> take a fixed project name (the currently 
         # active one)
         projectname = None if params is not None else self.config.active_project
-        self.folders = Folders(params=params, workspace=workspace,
+        self.folders = Folders(params=params, workspace=self._workspace,
                                projectname=projectname)
         self.module = LayerGroup()
         self.layers = []
+        self.diagrams = []
         self.add_layer_groups()
-        self.add_outputs()
+        self.define_outputs()
 
     def add_layer_groups(self):
         root = self.module
@@ -223,7 +224,7 @@ class Output(object):
                      "Wirkungsbereich 7 - Standortkonkurrenz "
                      "Lebensmitteleinzelhandel")
     
-    def add_outputs(self):
+    def define_outputs(self):
         '''define the output layers here, has to be implemented in subclasses'''
         
     @property
@@ -454,11 +455,25 @@ class Output(object):
                       template_folder=template_folder)
         self.layers.append(layer)
         
-    def show(self):
+    def add_diagram(self, *args):
+        for arg in args:
+            self.diagrams.append(arg)
+        
+    def show(self, **kwargs):
+        self.show_layers()
+        self.show_diagrams(**kwargs)
+        
+    def show_diagrams(self, **kwargs):
+        for Diagram in self.diagrams:
+            diag = Diagram()
+            diag.create(**kwargs)
+            diag.show()
+        
+    def show_layers(self):
         for layer in self.layers:
-            self.show_layer(layer)
+            self._show_layer(layer)
 
-    def show_layer(self, layer):
+    def _show_layer(self, layer):
         """show the layer by adding it to the TOC of ArcGIS"""
         
         projektname = self.projectname

@@ -115,7 +115,6 @@ class OSMMarktEinlesen(Tool):
         self.markets_to_db(markets)
         self.set_chains()
         self.set_ags()
-        self.output.show()
 
 
 class TbxOSMMarktEinlesen(Tbx):

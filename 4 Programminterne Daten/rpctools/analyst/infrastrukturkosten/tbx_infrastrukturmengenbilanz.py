@@ -6,35 +6,19 @@ from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 import pandas as pd
 import numpy as np
-from rpctools.diagrams.infrastruktur import Netzlaenge, MassnahmenKosten
+from rpctools.outputs.infrastruktur import InfrastrukturOutput
 
 
 class InfrastrukturmengenBilanz(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Kosten.gdb'
-    _group_layer = "infrastruktur"
-    _line_layer = "Erschließungsnetz"
-    _point_layer = "Erschließungsnetz - punktuelle Maßnahmen" 
-    _line_table = 'Erschliessungsnetze_Linienelemente'
-    _point_table = 'Erschliessungsnetze_Punktelemente'    
     
-    def add_output(self):
-        # add Erschliessungsnetz
-        fc = self.folders.get_table(self._line_table)
-        layer = self.folders.get_layer(self._line_layer)
-        self.output.add_layer(self._group_layer, layer, fc, zoom=False)
-        
-        fc = self.folders.get_table(self._point_table)
-        layer = self.folders.get_layer(self._point_layer)
-        self.output.add_layer(self._group_layer, layer, fc, zoom=False)
+    @property
+    def Output(self):
+        return InfrastrukturOutput
         
     def run(self):
-        netz_diagram = Netzlaenge()
-        netz_diagram.create()
-        netz_diagram.show()
-        kosten_diagram = MassnahmenKosten()
-        kosten_diagram.create()
-        kosten_diagram.show()
+        self.output.show_diagrams()
 
 
 class TbxInfrastrukturmengenBilanz(Tbx):
