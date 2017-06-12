@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from rpctools.utils.diagrams import Diagram
+from rpctools.utils.diagram import Diagram
 import matplotlib.ticker as mticker
 
 
@@ -11,7 +11,7 @@ class Netzlaenge(Diagram):
         line_table = 'Erschliessungsnetze_Linienelemente'
         self.title = (u"{}: Länge der zusätzlichen Infrastrukturnetze "
                  u"(ohne punktuelle Maßnahmen)".format(
-                     self.par._get_projectname()))
+                     self.par.get_projectname()))
         x_label = u"Meter zusätzliche Netzlänge (ohne punktuelle Maßnahmen)"
         
         linien_df = self.table_to_dataframe(
@@ -50,7 +50,7 @@ class MassnahmenKosten(Diagram):
     def _create(self, **kwargs):
         point_table = 'Erschliessungsnetze_Punktelemente'
         self.title = u"{}: Kosten der punktuellen Maßnahmen".format(
-            self.par._get_projectname())
+            self.par.get_projectname())
         x_label = u"Kosten der punktuellen Maßnahmen"
         
         point_df = self.table_to_dataframe(

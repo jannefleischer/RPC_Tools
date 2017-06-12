@@ -6,11 +6,12 @@ import os
 from abc import ABCMeta, abstractmethod, abstractproperty
 from rpctools.utils.config import Folders
 from rpctools.utils.config import Config
-from rpctools.utils.output import Output, ArcpyEnv
+from rpctools.utils.output import ArcpyEnv
 from rpctools.utils.message import Message
 from rpctools.utils.singleton import Singleton
 from rpctools.utils.param_module import Params
 from rpctools.utils.arcpy_parameter import Parameter
+from rpctools.utils.output import Output
 import pandas as pd
 import numpy as np
 import arcpy
@@ -76,8 +77,10 @@ class Tool(object):
         self.mes = Message()
         self.parent_tbx = parent_tbx
         self.folders = ToolFolders(params=self.par)
-        self.output = Output(folders=self.folders, params=params,
-                             parent_tbx=parent_tbx)
+        if self.Output:
+            self.output = self.Output(params)
+        else:
+            self.output = Output(params)
 
     def main(self, par, parameters=None, messages=None):
         """
@@ -112,11 +115,20 @@ class Tool(object):
     @property
     def projectname(self):
         """Return the current projectname"""
-        return self.par._get_projectname()
+        return self.par.get_projectname()
 
     @abstractmethod
     def run(self):
         """The run method - has to be implemented in the subclass"""
+        
+    @property
+    def Output(self):
+        """
+        Returns the Toolclass
+
+        To be defined in the subclass
+        """
+        return None
 
 
 class Dependency(object):
@@ -427,6 +439,9 @@ class Tbx(object):
 
     def validate_inputs(self):
         return True, ''
+    
+    def show_outputs(self):
+        self.tool.output.show()
 
     def _updateMessages(self, parameters):
         """ to define in the subclass """
@@ -1010,6 +1025,7 @@ class Tbx(object):
             #raise e
         #finally:
         self._is_executing = False
+        self.show_outputs()
 
     def print_test_parameters(self):
         """

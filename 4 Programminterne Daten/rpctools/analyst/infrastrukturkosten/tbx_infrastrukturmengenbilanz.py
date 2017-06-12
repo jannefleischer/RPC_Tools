@@ -22,11 +22,11 @@ class InfrastrukturmengenBilanz(Tool):
         # add Erschliessungsnetz
         fc = self.folders.get_table(self._line_table)
         layer = self.folders.get_layer(self._line_layer)
-        self.output.add_output(self._group_layer, layer, fc, zoom=False)
+        self.output.add_layer(self._group_layer, layer, fc, zoom=False)
         
         fc = self.folders.get_table(self._point_table)
         layer = self.folders.get_layer(self._point_layer)
-        self.output.add_output(self._group_layer, layer, fc, zoom=False)
+        self.output.add_layer(self._group_layer, layer, fc, zoom=False)
         
     def run(self):
         netz_diagram = Netzlaenge()

@@ -26,40 +26,36 @@ from rpctools.utils.spatial_lib import get_gemeindetyp
 from rpctools.utils.constants import Nutzungsart
 from rpctools.utils.encoding import encode
 
-from rpctools.definitions.diagram_teilflaechen import DiaTeilflaechen
+from rpctools.utils.params import Tool
+from rpctools.diagrams.diagram_teilflaechen import DiaTeilflaechen
+from rpctools.outputs.projektverwaltung import ProjektverwaltungOutput
 
 
-class Projektverwaltung(DiaTeilflaechen):
+class Projektverwaltung(Tool):
 
     _param_projectname = 'name'
     _workspace = 'FGDB_Definition_Projekt.gdb'
-
-    def add_output_new_project(self):
-        # add Teilflächen
-        fc = self.folders.get_table("Teilflaechen_Plangebiet")
-        layer = self.folders.get_layer("Teilflächen des Plangebiets")
-        self.output.add_output("projektdefinition", layer, fc)
-
-        # add OpenStreetmap
-        layer = self.folders.get_layer("OpenStreetMap")
-        self.output.add_output("hintergrundkarten", layer,
-                               zoom=False, in_project=False)
+    
+    @property
+    def Output(self):
+        return ProjektverwaltungOutput    
 
 
 class ProjektAnlegen(Projektverwaltung):
-    """Projet neu anlegen"""
+    """Projekt neu anlegen"""
 
     def run(self):
         """"""
         gc.collect()
         #self.output.define_projection()
-        prject_anlegen_successful = self.projekt_anlegen()
+        success = self.projekt_anlegen()
         # test if self.projekt_anlegen() was successful
         # if not: AddMessage and delete project again
-        if prject_anlegen_successful:
+        if success:
             self.parent_tbx.config.active_project = self.projectname
-            self.add_output_new_project()
-            self.add_diagramm()
+            self.show_output()
+            #diagram = DiaTeilflaechen()
+            #self.add_diagramm()
         else:
             arcpy.AddMessage("Fehlerhaftes Projekt wird wieder entfernt...")
             arcpy.Delete_management(self.folders.get_projectpath(check=False))
@@ -374,7 +370,7 @@ class ProjektKopieren(Projektverwaltung):
         """"""
         self.output.define_projection()
         self.projekt_kopieren()
-        self.add_output_new_project()
+        self.show_output()
         self.add_diagramm()
 
     def projekt_kopieren(self):

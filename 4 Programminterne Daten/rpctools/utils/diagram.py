@@ -5,11 +5,12 @@ import subprocess
 import os
 from argparse import ArgumentParser
 from abc import ABCMeta, abstractmethod
+import sys
+import pickle
+
 from rpctools.utils.params import DummyTbx
 from rpctools.utils import diagram_exec
 from rpctools.utils.encoding import encode
-import sys
-import pickle
 
 
 class Diagram(DummyTbx):

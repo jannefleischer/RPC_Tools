@@ -51,4 +51,6 @@ class TbxWanderungssalden(Tbx):
 if __name__ == '__main__':
     t = TbxWanderungssalden()
     t.getParameterInfo()
+    t.set_active_project()
+    t.execute()
     t.open()
