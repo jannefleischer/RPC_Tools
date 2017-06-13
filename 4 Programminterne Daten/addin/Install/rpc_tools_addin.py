@@ -239,7 +239,7 @@ class ProjektAuswahl(object):
         if project is None:
             project = self.value
         config.active_project = project
-        ProjektverwaltungOutput().show_layers()
+        ProjektverwaltungOutput().show()
 
     def onFocus(self, focused):
         if focused:

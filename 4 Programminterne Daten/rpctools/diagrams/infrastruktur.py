@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from rpctools.utils.diagram import Diagram
+from rpctools.utils.diagram import MatplotDiagram
 import matplotlib.ticker as mticker
 
 
-class Netzlaenge(Diagram):
+class Netzlaenge(MatplotDiagram):
     
     def _create(self, **kwargs):
         line_table = 'Erschliessungsnetze_Linienelemente'
@@ -45,7 +45,7 @@ class Netzlaenge(Diagram):
         return ax
     
 
-class MassnahmenKosten(Diagram):
+class MassnahmenKosten(MatplotDiagram):
     
     def _create(self, **kwargs):
         point_table = 'Erschliessungsnetze_Punktelemente'

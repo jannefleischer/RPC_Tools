@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 import subprocess
 import os
 from argparse import ArgumentParser
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 import sys
 import pickle
+import arcpy
 
 from rpctools.utils.params import DummyTbx
 from rpctools.utils import diagram_exec
@@ -14,6 +15,73 @@ from rpctools.utils.encoding import encode
 
 
 class Diagram(DummyTbx):
+    _workspace = None
+    
+    def __init__(self, title='Diagramm'):
+        """
+        title : str
+        """
+        super(Diagram, self).__init__()
+        self.title = title
+        if self._workspace:
+            self.folders._workspace = self._workspace
+        
+    @abstractmethod
+    def create(self, **kwargs):
+        '''
+        create a plot
+        
+        Parameters
+        ----------
+        projectname: str, optional
+            the name of the project the data the plot is based on belongs to
+            defaults to the active project
+            
+        kwargs: other optional parameters the subclassing diagram needs
+        '''
+
+    def show(self):
+        pass
+
+
+class ArcpyDiagram(Diagram):
+    
+    def __init__(self, title='Diagramm'):
+        """
+        title : str
+        """
+        super(ArcpyDiagram, self).__init__(title=title)
+        self.graph = None
+        self.template = None
+        
+    def create(self, **kwargs):
+        '''
+        create a plot
+        
+        Parameters
+        ----------
+        projectname: str, optional
+            the name of the project the data the plot is based on belongs to
+            defaults to the active project
+            
+        kwargs: other optional parameters the subclassing diagram needs
+        '''
+        projectname = kwargs['projectname'] if 'projectname' in kwargs else None
+        self._getParameterInfo()
+        self.set_active_project(projectname=projectname)
+        self.graph, self.template = self._create(**kwargs)
+        
+
+    def _create(self, **kwargs):
+        """to be implemented by subclasses,
+        has to return the graph-object and the path to the template"""
+        
+    def show(self):
+        title = self.graph.graphPropsGeneral.title or self.title
+        self.output.add_graph(self.template, self.graph, title)
+
+
+class MatplotDiagram(Diagram):
     '''
     superclass to plot diagrams with matplotlib
     '''
@@ -25,8 +93,7 @@ class Diagram(DummyTbx):
         """
         title : str
         """
-        super(Diagram, self).__init__()
-        self.title = title
+        super(MatplotDiagram, self).__init__(title=title)
         self.figure = None
         
     def show(self, external=True):
@@ -65,10 +132,6 @@ class Diagram(DummyTbx):
         self._getParameterInfo()
         self.set_active_project(projectname=projectname)
         self.figure = self._create(**kwargs)
-        
-    def _create(self, **kwargs):
-        """to be implemented by subclasses,
-        has to return the axes-object of the plot"""
 
     def show_external(self, plot, filename):
         if plot is None:
@@ -79,3 +142,7 @@ class Diagram(DummyTbx):
             [os.path.join(sys.exec_prefix, 'python.exe'),
              '-m' , diagram_exec.__name__, '-f', filename,
              '-t', encode(self.title)], shell=True)
+        
+    def _create(self, **kwargs):
+        """to be implemented by subclasses,
+        has to return the axes-object of the plot"""

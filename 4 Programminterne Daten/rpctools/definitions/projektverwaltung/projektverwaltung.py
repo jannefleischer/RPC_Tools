@@ -38,7 +38,7 @@ class Projektverwaltung(Tool):
     
     @property
     def Output(self):
-        return ProjektverwaltungOutput    
+        return ProjektverwaltungOutput
 
 
 class ProjektAnlegen(Projektverwaltung):

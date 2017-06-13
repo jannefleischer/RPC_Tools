@@ -668,7 +668,8 @@ class Output(object):
         df.geographicTransformations = [self.config.transformation]
         arcpy.RefreshActiveView()
 
-    def add_graph(self, input_template, graph, out_graph_name):
+    @staticmethod
+    def add_graph(input_template, graph, out_graph_name):
         """
         Add a graph to the output.
         If a graph with the same name already exists,

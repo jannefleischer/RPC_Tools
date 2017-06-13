@@ -109,6 +109,8 @@ class Routing(Tool):
         arcpy.AddField_management(nodes_path, 'Manuelle_Gewichtung')
         arcpy.AddField_management(nodes_path, 'Neue_Gewichte',
                                   field_type='DOUBLE')
+        
+        self.output.show()
 
 
 

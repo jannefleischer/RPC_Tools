@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from rpctools.utils.diagram import Diagram
+from rpctools.utils.diagram import MatplotDiagram
 import matplotlib.ticker as mticker
 import pandas as pd
 
 
-class BewohnerEntwicklung(Diagram):
+class BewohnerEntwicklung(MatplotDiagram):
     def _create(self, **kwargs):
         flaechen_id = kwargs['flaechen_id']
         flaechen_name = kwargs['flaechen_name']
@@ -33,7 +33,7 @@ class BewohnerEntwicklung(Diagram):
         return ax
 
 
-class ArbeitsplatzEntwicklung(Diagram):
+class ArbeitsplatzEntwicklung(MatplotDiagram):
     def _create(self, **kwargs):
         flaechen_id = kwargs['flaechen_id']
         flaechen_name = kwargs['flaechen_name']
@@ -59,7 +59,7 @@ class ArbeitsplatzEntwicklung(Diagram):
         return ax
 
 
-class BranchenAnteile(Diagram):
+class BranchenAnteile(MatplotDiagram):
     def _create(self, **kwargs):
         flaechen_id = kwargs['flaechen_id']
         flaechen_name = kwargs['flaechen_name']

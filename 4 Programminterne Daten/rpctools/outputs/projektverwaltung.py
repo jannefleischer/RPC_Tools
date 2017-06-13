@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from rpctools.utils.output import Output
+from rpctools.diagrams.diagram_teilflaechen import DiaTeilflaechen
 
 
 class ProjektverwaltungOutput(Output):
@@ -16,3 +17,5 @@ class ProjektverwaltungOutput(Output):
         layer = "OpenStreetMap"
         self.add_layer("hintergrundkarten", layer,
                         zoom=False, in_project=False)
+        
+        self.add_diagram(DiaTeilflaechen)

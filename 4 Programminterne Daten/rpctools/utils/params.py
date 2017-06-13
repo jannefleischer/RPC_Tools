@@ -222,6 +222,10 @@ class Tbx(object):
         """projects that were changed (only works if toolbox works with
         temporary databases)"""
         return self.folders.get_temporary_projects()
+    
+    @property
+    def output(self):
+        return self.tool.output
 
     def __init__(self):
 
