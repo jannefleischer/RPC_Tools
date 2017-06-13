@@ -90,13 +90,13 @@ class Sales(object):
         dist_matrix = dist_matrix.T
         results = pd.DataFrame(data=1., index=dist_matrix.index,
                                columns=dist_matrix.columns)
-        competing_markets = self.markets[['id', 'id_kette']]
+        competing_markets = df_markets[['id_kette']]
         for id_kette in np.unique(competing_markets['id_kette']):
             markets_of_same_type = \
                 competing_markets[competing_markets['id_kette'] == id_kette]
             if len(markets_of_same_type['id_kette']) == 1 or id_kette == 0:
                 continue
-            indices = list(markets_of_same_type['id'])
+            indices = list(markets_of_same_type.index)
             number_of_competing_markets = len(indices)
             same_type_dist_matrix = dist_matrix[indices]
             same_type_dist_matrix['Minimum'] = \

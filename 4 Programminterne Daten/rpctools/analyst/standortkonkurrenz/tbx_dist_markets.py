@@ -20,9 +20,14 @@ class DistMarkets(Tool):
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     # ToDo: set this in toolbox?
     recalculate = False
-
-    def add_outputs(self): 
-        pass
+    
+    def add_outputs(self):
+        # Add Layers
+            group_layer = ("standortkonkurrenz")
+            fc = 'Maerkte'
+            layer_planfall = 'Umsatzdifferenz'
+        
+            self.output.add_layer(group_layer, layer_nullfall, fc, zoom=False)
     
     def run(self):
         folders = Folders(self.par)
@@ -88,7 +93,9 @@ class DistMarkets(Tool):
         df_markets = pd.DataFrame()
         df_markets['id'] = sales_nullfall.index
         df_markets['umsatz_nullfall'] = sales_nullfall.values
-        df_markets['umsatz_planfall'] = sales_planfall.values
+        df_markets['umsatz_planfall'] = sales_planfall.values    
+        df_markets['umsatz_differenz'] = ((sales_planfall /
+                                          sales_nullfall) * 100 - 100).values
         self.parent_tbx.dataframe_to_table('Maerkte', df_markets, pkeys=['id'])
         
         # invert the pivoted tables

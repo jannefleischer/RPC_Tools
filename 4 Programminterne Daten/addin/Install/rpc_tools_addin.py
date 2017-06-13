@@ -11,9 +11,6 @@ from rpctools.definitions.projektverwaltung.tbx_projektauswahl import \
      TbxProjektauswahl
 from rpctools.analyst.infrastrukturkosten.tbx_infrastrukturmengenbilanz import \
      TbxInfrastrukturmengenBilanz
-from rpctools.outputs.projektverwaltung import ProjektverwaltungOutput
-from rpctools.outputs.standortkonkurrenz import MarketsOutput
-from rpctools.outputs.infrastruktur import InfrastrukturOutput
 
 folders = Folders()
 config = Config()
@@ -481,7 +478,7 @@ class BeschreibungPunktuelleMassnahmeElektrizitaet(Beschreibung):
 
 def delete_selected_elements(layer_name):
     active = config.active_project
-    layers = ProjektverwaltungOutput().get_layers(layer_name)
+    layers = projektauswahl.tbx.output.get_layers(layer_name)
     if not layers:
         return
     # ToDo: loop necessary?
