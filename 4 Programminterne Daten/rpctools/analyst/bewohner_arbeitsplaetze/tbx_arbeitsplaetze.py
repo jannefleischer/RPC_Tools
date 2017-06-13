@@ -16,6 +16,7 @@ class Arbeitsplaetze(Tool):
     _workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
     
     def add_outputs(self):
+        tfl = self.parent_tbx.get_teilflaeche(self.par.teilflaeche.value)
         diagram = ArbeitsplatzEntwicklung()
         diagram.create(flaechen_id=tfl.flaechen_id,
                        flaechen_name=tfl.name)
