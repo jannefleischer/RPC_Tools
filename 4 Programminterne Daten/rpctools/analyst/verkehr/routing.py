@@ -66,7 +66,8 @@ class Routing(Tool):
                         total_trips_for_tou += trips
                 for tfl_id in tfl_id_with_tou:
                     source_id, x_coord, y_coord, trips, tfl_use = data_tfl[tfl_id]
-                    trips = trips_by_car * trips / total_trips_for_tou
+                    trips = trips_by_car * trips / total_trips_for_tou \
+                        if total_trips_for_tou else 0
                     data_tfl[tfl_id] = (source_id, x_coord, y_coord, trips, tfl_use)
             return data_tfl
 
