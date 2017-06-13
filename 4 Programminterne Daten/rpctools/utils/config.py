@@ -115,7 +115,7 @@ class Config(object):
 ########################################################################
 class Folders(object):
     """"""
-    def __init__(self, params=None):
+    def __init__(self, params=None, projectname=None, workspace=None): 
         """class that returns path"""
         self.BASE_PATH = abspath(join(dirname(__file__), '..', '..', '..'))
         self._PROJECT_BASE_PATH = '3 Benutzerdefinierte Projekte'
@@ -137,6 +137,8 @@ class Folders(object):
         self._ANALYST_PYT_PATH = '2 Planungsprojekte analysieren'
         # the params
         self._params = params
+        self._projectname = projectname
+        self._workspace = workspace
         self._invalid_paths = []
         self._CONFIG_FILE = 'config.txt'
         self._OTP_PICKLE_FILE = 'otpgraph.pickle'
@@ -165,15 +167,15 @@ class Folders(object):
         return path
 
     @property
-    def project(self):
+    def projectname(self):
         """The project name"""
-        projectname = self._params._get_projectname()
+        projectname = self._projectname or self._params.get_projectname()
         return projectname
 
     @property
     def workspace(self):
         """The default database name"""
-        workspace = self._params._workspace
+        workspace = self._workspace or self._params._workspace
         return workspace
 
     @property
@@ -289,7 +291,7 @@ class Folders(object):
         projectpath : str
             the full path of the Project folder
         """
-        projectname = project or self.project
+        projectname = project or self.projectname
         return self.join_and_check(self.PROJECT_BASE_PATH,
                                    projectname,
                                    check=check)
@@ -301,7 +303,7 @@ class Folders(object):
             check=check)
 
     def get_temporary_projectpath(self, project=None):
-        projectname = project or self.project
+        projectname = project or self.projectname
         path = join(self.TEMPORARY_GDB_PATH, projectname)
         if not exists(path):
             mkdir(path)
@@ -347,7 +349,7 @@ class Folders(object):
             the full path of the Workspace
         """
         workspace = basename(workspace) or self.workspace
-        projectname = project or self.project
+        projectname = project or self.projectname
         return self.join_and_check(self.get_projectpath(projectname), workspace,
                                    check=check)
 
@@ -369,7 +371,7 @@ class Folders(object):
             the full path to a table in the Workspace
         """
         workspace = basename(workspace) or self.workspace
-        projectname = project or self.project
+        projectname = project or self.projectname
         table = self.join_and_check(self.get_db(workspace, projectname),
                                     tablename,
                                     check=check)

@@ -6,11 +6,12 @@ import os
 from abc import ABCMeta, abstractmethod, abstractproperty
 from rpctools.utils.config import Folders
 from rpctools.utils.config import Config
-from rpctools.utils.output import Output, ArcpyEnv
+from rpctools.utils.output import ArcpyEnv
 from rpctools.utils.message import Message
 from rpctools.utils.singleton import Singleton
 from rpctools.utils.param_module import Params
 from rpctools.utils.arcpy_parameter import Parameter
+from rpctools.utils.output import Output
 import pandas as pd
 import numpy as np
 import arcpy
@@ -76,8 +77,7 @@ class Tool(object):
         self.mes = Message()
         self.parent_tbx = parent_tbx
         self.folders = ToolFolders(params=self.par)
-        self.output = Output(folders=self.folders, params=params,
-                             parent_tbx=parent_tbx)
+        self.output = Output(params)
 
     def main(self, par, parameters=None, messages=None):
         """
@@ -112,7 +112,13 @@ class Tool(object):
     @property
     def projectname(self):
         """Return the current projectname"""
-        return self.par._get_projectname()
+        return self.par.get_projectname()
+    
+    @abstractmethod
+    def add_outputs(self):
+        """method defining layers, diagrams, etc. as a result of the
+        calculations of the toolbox and adding them to outputs
+        - has to be implemented in the subclass"""
 
     @abstractmethod
     def run(self):
@@ -210,6 +216,15 @@ class Tbx(object):
         """projects that were changed (only works if toolbox works with
         temporary databases)"""
         return self.folders.get_temporary_projects()
+    
+    @property
+    def output(self):
+        return self.tool.output
+    
+    def show_outputs(self):
+        self.output.clear()
+        self.tool.add_outputs()
+        self.output.show()
 
     def __init__(self):
 
@@ -1010,6 +1025,7 @@ class Tbx(object):
             #raise e
         #finally:
         self._is_executing = False
+        self.show_outputs()
 
     def print_test_parameters(self):
         """
@@ -1081,6 +1097,9 @@ class Tbx(object):
             
 
 class DummyTool(Tool):
+    
+    def add_outputs(self):
+        pass
     
     def run(self):
         pass

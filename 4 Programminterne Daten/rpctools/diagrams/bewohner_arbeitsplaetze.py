@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from rpctools.utils.diagrams import Diagram
+from rpctools.utils.diagram import MatplotDiagram
 import matplotlib.ticker as mticker
 import pandas as pd
 
 
-class BewohnerEntwicklung(Diagram):
+class BewohnerEntwicklung(MatplotDiagram):
     def _create(self, **kwargs):
         flaechen_id = kwargs['flaechen_id']
         flaechen_name = kwargs['flaechen_name']
         self.title = (u"{} - {}: Geschätzte Einwohnerentwicklung".format(
-            self.par._get_projectname(), flaechen_name))
+            self.par.get_projectname(), flaechen_name))
         
         table = 'Bewohner_nach_Altersgruppe_und_Jahr'
         workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
@@ -33,13 +33,13 @@ class BewohnerEntwicklung(Diagram):
         return ax
 
 
-class ArbeitsplatzEntwicklung(Diagram):
+class ArbeitsplatzEntwicklung(MatplotDiagram):
     def _create(self, **kwargs):
         flaechen_id = kwargs['flaechen_id']
         flaechen_name = kwargs['flaechen_name']
         self.title = (u"{} - {}: Geschätzte Anzahl Arbeitsplätze "
                       u"(Orientierungswerte)".format(
-                          self.par._get_projectname(), flaechen_name))
+                          self.par.get_projectname(), flaechen_name))
         
         flaechen_id = kwargs['flaechen_id']
         
@@ -57,14 +57,15 @@ class ArbeitsplatzEntwicklung(Diagram):
         ax.yaxis.grid(True, which='major')
         
         return ax
-    
-class BranchenAnteile(Diagram):
+
+
+class BranchenAnteile(MatplotDiagram):
     def _create(self, **kwargs):
         flaechen_id = kwargs['flaechen_id']
         flaechen_name = kwargs['flaechen_name']
         self.title = (u"{} - {}: Geschätzte Branchenanteile an den "
                       u"Arbeitsplätzen".format(
-                          self.par._get_projectname(), flaechen_name))
+                          self.par.get_projectname(), flaechen_name))
         
         flaechen_id = kwargs['flaechen_id']
         

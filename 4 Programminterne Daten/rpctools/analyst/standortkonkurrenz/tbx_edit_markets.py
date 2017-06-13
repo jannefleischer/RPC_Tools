@@ -13,7 +13,10 @@ PLANFALL = 1
 
 class EditMarkets(Tool):
     _param_projectname = 'projectname'
-    _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'    
+    _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
+
+    def add_outputs(self): 
+        pass
 
     def run(self):
         markets_df = self.parent_tbx.markets_df

@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
 
-
 import arcpy
 from rpctools.utils.encoding import encode
-from rpctools.utils.params import Tool
+from rpctools.utils.diagram import ArcpyDiagram
 
 
-class DiaTeilflaechen(Tool):
-    def add_diagramm(self):
+class DiaTeilflaechen(ArcpyDiagram):
+    _workspace = 'FGDB_Definition_Projekt.gdb'
+    
+    def _create(self):
         """
         Diagramm für Teilflächen
         """
         # Erstelle Diagramm Teilflaechen nach Hektar
-        project_name = self.projectname
-        out_graph_name = str(project_name) + ": Teilflächen nach Hektar"
+        project_name = self.folders.projectname
+        title = encode(
+            "{}: Teilflächen des Plangebiets (Bruttofläche)"
+            .format(project_name))
         input_template = self.folders.get_diagram_template(
             'Teilflaechen_Hektar')
         input_data = self.folders.get_table('Teilflaechen_Plangebiet',
@@ -29,5 +32,11 @@ class DiaTeilflaechen(Tool):
         graph.addSeriesBarVertical(dataSrc=input_data,
                                    fieldY="Flaeche_ha",
                                    fieldLabel="Name")
-        graph.graphPropsGeneral.title = encode("{}: Teilflächen des Plangebiets (Bruttofläche)".format(project_name))
-        self.output.add_graph(input_template, graph, out_graph_name)
+        graph.graphPropsGeneral.title = title
+        return graph, input_template
+
+    
+if __name__ == "__main__":
+    diagram = DiaTeilflaechen()
+    diagram.create()
+    diagram.show()

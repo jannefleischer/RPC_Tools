@@ -14,6 +14,18 @@ import arcpy
 class Arbeitsplaetze(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
+    
+    def add_outputs(self):
+        diagram = ArbeitsplatzEntwicklung()
+        diagram.create(flaechen_id=tfl.flaechen_id,
+                       flaechen_name=tfl.name)
+        self.output.add(diagram)
+        
+        diagram.show()
+        diagram = BranchenAnteile()
+        diagram.create(flaechen_id=tfl.flaechen_id,
+                       flaechen_name=tfl.name)
+        self.output.add(diagram)
 
     def run(self):
         """"""
@@ -22,7 +34,6 @@ class Arbeitsplaetze(Tool):
                          .format(tfl.name))
         self.calculate_growth(tfl)
         self.calculate_percentages(tfl)
-        self.diagram(tfl)
         
     def calculate_growth(self, tfl): ### Structure and age ###
         flaechen_table = 'Teilflaechen_Plangebiet'
@@ -95,15 +106,7 @@ class Arbeitsplaetze(Tool):
         perc_res_df['IDTeilflaeche'] = flaechen_id
         
         tbx.insert_dataframe_in_table(perc_res_table, perc_res_df)
-        
-    def diagram(self, tfl):
-        diagram = ArbeitsplatzEntwicklung()
-        diagram.create(flaechen_id=tfl.flaechen_id, flaechen_name=tfl.name)
-        diagram.show()
-        diagram = BranchenAnteile()
-        diagram.create(flaechen_id=tfl.flaechen_id, flaechen_name=tfl.name)
-        diagram.show()
-        
+
 
 class TbxArbeitsplaetze(TbxFlaechendefinition):
     _nutzungsart = Nutzungsart.GEWERBE

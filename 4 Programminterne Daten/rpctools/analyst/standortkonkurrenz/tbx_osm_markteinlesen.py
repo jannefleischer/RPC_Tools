@@ -15,17 +15,15 @@ from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
 class OSMMarktEinlesen(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
-
-    def add_output(self):
+    
+    def add_outputs(self):
         group_layer = ("standortkonkurrenz")
-        fc = self.folders.get_table('Maerkte')
-        layer = self.folders.get_layer('Märkte Nullfall')
-        self.output.add_output(group_layer, layer, fc, zoom=False)
-
-        fc = self.folders.get_table('Maerkte')
-        layer = self.folders.get_layer('Märkte Planfall')
-        self.output.add_output(group_layer, layer, fc, zoom=False)
-
+        fc = 'Maerkte'
+        layer_nullfall = 'Märkte Nullfall'
+        layer_planfall = 'Märkte Planfall'
+    
+        self.output.add_layer(group_layer, layer_nullfall, fc, zoom=False)
+        self.output.add_layer(group_layer, layer_planfall, fc, zoom=False)
 
     def markets_to_db(self, supermarkets):
         """Create the point-features for supermarkets"""
@@ -121,7 +119,6 @@ class OSMMarktEinlesen(Tool):
         self.markets_to_db(markets)
         self.set_chains()
         self.set_ags()
-        self.add_output()
 
 
 class TbxOSMMarktEinlesen(Tbx):

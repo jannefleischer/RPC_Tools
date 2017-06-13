@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-
-
 from collections import OrderedDict
 import arcpy
+
+from rpctools.utils.config import Config, Folders
 
 
 class ArcpyEnv(object):
@@ -163,17 +163,45 @@ class LayerGroup(OrderedDict):
         return lg
 
 
+class Layer(object):
+    def __init__(self,
+                 groupname,
+                 template_layer,
+                 featureclass='',
+                 template_folder='', 
+                 disable_other=False,
+                 subgroup="",
+                 in_project=True,
+                 zoom=True):
+        self.groupname = groupname
+        self.template_layer = template_layer
+        self.featureclass = featureclass
+        self.disable_other = disable_other
+        self.subgroup = subgroup
+        self.in_project = in_project
+        self.zoom = zoom
+        self.template_folder = template_folder
 
-class Output(object):
+
+class Output(object):    
     """
     Add and update layers to the current ArcMap file.
     """
-    def __init__(self, folders, params, parent_tbx):
-        self.folders = folders
+    _workspace = None
+    
+    def __init__(self, params=None):
+        self.config = Config()
         self.params = params
+        # no params object given -> take a fixed project name (the currently 
+        # active one)
+        projectname = None if params is not None else self.config.active_project
+        self.folders = Folders(params=params, workspace=self._workspace,
+                               projectname=projectname)
         self.module = LayerGroup()
+        self.layers = []
+        self.diagrams = []
         self.add_layer_groups()
-        self.parent_tbx = parent_tbx
+        self.define_outputs()
 
     def add_layer_groups(self):
         root = self.module
@@ -195,12 +223,21 @@ class Output(object):
         analysen.add("standortkonkurrenz",
                      "Wirkungsbereich 7 - Standortkonkurrenz "
                      "Lebensmitteleinzelhandel")
+    
+    def define_outputs(self):
+        '''define the output layers here, has to be implemented in subclasses'''
+        
+    @property
+    def projectname(self):
+        projectname = self.params.get_projectname() if self.params else \
+            self.config.active_project
+        return projectname
 
     def set_projectlayer(self, projektname=None):
         """
         Check and add project layer
         """
-        projektname = projektname or self.params._get_projectname()
+        projektname = projektname or self.projectname
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
 
@@ -229,7 +266,7 @@ class Output(object):
         ----------
         projectname : str, optional
         """
-        projectname = projectname or self.params._get_projectname()
+        projectname = projectname or self.projectname
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
         layers = arcpy.mapping.ListLayers(current_mxd, projectname,
@@ -240,6 +277,21 @@ class Output(object):
                 projectlayer = layer
 
         return projectlayer
+    
+    @staticmethod
+    def change_layers_workspace(source_ws, target_ws):
+        """
+        change the workspace in the current map that reference source_ws
+        to target_ws
+    
+        Parameters
+        ----------
+        source_ws : str
+        target_ws : str
+        """
+        mxd = arcpy.mapping.MapDocument('CURRENT')
+        mxd.findAndReplaceWorkspacePaths(source_ws, target_ws)
+        arcpy.RefreshActiveView()
 
     def get_layers(self, layername, projectname=None):
         """
@@ -357,17 +409,18 @@ class Output(object):
                 dataframe, target_grouplayer, addLayer, "BOTTOM")
             arcpy.RefreshActiveView()
             arcpy.RefreshTOC()
-
-    def add_output(self,
-                   groupname,
-                   template_layer,
-                   featureclass='',
-                   disable_other=False,
-                   subgroup="",
-                   in_project=True,
-                   zoom=True):
+            
+    def add_layer(self,
+                  groupname,
+                  template_layer,
+                  featureclass='',
+                  template_folder='', 
+                  disable_other=False,
+                  subgroup="",
+                  in_project=True,
+                  zoom=True):
         """
-        Add output layer to group
+        Add output layer
 
         Parameters
         ----------
@@ -375,11 +428,14 @@ class Output(object):
             the layer group
 
         template_layer : str
-            full path of the template layer
+            name of the template layer
 
         featureclass : str, optional
-            the full path of the feature class,
+            the name of the feature class table,
             which should be linked to the layer
+            
+        template_folder : str, optional
+            a subfolder of the template_layer
 
         disable_other : boolean, optional(Default=False)
             if true, then all other layers will be turned off
@@ -393,9 +449,44 @@ class Output(object):
         zoom : bool, optional(Default = True)
             if True, zoom to layer extent
         """
+        layer = Layer(groupname, template_layer, featureclass=featureclass, 
+                      disable_other=disable_other, subgroup=subgroup, 
+                      in_project=in_project, zoom=zoom,
+                      template_folder=template_folder)
+        self.layers.append(layer)
+        
+    def add_diagram(self, *args):
+        '''add a diagram (or multiple diagrams), diagram has to be an
+        instantiated subclass of Diagram'''
+        for arg in args:
+            self.diagrams.append(arg)
+        
+    def show(self):
+        '''show all available outputs (diagrams, layers etc.)'''
+        self.show_layers()
+        self.show_diagrams()
+        
+    def show_diagrams(self):
+        '''show available diagrams'''
+        for diagram in self.diagrams:
+            diagram.show()
+        
+    def show_layers(self):
+        '''show available layers'''
+        for layer in self.layers:
+            self._show_layer(layer)
+            
+    def clear(self):
+        '''remove all outputs (diagrams, layers etc.)'''
+        self.diagrams = []
+        self.layers = []
 
-        projektname = self.params._get_projectname()
-        group = self.module.get_label(groupname)
+    def _show_layer(self, layer):
+        """show the layer by adding it to the TOC of ArcGIS"""
+        
+        projektname = self.projectname
+        
+        group = self.module.get_label(layer.groupname)
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
         current_dataframe.geographicTransformations = ['DHDN_To_WGS_1984_5x',
@@ -409,21 +500,24 @@ class Output(object):
         self.set_headgrouplayer(project_layer, current_dataframe)
 
         # Template Layer laden
+        template_layer = self.folders.get_layer(layer.template_layer,
+                                                layer.template_folder)
         source_layer = arcpy.mapping.Layer(template_layer)
         arcpy.AddMessage(source_layer)
 
         # Datasource des Layers auf die gewünschte FeatureClass setzen
-        if featureclass:
+        if layer.featureclass:
+            featureclass = self.folders.get_table(layer.featureclass)
             arcpy.AddMessage(featureclass)
             source_ws = source_layer.workspacePath
             target_ws = arcpy.Describe(featureclass).path
             source_layer.findAndReplaceWorkspacePath(source_ws, target_ws)
 
         # Untergruppen hinzufügen
-        if in_project:
+        if layer.in_project:
             self.set_grouplayer(group, project_layer, current_dataframe)
-            if subgroup != "":
-                self.set_subgrouplayer(group, subgroup,
+            if layer.subgroup != "":
+                self.set_subgrouplayer(group, layer.subgroup,
                                        project_layer, current_dataframe)
 
             # Neuen Layer hinzufuegen
@@ -434,13 +528,13 @@ class Output(object):
                 current_mxd, group, current_dataframe)[0]
 
         # Layer zur Group oder Subgroup hinzufügen
-        if not subgroup:
+        if not layer.subgroup:
             self.add_or_replace_layer(target_grouplayer,
                                       current_dataframe,
                                       source_layer)
         else:
             target_subgrouplayer = arcpy.mapping.ListLayers(
-                target_grouplayer, subgroup, current_dataframe)[0]
+                target_grouplayer, layer.subgroup, current_dataframe)[0]
 
             self.add_or_replace_layer(target_subgrouplayer,
                                       current_dataframe,
@@ -451,23 +545,23 @@ class Output(object):
                                              source_layer.name,
                                              current_dataframe)[0]
         # Auf Layer zentrieren
-        if zoom:
+        if layer.zoom:
             ext = new_layer.getExtent()
             current_dataframe.extent = ext
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
 
-        if disable_other == True:
+        if layer.disable_other == True:
             for lyr in arcpy.mapping.ListLayers(project_layer):
                 lyr.visible = False
         new_layer.visible = True
-        if subgroup != "":
+        if layer.subgroup != "":
             target_subgrouplayer.visible = True
         target_grouplayer.visible = True
-        if in_project:
+        if layer.in_project:
             project_layer.visible = True
             analysen = self.module["analysen"]
-            if groupname in analysen:
+            if layer.groupname in analysen:
                 arcpy.mapping.ListLayers(project_layer,
                                          analysen,
                                          current_dataframe)[0].visible = True
@@ -475,7 +569,7 @@ class Output(object):
         arcpy.RefreshTOC()
         
     def layer_exists(self, layername):
-        projektname = self.params._get_projectname()
+        projektname = self.projectname
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
         project_layer = arcpy.mapping.ListLayers(current_dataframe, projektname)
@@ -506,7 +600,7 @@ class Output(object):
 
     def delete_output(self, layer):
 
-        projektname = self.params._get_projectname()
+        projektname = self.projectname
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
         project_layer = self.get_projectlayer(projektname)
@@ -550,7 +644,7 @@ class Output(object):
         template_lyr = self.folders.get_layer(layername=layername,
                                               enhance=True,
                                               folder=folder)
-        self.add_output(groupname=groupname,
+        self.add_layer(groupname=groupname,
                         template_layer=template_lyr,
                         featureclass=fc,
                         disable_other=disable_other,
@@ -573,31 +667,17 @@ class Output(object):
             lyr = matched_layers[0]
             lyr.symbology.reclassify()
 
-    def change_layers_workspace(self, source_ws, target_ws):
-        """
-        change the workspace in the current map that reference source_ws
-        to target_ws
-
-        Parameters
-        ----------
-        source_ws : str
-        target_ws : str
-        """
-        mxd = arcpy.mapping.MapDocument('CURRENT')
-        mxd.findAndReplaceWorkspacePaths(source_ws, target_ws)
-        arcpy.RefreshActiveView()
-
     def define_projection(self):
         """Define the projection of the current dataframe from the config"""
-        config = self.parent_tbx.config
         mxd = arcpy.mapping.MapDocument('CURRENT')
         df = mxd.activeDataFrame
-        sr = arcpy.SpatialReference(config.epsg)
+        sr = arcpy.SpatialReference(self.config.epsg)
         df.spatialReference = sr
-        df.geographicTransformations = [config.transformation]
+        df.geographicTransformations = [self.config.transformation]
         arcpy.RefreshActiveView()
 
-    def add_graph(self, input_template, graph, out_graph_name):
+    @staticmethod
+    def add_graph(input_template, graph, out_graph_name):
         """
         Add a graph to the output.
         If a graph with the same name already exists,

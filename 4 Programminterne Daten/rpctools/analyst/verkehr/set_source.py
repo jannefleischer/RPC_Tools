@@ -7,6 +7,9 @@ from rpctools.utils.params import Tool
 
 class SetSource(Tool):
     _workspace = 'FGDB_Verkehr.gdb'
+    
+    def add_outputs(self):
+        pass
 
     def run(self):
         toolbox = self.parent_tbx

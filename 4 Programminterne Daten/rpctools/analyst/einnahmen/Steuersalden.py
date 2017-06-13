@@ -13,6 +13,9 @@ class Steuersalden(Tool):
 
     _param_projectname = 'name'
     _workspace = 'FGDB_Einnahmen.gdb'
+    
+    def add_outputs(self):
+        pass
 
     def run(self):
         """run Steuersalden Tool"""
@@ -112,7 +115,7 @@ class Steuersalden(Tool):
 
     # Anzeigen der Saldo-Layer
 
-        tbl_steuersalden = self.folders.get_table(tablename="Steuersalden")
+        tbl_steuersalden = "Steuersalden"
         groupname = "einnahmen"
         folder = "einnahmen"
 
@@ -131,9 +134,10 @@ class Steuersalden(Tool):
             "Negativer Gesamtsaldo"
         ]
         for layername in saldos:
-            self.output.add_output(
+            self.output.add_layer(
                 groupname=groupname,
-                template_layer=self.folders.get_layer(layername, folder),
+                template_layer=layername,
+                template_folder=folder,
                 featureclass=tbl_steuersalden,
                 disable_other=False,
                 subgroup=subgroup,

@@ -14,6 +14,9 @@ ACTIONS = [u'Kostenaufteilungsregel anlegen',
 
 class Kostenregeln(Tool):
 
+    def add_outputs(self): 
+        pass
+
     def run(self):
 
         kostenaufteilungsregel_tabelle = self.folders.get_base_table(

@@ -6,11 +6,10 @@ import numpy as np
 from rpctools.utils.config import Folders
 from rpctools.utils.params import Tool
 from rpctools.analyst.verkehr.otp_router import OTPRouter
+from rpctools.analyst.verkehr.routing import Routing
 
 
-class UpdateNodes(Tool):
-    _workspace = 'FGDB_Verkehr.gdb'
-    _param_projectname = 'project'
+class UpdateNodes(Routing):
 
     def run(self):
 
@@ -78,11 +77,4 @@ class UpdateNodes(Tool):
         for layer in layers:
             arcpy.mapping.RemoveLayer(df, layer)
 
-        lyr_zielpunkte_gew = self.folders.get_layer('Zielpunkte_gewichtet', 'Verkehr')
-        fc_zielpunkte_gew = self.folders.get_table('Zielpunkte')
-        self.output.add_output('verkehr', lyr_zielpunkte_gew, fc_zielpunkte_gew)
-        
-        lyr_links = self.folders.get_layer('links', 'Verkehr')
-        fc_links = self.folders.get_table('links')
-        self.output.add_output('verkehr', lyr_links, fc_links)
         

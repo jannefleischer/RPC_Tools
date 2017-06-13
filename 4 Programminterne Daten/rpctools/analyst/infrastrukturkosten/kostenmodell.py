@@ -26,6 +26,9 @@ from rpctools.utils.params import Tool
 class Kostenmodell(Tool):
     #_dbname = 'FGDB_Definition_Projekt.gdb'
 
+    def add_outputs(self): 
+        pass
+
     def run(self):
         messages = self.mes
         parameters = self.par

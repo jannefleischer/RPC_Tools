@@ -6,35 +6,32 @@ from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 import pandas as pd
 import numpy as np
-from rpctools.diagrams.infrastruktur import Netzlaenge, MassnahmenKosten
+from rpctools.diagrams.infrastruktur import MassnahmenKosten, Netzlaenge
 
 
 class InfrastrukturmengenBilanz(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Kosten.gdb'
-    _group_layer = "infrastruktur"
-    _line_layer = "Erschließungsnetz"
-    _point_layer = "Erschließungsnetz - punktuelle Maßnahmen" 
-    _line_table = 'Erschliessungsnetze_Linienelemente'
-    _point_table = 'Erschliessungsnetze_Punktelemente'    
     
-    def add_output(self):
-        # add Erschliessungsnetz
-        fc = self.folders.get_table(self._line_table)
-        layer = self.folders.get_layer(self._line_layer)
-        self.output.add_output(self._group_layer, layer, fc, zoom=False)
+    def add_outputs(self):
+        fc = 'Erschliessungsnetze_Linienelemente'
+        layer = "Erschließungsnetz"
+        self.output.add_layer(group_layer, layer, fc, zoom=False)
+    
+        fc = 'Erschliessungsnetze_Punktelemente'
+        layer = "Erschließungsnetz - punktuelle Maßnahmen" 
+        self.output.add_layer(group_layer, layer, fc, zoom=False)
         
-        fc = self.folders.get_table(self._point_table)
-        layer = self.folders.get_layer(self._point_layer)
-        self.output.add_output(self._group_layer, layer, fc, zoom=False)
-        
-    def run(self):
-        netz_diagram = Netzlaenge()
-        netz_diagram.create()
-        netz_diagram.show()
         kosten_diagram = MassnahmenKosten()
         kosten_diagram.create()
-        kosten_diagram.show()
+    
+        netz_diagram = Netzlaenge()
+        netz_diagram.create()
+        
+        self.output.add_diagram(kosten_diagram, netz_diagram)
+        
+    def run(self):
+        self.output.show_diagrams()
 
 
 class TbxInfrastrukturmengenBilanz(Tbx):

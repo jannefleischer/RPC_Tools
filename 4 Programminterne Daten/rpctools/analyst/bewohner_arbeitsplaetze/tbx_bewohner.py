@@ -12,12 +12,18 @@ import arcpy
 class Bewohner(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
+    
+    def add_outputs(self):
+        tfl = self.parent_tbx.get_teilflaeche(self.par.teilflaeche.value)
+        diagram = BewohnerEntwicklung()
+        diagram.create(flaechen_id=tfl.flaechen_id,
+                       flaechen_name=tfl.name)
+        self.output.add_diagram(diagram)
 
     def run(self):    
         # table and column names
         tfl = self.parent_tbx.get_teilflaeche(self.par.teilflaeche.value)
         self.calculate_development(tfl)
-        self.diagram(tfl)
         
     def calculate_development(self, tfl): 
         """"""
@@ -88,11 +94,6 @@ class Bewohner(Tool):
             bewohner_df = bewohner_df.append(entry)            
         
         tbx.insert_dataframe_in_table(bewohner_table, bewohner_df)
-        
-    def diagram(self, tfl):
-        diagram = BewohnerEntwicklung()
-        diagram.create(flaechen_id=tfl.flaechen_id, flaechen_name=tfl.name)
-        diagram.show()
 
 
 class TbxBewohner(TbxFlaechendefinition):

@@ -11,6 +11,9 @@ from rpctools.definitions.projektverwaltung.tbx_projektauswahl import \
      TbxProjektauswahl
 from rpctools.analyst.infrastrukturkosten.tbx_infrastrukturmengenbilanz import \
      TbxInfrastrukturmengenBilanz
+from rpctools.outputs.projektverwaltung import ProjektverwaltungOutput
+from rpctools.outputs.standortkonkurrenz import MarketsOutput
+from rpctools.outputs.infrastruktur import InfrastrukturOutput
 
 folders = Folders()
 config = Config()
@@ -205,6 +208,12 @@ class ToolboxButton(object):
             pythonaddins.MessageBox(msg, 'Fehler', 0)
 
 
+class Output(ToolboxButton):
+    def onClick(self):
+        self.tbx.set_active_project()
+        self.tbx.show_outputs()
+
+
 ### PROJECT MANAGEMENT ###
 
 
@@ -215,15 +224,17 @@ class ProjektAnlegen(ToolboxButton):
     _toolbox_name = 'TbxProjektAnlegen'
 
 
-class ProjektAuswahl(object):
+class ProjektAuswahl(Output):
+    _path = folders.DEFINITION_PYT_PATH
+    _pyt_file = 'Projektverwaltung.pyt'
+    _toolbox_name = 'TbxProjektauswahl'
     """Implementation for rpc_tools.projekt_auswahl (ComboBox)"""
     def __init__(self):
+        super(ProjektAuswahl, self).__init__()
         self.editable = True
         self.enabled = True
         self.dropdownWidth = 'WWWWWW'
         self.width = 'WWWWWW'
-        self.tbx = TbxProjektauswahl()
-        self.tbx.getParameterInfo()
         # connect the change of the active project to a refresh of the project-
         # list (esp. to auto. select the active project)
         config.on_change('active_project', lambda active: self.refresh())
@@ -237,8 +248,8 @@ class ProjektAuswahl(object):
     def activate_project(self, project=None):
         if project is None:
             project = self.value
-        self.tbx.par.active_project.value = project
-        self.tbx.execute()
+        config.active_project = project
+        self.onClick()
 
     def onFocus(self, focused):
         if focused:
@@ -313,7 +324,7 @@ class InfrastructureDrawingTool(object):
         arcpy.RefreshActiveView()
 
     def show_output(self, redraw=False):
-        infrastrukturmengen_bilanzieren.show_output(redraw=False)
+        erschliessungsnetze_anzeigen.show_outputs()
 
     def get_ids(self, tablename):
         project=config.active_project
@@ -470,8 +481,7 @@ class BeschreibungPunktuelleMassnahmeElektrizitaet(Beschreibung):
 
 def delete_selected_elements(layer_name):
     active = config.active_project
-    layers = projekt_auswahl.tbx.tool.output.get_layers(
-        layer_name, projectname=active)
+    layers = ProjektverwaltungOutput().get_layers(layer_name)
     if not layers:
         return
     # ToDo: loop necessary?
@@ -514,19 +524,11 @@ class InfrastrukturmengenBilanzieren(ToolboxButton):
     _toolbox_name = 'TbxInfrastrukturmengenBilanz'
     _do_show = False
 
-    def show_output(self, redraw=False):
-        self.tbx.set_active_project()
-        if redraw or not self.tbx.tool.output.layer_exists(
-            'Wirkungsbereich 5 - Infrastrukturfolgekosten'):
-            self.tbx.tool.add_output()
 
-
-class ErschliessungsnetzeAnzeigen(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        infrastrukturmengen_bilanzieren.show_output(redraw=True)
+class ErschliessungsnetzeAnzeigen(Output):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxInfrastrukturmengenBilanz'
 
 
 ### NUTZUNGEN ###
@@ -660,18 +662,12 @@ class BestandOSMEinlesen(ToolboxButton):
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxOSMMarktEinlesen'
     _do_show = True
-    
-    def show_output(self):
-        self.tbx.set_active_project()
-        self.tbx.tool.add_output()
 
-        
-class MaerkteAnzeigen(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        bestand_osm.show_output()
+
+class MaerkteAnzeigen(Output):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
+    _toolbox_name = 'TbxOSMMarktEinlesen'
         
     
 class BestandEinlesen(object):

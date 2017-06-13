@@ -8,7 +8,18 @@ from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 from rpctools.definitions.projektverwaltung.projektauswahl import \
      Projektauswahl
+from rpctools.definitions.projektverwaltung.projektverwaltung \
+     import Projektverwaltung
 
+
+class Projektauswahl(Projektverwaltung):
+    _param_projectname = 'active_project'
+    _workspace = 'FGDB_Definition_Projekt.gdb'
+
+    def run(self):
+        self.parent_tbx.config.active_project = self.par.active_project.value
+        self.output.define_projection()
+        
 
 class TbxProjektauswahl(Tbx):
     """Toolbox Projektauswahl"""
@@ -61,7 +72,6 @@ class TbxProjektauswahl(Tbx):
 if __name__ == '__main__':
     t = TbxProjektauswahl()
     params = t.getParameterInfo()
-    t.print_test_parameters()
-    t.par.active_project.value = 'abc'
+    t.par.active_project.value = t.config.active_project
     t.execute()
 

@@ -155,7 +155,7 @@ class Params(object):
         param_projectname = getattr(self, self._param_projectname, None)
         return param_projectname
 
-    def _get_projectname(self):
+    def get_projectname(self):
         """
         return the value for project name parameter if exists, else empty string
 

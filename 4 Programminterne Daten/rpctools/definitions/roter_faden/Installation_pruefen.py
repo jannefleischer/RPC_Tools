@@ -19,5 +19,9 @@ from rpctools.utils.params import Tool
 
 class InstallationPruefen(Tool):
     """"""
+
+    def add_outputs(self): 
+        pass
+    
     def run(self):
         """"""
