@@ -4,7 +4,7 @@ from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten import \
      TbxFlaechendefinition
 from rpctools.utils.params import Tool
 from rpctools.utils.constants import Nutzungsart
-from rpctools.outputs.bewohner_arbeitsplaetze import BewohnerOutput
+from rpctools.diagrams.bewohner_arbeitsplaetze import BewohnerEntwicklung
 import pandas as pd
 import arcpy
 
@@ -13,16 +13,17 @@ class Bewohner(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
     
-    @property
-    def Output(self):
-        return BewohnerOutput
+    def add_outputs(self):
+        tfl = self.parent_tbx.get_teilflaeche(self.par.teilflaeche.value)
+        diagram = BewohnerEntwicklung()
+        diagram.create(flaechen_id=tfl.flaechen_id,
+                       flaechen_name=tfl.name)
+        self.output.add_diagram(diagram)
 
     def run(self):    
         # table and column names
         tfl = self.parent_tbx.get_teilflaeche(self.par.teilflaeche.value)
         self.calculate_development(tfl)
-        self.output.show_diagrams(flaechen_id=tfl.flaechen_id,
-                                  flaechen_name=tfl.name)
         
     def calculate_development(self, tfl): 
         """"""

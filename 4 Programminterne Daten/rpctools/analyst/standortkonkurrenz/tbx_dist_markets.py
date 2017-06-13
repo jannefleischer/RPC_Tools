@@ -20,6 +20,9 @@ class DistMarkets(Tool):
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     # ToDo: set this in toolbox?
     recalculate = False
+
+    def add_outputs(self): 
+        pass
     
     def run(self):
         folders = Folders(self.par)

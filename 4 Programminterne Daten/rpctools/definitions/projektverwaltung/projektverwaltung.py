@@ -28,7 +28,6 @@ from rpctools.utils.encoding import encode
 
 from rpctools.utils.params import Tool
 from rpctools.diagrams.diagram_teilflaechen import DiaTeilflaechen
-from rpctools.outputs.projektverwaltung import ProjektverwaltungOutput
 
 
 class Projektverwaltung(Tool):
@@ -36,14 +35,30 @@ class Projektverwaltung(Tool):
     _param_projectname = 'name'
     _workspace = 'FGDB_Definition_Projekt.gdb'
     
-    @property
-    def Output(self):
-        return ProjektverwaltungOutput
+    def add_outputs(self):
+        # add Teilflächen
+        fc = "Teilflaechen_Plangebiet"
+        layer = "Teilflächen des Plangebiets"
+        self.output.add_layer("projektdefinition", layer, fc)
+
+        # add OpenStreetmap
+        layer = "OpenStreetMap"
+        self.output.add_layer("hintergrundkarten", layer,
+                        zoom=False, in_project=False)
+        
+        diagram = DiaTeilflaechen()
+        self.output.add_diagram(diagram)
 
 
 class ProjektAnlegen(Projektverwaltung):
     """Projekt neu anlegen"""
 
+    def show_outputs(self):
+        diagram = BewohnerEntwicklung()
+        diagram.create(flaechen_id=tfl.flaechen_id,
+                       flaechen_name=tfl.name)
+        diagram.show()
+        
     def run(self):
         """"""
         gc.collect()
@@ -53,10 +68,6 @@ class ProjektAnlegen(Projektverwaltung):
         # if not: AddMessage and delete project again
         if success:
             self.parent_tbx.config.active_project = self.projectname
-            self.output.show()
-            #self.output.show_diagrams()
-            #diagram = DiaTeilflaechen()
-            #self.add_diagramm()
         else:
             arcpy.AddMessage("Fehlerhaftes Projekt wird wieder entfernt...")
             arcpy.Delete_management(self.folders.get_projectpath(check=False))
@@ -409,6 +420,9 @@ class ProjektKopieren(Projektverwaltung):
 
 
 class ProjektLoeschen(Tool):
+
+    def add_outputs(self): 
+        pass
 
     def run(self):
         # prevent eventual locks

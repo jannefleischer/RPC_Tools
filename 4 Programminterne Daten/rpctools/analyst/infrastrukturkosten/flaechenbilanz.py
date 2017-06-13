@@ -24,6 +24,9 @@ class Flaechenbilanz(Tool):
 
     _workspace = 'FGDB_Definition_Projekt.gdb'
 
+    def add_outputs(self): 
+        pass
+
     @property
     def teilflaechen_table(self):
         return self.folders.get_table('Teilflaechen_Plangebiet')

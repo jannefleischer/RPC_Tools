@@ -456,22 +456,30 @@ class Output(object):
         self.layers.append(layer)
         
     def add_diagram(self, *args):
+        '''add a diagram (or multiple diagrams), diagram has to be an
+        instantiated subclass of Diagram'''
         for arg in args:
             self.diagrams.append(arg)
         
-    def show(self, **kwargs):
+    def show(self):
+        '''show all available outputs (diagrams, layers etc.)'''
         self.show_layers()
-        self.show_diagrams(**kwargs)
+        self.show_diagrams()
         
-    def show_diagrams(self, **kwargs):
-        for Diagram in self.diagrams:
-            diag = Diagram()
-            diag.create(**kwargs)
-            diag.show()
+    def show_diagrams(self):
+        '''show available diagrams'''
+        for diagram in self.diagrams:
+            diagram.show()
         
     def show_layers(self):
+        '''show available layers'''
         for layer in self.layers:
             self._show_layer(layer)
+            
+    def clear(self):
+        '''remove all outputs (diagrams, layers etc.)'''
+        self.diagrams = []
+        self.layers = []
 
     def _show_layer(self, layer):
         """show the layer by adding it to the TOC of ArcGIS"""

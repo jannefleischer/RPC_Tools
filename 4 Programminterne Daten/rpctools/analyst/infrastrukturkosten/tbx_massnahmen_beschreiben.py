@@ -11,6 +11,9 @@ class MassnahmenBeschreiben(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Kosten.gdb'
     
+    def add_outputs(self):
+        pass
+    
     def run(self):
         """"""
 

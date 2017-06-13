@@ -10,16 +10,20 @@ from rpctools.utils.encoding import encode
 from rpctools.utils.spatial_lib import get_ags
 from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
                                                               Point)
-from rpctools.outputs.standortkonkurrenz import MarketsOutput
 
 
 class OSMMarktEinlesen(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     
-    @property
-    def Output(self):
-        return MarketsOutput
+    def add_outputs(self):
+        group_layer = ("standortkonkurrenz")
+        fc = 'Maerkte'
+        layer_nullfall = 'Märkte Nullfall'
+        layer_planfall = 'Märkte Planfall'
+    
+        self.output.add_layer(group_layer, layer_nullfall, fc, zoom=False)
+        self.output.add_layer(group_layer, layer_planfall, fc, zoom=False)
 
     def markets_to_db(self, supermarkets):
         """Create the point-features for supermarkets"""

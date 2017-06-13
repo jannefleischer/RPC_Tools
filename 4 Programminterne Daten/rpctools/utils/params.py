@@ -77,10 +77,7 @@ class Tool(object):
         self.mes = Message()
         self.parent_tbx = parent_tbx
         self.folders = ToolFolders(params=self.par)
-        if self.Output:
-            self.output = self.Output(params)
-        else:
-            self.output = Output(params)
+        self.output = Output(params)
 
     def main(self, par, parameters=None, messages=None):
         """
@@ -116,19 +113,16 @@ class Tool(object):
     def projectname(self):
         """Return the current projectname"""
         return self.par.get_projectname()
+    
+    @abstractmethod
+    def add_outputs(self):
+        """method defining layers, diagrams, etc. as a result of the
+        calculations of the toolbox and adding them to outputs
+        - has to be implemented in the subclass"""
 
     @abstractmethod
     def run(self):
         """The run method - has to be implemented in the subclass"""
-        
-    @property
-    def Output(self):
-        """
-        Returns the Toolclass
-
-        To be defined in the subclass
-        """
-        return None
 
 
 class Dependency(object):
@@ -226,6 +220,11 @@ class Tbx(object):
     @property
     def output(self):
         return self.tool.output
+    
+    def show_outputs(self):
+        self.output.clear()
+        self.tool.add_outputs()
+        self.output.show()
 
     def __init__(self):
 
@@ -1026,6 +1025,7 @@ class Tbx(object):
             #raise e
         #finally:
         self._is_executing = False
+        self.show_outputs()
 
     def print_test_parameters(self):
         """
@@ -1097,6 +1097,9 @@ class Tbx(object):
             
 
 class DummyTool(Tool):
+    
+    def add_outputs(self):
+        pass
     
     def run(self):
         pass

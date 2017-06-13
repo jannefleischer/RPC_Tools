@@ -19,8 +19,6 @@ class Projektauswahl(Projektverwaltung):
     def run(self):
         self.parent_tbx.config.active_project = self.par.active_project.value
         self.output.define_projection()
-        self.output.show()
-        #self.add_diagramm()
         
 
 class TbxProjektauswahl(Tbx):

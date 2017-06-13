@@ -5,16 +5,21 @@ import arcpy
 import os
 from rpctools.utils.params import Tool
 from rpctools.analyst.verkehr.otp_router import Point, OTPRouter
-from rpctools.outputs.verkehr import VerkehrOutput
 
 
 class Routing(Tool):
     _workspace = 'FGDB_Verkehr.gdb'
     _param_projectname = 'project'
     
-    @property
-    def Output(self):
-        return VerkehrOutput
+    def add_outputs(self):
+        # Add Layers
+        self.output.add_layer('verkehr', 'Zielpunkte',
+                           featureclass='Zielpunkte',
+                           template_folder='Verkehr')
+    
+        self.output.add_layer('verkehr', 'links',
+                           featureclass='links',
+                           template_folder='Verkehr')
 
     def run(self):
         toolbox = self.parent_tbx
@@ -109,9 +114,6 @@ class Routing(Tool):
         arcpy.AddField_management(nodes_path, 'Manuelle_Gewichtung')
         arcpy.AddField_management(nodes_path, 'Neue_Gewichte',
                                   field_type='DOUBLE')
-        
-        self.output.show()
-
 
 
 if __name__ == '__main__':

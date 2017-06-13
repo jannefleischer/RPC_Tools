@@ -208,6 +208,12 @@ class ToolboxButton(object):
             pythonaddins.MessageBox(msg, 'Fehler', 0)
 
 
+class Output(ToolboxButton):
+    def onClick(self):
+        self.tbx.set_active_project()
+        self.tbx.show_outputs()
+
+
 ### PROJECT MANAGEMENT ###
 
 
@@ -218,9 +224,13 @@ class ProjektAnlegen(ToolboxButton):
     _toolbox_name = 'TbxProjektAnlegen'
 
 
-class ProjektAuswahl(object):
+class ProjektAuswahl(Output):
+    _path = folders.DEFINITION_PYT_PATH
+    _pyt_file = 'Projektverwaltung.pyt'
+    _toolbox_name = 'TbxProjektauswahl'
     """Implementation for rpc_tools.projekt_auswahl (ComboBox)"""
     def __init__(self):
+        super(ProjektAuswahl, self).__init__()
         self.editable = True
         self.enabled = True
         self.dropdownWidth = 'WWWWWW'
@@ -239,7 +249,7 @@ class ProjektAuswahl(object):
         if project is None:
             project = self.value
         config.active_project = project
-        ProjektverwaltungOutput().show()
+        self.onClick()
 
     def onFocus(self, focused):
         if focused:
@@ -314,7 +324,7 @@ class InfrastructureDrawingTool(object):
         arcpy.RefreshActiveView()
 
     def show_output(self, redraw=False):
-        InfrastrukturOutput().show_layers()
+        erschliessungsnetze_anzeigen.show_outputs()
 
     def get_ids(self, tablename):
         project=config.active_project
@@ -515,12 +525,10 @@ class InfrastrukturmengenBilanzieren(ToolboxButton):
     _do_show = False
 
 
-class ErschliessungsnetzeAnzeigen(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        InfrastrukturOutput().show_layers()
+class ErschliessungsnetzeAnzeigen(Output):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxInfrastrukturmengenBilanz'
 
 
 ### NUTZUNGEN ###
@@ -656,13 +664,10 @@ class BestandOSMEinlesen(ToolboxButton):
     _do_show = True
 
 
-class MaerkteAnzeigen(object):
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        output = MarketsOutput()
-        output.show()
+class MaerkteAnzeigen(Output):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
+    _toolbox_name = 'TbxOSMMarktEinlesen'
         
     
 class BestandEinlesen(object):

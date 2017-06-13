@@ -6,16 +6,10 @@ import numpy as np
 from rpctools.utils.config import Folders
 from rpctools.utils.params import Tool
 from rpctools.analyst.verkehr.otp_router import OTPRouter
-from rpctools.outputs.verkehr import VerkehrOutput
+from rpctools.analyst.verkehr.routing import Routing
 
 
-class UpdateNodes(Tool):
-    _workspace = 'FGDB_Verkehr.gdb'
-    _param_projectname = 'project'
-    
-    @property
-    def Output(self):
-        return VerkehrOutput
+class UpdateNodes(Routing):
 
     def run(self):
 

@@ -70,13 +70,15 @@ class ArcpyDiagram(Diagram):
         self._getParameterInfo()
         self.set_active_project(projectname=projectname)
         self.graph, self.template = self._create(**kwargs)
-        
+        self.created = True
 
     def _create(self, **kwargs):
         """to be implemented by subclasses,
         has to return the graph-object and the path to the template"""
         
     def show(self):
+        if not self.graph:
+            self.create()
         title = self.graph.graphPropsGeneral.title or self.title
         self.output.add_graph(self.template, self.graph, title)
 
@@ -108,6 +110,8 @@ class MatplotDiagram(Diagram):
             show the plot in an external process
             defaults to True
         '''
+        if not self.figure:
+            self.create()
         filename = os.path.join(self.folders.TEMPORARY_GDB_PATH, 
                                 '{}diagram.pickle'.format(
                                     self.__class__.__name__))
