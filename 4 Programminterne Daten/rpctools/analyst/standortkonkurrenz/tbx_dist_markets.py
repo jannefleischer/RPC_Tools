@@ -57,22 +57,22 @@ class DistMarkets(Tool):
         x, y = get_project_centroid(self.projectname)
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
         
-        #if self.recalculate or len(tbx.query_table('Siedlungszellen')) == 0:
-        arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
-        zensus_points, bbox = zensus.cutout_area(centroid, square_size)
-        tfl_points = self.get_tfl_points()
-        # settlements = zensus centroids + teilflaeche centroids
-        sz_points = zensus_points + tfl_points
-        arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
-        self.zensus_to_db(sz_points)
-        active_project = self.parent_tbx.config.active_project
-        zensus.add_kk(sz_points, active_project)
-        # TODO: Update instead of rewrite
-        self.zensus_to_db(sz_points)
-        #else:
-            #bbox = zensus.get_bbox(centroid, square_size)
-            #arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
-                             #'Neuberechnung wird übersprungen')
+        if self.recalculate or len(tbx.query_table('Siedlungszellen')) == 0:
+            arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
+            zensus_points, bbox = zensus.cutout_area(centroid, square_size)
+            tfl_points = self.get_tfl_points()
+            # settlements = zensus centroids + teilflaeche centroids
+            sz_points = zensus_points + tfl_points
+            arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
+            self.zensus_to_db(sz_points)
+            active_project = self.parent_tbx.config.active_project
+            zensus.add_kk(sz_points, active_project)
+            # TODO: Update instead of rewrite
+            self.zensus_to_db(sz_points)
+        else:
+            bbox = zensus.get_bbox(centroid, square_size)
+            arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
+                             'Neuberechnung wird übersprungen')
         arcpy.AddMessage(u'Berechne Entfernungen der Märkte '
                          u'zu den Siedlungszellen...')
         
@@ -84,8 +84,12 @@ class DistMarkets(Tool):
         dest_ids = [d.id for d in destinations]
         already_calculated = np.unique(tbx.table_to_dataframe(
             'Beziehungen_Maerkte_Zellen', columns=['id_markt'])['id_markt'])
+        n_markets = len(markets)
+        i = 1
         for index, market in markets.iterrows():
-            arcpy.AddMessage(u' - {}'.format(market['name']))
+            arcpy.AddMessage(u' - {name} ({i}/{n})'.format(
+                name=market['name'], i=i, n=n_markets))
+            i += 1
             if self.recalculate or market['id'] not in already_calculated:
                 arcpy.AddMessage('   wird berechnet')
                 market_id = market['id']

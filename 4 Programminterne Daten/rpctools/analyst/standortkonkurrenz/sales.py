@@ -57,7 +57,7 @@ class Sales(object):
         
         # in case of Nullfall take zensus points without planned areas
         if setting == self.NULLFALL:
-            zensus = self.zensus[zensus['geplant'] == 0]
+            zensus = self.zensus[self.zensus['geplant'] == 0]
         else:
             zensus = self.zensus
 
