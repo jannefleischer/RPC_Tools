@@ -8,11 +8,12 @@ import numpy as np
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 from rpctools.utils.spatial_lib import get_project_centroid
-from rpctools.analyst.standortkonkurrenz.zensus import Zensus
+from rpctools.analyst.standortkonkurrenz.zensus import Zensus, ZensusCell
 from rpctools.analyst.standortkonkurrenz.routing_distances import DistanceRouting
 from rpctools.analyst.standortkonkurrenz.osm_einlesen import Point
 from rpctools.utils.config import Folders
 from rpctools.analyst.standortkonkurrenz.sales import Sales
+from rpctools.utils.constants import Nutzungsart
 
 
 class DistMarkets(Tool):
@@ -56,19 +57,22 @@ class DistMarkets(Tool):
         x, y = get_project_centroid(self.projectname)
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
         
-        if self.recalculate or len(tbx.query_table('Siedlungszellen')) == 0:            
-            arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
-            zensus_points, bbox = zensus.cutout_area(centroid, square_size)
-            arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
-            self.zensus_to_db(zensus_points)
-            active_project = self.parent_tbx.config.active_project
-            zensus.add_kk(zensus_points, active_project)
-            # TODO: Update instead of rewrite
-            self.zensus_to_db(zensus_points)
-        else:
-            bbox = zensus.get_bbox(centroid, square_size)
-            arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
-                             'Neuberechnung wird übersprungen')
+        #if self.recalculate or len(tbx.query_table('Siedlungszellen')) == 0:
+        arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
+        zensus_points, bbox = zensus.cutout_area(centroid, square_size)
+        tfl_points = self.get_tfl_points()
+        # settlements = zensus centroids + teilflaeche centroids
+        sz_points = zensus_points + tfl_points
+        arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
+        self.zensus_to_db(sz_points)
+        active_project = self.parent_tbx.config.active_project
+        zensus.add_kk(sz_points, active_project)
+        # TODO: Update instead of rewrite
+        self.zensus_to_db(sz_points)
+        #else:
+            #bbox = zensus.get_bbox(centroid, square_size)
+            #arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
+                             #'Neuberechnung wird übersprungen')
         arcpy.AddMessage(u'Berechne Entfernungen der Märkte '
                          u'zu den Siedlungszellen...')
         
@@ -81,7 +85,7 @@ class DistMarkets(Tool):
         already_calculated = np.unique(tbx.table_to_dataframe(
             'Beziehungen_Maerkte_Zellen', columns=['id_markt'])['id_markt'])
         for index, market in markets.iterrows():
-            arcpy.AddMessage(' - {}'.format(market['name']))
+            arcpy.AddMessage(u' - {}'.format(market['name']))
             if self.recalculate or market['id'] not in already_calculated:
                 arcpy.AddMessage('   wird berechnet')
                 market_id = market['id']
@@ -104,6 +108,18 @@ class DistMarkets(Tool):
         kk_planfall = sales.calculate_planfall()
         arcpy.AddMessage(u'Berechne Kenngrößen...')
         self.sales_to_db(kk_nullfall, kk_planfall)
+        
+    def get_tfl_points(self):
+        df_tfl = self.parent_tbx.table_to_dataframe(
+            'Teilflaechen_Plangebiet', workspace='FGDB_Definition_Projekt.gdb', 
+            where='ew>0')
+        points = []
+        for index, tfl in df_tfl.iterrows():
+            point = ZensusCell(tfl['INSIDE_X'], tfl['INSIDE_Y'],
+                               epsg=self.parent_tbx.config.epsg, ew=tfl['ew'],
+                               planned=1)
+            points.append(point)
+        return points        
 
     def sales_to_db(self, kk_nullfall, kk_planfall):
         # sum up sales join them on index to dataframe, replace missing entries
@@ -197,6 +213,7 @@ class DistMarkets(Tool):
         kk_indices = []
         kks = []
         cell_ids = []
+        planned = []
         self.parent_tbx.delete_rows_in_table('Siedlungszellen')
         for point in zensus_points:
             if point.ew <= 0:
@@ -208,12 +225,14 @@ class DistMarkets(Tool):
             kk_indices.append(point.kk_index)
             kks.append(point.kk)
             cell_ids.append(point.id)
+            planned.append(point.planned)
 
         df['id'] = cell_ids
         df['SHAPE'] = shapes
         df['ew'] = ews
         df['kk_index'] = kk_indices
         df['kk'] = kks
+        df['geplant'] = planned
 
         self.parent_tbx.insert_dataframe_in_table('Siedlungszellen', df)
 
@@ -261,7 +280,7 @@ if __name__ == "__main__":
     t = TbxDistMarkets()
     t.getParameterInfo()
     t.set_active_project()
-    t.show_outputs()
+    #t.show_outputs()
     t.execute()
 
     print 'done'

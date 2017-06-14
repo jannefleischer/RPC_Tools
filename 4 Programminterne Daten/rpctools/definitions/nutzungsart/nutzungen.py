@@ -14,15 +14,17 @@ class Nutzungen(Tool):
     def run(self):        
         """"""
         
-    def update_wege_flaeche(self, flaechen_id, ways, ways_miv):
+    def update_wege_flaeche(self, flaechen_id, ways, ways_miv, n_ew=0):
         wege_col = 'Wege_gesamt'
         wege_miv_col = 'Wege_MIV'
+        ew_col = 'ew'
         flaechen_table = 'Teilflaechen_Plangebiet'
         flaechen_id_col = 'id_teilflaeche'
         self.parent_tbx.update_table(
             flaechen_table,
             column_values={wege_miv_col: ways_miv.sum(),
-                           wege_col: ways.sum()}, 
+                           wege_col: ways.sum(),
+                           ew_col: n_ew}, 
             where='{} = {}'.format(flaechen_id_col, flaechen_id)
         )
         
@@ -110,7 +112,9 @@ class NutzungenWohnen(Nutzungen):
             n_ew = group[ew_col] * group[we_col]
             n_ways = n_ew * group[wege_je_ew_col]
             n_ways_miv = n_ways * group[pkw_perc_col] / 100
-            self.update_wege_flaeche(flaechen_id, n_ways.sum(), n_ways_miv.sum())
+            self.update_wege_flaeche(flaechen_id,
+                                     n_ways.sum(), n_ways_miv.sum(),
+                                     n_ew.sum())
         
         ### Structure and age ###
         

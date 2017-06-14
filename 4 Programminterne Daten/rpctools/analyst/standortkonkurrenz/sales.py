@@ -54,10 +54,16 @@ class Sales(object):
                                             #axis=0)
 
         # no exp. over whole matrix -> row-wise instead
+        
+        # in case of Nullfall take zensus points without planned areas
+        if setting == self.NULLFALL:
+            zensus = self.zensus[zensus['geplant'] == 0]
+        else:
+            zensus = self.zensus
 
         df_kk = pd.DataFrame()
-        df_kk['id_siedlungszelle'] = self.zensus['id']
-        df_kk['kk'] = self.zensus['kk']
+        df_kk['id_siedlungszelle'] = zensus['id']
+        df_kk['kk'] = zensus['kk']
         kk_merged = distances.merge(df_kk, on='id_siedlungszelle')
 
         kk_matrix = kk_merged.pivot(index='id_markt',

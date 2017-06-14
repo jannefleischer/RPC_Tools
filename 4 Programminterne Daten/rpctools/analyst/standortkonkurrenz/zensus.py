@@ -9,11 +9,14 @@ import arcpy
 
 
 class ZensusCell(Point):
-    def __init__(self, x, y, epsg=4326, ew=0, id=None, kk_index=None, kk=None):
+    def __init__(self, x, y, epsg=4326, ew=0, id=None, kk_index=None,
+                 kk=None, planned=0):
         super(ZensusCell, self).__init__(x, y, id=id, epsg=epsg)
         self.ew = ew
         self.kk_index = kk_index
         self.kk = kk
+        # is this point part of the planned areas? 0 - yes, 1 - no
+        self.planned = planned
 
 
 class Zensus(object):

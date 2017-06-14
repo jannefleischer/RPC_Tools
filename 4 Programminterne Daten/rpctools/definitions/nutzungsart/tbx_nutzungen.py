@@ -30,7 +30,7 @@ class TbxNutzungen(TbxFlaechendefinition):
     def label(self):
         return self._label
     
-    def execute(self, parameters, messages):
+    def execute(self, parameters=None, messages=None):
         """"""
         self.commit_tfl_changes()
         super(TbxNutzungen, self).execute(parameters, messages)
@@ -567,13 +567,15 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         
 
 if __name__ == '__main__':
-    t = TbxNutzungenGewerbe()
+    t = TbxNutzungenWohnen()
     params = t.getParameterInfo()
-    t.par.projectname.value = t.config.active_project
-    t.commit_tfl_changes()
-    t.tool.calculate_ways()
-    t.tool.update_wege_projekt()
-    t.tool.main(t.par, None)
+    t.set_active_project()
+    t._temporary_gdbs = []
+    t.execute()
+    #t.commit_tfl_changes()
+    #t.tool.calculate_ways()
+    #t.tool.update_wege_projekt()
+    #t.tool.main(t.par, None)
     #df = t.table_to_dataframe('Teilflaechen_Plangebiet',
                               #workspace='FGDB_Definition_Projekt.gdb')
     #t.table_to_dataframe('Wohnen_WE_in_Gebaeudetypen', columns=None)
