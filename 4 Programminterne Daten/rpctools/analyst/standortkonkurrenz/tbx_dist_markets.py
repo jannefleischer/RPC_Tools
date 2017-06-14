@@ -23,11 +23,29 @@ class DistMarkets(Tool):
     
     def add_outputs(self):
         # Add Layers
-            group_layer = ("standortkonkurrenz")
-            fc = 'Maerkte'
-            layer = 'Umsatzveränderung Planfall'
+        group_layer = ("standortkonkurrenz")
+        fc = 'Maerkte'
+        layer = 'Umsatzveränderung Planfall'
+    
+        self.output.add_layer(group_layer, layer, fc, zoom=False)
+    
+        fc = 'Maerkte'
+        layer = 'Kaufkraftbindung'
+        betriebstyp_col = 'id_betriebstyp_nullfall'
+        df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
+        id_nullfall = df_markets['id_betriebstyp_nullfall']
+        id_planfall = df_markets['id_betriebstyp_planfall']
+        planfall_idx = (id_nullfall != id_planfall) & (id_planfall > 0)
         
-            self.output.add_layer(group_layer, layer, fc, zoom=False)
+        for index, plan_market in df_markets[planfall_idx].iterrows():
+            layer_name = '{n} {m} ({i})'.format(n=layer,
+                                                m=plan_market['name'],
+                                                i=plan_market['id'])
+            self.output.add_layer(group_layer, layer, fc,
+                                  query='id_markt={}'.format(
+                                      plan_market['id']),
+                                  name=layer_name, 
+                                  zoom=False)
     
     def run(self):
         folders = Folders(self.par)
@@ -116,9 +134,11 @@ class DistMarkets(Tool):
         cells = self.parent_tbx.table_to_dataframe('Beziehungen_Maerkte_Zellen')
         del cells['kk_strom_nullfall']
         del cells['kk_strom_planfall']
-        cells = cells.merge(df_nullfall, on=['id_siedlungszelle', 'id_markt'])
-        cells = cells.merge(df_planfall, on=['id_siedlungszelle', 'id_markt'])
-        
+        cells = cells.merge(df_nullfall,
+                            on=['id_siedlungszelle', 'id_markt'], how='left')
+        cells = cells.merge(df_planfall,
+                            on=['id_siedlungszelle', 'id_markt'], how='left')
+        cells.fillna(0, inplace=True)
         cells.sort(['id_markt', 'id_siedlungszelle'], inplace=True)
         
         
@@ -241,6 +261,7 @@ if __name__ == "__main__":
     t = TbxDistMarkets()
     t.getParameterInfo()
     t.set_active_project()
+    t.show_outputs()
     t.execute()
 
     print 'done'
