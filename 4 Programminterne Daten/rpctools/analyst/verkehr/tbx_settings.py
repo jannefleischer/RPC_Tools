@@ -8,7 +8,7 @@ class Settings(Tool):
     _workspace = 'FGDB_Verkehr.gdb'
     _param_projectname = 'project'
 
-    def show_outputs(self): 
+    def add_outputs(self): 
         pass
 
     def run(self):

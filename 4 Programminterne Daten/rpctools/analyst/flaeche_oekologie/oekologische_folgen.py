@@ -28,7 +28,7 @@ import lib_oekologischeFolgen as lib_oeko
 
 class OekologischeFolgen(Tool):
 
-    def show_outputs(self): 
+    def add_outputs(self): 
         pass
 
     def run(self):

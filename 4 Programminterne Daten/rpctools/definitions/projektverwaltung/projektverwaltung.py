@@ -52,12 +52,6 @@ class Projektverwaltung(Tool):
 
 class ProjektAnlegen(Projektverwaltung):
     """Projekt neu anlegen"""
-
-    def show_outputs(self):
-        diagram = BewohnerEntwicklung()
-        diagram.create(flaechen_id=tfl.flaechen_id,
-                       flaechen_name=tfl.name)
-        diagram.show()
         
     def run(self):
         """"""
@@ -179,6 +173,7 @@ class ProjektAnlegen(Projektverwaltung):
             row.setValue("WE_gesamt", 0)
             row.setValue("AP_gesamt", 0)
             row.setValue("VF_gesamt", 0)
+            row.setValue("ew", 0)
             row.setValue("Wege_gesamt", 0)
             row.setValue("Wege_MIV", 0)
             cursor.updateRow(row)
@@ -242,6 +237,7 @@ class ProjektAnlegen(Projektverwaltung):
         arcpy.AddField_management(tfl, "WE_gesamt", "LONG")
         arcpy.AddField_management(tfl, "AP_gesamt", "LONG")
         arcpy.AddField_management(tfl, "VF_gesamt", "LONG")
+        arcpy.AddField_management(tfl, "ew", "LONG")
         arcpy.AddField_management(tfl, "Wege_gesamt", "LONG")
         arcpy.AddField_management(tfl, "Wege_MIV", "LONG")
 

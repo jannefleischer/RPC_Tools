@@ -571,7 +571,8 @@ class Output(object):
         new_layer.visible = True
         if layer.name:
             new_layer.name = layer.name
-        new_layer.definitionQuery = layer.query
+        if layer.query:
+            new_layer.definitionQuery = layer.query
         if layer.subgroup != "":
             target_subgrouplayer.visible = True
         target_grouplayer.visible = True
