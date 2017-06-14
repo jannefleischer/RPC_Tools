@@ -167,11 +167,13 @@ class Layer(object):
     def __init__(self,
                  groupname,
                  template_layer,
+                 name='', 
                  featureclass='',
                  template_folder='', 
                  disable_other=False,
                  subgroup="",
                  in_project=True,
+                 query="", 
                  zoom=True):
         self.groupname = groupname
         self.template_layer = template_layer
@@ -181,6 +183,8 @@ class Layer(object):
         self.in_project = in_project
         self.zoom = zoom
         self.template_folder = template_folder
+        self.query = query
+        self.name = name
 
 
 class Output(object):    
@@ -415,9 +419,11 @@ class Output(object):
                   template_layer,
                   featureclass='',
                   template_folder='', 
+                  name='', 
                   disable_other=False,
                   subgroup="",
                   in_project=True,
+                  query="", 
                   zoom=True):
         """
         Add output layer
@@ -434,6 +440,13 @@ class Output(object):
             the name of the feature class table,
             which should be linked to the layer
             
+        name: str, optional
+            name of the layer in TOC (defaults to name of template layer)
+            
+        query: str, optional
+            query definition, defines which features are shown (e.g. id=10)
+            (shows all features by default)
+            
         template_folder : str, optional
             a subfolder of the template_layer
 
@@ -449,9 +462,10 @@ class Output(object):
         zoom : bool, optional(Default = True)
             if True, zoom to layer extent
         """
-        layer = Layer(groupname, template_layer, featureclass=featureclass, 
+        layer = Layer(groupname, template_layer, name=name, 
+                      featureclass=featureclass,
                       disable_other=disable_other, subgroup=subgroup, 
-                      in_project=in_project, zoom=zoom,
+                      in_project=in_project, zoom=zoom, query=query, 
                       template_folder=template_folder)
         self.layers.append(layer)
         
@@ -555,6 +569,9 @@ class Output(object):
             for lyr in arcpy.mapping.ListLayers(project_layer):
                 lyr.visible = False
         new_layer.visible = True
+        if layer.name:
+            new_layer.name = layer.name
+        new_layer.definitionQuery = layer.query
         if layer.subgroup != "":
             target_subgrouplayer.visible = True
         target_grouplayer.visible = True
