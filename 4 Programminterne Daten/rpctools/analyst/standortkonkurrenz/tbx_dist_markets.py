@@ -25,9 +25,9 @@ class DistMarkets(Tool):
         # Add Layers
             group_layer = ("standortkonkurrenz")
             fc = 'Maerkte'
-            layer_planfall = 'Umsatzdifferenz'
+            layer = 'Umsatzveränderung Planfall'
         
-            self.output.add_layer(group_layer, layer_nullfall, fc, zoom=False)
+            self.output.add_layer(group_layer, layer, fc, zoom=False)
     
     def run(self):
         folders = Folders(self.par)
@@ -88,15 +88,19 @@ class DistMarkets(Tool):
         self.sales_to_db(kk_nullfall, kk_planfall)
 
     def sales_to_db(self, kk_nullfall, kk_planfall):
+        # sum up sales join them on index to dataframe, replace missing entries
+        # (e.g. no entries for planned markets in nullfall -> sales = 0)
         sales_nullfall = kk_nullfall.sum(axis=1)
         sales_planfall = kk_planfall.sum(axis=1)
-        df_markets = pd.DataFrame()
-        df_markets['id'] = sales_nullfall.index
-        df_markets['umsatz_nullfall'] = sales_nullfall.values
-        df_markets['umsatz_planfall'] = sales_planfall.values    
-        df_markets['umsatz_differenz'] = ((sales_planfall /
-                                          sales_nullfall) * 100 - 100).values
-        self.parent_tbx.dataframe_to_table('Maerkte', df_markets, pkeys=['id'])
+        df_sales_null = pd.DataFrame(sales_nullfall, columns=['umsatz_nullfall'])
+        df_sales_plan = pd.DataFrame(sales_planfall, columns=['umsatz_planfall'])
+        df_sales = df_sales_null.join(df_sales_plan, how='outer')
+        df_sales.fillna(0, inplace=True)
+        df_sales['id'] = df_sales.index
+        df_sales['umsatz_differenz'] = ((df_sales['umsatz_planfall'] /
+                                         df_sales['umsatz_nullfall']) * 100 - 100)
+        
+        self.parent_tbx.dataframe_to_table('Maerkte', df_sales, pkeys=['id'])
         
         # invert the pivoted tables
         kk_nullfall['id_markt'] = kk_nullfall.index

@@ -34,6 +34,16 @@ class Sales(object):
     def _calculate_sales(self, setting):
         df_markets = self._prepare_markets(self.markets, setting)
         df_markets.set_index('id', inplace=True)
+        
+        # drop rows with markets, that are not in the dataframe of markets
+        # used for current settings 
+        # (e.g. planfall markets when current setting is nullfall)
+        ids_not_in_df = np.setdiff1d(
+            np.unique(self.distances['id_markt']), df_markets.index)
+        distances = self.distances.drop(
+            self.distances.index[np.in1d(self.distances['id_markt'],
+                                         ids_not_in_df)])
+        
         #df_markets.sort(columns='id', inplace=True)
         #dist_matrix = self.get_dist_matrix().sort()
         ## dist_matrix and df_markets should have same market-ids
@@ -48,7 +58,7 @@ class Sales(object):
         df_kk = pd.DataFrame()
         df_kk['id_siedlungszelle'] = self.zensus['id']
         df_kk['kk'] = self.zensus['kk']
-        kk_merged = self.distances.merge(df_kk, on='id_siedlungszelle')
+        kk_merged = distances.merge(df_kk, on='id_siedlungszelle')
 
         kk_matrix = kk_merged.pivot(index='id_markt',
                                     columns='id_siedlungszelle',
@@ -58,29 +68,27 @@ class Sales(object):
                                       columns='id_siedlungszelle',
                                       values='distanz')
 
-        n_cells = len(np.unique(self.distances['id_siedlungszelle']))
+        n_cells = len(np.unique(distances['id_siedlungszelle']))
         attraction_matrix = pd.DataFrame(data=np.zeros(dist_matrix.shape),
                                          index=dist_matrix.index,
                                          columns=dist_matrix.columns)
 
         for index, market in df_markets.iterrows():
-            distances = dist_matrix.loc[index]
+            dist = dist_matrix.loc[index]
             factor = market['exp_faktor']
             exponent = market['exponent']
-            attraction_matrix.loc[index] = factor * np.exp(distances * exponent)
+            attraction_matrix.loc[index] = factor * np.exp(dist * exponent)
 
         competitor_matrix = self.calc_competitors(dist_matrix, df_markets)
         # include competition between same market types in attraction_matrix
         attraction_matrix = pd.DataFrame(
-            data=attraction_matrix.values*competitor_matrix.values,
+            data=attraction_matrix.values * competitor_matrix.values,
             columns=attraction_matrix.columns,
             index=attraction_matrix.index)
         probabilities = attraction_matrix / attraction_matrix.sum(axis=0)
         kk_flow = probabilities * kk_matrix
 
         return kk_flow
-
-
 
     def calc_competitors(self, dist_matrix, df_markets):
         """
@@ -149,11 +157,8 @@ class Sales(object):
                             (competition_factors['Umkreis']>1), \
                             market_id] = factor
 
-            # Return results in shape of dist_matrix
-            return results.T
-
-
-
+        # Return results in shape of dist_matrix
+        return results.T
 
     def get_dist_matrix(self):
         # Dataframe for distances
