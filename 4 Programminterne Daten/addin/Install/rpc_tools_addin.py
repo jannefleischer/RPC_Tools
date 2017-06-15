@@ -757,7 +757,7 @@ class ZentrumBearbeiten(ToolboxButton):
 
     def onMouseDownMap(self, x, y, button, shift):
         config.active_coord = (x, y)
-        super(ZentrumBearbeiten, self)
+        super(ZentrumBearbeiten, self).onClick()
 
 
 class ZentrumHinzu(ZentrumBearbeiten):
