@@ -10,16 +10,18 @@ from rpctools.analyst.verkehr.otp_router import Point, OTPRouter
 class Routing(Tool):
     _workspace = 'FGDB_Verkehr.gdb'
     _param_projectname = 'project'
-    
+
     def add_outputs(self):
         # Add Layers
         self.output.add_layer('verkehr', 'Zielpunkte',
                            featureclass='Zielpunkte',
                            template_folder='Verkehr')
-    
+
         self.output.add_layer('verkehr', 'links',
                            featureclass='links',
                            template_folder='Verkehr')
+
+
 
     def run(self):
         toolbox = self.parent_tbx
@@ -115,6 +117,28 @@ class Routing(Tool):
         arcpy.AddField_management(nodes_path, 'Manuelle_Gewichtung')
         arcpy.AddField_management(nodes_path, 'Neue_Gewichte',
                                   field_type='DOUBLE')
+        self.create_attachement_points()
+
+    def create_attachement_points(self):
+        toolbox = self.parent_tbx
+        in_table = toolbox.folders.get_table('Teilflaechen_Plangebiet', workspace='FGDB_Definition_Projekt.gdb')
+        out_layer = 'out_layer'
+        ws = toolbox.folders.get_db(workspace='FGDB_Definition_Projekt.gdb')
+        layer_name = 'Anbindungspunkte'
+        out_file = os.path.join(ws, layer_name)
+        if arcpy.Exists(out_layer):
+            arcpy.Delete_management(out_layer)
+        arcpy.MakeXYEventLayer_management(table=in_table, in_x_field='SOURCE_X',
+                                         in_y_field='SOURCE_Y',
+                                         out_layer=out_layer,
+                                         spatial_reference=toolbox.config.epsg,
+                                         in_z_field='id_teilflaeche')
+        if arcpy.Exists(out_file):
+            arcpy.Delete_management(out_file)
+        arcpy.FeatureClassToFeatureClass_conversion(in_features=out_layer,
+                                                   out_path=ws,
+                                                   out_name=layer_name)
+
 
 
 if __name__ == '__main__':
