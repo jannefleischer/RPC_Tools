@@ -11,6 +11,7 @@ from rpctools.analyst.standortkonkurrenz.tbx_osm_markteinlesen import TbxOSMMark
 from rpctools.analyst.standortkonkurrenz.tbx_projektwirkung import TbxProjektwirkungMarkets
 from rpctools.analyst.standortkonkurrenz.tbx_edit_markets import (
     TbxEditMarketsPlanfall, TbxEditMarketsNullfall)
+from rpctools.analyst.standortkonkurrenz.tbx_versorgungsbereiche import TbxEditCenters
 
 class Toolbox(object):
     def __init__(self):
@@ -19,7 +20,8 @@ class Toolbox(object):
         self.tools = [TbxOSMMarktEinlesen,
                       TbxProjektwirkungMarkets,
                       TbxEditMarketsNullfall, 
-                      TbxEditMarketsPlanfall]
+                      TbxEditMarketsPlanfall,
+                      TbxEditCenters]
 
 
 

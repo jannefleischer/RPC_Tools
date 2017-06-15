@@ -11,6 +11,7 @@ from rpctools.definitions.projektverwaltung.tbx_projektauswahl import \
      TbxProjektauswahl
 from rpctools.analyst.infrastrukturkosten.tbx_infrastrukturmengenbilanz import \
      TbxInfrastrukturmengenBilanz
+from rpctools.utils.singleton import Singleton
 
 folders = Folders()
 config = Config()
@@ -158,23 +159,16 @@ class TrinkwasserKostenaufteilung(object):
         self.checked = False
     def onClick(self):
         pass
-
-
-class ToolboxButton(object):
-    """super class for buttons calling toolboxes on click"""
-    __metaclass__ = ABCMeta
+    
+class ToolboxWrapper(object):
     # path to pyt file
     _path = None
     # the pyt importing the required toolbox
     _pyt_file = None
     # the class name of the toolbox (as imported in the pyt file)
     _toolbox_name = None
-    # show the toolbox on click (if False, just execute the Tool)
-    _do_show = True
 
     def __init__(self):
-        self.enabled = True
-        self.checked = False
         self.path = os.path.join(self._path, self._pyt_file)
         self._tbx = None
 
@@ -186,6 +180,17 @@ class ToolboxButton(object):
             self._tbx = getattr(tbx_module, self._toolbox_name)()
             self._tbx.getParameterInfo()
         return self._tbx
+
+
+class ToolboxButton(ToolboxWrapper):
+    """super class for buttons calling toolboxes on click"""
+    # show the toolbox on click (if False, just execute the Tool)
+    _do_show = True
+
+    def __init__(self):
+        super(ToolboxButton, self).__init__()
+        self.enabled = True
+        self.checked = False
 
     def onClick(self):
         """call toolbox on click"""
@@ -205,10 +210,14 @@ class ToolboxButton(object):
             pythonaddins.MessageBox(msg, 'Fehler', 0)
 
 
-class Output(ToolboxButton):
-    def onClick(self):
+class Output(ToolboxWrapper):
+    __metaclass__ = Singleton
+    def show(self):
         self.tbx.set_active_project()
         self.tbx.show_outputs()
+        
+    def onClick(self):
+        self.show()
 
 
 ### PROJECT MANAGEMENT ###
@@ -246,7 +255,7 @@ class ProjektAuswahl(Output):
         if project is None:
             project = self.value
         config.active_project = project
-        self.onClick()
+        self.show()
 
     def onFocus(self, focused):
         if focused:
@@ -665,7 +674,7 @@ class MaerkteAnzeigen(Output):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxOSMMarktEinlesen'
-        
+
     
 class BestandEinlesen(object):
     pass
@@ -718,11 +727,60 @@ class BestandMarktHinzu(MarktHinzu):
 
 class PlanfallMarktHinzu(MarktHinzu):
     _toolbox_name = 'TbxEditMarketsPlanfall'
-    _new_market_name = 'unbenannter geplanter Markt'    
+    _new_market_name = 'unbenannter geplanter Markt'
 
 
 class PlanfallMarktErweitern(object):
     pass
+
+
+class ZentrenOutput(Output):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
+    _toolbox_name = 'TbxEditCenters'
+
+
+class ZentrumBearbeiten(ToolboxButton):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
+    _toolbox_name = 'TbxEditCenters'
+
+    def __init__(self):
+        super(ZentrumBearbeiten, self).__init__()
+        self.enabled = True
+        self.shape = 'NONE'
+        self.cursor = 3
+        self.output = ZentrenOutput()
+        
+    def onClick(self, coord=None):
+        self.output.show()
+
+    def onMouseDownMap(self, x, y, button, shift):
+        config.active_coord = (x, y)
+        super(ZentrumBearbeiten, self)
+
+
+class ZentrumHinzu(ZentrumBearbeiten):
+    _new_center_name = 'unbenannter Versorgungsbereich'
+    def __init__(self):
+        super(ZentrumHinzu, self).__init__()
+        self.shape = 'Line'
+        
+    def onLine(self, line_geometry):
+        tbx = self.tbx
+        tbx.set_active_project()
+        array = arcpy.Array()
+        points = line_geometry.getPart(0)  
+        for point in points:  
+            array.add(point)
+        array.add(line_geometry.firstPoint)
+        polygon = arcpy.Polygon(array)
+        tbx.add_center_to_db(self._new_center_name, polygon)
+        arcpy.RefreshActiveView()
+        #super(ZentrumBearbeiten, self).onClick()
+
+    def onMouseDownMap(self, x, y, button, shift): 
+        pass
 
 
 class StandortkonkurrenzProjektwirkung(ToolboxButton):

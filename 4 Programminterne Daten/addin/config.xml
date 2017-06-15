@@ -217,6 +217,12 @@
                 <Tool caption="geplanten Markt bearbeiten/entfernen" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
+                <Tool caption="Versorgungsbereich zeichnen" category="ProjektCheck" class="ZentrumHinzu" id="rpc_tools.zentrum_hinzu" image="Images\GenericPencilArea16.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Versorgungsbereich bearbeiten/entfernen" category="ProjektCheck" class="ZentrumBearbeiten" id="rpc_tools.zentrum_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
                 <Button caption="Projektwirkung sch&#228;tzen" category="ProjektCheck" class="StandortkonkurrenzProjektwirkung" id="rpc_tools.standortkonkurrenz_projektwirkung" image="Images\GenericCalculator16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -432,11 +438,18 @@
                         <Tool refID="rpc_tools.planfall_bearbeiten" />
                     </Items>
                 </Menu>
+                <Menu caption="Versorgungsbereiche" category="ProjektCheck" id="rpc_tools.menu_zentren" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.zentrum_hinzu" />
+                        <Tool refID="rpc_tools.zentrum_bearbeiten" />
+                    </Items>
+                </Menu>
                 <Menu caption="Standortkonkurrenz" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.maerkte_anzeigen" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_nullfall" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_planfall" />
+                        <Menu refID="rpc_tools.menu_zentren" />
                         <Button refID="rpc_tools.standortkonkurrenz_projektwirkung" />
                     </Items>
                 </Menu>
