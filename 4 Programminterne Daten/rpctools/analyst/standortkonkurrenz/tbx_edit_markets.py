@@ -27,7 +27,11 @@ class EditMarkets(Tool):
         for idx, market in delete_df.iterrows():
             arcpy.AddMessage(u' - {}'.format(market['pretty']))
             self.parent_tbx.delete_rows_in_table(
-                'Maerkte', where='id={}'.format(market['id']))
+                'Maerkte',
+                where='id={}'.format(market['id']))
+            self.parent_tbx.delete_rows_in_table(
+                'Beziehungen_Maerkte_Zellen',
+                where='id_markt={}'.format(market['id']))
         arcpy.AddMessage(u'Schreibe Änderungen in Datenbank...')
         self.parent_tbx.dataframe_to_table('Maerkte', update_df,
                                            ['id'], upsert=False)

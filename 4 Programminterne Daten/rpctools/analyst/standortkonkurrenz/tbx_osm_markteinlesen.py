@@ -33,6 +33,9 @@ class OSMMarktEinlesen(Tool):
                    'SHAPE@', 'id']
         table = self.folders.get_table(tablename)
         arcpy.TruncateTable_management(table)
+        # remove results as well (distances etc.)
+        res_table = self.folders.get_table('Beziehungen_Maerkte_Zellen')
+        arcpy.TruncateTable_management(self.folders.get_table(res_table))
         with arcpy.da.InsertCursor(table, columns) as rows:
             for i, markt in enumerate(supermarkets):
                 if markt.name is None:
