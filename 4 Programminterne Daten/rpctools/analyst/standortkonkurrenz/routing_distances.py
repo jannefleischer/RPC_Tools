@@ -113,6 +113,8 @@ class DistanceRouting(object):
         return bbox
 
     def get_distances(self, origin, destinations, bbox=None):
+        distances = np.ones(len(destinations), dtype=int)
+        distances *= np.iinfo(distances.dtype).max
         dist_raster = self._request_dist_raster(origin)
         if bbox is not None:
             bbox = self.add_bbox_edge(bbox)
@@ -124,13 +126,13 @@ class DistanceRouting(object):
         raster.load(dist_raster)
         raster.register_points(destinations)
         start = time.time()
-        distances = []
-        for dest in destinations:
-            distances.append(raster.get_value(dest))
+        for i, dest in enumerate(destinations):
+            distances[i] = raster.get_value(dest)
         print('mapping {}s'.format(time.time() - start))
         return distances
 
     def _request_dist_raster(self, origin):
+        err = 'Fehler bei der Anfrage. Liegt der Punkt innerhalb des Gebietes?'
         t = origin.transform(self.epsg) if origin.epsg != self.epsg \
             else origin
         params = {
@@ -146,7 +148,11 @@ class DistanceRouting(object):
         start = time.time()
         r = requests.post(self.URL, params=params)
         print('request post {}s'.format(time.time() - start))
-        id = r.json()['id']
+        try: 
+            id = r.json()['id']
+        except:
+            arcpy.AddError(err)
+            return None
         #url = '{url}/{id}/indicator?targets=Siedlungszellen_FeaturesToJS&detail=true'.format(url=self.URL, id=id)
         url = '{url}/{id}/raster'.format(url=self.URL, id=id)
 
@@ -166,4 +172,7 @@ class DistanceRouting(object):
             with open(out_raster, 'wb') as f:
                 r.raw.decode_content = True
                 shutil.copyfileobj(r.raw, f)
+        else:
+            arcpy.AddError(err)
+            return None
         return out_raster

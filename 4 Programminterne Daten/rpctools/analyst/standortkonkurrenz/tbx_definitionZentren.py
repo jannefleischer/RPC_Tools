@@ -24,9 +24,6 @@ class TbxDefinitionZentren(Tbx):
         params = self.par
         projekte = self.folders.get_projects()
 
-
-
-
         # Projekt_auswählen
         param_1 = params.projectname = arcpy.Parameter()
         param_1.name = u'Projekt_ausw\xe4hlen'

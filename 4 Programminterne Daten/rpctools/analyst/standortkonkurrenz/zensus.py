@@ -10,13 +10,13 @@ import arcpy
 
 class ZensusCell(Point):
     def __init__(self, x, y, epsg=4326, ew=0, id=None, kk_index=None,
-                 kk=None, planned=0):
+                 kk=None, tfl_id=-1):
         super(ZensusCell, self).__init__(x, y, id=id, epsg=epsg)
         self.ew = ew
         self.kk_index = kk_index
         self.kk = kk
-        # is this point part of the planned areas? 0 - yes, 1 - no
-        self.planned = planned
+        # -1 if point is not correlated to a planned area
+        self.tfl_id = tfl_id
 
 
 class Zensus(object):
@@ -61,7 +61,7 @@ class Zensus(object):
             p = ZensusCell(x, y, id=i, epsg=srid, ew=value)
             zensus_points.append(p)
 
-        return zensus_points, bbox
+        return zensus_points, bbox, i
     
     def get_bbox(self, centroid, size):
         # p1 and p2 build square around centroid

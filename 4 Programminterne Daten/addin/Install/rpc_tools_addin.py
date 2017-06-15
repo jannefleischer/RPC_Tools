@@ -728,7 +728,7 @@ class PlanfallMarktErweitern(object):
 class StandortkonkurrenzProjektwirkung(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
-    _toolbox_name = 'TbxDistMarkets'
+    _toolbox_name = 'TbxProjektwirkungMarkets'
     
 
 if __name__ == "__main__":

@@ -13,10 +13,9 @@ from rpctools.analyst.standortkonkurrenz.routing_distances import DistanceRoutin
 from rpctools.analyst.standortkonkurrenz.osm_einlesen import Point
 from rpctools.utils.config import Folders
 from rpctools.analyst.standortkonkurrenz.sales import Sales
-from rpctools.utils.constants import Nutzungsart
 
 
-class DistMarkets(Tool):
+class ProjektwirkungMarkets(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     # ToDo: set this in toolbox?
@@ -50,57 +49,19 @@ class DistMarkets(Tool):
     
     def run(self):
         folders = Folders(self.par)
-        tbx = self.parent_tbx
-        square_size = self.par.square_size.value * 1000
-        zensus = Zensus()
-
-        x, y = get_project_centroid(self.projectname)
-        centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
+    
+        df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
+        bbox = self.calculate_zensus(df_markets)
+    
+        arcpy.AddMessage('Aktualisiere Siedlungszellen der Teilflächen...')
+        self.update_tfl_points()
         
-        if self.recalculate or len(tbx.query_table('Siedlungszellen')) == 0:
-            arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
-            zensus_points, bbox = zensus.cutout_area(centroid, square_size)
-            tfl_points = self.get_tfl_points()
-            # settlements = zensus centroids + teilflaeche centroids
-            sz_points = zensus_points + tfl_points
-            arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
-            self.zensus_to_db(sz_points)
-            active_project = self.parent_tbx.config.active_project
-            zensus.add_kk(sz_points, active_project)
-            # TODO: Update instead of rewrite
-            self.zensus_to_db(sz_points)
-        else:
-            bbox = zensus.get_bbox(centroid, square_size)
-            arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
-                             'Neuberechnung wird übersprungen')
         arcpy.AddMessage(u'Berechne Entfernungen der Märkte '
                          u'zu den Siedlungszellen...')
-        
-        markets = self.parent_tbx.table_to_dataframe('Maerkte')
-        epsg = self.parent_tbx.config.epsg
+        self.calculate_distances(df_markets, bbox)
 
-        routing = DistanceRouting()
-        destinations = self.get_cells()
-        dest_ids = [d.id for d in destinations]
-        already_calculated = np.unique(tbx.table_to_dataframe(
-            'Beziehungen_Maerkte_Zellen', columns=['id_markt'])['id_markt'])
-        n_markets = len(markets)
-        i = 1
-        for index, market in markets.iterrows():
-            arcpy.AddMessage(u' - {name} ({i}/{n})'.format(
-                name=market['name'], i=i, n=n_markets))
-            i += 1
-            if self.recalculate or market['id'] not in already_calculated:
-                arcpy.AddMessage('   wird berechnet')
-                market_id = market['id']
-                x, y = market['SHAPE']
-                origin = Point(x, y, id=market_id, epsg=epsg)
-                distances = routing.get_distances(origin, destinations, bbox)
-                self.distances_to_db(market_id, destinations, distances)
-            else:
-                arcpy.AddMessage(u'   bereits berechnet, wird übersprungen')
-
-        df_markets = tbx.table_to_dataframe('Maerkte')
+        # reload markets
+        df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
         df_zensus = self.parent_tbx.table_to_dataframe('Siedlungszellen')
         df_distances = self.parent_tbx.table_to_dataframe(
             'Beziehungen_Maerkte_Zellen', 
@@ -113,19 +74,90 @@ class DistMarkets(Tool):
         arcpy.AddMessage(u'Berechne Kenngrößen...')
         self.sales_to_db(kk_nullfall, kk_planfall)
         
-    def get_tfl_points(self):
+    def calculate_zensus(self, markets):
+        '''extract zensus points (incl. points for planned areas)
+        and write them to the database'''
+        zensus = Zensus()
+        x, y = get_project_centroid(self.projectname)
+        centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
+        square_size = self.par.square_size.value * 1000
+        
+        if (self.recalculate or
+            len(self.parent_tbx.query_table('Siedlungszellen')) == 0):
+            arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
+            zensus_points, bbox, max_id = zensus.cutout_area(
+                centroid, square_size)
+            tfl_points = self.get_tfl_points(max_id + 1)
+            # settlements = zensus centroids + teilflaeche centroids
+            sz_points = zensus_points + tfl_points
+            arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
+            self.zensus_to_db(sz_points)
+            active_project = self.parent_tbx.config.active_project
+            zensus.add_kk(sz_points, active_project)
+            # TODO: Update instead of rewrite
+            self.zensus_to_db(sz_points)
+        else:
+            bbox = zensus.get_bbox(centroid, square_size)
+            arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
+                             'Neuberechnung wird übersprungen')
+        return bbox
+    
+    def get_tfl_points(self, start_id):
+        '''get the centroids of the planned areas as zensus points, start_id
+        is the id the first point gets (further areas ascending)'''
         df_tfl = self.parent_tbx.table_to_dataframe(
-            'Teilflaechen_Plangebiet', workspace='FGDB_Definition_Projekt.gdb', 
-            where='ew>0')
+            'Teilflaechen_Plangebiet', workspace='FGDB_Definition_Projekt.gdb')
         points = []
+        i = 0
         for index, tfl in df_tfl.iterrows():
             point = ZensusCell(tfl['INSIDE_X'], tfl['INSIDE_Y'],
                                epsg=self.parent_tbx.config.epsg, ew=tfl['ew'],
-                               planned=1)
+                               id=start_id+i, 
+                               tfl_id=1)
             points.append(point)
-        return points        
+            i += 1
+        return points
+    
+    def update_tfl_points(self):
+        '''update the number of inhabitants for points representing the
+        planned areas'''
+        df_tfl = self.parent_tbx.table_to_dataframe(
+            'Teilflaechen_Plangebiet',
+            columns=['id_teilflaeche', 'ew'], 
+            workspace='FGDB_Definition_Projekt.gdb')
+        for index, tfl in df_tfl.iterrows():
+            self.parent_tbx.update_table(
+                'Siedlungszellen',
+                column_values={'ew': tfl['ew']},
+                where='id_teilflaeche={}'.format(tfl['id_teilflaeche']))
+    
+    def calculate_distances(self, markets, bbox):
+        '''calculate distances between settlement points and markets and
+        write them to the database'''
+        routing = DistanceRouting()
+        destinations = self.get_cells()
+        dest_ids = [d.id for d in destinations]
+        already_calculated = np.unique(self.parent_tbx.table_to_dataframe(
+            'Beziehungen_Maerkte_Zellen', columns=['id_markt'])['id_markt'])
+        n_markets = len(markets)
+        i = 1
+        for index, market in markets.iterrows():
+            arcpy.AddMessage(u' - {name} ({i}/{n})'.format(
+                name=market['name'], i=i, n=n_markets))
+            i += 1
+            if self.recalculate or market['id'] not in already_calculated:
+                arcpy.AddMessage('   wird berechnet')
+                market_id = market['id']
+                x, y = market['SHAPE']
+                origin = Point(x, y, id=market_id,
+                               epsg=self.parent_tbx.config.epsg)
+                distances = routing.get_distances(origin, destinations, bbox)
+                self.distances_to_db(market_id, destinations, distances)
+            else:
+                arcpy.AddMessage(u'   bereits berechnet, wird übersprungen')        
 
     def sales_to_db(self, kk_nullfall, kk_planfall):
+        '''store the sales matrices in database'''
         # sum up sales join them on index to dataframe, replace missing entries
         # (e.g. no entries for planned markets in nullfall -> sales = 0)
         sales_nullfall = kk_nullfall.sum(axis=1)
@@ -217,7 +249,7 @@ class DistMarkets(Tool):
         kk_indices = []
         kks = []
         cell_ids = []
-        planned = []
+        tfl_ids = []
         self.parent_tbx.delete_rows_in_table('Siedlungszellen')
         for point in zensus_points:
             if point.ew <= 0:
@@ -229,19 +261,19 @@ class DistMarkets(Tool):
             kk_indices.append(point.kk_index)
             kks.append(point.kk)
             cell_ids.append(point.id)
-            planned.append(point.planned)
+            tfl_ids.append(point.tfl_id)
 
         df['id'] = cell_ids
         df['SHAPE'] = shapes
         df['ew'] = ews
         df['kk_index'] = kk_indices
         df['kk'] = kks
-        df['geplant'] = planned
+        df['id_teilflaeche'] = tfl_ids
 
         self.parent_tbx.insert_dataframe_in_table('Siedlungszellen', df)
 
 
-class TbxDistMarkets(Tbx):
+class TbxProjektwirkungMarkets(Tbx):
 
     @property
     def label(self):
@@ -249,7 +281,7 @@ class TbxDistMarkets(Tbx):
 
     @property
     def Tool(self):
-        return DistMarkets
+        return ProjektwirkungMarkets
 
     def _getParameterInfo(self):
 
@@ -264,15 +296,16 @@ class TbxDistMarkets(Tbx):
         p.direction = 'Input'
         p.datatype = u'GPString'
         p.value = self.config.active_project
-        p.enabled = False
 
         # set square size
         p = self.add_parameter('square_size')
-        p.name = u'sqare_size'.encode('cp1252')
-        p.displayName = u'Größe des Bereichs wählen (km)'.encode('cp1252')
+        p.name = u'sqare_size'
+        p.displayName = encode(u'Größe des betrachteten Siedlungs-Bereichs '
+                               u'wählen (km)')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPLong'
+        p.enabled = False
         p.value = 20
 
         return params
@@ -281,7 +314,7 @@ class TbxDistMarkets(Tbx):
         pass
 
 if __name__ == "__main__":
-    t = TbxDistMarkets()
+    t = TbxProjektwirkungMarkets()
     t.getParameterInfo()
     t.set_active_project()
     #t.show_outputs()
