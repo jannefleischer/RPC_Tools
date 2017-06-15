@@ -113,7 +113,7 @@ class ProjektwirkungMarkets(Tool):
             point = ZensusCell(tfl['INSIDE_X'], tfl['INSIDE_Y'],
                                epsg=self.parent_tbx.config.epsg, ew=tfl['ew'],
                                id=start_id+i, 
-                               tfl_id=1)
+                               tfl_id=tfl['id_teilflaeche'])
             points.append(point)
             i += 1
         return points
@@ -252,7 +252,9 @@ class ProjektwirkungMarkets(Tool):
         tfl_ids = []
         self.parent_tbx.delete_rows_in_table('Siedlungszellen')
         for point in zensus_points:
-            if point.ew <= 0:
+            # ignore zensus points with no inhabitants
+            # (but keep the planned ones)
+            if point.ew <= 0 and point.tfl_id < 0:
                 continue
             t = point.transform(epsg)
             t.create_geom()
