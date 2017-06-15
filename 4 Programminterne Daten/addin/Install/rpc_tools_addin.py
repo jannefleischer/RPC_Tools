@@ -683,27 +683,24 @@ class MarktBearbeiten(ToolboxButton):
         self.cursor = 3
         
     def onClick(self, coord=None):
-        if coord is None:
-            return
-        config.active_coord = coord
-        super(MarktBearbeiten, self).onClick()
+        maerkte_anzeigen.onClick()
 
     def onMouseDownMap(self, x, y, button, shift):
-        self.onClick((x, y))
+        config.active_coord = (x, y)
+        super(MarktBearbeiten, self).onClick()
 
 
 class MarktHinzu(MarktBearbeiten):
     '''does the same thing as MarktBearbeiten except adding a market at
     click position before opening toolbox'''
     _new_market_name = ''
-    def onClick(self, coord=None):
-        if not coord:
-            return
+    
+    def onMouseDownMap(self, x, y, button, shift):
         tbx = self.tbx
         tbx.set_active_project()
-        tbx.add_market_to_db(self._new_market_name, coord)
+        tbx.add_market_to_db(self._new_market_name, (x, y))
         arcpy.RefreshActiveView()
-        super(MarktHinzu, self).onClick(coord=coord)
+        super(MarktHinzu, self).onMouseDownMap(x, y, button, shift)
 
 
 class BestandMarktBearbeiten(MarktBearbeiten):
