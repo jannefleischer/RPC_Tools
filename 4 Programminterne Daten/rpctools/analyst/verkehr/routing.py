@@ -17,13 +17,12 @@ class Routing(Tool):
         self.output.add_layer('verkehr', 'Zielpunkte',
                            featureclass='Zielpunkte',
                            template_folder='Verkehr')
-
         self.output.add_layer('verkehr', 'links',
                            featureclass='links',
                            template_folder='Verkehr')
-
-
-
+        self.output.add_layer('verkehr', 'Anbindungspunkte',
+                              featureclass='Anbindungspunkte',
+                              template_folder='Verkehr')
     def run(self):
         toolbox = self.parent_tbx
         # tbx settings
