@@ -34,7 +34,7 @@ class Projektverwaltung(Tool):
 
     _param_projectname = 'name'
     _workspace = 'FGDB_Definition_Projekt.gdb'
-    
+
     def add_outputs(self):
         # add Teilflächen
         fc = "Teilflaechen_Plangebiet"
@@ -45,14 +45,14 @@ class Projektverwaltung(Tool):
         layer = "OpenStreetMap"
         self.output.add_layer("hintergrundkarten", layer,
                         zoom=False, in_project=False)
-        
+
         diagram = DiaTeilflaechen()
         self.output.add_diagram(diagram)
 
 
 class ProjektAnlegen(Projektverwaltung):
     """Projekt neu anlegen"""
-        
+
     def run(self):
         """"""
         gc.collect()
@@ -65,7 +65,7 @@ class ProjektAnlegen(Projektverwaltung):
         else:
             arcpy.AddMessage("Fehlerhaftes Projekt wird wieder entfernt...")
             arcpy.Delete_management(self.folders.get_projectpath(check=False))
-        
+
 
     def projekt_anlegen(self):
         """Projekt anlegen"""
@@ -325,8 +325,7 @@ class ProjektAnlegen(Projektverwaltung):
         # calculate Gauß-Krüger-Coordinates and append them to tfl
         arcpy.AddGeometryAttributes_management(
             Input_Features=tfl, Geometry_Properties="CENTROID_INSIDE")
-        arcpy.AddField_management(tfl, "SOURCE_X", "DOUBLE")
-        arcpy.AddField_management(tfl, "SOURCE_Y", "DOUBLE")
+
 
 
         # Check if the distances between the centroids is smaller than max_dist
@@ -357,19 +356,24 @@ class ProjektAnlegen(Projektverwaltung):
 
         return ags_project[0], gen_project[0], success
 
-
     def set_source_xy(self):
-        """"""
         toolbox = self.parent_tbx
-        XY_INSIDE = toolbox.query_table("Teilflaechen_Plangebiet",
-                                        ['id_teilflaeche',
-                                         'INSIDE_X', 'INSIDE_Y'])
-        for row in XY_INSIDE:
-
-            toolbox.update_table("Teilflaechen_Plangebiet",
-                                {'SOURCE_X': row[1],
-                                 'SOURCE_Y': row[2]},
-                                pkey={'id_teilflaeche': row[0]})
+        in_workspace = 'FGDB_Definition_Projekt.gdb'
+        out_workspace = 'FGDB_Verkehr.gdb'
+        in_table = 'Teilflaechen_Plangebiet'
+        out_table = 'Anbindungspunkte'
+        in_data = toolbox.query_table(in_table,
+                                      columns=['INSIDE_X',
+                                               'INSIDE_Y',
+                                               'id_teilflaeche'],
+                                      workspace=in_workspace)
+        for shape_x, shape_y, area in in_data:
+            shape = arcpy.Point(shape_x, shape_y)
+            toolbox.upsert_row_in_table(
+                table_name=out_table,
+                column_values={'Shape': shape, 'id_teilflaeche': area},
+                pkey={'id_teilflaeche': area},
+                workspace=out_workspace)
 
 
 class ProjektKopieren(Projektverwaltung):
@@ -417,7 +421,7 @@ class ProjektKopieren(Projektverwaltung):
 
 class ProjektLoeschen(Tool):
 
-    def add_outputs(self): 
+    def add_outputs(self):
         pass
 
     def run(self):

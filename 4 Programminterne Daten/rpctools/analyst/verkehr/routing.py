@@ -43,7 +43,8 @@ class Routing(Tool):
             Coordinate_System=4326)
 
         # get data from Teilflaechen_Plangebiet table
-        columns = ['id_teilflaeche', 'SOURCE_X', 'SOURCE_Y', 'Wege_gesamt',
+        # xxx
+        columns = ['id_teilflaeche', 'INSIDE_X', 'INSIDE_Y', 'Wege_gesamt',
                    'Nutzungsart']
         cursor = arcpy.da.SearchCursor(tmp_table, columns)
         data_tfl = [row for row in cursor]
@@ -119,25 +120,6 @@ class Routing(Tool):
                                   field_type='DOUBLE')
         self.create_attachement_points()
 
-    def create_attachement_points(self):
-        toolbox = self.parent_tbx
-        in_table = toolbox.folders.get_table('Teilflaechen_Plangebiet', workspace='FGDB_Definition_Projekt.gdb')
-        out_layer = 'out_layer'
-        ws = toolbox.folders.get_db(workspace='FGDB_Definition_Projekt.gdb')
-        layer_name = 'Anbindungspunkte'
-        out_file = os.path.join(ws, layer_name)
-        if arcpy.Exists(out_layer):
-            arcpy.Delete_management(out_layer)
-        arcpy.MakeXYEventLayer_management(table=in_table, in_x_field='SOURCE_X',
-                                         in_y_field='SOURCE_Y',
-                                         out_layer=out_layer,
-                                         spatial_reference=toolbox.config.epsg,
-                                         in_z_field='id_teilflaeche')
-        if arcpy.Exists(out_file):
-            arcpy.Delete_management(out_file)
-        arcpy.FeatureClassToFeatureClass_conversion(in_features=out_layer,
-                                                   out_path=ws,
-                                                   out_name=layer_name)
 
 
 
