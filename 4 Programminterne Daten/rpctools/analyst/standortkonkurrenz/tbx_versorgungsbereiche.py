@@ -102,7 +102,11 @@ class TbxEditCenters(Tbx):
         column_values = {
             'id': new_id,
             'name': name,
-            'SHAPE@': polygon
+            'nutzerdefiniert': 1,
+            'SHAPE@': polygon,
+            'umsatz_differenz': 0,
+            'umsatz_planfall': 0,
+            'umsatz_nullfall': 0
         }
         self.insert_rows_in_table('Zentren', column_values)
     

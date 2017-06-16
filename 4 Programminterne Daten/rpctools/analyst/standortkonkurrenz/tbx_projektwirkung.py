@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import json
 import numpy as np
+import pandas as pd
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
@@ -25,9 +26,11 @@ class ProjektwirkungMarkets(Tool):
         # Add Layers
         group_layer = ("standortkonkurrenz")
         fc = 'Maerkte'
-        layer = 'Umsatzveränderung Planfall'
+        layer_maerkte = u'Umsatzveränderung Märkte'
+        layer_zentren = u'Umsatzveränderung Bereiche'
     
-        self.output.add_layer(group_layer, layer, fc, zoom=False)
+        self.output.add_layer(group_layer, layer_zentren, fc, zoom=False)
+        self.output.add_layer(group_layer, layer_maerkte, fc, zoom=False)
     
         fc = 'Maerkte'
         layer = 'Kaufkraftbindung'
@@ -49,6 +52,10 @@ class ProjektwirkungMarkets(Tool):
     
     def run(self):
         folders = Folders(self.par)
+        
+        if self.recalculate:
+            self.parent_tbx.delete_rows_in_table('Beziehungen_Maerkte_Zellen')
+            self.parent_tbx.delete_rows_in_table('Siedlungszellen')
     
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
         bbox = self.calculate_zensus(df_markets)
@@ -73,6 +80,8 @@ class ProjektwirkungMarkets(Tool):
         kk_planfall = sales.calculate_planfall()
         arcpy.AddMessage(u'Berechne Kenngrößen...')
         self.sales_to_db(kk_nullfall, kk_planfall)
+        arcpy.AddMessage(u'Berechne Umsatzänderungen der Versorgungsbereiche...')
+        self.update_centers()
         
     def calculate_zensus(self, markets):
         '''extract zensus points (incl. points for planned areas)
@@ -82,8 +91,7 @@ class ProjektwirkungMarkets(Tool):
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
         square_size = self.par.square_size.value * 1000
         
-        if (self.recalculate or
-            len(self.parent_tbx.query_table('Siedlungszellen')) == 0):
+        if (len(self.parent_tbx.query_table('Siedlungszellen')) == 0):
             arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
             zensus_points, bbox, max_id = zensus.cutout_area(
                 centroid, square_size)
@@ -145,7 +153,7 @@ class ProjektwirkungMarkets(Tool):
             arcpy.AddMessage(u' - {name} ({i}/{n})'.format(
                 name=market['name'], i=i, n=n_markets))
             i += 1
-            if self.recalculate or market['id'] not in already_calculated:
+            if market['id'] not in already_calculated:
                 arcpy.AddMessage('   wird berechnet')
                 market_id = market['id']
                 x, y = market['SHAPE']
@@ -214,6 +222,54 @@ class ProjektwirkungMarkets(Tool):
         arcpy.AddMessage(u'Schreibe Kenngrößen in Datenbank...')
         self.parent_tbx.insert_dataframe_in_table('Beziehungen_Maerkte_Zellen',
                                                   cells)
+        
+    def update_centers(self):
+        '''calculate the sales of the defined centers'''
+        tmp_join = os.path.join(arcpy.env.scratchGDB, 'tmp_join')
+        tmp_markets = os.path.join(arcpy.env.scratchGDB, 'tmp_markets')
+        if arcpy.Exists(tmp_join):
+            arcpy.Delete_management(tmp_join)
+        if arcpy.Exists(tmp_markets):
+            arcpy.Delete_management(tmp_markets)
+        
+        umsatz_fields = ['umsatz_nullfall', 'umsatz_planfall']
+            
+        markets_table = self.parent_tbx.folders.get_table('Maerkte')
+        centers_table = self.parent_tbx.folders.get_table('Zentren')
+        
+        arcpy.CopyFeatures_management(markets_table, tmp_markets)
+        # you have to remove the id column to join because both tables have 
+        # column of same name
+        arcpy.DeleteField_management(tmp_markets, 'id')
+        # remove the planned markets, that did not exist in nullfall
+        self.parent_tbx._delete_rows_in_table(tmp_markets,
+                                              where='id_betriebstyp_nullfall=0')
+        
+        fieldmappings = arcpy.FieldMappings()
+        for field in umsatz_fields:
+            fm = arcpy.FieldMap()
+            fm.addInputField(tmp_markets, field)
+            fieldmappings.addFieldMap(fm)
+        fm_c = arcpy.FieldMap()
+        # the table assigned to the fieldmapping is ignored by dumbass arcpy, he 
+        # arcpy always takes markets_table anyway (so the need to delete before)
+        fm_c.addInputField(centers_table, 'id')
+        fieldmappings.addFieldMap(fm_c)
+        
+        arcpy.SpatialJoin_analysis(tmp_markets, centers_table, tmp_join,
+                                   join_type='KEEP_COMMON',
+                                   field_mapping=fieldmappings, 
+                                   match_option='WITHIN')
+        columns = ['id'] + umsatz_fields
+        rows = self.parent_tbx._query_table(tmp_join,
+                                            columns=columns)
+        df_join = pd.DataFrame.from_records(rows, columns=columns)
+        summed = df_join.groupby('id').sum()
+        summed['umsatz_differenz'] = 100 * (summed['umsatz_planfall'] /
+                                            summed['umsatz_nullfall']) - 100
+        summed['id'] = summed.index
+        self.parent_tbx.dataframe_to_table('Zentren', summed, pkeys=['id'])
+        
 
     def distances_to_db(self, market_id, destinations, distances):
         self.parent_tbx.delete_rows_in_table(

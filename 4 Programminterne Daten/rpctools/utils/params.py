@@ -554,14 +554,14 @@ class Tbx(object):
                              workspace='',
                              ):
         """
-        Delete rows in a FileGeodatabase which match the where-clause or the
+        Delete rows in project table which match the where-clause or the
         primary key (if no pkey or where clause are given, all rows will be
         deleted!)
 
         Parameters
         ----------
         table : str
-            full path to the table
+             name of the table
         pkey: dict, optional
             the columns and the values of the primary key as key/value-pairs
         where: str, optional
@@ -575,10 +575,33 @@ class Tbx(object):
             the number of deleted rows
         """
         gc.collect()
-        where = where or self.get_where_clause(pkey)
         table_path = self._get_table_path(table, workspace=workspace)
         if not table_path:
-            return
+            return 0
+        return self._delete_rows_in_table(table_path, where=where, pkey=pkey)
+    
+    def _delete_rows_in_table(self, table_path, where=None, pkey=None): 
+        """
+        Delete rows in a FileGeodatabase which match the where-clause or the
+        primary key (if no pkey or where clause are given, all rows will be
+        deleted!)
+
+        Parameters
+        ----------
+        table_path : str
+            full path to the table
+        pkey: dict, optional
+            the columns and the values of the primary key as key/value-pairs
+        where: str, optional
+            a where clause to delete specific rows
+
+        Returns
+        -------
+        r : int
+            the number of deleted rows
+        """
+    
+        where = where or self.get_where_clause(pkey)        
         columns = pkey.keys() if pkey else '*'
         cursor = arcpy.da.UpdateCursor(table_path, columns, where_clause=where)
         r = 0
