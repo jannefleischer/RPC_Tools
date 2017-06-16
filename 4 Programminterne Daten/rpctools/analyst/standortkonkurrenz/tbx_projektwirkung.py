@@ -25,14 +25,16 @@ class ProjektwirkungMarkets(Tool):
     def add_outputs(self):
         # Add Layers
         group_layer = ("standortkonkurrenz")
-        fc = 'Maerkte'
+        fc_maerkte = 'Maerkte'
         layer_maerkte = u'Umsatzveränderung Märkte'
-        layer_zentren = u'Umsatzveränderung Bereiche'
+        fc_zentren = 'Zentren'
+        layer_vb = u'Umsatzveränderung Versorgungsbereiche'
+        layer_gem = u'Umsatzveränderung Gemeinden'
     
-        self.output.add_layer(group_layer, layer_zentren, fc, zoom=False)
-        self.output.add_layer(group_layer, layer_maerkte, fc, zoom=False)
+        self.output.add_layer(group_layer, layer_maerkte, fc_maerkte, zoom=False)
+        self.output.add_layer(group_layer, layer_vb, fc_zentren, zoom=False)
+        self.output.add_layer(group_layer, layer_gem, fc_zentren, zoom=False)
     
-        fc = 'Maerkte'
         layer = 'Kaufkraftbindung'
         betriebstyp_col = 'id_betriebstyp_nullfall'
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
@@ -44,7 +46,7 @@ class ProjektwirkungMarkets(Tool):
             layer_name = '{n} {m} ({i})'.format(n=layer,
                                                 m=plan_market['name'],
                                                 i=plan_market['id'])
-            self.output.add_layer(group_layer, layer, fc,
+            self.output.add_layer(group_layer, layer, fc_maerkte,
                                   query='id_markt={}'.format(
                                       plan_market['id']),
                                   name=layer_name, 
@@ -56,11 +58,14 @@ class ProjektwirkungMarkets(Tool):
         if self.recalculate:
             self.parent_tbx.delete_rows_in_table('Beziehungen_Maerkte_Zellen')
             self.parent_tbx.delete_rows_in_table('Siedlungszellen')
-    
+        
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
         bbox = self.calculate_zensus(df_markets)
+        
+        arcpy.AddMessage(u'Ermittle angrenzende Gemeinden...')
+        self.communities_to_centers(bbox)
     
-        arcpy.AddMessage('Aktualisiere Siedlungszellen der Teilflächen...')
+        arcpy.AddMessage(u'Aktualisiere Siedlungszellen der Teilflächen...')
         self.update_tfl_points()
         
         arcpy.AddMessage(u'Berechne Entfernungen der Märkte '
@@ -109,6 +114,48 @@ class ProjektwirkungMarkets(Tool):
             arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
                              'Neuberechnung wird übersprungen')
         return bbox
+    
+    def communities_to_centers(self, bbox):
+        '''get communities intersecting with bbox and write them as centers to
+        the database'''
+        gemeinden = self.parent_tbx.folders.get_base_table(
+            table='bkg_gemeinden', workspace='FGDB_Basisdaten_deutschland.gdb')
+        p1, p2 = bbox
+        # bbox as polygon
+        poly_points = arcpy.Array([
+            arcpy.Point(p1.x, p1.y),
+            arcpy.Point(p1.x, p2.y),
+            arcpy.Point(p2.x, p2.y),
+            arcpy.Point(p2.x, p1.y),
+            arcpy.Point(p1.x, p1.y)
+        ])
+        bbox_poly = arcpy.Polygon(poly_points)
+        # delete existing community-entries
+        self.parent_tbx.delete_rows_in_table('Zentren',
+                                             where='nutzerdefiniert=0')
+        ids = self.parent_tbx.query_table('Zentren', columns='id')
+        max_id = np.array(ids).max()
+        # clip the communities with the bbox
+        fc_bbox = arcpy.CopyFeatures_management([bbox_poly], 'in_memory/bbox')
+        fc_clipped = arcpy.Clip_analysis(gemeinden,
+                                         fc_bbox, 'in_memory/clipped')
+        cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'AGS'])
+        # add clipped communities as centers
+        for i, (shape, name, ags) in enumerate(cursor):
+            self.parent_tbx.insert_rows_in_table(
+                'Zentren',
+                column_values={
+                    'SHAPE@': shape,
+                    'name': name,
+                    'nutzerdefiniert': 0,
+                    'umsatz_differenz': 0,
+                    'umsatz_planfall': 0,
+                    'umsatz_nullfall': 0,
+                    'id': max_id + i + 1
+                })
+        del cursor
+        arcpy.Delete_management(fc_bbox)
+        arcpy.Delete_management(fc_clipped)
     
     def get_tfl_points(self, start_id):
         '''get the centroids of the planned areas as zensus points, start_id
