@@ -1,6 +1,7 @@
 import arcpy
 from rpctools.utils.params import Folders
 from rpctools.utils.params import DummyTbx
+from rpctools.utils.output import ArcpyEnv
 import numpy as np
 from os.path import join
 
@@ -75,22 +76,23 @@ def get_ags(features, id_column):
     ags_res : dict
         keys are the ids of the features with tuples of (ags, gen) as values
     """
-    folders = Folders()
-    gemeinden = folders.get_base_table('FGDB_Basisdaten_deutschland.gdb',
-                                       'bkg_gemeinden')
-    tmp_table = join(arcpy.env.scratchGDB, 'tmp_join')
-    if arcpy.Exists(tmp_table):
+    with ArcpyEnv(addOutputsToMap=False):
+        folders = Folders()
+        gemeinden = folders.get_base_table('FGDB_Basisdaten_deutschland.gdb',
+                                           'bkg_gemeinden')
+        tmp_table = join(arcpy.env.scratchGDB, 'tmp_join')
+        if arcpy.Exists(tmp_table):
+            arcpy.Delete_management(tmp_table)
+    
+        arcpy.SpatialJoin_analysis(features, gemeinden, tmp_table,
+                                   match_option='HAVE_THEIR_CENTER_IN')
+    
+        cursor = arcpy.da.SearchCursor(tmp_table, [id_column, 'AGS_0', 'GEN'])
+        ags_res = {}
+        for row in cursor:
+            ags_res[row[0]] = row[1], row[2]
+    
         arcpy.Delete_management(tmp_table)
-
-    arcpy.SpatialJoin_analysis(features, gemeinden, tmp_table,
-                               match_option='HAVE_THEIR_CENTER_IN')
-
-    cursor = arcpy.da.SearchCursor(tmp_table, [id_column, 'AGS_0', 'GEN'])
-    ags_res = {}
-    for row in cursor:
-        ags_res[row[0]] = row[1], row[2]
-
-    arcpy.Delete_management(tmp_table)
     return ags_res
 
 def get_gemeindetyp(ags):
