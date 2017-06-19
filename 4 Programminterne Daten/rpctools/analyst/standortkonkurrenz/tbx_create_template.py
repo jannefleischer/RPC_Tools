@@ -8,15 +8,16 @@ from rpctools.analyst.standortkonkurrenz.market_templates import MarketTemplate
 
 class CreateTemplate(Tool):
 
-    def add_outputs(self): 
+    def add_outputs(self):
         pass
 
     def run(self):
         typ = self.par.template_type.value
-        template = MarketTemplate(typ, self.folders.get_projectpath())
+        arcpy.AddMessage('Template wird erzeugt...')
+        template = MarketTemplate(typ, self.folders.get_projectpath(),
+                                  epsg=self.parent_tbx.config.epsg)
         template.create()
         template.open()
-
 
 class TbxCreateTemplate(Tbx):
     
@@ -40,13 +41,13 @@ class TbxCreateTemplate(Tbx):
         param.filter.list = []
     
         param = self.add_parameter('template_type')
-        param.name = encode(u'Märkte')
-        param.displayName = encode(u'Markt auswählen')
+        param.name = encode(u'type')
+        param.displayName = encode(u'Dateiformat des zu erzeugenden Templates')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.filter.list = MarketTemplate.template_types
-        param.value = param.filter.list[1]
+        param.value = param.filter.list[0]
         
         return self.par
     
