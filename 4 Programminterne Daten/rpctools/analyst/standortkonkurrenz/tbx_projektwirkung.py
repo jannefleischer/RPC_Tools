@@ -361,9 +361,9 @@ class ProjektwirkungMarkets(Tool):
             # (but keep the planned ones)
             if point.ew <= 0 and point.tfl_id < 0:
                 continue
-            t = point.transform(epsg)
-            t.create_geom()
-            shapes.append(t.geom)
+            point.transform(epsg)
+            point.create_geom()
+            shapes.append(point.geom)
             ews.append(point.ew)
             kk_indices.append(point.kk_index)
             kks.append(point.kk)

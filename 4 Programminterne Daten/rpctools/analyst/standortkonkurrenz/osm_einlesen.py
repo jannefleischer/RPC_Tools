@@ -38,8 +38,8 @@ class Point(object):
     def transform(self, target_srid):
         target_srs = Proj(init='epsg:{}'.format(target_srid))
         x, y = transform(self.proj, target_srs, self.x, self.y)
-        return Point(x, y, epsg=target_srid)
-
+        self.x = x
+        self.y = y
 
 class Supermarket(Point):
     """A Supermarket"""
@@ -85,10 +85,10 @@ class OSMShopsReader(object):
         json
         """
         query = 'DWithin(geom,POINT({y} {x}),{m},meters)'
-        transformed = point.transform(self.geoserver_epsg)
+        point.transform(self.geoserver_epsg)
         srsname = 'EPSG:{}'.format(self.epsg)
-        params = dict(CQL_FILTER=query.format(x=transformed.x,
-                                              y=transformed.y,
+        params = dict(CQL_FILTER=query.format(x=point.x,
+                                              y=point.y,
                                               m=distance),
                       srsname=srsname,
                       count=str(count))
@@ -153,7 +153,7 @@ class OSMShopsReader(object):
 if __name__ == '__main__':
     o = OSMShopsReader()
     source = Point(54, 10, epsg=4326)
-    #source = source.transform(3035)
+    #source.transform(3035)
     supermarkets = o.get_shops(source)
     o.create_supermarket_features(supermarkets)
 

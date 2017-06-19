@@ -57,10 +57,10 @@ class RasterManagement(object):
         if self.raster_values is None:
             raise Exception('A raster-file has to be loaded first!')
         for point in points:
-            t = point.transform(self.srid) if point.epsg != self.srid \
-                else point
-            mapped_x = int(abs(t.x - self.raster_origin.x) / self.cellWidth)
-            mapped_y = int(abs(t.y - self.raster_origin.y) / self.cellHeight)
+            if point.epsg != self.srid:
+                point.transform(self.srid) 
+            mapped_x = int(abs(point.x - self.raster_origin.x) / self.cellWidth)
+            mapped_y = int(abs(point.y - self.raster_origin.y) / self.cellHeight)
             self.point_raster_map[point.id] = (mapped_x, mapped_y)
 
     def get_value(self, point):
@@ -133,13 +133,13 @@ class DistanceRouting(object):
 
     def _request_dist_raster(self, origin):
         err = 'Fehler bei der Anfrage. Liegt der Punkt innerhalb des Gebietes?'
-        t = origin.transform(self.epsg) if origin.epsg != self.epsg \
-            else origin
+        if origin.epsg != self.epsg:
+            origin.transform(self.epsg) 
         params = {
             'batch': True,
             'routerId': self.ROUTER,
-            'fromPlace': "{},{}".format(t.y, t.x),
-            'toPlace': "{},{}".format(t.y, t.x),
+            'fromPlace': "{},{}".format(point.y, point.x),
+            'toPlace': "{},{}".format(point.y, point.x),
             'mode': 'CAR',
             'maxWalkDistance': 5000,
             'maxPreTransitTime': 1200,
