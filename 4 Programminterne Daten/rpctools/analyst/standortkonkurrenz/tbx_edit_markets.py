@@ -130,6 +130,13 @@ class TbxEditMarkets(Tbx):
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'
+    
+        param = self.add_parameter('delete_all')
+        param.name = encode(u'Alle Löschen')
+        param.displayName = encode(u'alle Märkte entfernen')
+        param.parameterType = 'Optional'
+        param.direction = 'Input'
+        param.datatype = u'GPBoolean'
         
         self.markets_df = []
         return self.par
@@ -211,6 +218,7 @@ class TbxEditMarkets(Tbx):
         return pretty
     
     def set_selected_market_inputs(self):
+        self.par.delete_all.value = False
         betriebstyp_col = 'id_betriebstyp_nullfall' \
             if self.setting == NULLFALL else 'id_betriebstyp_planfall'
         market_idx = self.markets_df['pretty'] == self.par.markets.value
@@ -229,7 +237,8 @@ class TbxEditMarkets(Tbx):
         self.par.do_delete.value = True if do_delete else False
     
     def validate_inputs(self):
-        if len(self.table_to_dataframe('Maerkte', columns=['id'])) == 0:
+        df_markets = self.get_markets()
+        if len(df_markets) == 0:
             if self.setting == NULLFALL:
                 msg = (u'Es sind keine Märkte im Bestand vorhanden. '
                        u'Bitte lesen Sie zunächst Märkte ein oder fügen Sie '
@@ -274,9 +283,18 @@ class TbxEditMarkets(Tbx):
         elif self.par.changed('do_delete'):
             do_delete = self.par.do_delete.value
             self.markets_df.loc[market_idx, 'do_delete'] = do_delete
-        
-        # update the pretty names of the markets
             
+        elif self.par.changed('delete_all'):
+            delete_all = self.par.delete_all.value
+            self.par.do_delete.value = delete_all
+            self.markets_df['do_delete'] = delete_all
+            # update the pretty names of ALL markets in list
+            for index, market in self.markets_df.iterrows():
+                pretty = self.get_pretty_market_name(market)
+                self.markets_df.loc[index, 'pretty'] = pretty
+            self.update_market_list()
+        
+        # update the pretty names of the selected market            
         if (self.par.changed('name') or 
             self.par.changed('chain') or
             self.par.changed('type_name') or

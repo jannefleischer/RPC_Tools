@@ -32,8 +32,6 @@ class ProjektwirkungMarkets(Tool):
         layer_gem = u'Umsatzveränderung Gemeinden'
     
         self.output.add_layer(group_layer, layer_maerkte, fc_maerkte, zoom=False)
-        self.output.add_layer(group_layer, layer_vb, fc_zentren, zoom=False)
-        self.output.add_layer(group_layer, layer_gem, fc_zentren, zoom=False)
     
         layer = 'Kaufkraftbindung'
         betriebstyp_col = 'id_betriebstyp_nullfall'
@@ -51,6 +49,9 @@ class ProjektwirkungMarkets(Tool):
                                       plan_market['id']),
                                   name=layer_name, 
                                   zoom=False)
+            
+        self.output.add_layer(group_layer, layer_vb, fc_zentren, zoom=False)
+        self.output.add_layer(group_layer, layer_gem, fc_zentren, zoom=False)
     
     def run(self):
         folders = Folders(self.par)
@@ -112,7 +113,7 @@ class ProjektwirkungMarkets(Tool):
         else:
             bbox = zensus.get_bbox(centroid, square_size)
             arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
-                             'Neuberechnung wird übersprungen')
+                             'Berechnung wird übersprungen')
         return bbox
     
     def communities_to_centers(self, bbox):
