@@ -683,7 +683,9 @@ class TemplateErzeugen(ToolboxButton):
 
 
 class TemplateEinlesen(object):
-    pass
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
+    _toolbox_name = 'TbxMaerkteImportieren'
 
 
 class MarktBearbeiten(ToolboxButton):

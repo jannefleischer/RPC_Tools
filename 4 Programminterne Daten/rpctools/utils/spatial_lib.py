@@ -2,8 +2,17 @@ import arcpy
 from rpctools.utils.params import Folders
 from rpctools.utils.params import DummyTbx
 from rpctools.utils.output import ArcpyEnv
+import requests
 import numpy as np
 from os.path import join
+
+def google_geocode(address):
+    url = 'https://maps.googleapis.com/maps/api/geocode/json'
+    params = {'sensor': 'false', 'address': address}
+    r = requests.get(url, params=params)
+    results = r.json()['results']
+    location = results[0]['geometry']['location']
+    return location['lat'], location['lng']
 
 def get_closest_point(point, points):
     """get the point out of given points that is closest to the given point,

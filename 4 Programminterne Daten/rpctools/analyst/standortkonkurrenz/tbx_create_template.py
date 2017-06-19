@@ -4,9 +4,11 @@ import arcpy
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 from rpctools.analyst.standortkonkurrenz.market_templates import MarketTemplate
+import os
 
 
 class CreateTemplate(Tool):
+    subfolder = 'input_templates'
 
     def add_outputs(self):
         pass
@@ -14,10 +16,12 @@ class CreateTemplate(Tool):
     def run(self):
         typ = self.par.template_type.value
         arcpy.AddMessage('Template wird erzeugt...')
-        template = MarketTemplate(typ, self.folders.get_projectpath(),
-                                  epsg=self.parent_tbx.config.epsg)
+    
+        path = os.path.join(self.folders.get_projectpath(), self.subfolder)
+        template = MarketTemplate(typ, path, epsg=self.parent_tbx.config.epsg)
         template.create()
         template.open()
+
 
 class TbxCreateTemplate(Tbx):
     
@@ -46,8 +50,8 @@ class TbxCreateTemplate(Tbx):
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-        param.filter.list = MarketTemplate.template_types
-        param.value = param.filter.list[0]
+        param.filter.list = MarketTemplate.template_types.keys()
+        param.value = param.filter.list[1]
         
         return self.par
     

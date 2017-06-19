@@ -44,10 +44,11 @@ class Point(object):
 class Supermarket(Point):
     """A Supermarket"""
     __slots__ = ['id_markt', 'x', 'y', 'name', 'kette', 'shop', 'typ', 'geom']
-    def __init__(self, id_markt, x, y, name, kette, shop, typ, **kwargs):
+    def __init__(self, id_markt, x, y, name, kette, shop=None, typ=None,
+                 epsg=4326, 
+                 **kwargs):
+        super(Supermarket, self).__init__(x, y, id=id_markt, epsg=epsg)
         self.id_markt = id_markt
-        self.x = x
-        self.y = y
         self.name = name
         self.kette = kette
         self.shop = shop
