@@ -55,6 +55,7 @@ class ProjektwirkungMarkets(Tool):
     
     def run(self):
         folders = Folders(self.par)
+        self.recalculate = self.par.recalculate.value
         
         if self.recalculate:
             self.parent_tbx.delete_rows_in_table('Beziehungen_Maerkte_Zellen')
@@ -413,6 +414,14 @@ class TbxProjektwirkungMarkets(Tbx):
         p.datatype = u'GPLong'
         p.enabled = False
         p.value = 20
+        
+        param = self.add_parameter('recalculate')
+        param.name = encode(u'Neuberechnung')
+        param.displayName = encode(u'Neuberechnung der Distanzen und '
+                                   u'Siedlungszellen erzwingen')
+        param.parameterType = 'Optional'
+        param.direction = 'Input'
+        param.datatype = u'GPBoolean'
 
         return params
 
