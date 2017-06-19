@@ -675,8 +675,14 @@ class MaerkteAnzeigen(Output):
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxOSMMarktEinlesen'
 
-    
-class BestandEinlesen(object):
+
+class TemplateErzeugen(ToolboxButton):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
+    _toolbox_name = 'TbxCreateTemplate'
+
+
+class TemplateEinlesen(object):
     pass
 
 

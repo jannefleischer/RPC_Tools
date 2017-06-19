@@ -199,7 +199,10 @@
                 <Button caption="OpenStreetMap" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Bestand aus Datei einlesen" category="ProjektCheck" class="BestandEinlesen" id="rpc_tools.bestand_datei" image="Images\CadastralJobLoad16.png" message="" tip="">
+                <Button caption="Template erzeugen" category="ProjektCheck" class="TemplateErzeugen" id="rpc_tools.template_erzeugen" image="Images\MetadataDocumentLiveService16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Bestand aus Template einlesen" category="ProjektCheck" class="TemplateEinlesen" id="rpc_tools.template_einlesen" image="Images\MetadataGazetteerLoad16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Tool caption="Markt hinzuf&#252;gen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
@@ -421,7 +424,8 @@
                 <Menu caption="Bestand einlesen" category="ProjektCheck" id="rpc_tools.menu_bestand_einlesen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.bestand_osm" />
-                        <Button refID="rpc_tools.bestand_datei" />
+                        <Button refID="rpc_tools.template_erzeugen" />
+                        <Button refID="rpc_tools.template_einlesen" />
                     </Items>
                 </Menu>
                 <Menu caption="Nullfall" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
