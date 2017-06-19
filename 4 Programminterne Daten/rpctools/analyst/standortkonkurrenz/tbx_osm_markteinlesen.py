@@ -12,7 +12,7 @@ from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
                                                               Point)
 
 
-class OSMMarktEinlesen(Tool):
+class MarktEinlesen(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     
@@ -54,6 +54,8 @@ class OSMMarktEinlesen(Tool):
             self.parent_tbx.update_table('Maerkte',
                                          column_values={'AGS': ags_market[0]},
                                          where='id={}'.format(id))
+
+class OSMMarktEinlesen(MarktEinlesen):
 
     def set_chains(self):
         """

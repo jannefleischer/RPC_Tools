@@ -8,15 +8,13 @@ import re
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 from rpctools.analyst.standortkonkurrenz.market_templates import MarketTemplate
+from rpctools.analyst.standortkonkurrenz.tbx_osm_markteinlesen import MarktEinlesen
 
 
-class MaerkteImportieren(Tool):
+class MaerkteImportieren(MarktEinlesen):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     
-    def add_outputs(self):
-        pass
-
     def run(self):
         path, filename = os.path.split(self.par.filepath)
         name, ext = os.path.splitext(filename) 
@@ -24,7 +22,9 @@ class MaerkteImportieren(Tool):
         template_type = MarketTemplate.template_types.keys()[idx]
         template = MarketTemplate(template_type, path, filename=filename,
                                   epsg=self.parent_tbx.config.epsg)
-        df = template.get_markets()
+        markets = template.get_markets()
+        self.markets_to_db(markets)
+        print()
 
 
 class TbxMaerkteImportieren(Tbx):

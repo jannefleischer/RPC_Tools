@@ -161,7 +161,7 @@ class MarketTemplate(object):
             market = Supermarket(i, lon, lat,
                                  row['Name'], row['Kette'],
                                  epsg=4326)
-            market = market.transform(self.epsg)
+            market.transform(self.epsg)
             markets.append(market)
         return markets
         
