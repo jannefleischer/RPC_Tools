@@ -196,22 +196,22 @@
                 <Tool caption="Anbindungspunkt setzen" category="ProjektCheck" class="Anbindungspunkt" id="rpc_tools.anbindungspunkt" image="Images\CadastralFeatureSelect16.png" message="" tip="Setzen Sie auf der Karte einen Punkt zur Anbindung der Teilfl&#228;che an das Stra&#223;ennetz">
                     <Help heading="" />
                 </Tool>                
-                <Button caption="OpenStreetMap" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="">
+                <Button caption="OpenStreetMap anfragen" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Template erzeugen" category="ProjektCheck" class="TemplateErzeugen" id="rpc_tools.template_erzeugen" image="Images\MetadataDocumentLiveService16.png" message="" tip="">
+                <Button caption="Templates erzeugen" category="ProjektCheck" class="TemplateErzeugen" id="rpc_tools.template_erzeugen" image="Images\MetadataDocumentLiveService16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Bestand aus CSV/Excel einlesen" category="ProjektCheck" class="TemplateEinlesenDatei" id="rpc_tools.template_einlesen_datei" image="Images\MetadataGazetteerLoad16.png" message="" tip="">
+                <Button caption="CSV/Excel-Template einlesen" category="ProjektCheck" class="TemplateEinlesenDatei" id="rpc_tools.template_einlesen_datei" image="Images\MetadataGazetteerLoad16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Bestand aus Shape/Layer einlesen" category="ProjektCheck" class="TemplateEinlesenFeatureClass" id="rpc_tools.template_einlesen_featureclass" image="Images\MetadataGazetteerLoad16.png" message="" tip="">
+                <Button caption="Shape/Layer-Template einlesen" category="ProjektCheck" class="TemplateEinlesenFeatureClass" id="rpc_tools.template_einlesen_featureclass" image="Images\MetadataGazetteerLoad16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Markt hinzuf&#252;gen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
+                <Tool caption="bestehenden Markt hinzuf&#252;gen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Markt bearbeiten/entfernen" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
+                <Tool caption="bestehenden Markt bearbeiten/entfernen" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
                 <Tool caption="bestehenden Markt erweitern" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_erweitern" image="" message="" tip="">

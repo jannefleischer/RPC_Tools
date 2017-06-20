@@ -8,7 +8,6 @@ import os
 
 
 class CreateTemplate(Tool):
-    subfolder = 'input_templates'
 
     def add_outputs(self):
         pass
@@ -17,7 +16,7 @@ class CreateTemplate(Tool):
         typ = self.par.template_type.value
         arcpy.AddMessage('Template wird erzeugt...')
     
-        path = os.path.join(self.folders.get_projectpath(), self.subfolder)
+        path = self.par.folder.value.value
         template = MarketTemplate(typ, path, epsg=self.parent_tbx.config.epsg)
         template.create()
         template.open()
@@ -52,11 +51,21 @@ class TbxCreateTemplate(Tbx):
         param.datatype = u'GPString'
         param.filter.list = MarketTemplate.template_types.keys()
         param.value = param.filter.list[1]
+    
+        param = self.add_parameter('folder')
+        param.name = encode(u'folder')
+        param.displayName = encode(u'Zielordner')
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'DEFolder'
         
         return self.par
     
     def _open(self, params):
-        pass
+        param = self.par.folder
+        subfolder = 'input_templates'
+        param.value = os.path.join(self.folders.get_projectpath(),
+                                   subfolder)
     
     def validate_inputs(self):
         return True, ''
