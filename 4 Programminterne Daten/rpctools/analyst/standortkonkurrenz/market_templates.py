@@ -39,12 +39,16 @@ class MarketTemplate(object):
     
     _required_fields = OrderedDict({
         u'Name' : str,
-        u'Kette': str,
+        u'Kette': str
+    })
+    
+    _address_fields = OrderedDict({
         u'Ort': str,
         u'PLZ': int,
         u'Straße': int,
         u'Hausnummer': int
     })
+    
     _option_1 = {u'Vkfl_m²': int}
     _option_2 = {u'BTyp': int}
 
@@ -73,6 +77,8 @@ class MarketTemplate(object):
         self.sr = arcpy.SpatialReference(epsg)
             
         self.fields = self._required_fields.copy()
+        if self.template_type in ['CSV-Datei', 'Exceldatei']:
+            self.fields.update(self._address_fields)
         self.fields.update(self._option_1)
     
     def create(self):
@@ -138,11 +144,24 @@ class MarketTemplate(object):
             arcpy.AddField_management(file_path, field, field_type)
             
     def get_markets(self):
+        '''read and return the markets from file'''
         if self.template_type == 'CSV-Datei':
             df = pd.DataFrame.from_csv(self.file_path, sep=self._delimiter,
                                        encoding='latin1')
             df[df.index.name] = df.index
+        elif self.template_type == 'Exceldatei':
+            df = pd.read_excel(self.file_path)
+        elif self.template_type == 'Shapefile':
+            columns = [f.name for f in arcpy.ListFields(self.file_path)]        
+            cursor = arcpy.da.SearchCursor(self.file_path, columns)
+            rows = [row for row in cursor]
+            del cursor
+            df = pd.DataFrame.from_records(rows, columns=columns)
+        else:
+            raise Exception('unknown type of template')
         required = self._required_fields.keys()
+        if self.template_type in ['CSV-Datei', 'Exceldatei']:
+            required += self._address_fields.keys()
         if np.in1d(required, df.columns).sum() < len(required):
             raise LookupError('missing fields in given file')
         markets = self._df_to_markets(df)
@@ -151,17 +170,19 @@ class MarketTemplate(object):
     def _df_to_markets(self, df):
         markets = []
         for i, (idx, row) in enumerate(df.iterrows()):
-            address = '{postcode} {city} {street} {number}'.format(
-                postcode=row['PLZ'],
-                city=row['Ort'], 
-                street=row[u'Straße'], 
-                number=row['Hausnummer']
-            )
-            lat, lon = google_geocode(address)
-            market = Supermarket(i, lon, lat,
-                                 row['Name'], row['Kette'],
-                                 epsg=4326)
-            market.transform(self.epsg)
+            address = ''
+            name, kette, vkfl = row['Name'], row['Kette'], row[u'Vkfl_m²']
+            if self.template_type in ['CSV-Datei', 'Exceldatei']:
+                for field in self._address_fields.keys():
+                    address += u' {}'.format(row[field])
+                lat, lon = google_geocode(address)
+                market = Supermarket(i, lon, lat, name, kette, vkfl=vkfl,
+                                     epsg=4326)
+                market.transform(self.epsg)
+            else:
+                x, y = row['Shape']
+                market = Supermarket(i, x, y, name, kette, vkfl=vkfl,
+                                     epsg=self.epsg)
             markets.append(market)
         return markets
         

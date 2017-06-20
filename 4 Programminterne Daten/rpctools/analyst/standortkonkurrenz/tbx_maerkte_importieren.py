@@ -16,15 +16,22 @@ class MaerkteImportieren(MarktEinlesen):
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     
     def run(self):
-        path, filename = os.path.split(self.par.filepath)
-        name, ext = os.path.splitext(filename) 
+        path, filename = os.path.split(self.par.filepath.value.value)
+        name, ext = os.path.splitext(filename)
+        # get type of template by reverse looking up file extension
         idx = MarketTemplate.template_types.values().index(ext)
         template_type = MarketTemplate.template_types.keys()[idx]
         template = MarketTemplate(template_type, path, filename=filename,
                                   epsg=self.parent_tbx.config.epsg)
+        arcpy.AddMessage('Lese Datei ein...')
         markets = template.get_markets()
-        self.markets_to_db(markets)
-        print()
+        truncate = self.par.truncate.value
+        markets = self.parse_meta_by_chain(markets)
+        arcpy.AddMessage(u'Schreibe {} Märkte in die Datenbank...'
+                         .format(len(markets)))
+        self.markets_to_db(markets, truncate=truncate)
+        arcpy.AddMessage(u'Aktualisiere die AGS der Märkte...')
+        self.set_ags()
 
 
 class TbxMaerkteImportieren(Tbx):
@@ -57,8 +64,16 @@ class TbxMaerkteImportieren(Tbx):
         param.direction = 'Input'
         param.datatype = u'DEFile'
         #param.filter.type = 'File'
-        param.filter.list = MarketTemplate.template_types.values()
+        param.filter.list = [e.replace('.', '')
+                             for e in MarketTemplate.template_types.values()]
         #param.value = 1000
+        
+        param = self.add_parameter('truncate')
+        param.name = encode(u'truncate')
+        param.displayName = encode(u'vorhandene Märkte entfernen')
+        param.parameterType = 'Optional'
+        param.direction = 'Input'
+        param.datatype = u'GPBoolean'
 
         return params
 
@@ -70,6 +85,7 @@ class TbxMaerkteImportieren(Tbx):
 if __name__ == '__main__':
     t = TbxMaerkteImportieren()
     t._getParameterInfo()
-    t.par.filepath = r'C:\Users\ggr\Desktop\maerkte.csv'
+    t.par.filepath.value = r'C:\Users\ggr\Desktop\templates\maerkte_template.shp'
+    #t.par.filepath.value = r'C:\Users\ggr\Desktop\templates\maerkte_template.csv'
     t.set_active_project()
     t.execute()

@@ -43,16 +43,19 @@ class Point(object):
 
 class Supermarket(Point):
     """A Supermarket"""
-    __slots__ = ['id_markt', 'x', 'y', 'name', 'kette', 'shop', 'typ', 'geom']
-    def __init__(self, id_markt, x, y, name, kette, shop=None, typ=None,
-                 epsg=4326, 
+    __slots__ = ['id', 'x', 'y', 'id_betriebstyp', 'id_kette', 
+                 'name', 'kette', 'shop', 'typ', 'geom', 'vkfl']
+    def __init__(self, id, x, y, name, kette, shop=None, typ=None, vkfl=None, 
+                 id_betriebstyp=1, epsg=4326, 
                  **kwargs):
-        super(Supermarket, self).__init__(x, y, id=id_markt, epsg=epsg)
-        self.id_markt = id_markt
+        super(Supermarket, self).__init__(x, y, id=id, epsg=epsg)
+        self.id_betriebstyp = id_betriebstyp
         self.name = name
+        self.id_kette = 0
         self.kette = kette
         self.shop = shop
         self.typ = typ
+        self.vkfl = vkfl
         self.geom = None
 
     def __repr__(self):

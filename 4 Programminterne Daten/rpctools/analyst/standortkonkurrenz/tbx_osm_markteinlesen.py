@@ -25,24 +25,44 @@ class MarktEinlesen(Tool):
         self.output.add_layer(group_layer, layer_nullfall, fc, zoom=False)
         self.output.add_layer(group_layer, layer_planfall, fc, zoom=False)
 
-    def markets_to_db(self, supermarkets):
+    def markets_to_db(self, supermarkets, truncate=False):
         """Create the point-features for supermarkets"""
         tablename = 'Maerkte'
         sr = arcpy.SpatialReference(self.parent_tbx.config.epsg)
-        columns = ['name', 'id_betriebstyp_nullfall', 'id_betriebstyp_planfall',
-                   'SHAPE@', 'id']
+        
+        columns = [
+            'name',
+            'id_betriebstyp_nullfall',
+            'id_betriebstyp_planfall',
+            'id_kette', 
+            'SHAPE@',
+            'id']
         table = self.folders.get_table(tablename)
-        arcpy.TruncateTable_management(table)
         # remove results as well (distances etc.)
         res_table = self.folders.get_table('Beziehungen_Maerkte_Zellen')
-        arcpy.TruncateTable_management(self.folders.get_table(res_table))
+        
+        if truncate:
+            arcpy.TruncateTable_management(table)
+            arcpy.TruncateTable_management(self.folders.get_table(res_table))
+            max_id = 0
+        else:
+            df = self.parent_tbx.table_to_dataframe('Maerkte')
+            max_id = df['id'].max() if len(df) > 0 else 0
+            
         with arcpy.da.InsertCursor(table, columns) as rows:
             for i, markt in enumerate(supermarkets):
                 if markt.name is None:
                     continue
                 markt.create_geom()
                 if markt.geom:
-                    rows.insertRow((markt.name, 1, 1, markt.geom, i+1))
+                    rows.insertRow((
+                        markt.name,
+                        markt.id_betriebstyp,
+                        markt.id_betriebstyp,
+                        markt.id_kette, 
+                        markt.geom,
+                        max_id + i + 1
+                    ))
 
     def set_ags(self):
         """
@@ -55,63 +75,85 @@ class MarktEinlesen(Tool):
                                          column_values={'AGS': ags_market[0]},
                                          where='id={}'.format(id))
 
-class OSMMarktEinlesen(MarktEinlesen):
-
-    def set_chains(self):
+    def parse_meta_by_chain(self, markets): 
         """
-        Assign chains to supermarkets
+        use the name of the chain of the markets to parse and assign
+        chain-ids and betriebstyps
+        """
+        df_chains = self.parent_tbx.table_to_dataframe(
+            'Ketten', 
+            workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
+            is_base_table=True)
+        df_chains['name'] = [name.lower() for name in df_chains['name'].values]
+        df_bt = self.parent_tbx.table_to_dataframe(
+            'Betriebstypen', 
+            workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
+            is_base_table=True)
+        df_bt.fillna(sys.maxint, inplace=True)
+        for market in markets:
+            idx_kette = df_chains['name'] == market.kette.strip().lower()
+            market.id_kette = df_chains[idx_kette]['id_kette'].values[0] \
+                if idx_kette.sum() > 0 else 0
+            is_discounter = df_chains[idx_kette]['discounter'].values[0]
+            if is_discounter:
+                market.id_betriebstyp = 7
+            elif market.vkfl is not None:
+                fit_idx = ((df_bt['von_m2'] <= market.vkfl) &
+                           (df_bt['bis_m2'] > market.vkfl))
+                if fit_idx.sum() > 0:
+                    market.id_betriebstyp = df_bt[fit_idx]['id_betriebstyp'].values[0]
+        return markets
 
+    def parse_meta_by_name(self, markets):
+        """
+        use the name of the markets to parse and assign chain-ids and
+        betriebstyps
         """
 
-        ws_markets = self.folders.get_db(
-            'FGDB_Standortkonkurrenz_Supermaerkte.gdb')
-        ws_chains = self.folders.get_basedb(
-            'FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb')
+        df_chains_alloc = self.parent_tbx.table_to_dataframe(
+            'Ketten_Zuordnung', 
+            workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
+            is_base_table=True)
+        df_chains_alloc.sort(columns='prioritaet', ascending=False)
+        
+        ret_markets = []
 
-        table_markets = os.path.join(ws_markets, "Maerkte")
-        fields = ["name", "id_kette", "id_betriebstyp_nullfall", "id_betriebstyp_planfall"]
-        market_cursor = arcpy.da.UpdateCursor(table_markets, fields)
-
-        table_chains = os.path.join(ws_chains, "Ketten_Zuordnung")
-        fields = ["regex", "id_kette", "id_betriebstyp", "prioritaet"]
-
-        for market in market_cursor:
-            match_found = False
-            deleted = False
-            chain_cursor = arcpy.da.SearchCursor(
-                table_chains, fields,
-                sql_clause=(None, 'ORDER BY prioritaet DESC'))
-            for chain in chain_cursor:
-                if market[0] is not None:
-                    match_result = re.match(chain[0], market[0])
-                else:
-                    match_result = None
-                if match_result and not match_found:
-                    match_found = True
-                    if market[2] == -1:
-                        cursor.deleteRow()
-                        deleted = True
-                    else:
-                        market[1] = chain[1]
-                        market[2] = chain[2]
-                        market[3] = chain[2]
-                    break
-            if deleted:
+        for market in markets:
+            # no name -> nothing to parse
+            if not market.name:
                 continue
+            match_found = False
+            for idx, chain_alloc in df_chains_alloc.iterrows():
+                match_result = re.match(chain_alloc['regex'], market.name) 
+                if not match_result:
+                    continue
+                match_found = True
+                id_kette = chain_alloc['id_kette']
+                # don't add markets with id -1 (indicates markets that
+                # don't qualify as supermarkets or discounters)
+                if id_kette >= 0:
+                    market.id_betriebstyp = chain_alloc['id_betriebstyp']
+                    market.id_kette = id_kette
+                    ret_markets.append(market)
+                break
+            # add markets that didn't match (keep defaults)
             if not match_found:
-                market[1] = 0
-                market[2] = 1
-                market[3] = 1
-            market_cursor.updateRow(market)
+                ret_markets.append(market)
+        return ret_markets
+
+
+class OSMMarktEinlesen(MarktEinlesen):
 
     def run(self):
         tbx = self.parent_tbx
+        # calc. center of areas
         flaechen_df = tbx.table_to_dataframe(
             'Teilflaechen_Plangebiet',
             columns=['INSIDE_X', 'INSIDE_Y'],
             workspace='FGDB_Definition_Projekt.gdb')
         x = flaechen_df['INSIDE_X'].mean()
         y = flaechen_df['INSIDE_Y'].mean()
+        
         epsg = tbx.config.epsg
         centroid = Point(x, y, epsg=epsg)
         arcpy.AddMessage('Sende Standortanfrage an Geoserver...')
@@ -121,8 +163,12 @@ class OSMMarktEinlesen(MarktEinlesen):
         arcpy.AddMessage(u'{} Märkte gefunden'.format(len(markets)))
         arcpy.AddMessage(u'Supermärkte werden in die Datenbank übertragen...'
                          .format(len(markets)))
-        self.markets_to_db(markets)
-        self.set_chains()
+        truncate = self.par.truncate.value
+        markets = self.parse_meta_by_name(markets)
+        arcpy.AddMessage(u'Schreibe {} Märkte in die Datenbank...'
+                         .format(len(markets)))
+        self.markets_to_db(markets, truncate=truncate)
+        arcpy.AddMessage(u'Aktualisiere die AGS der Märkte...')
         self.set_ags()
 
 
@@ -170,6 +216,13 @@ class TbxOSMMarktEinlesen(Tbx):
         param.filter.type = 'Range'
         param.filter.list = [0, 5000]
         param.value = 1000
+        
+        param = self.add_parameter('truncate')
+        param.name = encode(u'truncate')
+        param.displayName = encode(u'vorhandene Märkte entfernen')
+        param.parameterType = 'Optional'
+        param.direction = 'Input'
+        param.datatype = u'GPBoolean'
 
         return params
 
