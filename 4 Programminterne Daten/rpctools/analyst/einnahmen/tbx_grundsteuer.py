@@ -4,9 +4,9 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-
-
-from rpctools.analyst.einnahmen.T4_Grundsteuer import Grundsteuer
+from rpctools.utils.constants import Nutzungsart
+from rpctools.utils.config import Folders as folders
+from rpctools.analyst.einnahmen.script_Grundsteuer import Grundsteuer
 
 
 class TbxGrundsteuer(Tbx):
@@ -23,97 +23,210 @@ class TbxGrundsteuer(Tbx):
     def _getParameterInfo(self):
 
         params = self.par
-        projekte = self.folders.get_projects()
+
         # Projektname
-        param_1 = params.name = arcpy.Parameter()
-        param_1.name = u'Projektname'
-        param_1.displayName = u'Projektname'
-        param_1.parameterType = 'Required'
-        param_1.direction = 'Input'
-        param_1.datatype = u'GPString'
-        param_1.filter.list = projekte
-        if projekte:
-            param_1.value = projekte[0]
+        param = params.name = arcpy.Parameter()
+        param.name = u'Projektname'
+        param.displayName = u'Projektname'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPString'
 
-        # Gemeindegrössenklasse_1964
-        param_2 = params.ggk_1964 = arcpy.Parameter()
-        param_2.name = encode(u'Gemeindegrößenklasse_1964')
-        param_2.displayName = encode(u'Gemeindegrößenklasse 1964')
-        param_2.parameterType = 'Required'
-        param_2.direction = 'Input'
-        param_2.datatype = u'GPString'
+        heading = "1 Hebesatz Grundsteuer B in der Projektgemeinde"
 
-        param_2.filter.list = [u'unter 2000 EW',
-                               u'2000 bis 5000 EW',
-                               u'5000 bis 10000 EW',
-                               u'10000 bis 50000 EW',
-                               u'50000 bis 500000 EW',
-                               encode(u'über 500000 EW')]
+        param = params.slider1 = arcpy.Parameter()
+        param.name = u'HebesatzB'
+        param.displayName = u'als von-Hundert-Satz'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.filter.type = 'Range'
+        param.filter.list = [50, 500]
+        param.category = heading
 
-        # Grundsteuerhebesatz_als_vH_Satz
-        param_3 = params.hebesatz = arcpy.Parameter()
-        param_3.name = u'Grundsteuerhebesatz_als_vH_Satz'
-        param_3.displayName = u'Grundsteuerhebesatz als vH Satz'
-        param_3.parameterType = 'Required'
-        param_3.direction = 'Input'
-        param_3.datatype = u'GPDouble'
+        heading = u"2 Wohnen: Jahresrohmieten nach Ertragswertverfahren (alte Bundesländer)"
 
-        heading = "01 Mieten"
+        param = params.slider2 = arcpy.Parameter()
+        param.name = u'efh'
+        param.displayName = u'Einfamilienhaus (Jahresrohmiete 1964 pro qm Wohnfläche) in Euro-Cent pro Monat'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.filter.type = 'Range'
+        param.filter.list = [50, 500]
+        param.category = heading
 
-        # Einfamilienhaus__Monatsrohmiete__in_€_m²_
-        param_4 = params.efh_rohmiete = arcpy.Parameter()
-        param_4.name = encode(u'Einfamilienhaus__Monatsrohmiete__in_€')
-        param_4.displayName = encode(u'Einfamilienhaus: Monatsrohmiete (in €)')
-        param_4.parameterType = 'Required'
-        param_4.direction = 'Input'
-        param_4.datatype = u'GPDouble'
-        param_4.category = heading
+        param = params.slider3 = arcpy.Parameter()
+        param.name = u'dh'
+        param.displayName = u'Doppelhaus (Jahresrohmiete 1964 pro qm Wohnfläche) in Euro-Cent pro Monat'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.filter.type = 'Range'
+        param.filter.list = [50, 500]
+        param.category = heading
 
-        # Zweifamilien-_oder_Doppelhaus__Monatsrohmiete__in_€_m²_
-        param_5 = params.zfh_rohmiete = arcpy.Parameter()
-        param_5.name = encode(u'Zweifamilien-_oder_Doppelhaus__Monatsrohmiete__in_€')
-        param_5.displayName = encode(u'Zweifamilien- oder Doppelhaus: Monatsrohmiete (in €)')
-        param_5.parameterType = 'Required'
-        param_5.direction = 'Input'
-        param_5.datatype = u'GPDouble'
-        param_5.category = heading
+        param = params.slider4 = arcpy.Parameter()
+        param.name = u'rh'
+        param.displayName = u'Reihenhaus (Jahresrohmiete 1964 pro qm Wohnfläche) in Euro-Cent pro Monat'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.filter.type = 'Range'
+        param.filter.list = [50, 500]
+        param.category = heading
 
-        # Reihenhaus__Monatsrohmiete__in_€_m²_
-        param_6 = params.rh_rohmiete = arcpy.Parameter()
-        param_6.name = encode(u'Reihenhaus__Monatsrohmiete__in_€')
-        param_6.displayName = encode(u'Reihenhaus: Monatsrohmiete (in €)')
-        param_6.parameterType = 'Required'
-        param_6.direction = 'Input'
-        param_6.datatype = u'GPDouble'
-        param_6.category = heading
+        param = params.slider5 = arcpy.Parameter()
+        param.name = u'mfh'
+        param.displayName = u'Mehrfamilienhaus (Jahresrohmiete 1964 pro qm Wohnfläche) in Euro-Cent pro Monat'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.filter.type = 'Range'
+        param.filter.list = [50, 500]
+        param.category = heading
 
-        # Mehrfamilienhaus__Monatsrohmiete__in_€_m²_
-        param_7 = params.mfh_rohmiete = arcpy.Parameter()
-        param_7.name = encode(u'Mehrfamilienhaus__Monatsrohmiete__in_€')
-        param_7.displayName = encode(u'Mehrfamilienhaus: Monatsrohmiete (in €)')
-        param_7.parameterType = 'Required'
-        param_7.direction = 'Input'
-        param_7.datatype = u'GPDouble'
-        param_7.category = heading
 
-        heading = "02 Garagen"
+        heading = u"3 Wohnen: Bodenwert nach Sachwertverfahren (Einfamilienhäuser in den neuen Bundesländern)"
 
-        # Jahresrohmiete_Garagen___pro_Garage_
-        param_8 = params.garagen_jahresrohmiete = arcpy.Parameter()
-        param_8.name = u'Jahresrohmiete_Garagen___pro_Garage_'
-        param_8.displayName = u'Jahresrohmiete Garagen (pro Garage)'
-        param_8.parameterType = 'Required'
-        param_8.direction = 'Input'
-        param_8.datatype = u'GPDouble'
-        param_8.category = heading
+        param = params.slider6 = arcpy.Parameter()
+        param.name = u'bodenwert'
+        param.displayName = u'Bodenwert 1935 in Euro-Cent pro Quadratmeter (im Sinne des Sachwertverfahrens)'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.filter.type = 'Range'
+        param.filter.list = [0, 800]
+        param.category = heading
 
-        # Jahresrohmiete_Carports___pro_Garage_
-        param_9 = params.carports_jahresrohmiete = arcpy.Parameter()
-        param_9.name = u'Jahresrohmiete_Carports___pro_Garage_'
-        param_9.displayName = u'Jahresrohmiete Carports (pro Garage)'
-        param_9.parameterType = 'Required'
-        param_9.direction = 'Input'
-        param_9.datatype = u'GPDouble'
-        param_9.category = heading
+        param = params.slider7 = arcpy.Parameter()
+        param.name = u'groesse_efh'
+        param.displayName = u'Mittlere Größe der Einfamilienhausgrundstücke'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Long'
+        param.filter.type = 'Range'
+        param.filter.list = [300, 3000]
+        param.category = heading
+
+
+        heading = u"4 Gewerbe/Einzelhandel: Voraussichtliches Bauvolumen"
+
+        param = params.slider8 = arcpy.Parameter()
+        param.name = u'bueroflaeche'
+        param.displayName = u'Bürofläche: qm Brutto-Grundfläche (BGF)'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Double'
+        param.value = 0
+        param.category = heading
+
+        param = params.slider9 = arcpy.Parameter()
+        param.name = u'lagerflaeche'
+        param.displayName = u'Hallen und Lagerfläche: qm Brutto-Grundfläche (BGF)'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'Double'
+        param.value = 0
+        param.category = heading
 
         return params
+
+
+    def eingaben_auslesen(self, params):
+
+        fields = ['AGS', 'Gemeindetyp']
+        folder = folders()
+        tablepath_rahmendaten = folder.get_table('Projektrahmendaten', "FGDB_Definition_Projekt.gdb", params.name.value)
+        cursor = arcpy.da.SearchCursor(tablepath_rahmendaten, fields)
+        for row in cursor:
+            ags = row[0]
+            gemeindetyp = row[1]
+
+        fields = ['AGS', 'Hebesatz_GrStB']
+        where_clause = '"AGS"' + "= '" + ags + "'"
+        cursor = self.query_table('bkg_gemeinden', fields, "FGDB_Basisdaten_deutschland.gdb", where_clause, is_base_table = True)
+        for row in cursor:
+            params.slider1.value = row[1]
+
+        fields = ["EFH_Rohmiete", 'DHH_Rohmiete', 'RHW_Rohmiete', 'MFH_Rohmiete', 'Bodenwert_Sachwertverfahren', 'qm_Grundstueck_pro_WE_EFH', 'BGF_Buero', 'BGF_Halle']
+        cursor = self.query_table('GrSt_Basisdaten', fields)
+        if cursor:
+            for row in cursor:
+                params.slider2.value = row[0]
+                params.slider3.value = row[1]
+                params.slider4.value = row[2]
+                params.slider5.value = row[3]
+                params.slider6.value = row[4]
+                params.slider7.value = row[5]
+                params.slider8.value = row[6]
+                params.slider9.value = row[7]
+        else:
+            fields = ['Gemeindetyp', "EFH_Rohmiete", 'DHH_Rohmiete', 'RHW_Rohmiete', 'MFH_Rohmiete', 'Bodenwert_SWV', 'qm_Grundstueck_pro_WE_EFH']
+            where_clause = '"Gemeindetyp"' + " = " + str(gemeindetyp)
+            cursor = self.query_table('GrSt_Startwerte_Rohmieten_Bodenwert', fields, "FGDB_Einnahmen_Tool.gdb", where_clause, is_base_table = True)
+            for row in cursor:
+                params.slider2.value = row[1]
+                params.slider3.value = row[2]
+                params.slider4.value = row[3]
+                params.slider5.value = row[4]
+                params.slider6.value = row[5]
+                params.slider7.value = row[6]
+                params.slider8.value = 0
+                params.slider9.value = 0
+
+
+
+    def _updateParameters(self, params):
+        """Modify the values and properties of parameters before internal
+        validation is performed.  This method is called whenever a parameter
+        has been changed."""
+
+        if params.name.altered and not params.name.hasBeenValidated:
+            self.eingaben_auslesen(params)
+
+        ags = ""
+        fields = ['AGS']
+        cursor = self.query_table('Projektrahmendaten', fields, "FGDB_Definition_Projekt.gdb")
+        for row in cursor:
+            ags = row[0]
+
+        if int(ags) <= 10999999:
+            self.par.slider2.active = True
+            self.par.slider3.active = True
+            self.par.slider4.active = True
+            self.par.slider5.active = True
+        else:
+            self.par.slider2.active = False
+            self.par.slider3.active = False
+            self.par.slider4.active = False
+            self.par.slider5.active = False
+
+        efh = 0
+        fields = ["Gebaeudetyp", 'WE']
+        cursor = self.query_table('Wohnen_WE_in_Gebaeudetypen', fields, "FGDB_Definition_Projekt.gdb")
+        for row in cursor:
+            if row[0] == "Einfamilienhaus":
+                efh += row[1]
+
+        if efh == 0 or int(ags) < 11000000:
+            self.par.slider6.active = False
+            self.par.slider7.active = False
+        else:
+            self.par.slider6.active = True
+            self.par.slider7.active = True
+
+
+        where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.GEWERBE, Nutzungsart.EINZELHANDEL)
+
+        rows = self.query_table('Teilflaechen_Plangebiet',
+                                ['Nutzungsart'],
+                                workspace='FGDB_Definition_Projekt.gdb',
+                                where=where)
+
+        if not rows:
+            self.par.slider8.active = False
+            self.par.slider9.active = False
+        else:
+            self.par.slider8.active = True
+            self.par.slider9.active = True
