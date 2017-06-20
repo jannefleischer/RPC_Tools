@@ -18,12 +18,14 @@ class MaerkteImportieren(MarktEinlesen):
     def run(self):
         template = self.par.template.value
         # in case of DEFile you get the value by calling param.value.value
-        # (for whatever reason they implemented it that way)
+        # (for whatever reason)
         if hasattr(template, 'value'):
             template = template.value
         
+        # filepath as input 
         if isinstance(template, str):
             path, filename = os.path.split(filepath)
+        # layer as input
         else: 
             desc = arcpy.Describe(template)
             path, filename = desc.path, desc.file
