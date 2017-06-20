@@ -160,7 +160,7 @@
                 <Button caption="Grundsteuer" category="ProjektCheck" class="Grundsteuer" id="rpc_tools.grundsteuer" image="Images\011000-home_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Einkommensteuer" category="ProjektCheck" class="Einkommensteuer" id="rpc_tools.grundsteuer" image="Images\011000-home_1.png" message="" tip="">
+                <Button caption="Einkommensteuer" category="ProjektCheck" class="Einkommensteuer" id="rpc_tools.einkommensteuer" image="Images\011000-home_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Hebes&#228;tze kontrollieren" category="ProjektCheck" class="Hebesaetze" id="rpc_tools.hebesaetze" image="Images\506700-factory_1.png" message="" tip="">
@@ -413,15 +413,21 @@
                         <Menu refID="rpc_tools.wanderungssalden_beschaeftigte" />
                     </Items>
                 </Menu>
-                <Menu caption="Einnahmen" category="ProjektCheck" id="rpc_tools.menu_einnahmen" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption=" Fiskalische Bilanzen sch&#228;tzen" category="ProjektCheck" id="rpc_tools.menu_fiskalische_bilanzen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.grundsteuer" />
                         <Button refID="rpc_tools.einkommensteuer" />
                         <Button refID="rpc_tools.familienleistungsausgleich" />
-                        <Menu refID="rpc_tools.menu_wanderungssalden" />
+                        <Menu refID="rpc_tools.menu_gewerbesteuer" />
                         <Button refID="rpc_tools.umsatzsteuer" />
                         <Button refID="rpc_tools.bilanzen_gesamtsumme" />
                         <Button refID="rpc_tools.bilanzen_hinweise" />
+                    </Items>
+                </Menu>
+                <Menu caption="Kommunale Steuereinnahmen" category="ProjektCheck" id="rpc_tools.menu_einnahmen" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>                    
+                        <Menu refID="rpc_tools.menu_wanderungssalden" />
+                        <Menu refID="rpc_tools.menu_fiskalische_bilanzen" />
                     </Items>
                 </Menu>
                 <Menu caption="Bestand einlesen" category="ProjektCheck" id="rpc_tools.menu_bestand_einlesen" isRootMenu="false" isShortcutMenu="true" separator="true">
