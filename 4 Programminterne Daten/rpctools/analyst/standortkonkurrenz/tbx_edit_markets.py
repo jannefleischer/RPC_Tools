@@ -20,8 +20,11 @@ class EditMarkets(Tool):
 
     def run(self):
         markets_df = self.parent_tbx.markets_df
+        # check which markets should be deleted, the other ones will be updated
         delete_df = markets_df.loc[markets_df['do_delete'] == True]
         update_df = markets_df.loc[markets_df['do_delete'] == False]
+        
+        # deletions
         if len(delete_df) > 0:
             arcpy.AddMessage(u'Lösche Märkte')
         for idx, market in delete_df.iterrows():
@@ -32,6 +35,8 @@ class EditMarkets(Tool):
             self.parent_tbx.delete_rows_in_table(
                 'Beziehungen_Maerkte_Zellen',
                 where='id_markt={}'.format(market['id']))
+        
+        # updates
         arcpy.AddMessage(u'Schreibe Änderungen in Datenbank...')
         self.parent_tbx.dataframe_to_table('Maerkte', update_df,
                                            ['id'], upsert=False)
@@ -100,6 +105,7 @@ class TbxEditMarkets(Tbx):
             is_base_table=True
         )
         
+        # list pretty names for Betriebstypen
         pretty_names = []
         for idx, typ in self.types_df.iterrows():
             details = ''
@@ -183,17 +189,20 @@ class TbxEditMarkets(Tbx):
                           where='id={}'.format(new_id))
     
     def _open(self, params):
+        # reset markets dataframe on opening of toolbox
         self.markets_df = self.get_markets()
         self.markets_df['do_delete'] = False
         self.markets_df.sort(columns='id', inplace=True)
         if len(self.markets_df) == 0:
             return
 
+        # check, if there is a specific location set (most likely via addin)
         x, y = self.config.active_coord
         closest_idx = None
         if x and y:
             closest_idx, c = get_closest_point((x, y), self.markets_df['SHAPE'])
         
+        # update the names of the markets and list them
         pretty_names = []
         for idx, market in self.markets_df.iterrows():
             pretty = self.get_pretty_market_name(market)
@@ -203,6 +212,8 @@ class TbxEditMarkets(Tbx):
         self.set_selected_market_inputs()
         
     def get_pretty_market_name(self, market):
+        '''assemble a meaningful name for the market incl. name and additional
+        informations'''
         betriebstyp_col = 'id_betriebstyp_nullfall' \
             if self.setting == NULLFALL else 'id_betriebstyp_planfall'
         chain_name = self.chains_df['name'][
@@ -218,6 +229,7 @@ class TbxEditMarkets(Tbx):
         return pretty
     
     def set_selected_market_inputs(self):
+        '''set all input fields to match data of currently selected market'''
         self.par.delete_all.value = False
         betriebstyp_col = 'id_betriebstyp_nullfall' \
             if self.setting == NULLFALL else 'id_betriebstyp_planfall'
@@ -250,6 +262,7 @@ class TbxEditMarkets(Tbx):
         return True, ''
         
     def update_market_list(self, idx=None):
+        '''update the input list of markets with pretty names in dataframe'''
         if idx is None:
             idx = self.par.markets.filter.list.index(
                 self.par.markets.value) if self.par.markets.value else 0
@@ -289,12 +302,13 @@ class TbxEditMarkets(Tbx):
             self.par.do_delete.value = delete_all
             self.markets_df['do_delete'] = delete_all
             # update the pretty names of ALL markets in list
+            # (setting the prefix that indicates the deletion)
             for index, market in self.markets_df.iterrows():
                 pretty = self.get_pretty_market_name(market)
                 self.markets_df.loc[index, 'pretty'] = pretty
             self.update_market_list()
         
-        # update the pretty names of the selected market            
+        # update the pretty names of the selected market
         if (self.par.changed('name') or 
             self.par.changed('chain') or
             self.par.changed('type_name') or
@@ -304,7 +318,8 @@ class TbxEditMarkets(Tbx):
                 self.markets_df.iloc[i])
             self.markets_df.loc[market_idx, 'pretty'] = pretty
             self.update_market_list()
-            
+        
+        # market changed -> change values of input fields
         if self.par.changed('markets'):
             self.set_selected_market_inputs()
         return params
