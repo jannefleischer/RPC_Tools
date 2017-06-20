@@ -517,12 +517,10 @@ class Output(object):
         template_layer = self.folders.get_layer(layer.template_layer,
                                                 layer.template_folder)
         source_layer = arcpy.mapping.Layer(template_layer)
-        arcpy.AddMessage(source_layer)
 
         # Datasource des Layers auf die gewünschte FeatureClass setzen
         if layer.featureclass:
             featureclass = self.folders.get_table(layer.featureclass)
-            arcpy.AddMessage(featureclass)
             source_ws = source_layer.workspacePath
             target_ws = arcpy.Describe(featureclass).path
             source_layer.findAndReplaceWorkspacePath(source_ws, target_ws)
