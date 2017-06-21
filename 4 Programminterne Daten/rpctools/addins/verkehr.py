@@ -1,4 +1,4 @@
-from rpctools.addins.common import ToolboxButton, folders
+from rpctools.addins.common import ToolboxButton, folders, config
 
 __all__ = ['InitialRouting', 'RoutingSettings',
            'WeightedRouting', 'Anbindungspunkt']
