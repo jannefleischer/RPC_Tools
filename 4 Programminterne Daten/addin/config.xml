@@ -166,7 +166,7 @@
                 <Button caption="Hebes&#228;tze kontrollieren" category="ProjektCheck" class="Hebesaetze" id="rpc_tools.hebesaetze" image="Images\506700-factory_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Gemeindebilanzen sch&#228;zen" category="ProjektCheck" class="Gemeindebilanzen" id="rpc_tools.gemeindebilanzen" image="Images\506700-factory_1.png" message="" tip="">
+                <Button caption="Gemeindebilanzen sch&#228;tzen" category="ProjektCheck" class="Gemeindebilanzen" id="rpc_tools.gemeindebilanzen" image="Images\506700-factory_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Familienleistungsausgleich" category="ProjektCheck" class="Familienleistungsausgleich" id="rpc_tools.familienleistungsausgleich" image="" message="" tip="">
@@ -413,7 +413,7 @@
                         <Menu refID="rpc_tools.wanderungssalden_beschaeftigte" />
                     </Items>
                 </Menu>
-                <Menu caption=" Fiskalische Bilanzen sch&#228;tzen" category="ProjektCheck" id="rpc_tools.menu_fiskalische_bilanzen" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="Fiskalische Bilanzen sch&#228;tzen" category="ProjektCheck" id="rpc_tools.menu_fiskalische_bilanzen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.grundsteuer" />
                         <Button refID="rpc_tools.einkommensteuer" />
