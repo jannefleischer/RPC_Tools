@@ -120,16 +120,17 @@ class TbxMaerkteImportierenDatei(TbxMaerkteImportieren):
         
         #param.filter.list = [e.replace('.', '')
                                  #for e in MarketTemplate.template_types.values()]
-        param.filter.list = ['csv', 'xls']
+        param.filter.list = ['csv', 'xlsx']
         
         return params
 
 if __name__ == '__main__':
-    #t = TbxMaerkteImportierenDatei()
-    #t._getParameterInfo()
-    #t.par.filepath.value = r'C:\Users\ggr\Desktop\templates\maerkte_template.csv'    
-    t = TbxMaerkteImportierenFeatureClass()
+    t = TbxMaerkteImportierenDatei()
     t._getParameterInfo()
-    t.par.filepath.value = r'C:\Users\ggr\Desktop\templates\maerkte_template.shp'
     t.set_active_project()
+    t.par.template.value = r'C:\Users\ggr\Desktop\templates\maerkte_template.xlsx'    
+    #t = TbxMaerkteImportierenFeatureClass()
+    #t._getParameterInfo()
+    #t.par.template.value = r'C:\Users\ggr\Desktop\templates\maerkte_template.shp'
+    #t.set_active_project()
     t.execute()

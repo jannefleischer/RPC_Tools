@@ -3,7 +3,8 @@ from csv import DictWriter, DictReader
 import subprocess
 import os
 import sys
-import xlwt
+import xlsxwriter
+import xlrd
 import arcpy
 from collections import OrderedDict
 import pandas as pd
@@ -33,7 +34,7 @@ class MarketTemplate(object):
     
     template_types = {
         'CSV-Datei': '.csv',
-        'Exceldatei': '.xls',
+        'Exceldatei': '.xlsx',
         'Shapefile': '.shp'
      }
     
@@ -124,12 +125,12 @@ class MarketTemplate(object):
     @staticmethod
     def _create_excel_template(file_path, fields):
         if os.path.exists(file_path):
-            os.remove(file_path)
-        book = xlwt.Workbook()
-        sheet = book.add_sheet(u'Bestandsmärkte')
+            os.remove(file_path)            
+        book = xlsxwriter.Workbook(file_path)
+        sheet = book.add_worksheet()
         for i, field in enumerate(fields):
             sheet.write(0, i, field)
-        book.save(file_path)
+        book.close()
     
     @staticmethod
     def _create_shape_template(file_path, fields, spatial_reference):

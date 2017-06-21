@@ -80,4 +80,7 @@ if __name__ == '__main__':
     t = TbxCreateTemplate()
     t._getParameterInfo()
     t.set_active_project()
+    t._open(t.par)
+    t.par.template_type.value = 'Exceldatei'
+    t.set_active_project()
     t.execute()
