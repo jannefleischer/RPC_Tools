@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 import sys
 
@@ -6,8 +6,6 @@ import arcpy
 import datetime
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.definitions.projektverwaltung.projektauswahl import \
-     Projektauswahl
 from rpctools.definitions.projektverwaltung.projektverwaltung \
      import Projektverwaltung
 
