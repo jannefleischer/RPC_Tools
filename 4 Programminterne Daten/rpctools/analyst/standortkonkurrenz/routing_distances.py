@@ -138,8 +138,8 @@ class DistanceRouting(object):
         params = {
             'batch': True,
             'routerId': self.ROUTER,
-            'fromPlace': "{},{}".format(point.y, point.x),
-            'toPlace': "{},{}".format(point.y, point.x),
+            'fromPlace': "{},{}".format(origin.y, origin.x),
+            'toPlace': "{},{}".format(origin.y, origin.x),
             'mode': 'CAR',
             'maxWalkDistance': 5000,
             'maxPreTransitTime': 1200,
