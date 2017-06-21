@@ -8,7 +8,7 @@ class Settings(Tool):
     _workspace = 'FGDB_Verkehr.gdb'
     _param_projectname = 'project'
 
-    def add_outputs(self): 
+    def add_outputs(self):
         pass
 
     def run(self):
@@ -36,7 +36,7 @@ class TbxSettings(Tbx):
 
     @property
     def label(self):
-        return encode(u'Schritt 1: Einstellungen des Verkehrsaufkommens')
+        return encode(u'Einstellungen des Verkehrsaufkommens')
 
     @property
     def Tool(self):

@@ -24,7 +24,7 @@ class TbxSetSource(TbxFlaechendefinition):
 
     @property
     def label(self):
-        return encode(u'Schritt 3: Startpunkte ändern')
+        return encode(u'Anbindungspunkte setzen')
 
     @property
     def Tool(self):

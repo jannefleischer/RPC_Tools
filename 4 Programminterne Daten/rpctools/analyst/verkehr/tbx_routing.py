@@ -13,7 +13,7 @@ class TbxRouting(Tbx):
 
     @property
     def label(self):
-        return encode(u'Schritt 2: Verkehrsaufkommen berechnen')
+        return encode(u'initiales Routing')
 
     @property
     def Tool(self):
