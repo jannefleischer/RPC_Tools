@@ -31,6 +31,7 @@ class TbxSetSource(TbxFlaechendefinition):
         return SetSource
 
     def _open(self, params):
+        self.update_teilflaechen()
         x, y = self.config.active_coord
         params.x_source.value = x
         params.y_source.value = y
@@ -66,5 +67,7 @@ class TbxSetSource(TbxFlaechendefinition):
 
 if __name__ == '__main__':
     tbx = TbxSetSource()
+    tbx._getParameterInfo()
+    tbx.set_active_project()
     p = tbx.getParameterInfo()
     print
