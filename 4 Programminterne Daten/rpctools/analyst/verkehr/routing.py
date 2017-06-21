@@ -15,11 +15,11 @@ class Routing(Tool):
     def add_outputs(self):
         # Add Layers
         self.output.add_layer('verkehr', 'Zielpunkte',
-                           featureclass='Zielpunkte',
-                           template_folder='Verkehr')
+                              featureclass='Zielpunkte',
+                              template_folder='Verkehr')
         self.output.add_layer('verkehr', 'links',
-                           featureclass='links',
-                           template_folder='Verkehr')
+                              featureclass='links',
+                              template_folder='Verkehr')
         self.output.add_layer('verkehr', 'Anbindungspunkte',
                               featureclass='Anbindungspunkte',
                               template_folder='Verkehr')

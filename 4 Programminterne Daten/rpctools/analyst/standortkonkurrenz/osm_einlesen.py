@@ -38,6 +38,8 @@ class Point(object):
     def transform(self, target_srid):
         target_srs = Proj(init='epsg:{}'.format(target_srid))
         x, y = transform(self.proj, target_srs, self.x, self.y)
+        self.epsg = target_srid
+        self.proj = Proj(init='epsg:{}'.format(self.epsg))
         self.x = x
         self.y = y
 

@@ -516,6 +516,7 @@ class Output(object):
         # Template Layer laden
         template_layer = self.folders.get_layer(layer.template_layer,
                                                 layer.template_folder)
+        arcpy.AddMessage(template_layer)
         source_layer = arcpy.mapping.Layer(template_layer)
 
         # Datasource des Layers auf die gewünschte FeatureClass setzen
