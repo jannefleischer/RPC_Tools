@@ -339,7 +339,7 @@ class ProjektAnlegen(Projektverwaltung):
             for j in range(i):
                 dist = np.linalg.norm(np.subtract(XY_INSIDE[i], XY_INSIDE[j]))
                 distances.append(dist)
-        if max(distances) > max_dist:
+        if distances and max(distances) > max_dist:
             arcpy.AddError("Der Abstand zwischen den Schwerpunkten der "
                            "Teilflächen darf nicht größer "
                            "als {} sein".format(max_dist))
