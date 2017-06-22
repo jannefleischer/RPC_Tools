@@ -13,7 +13,7 @@ class DiaTeilflaechen(ArcpyDiagram):
         Diagramm für Teilflächen
         """
         # Erstelle Diagramm Teilflaechen nach Hektar
-        project_name = self.folders.projectname
+        project_name = self.par.get_projectname()
         title = encode(
             "{}: Teilflächen des Plangebiets (Bruttofläche)"
             .format(project_name))
