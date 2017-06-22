@@ -115,6 +115,8 @@ class ProjektwirkungMarkets(Tool):
             bbox = zensus.get_bbox(centroid, square_size)
             arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
                              'Berechnung wird übersprungen')
+        for p in bbox:
+            p.transform(self.parent_tbx.config.epsg)
         return bbox
     
     def communities_to_centers(self, bbox):

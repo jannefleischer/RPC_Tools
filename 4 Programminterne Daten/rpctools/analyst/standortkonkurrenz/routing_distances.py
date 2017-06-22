@@ -25,13 +25,20 @@ def filter_raster(array, threshold=120):
             new_array[y][x] = np.sum(neighbours) / len(neighbours)
     return new_array
 
-def filter_raster_nd(array, threshold=120):
-    kernel = np.ones((3, 3))
-    mean_filtered = filters.convolve(array, kernel, mode='nearest')
-    thresh_exceeded = array > threshold
-    res = array.copy()
-    res[thresh_exceeded] = mean_filtered[thresh_exceeded]
-    return res
+def dilate_raster(array, kernel_size=3, threshold=120):
+    '''smooth the borders of areas exceeding the given threshold,
+    so that these areas shrink by half the kernel-size along their borders'''
+    thresh_exceeded = array >= threshold
+    ret = np.where(thresh_exceeded, np.nan, array)
+    o = kernel_size // 2
+    filtered = filters.generic_filter(
+        ret, np.nanmedian, (kernel_size, kernel_size), origin=(o, o),
+        mode='reflect')
+    a = array.copy()
+    thresh_exceeded_and_not_nan = thresh_exceeded & ~ np.isnan(filtered) 
+    fill_values = filtered[thresh_exceeded]
+    a[thresh_exceeded_and_not_nan] = filtered[thresh_exceeded_and_not_nan]
+    return a
 
 
 class RasterManagement(object):
@@ -50,7 +57,8 @@ class RasterManagement(object):
             raster_file, 'CELLSIZEX').getOutput(0).replace(',', '.'))
         self.cellHeight = float(arcpy.GetRasterProperties_management(
             raster_file, 'CELLSIZEY').getOutput(0).replace(',', '.'))
-        self.raster_values = filter_raster(arcpy.RasterToNumPyArray(raster_file))
+        self.raster_values = dilate_raster(
+            arcpy.RasterToNumPyArray(raster_file))
         x = 'for debug'
 
     def register_points(self, points):
