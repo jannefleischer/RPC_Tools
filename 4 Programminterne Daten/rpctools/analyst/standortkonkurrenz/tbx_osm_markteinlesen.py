@@ -41,13 +41,14 @@ class MarktEinlesen(Tool):
         # remove results as well (distances etc.)
         res_table = self.folders.get_table('Beziehungen_Maerkte_Zellen')
         
+        # delete markets of nullfall and ALL results (easiest way)
         if truncate:
-            arcpy.TruncateTable_management(table)
+            self.parent_tbx.delete_rows_in_table(
+                tablename, where='id_betriebstyp_nullfall > 0')
             arcpy.TruncateTable_management(self.folders.get_table(res_table))
-            max_id = 0
-        else:
-            df = self.parent_tbx.table_to_dataframe('Maerkte')
-            max_id = df['id'].max() if len(df) > 0 else 0
+            
+        df = self.parent_tbx.table_to_dataframe('Maerkte')
+        max_id = df['id'].max() if len(df) > 0 else 0
             
         with arcpy.da.InsertCursor(table, columns) as rows:
             for i, markt in enumerate(supermarkets):
