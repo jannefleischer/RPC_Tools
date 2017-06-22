@@ -13,8 +13,6 @@ from rpctools.definitions.projektverwaltung.projektverwaltung \
 
 
 class Projektauswahl(Projektverwaltung):
-    _param_projectname = 'active_project'
-    _workspace = 'FGDB_Definition_Projekt.gdb'
 
     def run(self):
         self.parent_tbx.config.active_project = self.par.active_project.value
@@ -39,7 +37,7 @@ class TbxProjektauswahl(Tbx):
     def _getParameterInfo(self):
         params = self.par
         # Bestehendes_Projekt_auswählen
-        p = self.add_parameter('active_project')
+        p = self.add_parameter('name')
         p.name = encode('aktives Projekt')
         p.displayName = encode('aktives Projekt auswählen')
         p.parameterType = 'Required'
@@ -47,9 +45,9 @@ class TbxProjektauswahl(Tbx):
         p.datatype = 'GPString'
         active = self.config.active_project
         projects = self.folders.get_projects()
-        params.active_project.filter.list = projects
+        p.filter.list = projects
         if active and active in projects:
-            params.active_project.value = active
+            p.value = active
         return params
 
     def _updateParameters(self, params):
@@ -72,6 +70,8 @@ class TbxProjektauswahl(Tbx):
 if __name__ == '__main__':
     t = TbxProjektauswahl()
     params = t.getParameterInfo()
-    t.par.active_project.value = t.config.active_project
+    t.par.name.value = 'NEU'
+    t.show_outputs()    
+    #t.par.active_project.value = t.config.active_project
     t.execute()
 

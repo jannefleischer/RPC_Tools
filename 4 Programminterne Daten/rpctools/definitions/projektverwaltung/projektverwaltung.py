@@ -46,7 +46,7 @@ class Projektverwaltung(Tool):
         self.output.add_layer("hintergrundkarten", layer,
                         zoom=False, in_project=False)
 
-        diagram = DiaTeilflaechen()
+        diagram = DiaTeilflaechen(projectname=self.par.name.value)
         self.output.add_diagram(diagram)
 
 
