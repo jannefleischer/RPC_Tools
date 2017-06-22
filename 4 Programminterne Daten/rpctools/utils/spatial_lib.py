@@ -15,8 +15,10 @@ def google_geocode(address, api_key=''):
     r = requests.get(url, params=params)
     json = r.json()
     results = json['results']
-    msg = json['error_message'] if json.has_key('error_message') else ''
+    msg = json['status'] if json.has_key('status') else ''
     if not results:
+        if json.has_key('error_message'):
+            msg = json['error_message']
         return None, msg
     location = results[0]['geometry']['location']
     return (location['lat'], location['lng']), msg
