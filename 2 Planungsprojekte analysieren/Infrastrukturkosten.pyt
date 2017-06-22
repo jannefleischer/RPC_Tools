@@ -1,15 +1,4 @@
 # -*- coding: utf-8 -*-
-# reload
-from rpctools.analyst.infrastrukturkosten import tbx_aufteilungsregeln
-reload(tbx_aufteilungsregeln)
-from rpctools.analyst.infrastrukturkosten import tbx_kostenermittlung
-reload(tbx_kostenermittlung)
-from rpctools.analyst.infrastrukturkosten import tbx_flaechenbilanz
-reload(tbx_flaechenbilanz)
-#from rpctools.analyst.infrastrukturkosten import tbx_massnahmen_beschreiben
-#reload(tbx_massnahmen_beschreiben)
-from rpctools.analyst.infrastrukturkosten import tbx_infrastrukturmengenbilanz
-reload(tbx_infrastrukturmengenbilanz)
 
 from rpctools.analyst.infrastrukturkosten.tbx_kostenermittlung import \
      TbxInfrastrukturkostenermittlung

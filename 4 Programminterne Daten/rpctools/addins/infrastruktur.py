@@ -21,7 +21,12 @@ __all__ = [
     "GesamtkostenErmitteln", "KanalisationKostenaufteilung",
     "KostenNachKostentraegernAuswerten", "KostenProWEBzwAPVergleichen",
     "KostenkennwerteKontrollieren", "StrasseAeussereKostenaufteilung",
-    "StrasseInnereKostenaufteilung", "TrinkwasserKostenaufteilung"
+    "StrasseInnereKostenaufteilung", "TrinkwasserKostenaufteilung",
+    'BeschreibungPunktuelleMassnahmeStrasseInnere',
+    'BeschreibungPunktuelleMassnahmeStrasseAeussere',
+    'BeschreibungPunktuelleMassnahmeKanalisation',
+    'BeschreibungPunktuelleMassnahmeTrinkwasser',
+    'BeschreibungPunktuelleMassnahmeElektrizitaet'
 ]
 
 
