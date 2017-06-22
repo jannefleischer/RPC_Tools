@@ -47,6 +47,7 @@ class TbxKontrolleGewerbesteuer(Tbx):
         par.saldo.datatype = u'GPLong'
         par.saldo.filter.type = 'Range'
         par.saldo.filter.list = [100, 600]
+        par.saldo.value = 250
 
         return par
 
