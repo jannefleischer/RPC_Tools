@@ -1,6 +1,6 @@
 import arcpy
 
-from rpctools.addins.common import ToolboxButton, folders
+from rpctools.addins.common import ToolboxButton, folders, config
 from rpctools.addins.outputs import MaerkteAnzeigen, ZentrenAnzeigen
 
 __all__ = [
@@ -49,9 +49,10 @@ class MarktBearbeiten(ToolboxButton):
         self.enabled = True
         self.shape = 'NONE'
         self.cursor = 3
+        self.output = MaerkteAnzeigen()
         
     def onClick(self, coord=None):
-        maerkte_anzeigen.onClick()
+        self.output.show()
 
     def onMouseDownMap(self, x, y, button, shift):
         config.active_coord = (x, y)
