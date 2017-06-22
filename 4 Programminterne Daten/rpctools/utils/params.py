@@ -221,10 +221,13 @@ class Tbx(object):
     def output(self):
         return self.tool.output
     
-    def show_outputs(self):
+    def show_outputs(self, show_layers=True, show_diagrams=True):
         self.output.clear()
         self.tool.add_outputs()
-        self.output.show()
+        if show_layers:
+            self.output.show_layers()
+        if show_diagrams:
+            self.output.show_diagrams()
 
     def __init__(self):
 

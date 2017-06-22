@@ -11,6 +11,7 @@ class ErschliessungsnetzeAnzeigen(Output):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Infrastrukturkosten.pyt'
     _toolbox_name = 'TbxInfrastrukturmengenBilanz'
+    _show_diagrams = False
 
 
 class ZentrenAnzeigen(Output):

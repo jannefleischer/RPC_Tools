@@ -64,9 +64,12 @@ class ToolboxButton(ToolboxWrapper):
 class Output(ToolboxWrapper):
     '''wrapper to show outputs of specific tool'''
     __metaclass__ = Singleton
+    _show_layers = True
+    _show_diagrams = True
     def show(self):
         self.tbx.set_active_project()
-        self.tbx.show_outputs()
+        self.tbx.show_outputs(show_layers=self._show_layers, 
+                              show_diagrams=self._show_diagrams)
         
     def onClick(self):
         self.show()
