@@ -139,77 +139,77 @@ class BeschreibungPunktuelleMassnahmeStrasseInnere(Beschreibung):
 
 class AnliegerstrasseAeussere(InfrastructureLineTool):
     """Implementation for rpc_tools.anliegerstrasse_aeussere (Tool)"""
-    _id_netzelement = 14
+    _id_netzelement = 21
 
 
 class SammelstrasseAeussere(InfrastructureLineTool):
     """Implementation for rpc_tools.sammelstrasse_aeussere (Tool)"""
-    _id_netzelement = 15
+    _id_netzelement = 22
 
 
 class LagePunktuelleMassnahmeStrasseAeussere(InfrastructurePointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_aeussere (Tool)"""
-    _id_netzelement = 16
+    _id_netzelement = 23
 
 
 class BeschreibungPunktuelleMassnahmeStrasseAeussere(Beschreibung):
     """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_strasse_auessere (Button)"""
-    _id_netzelement = 16
+    _id_netzelement = 23
 
 
 class KanalTrennsystem(InfrastructureLineTool):
     """Implementation for rpc_tools.kanal_trennsystem (Tool)"""
-    _id_netzelement = 21
+    _id_netzelement = 31
 
 
 class KanalMischsystem(InfrastructureLineTool):
     """Implementation for rpc_tools.kanal_mischsystem (Tool)"""
-    _id_netzelement = 22
+    _id_netzelement = 32
 
 
 class KanalNurSchmutzwasser(InfrastructureLineTool):
     """Implementation for rpc_tools.kanal_nur_schmutzwasser (Tool)"""
-    _id_netzelement = 23
+    _id_netzelement = 33
 
 
 class LagePunktuelleMassnahmeKanalisation(InfrastructurePointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_kanalisation (Tool)"""
-    _id_netzelement = 24
+    _id_netzelement = 34
 
 
 class BeschreibungPunktuelleMassnahmeKanalisation(Beschreibung):
     """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_kanalisation (Button)"""
-    _id_netzelement = 24
+    _id_netzelement = 34
 
 
 class Trinkwasserleitung(InfrastructureLineTool):
     """Implementation for rpc_tools.trinkwasserleitung (Tool)"""
-    _id_netzelement = 31
+    _id_netzelement = 41
 
 
 class LagePunktuelleMassnahmeTrinkwasser(InfrastructurePointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_trinkwasser (Tool)"""
-    _id_netzelement = 32
+    _id_netzelement = 42
 
 
 class BeschreibungPunktuelleMassnahmeTrinkwasser(Beschreibung):
     """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser (Button)"""
-    _id_netzelement = 32
+    _id_netzelement = 42
 
 
 class Stromleitung(InfrastructureLineTool):
     """Implementation for rpc_tools.stromleitung (Tool)"""
-    _id_netzelement = 41
+    _id_netzelement = 51
 
 
 class LagePunktuelleMassnahmeElektrizitaet(InfrastructurePointTool):
     """Implementation for rpc_tools.lage_punktuelle_massnahme_elektrizitaet (Tool)"""
-    _id_netzelement = 42
+    _id_netzelement = 52
 
 
 class BeschreibungPunktuelleMassnahmeElektrizitaet(Beschreibung):
     """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet (Button)"""
-    _id_netzelement = 42
+    _id_netzelement = 52
 
 
 def delete_selected_elements(layer_name):

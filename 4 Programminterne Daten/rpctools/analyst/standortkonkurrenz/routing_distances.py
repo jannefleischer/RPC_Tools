@@ -48,7 +48,7 @@ class RasterManagement(object):
         # map point via id to a raster cell
         self.point_raster_map = {}
 
-    def load(self, raster_file):
+    def load(self, raster_file, unreachable=120):
         desc = arcpy.Describe(raster_file)
         e = desc.Extent
         self.srid = desc.spatialReference.factoryCode
@@ -58,8 +58,9 @@ class RasterManagement(object):
         self.cellHeight = float(arcpy.GetRasterProperties_management(
             raster_file, 'CELLSIZEY').getOutput(0).replace(',', '.'))
         self.raster_values = dilate_raster(
-            arcpy.RasterToNumPyArray(raster_file))
-        x = 'for debug'
+            arcpy.RasterToNumPyArray(raster_file),
+            threshold=unreachable
+        )
 
     def register_points(self, points):
         if self.raster_values is None:
@@ -74,6 +75,7 @@ class RasterManagement(object):
     def get_value(self, point):
         mapped_x, mapped_y = self.point_raster_map[point.id]
         return self.raster_values[mapped_y][mapped_x]
+
 
 class DistanceRouting(object):
     URL = r'https://projektcheck.ggr-planung.de/otp/surfaces'
