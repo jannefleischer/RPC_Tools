@@ -93,9 +93,12 @@ class MarktEinlesen(Tool):
         df_bt.fillna(sys.maxint, inplace=True)
         for market in markets:
             idx_kette = df_chains['name'] == market.kette.strip().lower()
-            market.id_kette = df_chains[idx_kette]['id_kette'].values[0] \
-                if idx_kette.sum() > 0 else 0
-            is_discounter = df_chains[idx_kette]['discounter'].values[0]
+            if idx_kette.sum() > 0:
+                market.id_kette = df_chains[idx_kette]['id_kette'].values[0] 
+                is_discounter = df_chains[idx_kette]['discounter'].values[0]
+            else:
+                market.id_kette = 0
+                is_discounter = 0
             if is_discounter:
                 market.id_betriebstyp = 7
             elif market.vkfl is not None:

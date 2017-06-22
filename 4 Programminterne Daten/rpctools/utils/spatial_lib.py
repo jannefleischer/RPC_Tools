@@ -2,25 +2,29 @@ import arcpy
 from rpctools.utils.params import Folders
 from rpctools.utils.params import DummyTbx
 from rpctools.utils.output import ArcpyEnv
+
 import requests
 import numpy as np
 from os.path import join
 
-def google_geocode(address):
+def google_geocode(address, api_key=''):
     url = 'https://maps.googleapis.com/maps/api/geocode/json'
     params = {'sensor': 'false', 'address': address}
+    if api_key:
+        params['key'] = api_key
     r = requests.get(url, params=params)
-    results = r.json()['results']
-    if results:
-        location = results[0]['geometry']['location']
-    else:
-        return None, None
-    return location['lat'], location['lng']
+    json = r.json()
+    results = json['results']
+    msg = json['error_message'] if json.has_key('error_message') else ''
+    if not results:
+        return None, msg
+    location = results[0]['geometry']['location']
+    return (location['lat'], location['lng']), msg
 
 def get_closest_point(point, points):
     """get the point out of given points that is closest to the given point,
     points are be passed as tuples of x, y (z optional) coordinates
-
+    
     Parameters
     ----------
     point : tuple
@@ -95,15 +99,15 @@ def get_ags(features, id_column):
         tmp_table = join(arcpy.env.scratchGDB, 'tmp_join')
         if arcpy.Exists(tmp_table):
             arcpy.Delete_management(tmp_table)
-
+    
         arcpy.SpatialJoin_analysis(features, gemeinden, tmp_table,
                                    match_option='HAVE_THEIR_CENTER_IN')
-
+    
         cursor = arcpy.da.SearchCursor(tmp_table, [id_column, 'AGS_0', 'GEN'])
         ags_res = {}
         for row in cursor:
             ags_res[row[0]] = row[1], row[2]
-
+    
         arcpy.Delete_management(tmp_table)
     return ags_res
 
@@ -131,7 +135,7 @@ def assign_groessenklassen():
     gr_df.loc[np.isnan(gr_df['bis']), 'bis'] = sys.maxint
     gem_columns = ['Einwohner', 'groessenklasse']
     gem_table = folders.get_base_table(workspace, 'bkg_gemeinden')
-
+    
     cursor = arcpy.da.UpdateCursor(gem_table, gem_columns)
     for ew, gr_klasse in cursor:
         higher = ew >= gr_df['von']
