@@ -1,3 +1,5 @@
+import arcpy
+
 from rpctools.addins.common import ToolboxButton, folders
 from rpctools.addins.outputs import MaerkteAnzeigen, ZentrenAnzeigen
 
