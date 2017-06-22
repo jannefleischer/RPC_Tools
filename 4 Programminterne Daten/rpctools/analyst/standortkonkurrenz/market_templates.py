@@ -17,8 +17,8 @@ from rpctools.analyst.standortkonkurrenz.osm_einlesen import Point, Supermarket
 class MarketTemplate(object):
     '''
     class for managing templates holding markets as inputs for the Tool
-    'Standortkonkurrenz'    
-    
+    'Standortkonkurrenz'
+
     Parameters
     ----------
         template_type : str,
@@ -31,71 +31,71 @@ class MarketTemplate(object):
         epsg : int, optional (defaults to 4326)
             the projection (required to write shapefiles)
     '''
-    
+
     template_types = {
         'CSV-Datei': '.csv',
         'Exceldatei': '.xlsx',
         'Shapefile': '.shp'
      }
-    
+
     _required_fields = OrderedDict({
         u'Name' : str,
         u'Kette': str
     })
-    
+
     _address_fields = OrderedDict({
         u'Ort': str,
         u'PLZ': int,
         u'Straße': int,
         u'Hausnummer': int
     })
-    
+
     _option_1 = {u'Vkfl_m²': int}
     _option_2 = {u'BTyp': int}
 
     _default_name = 'maerkte_template'
-    
+
     _delimiter = ';'
-    
+
     def __init__(self, template_type, path, filename=None, epsg=4326):
         self.path = path
         self.template_type = template_type
-        
+
         if not os.path.exists(self.path):
             os.mkdir(self.path)
-        
+
         if template_type not in self.template_types.keys():
             raise Exception('unknown type of template')
-        
+
         if not filename:
             filename = '{name}{ext}'.format(
                 name=self._default_name,
                 ext=self.template_types[template_type]
             )
         self.file_path = os.path.join(self.path, filename)
-        
+
         self.epsg = epsg
         self.sr = arcpy.SpatialReference(epsg)
-            
+
         self.fields = self._required_fields.copy()
         if self.template_type in ['CSV-Datei', 'Exceldatei']:
             self.fields.update(self._address_fields)
         self.fields.update(self._option_1)
-    
+
     def create(self):
         '''create the template file, overwrites if already exists'''
 
         if self.template_type == 'CSV-Datei':
             self._create_csv_template(self.file_path, self.fields.keys(),
                                       self._delimiter)
-        
+
         elif self.template_type == 'Exceldatei':
             self._create_excel_template(self.file_path, self.fields.keys())
 
         elif self.template_type == 'Shapefile':
             self._create_shape_template(self.file_path, self.fields,
                                         spatial_reference=self.sr)
-            
+
     def open(self):
         '''open the file (externally with default app if not a shape file)'''
         if self.template_type in ['CSV-Datei', 'Exceldatei']:
@@ -121,17 +121,17 @@ class MarketTemplate(object):
                                 [f.encode('utf8') for f in fields],
                                 delimiter=delimiter)
             writer.writeheader()
-            
+
     @staticmethod
     def _create_excel_template(file_path, fields):
         if os.path.exists(file_path):
-            os.remove(file_path)            
+            os.remove(file_path)
         book = xlsxwriter.Workbook(file_path)
         sheet = book.add_worksheet()
         for i, field in enumerate(fields):
             sheet.write(0, i, field)
         book.close()
-    
+
     @staticmethod
     def _create_shape_template(file_path, fields, spatial_reference):
         if arcpy.Exists(file_path):
@@ -143,7 +143,7 @@ class MarketTemplate(object):
         for field, dtype in fields.iteritems():
             field_type = 'LONG' if dtype == int else 'TEXT'
             arcpy.AddField_management(file_path, field, field_type)
-            
+
     def get_markets(self):
         '''read and return the markets from file'''
         if self.template_type == 'CSV-Datei':
@@ -153,7 +153,7 @@ class MarketTemplate(object):
         elif self.template_type == 'Exceldatei':
             df = pd.read_excel(self.file_path)
         elif self.template_type == 'Shapefile':
-            columns = [f.name for f in arcpy.ListFields(self.file_path)]        
+            columns = [f.name for f in arcpy.ListFields(self.file_path)]
             cursor = arcpy.da.SearchCursor(self.file_path, columns)
             rows = [row for row in cursor]
             del cursor
@@ -167,7 +167,7 @@ class MarketTemplate(object):
             raise LookupError('missing fields in given file')
         markets = self._df_to_markets(df)
         return markets
-    
+
     def _df_to_markets(self, df):
         markets = []
         for i, (idx, row) in enumerate(df.iterrows()):
@@ -177,13 +177,17 @@ class MarketTemplate(object):
                 for field in self._address_fields.keys():
                     address += u' {}'.format(row[field])
                 lat, lon = google_geocode(address)
-                market = Supermarket(i, lon, lat, name, kette, vkfl=vkfl,
+
+                if lat == None:
+                    arcpy.AddMessage("Fehler beim Lesen der Adresse von Markt {}".format(name))
+                else:
+                    market = Supermarket(i, lon, lat, name, kette, vkfl=vkfl,
                                      epsg=4326)
-                market.transform(self.epsg)
+                    market.transform(self.epsg)
+                    markets.append(market)
             else:
                 x, y = row['Shape']
                 market = Supermarket(i, x, y, name, kette, vkfl=vkfl,
                                      epsg=self.epsg)
-            markets.append(market)
+                markets.append(market)
         return markets
-        
