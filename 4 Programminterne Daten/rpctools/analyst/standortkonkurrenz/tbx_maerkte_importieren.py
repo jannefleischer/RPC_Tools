@@ -40,7 +40,8 @@ class MaerkteImportieren(MarktEinlesen):
         arcpy.AddMessage('Lese Datei ein...')
         markets = template.get_markets()
         truncate = self.par.truncate.value
-        markets = self.parse_meta_by_chain(markets)
+        markets = self.parse_meta(markets, field='kette')
+        markets = self.set_betriebstyp_vkfl(markets)
         arcpy.AddMessage(u'Schreibe {} Märkte in die Datenbank...'
                          .format(len(markets)))
         self.markets_to_db(markets, truncate=truncate)
@@ -128,7 +129,8 @@ if __name__ == '__main__':
     t = TbxMaerkteImportierenDatei()
     t._getParameterInfo()
     t.set_active_project()
-    t.par.template.value = r'C:\Users\ggr\Desktop\templates\maerkte_template.xlsx'    
+    t.par.truncate.value = True
+    t.par.template.value = r'C:\Users\ggr\Desktop\templates\maerkte_template_auszug.xlsx'    
     #t = TbxMaerkteImportierenFeatureClass()
     #t._getParameterInfo()
     #t.par.template.value = r'C:\Users\ggr\Desktop\templates\maerkte_template.shp'

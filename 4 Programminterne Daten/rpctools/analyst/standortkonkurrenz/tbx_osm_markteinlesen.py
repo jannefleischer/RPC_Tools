@@ -76,7 +76,7 @@ class MarktEinlesen(Tool):
                                          column_values={'AGS': ags_market[0]},
                                          where='id={}'.format(id))
 
-    def parse_meta_by_chain(self, markets): 
+    def set_betriebstyp_vkfl(self, markets): 
         """
         use the name of the chain of the markets to parse and assign
         chain-ids and betriebstyps
@@ -85,17 +85,15 @@ class MarktEinlesen(Tool):
             'Ketten', 
             workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
             is_base_table=True)
-        df_chains['name'] = [name.lower() for name in df_chains['name'].values]
         df_bt = self.parent_tbx.table_to_dataframe(
             'Betriebstypen', 
             workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
             is_base_table=True)
         df_bt.fillna(sys.maxint, inplace=True)
         for market in markets:
-            idx_kette = df_chains['name'] == market.kette.strip().lower()
-            if idx_kette.sum() > 0:
-                market.id_kette = df_chains[idx_kette]['id_kette'].values[0] 
-                is_discounter = df_chains[idx_kette]['discounter'].values[0]
+            if market.id_kette > 0:
+                idx = df_chains['id_kette'] == market.id_kette
+                is_discounter = df_chains[idx]['discounter'].values[0]
             else:
                 market.id_kette = 0
                 is_discounter = 0
@@ -108,7 +106,7 @@ class MarktEinlesen(Tool):
                     market.id_betriebstyp = df_bt[fit_idx]['id_betriebstyp'].values[0]
         return markets
 
-    def parse_meta_by_name(self, markets):
+    def parse_meta(self, markets, field='name'):
         """
         use the name of the markets to parse and assign chain-ids and
         betriebstyps
@@ -124,11 +122,12 @@ class MarktEinlesen(Tool):
 
         for market in markets:
             # no name -> nothing to parse
-            if not market.name:
+            if not getattr(market, field):
                 continue
             match_found = False
             for idx, chain_alloc in df_chains_alloc.iterrows():
-                match_result = re.match(chain_alloc['regex'], market.name) 
+                match_result = re.match(chain_alloc['regex'],
+                                        getattr(market, field))
                 if not match_result:
                     continue
                 match_found = True
@@ -143,7 +142,7 @@ class MarktEinlesen(Tool):
             # add markets that didn't match (keep defaults)
             if not match_found:
                 ret_markets.append(market)
-        return ret_markets
+        return ret_markets    
 
 
 class OSMMarktEinlesen(MarktEinlesen):
@@ -168,7 +167,7 @@ class OSMMarktEinlesen(MarktEinlesen):
         arcpy.AddMessage(u'Supermärkte werden in die Datenbank übertragen...'
                          .format(len(markets)))
         truncate = self.par.truncate.value
-        markets = self.parse_meta_by_name(markets)
+        markets = self.parse_meta(markets)
         arcpy.AddMessage(u'Schreibe {} Märkte in die Datenbank...'
                          .format(len(markets)))
         self.markets_to_db(markets, truncate=truncate)
@@ -238,5 +237,6 @@ class TbxOSMMarktEinlesen(Tbx):
 if __name__ == '__main__':
     t = TbxOSMMarktEinlesen()
     t._getParameterInfo()
+    t.par.truncate.value = True
     t.set_active_project()
     t.execute()

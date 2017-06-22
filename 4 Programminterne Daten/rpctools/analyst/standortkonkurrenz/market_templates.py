@@ -185,7 +185,6 @@ class MarketTemplate(object):
                 location, msg = google_geocode(address, api_key=api_key)
                 if location is None:
                     arcpy.AddMessage(u'Fehler: {msg}'.format(msg=msg))
-                    arcpy.AddMessage(msg)
                     continue
                 lat, lon = location
                 market = Supermarket(i, lon, lat, name, kette, vkfl=vkfl,
