@@ -144,7 +144,7 @@ class DistanceRouting(object):
         return distances
 
     def _request_dist_raster(self, origin):
-        err = 'Fehler bei der Anfrage. Liegt der Punkt innerhalb des Gebietes?'
+        err = 'Fehler bei der Anfrage. Liegt der Punkt innerhalb Deutschlands?'
         if origin.epsg != self.epsg:
             origin.transform(self.epsg) 
         params = {

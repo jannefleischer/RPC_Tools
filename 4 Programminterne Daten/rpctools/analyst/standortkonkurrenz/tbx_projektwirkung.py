@@ -215,7 +215,8 @@ class ProjektwirkungMarkets(Tool):
                 x, y = market['SHAPE']
                 origin = Point(x, y, id=market_id,
                                epsg=self.parent_tbx.config.epsg)
-                distances = routing.get_distances(origin, destinations, bbox)
+                #distances = routing.get_distances(origin, destinations, bbox)
+                distances = routing.get_distances(origin, destinations)
                 self.distances_to_db(market_id, destinations, distances)
             else:
                 arcpy.AddMessage(u'   bereits berechnet, wird übersprungen')        
