@@ -116,6 +116,8 @@ class DistanceRouting(object):
         distances = np.ones(len(destinations), dtype=int)
         distances *= np.iinfo(distances.dtype).max
         dist_raster = self._request_dist_raster(origin)
+        if dist_raster is None:
+            return distances
         if bbox is not None:
             bbox = self.add_bbox_edge(bbox)
             fn, ext = os.path.splitext(dist_raster)
