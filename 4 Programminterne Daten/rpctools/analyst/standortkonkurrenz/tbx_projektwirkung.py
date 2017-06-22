@@ -138,9 +138,14 @@ class ProjektwirkungMarkets(Tool):
         ids = self.parent_tbx.query_table('Zentren', columns='id')
         max_id = np.array(ids).max() if len(ids) > 0 else 0 
         # clip the communities with the bbox
-        fc_bbox = arcpy.CopyFeatures_management([bbox_poly], 'in_memory/bbox')
-        fc_clipped = arcpy.Clip_analysis(gemeinden,
-                                         fc_bbox, 'in_memory/clipped')
+        fc_bbox = 'in_memory/bbox'
+        fc_clipped = 'in_memory/clipped'
+        if arcpy.Exists(fc_bbox):        
+            arcpy.Delete_management(fc_bbox)
+        if arcpy.Exists(fc_clipped): 
+            arcpy.Delete_management(fc_clipped)
+        arcpy.CopyFeatures_management([bbox_poly], fc_bbox)
+        arcpy.Clip_analysis(gemeinden, fc_bbox, fc_clipped)
         cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'AGS'])
         # add clipped communities as centers
         for i, (shape, name, ags) in enumerate(cursor):
