@@ -6,7 +6,7 @@ from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 from rpctools.analyst.einnahmen.Steuersalden import Steuersalden
 
-class TbxSteuersalden(Tbx):
+class TbxGesamtsumme(Tbx):
     """Toolbox Wanderungssalden für Einnahmen"""
 
     @property

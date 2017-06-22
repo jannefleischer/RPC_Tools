@@ -69,7 +69,7 @@ def create_gemeindebilanzen(self, projektname):
             arcpy.SelectLayerByLocation_management("gemeinden_lyr", "INTERSECT", "projektflaechen_lyr", umkreis_km, "NEW_SELECTION")
             arcpy.CopyFeatures_management("gemeinden_lyr", gemeindebilanzen)
 
-            columns_kept = ["OBJECTID", "Shape", "RS", "AGS", "GEN", "BEZ", "IBZ", "BEM", "Einwohner", "SvB", "SvB_pro_Ew", "Shape_Length", "Shape_Area", "GK3_X", "GK3_Y"]
+            columns_kept = ["OBJECTID", "Shape", "RS", "AGS", "GEN", "BEZ", "IBZ", "BEM", "Einwohner", "SvB", "SvB_pro_Ew", "Shape_Length", "Shape_Area", "GK3_X", "GK3_Y", "Hebesatz_GewSt"]
             fields = arcpy.ListFields(gemeindebilanzen)
             for field in fields:
                 if not field.name in columns_kept:

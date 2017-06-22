@@ -14,6 +14,9 @@ class HebesaetzeKontrolle(Tool):
     _param_projectname = 'name'
     _workspace = 'FGDB_Einnahmen.gdb'
 
+    def add_outputs(self):
+        pass
+
     def run(self):
         """run HebesaetzeKontrolle Tool"""
 

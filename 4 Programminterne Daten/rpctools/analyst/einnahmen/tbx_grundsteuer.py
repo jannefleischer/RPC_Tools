@@ -39,7 +39,7 @@ class TbxGrundsteuer(Tbx):
         param.displayName = u'als von-Hundert-Satz'
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
+        param.datatype = u'GPLong'
         param.filter.type = 'Range'
         param.filter.list = [50, 500]
         param.category = heading
@@ -51,7 +51,7 @@ class TbxGrundsteuer(Tbx):
         param.displayName = u'Einfamilienhaus (Jahresrohmiete 1964 pro qm Wohnfläche) in Euro-Cent pro Monat'
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
+        param.datatype = u'GPLong'
         param.filter.type = 'Range'
         param.filter.list = [50, 500]
         param.category = heading
@@ -61,7 +61,7 @@ class TbxGrundsteuer(Tbx):
         param.displayName = u'Doppelhaus (Jahresrohmiete 1964 pro qm Wohnfläche) in Euro-Cent pro Monat'
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
+        param.datatype = u'GPLong'
         param.filter.type = 'Range'
         param.filter.list = [50, 500]
         param.category = heading
@@ -71,7 +71,7 @@ class TbxGrundsteuer(Tbx):
         param.displayName = u'Reihenhaus (Jahresrohmiete 1964 pro qm Wohnfläche) in Euro-Cent pro Monat'
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
+        param.datatype = u'GPLong'
         param.filter.type = 'Range'
         param.filter.list = [50, 500]
         param.category = heading
@@ -81,7 +81,7 @@ class TbxGrundsteuer(Tbx):
         param.displayName = u'Mehrfamilienhaus (Jahresrohmiete 1964 pro qm Wohnfläche) in Euro-Cent pro Monat'
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
+        param.datatype = u'GPLong'
         param.filter.type = 'Range'
         param.filter.list = [50, 500]
         param.category = heading
@@ -94,7 +94,7 @@ class TbxGrundsteuer(Tbx):
         param.displayName = u'Bodenwert 1935 in Euro-Cent pro Quadratmeter (im Sinne des Sachwertverfahrens)'
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
+        param.datatype = u'GPLong'
         param.filter.type = 'Range'
         param.filter.list = [0, 800]
         param.category = heading
@@ -104,7 +104,7 @@ class TbxGrundsteuer(Tbx):
         param.displayName = u'Mittlere Größe der Einfamilienhausgrundstücke'
         param.parameterType = 'Required'
         param.direction = 'Input'
-        param.datatype = u'Long'
+        param.datatype = u'GPLong'
         param.filter.type = 'Range'
         param.filter.list = [300, 3000]
         param.category = heading

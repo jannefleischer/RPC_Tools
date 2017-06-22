@@ -40,23 +40,35 @@ class TbxKontrolleGewerbesteuer(Tbx):
         par.gemeinde.filter.list = []
 
         par.saldo = arcpy.Parameter()
-        par.saldo.name = u'Saldo'
-        par.saldo.displayName = u'Saldo'
+        par.saldo.name = u'Hebesatz'
+        par.saldo.displayName = u'Hebesatz für die Gewerbesteuer (von-Hundert-Satz)'
         par.saldo.parameterType = 'Required'
         par.saldo.direction = 'Input'
         par.saldo.datatype = u'GPLong'
+        par.saldo.filter.type = 'Range'
+        par.saldo.filter.list = [100, 600]
 
         return par
 
     def _updateParameters(self, params):
         par = self.par
+
+        cursor = self.query_table(table_name = 'Chronik_Nutzung',
+                                columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
+                                workspace='FGDB_Einnahmen.gdb')
+        for row in cursor:
+            if row[0] == u"Wanderung Beschäftigte" and row[1] is None:
+                par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Beschäftigte berechnet!')
+
+        where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.WOHNEN, Nutzungsart.EINZELHANDEL)
         if par.changed('name'):
-            where = 'Nutzungsart = {}'.format(self._nutzungsart)
+            where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.WOHNEN, Nutzungsart.EINZELHANDEL)
             rows = self.query_table('Teilflaechen_Plangebiet',
                                     ['Nutzungsart'],
                                     workspace='FGDB_Definition_Projekt.gdb',
                                     where=where)
             if not rows:
+                par.name.setErrorMessage(u'In diesem Projekt sind keine Gewerbe- oder Einzelhandelsflächen definiert!')
                 par.gemeinde.enabled = False
                 par.gemeinde.filter.list = []
                 par.gemeinde.value = (u'Projekt enthält keine Flächen mit der '
@@ -64,10 +76,10 @@ class TbxKontrolleGewerbesteuer(Tbx):
             else:
                 par.gemeinde.enabled = True
                 gemeinden = []
-                fields = ["GEN", self._saldo_field]
+                fields = ["GEN", "Hebesatz_GewSt"]
                 rows = self.query_table('Gemeindebilanzen', fields,
                                         workspace='FGDB_Einnahmen.gdb')
-                for gem_name, saldo in rows:
+                for gem_name, hebesteuer in rows:
                     gemeinden.append(u"{} || Saldo: {}".format(
-                        gem_name, saldo))
+                        gem_name, hebesteuer))
                 par.gemeinde.filter.list = sorted(gemeinden)

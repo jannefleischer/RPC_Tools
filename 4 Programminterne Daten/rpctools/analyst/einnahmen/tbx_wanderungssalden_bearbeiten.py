@@ -90,7 +90,7 @@ class TbxGewSaldenbearbeiten(TbxSaldenbearbeiten):
 
     @property
     def label(self):
-        return u'Schritt 1b: Erwerbstätige-Salden bearbeiten'
+        return u'Schritt 2a: Erwerbstätige-Salden bearbeiten'
 
     @property
     def Tool(self):

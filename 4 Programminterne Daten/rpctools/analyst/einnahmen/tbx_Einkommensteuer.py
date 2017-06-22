@@ -7,11 +7,11 @@ from rpctools.utils.encoding import encode
 from rpctools.analyst.einnahmen.script_Einkommensteuer import Einkommensteuer
 
 class TbxEinkommensteuer(Tbx):
-    """Toolbox Wanderungssalden für Einnahmen"""
+    """Toolbox Einkommensteuer für Einnahmen"""
 
     @property
     def label(self):
-        return u'Schritt 2: Steuersalden schätzen'
+        return u'Schritt 3: Einkommensteuer schätzen'
 
     @property
     def Tool(self):
