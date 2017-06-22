@@ -136,7 +136,7 @@ class ProjektwirkungMarkets(Tool):
         self.parent_tbx.delete_rows_in_table('Zentren',
                                              where='nutzerdefiniert=0')
         ids = self.parent_tbx.query_table('Zentren', columns='id')
-        max_id = np.array(ids).max()
+        max_id = np.array(ids).max() if len(ids) > 0 else 0 
         # clip the communities with the bbox
         fc_bbox = arcpy.CopyFeatures_management([bbox_poly], 'in_memory/bbox')
         fc_clipped = arcpy.Clip_analysis(gemeinden,
