@@ -10,6 +10,8 @@ from rpctools.analyst.infrastrukturkosten.tbx_massnahmen_beschreiben import \
      TbxMassnahmenBeschreiben
 from rpctools.analyst.infrastrukturkosten.tbx_infrastrukturmengenbilanz import \
      TbxInfrastrukturmengenBilanz
+from rpctools.analyst.infrastrukturkosten.tbx_kostenkennwerte_kontrollieren \
+     import TbxKostenkennwerteKontrollieren
 
 
 class Toolbox(object):
@@ -17,7 +19,8 @@ class Toolbox(object):
         self.label = u'Infrastrukturkosten'
         self.alias = ''
         self.tools = [TbxMassnahmenBeschreiben,
-                      TbxInfrastrukturmengenBilanz, 
+                      TbxInfrastrukturmengenBilanz,
                       TbxFlaechenbilanz,
                       TbxInfrastrukturkostenermittlung,
-                      TbxKostenaufteilungsregeln]
+                      TbxKostenaufteilungsregeln,
+                      TbxKostenkennwerteKontrollieren]

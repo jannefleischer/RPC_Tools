@@ -43,7 +43,8 @@ class KostenkennwerteKontrollieren(Tool):
             columns=['BKI_Regionalfaktor'], where="AGS='{}'".format(str(ags)),
             is_base_table=True)
         # fill table Kostenkennwerte_Linienelemente
-        regional_time_factor = time_factor * regional_factor.loc[:, 'BKI_Regionalfaktor']
+        regional_time_factor = time_factor * \
+            regional_factor.loc[:, 'BKI_Regionalfaktor']
         rounding_factor = 5
         df_networks = tbx.table_to_dataframe('Netze_und_Netzelemente',
                                              workspace='FGDB_Kosten_Tool.gdb',
@@ -71,7 +72,7 @@ class KostenkennwerteKontrollieren(Tool):
         return df
 
 class TbxKostenkennwerteKontrollieren(Tbx):
-
+    _opened_for_the_first_time = True
     @property
     def label(self):
         return encode(u'Kostenkennwerte kontrollieren')
@@ -81,11 +82,28 @@ class TbxKostenkennwerteKontrollieren(Tbx):
         return KostenkennwerteKontrollieren
 
     def _open(self, params):
-        pass
+        df_costs = self.table_to_dataframe('Kostenkennwerte_Linienelemente',
+                                           workspace='FGDB_Kosten.gdb')
+        self.df_costs = df_costs
+        network_elements = list(self.df_costs.Netzelement)
+        params.network.filter.list = network_elements
+        params.network.value = network_elements[0]
+        params.costs_EH.value = int(self.df_costs.Euro_EH[0])
+        params.costs_BU.value = int(self.df_costs.Cent_BU[0])
+        params.costs_EN.value = int(self.df_costs.Euro_EN[0])
+        params.lifespan.value = int(self.df_costs.Lebensdauer[0])
+
 
     def _updateParameters(self, params):
-
-        pass
+        condition = params.network.value
+        where= u"network = '{}'".format(condition)
+        if self.par.changed('network'):
+            costs_EH, costs_BU, costs_EN, lifespan = self.df_costs['Euro_EH', 'Cent_BU', 'Euro_EN', 'Lebensdauer'].where(where)
+            params.costs_EH.value = costs_EH
+            params.costs_BU.value = costs_BU
+            params.costs_EN.value = costs_EN
+            params.lifespan.value = lifespan
+        return
 
     def _getParameterInfo(self):
         params = self.par
@@ -98,10 +116,54 @@ class TbxKostenkennwerteKontrollieren(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-
         p.filter.list = projekte
         if projekte:
             p.value = projekte[0]
+        # Netzelement
+        p = self.add_parameter('network')
+        p.name = u'network'.encode('cp1252')
+        p.displayName = u'Netzelement'.encode('cp1252')
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'GPString'
+        # Kosten EH
+        p = self.add_parameter('costs_EH')
+        p.name = u'costs_EH'.encode('cp1252')
+        p.displayName = u'Kosten der erstmaligen Herstellung: EUR pro laufenen Meter'.encode('cp1252')
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'Long'
+        p.filter.type = 'Range'
+        p.filter.list = [0, 2000]
+        # Kosten BU
+        p = self.add_parameter('costs_BU')
+        p.name = u'costs_BU'.encode('cp1252')
+        p.displayName = u'Jährliche Kosten für Betrieb und Unterhaltung: Cent pro laufenden Meter und Jahr'.encode('cp1252')
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'Long'
+        p.filter.type = 'Range'
+        p.filter.list = [0, 2000]
+        # Kosten EN
+        p = self.add_parameter('costs_EN')
+        p.name = u'costs_EN'.encode('cp1252')
+        p.displayName = u'Kosten der Erneuerung: Euro pro laufenden Meter und Erneuerungszyklus'.encode('cp1252')
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'Long'
+        p.filter.type = 'Range'
+        p.filter.list = [0, 2000]
+        # Lebensdauer
+        p = self.add_parameter('lifespan')
+        p.name = u'lifespan'.encode('cp1252')
+        p.displayName = u'Lebensdauer: Jahre zwischen den Erneuerungszyklen'.encode('cp1252')
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = u'Long'
+        p.filter.type = 'Range'
+        p.filter.list = [0, 100]
+
+
 
         return params
 
@@ -110,5 +172,6 @@ if __name__ == '__main__':
     t = TbxKostenkennwerteKontrollieren()
     t._getParameterInfo()
     t.par.project.value = t.config.active_project
-    t._updateParameters(None)
+    t._open(t.par)
+    t._updateParameters(t.par)
     t.execute()
