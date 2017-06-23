@@ -40,7 +40,6 @@ def dilate_raster(array, kernel_size=3, threshold=120):
     a[thresh_exceeded_and_not_nan] = filtered[thresh_exceeded_and_not_nan]
     return a
 
-
 class RasterManagement(object):
     def __init__(self):
         self.raster_values = self.raster_origin = self.srid = None
@@ -57,6 +56,7 @@ class RasterManagement(object):
             raster_file, 'CELLSIZEX').getOutput(0).replace(',', '.'))
         self.cellHeight = float(arcpy.GetRasterProperties_management(
             raster_file, 'CELLSIZEY').getOutput(0).replace(',', '.'))
+        
         self.raster_values = dilate_raster(
             arcpy.RasterToNumPyArray(raster_file),
             threshold=unreachable
@@ -114,13 +114,11 @@ class DistanceRouting(object):
         p1, p2 = bbox
         bbox_size = abs(p1.x-p2.x)
         edge = bbox_size * rel_edge
-        p1.x -= edge
-        p1.y -= edge
-        p2.x += edge
-        p2.y += edge
-        bbox = (p1, p2)
+        p1_new = Point(p1.x - edge, p1.y - edge, epsg=p1.epsg)
+        p2_new = Point(p2.x + edge, p2.y + edge, epsg=p2.epsg)
+        ret = (p1_new, p2_new)
 
-        return bbox
+        return ret
 
     def get_distances(self, origin, destinations, bbox=None):
         distances = np.ones(len(destinations), dtype=int)
@@ -133,14 +131,19 @@ class DistanceRouting(object):
             fn, ext = os.path.splitext(dist_raster)
             clipped_raster = fn + '_clipped' + ext
             clip_raster(dist_raster, clipped_raster, bbox)
+            arcpy.Delete_management(dist_raster)
             dist_raster = clipped_raster
+        start = time.time()
         raster = RasterManagement()
         raster.load(dist_raster)
-        raster.register_points(destinations)
+        print('filtering raster {}s'.format(time.time() - start))        
         start = time.time()
+        raster.register_points(destinations)
         for i, dest in enumerate(destinations):
             distances[i] = raster.get_value(dest)
         print('mapping {}s'.format(time.time() - start))
+    
+        arcpy.Delete_management(dist_raster)
         return distances
 
     def _request_dist_raster(self, origin):
@@ -188,3 +191,10 @@ class DistanceRouting(object):
             arcpy.AddError(err)
             return None
         return out_raster
+
+if __name__ == "__main__":
+    for i in range(100):
+        start = time.time()
+        array = np.ones((100, 100))
+        dilate_raster(array)
+        print('{}s'.format(time.time() - start))
