@@ -11,6 +11,7 @@ from rpctools.addins.bewohner_arbeitsplaetze import *
 from rpctools.addins.einnahmen import *
 from rpctools.addins.projektverwaltung import *
 from rpctools.addins.flaeche_oekologie import *
+from rpctools.addins.erreichbarkeit import *
 
 
 class SkizzeBeenden(object):

@@ -350,6 +350,24 @@
                 <Tool caption="Kleinpflaster" category="ProjektCheck" class="PlanfallKleinpflaster" id="rpc_tools.planfall_kleinpflaster" image="" message="" tip="">
                     <Help heading="" />
                 </Tool>
+                
+                <!-- ERREICHBARKEIT  -->
+
+                <Button caption="Haltestellen einlesen" category="ProjektCheck" class="HaltestellenEinlesen" id="rpc_tools.haltestellen_einlesen" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Haltestellenplan aufrufen" category="ProjektCheck" class="Haltestellenplan" id="rpc_tools.haltestellenplan" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Fahrtzeit zu zentralen Orten ermitteln" category="ProjektCheck" class="FahrtzeitZentraleOrte" id="rpc_tools.fahrtzeit_zentrale_orte" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Isochrone erzeugen" category="ProjektCheck" class="Isochrone" id="rpc_tools.isochrone" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Einrichtungen einlesen" category="ProjektCheck" class="EinrichtungenEinlesen" id="rpc_tools.einrichtungen_einlesen" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
 
             </Commands>
             <Extensions>
@@ -392,9 +410,20 @@
                         <Button refID="rpc_tools.bewohner_schaetzen" />
                         <Button refID="rpc_tools.arbeitsplaetze_schaetzen" />
                     </Items>
+                </Menu>                
+                <Menu caption="&#214;PNV-Anbindung" category="ProjektCheck" id="rpc_tools.menu_oepnv" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.haltestellen_einlesen" />
+                        <Button refID="rpc_tools.haltestellenplan" />
+                        <Button refID="rpc_tools.fahrtzeit_zentrale_orte" />
+                    </Items>
                 </Menu>
                 <Menu caption="Erreichbarkeit" category="ProjektCheck" id="rpc_tools.menu_erreichbarkeit" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items />
+                    <Items>
+                        <Menu refID="rpc_tools.menu_oepnv" />
+                        <Button refID="rpc_tools.isochrone" />
+                        <Button refID="rpc_tools.einrichtungen_einlesen" />
+                    </Items>
                 </Menu>
                 <Menu caption="Verkehr im Umfeld" category="ProjektCheck" id="rpc_tools.menu_verkehr_im_umfeld" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
