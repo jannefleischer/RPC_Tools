@@ -28,7 +28,8 @@ class ToolboxWrapper(object):
     def tbx(self):
         """the instanciated toolbox (load on demand only)"""
         if not self._tbx:
-            tbx_module = load_source(self._toolbox_name, self.path)
+            tbx_module = load_source(self._toolbox_name,
+                                     self.path.encode('utf-8'))
             self._tbx = getattr(tbx_module, self._toolbox_name)()
             self._tbx.getParameterInfo()
         return self._tbx
