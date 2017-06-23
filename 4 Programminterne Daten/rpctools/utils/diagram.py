@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import subprocess
 import os
 from argparse import ArgumentParser
-from abc import abstractmethod
 import sys
 import pickle
 import arcpy
@@ -14,32 +13,28 @@ from rpctools.utils import diagram_exec
 from rpctools.utils.encoding import encode
 
 
-class Diagram(DummyTbx):
+class Diagram(object):
     _workspace = None
     
     def __init__(self, projectname=None, title='Diagramm'):
         """
         title : str
         """
-        super(Diagram, self).__init__()    
+        super(Diagram, self).__init__()
         self.projectname = projectname
         self.title = title
-        if self._workspace:
-            self.folders._workspace = self._workspace
+        self.tbx = DummyTbx()
         
-    @abstractmethod
     def create(self, **kwargs):
         '''
         create a plot
         
-        Parameters
-        ----------
-        projectname: str, optional
-            the name of the project the data the plot is based on belongs to
-            defaults to the active project
-            
         kwargs: other optional parameters the subclassing diagram needs
-        '''
+        '''    
+        self.tbx._getParameterInfo()
+        self.tbx.set_active_project(projectname=self.projectname)
+        if self._workspace:
+            self.tbx.folders._workspace = self._workspace
 
     def show(self):
         pass    
@@ -67,21 +62,18 @@ class ArcpyDiagram(Diagram):
             
         kwargs: other optional parameters the subclassing diagram needs
         '''
-        self._getParameterInfo()
-        self.set_active_project(projectname=self.projectname)
+        super(ArcpyDiagram, self).create(**kwargs)
         self.graph, self.template = self._create(**kwargs)
-        self.created = True
 
     def _create(self, **kwargs):
         """to be implemented by subclasses,
         has to return the graph-object and the path to the template"""
         
     def show(self):
-        #if not self.graph:
-        self.create()
+        if not self.graph:
+            self.create()
         title = self.graph.graphPropsGeneral.title or self.title
-        self.output.add_graph(self.template, self.graph, title)
-
+        self.tbx.output.add_graph(self.template, self.graph, title)
 
 
 class MatplotDiagram(Diagram):
@@ -111,9 +103,9 @@ class MatplotDiagram(Diagram):
             show the plot in an external process
             defaults to True
         '''
-        #if not self.figure:
-        self.create()
-        filename = os.path.join(self.folders.TEMPORARY_GDB_PATH, 
+        if not self.figure:
+            self.create()
+        filename = os.path.join(self.tbx.folders.TEMPORARY_GDB_PATH, 
                                 '{}diagram.pickle'.format(
                                     self.__class__.__name__))
         if external:
@@ -133,9 +125,7 @@ class MatplotDiagram(Diagram):
             
         kwargs: other optional parameters the subclassing diagram needs
         '''
-        projectname = kwargs['projectname'] if 'projectname' in kwargs else None
-        self._getParameterInfo()
-        self.set_active_project(projectname=projectname)
+        super(MatplotDiagram, self).create(**kwargs)
         self.figure = self._create(**kwargs)
 
     def show_external(self, plot, filename):

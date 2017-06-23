@@ -13,18 +13,18 @@ class DiaTeilflaechen(ArcpyDiagram):
         Diagramm für Teilflächen
         """
         # Erstelle Diagramm Teilflaechen nach Hektar
-        project_name = self.par.get_projectname()
+        project_name = self.tbx.par.get_projectname()
         title = encode(
             "{}: Teilflächen des Plangebiets (Bruttofläche)"
             .format(project_name))
-        input_template = self.folders.get_diagram_template(
+        input_template = self.tbx.folders.get_diagram_template(
             'Teilflaechen_Hektar')
-        input_data = self.folders.get_table('Teilflaechen_Plangebiet',
+        input_data = self.tbx.folders.get_table('Teilflaechen_Plangebiet',
                                             check=False)
         # Create the graph
         graph = arcpy.Graph()
         mxd = arcpy.mapping.MapDocument("CURRENT")
-        project_layer = self.output.get_projectlayer()
+        project_layer = self.tbx.output.get_projectlayer()
         input_data = arcpy.mapping.ListLayers(project_layer,
                                               "Teilflaechen_Plangebiet",
                                               mxd.activeDataFrame)[0]

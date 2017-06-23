@@ -20,13 +20,13 @@ class Arbeitsplaetze(Tool):
         diagram = ArbeitsplatzEntwicklung()
         diagram.create(flaechen_id=tfl.flaechen_id,
                        flaechen_name=tfl.name)
-        self.output.add(diagram)
+        self.output.add_diagram(diagram)
         
         diagram.show()
         diagram = BranchenAnteile()
         diagram.create(flaechen_id=tfl.flaechen_id,
                        flaechen_name=tfl.name)
-        self.output.add(diagram)
+        self.output.add_diagram(diagram)
 
     def run(self):
         """"""
