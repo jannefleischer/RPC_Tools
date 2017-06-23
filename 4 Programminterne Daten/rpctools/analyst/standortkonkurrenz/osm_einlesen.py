@@ -1,47 +1,16 @@
 # -*- coding: utf-8 -*-
 #
-
+from rpctools.utils.spatial_lib import Point
 import requests
 
 #import arcpy
 import os
 from collections import OrderedDict
 #from rpctools.analyst.verkehr.otp_routing import Point
-from pyproj import Proj, transform
 import urllib
 import re
 import arcpy
 
-
-class Point(object):
-    """A Point object"""
-    __slots__ = ['x', 'y', 'id', 'geom', 'epsg', 'proj']
-    def __init__(self, x, y, id=None, epsg=4326):
-        self.id = id
-        self.x = x
-        self.y = y
-        self.geom = None
-        self.epsg = epsg
-        self.proj = Proj(init='epsg:{}'.format(epsg))
-
-    def __repr__(self):
-        return '{},{}'.format(self.x, self.y)
-
-    def __hash__(self):
-        return hash((self.x, self.y))
-
-    def create_geom(self):
-        """Create geometry from coordinates"""
-        geom = arcpy.Point(self.x, self.y)
-        self.geom = geom
-
-    def transform(self, target_srid):
-        target_srs = Proj(init='epsg:{}'.format(target_srid))
-        x, y = transform(self.proj, target_srs, self.x, self.y)
-        self.epsg = target_srid
-        self.proj = Proj(init='epsg:{}'.format(self.epsg))
-        self.x = x
-        self.y = y
 
 class Supermarket(Point):
     """A Supermarket"""

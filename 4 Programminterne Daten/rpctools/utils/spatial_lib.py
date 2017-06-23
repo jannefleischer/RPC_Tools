@@ -2,10 +2,42 @@ import arcpy
 from rpctools.utils.params import Folders
 from rpctools.utils.params import DummyTbx
 from rpctools.utils.output import ArcpyEnv
+from pyproj import Proj, transform
 
 import requests
 import numpy as np
 from os.path import join
+
+
+class Point(object):
+    """A Point object"""
+    __slots__ = ['x', 'y', 'id', 'geom', 'epsg', 'proj']
+    def __init__(self, x, y, id=None, epsg=4326):
+        self.id = id
+        self.x = x
+        self.y = y
+        self.geom = None
+        self.epsg = epsg
+        self.proj = Proj(init='epsg:{}'.format(epsg))
+
+    def __repr__(self):
+        return '{},{}'.format(self.x, self.y)
+
+    def __hash__(self):
+        return hash((self.x, self.y))
+
+    def create_geom(self):
+        """Create geometry from coordinates"""
+        geom = arcpy.Point(self.x, self.y)
+        self.geom = geom
+
+    def transform(self, target_srid):
+        target_srs = Proj(init='epsg:{}'.format(target_srid))
+        x, y = transform(self.proj, target_srs, self.x, self.y)
+        self.epsg = target_srid
+        self.proj = Proj(init='epsg:{}'.format(self.epsg))
+        self.x = x
+        self.y = y
 
 def google_geocode(address, api_key=''):
     url = 'https://maps.googleapis.com/maps/api/geocode/json'
@@ -25,7 +57,7 @@ def google_geocode(address, api_key=''):
 
 def get_closest_point(point, points):
     """get the point out of given points that is closest to the given point,
-    points are be passed as tuples of x, y (z optional) coordinates
+    points have to be passed as tuples of x, y (z optional) coordinates
     
     Parameters
     ----------
@@ -46,6 +78,9 @@ def get_closest_point(point, points):
     distances = np.apply_along_axis(np.linalg.norm, 1, diff)
     closest_idx = distances.argmin()
     return closest_idx, tuple(points[closest_idx])
+
+def get_points_in_radius(table, center, radius):
+    pass
 
 def clip_raster(in_file, out_file, bbox):
 

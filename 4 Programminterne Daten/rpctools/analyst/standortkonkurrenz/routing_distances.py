@@ -1,6 +1,6 @@
 from rpctools.utils.config import Folders
 from rpctools.utils.spatial_lib import clip_raster
-from rpctools.analyst.standortkonkurrenz.osm_einlesen import Point
+from rpctools.utils.spatial_lib import Point
 
 import arcpy
 import os

@@ -11,7 +11,7 @@ from rpctools.utils.encoding import encode
 from rpctools.utils.spatial_lib import get_project_centroid
 from rpctools.analyst.standortkonkurrenz.zensus import Zensus, ZensusCell
 from rpctools.analyst.standortkonkurrenz.routing_distances import DistanceRouting
-from rpctools.analyst.standortkonkurrenz.osm_einlesen import Point
+from rpctools.utils.spatial_lib import Point
 from rpctools.utils.config import Folders
 from rpctools.analyst.standortkonkurrenz.sales import Sales
 
