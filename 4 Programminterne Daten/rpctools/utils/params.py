@@ -863,7 +863,10 @@ class Tbx(object):
         # intersection of fields between dataframe and available fields
         # (prevent writing columns of df that don't exist in db)
         columns = np.intersect1d(dataframe.columns.values, fields)
-        values = [row[1][columns].values for row in dataframe.iterrows()]
+        #values = [row[1][columns].values for row in dataframe.iterrows()]
+        # faster way
+        df = dataframe[columns]
+        values = [row.tolist() for index, row in df.iterrows()]
         self._insert_rows_in_table(table_path, columns, values)
 
     def query_table(self, table_name, columns=[], workspace='',

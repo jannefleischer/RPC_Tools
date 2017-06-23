@@ -277,8 +277,8 @@ class ProjektwirkungMarkets(Tool):
         #for col in cells.columns:
             #column_values[col] = cells[col].values
         arcpy.AddMessage(u'Schreibe Kenngrößen in Datenbank...')
-        self.parent_tbx.insert_dataframe_in_table('Beziehungen_Maerkte_Zellen',
-                                                  cells)
+        self.parent_tbx.insert_dataframe_in_table(
+            'Beziehungen_Maerkte_Zellen', cells)
         
     def update_centers(self):
         '''calculate the sales of the defined centers'''
