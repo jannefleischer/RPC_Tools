@@ -10,11 +10,11 @@ class BewohnerEntwicklung(MatplotDiagram):
         flaechen_id = kwargs['flaechen_id']
         flaechen_name = kwargs['flaechen_name']
         self.title = (u"{} - {}: Geschätzte Einwohnerentwicklung".format(
-            self.par.get_projectname(), flaechen_name))
+            self.tbx.par.get_projectname(), flaechen_name))
         
         table = 'Bewohner_nach_Altersgruppe_und_Jahr'
         workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
-        table_df = self.table_to_dataframe(
+        table_df = self.tbx.table_to_dataframe(
             table, workspace=workspace,
             where='IDTeilflaeche={}'.format(flaechen_id))
         groups = table_df['Altersklasse'].unique()
@@ -39,13 +39,13 @@ class ArbeitsplatzEntwicklung(MatplotDiagram):
         flaechen_name = kwargs['flaechen_name']
         self.title = (u"{} - {}: Geschätzte Anzahl Arbeitsplätze "
                       u"(Orientierungswerte)".format(
-                          self.par.get_projectname(), flaechen_name))
+                          self.tbx.par.get_projectname(), flaechen_name))
         
         flaechen_id = kwargs['flaechen_id']
         
         table = 'AP_nach_Jahr'
         workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
-        table_df = self.table_to_dataframe(
+        table_df = self.tbx.table_to_dataframe(
             table, workspace=workspace,
             columns=['Jahr', 'AP'], 
             where='IDTeilflaeche={}'.format(flaechen_id))
@@ -65,18 +65,18 @@ class BranchenAnteile(MatplotDiagram):
         flaechen_name = kwargs['flaechen_name']
         self.title = (u"{} - {}: Geschätzte Branchenanteile an den "
                       u"Arbeitsplätzen".format(
-                          self.par.get_projectname(), flaechen_name))
+                          self.tbx.par.get_projectname(), flaechen_name))
         
         flaechen_id = kwargs['flaechen_id']
         
         table = 'Branchenanteile'
         branche_table = 'Gewerbe_Branchen'
         workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
-        table_df = self.table_to_dataframe(
+        table_df = self.tbx.table_to_dataframe(
             table, workspace=workspace,
             columns=['IDBranche', 'Anteil'], 
             where='IDTeilflaeche={}'.format(flaechen_id))
-        branche_table_df = self.table_to_dataframe(
+        branche_table_df = self.tbx.table_to_dataframe(
             branche_table, workspace='FGDB_Definition_Projekt_Tool.gdb',
             columns=['ID_Branche_Projektcheck', 'Name_Branche_Projektcheck'],
             is_base_table=True
@@ -102,9 +102,9 @@ if __name__ == "__main__":
     #diagram = BewohnerEntwicklung()
     #diagram.create(projectname='1', flaechen_id=1, flaechen_name=u'Testfläche')
     #diagram.show()
-    diagram = ArbeitsplatzEntwicklung()
-    diagram.create(projectname='Test2', flaechen_id=1, flaechen_name=u'Testfläche')
-    diagram.show()
-    #diagram = BranchenAnteile()
-    #diagram.create(projectname='Test', flaechen_id=2, flaechen_name=u'Testfläche')
+    #diagram = ArbeitsplatzEntwicklung()
+    #diagram.create(projectname='Test2', flaechen_id=1, flaechen_name=u'Testfläche')
     #diagram.show()
+    diagram = BranchenAnteile()
+    diagram.create(flaechen_id=2, flaechen_name=u'bla')
+    diagram.show()

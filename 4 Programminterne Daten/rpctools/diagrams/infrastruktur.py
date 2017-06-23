@@ -11,14 +11,14 @@ class Netzlaenge(MatplotDiagram):
         line_table = 'Erschliessungsnetze_Linienelemente'
         self.title = (u"{}: Länge der zusätzlichen Infrastrukturnetze "
                  u"(ohne punktuelle Maßnahmen)".format(
-                     self.par.get_projectname()))
+                     self.tbx.par.get_projectname()))
         x_label = u"Meter zusätzliche Netzlänge (ohne punktuelle Maßnahmen)"
         
-        linien_df = self.table_to_dataframe(
+        linien_df = self.tbx.table_to_dataframe(
             line_table, columns=['SHAPE_Length', 'IDNetz'],
             workspace='FGDB_Kosten.gdb'
         )
-        base_df = self.table_to_dataframe(
+        base_df = self.tbx.table_to_dataframe(
             'Netze_und_Netzelemente', workspace='FGDB_Kosten_Tool.gdb',
             columns=['IDNetz', 'Netz'], 
             is_base_table=True
@@ -50,12 +50,12 @@ class MassnahmenKosten(MatplotDiagram):
     def _create(self, **kwargs):
         point_table = 'Erschliessungsnetze_Punktelemente'
         self.title = u"{}: Kosten der punktuellen Maßnahmen".format(
-            self.par.get_projectname())
+            self.tbx.par.get_projectname())
         x_label = u"Kosten der punktuellen Maßnahmen"
         
-        point_df = self.table_to_dataframe(
+        point_df = self.tbx.table_to_dataframe(
             point_table, workspace='FGDB_Kosten.gdb')
-        base_df = self.table_to_dataframe(
+        base_df = self.tbx.table_to_dataframe(
             'Netze_und_Netzelemente', workspace='FGDB_Kosten_Tool.gdb',
             columns=['IDNetz', 'Netz'], 
             is_base_table=True
