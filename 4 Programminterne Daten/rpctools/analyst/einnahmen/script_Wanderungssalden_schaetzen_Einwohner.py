@@ -21,23 +21,26 @@ class Wanderungssalden1(Tool):
     def add_outputs(self):
 
 	self.output.delete_output("Einw_Saldo")
-		
-        self.output.add_layer(
-                    groupname = "einnahmen", 
-                    featureclass = "Gemeindebilanzen", 
+
+    gemeinde_werte = lib_einnahmen.get_values(["Einw_Saldo"], self.projectname)
+
+    symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
+
+    self.output.add_layer(
+                    groupname = "einnahmen",
+                    featureclass = "Gemeindebilanzen",
                     template_layer = "Skala_minus_x",
                     template_folder = "einnahmen",
-                    name = "Einw_Saldo", 
+                    name = "Einw_Saldo",
                     disable_other = True)
-					
-	arcpy.RefreshTOC()
-	
-        lyr = self.output.get_layers("Einw_Saldo", self.projectname)
-        if lyr:  
-            lyr[0].symbology.valueField = "Einw_Saldo"
-            lyr[0].symbology.classBreakValues = [-10, -8, -6, -4, -3, -2, -1, 0, 999999999]		
-	#gemeinde_werte = lib_einnahmen.get_values(["Einw_Saldo"], self.projectname)
-        arcpy.RefreshTOC()
+
+
+    lyr = self.output.get_layers("Einw_Saldo", self.projectname)
+    if lyr:
+        lyr[0].symbology.valueField = "Einw_Saldo"
+
+    arcpy.RefreshTOC()
+    arcpy.RefreshActiveView()
 
     def run(self):
 
@@ -158,7 +161,7 @@ class Wanderungssalden1(Tool):
             gemeinde[2] = gemeinde[0] + gemeinde[1]
             cursor.updateRow(gemeinde)
 
-       
+
         c.set_chronicle("Wanderung Einwohner", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
 
 
