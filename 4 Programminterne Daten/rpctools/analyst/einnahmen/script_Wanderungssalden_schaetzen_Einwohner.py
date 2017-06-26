@@ -33,7 +33,8 @@ class Wanderungssalden1(Tool):
             template_folder = "einnahmen",
             name = "Einw_Saldo",
             disable_other = True,
-            symbology = {'valueField': "FamLeistAusgl"}
+            symbology = {'valueField': "FamLeistAusgl"},
+            label_replace = {'Einw_Saldo': 'FamLeistAusgl'}
         )
 
         arcpy.RefreshTOC()

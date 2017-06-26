@@ -174,7 +174,8 @@ class Layer(object):
                  subgroup="",
                  in_project=True,
                  query="",
-                 symbology={}, 
+                 symbology={},
+                 label_replace={}, 
                  zoom=True):
         self.groupname = groupname
         self.template_layer = template_layer
@@ -187,6 +188,7 @@ class Layer(object):
         self.query = query
         self.name = name
         self.symbology = symbology
+        self.label_replace = label_replace
 
 
 class Output(object):    
@@ -426,7 +428,8 @@ class Output(object):
                   subgroup="",
                   in_project=True,
                   query="",
-                  symbology={}, 
+                  symbology={},
+                  label_replace={},
                   zoom=True):
         """
         Add output layer
@@ -468,12 +471,16 @@ class Output(object):
         symbology : dictionary, optional
             sets symbology of layer on show, keys are the symbology-field and
             values the values to be set
+        label_replace : dictionary, optional
+            replaces columns in label expressions, keys are the old values and
+            the values the new ones to replace them with
         """
         layer = Layer(groupname, template_layer, name=name, 
                       featureclass=featureclass,
                       disable_other=disable_other, subgroup=subgroup, 
                       in_project=in_project, zoom=zoom, query=query, 
-                      template_folder=template_folder, symbology=symbology)        
+                      template_folder=template_folder, symbology=symbology,
+                      label_replace=label_replace)        
         self.layers.append(layer)
         
     def add_diagram(self, *args):
@@ -523,7 +530,7 @@ class Output(object):
         # Template Layer laden
         template_layer = self.folders.get_layer(layer.template_layer,
                                                 layer.template_folder)
-        arcpy.AddMessage(template_layer)
+        #arcpy.AddMessage(template_layer)
         source_layer = arcpy.mapping.Layer(template_layer)
 
         # Datasource des Layers auf die gewünschte FeatureClass setzen
@@ -582,9 +589,23 @@ class Output(object):
         if layer.subgroup != "":
             target_subgrouplayer.visible = True
         
-        sym = new_layer.symbology
-        for f, v in layer.symbology.iteritems():
-            setattr(sym, f, v)
+        # not all layers support symbology
+        try: 
+            sym = new_layer.symbology
+            for f, v in layer.symbology.iteritems():
+                setattr(sym, f, v)
+        except Exception as e:
+            print(e)
+    
+        # same with labels
+        try: 
+            for label_class in new_layer.labelClasses:
+                exp = label_class.expression
+                for l, v in layer.label_replace.iteritems():
+                    exp = exp.replace(l, v)
+                label_class.expression = exp    
+        except Exception as e:
+            print(e)
             
         target_grouplayer.visible = True
         if layer.in_project:
