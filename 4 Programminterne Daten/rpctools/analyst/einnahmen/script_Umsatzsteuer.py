@@ -134,7 +134,7 @@ class Steuersalden(Tool):
             "Negativer Gesamtsaldo"
         ]
         for layername in saldos:
-            self.output.add_output(
+            self.output.add_layer(
                 groupname=groupname,
                 template_layer=self.folders.get_layer(layername, folder),
                 featureclass=tbl_steuersalden,

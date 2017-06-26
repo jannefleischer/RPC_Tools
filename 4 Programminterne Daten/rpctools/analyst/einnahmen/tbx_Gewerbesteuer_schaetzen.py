@@ -4,10 +4,10 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.analyst.einnahmen.Steuersalden import Steuersalden
+from rpctools.analyst.einnahmen.script_Gewerbesteuer_schaetzen import Gewerbesteuer
 
 class TbxGewerbesteuer(Tbx):
-    """Toolbox Wanderungssalden fÃ¼r Einnahmen"""
+    """Toolbox Wanderungssalden für Einnahmen"""
 
     @property
     def label(self):
@@ -15,7 +15,7 @@ class TbxGewerbesteuer(Tbx):
 
     @property
     def Tool(self):
-        return Steuersalden
+        return Gewerbesteuer
 
     def _getParameterInfo(self):
 
@@ -35,28 +35,24 @@ class TbxGewerbesteuer(Tbx):
     def _updateParameters(self, params):
 
         par = self.par
-        projects = self.folders.get_projects()
-        projects_wohnen_gewerbe = []
 
-        for project in projects:
-            table_teilflaechen = self.folders.get_table(
-                tablename='Teilflaechen_Plangebiet',
-                workspace="FGDB_Definition_Projekt.gdb",
-                project=project)
-            fields = "Nutzungsart"
-            cursor = arcpy.da.SearchCursor(table_teilflaechen, fields)
-            wohnen_gewerbe_exists = False
+        cursor = self.query_table(table_name = 'Chronik_Nutzung',
+                                columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
+                                workspace='FGDB_Einnahmen.gdb')
+        for row in cursor:
+            if row[0] == u"Wanderung Beschäftigte" and row[1] is None:
+                par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden fÃ¼r Beschäftigte berechnet!')
 
-            for flaeche in cursor:
-                if flaeche[0] == 1 or flaeche[0] == 2:
-                    wohnen_gewerbe_exists = True
-
-            if wohnen_gewerbe_exists == True:
-                projects_wohnen_gewerbe.append(project)
-
-        par.name.filter.list = projects_wohnen_gewerbe
-        if projects_wohnen_gewerbe:
-            par.name.value = projects_wohnen_gewerbe[0]
-        else:
-            par.name.value = None
-            par.name.filter.enabled = False
+        where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.WOHNEN, Nutzungsart.EINZELHANDEL)
+        if par.changed('name'):
+            where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.WOHNEN, Nutzungsart.EINZELHANDEL)
+            rows = self.query_table('Teilflaechen_Plangebiet',
+                                    ['Nutzungsart'],
+                                    workspace='FGDB_Definition_Projekt.gdb',
+                                    where=where)
+            if not rows:
+                par.name.setErrorMessage(u'In diesem Projekt sind keine Gewerbe- oder Einzelhandelsflächen definiert!')
+                par.gemeinde.enabled = False
+                par.gemeinde.filter.list = []
+                par.gemeinde.value = (u'Projekt enthält keine Flächen mit der '
+                                      u'benötigten Nutzungsart')

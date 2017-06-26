@@ -3,6 +3,17 @@ import math
 import rpctools.utils.config as config
 import os
 
+def get_values(spalte, projekt):
+    values = []
+    
+    folders = config.Folders()
+    path_gemeindebilanzen = folders.get_table('Gemeindebilanzen', "FGDB_Einnahmen.gdb", projekt)
+    cursor = arcpy.da.SearchCursor(path_gemeindebilanzen, spalte)
+    for row in cursor:
+        values.append(row[0])
+    
+    return values
+
 def get_symbology(gemeindewerte, vorzeichen):
 
     gemeinde_values = gemeindewerte

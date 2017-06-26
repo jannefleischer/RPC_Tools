@@ -39,15 +39,15 @@ class TbxKontrolleGewerbesteuer(Tbx):
         par.gemeinde.datatype = u'GPString'
         par.gemeinde.filter.list = []
 
-        par.saldo = arcpy.Parameter()
-        par.saldo.name = u'Hebesatz'
-        par.saldo.displayName = u'Hebesatz für die Gewerbesteuer (von-Hundert-Satz)'
-        par.saldo.parameterType = 'Required'
-        par.saldo.direction = 'Input'
-        par.saldo.datatype = u'GPLong'
-        par.saldo.filter.type = 'Range'
-        par.saldo.filter.list = [100, 600]
-        par.saldo.value = 250
+        par.hebesatz = arcpy.Parameter()
+        par.hebesatz.name = u'Hebesatz'
+        par.hebesatz.displayName = u'Hebesatz für die Gewerbesteuer (von-Hundert-Satz)'
+        par.hebesatz.parameterType = 'Required'
+        par.hebesatz.direction = 'Input'
+        par.hebesatz.datatype = u'GPLong'
+        par.hebesatz.filter.type = 'Range'
+        par.hebesatz.filter.list = [100, 600]
+        par.hebesatz.value = 250
 
         return par
 
@@ -81,6 +81,6 @@ class TbxKontrolleGewerbesteuer(Tbx):
                 rows = self.query_table('Gemeindebilanzen', fields,
                                         workspace='FGDB_Einnahmen.gdb')
                 for gem_name, hebesteuer in rows:
-                    gemeinden.append(u"{} || Saldo: {}".format(
+                    gemeinden.append(u"{} || Hebesatz: {}".format(
                         gem_name, hebesteuer))
                 par.gemeinde.filter.list = sorted(gemeinden)

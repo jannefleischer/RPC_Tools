@@ -6,9 +6,11 @@ import sys
 import arcpy
 
 from rpctools.utils.params import Tool
+import rpctools.utils.chronik as c
+from rpctools.utils.encoding import encode
+import rpctools.utils.layer_einnahmen as lib_einnahmen
 
-
-class Steuersalden(Tool):
+class Gewerbesteuer(Tool):
     """Steuersalden-Tool"""
 
     _param_projectname = 'name'
@@ -20,141 +22,106 @@ class Steuersalden(Tool):
     def run(self):
         """run Steuersalden Tool"""
 
-        subgroup = "Steuereinnahmesalden"
+        params = self.par
+        projektname = self.projectname
 
-    # Pruefen, ob Wanderungssalden-Tabelle existiert; falls ja, dann loeschen
-        layer_pfad = self.folders.get_db("FGDB_Einnahmen.gdb")
-        wanderungssalden_pfad = os.path.join(layer_pfad, "Wanderungssalden")
-        layer_existiert = arcpy.Exists(wanderungssalden_pfad)
+        Gewerbesteuermessbetrag_Projekt = 0
+        
+        gewerbe_vorhanden = False
+        gewerbe_messbetrag = 0
+        einzelhandel_vorhanden = False
+        einzelhandel_messbetrag = 0
+        
+        fields1 = ['Nutzungsart', 'id_teilflaeche', 'ags_bkg']
+        table_teilflaechen = self.folders.get_table('Teilflaechen_Plangebiet', "FGDB_Definition_Projekt.gdb")
+        cursor1 = arcpy.da.SearchCursor(table_teilflaechen, fields1)
+        for row1 in cursor1:
+            ags = row1[2]
+            ags2 = ags[0:2]
+            if teilflaeche[0] == Nutzungsart.GEWERBE:
+                gewerbe_vorhanden = True
+                Summe_Arbeitsplatzschaetzungen = 0
+                fields2 = ['anzahl_jobs_schaetzung']
+                table_gewerbeanteile = self.folders.get_table('Gewerbe_Anteile', "FGDB_Definition_Projekt.gdb")
+                cursor2 = arcpy.da.SearchCursor(table_gewerbeanteile, fields2)
+                for row2 in cursor2:
+                    Summe_Arbeitsplatzschaetzungen += row2[0]
+                    
+                Reale_Summe_AP = 0
+                fields3 = ['Arbeitsplaetze']
+                table_arbeitsplaetze = self.folders.get_table('Gewerbe_Arbeitsplaetze', "FGDB_Definition_Projekt.gdb")
+                cursor3 = arcpy.da.SearchCursor(table_arbeitsplaetze, fields3)
+                for row3 in cursor3:
+                    Summe_Arbeitsplatzschaetzungen += row3[0]
+                    
+                Korrekturfaktor_AP = Reale_Summe_AP / Summe_Arbeitsplatzschaetzungen
+                
+                fields4 = ['anzahl_jobs_schaetzung', 'branche']
+                cursor4 = arcpy.da.SearchCursor(table_gewerbeanteile, fields4)
+                for row4 in cursor4:
+                    Messbetrag = 0
+                    fields5 = ['AGS2', 'IDBranche', 'GewStMessbetrag_pro_Arbeitsplatz']
+                    where1 = '"AGS2"' + "='" + ags2 + "'" + " AND " + '"IDBranche"' + "='" + row4[1] + "'"  
+                    table_messbetrag_pro_ap = self.folders.get_base_table("FGDB_Einnahmen_Tool.gdb", "GewSt_Messbetrag_pro_Arbeitsplatz")
+                    cursor5 = arcpy.da.SearchCursor(table_messbetrag_pro_ap, fields5, where1)
+                    for branche in cursor5:
+                        Messbetrag_pro_Arbeitsplatz = branche[2] 
+                    
+                    Messbetrag = cursor4[0] * Korrekturfaktor_AP * Messbetrag_pro_Arbeitsplatz
+                    gewerbe_messbetrag += Messbetrag
+                                
+            if teilflaeche[0] == Nutzungsart.EINZELHANDEL:
+                einzelhandel_vorhanden = True
+                fields6 = ['Verkaufsflaeche_qm', 'ID_Teilflaeche', 'IDSortiment']
+                where2 = '"ID_Teilflaeche"' + "='" + row1[1] + "'"
+                table_verkaufsflaechen = self.folders.get_table('Einzelhandel_Verkaufsflaechen', "FGDB_Definition_Projekt.gdb")
+                cursor6 = arcpy.da.SearchCursor(table_verkaufsflaechen, fields6, where2)
+                for row6 in cursor6:
+                    Messbetrag = 0
+                    verkaufsflaeche = row6[0]
 
-        if layer_existiert == 0:
-            arcpy.AddMessage(
-                "Es wurden noch keine Wanderungssalden für das angegebene "
-                "Projekt berechnet. Bitte zuerst "
-                "'Schritt 1: Wanderungssalden schätzen' durchführen.")
-            sys.exit()
+                    fields7 = ['GewStMessbetrag_pro_qm_Verkaufsflaeche', 'ID_Sortiment']
+                    where3 = '"ID_Sortiment"' + "='" + row6[2] + "'"
+                    table_messbetrag_pro_qm = self.folders.get_base_table("FGDB_Einnahmen_Tool.gdb", "GewSt_Messbetrag_und_SvB_pro_qm_Verkaufsflaeche")
+                    cursor7 = arcpy.da.SearchCursor(table_messbetrag_pro_qm, fields7, where3)
+                    for row7 in cursor7:
+                        messbetrag_pro_qm =row7[0]
+                    
+                    Messbetrag = verkaufsflaeche * messbetrag_pro_qm
+                    einzelhandel_messbetrag += Messbetrag
+        
+        Gewerbesteuermessbetrag_Projekt = gewerbe_messbetrag + einzelhandel_messbetrag
+        
+        SvB_Branchen = 0
+        if gewerbe_vorhanden:
+            fields = ['Arbeitsplaetze']
+            table_arbeitsplaetze = self.folders.get_table('Gewerbe_Arbeitsplaetze', "FGDB_Definition_Projekt.gdb")
+            cursor = arcpy.da.SearchCursor(table_arbeitsplaetze, fields)
+            for gewerbe in cursor:
+                SvB_Branchen += gewerbe[0]
+            
+        SvB_Verkaufsflaechen = 0
+        if einzelhandel_vorhanden:
+            fields = ['Verkaufsflaeche_qm', 'IDSortiment']
+            cursor = arcpy.da.SearchCursor(table_verkaufsflaechen, fields)
+            for verkaufsflaeche in cursor:
+                fields2 = ['SvB_pro_qm_Verkaufsflaeche', 'ID_Sortiment']
+                where2 = '"ID_Sortiment"' + "='" + verkaufsflaeche[1] + "'"
+                cursor2 = arcpy.da.SearchCursor(table_messbetrag_pro_qm, fields2, where2)
+                for row in cursor2:
+                    SvB_Verkaufsflaechen += verkaufsflaeche[0] * row[0]
+                
+        Bewerbesteuermessbetrag_pro_SvB_Projekt = Gewerbesteuermessbetrag_Projekt / (SvB_Branchen + SvB_Verkaufsflaechen)
+        
+        table_bilanzen = self.folders.get_table("Gemeindebilanzen", "FGDB_Einnahmen.gdb")
+        fields = ["AGS", "GewSt", "Hebesatz_GewSt", "SvB_Saldo"]        
+        cursor = arcpy.da.UpdateCursor(table_bilanzen, fields)
+        for row in cursor:
+            if row[0] == ags:
+                row[1] = Bewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100) * (row[3] + SvB_Verkaufsflaechen) / (SvB_Branchen + SvB_Verkaufsflaechen)
+            else:
+                row[1] = Bewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100) * row[3] / (SvB_Branchen + SvB_Verkaufsflaechen)
+            cursor.updateRow(row)
 
-        # Löschen bisheriger Layer
-        self.output.delete_output(subgroup)
-
-    # Layer "Steuereinnahmesalden" mit Gemeinden
-    # aus dem Layer "Wanderungssalden" erzeugen,
-    # vorhandenen Steuersaldo-Layer löschen
-
-        if arcpy.Exists("Wanderungssalden_lyr"):
-            arcpy.Delete_management("Wanderungssalden_lyr")
-        arcpy.MakeFeatureLayer_management(wanderungssalden_pfad,
-                                          "Wanderungssalden_lyr")
-
-        steuersalden_pfad = os.path.join(layer_pfad, "Steuersalden")
-        if arcpy.Exists(steuersalden_pfad) == 1:
-            arcpy.Delete_management(steuersalden_pfad)
-        arcpy.CopyFeatures_management("Wanderungssalden_lyr",
-                                      steuersalden_pfad)
-
-        list_fields = []
-        list_fieldobjects = arcpy.ListFields(steuersalden_pfad)
-
-        for field in list_fieldobjects:
-            if not field.required:
-                list_fields.append(field.name)
-        list_fields.remove("GEN")
-        arcpy.DeleteField_management(steuersalden_pfad, list_fields)
-
-    # Hinzufuegen leerer Spalten zu Steuersalden
-        arcpy.AddField_management(steuersalden_pfad, "Grundsteuer", "LONG")
-        arcpy.AddField_management(steuersalden_pfad, "Einkommensteuer", "LONG")
-        arcpy.AddField_management(steuersalden_pfad, "Familienleistungsausgleich", "LONG")
-        arcpy.AddField_management(steuersalden_pfad, "Gewerbesteuer", "LONG")
-        arcpy.AddField_management(steuersalden_pfad, "Umsatzsteuer", "LONG")
-        arcpy.AddField_management(steuersalden_pfad, "Summe_Saldo_Steuereinnahmen", "LONG")
-
-    # Grundsteuer ermitteln
-    # Dummy-Rechenweg
-        grundsteuer = 999
-
-        fields = ["Grundsteuer"]
-        cursor = arcpy.da.UpdateCursor(steuersalden_pfad, fields)
-        for gemeinde in cursor:
-            gemeinde[0] = grundsteuer
-            cursor.updateRow(gemeinde)
-
-    # Einkommensteuer und Familienleistungsausgleich ermitteln
-    # Dummy-Rechenweg
-        einkommen = 888
-        familienausgleich = 777
-
-        fields = ["Einkommensteuer", "Familienleistungsausgleich"]
-        cursor = arcpy.da.UpdateCursor(steuersalden_pfad, fields)
-        for gemeinde in cursor:
-            gemeinde[0] = einkommen
-            gemeinde[1] = familienausgleich
-            cursor.updateRow(gemeinde)
-
-    # Gewerbesteuer und Umsatzsteuer ermitteln
-    # Dummy-Rechenweg
-        gewerbe = 666
-        umsatz = 555
-
-        fields = ["Gewerbesteuer", "Umsatzsteuer"]
-        cursor = arcpy.da.UpdateCursor(steuersalden_pfad, fields)
-        for gemeinde in cursor:
-            gemeinde[0] = gewerbe
-            gemeinde[1] = umsatz
-            cursor.updateRow(gemeinde)
-
-    # Aufsummieren der Steuereinnahmen
-
-        fields = ["Grundsteuer", "Einkommensteuer",
-                  "Familienleistungsausgleich", "Gewerbesteuer",
-                  "Umsatzsteuer", "Summe_Saldo_Steuereinnahmen"]
-        cursor = arcpy.da.UpdateCursor(steuersalden_pfad, fields)
-        for gemeinde in cursor:
-            gemeinde[5] = gemeinde[0] + gemeinde[1] + gemeinde[2] + gemeinde[3] + gemeinde[4]
-            cursor.updateRow(gemeinde)
-
-    # Anzeigen der Saldo-Layer
-
-        tbl_steuersalden = self.folders.get_table(tablename="Steuersalden")
-        groupname = "einnahmen"
-        folder = "einnahmen"
-
-        saldos = [
-            "Positiver Grundsteuersaldo",
-            "Negativer Grundsteuersaldo",
-            "Positiver Einkommensteuersaldo",
-            "Negativer Einkommensteuersaldo",
-            "Positiver Familienleistungsausgleichssaldo",
-            "Negativer Familienleistungsausgleichssaldo",
-            "Positiver Gewerbesteuersaldo",
-            "Negativer Gewerbesteuersaldo",
-            "Positiver Umsatzsteuersaldo",
-            "Negativer Umsatzsteuersaldo",
-            "Positiver Gesamtsaldo"
-            "Negativer Gesamtsaldo"
-        ]
-        for layername in saldos:
-            self.output.add_output(
-                groupname=groupname,
-                template_layer=self.folders.get_layer(layername, folder),
-                featureclass=tbl_steuersalden,
-                disable_other=False,
-                subgroup=subgroup,
-            )
-
-    #   Symbology anpassen
-        mxd = arcpy.mapping.MapDocument("CURRENT")
-        negative_saldos = [
-            "Negativer Grundsteuersaldo",
-            "Negativer Einkommensteuersaldo",
-            "Negativer Familienleistungsausgleichssaldo",
-            "Negativer Gewerbesteuersaldo",
-            "Negativer Umsatzsteuersaldo",
-            "Negativer Gesamtsaldo"
-        ]
-        for lyrname in negative_saldos:
-            # ToDo: check if to reclassify in mxd or only in project_layer
-            self.output.reclassify_layer(mxd, lyrname)
-        arcpy.RefreshTOC()
-
+        c.set_chronicle("Gewerbesteuer", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
 

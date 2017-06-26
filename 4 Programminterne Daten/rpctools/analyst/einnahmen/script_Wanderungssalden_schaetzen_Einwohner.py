@@ -19,7 +19,25 @@ class Wanderungssalden1(Tool):
     _workspace = 'FGDB_Einnahmen.gdb'
 
     def add_outputs(self):
-        pass
+
+	self.output.delete_output("Einw_Saldo")
+		
+        self.output.add_layer(
+                    groupname = "einnahmen", 
+                    featureclass = "Gemeindebilanzen", 
+                    template_layer = "Skala_minus_x",
+                    template_folder = "einnahmen",
+                    name = "Einw_Saldo", 
+                    disable_other = True)
+					
+	arcpy.RefreshTOC()
+	
+        lyr = self.output.get_layers("Einw_Saldo", self.projectname)
+        if lyr:  
+            lyr[0].symbology.valueField = "Einw_Saldo"
+            lyr[0].symbology.classBreakValues = [-10, -8, -6, -4, -3, -2, -1, 0, 999999999]		
+	#gemeinde_werte = lib_einnahmen.get_values(["Einw_Saldo"], self.projectname)
+        arcpy.RefreshTOC()
 
     def run(self):
 
@@ -77,7 +95,7 @@ class Wanderungssalden1(Tool):
         exponentialfaktor_wohnen = -0.1
         konstant_bis_km_wohnen = 3
 
-        # Mittelpunkt der Projektflächen
+        # Mittelpunkt der Projektflaechen
         table = 'Teilflaechen_Plangebiet'
         columns = np.array(['Nutzungsart', 'Flaeche_ha', 'INSIDE_X', 'INSIDE_Y'])
         Results = wmean.Read_FGDB(workspace_projekt_definition, table, columns)
@@ -128,8 +146,7 @@ class Wanderungssalden1(Tool):
             ags_projekt = projekt[0]
 
 
-        #Ergebnis einfügen
-        liste_salden = []
+        #Ergebnis einfuegen
         fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "Wanderungsanteil_Ew", "AGS"]
         cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
         for gemeinde in cursor:
@@ -139,46 +156,9 @@ class Wanderungssalden1(Tool):
             else:
                 gemeinde[0] = 0
             gemeinde[2] = gemeinde[0] + gemeinde[1]
-            liste_salden.append(gemeinde[2])
             cursor.updateRow(gemeinde)
 
-
-
-        #Prüfen, ob  Wohngebiete existieren
-        wohnen_exists = False
-
-        table_teilflaechen = self.folders.get_table(
-            tablename='Teilflaechen_Plangebiet',
-            workspace="FGDB_Definition_Projekt.gdb",
-            project=projektname)
-        fields = "Nutzungsart"
-        cursor = arcpy.da.SearchCursor(table_teilflaechen, fields)
-        wohnen_gewerbe_exists = False
-
-        for flaeche in cursor:
-            if flaeche[0] == 1:
-                wohnen_exists = True
-
-##        groupname = "einnahmen"
-##        tbl_wanderungssalden = self.folders.get_table("Gemeindebilanzen")
-##        folder = "einnahmen"
-##        disable_other = False
-##        layer = lib_einnahmen.get_symbology(liste_salden, 1)
-##        arcpy.AddMessage("Layer-Pfad:" + layer)
-##        arcpy.AddMessage("tbl-Pfad:" + str(tbl_wanderungssalden))
-##        #Einwohnersaldo-Layer hinzufügen
-##        if wohnen_exists:
-##                self.output.replace_output(
-##                    groupname, tbl_wanderungssalden, "Skala_minus_x",
-##                    folder, disable_other)
-##
-##        lyr = output.get_layers("Skala_minus_x", projektname)[0]
-##
-##        lyr.symbology.valueField = "Einw_Saldo"
-##        lyr.symbology.classBreakValues = [-10, -8, -6, -4, -3, -2, -1, 0, 999999999]
-##
-##        arcpy.RefreshTOC()
-
+       
         c.set_chronicle("Wanderung Einwohner", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
 
 
