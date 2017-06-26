@@ -55,7 +55,7 @@ def google_geocode(address, api_key=''):
     location = results[0]['geometry']['location']
     return (location['lat'], location['lng']), msg
 
-def get_closest_point(point, points):
+def closest_point(point, points):
     """get the point out of given points that is closest to the given point,
     points have to be passed as tuples of x, y (z optional) coordinates
     
@@ -73,14 +73,60 @@ def get_closest_point(point, points):
     point : tuple
         x, y of closest point
     """
-    points = [np.array(p) for p in points]
-    diff = np.array(points) - np.array(point)
-    distances = np.apply_along_axis(np.linalg.norm, 1, diff)
+    distances = _get_distances(point, points)
     closest_idx = distances.argmin()
     return closest_idx, tuple(points[closest_idx])
 
-def get_points_in_radius(table, center, radius):
-    pass
+def points_within(center_point, points, radius):
+    """get the points within a radius around a given center_point,
+    points have to be passed as tuples of x, y (z optional) coordinates
+    
+    Parameters
+    ----------
+    center_point : tuple
+        x, y (, z) coordinates of point
+    points : list of tuples
+        x, y (, z) coordinates of points
+    radius : int
+        metric depends on projection of points (e.g. meter if Gauss-Krueger)
+
+    Returns
+    -------
+    indices : list of bool
+        True if point is wihtin radius
+    points : list of tuples
+        points within radius
+    """
+    distances = _get_distances(point, points)
+    is_within = distances <= radius
+    return points[is_within], is_within
+
+def _get_distances(point, points):    
+    points = [np.array(p) for p in points]
+    diff = np.array(points) - np.array(point)
+    distances = np.apply_along_axis(np.linalg.norm, 1, diff)
+    return distances
+
+# cancelled: arcpro only
+#def get_points_in_radius(table, center, radius):
+    #fc_center = 'in_memory/center'
+    #fc_radius = 'in_memory/radius'
+    #from rpctools.utils.config import Config
+    #x, y = center
+    ##c = Point(x, y, epsg=Config().epsg)
+    ##c.transform(4326)
+    ##arcpy.CopyFeatures_management([arcpy.Point(c.y, c.x)], fc_center)
+    #arcpy.CreateFeatureclass_management(
+        #"in_memory", "center", "POINT")
+    #cursor = arcpy.da.InsertCursor(fc_center, ["SHAPE"])
+    #cursor.insertRow([arcpy.Point(x, y)])
+    #del(cursor)
+    #cursor = arcpy.da.SearchCursor(fc_center, ['*'])
+    #for row in cursor:
+        #print(row)
+        
+    #arcpy.PointDistance_analysis(fc_center, table, search_radius=35)
+    #cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'AGS'])
 
 def clip_raster(in_file, out_file, bbox):
 

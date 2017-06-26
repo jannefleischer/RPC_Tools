@@ -3,7 +3,7 @@ import arcpy
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.utils.spatial_lib import get_closest_point, get_ags
+from rpctools.utils.spatial_lib import closest_point, get_ags
 import numpy as np
 import pandas as pd
 
@@ -200,7 +200,7 @@ class TbxEditMarkets(Tbx):
         x, y = self.config.active_coord
         closest_idx = None
         if x and y:
-            closest_idx, c = get_closest_point((x, y), self.markets_df['SHAPE'])
+            closest_idx, c = closest_point((x, y), self.markets_df['SHAPE'])
         
         # update the names of the markets and list them
         pretty_names = []
