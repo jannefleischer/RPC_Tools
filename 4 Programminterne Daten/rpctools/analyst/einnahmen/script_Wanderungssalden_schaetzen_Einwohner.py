@@ -19,28 +19,26 @@ class Wanderungssalden1(Tool):
     _workspace = 'FGDB_Einnahmen.gdb'
 
     def add_outputs(self):
+        self.output.delete_output("Wanderungssalden Einwohner")
 
-	self.output.delete_output("Einw_Saldo")
+        self.output.delete_output("Einw_Saldo")
 
-    gemeinde_werte = lib_einnahmen.get_values(["Einw_Saldo"], self.projectname)
-
-    symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
-
-    self.output.add_layer(
-                    groupname = "einnahmen",
-                    featureclass = "Gemeindebilanzen",
-                    template_layer = "Skala_minus_x",
-                    template_folder = "einnahmen",
-                    name = "Einw_Saldo",
-                    disable_other = True)
-
-
-    lyr = self.output.get_layers("Einw_Saldo", self.projectname)
-    if lyr:
-        lyr[0].symbology.valueField = "Einw_Saldo"
-
-    arcpy.RefreshTOC()
-    arcpy.RefreshActiveView()
+        gemeinde_werte = lib_einnahmen.get_values(["Einw_Saldo"], self.projectname)
+    
+        symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
+    
+        self.output.add_layer(
+            groupname = "einnahmen",
+            featureclass = "Gemeindebilanzen",
+            template_layer = "Skala_minus_x",
+            template_folder = "einnahmen",
+            name = "Einw_Saldo",
+            disable_other = True,
+            symbology = {'valueField': "Einw_Saldo"}
+        )
+    
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
 
     def run(self):
 
@@ -71,8 +69,6 @@ class Wanderungssalden1(Tool):
         km = 20
         umkreis_km = str(km) + " Kilometers"
 
-    #Alte Layer löschen
-        self.output.delete_output("Wanderungssalden Einwohner")
 
     # Anteile der Herkunftsgemeinden an Einwohner bestimmen
 
@@ -82,7 +78,7 @@ class Wanderungssalden1(Tool):
             arcpy.Delete_management(pfad_buffer)
 
         arcpy.Buffer_analysis(
-                                in_features = "projektflaechen_lyr",
+            in_features = "projektflaechen_lyr",
                                 out_feature_class = pfad_buffer,
                                 buffer_distance_or_field = umkreis_km,
                                 dissolve_option = "ALL")
@@ -163,7 +159,4 @@ class Wanderungssalden1(Tool):
 
 
         c.set_chronicle("Wanderung Einwohner", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
-
-
-
 

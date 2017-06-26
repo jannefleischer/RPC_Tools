@@ -173,7 +173,8 @@ class Layer(object):
                  disable_other=False,
                  subgroup="",
                  in_project=True,
-                 query="", 
+                 query="",
+                 symbology={}, 
                  zoom=True):
         self.groupname = groupname
         self.template_layer = template_layer
@@ -185,6 +186,7 @@ class Layer(object):
         self.template_folder = template_folder
         self.query = query
         self.name = name
+        self.symbology = symbology
 
 
 class Output(object):    
@@ -423,7 +425,8 @@ class Output(object):
                   disable_other=False,
                   subgroup="",
                   in_project=True,
-                  query="", 
+                  query="",
+                  symbology={}, 
                   zoom=True):
         """
         Add output layer
@@ -461,12 +464,16 @@ class Output(object):
 
         zoom : bool, optional(Default = True)
             if True, zoom to layer extent
+            
+        symbology : dictionary, optional
+            sets symbology of layer on show, keys are the symbology-field and
+            values the values to be set
         """
         layer = Layer(groupname, template_layer, name=name, 
                       featureclass=featureclass,
                       disable_other=disable_other, subgroup=subgroup, 
                       in_project=in_project, zoom=zoom, query=query, 
-                      template_folder=template_folder)
+                      template_folder=template_folder, symbology=symbology)        
         self.layers.append(layer)
         
     def add_diagram(self, *args):
@@ -574,6 +581,11 @@ class Output(object):
             new_layer.definitionQuery = layer.query
         if layer.subgroup != "":
             target_subgrouplayer.visible = True
+        
+        sym = new_layer.symbology
+        for f, v in layer.symbology.iteritems():
+            setattr(sym, f, v)
+            
         target_grouplayer.visible = True
         if layer.in_project:
             project_layer.visible = True
