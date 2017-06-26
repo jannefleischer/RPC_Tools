@@ -84,20 +84,21 @@ def points_within(center_point, points, radius):
     Parameters
     ----------
     center_point : tuple
-        x, y (, z) coordinates of point
+        x, y (, z) coordinates of center-point of circle
     points : list of tuples
         x, y (, z) coordinates of points
     radius : int
+        radius of circle,
         metric depends on projection of points (e.g. meter if Gauss-Krueger)
 
     Returns
     -------
-    indices : list of bool
-        True if point is wihtin radius
     points : list of tuples
         points within radius
+    indices : list of bool
+        True if point is wihtin radius
     """
-    distances = _get_distances(point, points)
+    distances = _get_distances(center_point, points)
     is_within = distances <= radius
     return points[is_within], is_within
 
@@ -107,7 +108,7 @@ def _get_distances(point, points):
     distances = np.apply_along_axis(np.linalg.norm, 1, diff)
     return distances
 
-# cancelled: arcpro only
+# cancelled: distance calculation is arcpro only
 #def get_points_in_radius(table, center, radius):
     #fc_center = 'in_memory/center'
     #fc_radius = 'in_memory/radius'

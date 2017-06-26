@@ -49,6 +49,8 @@ class TbxWanderungssalden1(Tbx):
             par.name.setErrorMessage(u'In diesem Projekt sind keine Wohnflächen definiert!')
 
 if __name__ == '__main__':
-    t = TbxWanderungssalden()
+    t = TbxWanderungssalden1()
     t.getParameterInfo()
+    t.set_active_project()
+    t.show_outputs()
     t.open()

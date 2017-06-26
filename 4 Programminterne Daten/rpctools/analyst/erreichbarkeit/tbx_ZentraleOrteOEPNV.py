@@ -6,7 +6,8 @@ import pandas as pd
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.utils.spatial_lib import get_project_centroid, points_within
+from rpctools.utils.spatial_lib import get_project_centroid, points_within, Point
+from rpctools.analyst.erreichbarkeit.bahn_query import BahnQuery
 
 
 class ZentraleOrte(Tool):
@@ -29,16 +30,41 @@ class ZentraleOrte(Tool):
         
         oz_points = df_oz['SHAPE'].values
         mz_points = df_mz['SHAPE'].values
-        points, oz_within = points_within(centroid, oz_points, radius=70000)
-        points, mz_within = points_within(centroid, mz_points, radius=30000)
+        oz_points, oz_within = points_within(centroid, oz_points, radius=70000)
+        mz_points, mz_within = points_within(centroid, mz_points, radius=30000)
+        df_oz_within = df_oz[oz_within]
+        df_mz_within = df_mz[mz_within]
         
-        df_within = pd.concat([df_oz[oz_within], df_mz[mz_within]])
+        query = BahnQuery()
+        
+        def get_stations(points):
+            stations = []
+            for point in points:
+                t_p = Point(point[0], point[1],
+                            epsg=self.parent_tbx.config.epsg)
+                t_p.transform(4326)
+                station = query.closest_station((t_p.x, t_p.y))
+                stations.append(station)
+            return stations
+            
+        oz_stations = get_stations(oz_points)
+        mz_stations = get_stations(mz_points)
+        df_oz_within['haltestelle'] = oz_stations
+        df_mz_within['haltestelle'] = mz_stations
+                
+        df_within = pd.concat([df_oz_within, df_mz_within])
         df_within['name'] = df_within['GEN']
         df_within['id_zentraler_ort'] = df_within['OBJECTID']
         df_within['distanz'] = 0
             
         self.parent_tbx.delete_rows_in_table('Zentrale_Orte')
-        self.parent_tbx.insert_dataframe_in_table('Zentrale_Orte', df_within)        
+        self.parent_tbx.insert_dataframe_in_table('Zentrale_Orte', df_within)
+        
+        p_centroid = Point(centroid[0], centroid[1],
+                           epsg=self.parent_tbx.config.epsg)
+        p_centroid.transform(4326)
+        tfl_station = get_stations([centroid])[0]
+        
         
         
 
