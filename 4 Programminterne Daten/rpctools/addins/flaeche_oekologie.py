@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-from rpctools.addins.common import ToolboxButton, folders
+from rpctools.addins.common import ToolboxButton, folders, config
 
 __all__ = [
     "Waldgebiete", "Naturschutzgebiete",
-    "Landschaftsschutzgebiete", "Wasserschutzgebiete", 
+    "Landschaftsschutzgebiete", "Wasserschutzgebiete",
     "Bodenveraenderung", "Wohnflaechendichte", "Integrationsgrad",
     "UZVR",
-    "NullfallUeberbauteFlaechen", "NullfallNatuerlicheWasserflaeche", 
+    "NullfallUeberbauteFlaechen", "NullfallNatuerlicheWasserflaeche",
     "NullfallPlatten", "NullfallBaeumeStraeucher",
     "NullfallStauden", "NullfallWiese", "NullfallRasen",
     "NullfallRasengittersteine", "NullfallBeton", "NullfallAcker",
     "NullfallKleinpflaster",
-    "PlanfallUeberbauteFlaechen", "PlanfallNatuerlicheWasserflaeche", 
+    "PlanfallUeberbauteFlaechen", "PlanfallNatuerlicheWasserflaeche",
     "PlanfallPlatten", "PlanfallBaeumeStraeucher",
     "PlanfallStauden", "PlanfallWiese", "PlanfallRasen",
     "PlanfallRasengittersteine", "PlanfallBeton", "PlanfallAcker",
@@ -88,159 +88,239 @@ class UZVR(ToolboxButton):
     _pyt_file = u'Fläche und Ökologie.pyt'
     _toolbox_name = 'TbxUZVR'
 
-
-class NullfallUeberbauteFlaechen(ToolboxButton):
-    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
+class Draw_Bodenbedeckung(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+    _pyt_file = 'Fläche und Ökologie.pyt'
+    _toolbox_name = 'TbxBodenKontrolle'
+
+    def __init__(self):
+        super(Draw_Bodenbedeckung, self).__init__()
+        self.enabled = True
+        self.cursor = 3
+        self.bodenbedeckung = 0
+        self.planfall = False
+        self.shape = 'Line'
+        #self.output = BodenbedeckungAnzeigen()
+
+    def onClick(self, coord=None):
+        #self.output.show()
+        pass
+
+    def onLine(self, line_geometry):
+        tbx = self.tbx
+        tbx.set_active_project()
+        array = arcpy.Array()
+        points = line_geometry.getPart(0)
+        for point in points:
+            array.add(point)
+        first = line_geometry.firstPoint
+        array.add(first)
+        polygon = arcpy.Polygon(array)
+        tbx.bodenbedeckung_eintragen(polygon, self.bodenbedeckung, self.planfall)
+        arcpy.RefreshActiveView()
+        config.active_coord = (first.X, first.Y)
+        super(Draw_Bodenbedeckung, self).onClick()
+
+    def onMouseDownMap(self, x, y, button, shift):
+        pass
 
 
-class NullfallNatuerlicheWasserflaeche(ToolboxButton):
+class NullfallUeberbauteFlaechen(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(NullfallUeberbauteFlaechen, self).__init__()
+        self.bodenbedeckung = 1
+        self.planfall = False
 
 
-class NullfallPlatten(ToolboxButton):
+class NullfallNatuerlicheWasserflaeche(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(NullfallNatuerlicheWasserflaeche, self).__init__()
+        self.bodenbedeckung = 2
+        self.planfall = False
 
 
-class NullfallBaeumeStraeucher(ToolboxButton):
+class NullfallPlatten(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(NullfallPlatten, self).__init__()
+        self.bodenbedeckung = 3
+        self.planfall = False
 
 
-class NullfallStauden(ToolboxButton):
+class NullfallBaeumeStraeucher(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(NullfallBaeumeStraeucher, self).__init__()
+        self.bodenbedeckung = 4
+        self.planfall = False
 
 
-class NullfallWiese(ToolboxButton):
+class NullfallStauden(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(NullfallStauden, self).__init__()
+        self.bodenbedeckung = 5
+        self.planfall = False
 
 
-class NullfallRasen(ToolboxButton):
+class NullfallWiese(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(NullfallWiese, self).__init__()
+        self.bodenbedeckung = 6
+        self.planfall = False
 
 
-class NullfallRasengittersteine(ToolboxButton):
+class NullfallRasen(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(NullfallRasen, self).__init__()
+        self.bodenbedeckung = 7
+        self.planfall = False
 
 
-class NullfallBeton(ToolboxButton):
+class NullfallRasengittersteine(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(NullfallRasengittersteine, self).__init__()
+        self.bodenbedeckung = 8
+        self.planfall = False
 
 
-class NullfallAcker(ToolboxButton):
+class NullfallBeton(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(NullfallBeton, self).__init__()
+        self.bodenbedeckung = 9
+        self.planfall = False
 
 
-class NullfallKleinpflaster(ToolboxButton):
+class NullfallAcker(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(NullfallAcker, self).__init__()
+        self.bodenbedeckung = 10
+        self.planfall = False
 
 
-class PlanfallUeberbauteFlaechen(ToolboxButton):
+class NullfallKleinpflaster(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(NullfallKleinpflaster, self).__init__()
+        self.bodenbedeckung = 11
+        self.planfall = False
 
 
-class PlanfallNatuerlicheWasserflaeche(ToolboxButton):
+class PlanfallUeberbauteFlaechen(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(PlanfallUeberbauteFlaechen, self).__init__()
+        self.bodenbedeckung = 1
+        self.planfall = True
 
 
-class PlanfallPlatten(ToolboxButton):
+class PlanfallNatuerlicheWasserflaeche(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(PlanfallNatuerlicheWasserflaeche, self).__init__()
+        self.bodenbedeckung = 2
+        self.planfall = True
 
 
-class PlanfallBaeumeStraeucher(ToolboxButton):
+class PlanfallPlatten(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(PlanfallPlatten, self).__init__()
+        self.bodenbedeckung = 3
+        self.planfall = True
 
 
-class PlanfallStauden(ToolboxButton):
+class PlanfallBaeumeStraeucher(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(PlanfallBaeumeStraeucher, self).__init__()
+        self.bodenbedeckung = 4
+        self.planfall = True
 
 
-class PlanfallWiese(ToolboxButton):
+class PlanfallStauden(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(PlanfallStauden, self).__init__()
+        self.bodenbedeckung = 5
+        self.planfall = True
 
 
-class PlanfallRasen(ToolboxButton):
+class PlanfallWiese(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(PlanfallWiese, self).__init__()
+        self.bodenbedeckung = 6
+        self.planfall = True
 
 
-class PlanfallRasengittersteine(ToolboxButton):
+class PlanfallRasen(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(PlanfallRasen, self).__init__()
+        self.bodenbedeckung = 7
+        self.planfall = True
 
 
-class PlanfallBeton(ToolboxButton):
+class PlanfallRasengittersteine(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(PlanfallRasengittersteine, self).__init__()
+        self.bodenbedeckung = 8
+        self.planfall = True
 
 
-class PlanfallAcker(ToolboxButton):
+class PlanfallBeton(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(PlanfallBeton, self).__init__()
+        self.bodenbedeckung = 9
+        self.planfall = True
 
 
-class PlanfallKleinpflaster(ToolboxButton):
+class PlanfallAcker(Draw_Bodenbedeckung):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+
+    def __init__(self):
+        super(PlanfallAcker, self).__init__()
+        self.bodenbedeckung = 10
+        self.planfall = True
+
+
+class PlanfallKleinpflaster(Draw_Bodenbedeckung):
+    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
+
+    def __init__(self):
+        super(PlanfallKleinpflaster, self).__init__()
+        self.bodenbedeckung = 11
+        self.planfall = True
 
 
 
