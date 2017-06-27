@@ -22,7 +22,7 @@ class Wanderungssalden1(Tool):
 
         self.output.delete_output("Einw_Saldo")
 
-        gemeinde_werte = lib_einnahmen.get_values(["FamLeistAusgl"], self.projectname)
+        gemeinde_werte = lib_einnahmen.get_values(["Einw_Saldo"], self.projectname)
 
         symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
 
@@ -33,8 +33,8 @@ class Wanderungssalden1(Tool):
             template_folder = "einnahmen",
             name = "Einw_Saldo",
             disable_other = True,
-            symbology = {'valueField': "FamLeistAusgl"},
-            label_replace = {'Einw_Saldo': 'FamLeistAusgl'}
+            symbology = {'valueField': "Einw_Saldo"},
+            label_replace = {'Einw_Saldo': 'Einw_Saldo'}
         )
 
         arcpy.RefreshTOC()

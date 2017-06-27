@@ -19,7 +19,25 @@ class Wanderungssalden2(Tool):
     _workspace = 'FGDB_Einnahmen.gdb'
 
     def add_outputs(self):
-        pass
+        self.output.delete_output("SvB_Saldo")
+
+        gemeinde_werte = lib_einnahmen.get_values(["SvB_Saldo"], self.projectname)
+
+        symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
+
+        self.output.add_layer(
+            groupname = "einnahmen",
+            featureclass = "Gemeindebilanzen",
+            template_layer = symbology,
+            template_folder = "einnahmen",
+            name = "SvB_Saldo",
+            disable_other = True,
+            symbology = {'valueField': "SvB_Saldo"},
+            label_replace = {'Einw_Saldo': 'SvB_Saldo'}
+        )
+
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
 
     def run(self):
 

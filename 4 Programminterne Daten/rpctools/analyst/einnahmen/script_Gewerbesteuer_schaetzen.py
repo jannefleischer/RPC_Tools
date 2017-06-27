@@ -17,7 +17,25 @@ class Gewerbesteuer(Tool):
     _workspace = 'FGDB_Einnahmen.gdb'
 
     def add_outputs(self):
-        pass
+        self.output.delete_output("GewSt")
+
+        gemeinde_werte = lib_einnahmen.get_values(["GewSt"], self.projectname)
+
+        symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
+
+        self.output.add_layer(
+            groupname = "einnahmen",
+            featureclass = "Gemeindebilanzen",
+            template_layer = symbology,
+            template_folder = "einnahmen",
+            name = "GewSt",
+            disable_other = True,
+            symbology = {'valueField': "GewSt"},
+            label_replace = {'Einw_Saldo': 'GewSt'}
+        )
+
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
 
     def run(self):
         """run Steuersalden Tool"""
@@ -26,12 +44,12 @@ class Gewerbesteuer(Tool):
         projektname = self.projectname
 
         Gewerbesteuermessbetrag_Projekt = 0
-        
+
         gewerbe_vorhanden = False
         gewerbe_messbetrag = 0
         einzelhandel_vorhanden = False
         einzelhandel_messbetrag = 0
-        
+
         fields1 = ['Nutzungsart', 'id_teilflaeche', 'ags_bkg']
         table_teilflaechen = self.folders.get_table('Teilflaechen_Plangebiet', "FGDB_Definition_Projekt.gdb")
         cursor1 = arcpy.da.SearchCursor(table_teilflaechen, fields1)
@@ -46,30 +64,30 @@ class Gewerbesteuer(Tool):
                 cursor2 = arcpy.da.SearchCursor(table_gewerbeanteile, fields2)
                 for row2 in cursor2:
                     Summe_Arbeitsplatzschaetzungen += row2[0]
-                    
+
                 Reale_Summe_AP = 0
                 fields3 = ['Arbeitsplaetze']
                 table_arbeitsplaetze = self.folders.get_table('Gewerbe_Arbeitsplaetze', "FGDB_Definition_Projekt.gdb")
                 cursor3 = arcpy.da.SearchCursor(table_arbeitsplaetze, fields3)
                 for row3 in cursor3:
                     Summe_Arbeitsplatzschaetzungen += row3[0]
-                    
+
                 Korrekturfaktor_AP = Reale_Summe_AP / Summe_Arbeitsplatzschaetzungen
-                
+
                 fields4 = ['anzahl_jobs_schaetzung', 'branche']
                 cursor4 = arcpy.da.SearchCursor(table_gewerbeanteile, fields4)
                 for row4 in cursor4:
                     Messbetrag = 0
                     fields5 = ['AGS2', 'IDBranche', 'GewStMessbetrag_pro_Arbeitsplatz']
-                    where1 = '"AGS2"' + "='" + ags2 + "'" + " AND " + '"IDBranche"' + "='" + row4[1] + "'"  
+                    where1 = '"AGS2"' + "='" + ags2 + "'" + " AND " + '"IDBranche"' + "='" + row4[1] + "'"
                     table_messbetrag_pro_ap = self.folders.get_base_table("FGDB_Einnahmen_Tool.gdb", "GewSt_Messbetrag_pro_Arbeitsplatz")
                     cursor5 = arcpy.da.SearchCursor(table_messbetrag_pro_ap, fields5, where1)
                     for branche in cursor5:
-                        Messbetrag_pro_Arbeitsplatz = branche[2] 
-                    
+                        Messbetrag_pro_Arbeitsplatz = branche[2]
+
                     Messbetrag = cursor4[0] * Korrekturfaktor_AP * Messbetrag_pro_Arbeitsplatz
                     gewerbe_messbetrag += Messbetrag
-                                
+
             if teilflaeche[0] == Nutzungsart.EINZELHANDEL:
                 einzelhandel_vorhanden = True
                 fields6 = ['Verkaufsflaeche_qm', 'ID_Teilflaeche', 'IDSortiment']
@@ -86,12 +104,12 @@ class Gewerbesteuer(Tool):
                     cursor7 = arcpy.da.SearchCursor(table_messbetrag_pro_qm, fields7, where3)
                     for row7 in cursor7:
                         messbetrag_pro_qm =row7[0]
-                    
+
                     Messbetrag = verkaufsflaeche * messbetrag_pro_qm
                     einzelhandel_messbetrag += Messbetrag
-        
+
         Gewerbesteuermessbetrag_Projekt = gewerbe_messbetrag + einzelhandel_messbetrag
-        
+
         SvB_Branchen = 0
         if gewerbe_vorhanden:
             fields = ['Arbeitsplaetze']
@@ -99,7 +117,7 @@ class Gewerbesteuer(Tool):
             cursor = arcpy.da.SearchCursor(table_arbeitsplaetze, fields)
             for gewerbe in cursor:
                 SvB_Branchen += gewerbe[0]
-            
+
         SvB_Verkaufsflaechen = 0
         if einzelhandel_vorhanden:
             fields = ['Verkaufsflaeche_qm', 'IDSortiment']
@@ -110,11 +128,11 @@ class Gewerbesteuer(Tool):
                 cursor2 = arcpy.da.SearchCursor(table_messbetrag_pro_qm, fields2, where2)
                 for row in cursor2:
                     SvB_Verkaufsflaechen += verkaufsflaeche[0] * row[0]
-                
+
         Bewerbesteuermessbetrag_pro_SvB_Projekt = Gewerbesteuermessbetrag_Projekt / (SvB_Branchen + SvB_Verkaufsflaechen)
-        
+
         table_bilanzen = self.folders.get_table("Gemeindebilanzen", "FGDB_Einnahmen.gdb")
-        fields = ["AGS", "GewSt", "Hebesatz_GewSt", "SvB_Saldo"]        
+        fields = ["AGS", "GewSt", "Hebesatz_GewSt", "SvB_Saldo"]
         cursor = arcpy.da.UpdateCursor(table_bilanzen, fields)
         for row in cursor:
             if row[0] == ags:

@@ -6,7 +6,7 @@ import sys
 import arcpy
 import rpctools.utils.chronik as c
 from rpctools.utils.params import Tool
-
+import rpctools.utils.layer_einnahmen as lib_einnahmen
 
 class Familienleistungsausgleich(Tool):
     """FLA-Tool"""
@@ -15,7 +15,25 @@ class Familienleistungsausgleich(Tool):
     _workspace = 'FGDB_Einnahmen.gdb'
 
     def add_outputs(self):
-        pass
+        self.output.delete_output("FamLeistAusgl")
+
+        gemeinde_werte = lib_einnahmen.get_values(["FamLeistAusgl"], self.projectname)
+
+        symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
+
+        self.output.add_layer(
+            groupname = "einnahmen",
+            featureclass = "Gemeindebilanzen",
+            template_layer = symbology,
+            template_folder = "einnahmen",
+            name = "FamLeistAusgl",
+            disable_other = True,
+            symbology = {'valueField': "FamLeistAusgl"},
+            label_replace = {'Einw_Saldo': 'FamLeistAusgl'}
+        )
+
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
 
     def run(self):
         """run FLA Tool"""

@@ -6,7 +6,7 @@ import sys
 import arcpy
 import rpctools.utils.chronik as c
 from rpctools.utils.params import Tool
-
+import rpctools.utils.layer_einnahmen as lib_einnahmen
 
 class Einkommensteuer(Tool):
     """Einkommensteuer-Tool"""
@@ -15,7 +15,25 @@ class Einkommensteuer(Tool):
     _workspace = 'FGDB_Einnahmen.gdb'
 
     def add_outputs(self):
-        pass
+        self.output.delete_output("ESt")
+
+        gemeinde_werte = lib_einnahmen.get_values(["ESt"], self.projectname)
+
+        symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
+
+        self.output.add_layer(
+            groupname = "einnahmen",
+            featureclass = "Gemeindebilanzen",
+            template_layer = symbology,
+            template_folder = "einnahmen",
+            name = "ESt",
+            disable_other = True,
+            symbology = {'valueField': "ESt"},
+            label_replace = {'Einw_Saldo': 'ESt'}
+        )
+
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
 
     def run(self):
         """run Einkommensteuer Tool"""

@@ -15,7 +15,25 @@ class Grundsteuer(Tool):
     _workspace = 'FGDB_Einnahmen.gdb'
 
     def add_outputs(self):
-        pass
+        self.output.delete_output("GrSt")
+
+        gemeinde_werte = lib_einnahmen.get_values(["GrSt"], self.projectname)
+
+        symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
+
+        self.output.add_layer(
+            groupname = "einnahmen",
+            featureclass = "Gemeindebilanzen",
+            template_layer = symbology,
+            template_folder = "einnahmen",
+            name = "GrSt",
+            disable_other = True,
+            symbology = {'valueField': "GrSt"},
+            label_replace = {'Einw_Saldo': 'GrSt'}
+        )
+
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
 
     def run(self):
 
