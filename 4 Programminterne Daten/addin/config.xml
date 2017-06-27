@@ -359,7 +359,7 @@
                 
                 <!-- ERREICHBARKEIT  -->
 
-                <Button caption="Haltestellen einlesen" category="ProjektCheck" class="HaltestellenEinlesen" id="rpc_tools.haltestellen_einlesen" image="" message="" tip="">
+                <Button caption="Haltestellen ermitteln" category="ProjektCheck" class="HaltestellenZentraleOrte" id="rpc_tools.haltestellen_ermitteln" image="Images\TmStopHidingSelected16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Haltestellenplan aufrufen" category="ProjektCheck" class="Haltestellenplan" id="rpc_tools.haltestellenplan" image="" message="" tip="">
@@ -419,7 +419,7 @@
                 </Menu>                
                 <Menu caption="&#214;PNV-Anbindung" category="ProjektCheck" id="rpc_tools.menu_oepnv" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
-                        <Button refID="rpc_tools.haltestellen_einlesen" />
+                        <Button refID="rpc_tools.haltestellen_ermitteln" />
                         <Button refID="rpc_tools.haltestellenplan" />
                         <Button refID="rpc_tools.fahrtzeit_zentrale_orte" />
                     </Items>

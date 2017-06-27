@@ -23,70 +23,70 @@ class Waldgebiete(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxLayerWald'
 
 
 class Naturschutzgebiete(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxLayerNatur'
 
 
 class Landschaftsschutzgebiete(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxLayerLandschaft'
 
 
 class Wasserschutzgebiete(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxLayerWasser'
 
 
 class BodenEntfernen(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxBodenKontrolle'
 
 
 class BodenKontrollieren(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxBodenKontrolle'
 
 
 class Bodenveraenderung(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxBodenBewertung'
 
 
 class Wohnflaechendichte(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxWohnflaeche'
 
 
 class Integrationsgrad(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxIntegrationsgrad'
 
 
 class UZVR(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Fläche und Ökologie.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxUZVR'
 
 
 class NullfallUeberbauteFlaechen(ToolboxButton):

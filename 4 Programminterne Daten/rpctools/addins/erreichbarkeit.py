@@ -2,17 +2,17 @@
 from rpctools.addins.common import ToolboxButton, folders
 
 __all__ = [
-    "HaltestellenEinlesen", "Haltestellenplan",
+    "HaltestellenZentraleOrte", "Haltestellenplan",
     "FahrtzeitZentraleOrte", "Isochrone", 
     "EinrichtungenEinlesen"
 ]
 
 
-class HaltestellenEinlesen(ToolboxButton):
+class HaltestellenZentraleOrte(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Erreichbarkeit.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxZentraleOrteOEPNV'
 
 
 class Haltestellenplan(ToolboxButton):
