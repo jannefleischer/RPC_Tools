@@ -269,6 +269,12 @@
                     <Help heading="" />
                 </Button>
                 
+                <Button caption="Bodenbedeckung entfernen" category="ProjektCheck" class="BodenEntfernen" id="rpc_tools.boden_entfernen" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Bodenbedeckung kontrollieren" category="ProjektCheck" class="BodenKontrollieren" id="rpc_tools.boden_kontrollieren" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
                 <Button caption="Bodenver&#228;nderung bewerten" category="ProjektCheck" class="Bodenveraenderung" id="rpc_tools.bodenveraenderung" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -475,6 +481,8 @@
                     <Items>
                         <Menu refID="rpc_tools.menu_oeko_nullfall" />
                         <Menu refID="rpc_tools.menu_oeko_planfall" />
+                        <Button refID="rpc_tools.boden_entfernen" />
+                        <Button refID="rpc_tools.boden_kontrollieren" />
                         <Button refID="rpc_tools.bodenveraenderung" />
                     </Items>
                 </Menu>

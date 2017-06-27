@@ -15,7 +15,7 @@ __all__ = [
     "PlanfallPlatten", "PlanfallBaeumeStraeucher",
     "PlanfallStauden", "PlanfallWiese", "PlanfallRasen",
     "PlanfallRasengittersteine", "PlanfallBeton", "PlanfallAcker",
-    "PlanfallKleinpflaster" 
+    "PlanfallKleinpflaster", "BodenKontrollieren", "BodenEntfernen"
 ]
 
 
@@ -41,6 +41,20 @@ class Landschaftsschutzgebiete(ToolboxButton):
 
 
 class Wasserschutzgebiete(ToolboxButton):
+    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = u'Fläche und Ökologie.pyt'
+    _toolbox_name = '?'
+
+
+class BodenEntfernen(ToolboxButton):
+    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = u'Fläche und Ökologie.pyt'
+    _toolbox_name = '?'
+
+
+class BodenKontrollieren(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Fläche und Ökologie.pyt'

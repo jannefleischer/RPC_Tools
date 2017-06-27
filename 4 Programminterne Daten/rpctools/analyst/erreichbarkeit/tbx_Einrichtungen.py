@@ -22,31 +22,31 @@ class TbxEinrichtungen(Tbx):
     def _getParameterInfo(self):
 
         params = self.par
-    	projekte = self.folders.get_projects()
+        projekte = self.folders.get_projects()
 
-    	i=-1
-    	i+=1 ;
-    	self.Projekt= i
-    	i+=1
-    	self.Bereitsvorhandene=i
-    	i+=1
-    	self.Kita=i
-    	i+=1
-    	self.Grundschulen=i
-    	i+=1
-    	self.Arzt=i
-    	i+=1
-    	self.Apotheken=i
-    	i+=1
-    	self.Krankenhaeuser=i
-    	i+=1
-    	self.Sonstige=i
-    	i+=1
-    	self.BooleanEinzel=i
-    	i+=1
-    	self.Einzelhandel=i
-    	i+=1
-    	self.Einzelhandel_feature=i
+        i=-1
+        i+=1 ;
+        self.Projekt= i
+        i+=1
+        self.Bereitsvorhandene=i
+        i+=1
+        self.Kita=i
+        i+=1
+        self.Grundschulen=i
+        i+=1
+        self.Arzt=i
+        i+=1
+        self.Apotheken=i
+        i+=1
+        self.Krankenhaeuser=i
+        i+=1
+        self.Sonstige=i
+        i+=1
+        self.BooleanEinzel=i
+        i+=1
+        self.Einzelhandel=i
+        i+=1
+        self.Einzelhandel_feature=i
 
         # Projekt_auswählen
         param_1 = params.projectname = arcpy.Parameter()
@@ -155,89 +155,89 @@ class TbxEinrichtungen(Tbx):
 
     def _updateParameters(self, params):
 
-		i=-1
-		i+=1 ;
-		#Immer aus
-		self.params[self.Einzelhandel_feature].enabled=0
-		#Projekt
-		if self.params[i].altered and not self.params[i].hasBeenValidated:
-			projectname=self.params[0].value
+        i=-1
+        i+=1 ;
+        #Immer aus
+        self.params[self.Einzelhandel_feature].enabled=0
+        #Projekt
+        if self.params[i].altered and not self.params[i].hasBeenValidated:
+            projectname=self.params[0].value
 
-			#check ob alle 5 template excel datein vorhanden
-			if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))==False:
-				shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Kitas_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))
-			if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Grundschulen.xls"))==False:
-				shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Grundschulen_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Grundschulen.xls"))
-			if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))==False:
-				shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Einzelhandel_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))
-			if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Apotheken.xls"))==False:
-				shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Apotheken_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Apotheken.xls"))
-			if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Aerzte.xls"))==False:
-				shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Aerzte_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Aerzte.xls"))
-			if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))==False:
-				shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Krankenhaeuser_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))
-			if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Sonstige.xls"))==False:
-				shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Sonstige_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Sonstige.xls"))
-
-
-			tablepath_template_kitas =  join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Kindertagesstaetten.xls')
-			tablepath_template_grundschulen = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Grundschulen.xls')
-			tablepath_template_einzelhandel = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
-			tablepath_template_apotheken = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Apotheken.xls')
-			tablepath_template_aerzte = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Aerzte.xls')
-			tablepath_template_kh = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Krankenhaeuser.xls')
-			tablepath_template_sons = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Sonstige.xls')
-
-			self.params[self.Kita].value=tablepath_template_kitas
-			self.params[self.Grundschulen].value=tablepath_template_grundschulen
-			self.params[self.Einzelhandel].value=tablepath_template_einzelhandel
-			self.params[self.Apotheken].value=tablepath_template_apotheken
-			self.params[self.Arzt].value=tablepath_template_aerzte
-			self.params[self.Krankenhaeuser].value=tablepath_template_kh
-			self.params[self.Sonstige].value=tablepath_template_sons
-
-		i+=1
-		#Booleanabfrage
-		if self.params[i].value==True:
-			#Alle Eingaben sperren da schon Datenvorhanden die genutzt werden sollen
-			self.params[self.Kita].enabled=0
-			self.params[self.Grundschulen].enabled=0
-			self.params[self.Arzt].enabled=0
-			self.params[self.Einzelhandel].enabled=0
-			self.params[self.Apotheken].enabled=0
-			self.params[self.Krankenhaeuser].enabled=0
-			self.params[self.Sonstige].enabled=0
-
-			self.params[self.BooleanEinzel].enabled=0
-			self.params[self.Einzelhandel].enabled=0
-			self.params[self.Einzelhandel_feature].enabled=0
-
-		else:
-			self.params[self.Kita].enabled=1
-			self.params[self.Grundschulen].enabled=1
-			self.params[self.Arzt].enabled=1
-			self.params[self.Einzelhandel].enabled=1
-			self.params[self.Apotheken].enabled=1
-			self.params[self.Krankenhaeuser].enabled=1
-			self.params[self.Sonstige].enabled=1
+            #check ob alle 5 template excel datein vorhanden
+            if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))==False:
+                shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Kitas_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Kindertagesstaetten.xls"))
+            if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Grundschulen.xls"))==False:
+                shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Grundschulen_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Grundschulen.xls"))
+            if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))==False:
+                shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Einzelhandel_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Einzelhandel.xls"))
+            if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Apotheken.xls"))==False:
+                shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Apotheken_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Apotheken.xls"))
+            if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Aerzte.xls"))==False:
+                shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Aerzte_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Aerzte.xls"))
+            if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))==False:
+                shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Krankenhaeuser_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Krankenhaeuser.xls"))
+            if os.path.isfile(join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Sonstige.xls"))==False:
+                shutil.copyfile(join(BASE_PATH,'2_Tool','Erreichbarkeit','Einrichtungen_Sonstige_template.xls'),join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,"Einrichtungen_Sonstige.xls"))
 
 
-			self.params[self.BooleanEinzel].enabled=1
+            tablepath_template_kitas =  join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Kindertagesstaetten.xls')
+            tablepath_template_grundschulen = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Grundschulen.xls')
+            tablepath_template_einzelhandel = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
+            tablepath_template_apotheken = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Apotheken.xls')
+            tablepath_template_aerzte = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Aerzte.xls')
+            tablepath_template_kh = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Krankenhaeuser.xls')
+            tablepath_template_sons = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Sonstige.xls')
 
-		if self.params[self.BooleanEinzel].value==True:
-			projectname=self.params[0].value
-			tablepath_einzelhandel = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Standortdaten')
-			self.params[self.Einzelhandel_feature].value=tablepath_einzelhandel
-			self.params[self.Einzelhandel].enabled=0
-			self.params[self.Einzelhandel_feature].enabled=1
-		elif self.params[self.Projekt].value!=None and self.params[self.Kita].enabled!=0:
-			projectname=self.params[0].value
-			tablepath_template_einzelhandel = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
-			self.params[self.Einzelhandel].value=tablepath_template_einzelhandel
-			self.params[self.Einzelhandel].enabled=1
-			self.params[self.Einzelhandel_feature].enabled=0
+            self.params[self.Kita].value=tablepath_template_kitas
+            self.params[self.Grundschulen].value=tablepath_template_grundschulen
+            self.params[self.Einzelhandel].value=tablepath_template_einzelhandel
+            self.params[self.Apotheken].value=tablepath_template_apotheken
+            self.params[self.Arzt].value=tablepath_template_aerzte
+            self.params[self.Krankenhaeuser].value=tablepath_template_kh
+            self.params[self.Sonstige].value=tablepath_template_sons
 
-		return
+        i+=1
+        #Booleanabfrage
+        if self.params[i].value==True:
+            #Alle Eingaben sperren da schon Datenvorhanden die genutzt werden sollen
+            self.params[self.Kita].enabled=0
+            self.params[self.Grundschulen].enabled=0
+            self.params[self.Arzt].enabled=0
+            self.params[self.Einzelhandel].enabled=0
+            self.params[self.Apotheken].enabled=0
+            self.params[self.Krankenhaeuser].enabled=0
+            self.params[self.Sonstige].enabled=0
+
+            self.params[self.BooleanEinzel].enabled=0
+            self.params[self.Einzelhandel].enabled=0
+            self.params[self.Einzelhandel_feature].enabled=0
+
+        else:
+            self.params[self.Kita].enabled=1
+            self.params[self.Grundschulen].enabled=1
+            self.params[self.Arzt].enabled=1
+            self.params[self.Einzelhandel].enabled=1
+            self.params[self.Apotheken].enabled=1
+            self.params[self.Krankenhaeuser].enabled=1
+            self.params[self.Sonstige].enabled=1
+
+
+            self.params[self.BooleanEinzel].enabled=1
+
+        if self.params[self.BooleanEinzel].value==True:
+            projectname=self.params[0].value
+            tablepath_einzelhandel = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'FGDB_Standortkonkurrenz_Supermaerkte.gdb','Standortdaten')
+            self.params[self.Einzelhandel_feature].value=tablepath_einzelhandel
+            self.params[self.Einzelhandel].enabled=0
+            self.params[self.Einzelhandel_feature].enabled=1
+        elif self.params[self.Projekt].value!=None and self.params[self.Kita].enabled!=0:
+            projectname=self.params[0].value
+            tablepath_template_einzelhandel = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'Einrichtungen_Einzelhandel.xls')
+            self.params[self.Einzelhandel].value=tablepath_template_einzelhandel
+            self.params[self.Einzelhandel].enabled=1
+            self.params[self.Einzelhandel_feature].enabled=0
+
+        return
 
 
 
