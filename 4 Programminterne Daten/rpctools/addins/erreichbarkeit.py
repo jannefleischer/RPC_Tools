@@ -19,7 +19,7 @@ class Haltestellenplan(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Erreichbarkeit.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxFahrplaene'
 
 
 class FahrtzeitZentraleOrte(ToolboxButton):

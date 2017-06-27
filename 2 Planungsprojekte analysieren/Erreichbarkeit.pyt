@@ -16,6 +16,7 @@ from rpctools.analyst.erreichbarkeit.tbx_Ergebnisausgabe import TbxErgebnisausga
 from rpctools.analyst.erreichbarkeit.tbx_ErreichbarkeitOEPNV import TbxErreichbarkeitOEPNV
 from rpctools.analyst.erreichbarkeit.tbx_Vorberechnungen import TbxVorberechnungen
 from rpctools.analyst.erreichbarkeit.tbx_ZentraleOrteOEPNV import TbxZentraleOrteOEPNV
+from rpctools.analyst.erreichbarkeit.tbx_fahrplaene import TbxFahrplaene
 
 class Toolbox(object):
     def __init__(self):
@@ -24,6 +25,7 @@ class Toolbox(object):
         self.tools = [TbxVorberechnungen,
                       TbxEinrichtungen,
                       TbxZentraleOrteOEPNV,
+                      TbxFahrplaene, 
                       TbxErreichbarkeitOEPNV,
                       TbxErgebnisausgabe]
 

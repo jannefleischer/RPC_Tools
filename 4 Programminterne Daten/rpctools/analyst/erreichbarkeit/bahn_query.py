@@ -15,7 +15,7 @@ class Stop(Point):
 class BahnQuery(object):
     reiseauskunft_url = 'http://reiseauskunft.bahn.de/bin/query.exe/dn' #?S="+bahn_start+"&Z="+ziel+"%20Hbf&date="+bahn_wochentag+"&time="+bahn_uhrzeit[0]+"&start=1"
     mobile_url = 'http://mobile.bahn.de/bin/mobil/query.exe/dox'
-    timetable_url = 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn'#?ld=96242&country=DEU&rt=1&evaId=%s&bt=dep&time=24:00&maxJourneys=10000&date=%s&productsFilter=1111111111&max=10000&start=yes'
+    timetable_url = u'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn'
     
     routing_params = {
         'start': 1,
@@ -134,3 +134,11 @@ class BahnQuery(object):
             #sleep(0.5)
             
         return n_departures
+    
+    def get_timetable_url(self, stop_id):
+        params = self.timetable_params.copy()
+        params['date'] = self.date
+        params['evaId'] = stop_id
+        args = ['{}={}'.format(v, k) for v, k in params.iteritems()]
+        url = self.timetable_url + u'?' + u'&'.join(args)
+        return url

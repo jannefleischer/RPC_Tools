@@ -133,7 +133,8 @@ class TbxZentraleOrteOEPNV(Tbx):
 
     @property
     def label(self):
-        return encode(u'Zentrale Orte ÖPNV')
+        return encode(u'Haltestellen und Zentrale Orte '
+                      u'in der Umgebung ermitteln')
 
     @property
     def Tool(self):
