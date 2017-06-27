@@ -32,7 +32,7 @@ class InfrastrukturmengenBilanz(Tool):
         self.output.add_diagram(kosten_diagram, netz_diagram)
         
     def run(self):
-        self.output.show_diagrams()
+        pass
 
 
 class TbxInfrastrukturmengenBilanz(Tbx):
