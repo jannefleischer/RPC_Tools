@@ -15,7 +15,7 @@ from rpctools.analyst.erreichbarkeit.tbx_Einrichtungen import TbxEinrichtungen
 from rpctools.analyst.erreichbarkeit.tbx_Ergebnisausgabe import TbxErgebnisausgabe
 from rpctools.analyst.erreichbarkeit.tbx_ErreichbarkeitOEPNV import TbxErreichbarkeitOEPNV
 from rpctools.analyst.erreichbarkeit.tbx_Vorberechnungen import TbxVorberechnungen
-from rpctools.analyst.erreichbarkeit.tbx_ZentraleOrteOEPNV import TbxZentraleOrteOEPNV
+from rpctools.analyst.erreichbarkeit.tbx_HaltestellenZentraleOrte import TbxHaltestellenZentraleOrte
 from rpctools.analyst.erreichbarkeit.tbx_fahrplaene import TbxFahrplaene
 
 class Toolbox(object):
@@ -24,7 +24,7 @@ class Toolbox(object):
         self.alias = ''
         self.tools = [TbxVorberechnungen,
                       TbxEinrichtungen,
-                      TbxZentraleOrteOEPNV,
+                      TbxHaltestellenZentraleOrte,
                       TbxFahrplaene, 
                       TbxErreichbarkeitOEPNV,
                       TbxErgebnisausgabe]

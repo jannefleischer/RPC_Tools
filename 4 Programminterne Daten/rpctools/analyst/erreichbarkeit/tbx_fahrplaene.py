@@ -57,9 +57,12 @@ class TbxHaltestellen(Tbx):
             'Haltestellen', where='flaechenzugehoerig=1')
         
         names = self.df_stops['name'].values
+        distances = self.df_stops['fussweg'].values
+        pretty = [u'{} ({} m entfernt)'.format(n, d)
+                  for n, d in zip(names, distances)]
         param = params.stops
-        param.filter.list = names.tolist()
-        param.value = names[0]
+        param.filter.list = pretty
+        param.value = pretty[0]
 
 class TbxFahrplaene(TbxHaltestellen):
 

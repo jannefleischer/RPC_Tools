@@ -12,7 +12,7 @@ class HaltestellenZentraleOrte(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Erreichbarkeit.pyt'
-    _toolbox_name = 'TbxZentraleOrteOEPNV'
+    _toolbox_name = 'TbxHaltestellenZentraleOrte'
 
 
 class Haltestellenplan(ToolboxButton):
@@ -26,7 +26,7 @@ class FahrtzeitZentraleOrte(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Erreichbarkeit.pyt'
-    _toolbox_name = '?'
+    _toolbox_name = 'TbxErreichbarkeitOEPNV'
 
 
 class Isochrone(ToolboxButton):

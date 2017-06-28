@@ -16,7 +16,7 @@ def next_monday():
     nextmonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
     return nextmonday
 
-class ZentraleOrte(Tool):
+class HaltestellenZentraleOrte(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Erreichbarkeit.gdb'
     
@@ -34,7 +34,7 @@ class ZentraleOrte(Tool):
                          'in der Umgebung...')
         self.write_centers_stops()
         arcpy.AddMessage('Ermittle die Anzahl der Abfahrten je Haltestelle...')
-        self.update_connections(projectarea_only=True)
+        self.update_departures(projectarea_only=True)
         
     def write_centers_stops(self):
         '''get centers in radius around project centroid, write their closest
@@ -93,7 +93,7 @@ class ZentraleOrte(Tool):
         self._stops_to_db(mz_stops)
         self._stops_to_db(tfl_stops, is_project_stop=1)
         
-    def update_connections(self, projectarea_only=False):
+    def update_departures(self, projectarea_only=False):
         '''update the db-column 'abfahrten' of the stops with the number
         of departures
         '''
@@ -107,29 +107,32 @@ class ZentraleOrte(Tool):
         
     def _stops_to_db(self, stops, is_project_stop=0):
         '''(warning: changes projection of point!)'''
-        table = self.folders.get_table('Haltestellen')
         ids = []
         names = []
         shapes = []
+        distances = []
         
         for stop in stops:
             stop.transform(self.parent_tbx.config.epsg)
             shapes.append(arcpy.Point(stop.x, stop.y))
             ids.append(stop.id)
             names.append(stop.name)
+            distances.append(stop.distance)
             
         column_values = {
             'SHAPE': shapes,
             'id': ids,
             'name': names,
             'flaechenzugehoerig': [is_project_stop] * len(stops), 
-            'abfahrten': [0] * len(stops)
+            'abfahrten': [0] * len(stops),
+            'fussweg': distances
         }
+        
         self.parent_tbx.insert_rows_in_table('Haltestellen',
                                              column_values=column_values)
 
 
-class TbxZentraleOrteOEPNV(Tbx):
+class TbxHaltestellenZentraleOrte(Tbx):
 
     @property
     def label(self):
@@ -138,7 +141,7 @@ class TbxZentraleOrteOEPNV(Tbx):
 
     @property
     def Tool(self):
-        return ZentraleOrte
+        return HaltestellenZentraleOrte
 
     def _getParameterInfo(self):
 

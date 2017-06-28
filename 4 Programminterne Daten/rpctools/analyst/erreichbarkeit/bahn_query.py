@@ -7,9 +7,10 @@ import datetime
 
 
 class Stop(Point):
-    def __init__(self, x, y, name, id=None, epsg=4326):
+    def __init__(self, x, y, name, distance=0, id=None, epsg=4326):
         super(Stop, self).__init__(x, y, id=id, epsg=epsg)
         self.name = name
+        self.distance = distance
 
 
 class BahnQuery(object):
@@ -101,14 +102,13 @@ class BahnQuery(object):
             _id = int(parse_href_number('id', row))
             _dist = int(parse_href_number('dist', row))
             stop = Stop(self._from_db_coord(_x), self._from_db_coord(_y),
-                        self.html.unescape(_name),
+                        self.html.unescape(_name), distance=_dist, 
                         id=_id, epsg=4326)
-            stop.dist = _dist
             stops.append(stop)
         
         # response should be sorted by distances in first place, 
         # but do it again because you can
-        stops_sorted = sorted(stops, key=lambda x: x.dist)        
+        stops_sorted = sorted(stops, key=lambda x: x.distance)
         if n < len(stops_sorted):
             stops_sorted[:n]
                 
