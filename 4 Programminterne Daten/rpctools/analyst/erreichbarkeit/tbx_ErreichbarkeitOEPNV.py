@@ -93,19 +93,19 @@ class TbxErreichbarkeitOEPNV(TbxHaltestellen):
     def Tool(self):
         return ErreichbarkeitOEPNV
     
-    def _getParameterInfo(self):
-        super(TbxErreichbarkeitOEPNV, self)._getParameterInfo()
-        params = self.par
-        params.stops.displayName = encode(u'Abfahrt von Haltestelle:')
+    #def _getParameterInfo(self):
+        #super(TbxErreichbarkeitOEPNV, self)._getParameterInfo()
+        #params = self.par
+        #params.stops.displayName = encode(u'Abfahrt von Haltestelle:')
         
-        param = self.add_parameter('recalculate')
-        param.name = encode(u'Neuberechnung')
-        param.displayName = encode(u'Neuberechnung erzwingen')
-        param.parameterType = 'Optional'
-        param.direction = 'Input'
-        param.datatype = u'GPBoolean'
+        #param = self.add_parameter('recalculate')
+        #param.name = encode(u'Neuberechnung')
+        #param.displayName = encode(u'Neuberechnung erzwingen')
+        #param.parameterType = 'Optional'
+        #param.direction = 'Input'
+        #param.datatype = u'GPBoolean'
         
-        return params
+        #return params
 
 
 if __name__ == "__main__":
