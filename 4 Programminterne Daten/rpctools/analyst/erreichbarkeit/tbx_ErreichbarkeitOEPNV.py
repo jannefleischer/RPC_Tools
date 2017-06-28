@@ -6,7 +6,7 @@ from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 from rpctools.analyst.erreichbarkeit.tbx_fahrplaene import TbxHaltestellen
 from rpctools.analyst.erreichbarkeit.bahn_query import BahnQuery
-from rpctools.analyst.erreichbarkeit.tbx_ZentraleOrteOEPNV import next_monday
+from rpctools.analyst.erreichbarkeit.tbx_HaltestellenZentraleOrte import next_monday
 
 
 class ErreichbarkeitOEPNV(Tool):
