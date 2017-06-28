@@ -51,10 +51,20 @@ class TbxHaltestellen(Tbx):
 
         return params
     
-    def _open(self, params):
-        
-        self.df_stops = self.table_to_dataframe(
+    def validate_inputs(self):
+        df_stops = self.get_stops()
+        if len(df_stops) == 0:
+            msg = (u'Die Haltestellen wurden noch nicht ermittelt!') 
+            return False, msg
+        return True, ''
+    
+    def get_stops(self):
+        df_stops = self.table_to_dataframe(
             'Haltestellen', where='flaechenzugehoerig=1')
+        return df_stops
+        
+    def _open(self, params):
+        self.df_stops = self.get_stops()
         
         names = self.df_stops['name'].values
         distances = self.df_stops['fussweg'].values
