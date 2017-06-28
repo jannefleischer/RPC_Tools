@@ -159,7 +159,7 @@ class TbxHaltestellenZentraleOrte(Tbx):
         return params
 
 if __name__ == "__main__":
-    t = TbxZentraleOrteOEPNV()
+    t = TbxHaltestellenZentraleOrte()
     t.getParameterInfo()
     t.set_active_project()
     t.execute()

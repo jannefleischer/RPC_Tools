@@ -85,11 +85,9 @@ class BahnQuery(object):
         params['look_y'] = self._to_db_coord(point.y)
         
         r = requests.get(self.mobile_url, params=params)
-        # use regular expressions instead of parsing to xml, because html is
-        # malformed and lxml is tough to install on all machines
         
-        regex = '<a class="uLine"(.*?)</a>'
-        rows = re.findall(regex, r.text)
+        soup = BeautifulSoup(r.text, "html.parser")
+        rows = soup.findAll('a', {'class': 'uLine'})
         
         def parse_href_number(tag, href):
             regex = '{tag}=(\d+)!'.format(tag=tag)
@@ -98,17 +96,17 @@ class BahnQuery(object):
         stops = []
         
         for row in rows:
-            regex = '>(.*)'
-            _name = re.search(regex, row).group(1)
-            if not _name:
+            name = row.contents[0]
+            if not name:
                 continue
-            _x = int(parse_href_number('X', row))
-            _y = int(parse_href_number('Y', row))
-            _id = int(parse_href_number('id', row))
-            _dist = int(parse_href_number('dist', row))
-            stop = Stop(self._from_db_coord(_x), self._from_db_coord(_y),
-                        self.html.unescape(_name), distance=_dist, 
-                        id=_id, epsg=4326)
+            href = row.attrs['href']
+            x = int(parse_href_number('X', href))
+            y = int(parse_href_number('Y', href))
+            id = int(parse_href_number('id', href))
+            dist = int(parse_href_number('dist', href))
+            stop = Stop(self._from_db_coord(x), self._from_db_coord(y),
+                        self.html.unescape(name), distance=dist, 
+                        id=id, epsg=4326)
             stops.append(stop)
         
         # response should be sorted by distances in first place, 
@@ -192,14 +190,14 @@ class BahnQuery(object):
         params = self.timetable_params.copy()
         params['date'] = self.date
         params['maxJourneys'] = max_journeys
-        regex = 'id="journeyRow_(\d+)"'
         n_departures = []
         
         for id in stop_ids:
             params['evaId'] = id
             r = requests.get(self.timetable_url, params=params)
-            n_rows = len(re.findall(regex, r.text))
-            n_departures.append(n_rows)
+            soup = BeautifulSoup(r.text, "html.parser")
+            rows = soup.findAll('tr', id=lambda x: x and 'journeyRow_' in x)
+            n_departures.append(len(rows))
             sleep(self.timeout)
             
         return n_departures

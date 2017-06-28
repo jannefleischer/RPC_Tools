@@ -81,7 +81,6 @@ class ErreichbarkeitOEPNV(Tool):
                 df_centers,
                 pkeys=['id_origin', 'id_destination'],
                 upsert=True)
-        
 
 
 class TbxErreichbarkeitOEPNV(TbxHaltestellen):
