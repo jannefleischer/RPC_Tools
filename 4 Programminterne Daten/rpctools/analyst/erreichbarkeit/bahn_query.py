@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+import datetime
+from bs4 import BeautifulSoup
+from time import sleep
+
 import requests
 import re
+import sys
 from HTMLParser import HTMLParser
 from rpctools.utils.spatial_lib import Point
-import datetime
 
 
 class Stop(Point):
@@ -18,7 +22,7 @@ class BahnQuery(object):
     mobile_url = 'http://mobile.bahn.de/bin/mobil/query.exe/dox'
     timetable_url = u'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn'
     
-    routing_params = {
+    reiseauskunft_params = {
         'start': 1,
         'S': '',
         'Z': '',
@@ -26,7 +30,7 @@ class BahnQuery(object):
         'time': ''
     }
     
-    station_params = {
+    stop_params = {
         'Id': 9627,
         'n': 1,
         'rt': 1,
@@ -55,10 +59,11 @@ class BahnQuery(object):
     
     date_pattern = '%d.%m.%Y'
     
-    def __init__(self, date=None):
+    def __init__(self, date=None, timeout=0):
         self.html = HTMLParser()
         date = date or datetime.date.today()
         self.date = date.strftime(self.date_pattern)
+        self.timeout = timeout
         
     def _to_db_coord(self, c):
         return ("%.6f" % c).replace('.','')
@@ -71,7 +76,7 @@ class BahnQuery(object):
         ordered by distance (ascending)
         """
         # set url-parameters 
-        params = self.station_params.copy()
+        params = self.stop_params.copy()
         params['look_maxdist'] = max_distance
         params['look_stopclass'] = stopclass
         if point.epsg != 4326:
@@ -114,8 +119,72 @@ class BahnQuery(object):
                 
         return stops
     
-    def routing(origin, destination, times):
-        params = {}
+    def routing(self, origin, destination, times, max_retries=1):
+        '''
+        times - int or str (e.g. 15 or 15:00)
+        '''
+        params = self.reiseauskunft_params.copy()
+        params['date'] = self.date
+        params['S'] = origin
+        params['Z'] = destination
+        
+        duration = sys.maxint
+        departure = mode = ''
+        changes = 0
+        
+        def request_departure_table(time):
+            params['time'] = time
+            r = requests.get(self.reiseauskunft_url, params=params)
+            soup = BeautifulSoup(r.text, "html.parser")
+            table = soup.find('table', id='resultsOverview')
+            return table
+        
+        for time in times:
+            retries = 0
+            while retries <= max_retries:
+                table = request_departure_table(time)
+                # response contains departures
+                if table:
+                    break
+                # no valid response -> wait and try again 
+                # (may be caused by too many requests)
+                else: 
+                    sleep(2)
+                print('retry')
+                retries += 1
+            
+            # still no table -> skip
+            if not table:
+                print('skip')
+                continue
+
+            rows = table.findAll('tr', {'class': 'firstrow'})
+            
+            for row in rows:
+                # duration
+                content = row.find('td', {'class': 'duration'}).contents
+                h, m = content[0].replace('\n', '').split(':')
+                d = int(h) * 60 + int(m)
+                # if already found shorter duration -> skip
+                if d >= duration:
+                    continue
+                duration = d
+                
+                # departure
+                content = row.find('td', {'class': 'time'}).contents
+                departure = content[0].replace('\n', '')
+                
+                # modes
+                content = row.find('td', {'class': 'products'}).contents
+                mode = content[0].replace('\n', '')
+                
+                # changes
+                content = row.find('td', {'class': 'changes'}).contents
+                changes = int(content[0].replace('\n', ''))
+
+            sleep(self.timeout)
+
+        return duration, departure, changes, mode
         
     def n_departures(self, stop_ids, max_journeys=10000):
         '''stop_ids have to be hafas stuff'''
@@ -131,7 +200,7 @@ class BahnQuery(object):
             r = requests.get(self.timetable_url, params=params)
             n_rows = len(re.findall(regex, r.text))
             n_departures.append(n_rows)
-            #sleep(0.5)
+            sleep(self.timeout)
             
         return n_departures
     

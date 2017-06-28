@@ -820,12 +820,14 @@ class Tbx(object):
         columns_incl_pkeys = dataframe.columns.values
         desc = arcpy.Describe(table_path)
         fields = [field.name for field in desc.fields]
+    
+        # intersection of fields between dataframe and available fields
+        # (prevent writing columns of df that don't exist in db)        
+        columns_incl_pkeys = np.intersect1d(columns_incl_pkeys, fields)
         
         # columns without the pkeys
         columns = np.setdiff1d(columns_incl_pkeys, pkeys)
-        # intersection of fields between dataframe and available fields
-        # (prevent writing columns of df that don't exist in db)
-        columns = np.intersect1d(columns, fields)
+        
         for row in dataframe.iterrows():
             # row is a tuple with index at 0 and the columns at 1
             pkey_values = dict(zip(pkeys, row[1][pkeys].values))
@@ -838,7 +840,10 @@ class Tbx(object):
             if upsert and updated == 0:
                 # Todo: insert row with values including the primary keys?
                 #column_values.update(pkey_values)
-                self._insert_rows_in_table(table_path, columns, [values])
+                self._insert_rows_in_table(
+                    table_path,
+                    list(columns) + pkey_values.keys(),
+                    [list(values) + pkey_values.values()])
 
     def insert_dataframe_in_table(self, table_name, dataframe, workspace=''):
         """

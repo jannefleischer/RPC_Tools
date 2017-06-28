@@ -5,7 +5,7 @@ import webbrowser
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.analyst.erreichbarkeit.tbx_ZentraleOrteOEPNV import next_monday
+from rpctools.analyst.erreichbarkeit.tbx_HaltestellenZentraleOrte import next_monday
 from rpctools.analyst.erreichbarkeit.bahn_query import BahnQuery
 
 
@@ -63,6 +63,7 @@ class TbxHaltestellen(Tbx):
         param = params.stops
         param.filter.list = pretty
         param.value = pretty[0]
+
 
 class TbxFahrplaene(TbxHaltestellen):
 

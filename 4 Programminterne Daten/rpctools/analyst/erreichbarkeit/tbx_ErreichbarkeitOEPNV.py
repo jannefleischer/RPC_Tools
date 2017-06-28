@@ -1,114 +1,113 @@
 # -*- coding: utf-8 -*-
-import os
-import sys
+import pandas as pd
 import arcpy
 
-from rpctools.utils.params import Tbx
+from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
+from rpctools.analyst.erreichbarkeit.tbx_fahrplaene import TbxHaltestellen
+from rpctools.analyst.erreichbarkeit.bahn_query import BahnQuery
+from rpctools.analyst.erreichbarkeit.tbx_ZentraleOrteOEPNV import next_monday
 
 
-from rpctools.analyst.erreichbarkeit.T3_Erreichbarkeit_OEPNV import ErreichbarkeitOEPNV
+class ErreichbarkeitOEPNV(Tool):
+    _param_projectname = 'projectname'
+    _workspace = 'FGDB_Erreichbarkeit.gdb'
+    
+    times = range(9, 18)
+    
+    def add_outputs(self):
+        idx = self.par.selected_index('stops')
+        stop_id = self.parent_tbx.df_stops['id'].values[idx]
+        stop_name = self.parent_tbx.df_stops['name'].values[idx]
+        
+        group_layer = ("erreichbarkeit")
+        fc = 'Erreichbarkeiten_OEPNV'
+        layer = u'Erreichbarkeiten ÖPNV'    
+        
+        layer_name = u'{n} Haltestelle: {s})'.format(n=layer,
+                                                     s=stop_name)
+        self.output.add_layer(group_layer, layer, fc,
+                              query='id_origin={stop_id}'.format(stop_id),
+                              name=layer_name, 
+                              zoom=False)
+    
+    def run(self):
+        idx = self.par.selected_index('stops')
+        stop_name = self.parent_tbx.df_stops['name'].values[idx]
+        stop_id = self.parent_tbx.df_stops['id'].values[idx]
+        arcpy.AddMessage(u'Berechne Erreichbarkeit der Zentralen Orte\n '
+                         u'ausgehend von der Haltestelle {}'.format(stop_name))
+        self.routing(stop_name, stop_id, self.par.recalculate.value)
+        
+    def routing(self, origin, id_origin, recalculate=False):
+        query = BahnQuery(next_monday(), timeout=0.5)
+        df_centers = self.parent_tbx.table_to_dataframe('Zentrale_Orte')
+        df_stops = self.parent_tbx.table_to_dataframe('Haltestellen')        
+        df_calculated = self.parent_tbx.table_to_dataframe(
+            'Erreichbarkeiten_OEPNV')
+        df_centers['update'] = False
+        
+        for index, center in df_centers.iterrows():
+            id_destination = center['id_haltestelle']
+            destination = df_stops[df_stops['id'] == id_destination]['name'].values[0]
+            arcpy.AddMessage(u'  - {}'.format(destination))
+            
+            if not recalculate:
+                already_calculated = (
+                    (df_calculated['id_origin'] == id_origin).values &
+                    (df_calculated['id_destination'] == id_destination).values
+                ).sum() > 0
+                if already_calculated:
+                    arcpy.AddMessage(u'   bereits berechnet, wird übersprungen')
+                    continue
+            
+            (duration, departure,
+             changes, modes) = query.routing(origin, destination, self.times)
+            # just appending results to existing table to write them later
+            df_centers.loc[index, 'id_origin'] = id_origin
+            df_centers.loc[index, 'id_destination'] = id_destination
+            df_centers.loc[index, 'ziel'] = destination
+            df_centers.loc[index, 'abfahrt'] = departure
+            df_centers.loc[index, 'dauer'] = duration
+            df_centers.loc[index, 'umstiege'] = changes
+            df_centers.loc[index, 'verkehrsmittel'] = modes
+            df_centers.loc[index, 'update'] = True
+        
+        arcpy.AddMessage(u'Schreibe Ergebnisse in die Datenbank...')
+        self.parent_tbx.dataframe_to_table('Erreichbarkeiten_OEPNV',
+                                           df_centers,
+                                           pkeys=['id_origin', 'id_destination'], 
+                                           upsert=True)
 
-class TbxErreichbarkeitOEPNV(Tbx):
+
+class TbxErreichbarkeitOEPNV(TbxHaltestellen):
 
     @property
     def label(self):
-        return encode(u'Schritt 4: Erreichbarkeit von OEPNV ermitteln')
-
+        return encode(u'Erreichbarkeit der zentralen Orte im ÖPNV')
+    
     @property
     def Tool(self):
         return ErreichbarkeitOEPNV
-
+    
     def _getParameterInfo(self):
-
-        params = self.par
-        projekte = self.folders.get_projects()
-
-
-        # Projekt_auswählen
-        param_1 = params.projectname = arcpy.Parameter()
-        param_1.name = u'Projekt_ausw\xe4hlen'
-        param_1.displayName = u'Projekt ausw\xe4hlen'
-        param_1.parameterType = 'Required'
-        param_1.direction = 'Input'
-        param_1.datatype = u'GPString'
-
-        param_1.filter.list = projekte
-        if projekte:
-            param_1.value = projekte[0]
-
-        # Haltestelle1
-        param_2 = params.haltestelle1 = arcpy.Parameter()
-        param_2.name = u'Haltestelle1'
-        param_2.displayName = u'Haltestelle1'
-        param_2.parameterType = 'Required'
-        param_2.direction = 'Input'
-        param_2.datatype = u'GPString'
-        param_2.filter.list = []
+        params = super(TbxErreichbarkeitOEPNV, self)._getParameterInfo()
+        params.stops.displayName = encode(u'Abfahrt von Haltestelle:')
+        
+        param = self.add_parameter('recalculate')
+        param.name = encode(u'Neuberechnung')
+        param.displayName = encode(u'Neuberechnung erzwingen')
+        param.parameterType = 'Optional'
+        param.direction = 'Input'
+        param.datatype = u'GPBoolean'
+        
+        return self.par
 
 
-        # Haltestelle2
-        param_3 = params.haltestelle2  = arcpy.Parameter()
-        param_3.name = u'Haltestelle2'
-        param_3.displayName = u'Haltestelle2'
-        param_3.parameterType = 'Optional'
-        param_3.direction = 'Input'
-        param_3.datatype = u'GPString'
-        param_3.filter.list = []
-
-        # Haltestelle3
-        param_4 = params.haltestelle3  = arcpy.Parameter()
-        param_4.name = u'Haltestelle3'
-        param_4.displayName = u'Haltestelle3'
-        param_4.parameterType = 'Optional'
-        param_4.direction = 'Input'
-        param_4.datatype = u'GPString'
-        param_4.filter.list = []
-
-        return params
-
-
-    def _updateParameters(self, params):
-
-		#Projekt ausw�hlen
-		if self.params[0].altered and not self.params[0].hasBeenValidated:
-			projectname = self.params[0].value
-			self.params[1].value = ""
-			self.params[2].value = ""
-			self.params[3].value = ""
-			path_Halte = join(BASE_PATH,'3 Benutzerdefinierte Projekte',projectname,'FGDB_Erreichbarkeit.gdb','OEPNV_Haltestellen')
-
-			rows_Halte = arcpy.SearchCursor(path_Halte)
-			list_Halte1 = []
-			list_Halte2 = []
-			list_Halte3 = []
-			for row in rows_Halte:
-				list_Halte1.append(row.Name + " | " + str(row.Distanz) + "m entfernt")
-				list_Halte2.append(row.Name + " | " + str(row.Distanz) + "m entfernt")
-				list_Halte3.append(row.Name + " | " + str(row.Distanz) + "m entfernt")
-
-			list_Halte1 = sorted(list(set(list_Halte1)))
-			list_Halte2 = sorted(list(set(list_Halte2)))
-			list_Halte3 = sorted(list(set(list_Halte3)))
-
-			self.params[1].filter.list = list_Halte1
-			self.params[2].filter.list = list_Halte2
-			self.params[3].filter.list = list_Halte3
-
-		#Haltestellen ausw�hlen
-		if self.params[1].altered and not self.params[1].hasBeenValidated:
-
-			projectname = self.params[0].value
-			Halte1 = (self.params[1].value)
-
-		if self.params[2].altered and not self.params[2].hasBeenValidated:
-
-			projectname = self.params[0].value
-			Halte2 = (self.params[2].value)
-
-		if self.params[3].altered and not self.params[3].hasBeenValidated:
-
-			projectname = self.params[0].value
-			Halte3 = (self.params[3].value)
-
-		return
+if __name__ == "__main__":
+    t = TbxErreichbarkeitOEPNV()
+    t.getParameterInfo()
+    t.set_active_project()
+    t._open(t.par)
+    #t.show_outputs()
+    t.execute()

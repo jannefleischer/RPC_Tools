@@ -78,6 +78,7 @@ def install_packages(python_path):
     used_packages['sphinx']='Sphinx-1.5.5-py2.py3-none-any.whl'
     used_packages['numpydoc']='numpydoc-0.6.0-py2-none-any.whl'
     used_packages['enum']='enum-0.4.6-py2-none-any.whl'
+    used_packages['beautifulsoup4']='beautifulsoup4-4.6.0-py2-none-any.whl'
 
     used_packages['pypiwin32-219'] = 'pypiwin32-219-cp27-none-{}.whl'.format(platform)
     used_packages['pyproj'] = 'pyproj-1.9.5.1-cp27-cp27m-{}.whl'.format(platform)

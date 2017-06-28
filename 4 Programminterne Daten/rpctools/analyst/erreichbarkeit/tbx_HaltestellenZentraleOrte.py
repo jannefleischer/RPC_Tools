@@ -80,7 +80,6 @@ class HaltestellenZentraleOrte(Tool):
         df_within = pd.concat([df_oz_within, df_mz_within])
         df_within['name'] = df_within['GEN']
         df_within['id_zentraler_ort'] = df_within['OBJECTID']
-        df_within['distanz'] = 0
         
         self.parent_tbx.insert_dataframe_in_table('Zentrale_Orte', df_within)
         
