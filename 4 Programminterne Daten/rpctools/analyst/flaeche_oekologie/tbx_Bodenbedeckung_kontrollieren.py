@@ -4,22 +4,22 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.analyst.flaeche_oekologie.script_Bodenbedeckung_kontrollieren import BodenbedeckungKontrolle
+from rpctools.analyst.flaeche_oekologie.script_Ueberschneidungen import Ueberschneidungen
 from rpctools.utils.constants import Nutzungsart
 import rpctools.utils.lib_oekologie as lib_oeko
 import os
 
-class TbxBodenKontrolle(Tbx):
-    """Toolbox Wanderungssalden für Einnahmen"""
+class TbxUeberschneidungen(Tbx):
+    """Toolbox Ueberschneidungen"""
 
 
     @property
     def label(self):
-        return u'Bodenbedeckung kontrollieren'
+        return u'Ueberschneidungen anzeigen'
 
     @property
     def Tool(self):
-        return BodenbedeckungKontrolle
+        return Ueberschneidungen
 
     def _getParameterInfo(self):
 
