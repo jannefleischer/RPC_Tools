@@ -7,12 +7,12 @@ from rpctools.utils.encoding import encode
 from rpctools.analyst.einnahmen.script_Gewerbesteuer_kontrollieren import HebesaetzeKontrolle
 from rpctools.utils.constants import Nutzungsart
 
-class TbxWohnflaeche(Tbx):
+class TbxUeberschneidungen(Tbx):
     """Toolbox Wanderungssalden für Einnahmen"""
 
     @property
     def label(self):
-        return u'Wohnflächendichte vergleichen'
+        return u'Schritt 6: Hebesätze kontrollieren'
 
     @property
     def Tool(self):
@@ -84,3 +84,15 @@ class TbxWohnflaeche(Tbx):
                     gemeinden.append(u"{} || Hebesatz: {}".format(
                         gem_name, hebesteuer))
                 par.gemeinde.filter.list = sorted(gemeinden)
+
+class TbxLayerWald(Tbx):
+    test = 1
+
+class TbxLayerNatur(Tbx):
+    test = 1
+
+class TbxLayerLandschaft(Tbx):
+    test = 1
+
+class TbxLayerWasser(Tbx):
+    test = 1

@@ -4,19 +4,19 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.analyst.einnahmen.script_Gewerbesteuer_kontrollieren import HebesaetzeKontrolle
+from rpctools.analyst.flaeche_oekologie.script_Bodenbedeckung_bewerten import BodenbedeckungBewertung
 from rpctools.utils.constants import Nutzungsart
 
-class TbxWohnflaeche(Tbx):
-    """Toolbox Wanderungssalden für Einnahmen"""
+class TbxBodenBewertung(Tbx):
+    """'Bodenbedeckung bewerte"""
 
     @property
     def label(self):
-        return u'Wohnflächendichte vergleichen'
+        return u'Bodenbedeckung bewerten'
 
     @property
     def Tool(self):
-        return HebesaetzeKontrolle
+        return BodenbedeckungBewertung
 
     def _getParameterInfo(self):
 
@@ -30,24 +30,6 @@ class TbxWohnflaeche(Tbx):
         par.name.direction = 'Input'
         par.name.datatype = u'GPString'
         par.name.filter.list = []
-
-        par.gemeinde = arcpy.Parameter()
-        par.gemeinde.name = u'Gemeinde'
-        par.gemeinde.displayName = u'Gemeinden'
-        par.gemeinde.parameterType = 'Required'
-        par.gemeinde.direction = 'Input'
-        par.gemeinde.datatype = u'GPString'
-        par.gemeinde.filter.list = []
-
-        par.hebesatz = arcpy.Parameter()
-        par.hebesatz.name = u'Hebesatz'
-        par.hebesatz.displayName = u'Hebesatz für die Gewerbesteuer (von-Hundert-Satz)'
-        par.hebesatz.parameterType = 'Required'
-        par.hebesatz.direction = 'Input'
-        par.hebesatz.datatype = u'GPLong'
-        par.hebesatz.filter.type = 'Range'
-        par.hebesatz.filter.list = [100, 600]
-        par.hebesatz.value = 250
 
         return par
 
