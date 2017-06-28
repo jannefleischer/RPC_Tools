@@ -27,7 +27,7 @@ class ErreichbarkeitOEPNV(Tool):
         layer_name = u'{n} Haltestelle: {s})'.format(n=layer,
                                                      s=stop_name)
         self.output.add_layer(group_layer, layer, fc,
-                              query='id_origin={stop_id}'.format(stop_id),
+                              query='id_origin={}'.format(stop_id),
                               name=layer_name, 
                               zoom=False)
     
@@ -74,10 +74,14 @@ class ErreichbarkeitOEPNV(Tool):
             df_centers.loc[index, 'update'] = True
         
         arcpy.AddMessage(u'Schreibe Ergebnisse in die Datenbank...')
-        self.parent_tbx.dataframe_to_table('Erreichbarkeiten_OEPNV',
-                                           df_centers,
-                                           pkeys=['id_origin', 'id_destination'], 
-                                           upsert=True)
+        df_update = df_centers[df_centers['update'] == True]
+        if len(df_update) > 0:
+            self.parent_tbx.dataframe_to_table(
+                'Erreichbarkeiten_OEPNV',
+                df_centers,
+                pkeys=['id_origin', 'id_destination'],
+                upsert=True)
+        
 
 
 class TbxErreichbarkeitOEPNV(TbxHaltestellen):
@@ -91,7 +95,8 @@ class TbxErreichbarkeitOEPNV(TbxHaltestellen):
         return ErreichbarkeitOEPNV
     
     def _getParameterInfo(self):
-        params = super(TbxErreichbarkeitOEPNV, self)._getParameterInfo()
+        super(TbxErreichbarkeitOEPNV, self)._getParameterInfo()
+        params = self.par
         params.stops.displayName = encode(u'Abfahrt von Haltestelle:')
         
         param = self.add_parameter('recalculate')
@@ -101,7 +106,7 @@ class TbxErreichbarkeitOEPNV(TbxHaltestellen):
         param.direction = 'Input'
         param.datatype = u'GPBoolean'
         
-        return self.par
+        return params
 
 
 if __name__ == "__main__":
