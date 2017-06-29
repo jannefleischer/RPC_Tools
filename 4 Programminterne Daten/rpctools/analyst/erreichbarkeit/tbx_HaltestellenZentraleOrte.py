@@ -18,11 +18,11 @@ def next_monday():
     nextmonday = today + timedelta(days=-today.weekday(), weeks=1)
     return nextmonday
 
-def next_non_holiday(min_days_infront=2):
+def next_working_day(min_days_infront=2):
     """
-    get the next working day, where there are no holidays in all of germany
-    (no saturdays, sundays as well)
-    that basetable Feriendichte holds information of days infront of today
+    get the next working day in germany (no holidays, no saturdays, no sundays
+    in all federal states)
+    reuqires the basetable Feriendichte to hold days infront of today
     (atm data incl. 2017 - 2020)
 
     Parameters
@@ -48,7 +48,7 @@ def next_non_holiday(min_days_infront=2):
         where=where, is_base_table=True)
     df_density.sort('Datum', inplace=True)
     # can't compare directly because datetime64 has no length
-    infront = np.where(df_density['Datum'] == day)[0]
+    infront = np.where(df_density['Datum'] >= day)[0]
     if len(infront) > 0:
         # get the first day matching all conditions
         day = df_density.iloc[infront[0]]['Datum']
@@ -67,7 +67,7 @@ class HaltestellenZentraleOrte(Tool):
         self.output.add_layer(group_layer, layer_nullfall, fc, zoom=False)
     
     def run(self):
-        self.query = BahnQuery(date=next_non_holiday())
+        self.query = BahnQuery(date=next_working_day())
         arcpy.AddMessage('Berechne die zentralen Orte und Haltestellen '
                          'in der Umgebung...')
         self.write_centers_stops()
