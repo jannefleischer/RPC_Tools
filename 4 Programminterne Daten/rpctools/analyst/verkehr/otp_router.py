@@ -646,17 +646,19 @@ class OTPRouter(object):
         """Create the point-features from the transfer nodes"""
         sr = arcpy.SpatialReference(self.epsg)
         fields = ['node_id', 'Gewicht',
-                  'SHAPE@']
+                  'SHAPE@', 'Name']
         fc = os.path.join(self.ws, 'Zielpunkte')
         self.truncate(fc)
-
+        counter = 1
         with arcpy.da.InsertCursor(fc, fields) as rows:
             for node in self.transfer_nodes.itervalues():
+                name = 'Zielpunkt ' + str(counter)
+                counter += 1
                 geom = node.get_geom()
                 if geom:
                     rows.insertRow((node.node_id,
                                     node.weight,
-                                    geom))
+                                    geom, name))
 
     def truncate(self, fc):
         """
