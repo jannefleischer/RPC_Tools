@@ -82,12 +82,6 @@ class TbxUpdateNodes(Tbx):
 
     def _updateParameters(self, params):
 
-
-        """
-        if man_weight[0][0]:
-        print "acdasdfasf"
-
-        """
         where='node_id = {}'.format(params.choose_node.value)
         if self.par.changed('choose_node'):
             man_weight =  self.query_table('Zielpunkte',
