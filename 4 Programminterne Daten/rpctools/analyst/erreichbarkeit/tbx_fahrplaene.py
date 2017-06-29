@@ -5,7 +5,7 @@ import webbrowser
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.analyst.erreichbarkeit.tbx_HaltestellenZentraleOrte import next_monday
+from rpctools.analyst.erreichbarkeit.tbx_HaltestellenZentraleOrte import next_non_holiday
 from rpctools.analyst.erreichbarkeit.bahn_query import BahnQuery
 
 
@@ -17,7 +17,7 @@ class Fahrplaene(Tool):
         pass
     
     def run(self):
-        query = BahnQuery(next_monday())
+        query = BahnQuery(next_non_holiday())
         idx = self.par.selected_index('stops')
         id = self.parent_tbx.df_stops['id'].values[idx]
         url = query.get_timetable_url(id)

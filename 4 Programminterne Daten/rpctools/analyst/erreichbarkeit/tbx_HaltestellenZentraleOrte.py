@@ -3,8 +3,10 @@ import os
 import sys
 import arcpy
 import pandas as pd
+from datetime import datetime, date, timedelta
+import numpy as np
 
-from rpctools.utils.params import Tbx, Tool
+from rpctools.utils.params import Tbx, Tool, DummyTbx
 from rpctools.utils.encoding import encode
 from rpctools.utils.spatial_lib import get_project_centroid, points_within, Point
 from rpctools.analyst.erreichbarkeit.bahn_query import BahnQuery
@@ -12,9 +14,45 @@ from rpctools.analyst.erreichbarkeit.bahn_query import BahnQuery
 import datetime
 
 def next_monday():
-    today = datetime.date.today()
-    nextmonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
+    today = date.today()
+    nextmonday = today + timedelta(days=-today.weekday(), weeks=1)
     return nextmonday
+
+def next_non_holiday(min_days_infront=2):
+    """
+    get the next working day, where there are no holidays in all of germany
+    (no saturdays, sundays as well)
+    that basetable Feriendichte holds information of days infront of today
+    (atm data incl. 2017 - 2020)
+
+    Parameters
+    ----------
+    min_days_infront : int (default: 2)
+       returned day will be at least n days infront
+       
+    Returns
+    -------
+    day : datetime.date
+       the next day without holidays,
+       if day is out of range of basetable: today + min_days_infront
+    """
+    tbx = DummyTbx()
+    today = np.datetime64(date.today())
+    day = today + np.timedelta64(min_days_infront,'D')
+    # get working days (excl. holidays)
+    where = ("Wochentag <> 'Samstag' and "
+             "Wochentag <> 'Sonntag' and "
+             "Anteil_Ferien_Bevoelkerung = 0")
+    df_density = tbx.table_to_dataframe(
+        'Feriendichte', workspace='FGDB_Basisdaten_deutschland.gdb',
+        where=where, is_base_table=True)
+    df_density.sort('Datum', inplace=True)
+    # can't compare directly because datetime64 has no length
+    infront = np.where(df_density['Datum'] == day)[0]
+    if len(infront) > 0:
+        # get the first day matching all conditions
+        day = df_density.iloc[infront[0]]['Datum']
+    return day.date()
 
 class HaltestellenZentraleOrte(Tool):
     _param_projectname = 'projectname'
@@ -29,7 +67,7 @@ class HaltestellenZentraleOrte(Tool):
         self.output.add_layer(group_layer, layer_nullfall, fc, zoom=False)
     
     def run(self):
-        self.query = BahnQuery(date=next_monday())
+        self.query = BahnQuery(date=next_non_holiday())
         arcpy.AddMessage('Berechne die zentralen Orte und Haltestellen '
                          'in der Umgebung...')
         self.write_centers_stops()

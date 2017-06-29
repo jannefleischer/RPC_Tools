@@ -6,7 +6,7 @@ from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 from rpctools.analyst.erreichbarkeit.tbx_fahrplaene import TbxHaltestellen
 from rpctools.analyst.erreichbarkeit.bahn_query import BahnQuery
-from rpctools.analyst.erreichbarkeit.tbx_HaltestellenZentraleOrte import next_monday
+from rpctools.analyst.erreichbarkeit.tbx_HaltestellenZentraleOrte import next_non_holiday
 
 
 class ErreichbarkeitOEPNV(Tool):
@@ -40,7 +40,7 @@ class ErreichbarkeitOEPNV(Tool):
         self.routing(stop_name, stop_id, self.par.recalculate.value)
         
     def routing(self, origin, id_origin, recalculate=False):
-        query = BahnQuery(next_monday(), timeout=0.5)
+        query = BahnQuery(next_non_holiday(), timeout=0.5)
         df_centers = self.parent_tbx.table_to_dataframe('Zentrale_Orte')
         df_stops = self.parent_tbx.table_to_dataframe('Haltestellen')        
         df_calculated = self.parent_tbx.table_to_dataframe(
