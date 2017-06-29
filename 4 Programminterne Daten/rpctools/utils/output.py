@@ -595,7 +595,8 @@ class Output(object):
             for f, v in layer.symbology.iteritems():
                 setattr(sym, f, v)
         except Exception as e:
-            print(e)
+            pass
+            #print(e)
     
         # same with labels
         try: 
@@ -605,7 +606,8 @@ class Output(object):
                     exp = exp.replace(l, v)
                 label_class.expression = exp    
         except Exception as e:
-            print(e)
+            pass
+            #print(e)
             
         target_grouplayer.visible = True
         if layer.in_project:
