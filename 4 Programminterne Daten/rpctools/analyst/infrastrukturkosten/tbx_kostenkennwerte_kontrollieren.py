@@ -3,9 +3,10 @@ import arcpy
 
 from rpctools.utils.params import Tbx, Tool, Folders
 from rpctools.utils.encoding import encode
+from rpctools.analyst.infrastrukturkosten.kostenkennwerte \
+     import kostenkennwerte
 import numpy as np
 import pandas as pd
-import time
 
 
 class KostenkennwerteKontrollieren(Tool):
@@ -36,7 +37,7 @@ class TbxKostenkennwerteKontrollieren(Tbx):
     def _open(self, params):
         # if Kostenkennwerte_Linienelemente does not exist, create the table
         # initially
-        self.kostenkennwerte()
+        kostenkennwerte(self.par.project.value)
         df_costs = self.table_to_dataframe(self._table,
                                            workspace='FGDB_Kosten.gdb')
         self.df_costs = df_costs
@@ -137,56 +138,6 @@ class TbxKostenkennwerteKontrollieren(Tbx):
 
         return params
 
-    def kostenkennwerte(self):
-        # check if table Kostenkennwerte_Linienelemente contains content
-        df_costs_line_elements = self.table_to_dataframe(
-            self._table, workspace='FGDB_Kosten.gdb')
-        if len(df_costs_line_elements) != 0:
-            return
-        # calculate time factor
-        current_year = int(time.strftime("%Y"))
-        df_frame_data = self.table_to_dataframe('Rahmendaten',
-                                            workspace='FGDB_Kosten_Tool.gdb',
-                                            is_base_table=True)
-        interest = df_frame_data['Zins']
-        reference_year = df_frame_data['Stand_Kostenkennwerte']
-        time_factor = (1 + interest) ** (current_year - reference_year)
-        # get regional factor
-        ags = self.query_table('Projektrahmendaten',
-                              workspace='FGDB_Definition_Projekt.gdb',
-                              columns=['AGS'])[0][0]
-        regional_factor = self.table_to_dataframe(
-            'bkg_gemeinden', workspace='FGDB_Basisdaten_deutschland.gdb',
-            columns=['BKI_Regionalfaktor'], where="AGS='{}'".format(str(ags)),
-            is_base_table=True)
-        # fill table Kostenkennwerte_Linienelemente
-        regional_time_factor = time_factor * \
-            regional_factor.loc[:, 'BKI_Regionalfaktor']
-        rounding_factor = 5
-        df_networks = self.table_to_dataframe('Netze_und_Netzelemente',
-                                             workspace='FGDB_Kosten_Tool.gdb',
-                                             where="Typ='{}'".format('Linie'),
-                                             is_base_table=True)
-        # multiply with factors
-        df_networks.loc[:, ['Euro_EH', 'Cent_BU', 'Euro_EN']] *= \
-            regional_time_factor[0]
-        # round to 5
-        df_networks.loc[:, ['Euro_EH', 'Cent_BU', 'Euro_EN']] = \
-            self.round_df_to(
-                df_networks.loc[:, ['Euro_EH', 'Cent_BU', 'Euro_EN']],
-                rounding_factor)
-
-        self.dataframe_to_table(self._table, df_networks,
-                               pkeys=['ID'], workspace='FGDB_Kosten.gdb',
-                               upsert=True)
-        return
-
-    def round_df_to(self, df, rounding_factor):
-        df = df / rounding_factor
-        df = df.apply(pd.Series.round)
-        df *= rounding_factor
-        df = df.astype('int')
-        return df
 
 if __name__ == '__main__':
     t = TbxKostenkennwerteKontrollieren()
