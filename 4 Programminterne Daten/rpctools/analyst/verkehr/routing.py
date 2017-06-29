@@ -73,13 +73,6 @@ class Routing(Tool):
         o.create_transfer_node_features()
         o.dump(self.folders.get_otp_pickle_filename(check=False))
 
-        # Empty column for manual changes of weigths
-        nodes_path = self.folders.get_table('Zielpunkte', workspace='', project='',
-                                   check=True)
-        arcpy.AddField_management(nodes_path, 'Manuelle_Gewichtung')
-        arcpy.AddField_management(nodes_path, 'Neue_Gewichte',
-                                  field_type='DOUBLE')
-
     def get_areas_data(self):
         """
         Get data from areas and merge with table for attachement points

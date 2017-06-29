@@ -14,7 +14,7 @@ class UpdateNodes(Routing):
     def run(self):
 
         otp_router = OTPRouter.from_dump(self.folders.get_otp_pickle_filename())
-            
+
         toolbox = self.parent_tbx
         # get input data
         input_data = toolbox.query_table('Zielpunkte',
@@ -49,9 +49,9 @@ class UpdateNodes(Routing):
             total_weight = total_man_weight + total_old_weight_not_set
             old_weights_not_set = np.array(old_weights_not_set) / total_weight
             man_weights = np.array(man_weights) / total_weight
-            
+
         transfer_nodes = otp_router.transfer_nodes
-        
+
         def set_new_weights(weights, node_ids):
             """"""
             # write data to the new table
@@ -65,16 +65,17 @@ class UpdateNodes(Routing):
 
         set_new_weights(old_weights_not_set, node_id_not_set)
         set_new_weights(man_weights, node_id)
-        
+
         transfer_nodes.assign_weights_to_routes()
         otp_router.calc_vertex_weights()
-        otp_router.create_polyline_features()        
+        otp_router.create_polyline_features()
 
         # update the layers
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = arcpy.mapping.ListDataFrames(mxd, "*")[0]
-        layers = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
+        layers1 = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
+        layers2 = arcpy.mapping.ListLayers(mxd, "*Fahrten", df)
+        layers = sum([layers1, layers2], [])
         for layer in layers:
             arcpy.mapping.RemoveLayer(df, layer)
 
-        
