@@ -14,6 +14,9 @@ class TeilflaechenVerwalten(Tool):
     _workspace = 'FGDB_Definition_Projekt.gdb'
     
     def add_outputs(self):
+        fc = "Teilflaechen_Plangebiet"
+        layer = "Teilflächen des Plangebiets"
+        self.output.add_layer("projektdefinition", layer, fc)
         self.output.add_diagram(DiaTeilflaechen())
 
     def run(self):
