@@ -567,11 +567,11 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         
 
 if __name__ == '__main__':
-    t = TbxNutzungenWohnen()
+    t = TbxNutzungenGewerbe()
     params = t.getParameterInfo()
     t.set_active_project()
     t._temporary_gdbs = []
-    t.execute()
+    t.tool.run()
     #t.commit_tfl_changes()
     #t.tool.calculate_ways()
     #t.tool.update_wege_projekt()

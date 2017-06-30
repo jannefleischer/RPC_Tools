@@ -157,6 +157,82 @@ class NutzungenGewerbe(Nutzungen):
     def run(self):
         self.calculate_ways()
         self.update_wege_projekt()
+        arcpy.AddMessage(u'Berechne die Arbeitsplatzentwicklung '
+                         u'für die Gewerbeflächen...')
+        tfl_table = self.parent_tbx.query_table(
+            'Teilflaechen_Plangebiet', columns='id_teilflaeche', 
+            where='Nutzungsart = {}'.format(self.parent_tbx._nutzungsart))
+        ids = [i[0] for i in tfl_table]
+        for flaechen_id in ids:
+            self.calculate_growth(flaechen_id)
+        arcpy.AddMessage(u'Berechne die Branchenanteile...')
+        for flaechen_id in ids:
+            self.calculate_percentages(flaechen_id)
+        
+    def calculate_growth(self, flaechen_id): ### Structure and age ###
+        flaechen_table = 'Teilflaechen_Plangebiet'
+        project_table = 'Projektrahmendaten'
+        jobs_year_table = 'AP_nach_Jahr'
+        results_workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
+        
+        tbx = self.parent_tbx
+    
+        n_jobs = self.parent_tbx.query_table(
+                'Gewerbe_Arbeitsplaetze', columns=['Arbeitsplaetze'])[0][0]
+        
+        begin, duration = tbx.query_table(
+                flaechen_table, 
+                columns=['Beginn_Nutzung', 'Aufsiedlungsdauer'],
+                where='id_teilflaeche={}'.format(flaechen_id))[0]
+        
+        end = tbx.query_table(project_table,
+                              columns=['Ende_Betrachtungszeitraum'])[0][0]
+    
+        # empty the bewohner table (results will be stored there)
+        tbx.delete_rows_in_table(jobs_year_table,
+                                 where='IDTeilflaeche={}'.format(flaechen_id),
+                                 workspace=results_workspace)
+    
+        for progress in range(0, end - begin + 1):
+            proc_factor = (float(progress + 1) / duration
+                           if progress + 1 <= duration
+                           else 1)
+            year = begin + progress
+            
+            tbx.insert_rows_in_table(
+                jobs_year_table,
+                column_values={
+                    'Jahr': year,
+                    'AP': n_jobs * proc_factor, 
+                    'IDTeilflaeche': flaechen_id
+                },
+                workspace=results_workspace
+            )
+            
+    def calculate_percentages(self, flaechen_id):
+        perc_table = 'Gewerbe_Anteile'
+        perc_res_table = 'Branchenanteile'
+        results_workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
+        
+        tbx = self.parent_tbx
+        
+        tbx.delete_rows_in_table(perc_res_table,
+                                 where='IDTeilflaeche={}'.format(flaechen_id))
+        
+        perc_table_df = tbx.table_to_dataframe(
+            perc_table, where='IDTeilflaeche={}'.format(flaechen_id))
+        
+        perc_res_df = pd.DataFrame()
+        perc_res_df['IDBranche'] = perc_table_df['IDBranche']
+        perc_res_df['Anteil'] = (
+            perc_table_df['dichtekennwert_ap_pro_ha_brutto'] *
+            perc_table_df['anteil'])
+        
+        perc_res_df['Anteil'] /= perc_res_df['Anteil'].sum()
+        perc_res_df['IDTeilflaeche'] = flaechen_id
+        
+        tbx.insert_dataframe_in_table(perc_res_table, perc_res_df,
+                                      workspace=results_workspace)
         
     def calculate_ways(self):
         pkw_perc_col = 'Anteil_Pkw_Fahrer'
