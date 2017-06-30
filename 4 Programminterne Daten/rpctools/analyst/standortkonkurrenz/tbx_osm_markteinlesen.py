@@ -123,6 +123,8 @@ class MarktEinlesen(Tool):
         for market in markets:
             # no name -> nothing to parse
             if not getattr(market, field):
+                arcpy.AddMessage(u'  - Markt mit fehlendem Attribut "{}" wird '
+                                 u'übersprungen'.format(field))
                 continue
             match_found = False
             for idx, chain_alloc in df_chains_alloc.iterrows():
@@ -138,6 +140,10 @@ class MarktEinlesen(Tool):
                     market.id_betriebstyp = chain_alloc['id_betriebstyp']
                     market.id_kette = id_kette
                     ret_markets.append(market)
+                else:
+                    arcpy.AddMessage(
+                        u'  - Markt "{}" ist kein Lebensmitteleinzelhandel, '
+                        u'wird übersprungen'.format(market.name))
                 break
             # add markets that didn't match (keep defaults)
             if not match_found:
@@ -164,7 +170,7 @@ class OSMMarktEinlesen(MarktEinlesen):
         markets = reader.get_shops(centroid, distance=self.par.radius.value,
                                    count=self.par.count.value)
         arcpy.AddMessage(u'{} Märkte gefunden'.format(len(markets)))
-        arcpy.AddMessage(u'Supermärkte werden in die Datenbank übertragen...'
+        arcpy.AddMessage(u'Analysiere gefundene Märkte...'
                          .format(len(markets)))
         truncate = self.par.truncate.value
         markets = self.parse_meta(markets)

@@ -645,7 +645,7 @@
                         <Button refID="rpc_tools.template_einlesen_featureclass" />
                     </Items>
                 </Menu>
-                <Menu caption="M&#228;rkte im Bestand" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="Lebensmitteleinzelhandel im Bestand" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Menu refID="rpc_tools.menu_bestand_einlesen" />
                         <Tool refID="rpc_tools.bestand_hinzu" />
@@ -665,12 +665,12 @@
                         <Tool refID="rpc_tools.zentrum_bearbeiten" />
                     </Items>
                 </Menu>
-                <Menu caption="Standortkonkurrenz Lebensmitteleinzelhandel" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="Standortkonkurrenz Superm&#228;rkte" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
-                        <Button refID="rpc_tools.maerkte_anzeigen" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_nullfall" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_planfall" />
                         <Menu refID="rpc_tools.menu_zentren" />
+                        <Button refID="rpc_tools.maerkte_anzeigen" />
                         <Button refID="rpc_tools.standortkonkurrenz_projektwirkung" />
                     </Items>
                 </Menu>
