@@ -13,7 +13,7 @@ class TbxProjektVerwaltung(Tbx):
 
     def __init__(self):
         super(TbxProjektVerwaltung, self).__init__()
-        self.update_projects = False
+        self.requires_existing_project = False
 
 
 class TbxProjektAnlegen(TbxProjektVerwaltung):

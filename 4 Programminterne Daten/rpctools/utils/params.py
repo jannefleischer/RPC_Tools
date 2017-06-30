@@ -243,7 +243,7 @@ class Tbx(object):
         self.tool = Tool(self.par, self)
         self.canRunInBackground = False
         # update projects on call of updateParameters
-        self.update_projects = True
+        self.requires_existing_project = True
         self._dependencies = []
         # updates to these tables are written to temp. tables and written to
         # project db only on execution of tool
@@ -309,7 +309,7 @@ class Tbx(object):
         if self.par.toolbox_opened():
             self.open()
         # updating projects messes up the initial project management
-        if self.update_projects:
+        if self.requires_existing_project:
             self._update_project_list()
         self._update_dependencies(self.par)
             #self._create_temporary_copies()
@@ -326,7 +326,7 @@ class Tbx(object):
         # set the active project on open (do not do this in project management
         # toolboxes, updating projects messes them up, that's what the boolean
         # self.update_projects is for)
-        if (self.update_projects and
+        if (self.requires_existing_project and
             self.par._get_param_project() is not None):
             self.set_active_project()
             # don't call _open of subclass if there is only one parameter
@@ -350,6 +350,8 @@ class Tbx(object):
         project_param.enabled = False
 
     def validate_active_project(self):
+        if not self.requires_existing_project:
+            return True, ''
         active_project = self.config.active_project
         projects = self.folders.get_projects()
         if not active_project:
@@ -429,7 +431,7 @@ class Tbx(object):
         """
         self.par._update_parameters(parameters)
         params = self.par._od.values()
-        if self.update_projects:
+        if self.requires_existing_project:
             valid, message = self.validate_active_project()
             if not valid:
                 params[0].setErrorMessage(message)
