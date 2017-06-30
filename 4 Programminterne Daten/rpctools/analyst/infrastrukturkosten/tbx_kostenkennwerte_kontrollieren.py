@@ -42,8 +42,12 @@ class TbxKostenkennwerteKontrollieren(Tbx):
                                            workspace='FGDB_Kosten.gdb')
         self.df_costs = df_costs
         network_elements = list(self.df_costs.Netzelement)
-        params.network.filter.list = network_elements
-        params.network.value = network_elements[0]
+        network = list(self.df_costs.Netz)
+        network_and_elements = [network[i] + " | " + network_elements[i] for
+                                i in range(len(network_elements))]
+
+        params.network.filter.list = network_and_elements
+        params.network.value = network_and_elements[0]
         params.costs_EH.value = int(self.df_costs.Euro_EH[0])
         params.costs_BU.value = int(self.df_costs.Cent_BU[0])
         params.costs_EN.value = int(self.df_costs.Euro_EN[0])
@@ -55,8 +59,9 @@ class TbxKostenkennwerteKontrollieren(Tbx):
 
 
     def _updateParameters(self, params):
-        condition = params.network.value
-        df_id = self.df_costs[self.df_costs.Netzelement == condition].index
+        network, network_element = params.network.value.split(' | ')
+        df_id = self.df_costs[(self.df_costs.Netzelement == network_element) &
+                              (self.df_costs.Netz == network)].index
         if self.par.changed('network'):
             # set tbx parameters initially
             df_selected = self.get_from_df(self.df_costs,
