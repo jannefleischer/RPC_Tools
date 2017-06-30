@@ -11,6 +11,17 @@ from rpctools.analyst.verkehr.routing import Routing
 
 class UpdateNodes(Routing):
 
+    def add_outputs(self):
+        self.output.add_layer('verkehr', 'Zielpunkte_gewichtet',
+                              featureclass='Zielpunkte',
+                              template_folder='Verkehr',
+                              name='Zielpunkte gewichtet')
+        self.output.add_layer('verkehr', 'links',
+                              featureclass='links',
+                              template_folder='Verkehr',
+                              name='Zusätzliche PKW-Fahrten gewichtet')
+        return
+
     def run(self):
 
         otp_router = OTPRouter.from_dump(self.folders.get_otp_pickle_filename())
@@ -36,12 +47,15 @@ class UpdateNodes(Routing):
                 man_weights_not_set.append(man_weights.pop(i-idx_correct))
                 old_weights_not_set.append(old_weights.pop(i-idx_correct))
                 idx_correct += 1
-
+        arcpy.AddMessage(man_weights)
         # calculate new weights
+        man_weights = [weight / 100 for weight in man_weights]
+        arcpy.AddMessage(man_weights)
+        arcpy.AddMessage(old_weights_not_set)
         total_man_weight = sum(man_weights)
         total_old_weight_not_set = sum(old_weights_not_set)
-        if total_man_weight <= 100:
-            remaining_weight = 100 - total_man_weight
+        if total_man_weight <= 1:
+            remaining_weight = 1 - total_man_weight
             old_weights_not_set = np.array(old_weights_not_set) * \
                 remaining_weight / total_old_weight_not_set
             man_weights = np.array(man_weights)
@@ -74,7 +88,7 @@ class UpdateNodes(Routing):
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = arcpy.mapping.ListDataFrames(mxd, "*")[0]
         layers1 = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
-        layers2 = arcpy.mapping.ListLayers(mxd, "*Fahrten", df)
+        layers2 = arcpy.mapping.ListLayers(mxd, "*Fahrten*", df)
         layers = sum([layers1, layers2], [])
         for layer in layers:
             arcpy.mapping.RemoveLayer(df, layer)
