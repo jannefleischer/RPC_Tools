@@ -200,7 +200,8 @@ class TbxEditMarkets(Tbx):
         x, y = self.config.active_coord
         closest_idx = None
         if x and y:
-            closest_idx, c = closest_point((x, y), self.markets_df['SHAPE'])
+            closest_idx, c = closest_point((x, y),
+                                           self.markets_df['SHAPE'].values)
         
         # update the names of the markets and list them
         pretty_names = []
@@ -341,10 +342,10 @@ class TbxEditMarketsPlanfall(TbxEditMarkets):
 
 
 if __name__ == '__main__':
-    t = TbxEditMarketsPlanfall()
+    t = TbxEditMarketsNullfall()
     t._getParameterInfo()
     t.set_active_project()
     t.add_market_to_db('Test add', (3544252, 5925427))
-    t._open(None)
+    t.open()
     t._updateParameters(None)
     t.execute()
