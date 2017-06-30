@@ -35,6 +35,7 @@ class Projektverwaltung(Tool):
     _param_projectname = 'name'
     _workspace = 'FGDB_Definition_Projekt.gdb'
 
+
     def add_outputs(self):
         # add Teilflächen
         fc = "Teilflaechen_Plangebiet"
@@ -52,15 +53,20 @@ class Projektverwaltung(Tool):
 
 class ProjektAnlegen(Projektverwaltung):
     """Projekt neu anlegen"""
+    _success = True
+
+    def add_outputs(self):
+        if self._success:
+            super(ProjektAnlegen, self).add_outputs()
 
     def run(self):
         """"""
         gc.collect()
         #self.output.define_projection()
-        success = self.projekt_anlegen()
+        self.projekt_anlegen()
         # test if self.projekt_anlegen() was successful
         # if not: AddMessage and delete project again
-        if success:
+        if self._success:
             self.parent_tbx.config.active_project = self.projectname
         else:
             arcpy.AddMessage("Fehlerhaftes Projekt wird wieder entfernt...")
@@ -84,11 +90,11 @@ class ProjektAnlegen(Projektverwaltung):
         tfl, gdbPfad = self.copy_teilflaechen_to_gdb(project_name, flaeche)
         toolbox = self.parent_tbx
         max_dist = toolbox.config.max_area_distance
-        ags_projekt, gemeindename_projekt, get_gemeinde_success = \
+        ags_projekt, gemeindename_projekt = \
             self.get_gemeinde(tfl, 'OBJECTID', max_dist)
 
-        if not get_gemeinde_success:
-            return False
+        if not self._success:
+            return
         self.calculate_teilflaechen_attributes(tfl,
                                                beginn_betrachtung,
                                                ags_projekt,
@@ -109,8 +115,6 @@ class ProjektAnlegen(Projektverwaltung):
 
         arcpy.AddMessage("Neues Projekt angelegt im Ordner {}\n".format(
             project_path))
-
-        return True
 
     def set_projektrahmendaten(self,
                                ags_projekt,
@@ -318,7 +322,6 @@ class ProjektAnlegen(Projektverwaltung):
     def get_gemeinde(self, tfl, id_column, max_dist):
         """Verschneide Teilflächen mit Gemeinde"""
         # to do (Stefaan)
-        success = True
         arcpy.SetProgressorLabel('Verschneide Teilflächen mit Gemeinde')
         arcpy.SetProgressorPosition(10)
 
@@ -335,15 +338,16 @@ class ProjektAnlegen(Projektverwaltung):
         INSIDE_X = [row[0] for row in XY_INSIDE]
         INSIDE_Y = [row[1] for row in XY_INSIDE]
         distances = []
-        for i in range(len(XY_INSIDE)):
-            for j in range(i):
-                dist = np.linalg.norm(np.subtract(XY_INSIDE[i], XY_INSIDE[j]))
-                distances.append(dist)
-        if distances and max(distances) > max_dist:
-            arcpy.AddError("Der Abstand zwischen den Schwerpunkten der "
-                           "Teilflächen darf nicht größer "
-                           "als {} sein".format(max_dist))
-            success = False
+        if len(XY_INSIDE) > 1:
+            for i in range(len(XY_INSIDE)):
+                for j in range(i):
+                    dist = np.linalg.norm(np.subtract(XY_INSIDE[i], XY_INSIDE[j]))
+                    distances.append(dist)
+            if distances and max(distances) > max_dist:
+                arcpy.AddError("Der Abstand zwischen den Schwerpunkten der "
+                               "Teilflächen darf nicht größer "
+                               "als {} m sein!".format(max_dist))
+                self._success = False
 
         # get AGS and Gemeindename and check if AGS is unique
         ags_gen = get_ags(tfl, id_column)
@@ -352,9 +356,9 @@ class ProjektAnlegen(Projektverwaltung):
         if len(np.unique(ags_project)) != 1:
             arcpy.AddError("Die Teilflächen müssen in der selben Gemeinde"
                              "liegen")
-            success = False
+            self._success = False
 
-        return ags_project[0], gen_project[0], success
+        return ags_project[0], gen_project[0]
 
     def set_source_xy(self):
         toolbox = self.parent_tbx
