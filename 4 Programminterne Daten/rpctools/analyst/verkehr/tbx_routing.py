@@ -13,7 +13,7 @@ class TbxRouting(Tbx):
 
     @property
     def label(self):
-        return encode(u'initiales Routing')
+        return encode(u'Verkehrsbelastung initialisieren')
 
     @property
     def Tool(self):

@@ -13,7 +13,7 @@ class TbxUpdateNodes(Tbx):
     _opened_for_first_time = True
     @property
     def label(self):
-        return encode(u'gewichtetes Routing')
+        return encode(u'Verkehrsbelastung mit Gewichten versehen')
 
     @property
     def Tool(self):
