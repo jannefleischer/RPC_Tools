@@ -13,9 +13,9 @@
     <AddIn language="PYTHON" library="rpc_tools_addin.py" namespace="rpc_tools">
         <ArcMap>
             <Commands>
-            
+
                 <!-- PROJEKTVERWALTUNG -->
-                
+
                 <ComboBox caption="Projekt" category="ProjektCheck" class="ProjektAuswahl" id="rpc_tools.projekt_auswahl" itemSizeString="WWWWWW" message="" rows="4" sizeString="WWWWWW" tip="Nur dieses Projekt k&#246;nnen Sie editieren und analysieren. Weitere Projekte k&#246;nnen angezeigt bleiben.">
                     <Help heading="" />
                 </ComboBox>
@@ -31,9 +31,9 @@
                 <Button caption="Projekte l&#246;schen" category="ProjektCheck" class="ProjektLoeschen" id="rpc_tools.projekt_loeschen" image="Images\1001-cancel_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                
+
                 <!-- NUTZUNGEN -->
-                
+
                 <Button caption="Nutzungen auf Teilfl&#228;chen definieren" category="ProjektCheck" class="NutzungenDefinieren" id="rpc_tools.nutzungen_definieren" image="Images\013500-filter_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -46,18 +46,18 @@
                 <Button caption="Einzelhandel" category="ProjektCheck" class="Einzelhandel" id="rpc_tools.einzelhandel" image="Images\650000-grocery-shop_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                
+
                 <!-- BEWOHNER/ARBEITSPLAETZE -->
-                
+
                 <Button caption="Bewohnerzahl sch&#228;tzen" category="ProjektCheck" class="BewohnerSchaetzen" id="rpc_tools.bewohner_schaetzen" image="Images\4502-users_3.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Arbeitspl&#228;tze sch&#228;tzen" category="ProjektCheck" class="ArbeitsplaetzeSchaetzen" id="rpc_tools.arbeitsplaetze_schaetzen" image="Images\281500-worker_2.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                
+
                 <!-- INFRASTRUKTUR -->
-                
+
                 <Button caption="Erschlie&#223;ungsnetze anzeigen" category="ProjektCheck" class="ErschliessungsnetzeAnzeigen" id="rpc_tools.erschliessungsnetze_anzeigen" image="Images\eye-2-16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -154,9 +154,9 @@
                 <Button caption="Kosten pro WE bzw. AP vergleichen" category="ProjektCheck" class="KostenProWEBzwAPVergleichen" id="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" image="Images\GraphVerticalBar16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                
+
                 <!-- EINNAHMEN -->
-                
+
                 <Button caption="Sch&#228;tzen" category="ProjektCheck" class="EinwohnersaldenSchaetzen" id="rpc_tools.einwohnersalden_schaetzen" image="Images\4502-users_3.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -193,16 +193,16 @@
                 <Button caption="Hinweise zur Ergebnisinterpretation" category="ProjektCheck" class="BilanzenHinweise" id="rpc_tools.bilanzen_hinweise" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
-                
+
                 <!-- VERKEHR -->
-                
-                <Button caption="initiales Routing" category="ProjektCheck" class="InitialRouting" id="rpc_tools.initial_routing" image="Images\RouteFastest16.png" message="" tip="">
+
+                <Button caption="Verkehrsbelastung initialisieren" category="ProjektCheck" class="InitialRouting" id="rpc_tools.initial_routing" image="Images\RouteFastest16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Einstellungen des Verkehrsaufkommens" category="ProjektCheck" class="RoutingSettings" id="rpc_tools.routing_settings" image="Images\settings-4-16.png" message="" tip="">
+                <Button caption="Kennwerte zum Verkehrsaufkommen" category="ProjektCheck" class="RoutingSettings" id="rpc_tools.routing_settings" image="Images\settings-4-16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="gewichtetes Routing" category="ProjektCheck" class="WeightedRouting" id="rpc_tools.weighted_routing" image="Images\Route16.png" message="" tip="">
+                <Button caption="Verkehrsbelastung mit Gewichten versehen" category="ProjektCheck" class="WeightedRouting" id="rpc_tools.weighted_routing" image="Images\Route16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Tool caption="Skizze beenden" category="ProjektCheck" class="SkizzeBeenden" id="rpc_tools.skizze_beenden" image="Images\Analyze16.png" message="" tip="Mit Klicken dieses Buttons beenden Sie die Eingabe von Punkten, Netzelemente oder Fl&#228;chen.">
@@ -211,9 +211,9 @@
                 <Tool caption="Anbindungspunkt setzen" category="ProjektCheck" class="Anbindungspunkt" id="rpc_tools.anbindungspunkt" image="Images\CadastralFeatureSelect16.png" message="" tip="Setzen Sie auf der Karte einen Punkt zur Anbindung der Teilfl&#228;che an das Stra&#223;ennetz">
                     <Help heading="" />
                 </Tool>
-                
+
                 <!-- STANDORTKONKURRENZ  -->
-                
+
                 <Button caption="M&#228;rkte anzeigen" category="ProjektCheck" class="MaerkteAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -253,9 +253,9 @@
                 <Button caption="Projektwirkung sch&#228;tzen" category="ProjektCheck" class="StandortkonkurrenzProjektwirkung" id="rpc_tools.standortkonkurrenz_projektwirkung" image="Images\GenericCalculator16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                
+
                 <!-- FLAECHE UND OEKOLOGIE  -->
-                
+
                 <Button caption="Waldgebiete" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waldgebiete" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -268,7 +268,7 @@
                 <Button caption="Wasserschutzgebiete" category="ProjektCheck" class="Wasserschutzgebiete" id="rpc_tools.wasserschutzgebiete" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
-                
+
                 <Button caption="Bodenbedeckung entfernen" category="ProjektCheck" class="BodenEntfernen" id="rpc_tools.boden_entfernen" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -287,8 +287,8 @@
                 <Button caption="Bewertung UZVR" category="ProjektCheck" class="UZVR" id="rpc_tools.uzvr" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
-                
-                
+
+
                 <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="NullfallUeberbauteFlaechen" id="rpc_tools.nullfall_ueberbaute_flaechen" image="" message="" tip="">
                     <Help heading="" />
                 </Tool>
@@ -322,7 +322,7 @@
                 <Tool caption="Kleinpflaster" category="ProjektCheck" class="NullfallKleinpflaster" id="rpc_tools.nullfall_kleinpflaster" image="" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                
+
                 <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="PlanfallUeberbauteFlaechen" id="rpc_tools.planfall_ueberbaute_flaechen" image="" message="" tip="">
                     <Help heading="" />
                 </Tool>
@@ -356,7 +356,7 @@
                 <Tool caption="Kleinpflaster" category="ProjektCheck" class="PlanfallKleinpflaster" id="rpc_tools.planfall_kleinpflaster" image="" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                
+
                 <!-- ERREICHBARKEIT  -->
 
                 <Button caption="Haltestellen ermitteln" category="ProjektCheck" class="HaltestellenZentraleOrte" id="rpc_tools.haltestellen_ermitteln" image="Images\TmStopHidingSelected16.png" message="" tip="">
@@ -416,7 +416,7 @@
                         <Button refID="rpc_tools.bewohner_schaetzen" />
                         <Button refID="rpc_tools.arbeitsplaetze_schaetzen" />
                     </Items>
-                </Menu>                
+                </Menu>
                 <Menu caption="&#214;PNV-Anbindung" category="ProjektCheck" id="rpc_tools.menu_oepnv" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.haltestellen_ermitteln" />
@@ -433,9 +433,9 @@
                 </Menu>
                 <Menu caption="Verkehr im Umfeld" category="ProjektCheck" id="rpc_tools.menu_verkehr_im_umfeld" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
-                        <Button refID="rpc_tools.initial_routing" />
                         <Button refID="rpc_tools.routing_settings" />
                         <Tool refID="rpc_tools.anbindungspunkt" />
+                        <Button refID="rpc_tools.initial_routing" />
                         <Button refID="rpc_tools.weighted_routing" />
                     </Items>
                 </Menu>
@@ -597,7 +597,7 @@
                     </Items>
                 </Menu>
                 <Menu caption="Gewerbesteuer" category="ProjektCheck" id="rpc_tools.menu_gewerbesteuer" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>                    
+                    <Items>
                         <Button refID="rpc_tools.hebesaetze" />
                         <Button refID="rpc_tools.gemeindebilanzen" />
                     </Items>
@@ -632,7 +632,7 @@
                     </Items>
                 </Menu>
                 <Menu caption="Kommunale Steuereinnahmen" category="ProjektCheck" id="rpc_tools.menu_einnahmen" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>                    
+                    <Items>
                         <Menu refID="rpc_tools.menu_wanderungssalden" />
                         <Menu refID="rpc_tools.menu_fiskalische_bilanzen" />
                     </Items>
