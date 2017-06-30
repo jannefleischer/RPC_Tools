@@ -29,7 +29,7 @@ class ErreichbarkeitOEPNV(Tool):
         self.output.add_layer(group_layer, layer, fc,
                               query='id_origin={}'.format(stop_id),
                               name=layer_name, 
-                              zoom=False)
+                              zoom=True)
     
     def run(self):
         idx = self.par.selected_index('stops')
@@ -46,11 +46,13 @@ class ErreichbarkeitOEPNV(Tool):
         df_calculated = self.parent_tbx.table_to_dataframe(
             'Erreichbarkeiten_OEPNV')
         df_centers['update'] = False
+        n_centers = len(df_centers)
         
-        for index, center in df_centers.iterrows():
+        for i, (index, center) in enumerate(df_centers.iterrows()):
             id_destination = center['id_haltestelle']
             destination = df_stops[df_stops['id'] == id_destination]['name'].values[0]
-            arcpy.AddMessage(u'  - {}'.format(destination))
+            arcpy.AddMessage(u'  - {} ({}/{})'.format(destination, i + 1,
+                                                      n_centers))
             
             if not recalculate:
                 already_calculated = (
