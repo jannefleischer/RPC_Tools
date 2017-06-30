@@ -365,6 +365,9 @@
                 <Button caption="Haltestellenplan aufrufen" category="ProjektCheck" class="Haltestellenplan" id="rpc_tools.haltestellenplan" image="Images\ContentsWindowExplorer16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
+                <Button caption="Haltestellen anzeigen" category="ProjektCheck" class="HaltestellenAnzeigen" id="rpc_tools.haltestellen_anzeigen" image="Images\eye-2-16.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
                 <Button caption="Fahrtzeit zu zentralen Orten ermitteln" category="ProjektCheck" class="FahrtzeitZentraleOrte" id="rpc_tools.fahrtzeit_zentrale_orte" image="Images\RouteFastest16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -420,6 +423,7 @@
                 <Menu caption="&#214;PNV-Anbindung" category="ProjektCheck" id="rpc_tools.menu_oepnv" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.haltestellen_ermitteln" />
+                        <Button refID="rpc_tools.haltestellen_anzeigen" />
                         <Button refID="rpc_tools.haltestellenplan" />
                         <Button refID="rpc_tools.fahrtzeit_zentrale_orte" />
                     </Items>

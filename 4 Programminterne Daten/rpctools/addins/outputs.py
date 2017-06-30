@@ -24,4 +24,10 @@ class MaerkteAnzeigen(Output):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxOSMMarktEinlesen'
+    
+
+class HaltestellenAnzeigen(Output):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Erreichbarkeit.pyt'
+    _toolbox_name = 'TbxHaltestellenZentraleOrte'
 
