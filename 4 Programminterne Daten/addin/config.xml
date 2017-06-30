@@ -645,14 +645,14 @@
                         <Button refID="rpc_tools.template_einlesen_featureclass" />
                     </Items>
                 </Menu>
-                <Menu caption="Nullfall" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="M&#228;rkte im Bestand" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Menu refID="rpc_tools.menu_bestand_einlesen" />
                         <Tool refID="rpc_tools.bestand_hinzu" />
                         <Tool refID="rpc_tools.bestand_bearbeiten" />
                     </Items>
                 </Menu>
-                <Menu caption="Planfall" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_planfall" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="Ver&#228;nderungen durch Planung" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_planfall" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Tool refID="rpc_tools.planfall_erweitern" />
                         <Tool refID="rpc_tools.planfall_hinzu" />
@@ -665,7 +665,7 @@
                         <Tool refID="rpc_tools.zentrum_bearbeiten" />
                     </Items>
                 </Menu>
-                <Menu caption="Standortkonkurrenz" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="Standortkonkurrenz Lebensmitteleinzelhandel" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.maerkte_anzeigen" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_nullfall" />
