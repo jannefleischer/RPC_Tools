@@ -4,6 +4,17 @@ import numpy as np
 import pandas as pd
 
 def kostenkennwerte(project):
+    """
+    Check if Kostenkennwerte_Linienelemente hat data.
+    If not: Copy from Netze_und_Netzelemente (only if Shape == Line) and
+    multiply by interest- and time-factor
+
+    Parameters
+    ----------
+    project : String
+        name of the active project
+
+    """
     table = 'Kostenkennwerte_Linienelemente'
     workspace_tool = 'FGDB_Kosten_Tool.gdb'
     tbx = DummyTbx()
@@ -51,8 +62,48 @@ def kostenkennwerte(project):
     return
 
 def round_df_to(df, rounding_factor):
+    """
+    Round all values of a Dataframe to some value.
+    For example: round to 5 euro
+
+    Parameters
+    ----------
+    df : pandas dataframe
+        the input dataframe
+    rounding_factor : int
+        rounding value
+
+    """
     df = df / rounding_factor
     df = df.apply(pd.Series.round)
     df *= rounding_factor
     df = df.astype('int')
     return df
+
+def kostenaufteilung_startwerte(project):
+    """
+    Check if table Kostenaufteilung has data.
+    If not: copy data from Kostenaufteilung_Startwerte
+
+    Parameters
+    ----------
+    project : String
+        name of the active project
+
+    """
+    table = 'Kostenaufteilung'
+    tbx = DummyTbx()
+    tbx.set_active_project(project)
+    df_cost_allocation = tbx.table_to_dataframe(
+        table, workspace='FGDB_Kosten.gdb')
+    if len(df_cost_allocation) != 0:
+        return
+    df_cost_allocation_initial = tbx.table_to_dataframe(
+        'Kostenaufteilung_Startwerte', columns=[],
+        workspace='FGDB_Kosten_Tool.gdb', where=None, is_base_table=True)
+    tbx.dataframe_to_table(table, df_cost_allocation, pkeys=['ID'],
+                           workspace='FGDB_Kosten.gdb', upsert=True)
+
+
+
+
