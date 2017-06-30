@@ -52,7 +52,7 @@ def next_working_day(min_days_infront=2):
     if len(infront) > 0:
         # get the first day matching all conditions
         day = df_density.iloc[infront[0]]['Datum']
-    return day.date()
+    return pd.Timestamp(day).date()
 
 class HaltestellenZentraleOrte(Tool):
     _param_projectname = 'projectname'
