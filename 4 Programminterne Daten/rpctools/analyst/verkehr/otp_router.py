@@ -628,7 +628,7 @@ class OTPRouter(object):
         with arcpy.da.InsertCursor(fc, fields) as rows:
             for link in self.nodes.links:
                 geom = link.get_geom()
-                if geom:
+                if geom and link.distance_from_source <= self.dist:
                     rows.insertRow((link.link_id, link.weight,
                                     link.distance_from_source, geom))
 

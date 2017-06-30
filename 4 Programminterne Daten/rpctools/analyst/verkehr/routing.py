@@ -41,6 +41,7 @@ class Routing(Tool):
         # calculate routes
         workspace = self.folders.get_db()
         o = OTPRouter(workspace)
+        o.dist = inner_circle
         r_id = 0
         for single_tfl in data_tfl:
             source_id, trips, tfl_use, shape = single_tfl
