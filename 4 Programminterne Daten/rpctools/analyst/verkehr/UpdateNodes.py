@@ -57,6 +57,7 @@ class UpdateNodes(Routing):
             man_weights_set = np.array(man_weights_set) / total_weight
 
         transfer_nodes = otp_router.transfer_nodes
+        self.remove_output()
 
         def set_new_weights(weights, node_ids):
             """"""
@@ -76,7 +77,7 @@ class UpdateNodes(Routing):
         otp_router.calc_vertex_weights()
         otp_router.create_polyline_features()
 
-        # update the layers
+    def remove_output(self):
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = arcpy.mapping.ListDataFrames(mxd, "*")[0]
         layers1 = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
@@ -84,4 +85,3 @@ class UpdateNodes(Routing):
         layers = sum([layers1, layers2], [])
         for layer in layers:
             arcpy.mapping.RemoveLayer(df, layer)
-

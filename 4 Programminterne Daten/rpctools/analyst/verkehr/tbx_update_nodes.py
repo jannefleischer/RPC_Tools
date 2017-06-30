@@ -22,7 +22,7 @@ class TbxUpdateNodes(Tbx):
 
     def _open(self, params):
 
-        nodes = self.query_table('Zielpunkte', ['node_id'])
+        nodes = self.query_table('Zielpunkte', ['Name'])
         nodes = [tup[0] for tup in nodes]
 
         params.choose_node.filter.list = nodes
@@ -31,7 +31,7 @@ class TbxUpdateNodes(Tbx):
 
         weight = self.query_table('Zielpunkte',
                                   ['Gewicht'],
-                                  where='node_id = {}'.format(
+                                  where="Name = '{}'".format(
                                       params.choose_node.value))[0]
         params.new_weight.value = 0
         return
@@ -40,8 +40,6 @@ class TbxUpdateNodes(Tbx):
 
         params = self.par
         projekte = self.folders.get_projects()
-
-
         # Projekt_auswählen
         p = self.add_parameter('project')
         p.name = u'Projekt_auswählen'.encode('cp1252')
@@ -53,19 +51,13 @@ class TbxUpdateNodes(Tbx):
         p.filter.list = projekte
         if projekte:
             p.value = projekte[0]
-
-
-
         # Select Nodes
         p = self.add_parameter('choose_node')
         p.name = u'choose_node'.encode('cp1252')
         p.displayName = u'Zielknoten auswählen'.encode('cp1252')
         p.parameterType = 'Required'
         p.direction = 'Input'
-        p.datatype = u'GPLong'
-
-
-
+        p.datatype = u'GPString'
         # Set new value
         p = self.add_parameter('new_weight')
         p.name = u'new_weight'
@@ -82,7 +74,7 @@ class TbxUpdateNodes(Tbx):
 
     def _updateParameters(self, params):
 
-        where='node_id = {}'.format(params.choose_node.value)
+        where="Name = '{}'".format(params.choose_node.value)
         if self.par.changed('choose_node'):
             man_weight =  self.query_table('Zielpunkte',
                                 ['Manuelle_Gewichtung'],

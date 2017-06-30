@@ -9,16 +9,6 @@ from rpctools.definitions.projektverwaltung.tbx_teilflaechen_verwalten \
      import TbxFlaechendefinition
 from rpctools.utils.constants import Nutzungsart
 
-#class TbxSetSource(TbxFlaechendefinition):
-    #_nutzungsart = Nutzungsart.GEWERBE
-
-    #@property
-    #def Tool(self):
-        #return SetSource
-
-    #@property
-    #def label(self):
-        #return encode(u'Schritt 3: Startpunkte ändern')
 
 class TbxSetSource(TbxFlaechendefinition):
 

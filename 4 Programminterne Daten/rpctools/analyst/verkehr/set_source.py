@@ -9,7 +9,9 @@ class SetSource(Tool):
     _workspace = 'FGDB_Verkehr.gdb'
 
     def add_outputs(self):
-        pass
+        self.output.add_layer('verkehr', 'Anbindungspunkte',
+                              featureclass='Anbindungspunkte',
+                              template_folder='Verkehr')
 
     def run(self):
         toolbox = self.parent_tbx
@@ -21,3 +23,13 @@ class SetSource(Tool):
                              {'Shape': shape},
                              where='id_teilflaeche={}'.format(source_id),
                              workspace='FGDB_Verkehr.gdb')
+        self.remove_output()
+
+    def remove_output(self):
+        mxd = arcpy.mapping.MapDocument("CURRENT")
+        df = arcpy.mapping.ListDataFrames(mxd, "*")[0]
+        layers1 = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
+        layers2 = arcpy.mapping.ListLayers(mxd, "*Fahrten*", df)
+        layers = sum([layers1, layers2], [])
+        for layer in layers:
+            arcpy.mapping.RemoveLayer(df, layer)

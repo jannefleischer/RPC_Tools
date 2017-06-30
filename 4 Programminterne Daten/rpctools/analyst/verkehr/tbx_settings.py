@@ -31,6 +31,16 @@ class Settings(Tool):
                           {'Wege_gesamt': wege_e, 'PKW_Anteil': pkw_e},
                           where='Nutzungsart={}'.format(
                               nart.EINZELHANDEL))
+        self.remove_output()
+
+    def remove_output(self):
+        mxd = arcpy.mapping.MapDocument("CURRENT")
+        df = arcpy.mapping.ListDataFrames(mxd, "*")[0]
+        layers1 = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
+        layers2 = arcpy.mapping.ListLayers(mxd, "*Fahrten*", df)
+        layers = sum([layers1, layers2], [])
+        for layer in layers:
+            arcpy.mapping.RemoveLayer(df, layer)
 
 class TbxSettings(Tbx):
 
