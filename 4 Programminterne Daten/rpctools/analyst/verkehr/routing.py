@@ -44,6 +44,8 @@ class Routing(Tool):
         r_id = 0
         for single_tfl in data_tfl:
             source_id, trips, tfl_use, shape = single_tfl
+            arcpy.AddMessage(
+                "suche Routen von Teilfläche {} aus...".format(source_id))
             x_coord, y_coord = shape
             if not trips:
                 continue
@@ -58,14 +60,15 @@ class Routing(Tool):
             # calculate the routes to the segments
             for (lon, lat) in destinations:
                 destination = Point(lat, lon)
-                arcpy.AddMessage('suche Routen {}'.format(r_id))
                 json = o.get_routing_request(source, destination)
                 o.decode_coords(json, route_id=r_id, source_id=source_id)
                 r_id += 1
 
         o.nodes.transform()
         o.nodes_to_graph(meters=inner_circle)
+        arcpy.AddMessage("berechne Zielknoten...")
         o.transfer_nodes.calc_initial_weight()
+        arcpy.AddMessage("berechne Gewichte...")
         o.calc_vertex_weights()
         o.create_polyline_features()
         o.create_node_features()

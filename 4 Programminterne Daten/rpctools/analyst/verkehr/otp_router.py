@@ -144,10 +144,6 @@ class TransferNodes(OrderedDict):
             for route in tn.routes.itervalues():
                 n_routes_for_area = tn.get_n_routes_for_area(route.source_id)
                 total_weight_area = total_weights_areas[route.source_id]
-                arcpy.AddMessage(
-                    'area: {}, tn: {}, tn_weight: {}, total_weight: {}, n_routes: {}'.format(
-                    route.source_id, tn.node_id, tn.weight, total_weight_area, n_routes_for_area
-                ))
                 route.weight = tn.weight / total_weight_area / n_routes_for_area
 
 
@@ -485,10 +481,6 @@ class OTPRouter(object):
         coord_list = polyline.decode(points)
         route = self.routes.get_route(route_id, source_id)
         self.nodes.add_points(coord_list, route)
-        arcpy.AddMessage('Area {}, Route {}, first_point: {}'.format(
-            source_id,
-            route_id,
-            coord_list[0]))
         if source_id not in self.areas:
             self.areas.add_area(source_id)
 
@@ -597,7 +589,6 @@ class OTPRouter(object):
         N = len(self.nodes)
         mat = csc_matrix((data, (row, col)), shape=(N, N))
         source_nodes = self.routes.source_nodes
-        arcpy.AddMessage(str(source_nodes))
         dist_matrix = dijkstra(mat,
                                directed=True,
                                return_predecessors=False,
@@ -605,7 +596,6 @@ class OTPRouter(object):
                                #limit=meters,
                                )
         dist_vector = dist_matrix.min(axis=0)
-        arcpy.AddMessage(str(dist_vector))
         self.set_link_distance(dist_vector)
         dist_vector[dist_vector > meters] = np.NINF
         self.get_max_nodes(dist_vector)

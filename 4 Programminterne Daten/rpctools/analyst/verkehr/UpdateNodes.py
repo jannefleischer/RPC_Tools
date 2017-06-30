@@ -10,8 +10,10 @@ from rpctools.analyst.verkehr.routing import Routing
 
 
 class UpdateNodes(Routing):
-
+    pickle_file_exists = True
     def add_outputs(self):
+        if not self.pickle_file_exists:
+            return
         self.output.add_layer('verkehr', 'Zielpunkte_gewichtet',
                               featureclass='Zielpunkte',
                               template_folder='Verkehr',
@@ -23,8 +25,18 @@ class UpdateNodes(Routing):
         return
 
     def run(self):
-
-        otp_router = OTPRouter.from_dump(self.folders.get_otp_pickle_filename())
+        pickle_path = self.folders.get_otp_pickle_filename(check=False)
+        if not arcpy.Exists(pickle_path):
+            arcpy.AddError("Verkehrsbelastung mit Gewichten versehen konnte "
+                           "nicht ausgeführt werden.")
+            arcpy.AddError("Entweder ist das Verkehrsaufkommen nicht "
+                           "initialisiert worden, oder die Einstellungen der "
+                           "Anbindungspunkte bzw. Kennwerte wurden verändert. "
+                           "\n Bitte starten Sie 'Verkehrsaufkommen "
+                           "initialisieren' neu.")
+            self.pickle_file_exists = False
+            return
+        otp_router = OTPRouter.from_dump(pickle_path)
 
         toolbox = self.parent_tbx
         # get input data

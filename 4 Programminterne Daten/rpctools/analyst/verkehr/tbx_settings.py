@@ -31,7 +31,12 @@ class Settings(Tool):
                           {'Wege_gesamt': wege_e, 'PKW_Anteil': pkw_e},
                           where='Nutzungsart={}'.format(
                               nart.EINZELHANDEL))
+        arcpy.AddMessage("initialisiertes Verkehrsaufkommen wird gelöscht")
         self.remove_output()
+        # delete pickle file
+        pickle_path = self.folders.get_otp_pickle_filename()
+        if arcpy.Exists(pickle_path):
+            arcpy.Delete_management(pickle_path)
 
     def remove_output(self):
         mxd = arcpy.mapping.MapDocument("CURRENT")
