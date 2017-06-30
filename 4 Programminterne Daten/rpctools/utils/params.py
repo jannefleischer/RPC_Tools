@@ -338,16 +338,18 @@ class Tbx(object):
         if not project_param or not self.par._od.has_key(project_param):
             return
         active_project = projectname or self.config.active_project
+        projects = self.folders.get_projects()
         # fix active project if it was set to test project by a tool
         # (may happen while testing)
-        if active_project == self.folders._TEST_TMP_PROJECT:
+        is_tmp_project = active_project == self.folders._TEST_TMP_PROJECT
+        if is_tmp_project or active_project not in projects:
             active_project = self.config.active_project = ''
         project_param = self.par[project_param]
         project_param.filter.list = []
         project_param.value = active_project
         project_param.enabled = False
 
-    def _validate_active_project(self):
+    def validate_active_project(self):
         active_project = self.config.active_project
         projects = self.folders.get_projects()
         if not active_project:
@@ -428,7 +430,7 @@ class Tbx(object):
         self.par._update_parameters(parameters)
         params = self.par._od.values()
         if self.update_projects:
-            valid, message = self._validate_active_project()
+            valid, message = self.validate_active_project()
             if not valid:
                 params[0].setErrorMessage(message)
                 return

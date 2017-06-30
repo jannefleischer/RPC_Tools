@@ -49,18 +49,20 @@ class ToolboxButton(ToolboxWrapper):
         """call toolbox on click"""
         # validate active project
         self.tbx.set_active_project()
-        valid, msg = self.tbx.validate_inputs()
+        valid, msg = self.tbx.validate_active_project()
         # call toolbox
         if valid:
-            # let the GUI build an instance of the toolbox to show it
-            # (regular call of updateParameters etc. included)
-            if self._do_show:
-                pythonaddins.GPToolDialog(self.path, self._toolbox_name)
-            # execute main function of Tool only (no updates etc. possible)
-            else:
-                self.tbx.execute()
-        else:
-            pythonaddins.MessageBox(msg, 'Fehler', 0)
+            valid, msg = self.tbx.validate_inputs()
+            if valid:
+                # let the GUI build an instance of the toolbox to show it
+                # (regular call of updateParameters etc. included)
+                if self._do_show:
+                    pythonaddins.GPToolDialog(self.path, self._toolbox_name)
+                # execute main function of Tool only (no updates etc. possible)
+                else:
+                    self.tbx.execute()
+                return
+        pythonaddins.MessageBox(msg, 'Fehler', 0)
 
 
 class Output(ToolboxWrapper):
@@ -70,6 +72,10 @@ class Output(ToolboxWrapper):
     _show_diagrams = True
     def show(self):
         self.tbx.set_active_project()
+        valid, msg = self.tbx.validate_active_project()
+        if not valid:
+            pythonaddins.MessageBox(msg, 'Fehler', 0)
+            return
         self.tbx.show_outputs(show_layers=self._show_layers, 
                               show_diagrams=self._show_diagrams)
         
