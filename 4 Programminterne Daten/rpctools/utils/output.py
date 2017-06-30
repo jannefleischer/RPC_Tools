@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 import arcpy
+import numpy as np
 
 from rpctools.utils.config import Config, Folders
 
@@ -101,6 +102,17 @@ class LayerGroup(OrderedDict):
         label : str
         """
         return self[key].label
+    
+    def get_labels(self):
+        """
+        return all labels in order of adding
+
+        Returns
+        -------
+        labels : list of str
+        """
+        labels = [self[key].label for key in self.keys()]
+        return labels
 
     def get_value(self, key):
         value = self.get(key)
@@ -212,25 +224,28 @@ class Output(object):
         self.define_outputs()
 
     def add_layer_groups(self):
-        root = self.module
-        analysen = root.add("analysen", "Analysen")
-        pd = root.add("projektdefinition", "Projektdefinition")
+        root = self.module        
         background = root.add('hintergrundkarten',
                               'Hintergrundkarten Projekt-Check')
-
-        analysen.add("bevoelkerung",
-                     "Wirkungsbereich 1 - Bewohner und Arbeitsplaetze")
-        analysen.add("erreichbarkeit",
-                     "Wirkungsbereich 2 - Erreichbarkeit")
-        analysen.add("verkehr", "Wirkungsbereich 3 - Verkehr im Umfeld")
-        analysen.add("oekologie", "Wirkungsbereich 4 - Fläche und Ökologie")
-        analysen.add("infrastruktur",
-                     "Wirkungsbereich 5 - Infrastrukturfolgekosten")
-        analysen.add("einnahmen",
-                     "Wirkungsbereich 6 - Kommunale Steuereinnahmen")
-        analysen.add("standortkonkurrenz",
-                     "Wirkungsbereich 7 - Standortkonkurrenz "
-                     "Lebensmitteleinzelhandel")
+        
+        # project specific layers
+        # order of adding will represent order in TOC! (first added -> on top)
+        root.add("bevoelkerung",
+                 u"Wirkungsbereich 1 - Bewohner und Arbeitsplaetze")
+        root.add("erreichbarkeit",
+                 u"Wirkungsbereich 2 - Erreichbarkeit")
+        root.add("verkehr", u"Wirkungsbereich 3 - Verkehr im Umfeld")
+        root.add("infrastruktur",
+                 u"Wirkungsbereich 5 - Infrastrukturfolgekosten")
+        root.add("einnahmen",
+                 u"Wirkungsbereich 6 - Kommunale Steuereinnahmen")
+        root.add("standortkonkurrenz",
+                 u"Wirkungsbereich 7 - Standortkonkurrenz "
+                 u"Lebensmitteleinzelhandel")
+        
+        root.add("projektdefinition", u"Projektdefinition")
+        
+        root.add("oekologie", u"Wirkungsbereich 4 - Fläche und Ökologie")
     
     def define_outputs(self):
         '''define the output layers here, has to be implemented in subclasses'''
@@ -324,34 +339,6 @@ class Output(object):
         layers = arcpy.mapping.ListLayers(project_layer, layername)
         return layers
 
-    def set_headgrouplayer(self, project_layer=None, dataframe=None):
-        """
-        Check and add headgroup layer groups
-        """
-        project_layer = project_layer or self.get_projectlayer()
-        current_mxd = arcpy.mapping.MapDocument("CURRENT")
-        dataframe = dataframe or current_mxd.activeDataFrame
-
-        projektdef = self.module.get_label("projektdefinition")
-        if not arcpy.mapping.ListLayers(project_layer,
-                                        projektdef,
-                                        dataframe):
-            group_layer_template = self.folders.get_layer(
-                layername=projektdef,  folder='toc', enhance=True)
-            addLayer = arcpy.mapping.Layer(group_layer_template)
-            arcpy.mapping.AddLayerToGroup(dataframe, project_layer,
-                                          addLayer, "BOTTOM")
-
-        analysen = self.module.get_label("analysen")
-        if not arcpy.mapping.ListLayers(project_layer,
-                                        analysen,
-                                        dataframe):
-            group_layer_template = self.folders.get_layer(
-                layername=analysen, folder='toc', enhance=True)
-            addLayer = arcpy.mapping.Layer(group_layer_template)
-            arcpy.mapping.AddLayerToGroup(dataframe, project_layer,
-                                          addLayer, "BOTTOM")
-
     def set_backgroundgrouplayer(self, dataframe=None):
         """
         Check and add Background layer group
@@ -369,8 +356,7 @@ class Output(object):
 
     def set_grouplayer(self, group,
                        project_layer=None,
-                       dataframe=None,
-                       headgroup=""):
+                       dataframe=None):
         """
         Check and add subgroup layer
         """
@@ -382,12 +368,8 @@ class Output(object):
             group_layer_template = self.folders.get_layer(layername=group,
                 folder='toc', enhance=True)
             addLayer = arcpy.mapping.Layer(group_layer_template)
-            if headgroup == "":
-                target_headgroup = self.module["analysen"]
-            target_headgrouplayer = arcpy.mapping.ListLayers(
-                project_layer, target_headgroup, dataframe)[0]
             arcpy.mapping.AddLayerToGroup(
-                dataframe, target_headgrouplayer, addLayer, "BOTTOM")
+                dataframe, project_layer, addLayer, "BOTTOM")
             arcpy.RefreshActiveView()
             arcpy.RefreshTOC()
 
@@ -525,7 +507,6 @@ class Output(object):
         self.set_projectlayer(projektname)
         project_layer = self.get_projectlayer(projektname)
         self.set_backgroundgrouplayer(current_dataframe)
-        self.set_headgrouplayer(project_layer, current_dataframe)
 
         # Template Layer laden
         template_layer = self.folders.get_layer(layer.template_layer,
@@ -612,13 +593,32 @@ class Output(object):
         target_grouplayer.visible = True
         if layer.in_project:
             project_layer.visible = True
-            analysen = self.module["analysen"]
-            if layer.groupname in analysen:
-                arcpy.mapping.ListLayers(project_layer,
-                                         analysen,
-                                         current_dataframe)[0].visible = True
+        self.sort_layers()
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
+        
+    def sort_layers(self):
+        project_layer = self.get_projectlayer()
+        # groups currently in toc for active project
+        groups = [l for l in arcpy.mapping.ListLayers(project_layer)
+                  if l.isGroupLayer]
+        group_names = [g.name for g in groups]
+        # labels have already the desired sorting
+        labels = np.array(self.module.get_labels())
+        # get groups that are also in project labels, retaining order of labels
+        names_sorted = np.array(labels)[np.in1d(labels, group_names)]
+        if len(names_sorted) == 1:
+            return
+        layers_sorted = [groups[group_names.index(n)] for n in names_sorted]
+        
+        mxd = arcpy.mapping.MapDocument("CURRENT")
+        df = arcpy.mapping.ListDataFrames(mxd)[0]
+        # arcpy doesn't know the layers anymore after being moved
+        # so take last layer (in label order) as reference and move other 
+        # layers before it (ascending)
+        ref_layer = layers_sorted[-1]
+        for layer in layers_sorted[:-1]:
+            arcpy.mapping.MoveLayer(df, ref_layer, layer, "BEFORE")
         
     def layer_exists(self, layername):
         projektname = self.projectname
