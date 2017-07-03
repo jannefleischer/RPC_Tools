@@ -10,11 +10,6 @@ __all__ = [
     "AnliegerstrasseInnere", "AnliegerstrasseAeussere",
     "SammelstrasseAeussere", "SammelstrasseInnere", 
     "KanalMischsystem", "KanalNurSchmutzwasser", "KanalTrennsystem",
-    "LagePunktuelleMassnahmeElektrizitaet",
-    "LagePunktuelleMassnahmeKanalisation",
-    "LagePunktuelleMassnahmeStrasseAeussere",
-    "LagePunktuelleMassnahmeStrasseInnere",
-    "LagePunktuelleMassnahmeTrinkwasser",
     "Trinkwasserleitung", "Stromleitung", 
     "NetzabschnittLoeschen", "PunktuelleMassnahmeLoeschen",
     "InfrastrukturmengenBilanzieren", "ElektrizitaetKostenaufteilung", 
@@ -22,11 +17,7 @@ __all__ = [
     "KostenNachKostentraegernAuswerten", "KostenProWEBzwAPVergleichen",
     "KostenkennwerteKontrollieren", "StrasseAeussereKostenaufteilung",
     "StrasseInnereKostenaufteilung", "TrinkwasserKostenaufteilung",
-    'BeschreibungPunktuelleMassnahmeStrasseInnere',
-    'BeschreibungPunktuelleMassnahmeStrasseAeussere',
-    'BeschreibungPunktuelleMassnahmeKanalisation',
-    'BeschreibungPunktuelleMassnahmeTrinkwasser',
-    'BeschreibungPunktuelleMassnahmeElektrizitaet'
+    "PunktMassnahmeHinzu", "PunktMassnahmeBearbeiten"
 ]
 
 
@@ -86,7 +77,23 @@ class InfrastructureLineTool(InfrastructureDrawingTool):
         self.commit_geometry(self.table, line_geometry, self._id_netzelement)
 
 
-class InfrastructurePointTool(InfrastructureDrawingTool):
+class Beschreibung(ToolboxButton):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxMassnahmenBeschreiben'
+
+    def onClick(self):
+        config.active_coord = None
+        self._open()
+    
+    def _open(self):
+        # no way to directly tell the toolbox the id of the measure
+        # -> take the Config-singleton as a container to pass it
+        config.active_measure_id = self._id_netzelement
+        super(Beschreibung, self).onClick()
+
+
+class InfrastructurePointTool(InfrastructureDrawingTool, Beschreibung):
     table = 'Erschliessungsnetze_Punktelemente'
 
     def __init__(self):
@@ -108,18 +115,11 @@ class InfrastructurePointTool(InfrastructureDrawingTool):
                 'Bezeichnung': desc,
                 }
         )
-
-
-class Beschreibung(ToolboxButton):
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = 'Infrastrukturkosten.pyt'
-    _toolbox_name = 'TbxMassnahmenBeschreiben'
-
+        config.active_coord = (x, y)
+        self._open()
+    
     def onClick(self):
-        # no way to directly tell the toolbox the id of the measure
-        # -> take the Config-singleton as a container to pass it
-        config.active_measure_id = self._id_netzelement
-        super(Beschreibung, self).onClick()
+        pass
 
 
 class AnliegerstrasseInnere(InfrastructureLineTool):
@@ -132,16 +132,6 @@ class SammelstrasseInnere(InfrastructureLineTool):
     _id_netzelement = 12
 
 
-class LagePunktuelleMassnahmeStrasseInnere(InfrastructurePointTool):
-    """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_innere (Tool)"""
-    _id_netzelement = 13
-
-
-class BeschreibungPunktuelleMassnahmeStrasseInnere(Beschreibung):
-    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_strasse_innere (Button)"""
-    _id_netzelement = 13
-
-
 class AnliegerstrasseAeussere(InfrastructureLineTool):
     """Implementation for rpc_tools.anliegerstrasse_aeussere (Tool)"""
     _id_netzelement = 21
@@ -150,16 +140,6 @@ class AnliegerstrasseAeussere(InfrastructureLineTool):
 class SammelstrasseAeussere(InfrastructureLineTool):
     """Implementation for rpc_tools.sammelstrasse_aeussere (Tool)"""
     _id_netzelement = 22
-
-
-class LagePunktuelleMassnahmeStrasseAeussere(InfrastructurePointTool):
-    """Implementation for rpc_tools.lage_punktuelle_massnahme_strasse_aeussere (Tool)"""
-    _id_netzelement = 23
-
-
-class BeschreibungPunktuelleMassnahmeStrasseAeussere(Beschreibung):
-    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_strasse_auessere (Button)"""
-    _id_netzelement = 23
 
 
 class KanalTrennsystem(InfrastructureLineTool):
@@ -177,29 +157,9 @@ class KanalNurSchmutzwasser(InfrastructureLineTool):
     _id_netzelement = 33
 
 
-class LagePunktuelleMassnahmeKanalisation(InfrastructurePointTool):
-    """Implementation for rpc_tools.lage_punktuelle_massnahme_kanalisation (Tool)"""
-    _id_netzelement = 34
-
-
-class BeschreibungPunktuelleMassnahmeKanalisation(Beschreibung):
-    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_kanalisation (Button)"""
-    _id_netzelement = 34
-
-
 class Trinkwasserleitung(InfrastructureLineTool):
     """Implementation for rpc_tools.trinkwasserleitung (Tool)"""
     _id_netzelement = 41
-
-
-class LagePunktuelleMassnahmeTrinkwasser(InfrastructurePointTool):
-    """Implementation for rpc_tools.lage_punktuelle_massnahme_trinkwasser (Tool)"""
-    _id_netzelement = 42
-
-
-class BeschreibungPunktuelleMassnahmeTrinkwasser(Beschreibung):
-    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser (Button)"""
-    _id_netzelement = 42
 
 
 class Stromleitung(InfrastructureLineTool):
@@ -207,14 +167,34 @@ class Stromleitung(InfrastructureLineTool):
     _id_netzelement = 51
 
 
-class LagePunktuelleMassnahmeElektrizitaet(InfrastructurePointTool):
-    """Implementation for rpc_tools.lage_punktuelle_massnahme_elektrizitaet (Tool)"""
-    _id_netzelement = 52
+class PunktMassnahmeBearbeiten(ToolboxButton):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxMassnahmenEditieren'
+
+    def __init__(self):
+        super(PunktMassnahmeBearbeiten, self).__init__()
+        self.enabled = True
+        self.shape = 'NONE'
+        self.cursor = 3
+        self.output = ErschliessungsnetzeAnzeigen()
+        
+    def onClick(self, coord=None):
+        self.output.show()
+
+    def onMouseDownMap(self, x, y, button, shift):
+        config.active_coord = (x, y)
+        super(PunktMassnahmeBearbeiten, self).onClick()
 
 
-class BeschreibungPunktuelleMassnahmeElektrizitaet(Beschreibung):
-    """Implementation for rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet (Button)"""
-    _id_netzelement = 52
+class PunktMassnahmeHinzu(PunktMassnahmeBearbeiten):
+    
+    def onMouseDownMap(self, x, y, button, shift):
+        tbx = self.tbx
+        tbx.set_active_project()
+        tbx.add_measure_to_db(u'unbenannte Maßnahme', (x, y))
+        arcpy.RefreshActiveView()
+        super(PunktMassnahmeHinzu, self).onMouseDownMap(x, y, button, shift)
 
 
 def delete_selected_elements(layer_name):

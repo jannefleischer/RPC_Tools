@@ -61,31 +61,19 @@
                 <Button caption="Erschlie&#223;ungsnetze anzeigen" category="ProjektCheck" class="ErschliessungsnetzeAnzeigen" id="rpc_tools.erschliessungsnetze_anzeigen" image="Images\eye-2-16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="AnliegerstrasseInnere" id="rpc_tools.anliegerstrasse_innere" image="Images\Driving_Leg16.png" message="" tip="">
+                <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen (innere Erschlie&#223;ung)" category="ProjektCheck" class="AnliegerstrasseInnere" id="rpc_tools.anliegerstrasse_innere" image="Images\Driving_Leg16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Sammelstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="SammelstrasseInnere" id="rpc_tools.sammelstrasse_innere" image="Images\Driving_Distance16.png" message="" tip="">
+                <Tool caption="Sammelstra&#223;e hinzuf&#252;gen (innere Erschlie&#223;ung)" category="ProjektCheck" class="SammelstrasseInnere" id="rpc_tools.sammelstrasse_innere" image="Images\Driving_Distance16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeStrasseInnere" id="rpc_tools.lage_punktuelle_massnahme_strasse_innere" image="Images\664100-office-button.png" message="" tip="">
+                <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen (&#228;u&#223;ere Erschlie&#223;ung)" separator="true" category="ProjektCheck" class="AnliegerstrasseAeussere" id="rpc_tools.anliegerstrasse_aeussere" image="Images\Driving_Leg16_1.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeStrasseInnere" id="rpc_tools.beschreibung_punktuelle_massnahme_strasse_innere" image="Images\GenericTag16.png" message="" tip="">
-                    <Help heading="" />
-                </Button>
-                <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="AnliegerstrasseAeussere" id="rpc_tools.anliegerstrasse_aeussere" image="Images\Driving_Leg16_1.png" message="" tip="">
+                <Tool caption="Sammelstra&#223;e hinzuf&#252;gen (&#228;u&#223;ere Erschlie&#223;ung)" category="ProjektCheck" class="SammelstrasseAeussere" id="rpc_tools.sammelstrasse_aeussere" image="Images\Driving_Distance16_1.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Sammelstra&#223;e hinzuf&#252;gen" category="ProjektCheck" class="SammelstrasseAeussere" id="rpc_tools.sammelstrasse_aeussere" image="Images\Driving_Distance16_1.png" message="" tip="">
-                    <Help heading="" />
-                </Tool>
-                <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeStrasseAeussere" id="rpc_tools.lage_punktuelle_massnahme_strasse_aeussere" image="Images\664100-office-button.png" message="" tip="">
-                    <Help heading="" />
-                </Tool>
-                <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeStrasseAeussere" id="rpc_tools.beschreibung_punktuelle_massnahme_strasse_auessere" image="Images\GenericTag16.png" message="" tip="">
-                    <Help heading="" />
-                </Button>
-                <Tool caption="Kanal (Trennsystem) hinzuf&#252;gen" category="ProjektCheck" class="KanalTrennsystem" id="rpc_tools.kanal_trennsystem" image="Images\Kanal Trennsystem.png" message="" tip="">
+                <Tool caption="Kanal (Trennsystem) hinzuf&#252;gen" category="ProjektCheck" separator="true" class="KanalTrennsystem" id="rpc_tools.kanal_trennsystem" image="Images\Kanal Trennsystem.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
                 <Tool caption="Kanal (Mischsystem) hinzuf&#252;gen" category="ProjektCheck" class="KanalMischsystem" id="rpc_tools.kanal_mischsystem" image="Images\Kanal Mischsystem.png" message="" tip="">
@@ -94,34 +82,13 @@
                 <Tool caption="Kanal (nur Schmutzwasser) hinzuf&#252;gen" category="ProjektCheck" class="KanalNurSchmutzwasser" id="rpc_tools.kanal_nur_schmutzwasser" image="Images\Kanal nur Schmutzwasser.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeKanalisation" id="rpc_tools.lage_punktuelle_massnahme_kanalisation" image="Images\664100-office-button.png" message="" tip="">
+                <Tool caption="Trinkwasserleitung hinzuf&#252;gen" category="ProjektCheck" separator="true" class="Trinkwasserleitung" id="rpc_tools.trinkwasserleitung" image="Images\Trinkwasserleitung.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeKanalisation" id="rpc_tools.beschreibung_punktuelle_massnahme_kanalisation" image="Images\GenericTag16.png" message="" tip="">
-                    <Help heading="" />
-                </Button>
-                <Tool caption="Trinkwasserleitung hinzuf&#252;gen" category="ProjektCheck" class="Trinkwasserleitung" id="rpc_tools.trinkwasserleitung" image="Images\Trinkwasserleitung.png" message="" tip="">
-                    <Help heading="" />
-                </Tool>
-                <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeTrinkwasser" id="rpc_tools.lage_punktuelle_massnahme_trinkwasser" image="Images\664100-office-button.png" message="" tip="">
-                    <Help heading="" />
-                </Tool>
-                <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeTrinkwasser" id="rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser" image="" message="" tip="">
-                    <Help heading="" />
-                </Button>
                 <Tool caption="Stromleitung hinzuf&#252;gen" category="ProjektCheck" class="Stromleitung" id="rpc_tools.stromleitung" image="Images\Stromleitung.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Lage einzeichnen" category="ProjektCheck" class="LagePunktuelleMassnahmeElektrizitaet" id="rpc_tools.lage_punktuelle_massnahme_elektrizitaet" image="Images\664100-office-button.png" message="" tip="">
-                    <Help heading="" />
-                </Tool>
-                <Button caption="Ma&#223;nahme beschreiben" category="ProjektCheck" class="BeschreibungPunktuelleMassnahmeElektrizitaet" id="rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet" image="Images\GenericTag16.png" message="" tip="">
-                    <Help heading="" />
-                </Button>
                 <Button caption="Ausgew&#228;hlte Netzelemente l&#246;schen" category="ProjektCheck" class="NetzabschnittLoeschen" id="rpc_tools.netzabschnitt_loeschen" image="Images\ArcScanRasterPaintingDrawLineTool16.png" message="" tip="">
-                    <Help heading="" />
-                </Button>
-                <Button caption="Ausgew&#228;hlte punktuelle Ma&#223;nahmen l&#246;schen" category="ProjektCheck" class="PunktuelleMassnahmeLoeschen" id="rpc_tools.punktuelle_massnahme_loeschen" image="Images\ElementMarker16x11.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Infrastrukturmengen bilanzieren" category="ProjektCheck" class="InfrastrukturmengenBilanzieren" id="rpc_tools.infrastrukturmengen_bilanzieren" image="Images\400000-ruler.png" message="" tip="">
@@ -154,6 +121,12 @@
                 <Button caption="Kosten pro WE bzw. AP vergleichen" category="ProjektCheck" class="KostenProWEBzwAPVergleichen" id="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" image="Images\GraphVerticalBar16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
+                <Tool caption="Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" class="PunktMassnahmeHinzu" id="rpc_tools.massnahme_hinzu" image="Images\GreenPin16.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Ma&#223;nahme bearbeiten/entfernen" category="ProjektCheck" class="PunktMassnahmeBearbeiten" id="rpc_tools.massnahme_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
 
                 <!-- EINNAHMEN -->
 
@@ -499,84 +472,30 @@
                         <Button refID="rpc_tools.uzvr" />
                     </Items>
                 </Menu>
-                <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_strasse_innere" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Tool refID="rpc_tools.lage_punktuelle_massnahme_strasse_innere" />
-                        <Button refID="rpc_tools.beschreibung_punktuelle_massnahme_strasse_innere" />
-                    </Items>
-                </Menu>
-                <Menu caption="Stra&#223;e (innere Erschlie&#223;ung)" category="ProjektCheck" id="rpc_tools.strasse_innere_erschliessung" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Tool refID="rpc_tools.anliegerstrasse_innere" />
-                        <Tool refID="rpc_tools.sammelstrasse_innere" />
-                        <Menu refID="rpc_tools.punktuelle_massnahme_strasse_innere" />
-                    </Items>
-                </Menu>
-                <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_strasse_aeussere" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Tool refID="rpc_tools.lage_punktuelle_massnahme_strasse_aeussere" />
-                        <Button refID="rpc_tools.beschreibung_punktuelle_massnahme_strasse_auessere" />
-                    </Items>
-                </Menu>
-                <Menu caption="Stra&#223;e (&#228;u&#223;ere Erschlie&#223;ung)" category="ProjektCheck" id="rpc_tools.strasse_aeussere_erschliessung" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Tool refID="rpc_tools.anliegerstrasse_aeussere" />
-                        <Tool refID="rpc_tools.sammelstrasse_aeussere" />
-                        <Menu refID="rpc_tools.punktuelle_massnahme_strasse_aeussere" />
-                    </Items>
-                </Menu>
-                <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_kanalisation" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Tool refID="rpc_tools.lage_punktuelle_massnahme_kanalisation" />
-                        <Button refID="rpc_tools.beschreibung_punktuelle_massnahme_kanalisation" />
-                    </Items>
-                </Menu>
-                <Menu caption="Kanalisation" category="ProjektCheck" id="rpc_tools.kanalisation" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Button refID="rpc_tools.kanal_trennsystem" />
-                        <Tool refID="rpc_tools.kanal_mischsystem" />
-                        <Tool refID="rpc_tools.kanal_nur_schmutzwasser" />
-                        <Menu refID="rpc_tools.punktuelle_massnahme_kanalisation" />
-                    </Items>
-                </Menu>
-                <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_trinkwasser" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Tool refID="rpc_tools.lage_punktuelle_massnahme_trinkwasser" />
-                        <Button refID="rpc_tools.beschreibung_punktuelle_massnahme_trinkwasser" />
-                    </Items>
-                </Menu>
-                <Menu caption="Trinkwasser" category="ProjektCheck" id="rpc_tools.trinkwasser" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Tool refID="rpc_tools.trinkwasserleitung" />
-                        <Menu refID="rpc_tools.punktuelle_massnahme_trinkwasser" />
-                    </Items>
-                </Menu>
-                <Menu caption="Punktuelle Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" id="rpc_tools.punktuelle_massnahme_elektrizitaet" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Tool refID="rpc_tools.lage_punktuelle_massnahme_elektrizitaet" />
-                        <Button refID="rpc_tools.beschreibung_punktuelle_massnahme_elektrizitaet" />
-                    </Items>
-                </Menu>
-                <Menu caption="Elektrizit&#228;t" category="ProjektCheck" id="rpc_tools.elektrizitaet" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Tool refID="rpc_tools.stromleitung" />
-                        <Menu refID="rpc_tools.punktuelle_massnahme_elektrizitaet" />
-                    </Items>
-                </Menu>
                 <Menu caption="Netzelement l&#246;schen" category="ProjektCheck" id="rpc_tools.loeschen_erschliessung" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.netzabschnitt_loeschen" />
                         <Button refID="rpc_tools.punktuelle_massnahme_loeschen" />
                     </Items>
                 </Menu>
-                <Menu caption="Erschlie&#223;ungsnetze skizzieren" category="ProjektCheck" id="rpc_tools.erschliessungsnetze_skizzieren" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Menu refID="rpc_tools.strasse_innere_erschliessung" />
-                        <Menu refID="rpc_tools.strasse_aeussere_erschliessung" />
-                        <Menu refID="rpc_tools.kanalisation" />
-                        <Menu refID="rpc_tools.trinkwasser" />
-                        <Menu refID="rpc_tools.elektrizitaet" />
-                        <Menu refID="rpc_tools.loeschen_erschliessung" />
+                <Menu caption="Erschlie&#223;ungsnetze skizzieren" category="ProjektCheck" id="rpc_tools.menu_erschliessungsnetze_skizzieren" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>                    
+                        <Tool refID="rpc_tools.anliegerstrasse_innere" />
+                        <Tool refID="rpc_tools.sammelstrasse_innere" />
+                        <Tool refID="rpc_tools.anliegerstrasse_aeussere"  separator="true"/>
+                        <Tool refID="rpc_tools.sammelstrasse_aeussere" />
+                        <Tool refID="rpc_tools.kanal_trennsystem"  separator="true"/>
+                        <Tool refID="rpc_tools.kanal_mischsystem" />
+                        <Tool refID="rpc_tools.kanal_nur_schmutzwasser" />
+                        <Tool refID="rpc_tools.trinkwasserleitung"  separator="true"/>
+                        <Tool refID="rpc_tools.stromleitung"  separator="true"/>
+                        <Menu refID="rpc_tools.loeschen_erschliessung"  separator="true"/>
+                    </Items>
+                </Menu>
+                <Menu caption="Punktuelle Ma&#223;nahmen" category="ProjektCheck" id="rpc_tools.menu_punktuelle_massnahmen" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>                    
+                        <Tool refID="rpc_tools.massnahme_hinzu" />
+                        <Tool refID="rpc_tools.massnahme_bearbeiten" />
                     </Items>
                 </Menu>
                 <Menu caption="Kostenaufteilung festlegen" category="ProjektCheck" id="rpc_tools.menu_kostenaufteilung" isRootMenu="false" isShortcutMenu="true" separator="true">
@@ -591,7 +510,8 @@
                 <Menu caption="Infrastrukturfolgekosten" category="ProjektCheck" id="rpc_tools.menu_infrastrukturkosten" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.erschliessungsnetze_anzeigen"/>
-                        <Menu refID="rpc_tools.erschliessungsnetze_skizzieren" />
+                        <Menu refID="rpc_tools.menu_erschliessungsnetze_skizzieren" />
+                        <Menu refID="rpc_tools.menu_punktuelle_massnahmen" />
                         <Button refID="rpc_tools.infrastrukturmengen_bilanzieren" />
                         <Button refID="rpc_tools.kostenkennwerte_kontrollieren" />
                         <Button refID="rpc_tools.gesamtkosten_ermitteln" />
