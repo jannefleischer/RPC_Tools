@@ -50,7 +50,6 @@ class TbxMassnahmenEditieren(Tbx):
 
     def _getParameterInfo(self):        
         params = self.par
-        self.current_massnahme_id = None
         
         p = self.add_parameter('projectname')
         p.name = u'Projekt'
@@ -63,8 +62,8 @@ class TbxMassnahmenEditieren(Tbx):
         p.value = '' if len(projects) == 0 else p.filter.list[0]
     
         p = self.add_parameter('measures')
-        p.name = encode(u'Maßnahmen')
-        p.displayName = encode(u'Maßnahmen')
+        p.name = encode(u'Maßnahme')
+        p.displayName = encode(u'Maßnahme')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
@@ -173,7 +172,7 @@ class TbxMassnahmenEditieren(Tbx):
         # reset measures dataframe on opening of toolbox
         self.df_measures = self.get_measures()
         self.df_measures['do_delete'] = False
-        self.df_measures.sort(columns='IDNetzelement', inplace=True)
+        self.df_measures.sort(columns=['IDNetzelement', 'id'], inplace=True)
         if len(self.df_measures) == 0:
             return
 
@@ -198,7 +197,7 @@ class TbxMassnahmenEditieren(Tbx):
         informations'''
         idx = self.df_elements['IDNetzelement'] == measure['IDNetzelement']
         net_name = self.df_elements['Netz'][idx].values[0]
-        pretty = u'"{name}" ({id}) - {net}'.format(
+        pretty = u'{net} - "{name}" ({id})'.format(
             id=measure['id'], name=measure['Bezeichnung'], net=net_name)
         if measure['do_delete']:
             pretty += u' - WIRD ENTFERNT'
@@ -209,9 +208,13 @@ class TbxMassnahmenEditieren(Tbx):
         if idx is None:
             idx = self.par.measures.filter.list.index(
                 self.par.measures.value) if self.par.measures.value else 0
+        # sort by net id, keep id of measure with given idx
+        m_id = self.df_measures.iloc[idx]['id']
+        self.df_measures.sort(columns=['IDNetzelement', 'id'], inplace=True)
+        new_idx = np.where(self.df_measures['id'] == m_id)[0][0]
         pretty = self.df_measures['pretty'].values.tolist()
         self.par.measures.filter.list = pretty
-        self.par.measures.value = pretty[idx] if idx >= 0 else pretty[0]
+        self.par.measures.value = pretty[new_idx]
 
     def set_selected_measure_inputs(self):
         '''set all input fields to match data of currently selected measure'''
@@ -310,5 +313,6 @@ if __name__ == '__main__':
     t.set_active_project()
     #t.add_measure_to_db('Test add', (3544252, 5925427))
     t.open()
+    t.update_measures_list(idx=5)
     t._updateParameters(None)
     t.execute()
