@@ -77,6 +77,18 @@ class TbxNutzungen(TbxFlaechendefinition):
 
         return params
 
+    def commit_tfl_changes(self):
+        """"""
+        super(TbxNutzungen, self).commit_tfl_changes()
+        tfl = self.par._current_tfl
+        table = 'Teilflaechen_Plangebiet'
+        dauer = self.par.dauer_aufsiedlung.value \
+            if 'dauer_aufsiedlung' in self.par else 1
+        column_values = dict(
+            Beginn_Nutzung=self.par.bezugsbeginn.value,
+            Aufsiedlungsdauer=dauer)
+        self.update_table(table, column_values, tfl.where_clause)
+
     def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
         """update all inputs based on currently selected teilflaeche"""
         columns = ['Beginn_Nutzung', 'Aufsiedlungsdauer']
