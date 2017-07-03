@@ -42,7 +42,7 @@ class TemplateEinlesenFeatureClass(ToolboxButton):
 class MarktBearbeiten(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
-    _toolbox_name = None
+    _toolbox_name = None  # Nullfall/Planfall
 
     def __init__(self):
         super(MarktBearbeiten, self).__init__()
