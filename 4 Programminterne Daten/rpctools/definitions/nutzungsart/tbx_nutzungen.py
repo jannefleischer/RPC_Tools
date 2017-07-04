@@ -25,74 +25,39 @@ from collections import OrderedDict
 class TbxNutzungen(TbxFlaechendefinition):
     _label = u'Schritt 3{sub}: Nutzungen - {name} definieren'
     _nutzungsart = Nutzungsart.UNDEFINIERT
+    _displayname_begin = u'Beginn der Aufsiedlung (Jahreszahl)'
 
     @property
     def label(self):
         return self._label
-    
-    def execute(self, parameters=None, messages=None):
-        """"""
-        self.commit_tfl_changes()
-        super(TbxNutzungen, self).execute(parameters, messages)
 
-    def init_aufsiedlung(self, params, heading='', beginn_name='',
-                         default_zeitraum=5):
-        """WORKAROUND: add the "aufsiedlung" parameters outside of
-        _getParameterInfo, strangely instances of TbxNutzungen are
-        not recognized as subclasses TbxFlaechendefinition (so you can't call 
-        _getParameterInfo of TbxFlaechendefinition here)
-        Note: thats because of the reloads, as long as reloading is done in
-        pyt-files, the subclasses which are  directly derived from the reloaded
-        classes are not recognized as their subclasses"""
+    def _getParameterInfo(self):
+        super(TbxNutzungen, self)._getParameterInfo()
 
         # Beginn der Aufsiedlung (Jahreszahl)
         param = self.add_parameter('bezugsbeginn')
         param.name = u'Beginn_der_Aufsiedlung__Jahreszahl_'
-        param.displayName = beginn_name or encode(u'Beginn der Aufsiedlung '
-                                                  u'(Jahreszahl)')
+        param.displayName = self._displayname_begin
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
         param.filter.type = 'Range'
         # ToDo: Jahre an die Jahre der Projektdefinition anpassen
         param.filter.list = [2010, 2050]
-        param.value = 2018
-        param.category = heading
 
         param.value = datetime.datetime.now().year + 1
 
-        # Dauer des Bezugs (Jahre, 1 = Bezug wird noch im Jahr des
-        # Bezugsbeginns abgeschlossen)
-        param = self.add_parameter('dauer_aufsiedlung')
-        param.name = u'dauer_aufsiedlung'
-        param.displayName = (u'Dauer des Bezugs (Jahre, 1 = Bezug wird noch '
-                             u'im Jahr des Bezugsbeginns abgeschlossen)')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'Long'
-        param.value = default_zeitraum
-        param.filter.type = 'Range'
-        param.filter.list = [1, 20]
-        param.category = heading
+        return self.par
 
-        return params
-
-    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
-        """update all inputs based on currently selected teilflaeche"""
-        columns = ['Beginn_Nutzung', 'Aufsiedlungsdauer']
-        pkey = dict(id_teilflaeche=flaechen_id)
-        rows = self.query_table('Teilflaechen_Plangebiet',
-                                columns,
-                                pkey=pkey)
-        for row in rows:
-            self.par.bezugsbeginn.value = row[0]
-            if 'dauer_aufsiedlung' in self.par:
-                self.par.dauer_aufsiedlung.value = row[1]
+    def set_selected_area(self):
+        area, i = self.get_selected_area()
+        self.par.bezugsbeginn.value = area['Beginn_Nutzung']
 
 
 class TbxNutzungenWohnen(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='a', name='Wohnen')
     _nutzungsart = Nutzungsart.WOHNEN
+    _displayname_begin = u'Beginn des Bezugs (Jahreszahl)'
 
     ew_je_we_range = [r / 10.0 for r in range(10, 50)]
 
@@ -106,15 +71,10 @@ class TbxNutzungenWohnen(TbxNutzungen):
 
     def _getParameterInfo(self):
         params = super(TbxNutzungenWohnen, self)._getParameterInfo()
-        # workaround
-        heading = "1) Bezugszeitraum"
-        beginn_name = "Beginn des Bezugs (Jahreszahl)"
-        params = self.init_aufsiedlung(params, heading=heading,
-                                       beginn_name=beginn_name)
 
         # specific parameters for "Wohnen"
 
-        heading = encode(u"2) Anzahl Wohneinheiten nach Gebäudetypen")
+        heading = encode(u"1) Anzahl Wohneinheiten nach Gebäudetypen")
 
         for gt in self.gebaeudetypen.itervalues():
             assert isinstance(gt, Gebaeudetyp)
@@ -130,7 +90,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
             param.filter.list = [0, 500]
             param.category = heading
 
-        heading = ("3) Mittlere Anzahl Einwohner pro Wohneinheit " +
+        heading = ("2) Mittlere Anzahl Einwohner pro Wohneinheit " +
                    "(3 Jahre nach Bezug)")
 
         for gt in self.gebaeudetypen.itervalues():
@@ -148,11 +108,28 @@ class TbxNutzungenWohnen(TbxNutzungen):
             param.category = heading
 
         return params
+    
+    def _open(self, params):
+        super(TbxNutzungenWohnen, self)._open(params)
+        
+        self.df_acc_units = self.get_accommodation_units()
+        
+    def get_accommodation_units(self):
+        df_acc_units = self.table_to_dataframe(
+            'Wohnen_WE_in_Gebaeudetypen')
+        acc_area_ids = df_acc_units['IDTeilflaeche'].values
+        # initialize with default values if there are no entries for an area
+        for index, area in self.df_areas.iterrows():
+            if area['id_teilflaeche'] not in acc_area_ids:
+                for gt in self.gebaeudetypen.itervalues():
+                    self.par[gt.param_we].value = 0
+                    self.par[gt.param_ew_je_we].value = gt.default_ew_je_we
+        return df_acc_units
 
-    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
+    def set_selected_area(self):
         """update all inputs based on currently selected teilflaeche"""
-        super(TbxNutzungenWohnen, self).update_teilflaechen_inputs(
-            flaechen_id, flaechenname)
+        super(TbxNutzungenWohnen, self).set_selected_area()
+        area, idx = self.get_selected_area()
         columns = ['IDGebaeudetyp', 'WE', 'EW_je_WE']
         pkey = dict(IDTeilflaeche=flaechen_id)
         rows = self.query_table('Wohnen_WE_in_Gebaeudetypen',
@@ -197,6 +174,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
 class TbxNutzungenGewerbe(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='b', name='Gewerbe')
     _nutzungsart = Nutzungsart.GEWERBE
+    _displayname_begin = u'Beginn des Bezugs (Jahreszahl)'
 
     # properties derived from base tables
     _gewerbegebietstypen = None
@@ -267,11 +245,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     def _getParameterInfo(self):
         params = super(TbxNutzungenGewerbe, self)._getParameterInfo()
 
-        # workaround
-        heading = "1) Bezugszeitraum"
-        params = self.init_aufsiedlung(params, heading=heading)
-
-        heading = u"2) Voraussichtlicher Anteil der Branchen an der Nettofläche"
+        heading = u"1) Voraussichtlicher Anteil der Branchen an der Nettofläche"
 
         # Gebietstyp auswählen
         param = self.add_parameter('gebietstyp')
@@ -305,7 +279,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         
         self.add_dependency(sum_params, 100)
 
-        heading = u'3) Voraussichtliche Anzahl an Arbeitsplätzen'
+        heading = u'2) Voraussichtliche Anzahl an Arbeitsplätzen'
 
         # Arbeitsplatzzahl schätzen
         param = self.add_parameter('auto_select')
@@ -472,6 +446,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
 class TbxNutzungenEinzelhandel(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='c', name='Einzelhandel')
     _nutzungsart = Nutzungsart.EINZELHANDEL
+    _displayname_begin = u'Voraussichtliche Eröffnung'
     tablename = 'Einzelhandel_Verkaufsflaechen'
 
     @property
@@ -484,16 +459,8 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
 
     def _getParameterInfo(self):
         params = super(TbxNutzungenEinzelhandel, self)._getParameterInfo()
-        # workaround
-        heading = '1) Voraussichtliche Eröffnung '
-        beginn_name = encode(u'Eröffnung')
-        params = self.init_aufsiedlung(params, heading=heading,
-                                       beginn_name=beginn_name,
-                                       default_zeitraum=1)
-        # no duration needed as the shops are assumed to be finished instantly
-        self.remove_parameter('dauer_aufsiedlung')
 
-        heading = u'2) Verkaufsflächen'
+        heading = u'1) Verkaufsflächen'
 
         for srt in self.sortimente.itervalues():
             assert isinstance(srt, Sortiment)
@@ -555,11 +522,11 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         
 
 if __name__ == '__main__':
-    t = TbxNutzungenGewerbe()
-    params = t.getParameterInfo()
+    t = TbxNutzungenWohnen()
+    t.getParameterInfo()
     t.set_active_project()
-    t._temporary_gdbs = []
-    t.tool.run()
+    t.open()
+    t.execute()
     #t.commit_tfl_changes()
     #t.tool.calculate_ways()
     #t.tool.update_wege_projekt()

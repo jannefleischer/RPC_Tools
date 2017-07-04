@@ -81,7 +81,7 @@ class TbxFlaechendefinition(Tbx):
         return params
 
     def get_areas(self, nutzungsart=None):
-        where = 'nutzungsart = {}'.format(nutzungsart) if nutzungsart else None
+        where = 'Nutzungsart = {}'.format(nutzungsart) if nutzungsart else None
         df_areas = self.table_to_dataframe('Teilflaechen_Plangebiet',
                                            where=where)
         return df_areas
