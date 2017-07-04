@@ -9,6 +9,10 @@ from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 from rpctools.definitions.projektverwaltung.teilflaeche_verwalten import (
     TeilflaechenVerwalten)
+from rpctools.utils.constants import Nutzungsart
+from rpctools.utils.config import Config
+
+config = Config()
 
 
 class Teilflaeche(OrderedDict):
@@ -198,6 +202,12 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                        self.par.type_of_use.value)
             tou_id = self.df_types_of_use[tou_idx]['id'].values[0]
             self.df_areas.loc[idx, 'Nutzungsart'] = tou_id
+            
+            # set fixed duration (as defined in config)
+            # except 'Einzelhandel' opens instantly
+            duration = (1 if tou_id == Nutzungsart.EINZELHANDEL
+                        else config.aufsiedlungsdauer)
+            self.df_areas.loc[idx, 'Aufsiedlungsdauer'] = duration
         
         if params.changed('name') or params.changed('type_of_use'):
             # get area again because Series is just a copy of the row of Dataframe
@@ -229,4 +239,5 @@ if __name__ == '__main__':
     t = TbxTeilflaecheVerwalten()
     t.getParameterInfo()
     t.open()
+    t._updateParameters(t.par)
     t.execute()
