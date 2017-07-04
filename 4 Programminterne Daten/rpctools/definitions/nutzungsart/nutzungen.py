@@ -54,8 +54,10 @@ class NutzungenWohnen(Nutzungen):
 
     def run(self):
         """"""
+        self.update_tables()
+        
         self.calculate_we_ways()
-        self.update_wege_projekt()
+        self.update_wege_projekt()        
         
         tfl_table = self.parent_tbx.query_table(
             'Teilflaechen_Plangebiet', columns='id_teilflaeche', 
@@ -65,6 +67,28 @@ class NutzungenWohnen(Nutzungen):
                          u'der Teilflächen')
         for flaechen_id in ids:
             self.calculate_development(flaechen_id)
+            
+    def update_tables(self):
+        self.parent_tbx.dataframe_to_table(
+            'Wohnen_WE_in_Gebaeudetypen',
+            self.parent_tbx.df_acc_units,
+            ['IDTeilflaeche', 'IDGebaeudetyp'],
+            upsert=True)
+        
+        grouped = self.parent_tbx.df_acc_units.groupby(by='IDTeilflaeche')
+        
+        # sum up the accomodation units and write them to db
+        sums = grouped['WE'].sum()
+        for index, area in self.parent_tbx.df_areas.iterrows():
+            if area['id_teilflaeche'] in sums:
+                s = sums[area['id_teilflaeche']]
+                self.parent_tbx.df_areas.loc[index, 'WE_gesamt'] = s
+        
+        self.parent_tbx.dataframe_to_table(
+            'Teilflaechen_Plangebiet',
+            self.parent_tbx.df_areas, ['id_teilflaeche'],
+            upsert=False)
+        
         
     def calculate_development(self, flaechen_id): 
         """"""

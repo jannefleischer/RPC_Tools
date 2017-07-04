@@ -6,6 +6,7 @@ from os.path import abspath, dirname, join
 import numpy as np
 import arcpy
 import datetime
+import pandas as pd
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.constants import Nutzungsart
@@ -110,65 +111,77 @@ class TbxNutzungenWohnen(TbxNutzungen):
         return params
     
     def _open(self, params):
-        super(TbxNutzungenWohnen, self)._open(params)
-        
         self.df_acc_units = self.get_accommodation_units()
+        super(TbxNutzungenWohnen, self)._open(params)        
         
     def get_accommodation_units(self):
         df_acc_units = self.table_to_dataframe(
             'Wohnen_WE_in_Gebaeudetypen')
-        acc_area_ids = df_acc_units['IDTeilflaeche'].values
-        # initialize with default values if there are no entries for an area
-        for index, area in self.df_areas.iterrows():
-            if area['id_teilflaeche'] not in acc_area_ids:
-                for gt in self.gebaeudetypen.itervalues():
-                    self.par[gt.param_we].value = 0
-                    self.par[gt.param_ew_je_we].value = gt.default_ew_je_we
         return df_acc_units
 
     def set_selected_area(self):
         """update all inputs based on currently selected teilflaeche"""
         super(TbxNutzungenWohnen, self).set_selected_area()
         area, idx = self.get_selected_area()
-        columns = ['IDGebaeudetyp', 'WE', 'EW_je_WE']
-        pkey = dict(IDTeilflaeche=flaechen_id)
-        rows = self.query_table('Wohnen_WE_in_Gebaeudetypen',
-                                columns,
-                                pkey=pkey)
 
+        acc_idx = self.df_acc_units['IDTeilflaeche'] == area['id_teilflaeche']
+        rows = self.df_acc_units[acc_idx]
         # if there are no values defined yet, set to default values
-        if not rows:
+        if len(rows) == 0:
+            columns=['IDTeilflaeche', 'IDGebaeudetyp',
+                     'WE', 'EW_je_WE']
             for gt in self.gebaeudetypen.itervalues():
-                self.par[gt.param_we].value = 0
-                self.par[gt.param_ew_je_we].value = gt.default_ew_je_we
-            
-        # otherwise, update parameters from query
-        for row in rows:
-            gt = self.gebaeudetypen[row[0]]
-            self.par[gt.param_we].value = row[1]
-            self.par[gt.param_ew_je_we].value = row[2]
+                we = 0
+                ew_je_we = gt.default_ew_je_we
+                self.par[gt.param_we].value = we
+                self.par[gt.param_ew_je_we].value = ew_je_we
+                row = pd.DataFrame([[area['id_teilflaeche'], gt.typ_id,
+                                     we, ew_je_we]],
+                                   columns=columns)
+                self.df_acc_units = self.df_acc_units.append(
+                    row, ignore_index=True)
+        
+        else:
+            # otherwise: update values
+            for index, row in rows.iterrows():
+                gt = self.gebaeudetypen[row['IDGebaeudetyp']]
+                self.par[gt.param_we].value = row['WE']
+                self.par[gt.param_ew_je_we].value = row['EW_je_WE']
 
-    def commit_tfl_changes(self):
-        """"""
-        super(TbxNutzungenWohnen, self).commit_tfl_changes()
-        tfl = self.par._current_tfl
-        we_sum = 0
+    #def update_dataframes(self):
+        #""""""
+        #area, area_idx = self.get_selected_area()
+        #area_id = area['id_teilflaeche']
+        #we_sum = 0
+        #for gt in self.gebaeudetypen.itervalues():
+            #row_idx = ((self.df_acc_units['IDTeilflaeche'] == area['id_teilflaeche']).values &
+                       #(self.df_acc_units['IDGebaeudetyp'] == gt.typ_id).values)
+            #we = self.par[gt.param_we].value
+            #ew_je_we = self.par[gt.param_ew_je_we].value
+            #self.df_acc_units.loc[row_idx, 'WE'] = we
+            #self.df_acc_units.loc[row_idx, 'EW_je_WE'] = ew_je_we
+            #we_sum += we
+        #self.df_areas.loc[area_idx, 'WE_gesamt'] = we_sum
+        
+    def _update_row(self, area, geb_typ, key, value):
+        area_id = area['id_teilflaeche']
+        row_idx = ((self.df_acc_units['IDTeilflaeche'] == area['id_teilflaeche']).values &
+                   (self.df_acc_units['IDGebaeudetyp'] == geb_typ).values)
+        self.df_acc_units.loc[row_idx, key] = value
+        
+    def _updateParameters(self, params):
+        area, area_idx = self.get_selected_area()
+        
         for gt in self.gebaeudetypen.itervalues():
-            assert isinstance(gt, Gebaeudetyp)
-            table = 'Wohnen_WE_in_Gebaeudetypen'
-            pkey = dict(IDTeilflaeche=tfl.flaechen_id,
-                        IDGebaeudetyp=gt.typ_id)
-            we = self.par[gt.param_we].value
-            column_values = dict(
-                Gebaeudetyp=gt.name,
-                WE=we,
-                EW_je_WE=self.par[gt.param_ew_je_we].value,
-            )
-            r = self.upsert_row_in_table(table, column_values, pkey)
-            we_sum += we
-        self.update_table('Teilflaechen_Plangebiet',
-                          column_values={'WE_gesamt': we_sum}, 
-                          where='id_teilflaeche={}'.format(tfl.flaechen_id))
+            if params.changed(gt.param_we):
+                self._update_row(area, gt.typ_id, 'WE',
+                                 self.par[gt.param_we].value)
+            elif params.changed(gt.param_ew_je_we):
+                self._update_row(area, gt.typ_id, 'EW_je_WE',
+                                 self.par[gt.param_ew_je_we].value)
+                
+
+        return params    
 
 
 class TbxNutzungenGewerbe(TbxNutzungen):
@@ -526,6 +539,7 @@ if __name__ == '__main__':
     t.getParameterInfo()
     t.set_active_project()
     t.open()
+    t._updateParameters(t.par)
     t.execute()
     #t.commit_tfl_changes()
     #t.tool.calculate_ways()
@@ -536,6 +550,6 @@ if __name__ == '__main__':
     #t.table_to_dataframe('Wohnen_WE_in_Gebaeudetypen', columns=None)
     #t.print_test_parameters()
     #t.print_tool_parameters()
-    t.updateParameters(params)
-    t.updateMessages(params)
-    t.print_test_parameters()
+    #t.updateParameters(params)
+    #t.updateMessages(params)
+    #t.print_test_parameters()

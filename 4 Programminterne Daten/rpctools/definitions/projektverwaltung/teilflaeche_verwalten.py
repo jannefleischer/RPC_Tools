@@ -29,9 +29,11 @@ class TeilflaechenVerwalten(Tool):
             area_id = area['id_teilflaeche']
             
             if tou_id != Nutzungsart.WOHNEN:
-                table = 'Wohnen_WE_in_Gebaeudetypen'
-                self.parent_tbx.delete_rows_in_table(
-                    table, pkey=dict(IDTeilflaeche=area_id))
+                tables = ['Wohnen_WE_in_Gebaeudetypen',
+                          'Wohnen_Struktur_und_Alterung_WE']
+                for table in tables:
+                    self.parent_tbx.delete_rows_in_table(
+                        table, pkey=dict(IDTeilflaeche=area_id))
             if tou_id != Nutzungsart.GEWERBE:
                 tables = ['Gewerbe_Anteile', 'Gewerbe_Arbeitsplaetze']
                 for table in tables:
