@@ -263,6 +263,8 @@ class NutzungenWohnen(Nutzungen):
 class NutzungenGewerbe(Nutzungen):
     
     def run(self):
+        self.update_tables()
+        
         self.calculate_ways()
         self.update_wege_projekt()
         tfl_table = self.parent_tbx.query_table(
@@ -276,7 +278,23 @@ class NutzungenGewerbe(Nutzungen):
         arcpy.AddMessage(u'Berechne die Branchenanteile...')
         for flaechen_id in ids:
             self.calculate_percentages(flaechen_id)
+
+    def update_tables(self):
+        self.parent_tbx.dataframe_to_table(
+            'Gewerbe_Anteile',
+            self.parent_tbx.df_shares, ['IDTeilflaeche', 'IDBranche'],
+            upsert=True)
         
+        self.parent_tbx.dataframe_to_table(
+            'Gewerbe_Arbeitsplaetze',
+            self.parent_tbx.df_jobs, ['IDTeilflaeche'],
+            upsert=True)
+        
+        self.parent_tbx.dataframe_to_table(
+            'Teilflaechen_Plangebiet',
+            self.parent_tbx.df_areas, ['id_teilflaeche'],
+            upsert=False)
+
     def calculate_growth(self, flaechen_id): ### Structure and age ###
         flaechen_table = 'Teilflaechen_Plangebiet'
         project_table = 'Projektrahmendaten'
@@ -351,10 +369,10 @@ class NutzungenGewerbe(Nutzungen):
         arbeitsplaetze_table = 'Gewerbe_Arbeitsplaetze'
         id_flaeche_col = 'IDTeilflaeche'
         n_jobs_col = 'anzahl_jobs_schaetzung'
+        gew_tablename = 'Gewerbe_Anteile'
         
         arcpy.AddMessage('Berechne Anzahl der Wege...')
         
-        gew_tablename = self.parent_tbx.tablename
         
         gew_table_df = self.parent_tbx.table_to_dataframe(gew_tablename)
         gew_table_df.rename(columns={'IDBranche': id_branche_col}, inplace=True)
@@ -371,6 +389,7 @@ class NutzungenGewerbe(Nutzungen):
         
         grouped = joined.groupby(by=id_flaeche_col)
         for flaechen_id, group_data in grouped:
+            group_data.fillna(0, inplace=True)
             # the number of jobs as calculated resp. manually input in toolbox
             idx = arbeitsplaetze_table_df[id_flaeche_col] == flaechen_id
             preset = arbeitsplaetze_table_df.loc[idx]['Arbeitsplaetze'].values[0]
