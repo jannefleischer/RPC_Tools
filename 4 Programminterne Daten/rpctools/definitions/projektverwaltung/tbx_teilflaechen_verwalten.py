@@ -137,11 +137,23 @@ class TbxFlaechendefinition(Tbx):
         return params
     
     def validate_inputs(self):
-        df_areas = self.get_areas()
+        df_areas = self.get_areas(self._nutzungsart)
         if len(df_areas) == 0:
-            msg = (u'Es sind keine Flächen definiert!')
+            if self._nutzungsart:
+                idx = self.df_types_of_use['id'] == self._nutzungsart
+                tou = self.df_types_of_use[idx]['nutzungsart'].values[0]
+                tou_str = ' mit der Nutzungsart {}'.format(tou)
+            else:
+                tou_str = ''
+            msg = (u'Es sind keine Flächen{} definiert!'.format(tou_str))
             return False, msg
         return True, ''
+    
+    #if not self._get_teilflaechen(nutzungsart=self._nutzungsart):
+        #
+        #msg = (u'Keine Teilflächen mit der '
+                       #u'Nutzungsart "{}" definiert.'.format(nutzung))
+        #return False, msg    
 
     def _updateMessages(self, params):
         valid, msg = self.validate_inputs()
