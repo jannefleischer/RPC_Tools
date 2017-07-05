@@ -3,6 +3,7 @@
 from os.path import abspath, dirname, join
 from collections import OrderedDict
 import arcpy
+import numpy as np
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
@@ -47,103 +48,6 @@ class TbxFlaechendefinition(Tbx):
     _nutzungsarten = None
     _recently_opened = True
 
-    @property
-    def teilflaechen_table(self):
-        return self.folders.get_table('Teilflaechen_Plangebiet',
-                                      workspace='FGDB_Definition_Projekt.gdb')
-
-    def get_teilflaeche(self, name):
-        # type: (str) -> Teilflaeche
-        """
-        return the teilflaeche
-
-        Parameters
-        ----------
-        name : str
-
-        Returns
-        -------
-        teilflaeche : Teilflaeche
-        """
-        if not self.teilflaechen or name not in self.teilflaechen:
-            return None
-        teilflaeche = self.teilflaechen[name]
-        return teilflaeche
-
-    @property
-    def teilflaechen(self):
-        # type: () -> List[Teilflaeche]
-        """dict of key/value pairs of pretty names of teilflaechen as keys and
-        (id, name, ha, ags) as values"""
-        return self._teilflaechen
-    
-    @property
-    def nutzungsart_table(self):
-        return self.folders.get_table('Nutzungsart',
-                                      workspace='FGDB_Definition_Projekt.gdb')
-
-    @property
-    def nutzungsarten(self):
-        # only fetch once, won't change because it's a base definition
-        if self._nutzungsarten is None:
-            table = self.folders.get_base_table(
-                'FGDB_Definition_Projekt_Tool.gdb', 'Nutzungsarten')
-            fields = ['nutzungsart', 'id']
-            rows = arcpy.da.SearchCursor(table, fields)
-            self._nutzungsarten = OrderedDict([r for r in rows])
-            del rows
-        return self._nutzungsarten
-
-    def _get_teilflaechen(self, nutzungsart=None):
-        """
-        get pretty names of all teilflaechen of current project along with
-        their ids, stored names, hectars and ags,
-        optionally filtered by nutzungsart
-
-        Parameters
-        ----------
-        nutzungsart : int, optional
-            the nutzungsart of the flaechen
-
-        Returns
-        -------
-        teilflaechen : dict
-            key/value pairs of pretty names as keys and (id, name, ha, ags) as
-            values
-        """
-
-        columns = ['id_teilflaeche', 'Flaeche_ha', 'Name',
-                   'gemeinde_name', 'Nutzungsart', 'ags_bkg']
-        rows = self.query_table('Teilflaechen_Plangebiet', columns,
-                                workspace='FGDB_Definition_Projekt.gdb')
-        teilflaechen = OrderedDict()
-        inverted_nutzungsarten = {v: k for k, v in
-                                  self.nutzungsarten.iteritems()}
-
-        for flaechen_id, ha, name, gemeinde, nutzungsart_id, ags in rows:
-            # ignore other nutzungsart_ids, if filtering is requested
-            if nutzungsart is not None and nutzungsart != nutzungsart_id:
-                continue
-            n = inverted_nutzungsarten[nutzungsart_id]
-            pretty = ' | '.join([
-                'Nr. {}'.format(flaechen_id),
-                name,
-                str(gemeinde),
-                '{} ha'.format(round(ha, 2)),
-                'Nutzungsart: {}'.format(n)
-            ])
-            teilflaechen[pretty] = Teilflaeche(flaechen_id, name, ha, ags)
-
-        return teilflaechen
-
-    def get_nutzungsart_id(self, flaechen_id):
-        """get the nutzungsart of the given flaeche (by id)"""
-        row = self.query_table(
-            'Teilflaechen_Plangebiet', ['Nutzungsart'],
-            where = '"id_teilflaeche" = {}'.format(flaechen_id),
-            workspace='FGDB_Definition_Projekt.gdb')[0]
-        return row[0]
-
     def _getParameterInfo(self):
         # Projekt
         params = self.par
@@ -158,85 +62,99 @@ class TbxFlaechendefinition(Tbx):
         p.value = '' if len(projects) == 0 else p.filter.list[0]
 
         # Teilfläche
-        p = self.add_parameter('teilflaeche')
+        p = self.add_parameter('area')
         p.name = encode(u'Teilfläche')
         p.displayName = encode(u'Teilfläche')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
         p.filter.list = []
-
-        self.update_teilflaechen(self._nutzungsart)
-
-        self.add_temporary_management('FGDB_Definition_Projekt.gdb')
+        
+        self.df_types_of_use = self.table_to_dataframe(
+            'Nutzungsarten', workspace='FGDB_Definition_Projekt_Tool.gdb',
+            is_base_table=True
+        )
 
         return params
-    
-    def commit_tfl_changes(self):
-        """Commit Teilflaechen Changes"""
+
+    def get_areas(self, nutzungsart=None):
+        where = 'Nutzungsart = {}'.format(nutzungsart) if nutzungsart else None
+        df_areas = self.table_to_dataframe('Teilflaechen_Plangebiet',
+                                           where=where)
+        return df_areas
         
     def _open(self, params):
-        self.update_teilflaechen(self._nutzungsart)
-        self._recently_opened = True
+        self.df_areas = self.get_areas(self._nutzungsart)
+        pretty_names = [self.get_pretty_area_name(area) for
+                        idx, area in self.df_areas.iterrows()]
+        self.df_areas['pretty'] = pretty_names
+        self.update_area_list()
+        self.set_selected_area()
+    
+    def get_selected_area(self):
+        '''return the currently selected area as a Series and 
+        it's index in the list of areas
+        '''
+        area_idx = self.df_areas['pretty'] == self.par.area.value
+        idx = np.where(area_idx==True)[0][0]
+        area = self.df_areas.iloc[idx]
+        return area, idx
+        
+    def set_selected_area(self):
+        '''set the inputs for the currently selected area '''
+        raise NotImplementedError
+
+    def get_pretty_area_name(self, area):
+        '''assemble a meaningful name for the area incl. name and additional
+        informations'''
+        idx = self.df_types_of_use['id'] == area['Nutzungsart']
+        type_of_use = self.df_types_of_use['nutzungsart'][idx].values[0]
+        pretty = u'"{name}" ({id}) | {gemeinde} | {ha} ha | {tou}'.format(
+            id=area['id_teilflaeche'],
+            name=area['Name'],
+            ha=round(area['Flaeche_ha'], 2), 
+            gemeinde=area['gemeinde_name'], 
+            tou=type_of_use
+        )
+        return pretty
+    
+    def update_area_list(self, idx=None):
+        """update the list of areas and select the area with index if given"""
+        if idx is None:
+            idx = self.par.area.filter.list.index(
+                self.par.area.value) if self.par.area.value else 0
+        pretty = self.df_areas['pretty'].values.tolist()
+        self.par.area.filter.list = pretty
+        self.par.area.value = pretty[idx]
 
     def _updateParameters(self, params):
         if params.changed('projectname'):
             self._open(params)
 
-        if params.changed('teilflaeche') and self.par.teilflaeche.filter.list:
-            # don't commit after toolbox just opened (else the defaults overwrite
-            # the actual settings)
-            if not self._recently_opened:
-                self.commit_tfl_changes()
-            tfl = self.get_teilflaeche(params.teilflaeche.value)
-            params._current_tfl = tfl
-            self.update_teilflaechen_inputs(tfl.flaechen_id,
-                                            tfl.name)
-        self._recently_opened = False
-        return params
+        elif params.changed('area'):
+            self.set_selected_area()
 
-    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
-        """update all inputs based on currently selected teilflaeche"""
+        return params
     
     def validate_inputs(self):
-        if not self._get_teilflaechen(nutzungsart=self._nutzungsart):
-            nutzung = self.nutzungsarten.keys()[
-                self.nutzungsarten.values().index(self._nutzungsart)]
-            msg = (u'Keine Teilflächen mit der '
-                   u'Nutzungsart "{}" definiert.'.format(nutzung))
+        df_areas = self.get_areas(self._nutzungsart)
+        if len(df_areas) == 0:
+            if self._nutzungsart:
+                idx = self.df_types_of_use['id'] == self._nutzungsart
+                tou = self.df_types_of_use[idx]['nutzungsart'].values[0]
+                tou_str = ' mit der Nutzungsart {}'.format(tou)
+            else:
+                tou_str = ''
+            msg = (u'Es sind keine Flächen{} definiert!'.format(tou_str))
             return False, msg
         return True, ''
+    
+    #if not self._get_teilflaechen(nutzungsart=self._nutzungsart):
+        #
+        #msg = (u'Keine Teilflächen mit der '
+                       #u'Nutzungsart "{}" definiert.'.format(nutzung))
+        #return False, msg    
 
-    def update_teilflaechen(self, nutzungsart=None):
-        """update the parameter list of teilflaeche (opt. filter nutzungsart)"""
-        # currently selected flaeche
-        idx = self.par.selected_index('teilflaeche')
-        
-        if not self.par.projectname.value:
-            list_teilflaechen = []
-        else:
-            self._teilflaechen = self._get_teilflaechen(nutzungsart=nutzungsart)
-            list_teilflaechen = self.teilflaechen.keys()
-        self.par.teilflaeche.filter.list = list_teilflaechen
-        
-        if not list_teilflaechen:
-            flaeche = u'keine entsprechenden Flächen vorhanden'
-            for param in self.par:
-                param.enabled = False
-            
-        # a flaeche was selected and is in list, select it again
-        elif idx >= 0:
-            flaeche = self.par.teilflaeche.filter.list[idx]
-        
-        # flaeche not in list -> select first one
-        else:
-            flaeche = list_teilflaechen[0]
-            tfl = self.get_teilflaeche(flaeche)
-            self.par._current_tfl = tfl
-            self.par.teilflaeche.enabled = True
-        
-        self.par.teilflaeche.value = flaeche
-        
     def _updateMessages(self, params):
         valid, msg = self.validate_inputs()
         if not valid:
@@ -264,95 +182,65 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
         p.datatype = u'GPString'
 
         # Nutzungsart
-        p = self.add_parameter('nutzungsart')
+        p = self.add_parameter('type_of_use')
         p.name = encode(u'Nutzungsart')
         p.displayName = encode(u'Nutzungsart')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = self.nutzungsarten.keys()
+        p.filter.list = self.df_types_of_use['nutzungsart'].values.tolist()
 
         return params
 
     def _updateParameters(self, params):
         params = super(TbxTeilflaecheVerwalten, self)._updateParameters(params)
 
-        flaeche = params.teilflaeche.value
-        tfl = self.get_teilflaeche(params.teilflaeche.value)
-        if tfl:
-            where_tfl = 'id_teilflaeche={}'.format(tfl.flaechen_id)
+        area, idx = self.get_selected_area()
 
-            if params.changed('name'):
-                self.update_table('Teilflaechen_Plangebiet',
-                                  {'Name': params.name.value},
-                                  where=where_tfl)
-                self.update_teilflaechen()
+        #if params.changed('area') and self.par.area.filter.list:
+            #selected, idx = self.get_selected_area()
+            #pretty = self.get_pretty_area_name(selected)
+            #self.df_areas.loc[idx, 'pretty'] = pretty
+            #self.update_area_list()
 
-            if params.changed('nutzungsart'):
-                nutzungsart_id = self.nutzungsarten[params.nutzungsart.value]
-                # set nutzungsart in gdb and clear sums
-                self.update_table('Teilflaechen_Plangebiet',
-                                  {'Nutzungsart': nutzungsart_id,
-                                   'WE_gesamt': 0,
-                                   'AP_gesamt': 0,
-                                   'VF_gesamt': 0,
-                                   "Wege_gesamt": 0,
-                                   "Wege_MIV": 0},
-                                  where=where_tfl)
+        if params.changed('name'):
+            self.df_areas.loc[idx, 'Name'] = self.par.name.value
 
-                # delete corresponding rows wohnen/gewerbe/einzelhandel
-                if nutzungsart_id != Nutzungsart.WOHNEN:
-                    table = 'Wohnen_WE_in_Gebaeudetypen'
-                    self.delete_rows_in_table(
-                        table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
-                if nutzungsart_id != Nutzungsart.GEWERBE:
-                    tables = ['Gewerbe_Anteile', 'Gewerbe_Arbeitsplaetze']
-                    for table in tables:
-                        self.delete_rows_in_table(
-                            table, pkey=dict(IDTeilflaeche=tfl.flaechen_id))
-                if nutzungsart_id != Nutzungsart.EINZELHANDEL:
-                    table = 'Einzelhandel_Verkaufsflaechen'
-                    self.delete_rows_in_table(
-                        table, pkey=dict(IDTeilflaeche=tfl.flaechen_id,))
-                
-                self.update_teilflaechen()
+        elif params.changed('type_of_use'):
+            tou_idx = (self.df_types_of_use['nutzungsart'] ==
+                       self.par.type_of_use.value)
+            tou_id = self.df_types_of_use[tou_idx]['id'].values[0]
+            self.df_areas.loc[idx, 'Nutzungsart'] = tou_id
+        
+        if params.changed('name') or params.changed('type_of_use'):
+            # get area again because Series is just a copy of the row of Dataframe
+            # which was changed
+            area = self.df_areas.loc[idx]
+            # something changed -> update pretty representation of selected area 
+            # and update list as well (to show new pretty repr.)
+            pretty = self.get_pretty_area_name(area)
+            self.df_areas.loc[idx, 'pretty'] = pretty
+            self.update_area_list()
 
         return params
 
-    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
-        """update all inputs based on currently selected teilflaeche"""
-        self.par.name.value = flaechenname
-        nutzungsart_id = self.get_nutzungsart_id(flaechen_id)
-        nutzungsarten = self.nutzungsarten
-        nutzungsart = nutzungsarten.keys()[
-            nutzungsarten.values().index(nutzungsart_id)]
-        self.par.nutzungsart.value = nutzungsart
+    def set_selected_area(self):
+        '''set the inputs for the currently selected area '''
+        area, i = self.get_selected_area()
+        tou_idx = self.df_types_of_use['id'] == area['Nutzungsart']
+        type_of_use = self.df_types_of_use.loc[tou_idx]['nutzungsart'].values[0]
+        self.par.name.value = area['Name']
+        self.par.type_of_use.value = type_of_use
 
     def _updateMessages(self, params):
-        """Modify the messages created by internal validation for each tool
-        parameter.  This method is called after internal validation."""
-
-        if params.projectname.value != None and params.name.value != None:
-            projectname = params.projectname.value
-            tablepath_teilflaechen = self.teilflaechen_table
-            namen_cursor = arcpy.da.SearchCursor(tablepath_teilflaechen, "Name")
-
-            params.name.clearMessage()
-
-            for row in namen_cursor:
-                if params.name.value == row[0]:
-                    params.name.setErrorMessage("Name wurde bereits vergeben.")
+        valid, msg = self.validate_inputs()
+        if not valid:
+            self.par.projectname.setErrorMessage(msg)
 
 if __name__ == '__main__':
 
     t = TbxTeilflaecheVerwalten()
-    params = t.getParameterInfo()
-    t.update_table('Teilflaechen_Plangebiet', {'Nutzungsart': 1})
-    print(t.query_table('Teilflaechen_Plangebiet', ['Nutzungsart']))
-    t._commit_temporaries()
-    t._get_teilflaechen()
-    t.print_test_parameters()
-    t.print_tool_parameters()
-    t.updateParameters(params)
-    t.updateMessages(params)
-    t.print_test_parameters()
+    t.getParameterInfo()
+    t.open()
+    t._updateParameters(t.par)
+    t.execute()

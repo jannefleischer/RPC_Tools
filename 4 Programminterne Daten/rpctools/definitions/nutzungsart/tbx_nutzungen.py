@@ -6,6 +6,7 @@ from os.path import abspath, dirname, join
 import numpy as np
 import arcpy
 import datetime
+import pandas as pd
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.constants import Nutzungsart
@@ -25,42 +26,30 @@ from collections import OrderedDict
 class TbxNutzungen(TbxFlaechendefinition):
     _label = u'Schritt 3{sub}: Nutzungen - {name} definieren'
     _nutzungsart = Nutzungsart.UNDEFINIERT
+    _duration_heading = None
+    _displayname_begin = u'Beginn der Aufsiedlung (Jahreszahl)'
 
     @property
     def label(self):
         return self._label
-    
-    def execute(self, parameters=None, messages=None):
-        """"""
-        self.commit_tfl_changes()
-        super(TbxNutzungen, self).execute(parameters, messages)
 
-    def init_aufsiedlung(self, params, heading='', beginn_name='',
-                         default_zeitraum=5):
-        """WORKAROUND: add the "aufsiedlung" parameters outside of
-        _getParameterInfo, strangely instances of TbxNutzungen are
-        not recognized as subclasses TbxFlaechendefinition (so you can't call 
-        _getParameterInfo of TbxFlaechendefinition here)
-        Note: thats because of the reloads, as long as reloading is done in
-        pyt-files, the subclasses which are  directly derived from the reloaded
-        classes are not recognized as their subclasses"""
+    def _getParameterInfo(self):
+        super(TbxNutzungen, self)._getParameterInfo()
 
         # Beginn der Aufsiedlung (Jahreszahl)
         param = self.add_parameter('bezugsbeginn')
         param.name = u'Beginn_der_Aufsiedlung__Jahreszahl_'
-        param.displayName = beginn_name or encode(u'Beginn der Aufsiedlung '
-                                                  u'(Jahreszahl)')
+        param.displayName = self._displayname_begin
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
         param.filter.type = 'Range'
         # ToDo: Jahre an die Jahre der Projektdefinition anpassen
         param.filter.list = [2010, 2050]
-        param.value = 2018
-        param.category = heading
+        param.category = self._duration_heading
 
         param.value = datetime.datetime.now().year + 1
-
+    
         # Dauer des Bezugs (Jahre, 1 = Bezug wird noch im Jahr des
         # Bezugsbeginns abgeschlossen)
         param = self.add_parameter('dauer_aufsiedlung')
@@ -70,41 +59,39 @@ class TbxNutzungen(TbxFlaechendefinition):
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
-        param.value = default_zeitraum
+        param.value = 1
         param.filter.type = 'Range'
         param.filter.list = [1, 20]
-        param.category = heading
+        param.category = self._duration_heading
 
+        return self.par
+
+    def set_selected_area(self):
+        area, i = self.get_selected_area()
+        self.par.bezugsbeginn.value = int(area['Beginn_Nutzung'])
+        if 'dauer_aufsiedlung' in self.par:
+            self.par.dauer_aufsiedlung.value = int(area['Aufsiedlungsdauer'])
+
+    def _updateParameters(self, params):
+        area, idx = self.get_selected_area()
+        
+        if self.par.changed('area'):
+            self.set_selected_area()
+        
+        elif self.par.changed('bezugsbeginn'):
+            self.df_areas.loc[idx, 'Beginn_Nutzung'] = self.par.bezugsbeginn.value
+        elif ('dauer_aufsiedlung' in self.par and
+            self.par.changed('dauer_aufsiedlung')):
+            self.df_areas.loc[idx, 'Aufsiedlungsdauer'] = \
+                self.par.dauer_aufsiedlung.value
         return params
-
-    def commit_tfl_changes(self):
-        """"""
-        super(TbxNutzungen, self).commit_tfl_changes()
-        tfl = self.par._current_tfl
-        table = 'Teilflaechen_Plangebiet'
-        dauer = self.par.dauer_aufsiedlung.value \
-            if 'dauer_aufsiedlung' in self.par else 1
-        column_values = dict(
-            Beginn_Nutzung=self.par.bezugsbeginn.value,
-            Aufsiedlungsdauer=dauer)
-        self.update_table(table, column_values, tfl.where_clause)
-
-    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
-        """update all inputs based on currently selected teilflaeche"""
-        columns = ['Beginn_Nutzung', 'Aufsiedlungsdauer']
-        pkey = dict(id_teilflaeche=flaechen_id)
-        rows = self.query_table('Teilflaechen_Plangebiet',
-                                columns,
-                                pkey=pkey)
-        for row in rows:
-            self.par.bezugsbeginn.value = row[0]
-            if 'dauer_aufsiedlung' in self.par:
-                self.par.dauer_aufsiedlung.value = row[1]
 
 
 class TbxNutzungenWohnen(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='a', name='Wohnen')
     _nutzungsart = Nutzungsart.WOHNEN
+    _duration_heading = "1) Bezugszeitraum"
+    _displayname_begin = u'Beginn des Bezugs (Jahreszahl)'
 
     ew_je_we_range = [r / 10.0 for r in range(10, 50)]
 
@@ -118,11 +105,6 @@ class TbxNutzungenWohnen(TbxNutzungen):
 
     def _getParameterInfo(self):
         params = super(TbxNutzungenWohnen, self)._getParameterInfo()
-        # workaround
-        heading = "1) Bezugszeitraum"
-        beginn_name = "Beginn des Bezugs (Jahreszahl)"
-        params = self.init_aufsiedlung(params, heading=heading,
-                                       beginn_name=beginn_name)
 
         # specific parameters for "Wohnen"
 
@@ -160,61 +142,76 @@ class TbxNutzungenWohnen(TbxNutzungen):
             param.category = heading
 
         return params
+    
+    def _open(self, params):
+        self.df_acc_units = self.get_accommodation_units()
+        super(TbxNutzungenWohnen, self)._open(params)
+        
+    def get_accommodation_units(self):
+        df_acc_units = self.table_to_dataframe(
+            'Wohnen_WE_in_Gebaeudetypen')
+        return df_acc_units
 
-    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
-        """update all inputs based on currently selected teilflaeche"""
-        super(TbxNutzungenWohnen, self).update_teilflaechen_inputs(
-            flaechen_id, flaechenname)
-        columns = ['IDGebaeudetyp', 'WE', 'EW_je_WE']
-        pkey = dict(IDTeilflaeche=flaechen_id)
-        rows = self.query_table('Wohnen_WE_in_Gebaeudetypen',
-                                columns,
-                                pkey=pkey)
+    def set_selected_area(self):
+        """update all inputs based on currently selected area"""
+        super(TbxNutzungenWohnen, self).set_selected_area()
+        area, idx = self.get_selected_area()
 
+        acc_idx = self.df_acc_units['IDTeilflaeche'] == area['id_teilflaeche']
+        rows = self.df_acc_units[acc_idx]
         # if there are no values defined yet, set to default values
-        if not rows:
+        if len(rows) == 0:
+            columns=['IDTeilflaeche', 'IDGebaeudetyp',
+                     'WE', 'EW_je_WE']
             for gt in self.gebaeudetypen.itervalues():
-                self.par[gt.param_we].value = 0
-                self.par[gt.param_ew_je_we].value = gt.default_ew_je_we
-            
-        # otherwise, update parameters from query
-        for row in rows:
-            gt = self.gebaeudetypen[row[0]]
-            self.par[gt.param_we].value = row[1]
-            self.par[gt.param_ew_je_we].value = row[2]
-
-    def commit_tfl_changes(self):
-        """"""
-        super(TbxNutzungenWohnen, self).commit_tfl_changes()
-        tfl = self.par._current_tfl
-        we_sum = 0
+                we = 0
+                ew_je_we = gt.default_ew_je_we
+                self.par[gt.param_we].value = we
+                self.par[gt.param_ew_je_we].value = ew_je_we
+                row = pd.DataFrame([[area['id_teilflaeche'], gt.typ_id,
+                                     we, ew_je_we]],
+                                   columns=columns)
+                self.df_acc_units = self.df_acc_units.append(
+                    row, ignore_index=True)
+        
+        else:
+            # update values
+            for index, row in rows.iterrows():
+                gt = self.gebaeudetypen[row['IDGebaeudetyp']]
+                self.par[gt.param_we].value = row['WE']
+                self.par[gt.param_ew_je_we].value = row['EW_je_WE']
+        
+    def _update_row(self, area, geb_typ, key, value):
+        area_id = area['id_teilflaeche']
+        row_idx = ((self.df_acc_units['IDTeilflaeche'] == area['id_teilflaeche']).values &
+                   (self.df_acc_units['IDGebaeudetyp'] == geb_typ).values)
+        self.df_acc_units.loc[row_idx, key] = value
+        
+    def _updateParameters(self, params):
+        params = super(TbxNutzungenWohnen, self)._updateParameters(params)
+        area, area_idx = self.get_selected_area()
+        
         for gt in self.gebaeudetypen.itervalues():
-            assert isinstance(gt, Gebaeudetyp)
-            table = 'Wohnen_WE_in_Gebaeudetypen'
-            pkey = dict(IDTeilflaeche=tfl.flaechen_id,
-                        IDGebaeudetyp=gt.typ_id)
-            we = self.par[gt.param_we].value
-            column_values = dict(
-                Gebaeudetyp=gt.name,
-                WE=we,
-                EW_je_WE=self.par[gt.param_ew_je_we].value,
-            )
-            r = self.upsert_row_in_table(table, column_values, pkey)
-            we_sum += we
-        self.update_table('Teilflaechen_Plangebiet',
-                          column_values={'WE_gesamt': we_sum}, 
-                          where='id_teilflaeche={}'.format(tfl.flaechen_id))
+            if params.changed(gt.param_we):
+                self._update_row(area, gt.typ_id, 'WE',
+                                 self.par[gt.param_we].value)
+            elif params.changed(gt.param_ew_je_we):
+                self._update_row(area, gt.typ_id, 'EW_je_WE',
+                                 self.par[gt.param_ew_je_we].value)
+
+        return params    
 
 
 class TbxNutzungenGewerbe(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='b', name='Gewerbe')
     _nutzungsart = Nutzungsart.GEWERBE
+    _duration_heading = "1) Bezugszeitraum"
+    _displayname_begin = u'Beginn des Bezugs (Jahreszahl)'
 
     # properties derived from base tables
     _gewerbegebietstypen = None
     _presets = None
     _dichtekennwerte = None
-    tablename = 'Gewerbe_Anteile'
 
     def __init__(self):
         super(TbxNutzungenGewerbe, self).__init__()
@@ -224,67 +221,29 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     def Tool(self):
         return NutzungenGewerbe
 
-    @property
-    def gewerbegebietstypen(self):
-        """dictionary with names of gewerbegebiete as keys and ids as values"""
-        if self._gewerbegebietstypen is None:
-            table = self.folders.get_base_table(
-                'FGDB_Definition_Projekt_Tool.gdb',
-                'Gewerbegebietstypen')
-            self._gewerbegebietstypen = OrderedDict({u'<benutzerdefiniert>': 0})
-            columns = ['Name_Gewerbegebietstyp', 'IDGewerbegebietstyp']
-            cursor = arcpy.da.SearchCursor(table, columns)
-            for name, id_gewerbe in cursor:
-                self._gewerbegebietstypen[name] = id_gewerbe
-        return self._gewerbegebietstypen
-
-    @property
-    def presets(self):
-        """dictionary with gewerbetyp as keys and dictionaries
-        (key / value-pairs: id branche / recommended value) as values"""
-        if self._presets is None:
-            table = self.folders.get_base_table(
-                'FGDB_Definition_Projekt_Tool.gdb',
-                'Vorschlagswerte_Branchenstruktur')
-            self._presets = {}
-            columns = ['IDGewerbegebietstyp',
-                       'ID_Branche_ProjektCheck',
-                       'Vorschlagswert_in_Prozent']
-            cursor = arcpy.da.SearchCursor(table, columns)
-            for id_gewerbe, id_branche, value in cursor:
-                if id_gewerbe not in self._presets:
-                    self._presets[id_gewerbe] = {}
-                self._presets[id_gewerbe][id_branche] = value
-        return self._presets
-
-    @property
-    def dichtekennwerte(self):
-        """dictionary with gewerbetyp as keys and dictionaries
-        (key / value-pairs: id branche / jobs per ha) as values"""
-        if self._dichtekennwerte is None:
-            table = self.folders.get_base_table(
-                'FGDB_Definition_Projekt_Tool.gdb',
-                'Dichtekennwerte_Gewerbe')
-            self._dichtekennwerte = {}
-            columns = ['Gemeindetyp_ProjektCheck',
-                       'ID_Branche_ProjektCheck',
-                       'AP_pro_ha_brutto']
-            cursor = arcpy.da.SearchCursor(table, columns)
-            for gemeindetyp, id_branche, jobs_per_ha in cursor:
-                if gemeindetyp not in self._dichtekennwerte:
-                    self._dichtekennwerte[gemeindetyp] = {}
-                self._dichtekennwerte[gemeindetyp][id_branche] = jobs_per_ha
-        return self._dichtekennwerte
-
     def _getParameterInfo(self):
         params = super(TbxNutzungenGewerbe, self)._getParameterInfo()
-
-        # workaround
-        heading = "1) Bezugszeitraum"
-        params = self.init_aufsiedlung(params, heading=heading)
+        
+        self.df_comm_types = self.table_to_dataframe(            
+            'Gewerbegebietstypen',
+            workspace='FGDB_Definition_Projekt_Tool.gdb',
+            is_base_table=True
+        )
+        
+        self.df_presets = self.table_to_dataframe(
+            'Vorschlagswerte_Branchenstruktur',
+            workspace='FGDB_Definition_Projekt_Tool.gdb',
+            is_base_table=True
+        )
+        
+        self.df_density = self.table_to_dataframe(
+            'Dichtekennwerte_Gewerbe',
+            workspace='FGDB_Definition_Projekt_Tool.gdb',
+            is_base_table=True
+        )
 
         heading = u"2) Voraussichtlicher Anteil der Branchen an der Nettofläche"
-
+        
         # Gebietstyp auswählen
         param = self.add_parameter('gebietstyp')
         param.name = u'Gebietstyp'
@@ -293,7 +252,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.direction = 'Input'
         param.datatype = u'GPString'
 
-        param.filter.list = self.gewerbegebietstypen.keys()
+        param.filter.list = self.df_comm_types['Name_Gewerbegebietstyp'].values.tolist()
         param.value = param.filter.list[0]
         param.category = heading
 
@@ -347,28 +306,54 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         param.filter.list = [0, 10000]
 
         return params
+    
+    def _open(self, params):
+        self.df_shares = self.get_shares()
+        self.df_jobs = self.table_to_dataframe('Gewerbe_Arbeitsplaetze')
+        super(TbxNutzungenGewerbe, self)._open(params)
+        
+    def add_community_types(self): 
+        for index, area in self.df_areas.iterrows():
+            g_typ = get_gemeindetyp(area['ags_bkg'])
+            self.df_areas.loc[index, 'gemeindetyp'] = g_typ
+    
+    def get_shares(self):
+        df_shares = self.table_to_dataframe(
+            'Gewerbe_Anteile')
+        return df_shares    
 
     def set_gewerbe_presets(self, id_gewerbe):
         """set all branche values to db-presets of given gewerbe-id"""
-        presets = self.presets[id_gewerbe]
+        idx = self.df_presets['IDGewerbegebietstyp'] == id_gewerbe
+        presets = self.df_presets[idx]
         for branche in self.branchen.itervalues():
             param = self.par[branche.param_gewerbenutzung]
-            preset = presets[branche.id]
-            param.value = preset
+            p_idx = presets['ID_Branche_ProjektCheck'] == branche.id
+            param.value = int(presets[p_idx]['Vorschlagswert_in_Prozent'].values[0])
+
+    def _update_shares(self, area):
+        area_id = area['id_teilflaeche']
+        a_idx = self.df_shares['IDTeilflaeche'] == area['id_teilflaeche']
+        for branche in self.branchen.itervalues():
+            row_idx = a_idx & (self.df_shares['IDBranche'] == branche.id)
+            share = self.par[branche.param_gewerbenutzung].value
+            self.df_shares.loc[row_idx, 'anteil'] = share
+            self.df_shares.loc[row_idx, 'dichtekennwert_ap_pro_ha_brutto'] = \
+                branche.jobs_per_ha
+            self.df_shares.loc[row_idx, 'anzahl_jobs_schaetzung'] = \
+                branche.estimated_jobs
 
     def _updateParameters(self, params):
         params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
-
+        area, area_idx = self.get_selected_area()
         altered = False
-
-        flaeche = params.teilflaeche.value
-        tfl = self.get_teilflaeche(flaeche)
-        if not tfl:
-            return params
 
         # set presets
         if self.par.changed('gebietstyp'):
-            id_gewerbe = self.gewerbegebietstypen[params.gebietstyp.value]
+            comm_idx = (self.df_comm_types['Name_Gewerbegebietstyp'] ==
+                        params.gebietstyp.value)
+            id_gewerbe = self.df_comm_types[comm_idx][
+                'IDGewerbegebietstyp'].values[0]
             if id_gewerbe != Gewerbegebietstyp.BENUTZERDEFINIERT:
                 self.set_gewerbe_presets(id_gewerbe)
                 altered = True
@@ -392,99 +377,92 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             # manual entry
             else:
                 params.arbeitsplaetze_insgesamt.enabled = True
-            
-        if altered:  #and auto_idx == 0:
+        
+        if altered:
             n_jobs = self.estimate_jobs()
-            if auto_idx == 0:
-                params.arbeitsplaetze_insgesamt.value = n_jobs
+            params.arbeitsplaetze_insgesamt.value = n_jobs
+            self._update_shares(area)
+        
+        if self.par.changed('arbeitsplaetze_insgesamt') or altered:
+            idx = self.df_jobs['IDTeilflaeche'] == area['id_teilflaeche']
+            n_jobs = params.arbeitsplaetze_insgesamt.value
+            self.df_jobs.loc[idx, 'Arbeitsplaetze'] = n_jobs
                 
         return params
-
-    def commit_tfl_changes(self):
-        """"""
-        super(TbxNutzungenGewerbe, self).commit_tfl_changes()
-        tfl = self.par._current_tfl
-        for branche in self.branchen.itervalues():
-            job_param = self.par[branche.param_gewerbenutzung]
-            table = self.tablename
-            pkey = {'IDTeilflaeche': tfl.flaechen_id,
-                    'IDBranche': branche.id}
-            column_values = {
-                'anteil': job_param.value,
-                'anzahl_jobs_schaetzung': branche.estimated_jobs,
-                'dichtekennwert_ap_pro_ha_brutto': branche.jobs_per_ha
-            }
-            r = self.upsert_row_in_table(table, column_values, pkey)
-            
-        table_jobs = 'Gewerbe_Arbeitsplaetze'
-        pkey = {'IDTeilflaeche': tfl.flaechen_id}
-        job_param = self.par.arbeitsplaetze_insgesamt
-        column_values = {'Arbeitsplaetze': job_param.value}
-        r = self.upsert_row_in_table(table_jobs, column_values, pkey)
-        # write number of jobs into flaechen table as well 
-        self.update_table('Teilflaechen_Plangebiet',
-                          column_values={'AP_gesamt': job_param.value}, 
-                          where='id_teilflaeche={}'.format(tfl.flaechen_id))
 
     def estimate_jobs(self):
         """calculate estimation of number of jobs
         sets estimated jobs to branchen"""
-        flaeche = self.par.teilflaeche.value
-        if not flaeche:
-            return
+        area, idx = self.get_selected_area()
         jobs_sum = 0
-
-        tfl = self.teilflaechen[flaeche]
-        gemeindetyp = get_gemeindetyp(tfl.ags)
-        kennwerte = self.dichtekennwerte[gemeindetyp]
+        
+        if 'gemeindetyp' not in self.df_areas.columns:
+            self.add_community_types()
+            area, idx = self.get_selected_area()
+        gemeindetyp = area['gemeindetyp']
+        
+        df_kennwerte = self.df_density[
+            self.df_density['Gemeindetyp_ProjektCheck'] == gemeindetyp]
         for branche in self.branchen.itervalues():
             param = self.par[branche.param_gewerbenutzung]
-            branche.jobs_per_ha = kennwerte[branche.id]
-            jobs_branche = tfl.ha * (param.value / 100.) * branche.jobs_per_ha
+            idx = df_kennwerte['ID_Branche_ProjektCheck'] == branche.id
+            branche.jobs_per_ha = df_kennwerte[idx]['AP_pro_ha_brutto'].values[0]
+            jobs_branche = (area['Flaeche_ha'] *
+                            (param.value / 100.) *
+                            branche.jobs_per_ha)
             branche.estimated_jobs = jobs_branche
             jobs_sum += jobs_branche
         
         return jobs_sum
         
-    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
-        """update all inputs based on currently selected teilflaeche"""
-        super(TbxNutzungenGewerbe, self).update_teilflaechen_inputs(
-            flaechen_id, flaechenname) 
-        columns = ['IDBranche', 'anteil']
-        
-        pkey = {'IDTeilflaeche': flaechen_id}
-        rows = self.query_table(self.tablename,
-                                columns,
-                                pkey=pkey)
+    def set_selected_area(self):
+        """update all inputs based on currently selected area"""
+        super(TbxNutzungenGewerbe, self).set_selected_area()
+        area, idx = self.get_selected_area()
+        share_idx = self.df_shares['IDTeilflaeche'] == area['id_teilflaeche']
+        rows = self.df_shares[share_idx]
         # if there are no values defined yet, set to default values
-        if not rows:
+        if len(rows) == 0:
+            columns=['IDTeilflaeche', 'IDBranche', 'anteil']
             for branche in self.branchen.itervalues():
-                self.par[branche.param_gewerbenutzung].value = \
-                    branche.default_gewerbenutzung
-        # update parameters from query else
+                share = branche.default_gewerbenutzung
+                self.par[branche.param_gewerbenutzung].value = share
+                row = pd.DataFrame([[area['id_teilflaeche'], branche.id, share]],
+                                   columns=columns)
+                self.df_shares = self.df_shares.append(row, ignore_index=True)
+        # update values
         else: 
-            for row in rows:
-                branche = self.branchen[row[0]]
-                self.par[branche.param_gewerbenutzung].value = row[1]
-            table_jobs = 'Gewerbe_Arbeitsplaetze'
-            auto_idx = self.par.auto_select.filter.list.index(
-                self.par.auto_select.value)
-            # custom settings -> load from db
-            if auto_idx == 1:                
-                n_jobs = self.query_table(
-                    table_jobs, columns=['Arbeitsplaetze'], pkey=pkey)[0][0]
-            # auto calc. -> estimate jobs
-            else:
-                n_jobs = self.estimate_jobs()
-            self.par.arbeitsplaetze_insgesamt.value = n_jobs
+            for index, row in rows.iterrows():
+                branche = self.branchen[row['IDBranche']]
+                self.par[branche.param_gewerbenutzung].value = int(row['anteil'])
+        
+        # get number of jobs
+        job_idx = self.df_jobs['IDTeilflaeche'] == area['id_teilflaeche']
+        rows = self.df_jobs[job_idx]
+        if len(rows) == 0:
+            columns=['IDTeilflaeche', 'Arbeitsplaetze']
+            n_jobs = 0
+            row = pd.DataFrame([[area['id_teilflaeche'], n_jobs]],
+                               columns=columns)
+            self.df_jobs = self.df_jobs.append(row, ignore_index=True)
+        else:
+            n_jobs = int(rows['Arbeitsplaetze'].values[0])
+            
+        auto_idx = self.par.auto_select.filter.list.index(
+            self.par.auto_select.value)
+        # not custom settings -> estimate
+        if auto_idx == 0:
+            n_jobs = self.estimate_jobs()
 
+        self.par.arbeitsplaetze_insgesamt.value = n_jobs
         self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
 
 
 class TbxNutzungenEinzelhandel(TbxNutzungen):
     _label = TbxNutzungen._label.format(sub='c', name='Einzelhandel')
     _nutzungsart = Nutzungsart.EINZELHANDEL
-    tablename = 'Einzelhandel_Verkaufsflaechen'
+    _duration_heading = '1) Voraussichtliche Eröffnung'
+    _displayname_begin = u'Eröffnung'
 
     @property
     def Tool(self):
@@ -496,17 +474,11 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
 
     def _getParameterInfo(self):
         params = super(TbxNutzungenEinzelhandel, self)._getParameterInfo()
-        # workaround
-        heading = '1) Voraussichtliche Eröffnung '
-        beginn_name = encode(u'Eröffnung')
-        params = self.init_aufsiedlung(params, heading=heading,
-                                       beginn_name=beginn_name,
-                                       default_zeitraum=1)
         # no duration needed as the shops are assumed to be finished instantly
         self.remove_parameter('dauer_aufsiedlung')
-
+        
         heading = u'2) Verkaufsflächen'
-
+        
         for srt in self.sortimente.itervalues():
             assert isinstance(srt, Sortiment)
             # Verkaufsfläche nach Sortiment
@@ -523,55 +495,63 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
 
         return params
 
-    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
-        """update all inputs based on currently selected teilflaeche"""
-        super(TbxNutzungenEinzelhandel, self).update_teilflaechen_inputs(
-            flaechen_id,flaechenname)
-        columns = ['IDSortiment', 'Verkaufsflaeche_qm']
-        pkey = dict(IDTeilflaeche=flaechen_id)
-        rows = self.query_table(self.tablename,
-                                columns,
-                                pkey=pkey)
-
+    def _open(self, params):
+        self.df_sqm = self.get_sqm()
+        super(TbxNutzungenEinzelhandel, self)._open(params)
+        
+    def get_sqm(self):
+        df_sales_areas = self.table_to_dataframe(
+            'Einzelhandel_Verkaufsflaechen')
+        return df_sales_areas
+    
+    def set_selected_area(self):
+        """update all inputs based on currently selected area"""
+        super(TbxNutzungenEinzelhandel, self).set_selected_area()
+        area, idx = self.get_selected_area()
+        
+        sales_idx = self.df_sqm['IDTeilflaeche'] == area['id_teilflaeche']
+        rows = self.df_sqm[sales_idx]
         # if there are no values defined yet, set to default values
-        if not rows:
+        if len(rows) == 0:
+            columns=['IDTeilflaeche', 'IDSortiment', 'Verkaufsflaeche_qm']
             for srt in self.sortimente.itervalues():
                 self.par[srt.param_vfl].value = 0
+                row = pd.DataFrame([[area['id_teilflaeche'], srt.typ_id, 0]],
+                                   columns=columns)
+                self.df_sqm = self.df_sqm.append(
+                    row, ignore_index=True)
 
-        # otherwise, update parameters from query
-        for row in rows:
-            srt = self.sortimente[row[0]]
-            self.par[srt.param_vfl].value = row[1]
-            
-    def commit_tfl_changes(self):
-        """"""
-        super(TbxNutzungenEinzelhandel, self).commit_tfl_changes()
-        tfl = self.par._current_tfl
-        sqm_sum = 0
+        else:
+            # update values
+            for index, row in rows.iterrows():
+                srt = self.sortimente[row['IDSortiment']]
+                self.par[srt.param_vfl].value = row['Verkaufsflaeche_qm']
+
+    def _update_row(self, area, srt_typ, sqm):
+        area_id = area['id_teilflaeche']
+        row_idx = ((self.df_sqm['IDTeilflaeche'] == area['id_teilflaeche']).values &
+                   (self.df_sqm['IDSortiment'] == srt_typ).values)
+        self.df_sqm.loc[row_idx, 'Verkaufsflaeche_qm'] = sqm
+
+    def _updateParameters(self, params):
+        params = super(TbxNutzungenEinzelhandel, self)._updateParameters(params)
+        area, area_idx = self.get_selected_area()
+        
         for srt in self.sortimente.itervalues():
-            assert isinstance(srt, Sortiment)
-            pkey = dict(IDTeilflaeche=tfl.flaechen_id,
-                        IDSortiment=srt.typ_id)
-            sqm = self.par[srt.param_vfl].value
-            column_values = dict(
-                NameSortiment=srt.kurzname,
-                Verkaufsflaeche_qm=sqm,
-            )
-            r = self.upsert_row_in_table(
-                self.tablename, column_values, pkey)
-            sqm_sum += sqm
-        
-        self.update_table('Teilflaechen_Plangebiet',
-                          column_values={'VF_gesamt': sqm_sum}, 
-                          where='id_teilflaeche={}'.format(tfl.flaechen_id))
-        
+            if params.changed(srt.param_vfl):
+                sqm = self.par[srt.param_vfl].value
+                self._update_row(area, srt.typ_id, sqm)
+
+        return params
 
 if __name__ == '__main__':
-    t = TbxNutzungenGewerbe()
-    params = t.getParameterInfo()
+    t = TbxNutzungenWohnen()
+    t.getParameterInfo()
     t.set_active_project()
-    t._temporary_gdbs = []
-    t.tool.run()
+    t.validate_inputs()
+    t.open()
+    t._updateParameters(t.par)
+    t.execute()
     #t.commit_tfl_changes()
     #t.tool.calculate_ways()
     #t.tool.update_wege_projekt()
@@ -581,6 +561,6 @@ if __name__ == '__main__':
     #t.table_to_dataframe('Wohnen_WE_in_Gebaeudetypen', columns=None)
     #t.print_test_parameters()
     #t.print_tool_parameters()
-    t.updateParameters(params)
-    t.updateMessages(params)
-    t.print_test_parameters()
+    #t.updateParameters(params)
+    #t.updateMessages(params)
+    #t.print_test_parameters()
