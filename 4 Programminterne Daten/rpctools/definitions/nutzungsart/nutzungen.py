@@ -9,7 +9,7 @@ class Nutzungen(Tool):
     _workspace = 'FGDB_Definition_Projekt.gdb'
 
     def add_outputs(self): 
-        pass
+        arcpy.RefreshActiveView()
 
     def run(self):        
         """"""
@@ -406,8 +406,31 @@ class NutzungenGewerbe(Nutzungen):
 class NutzungenEinzelhandel(Nutzungen):
     
     def run(self):
+        self.update_tables()
+        
         self.calculate_ways()
         self.update_wege_projekt()
+        
+    def update_tables(self):
+        self.parent_tbx.dataframe_to_table(
+            'Einzelhandel_Verkaufsflaechen',
+            self.parent_tbx.df_sqm,
+            ['IDTeilflaeche', 'IDSortiment'],
+            upsert=True)
+        
+        grouped = self.parent_tbx.df_sqm.groupby(by='IDTeilflaeche')
+        
+        # sum up the sales areas and write them to db
+        sums = grouped['Verkaufsflaeche_qm'].sum()
+        for index, area in self.parent_tbx.df_areas.iterrows():
+            if area['id_teilflaeche'] in sums:
+                s = sums[area['id_teilflaeche']]
+                self.parent_tbx.df_areas.loc[index, 'VF_gesamt'] = s
+        
+        self.parent_tbx.dataframe_to_table(
+            'Teilflaechen_Plangebiet',
+            self.parent_tbx.df_areas, ['id_teilflaeche'],
+            upsert=False)
         
     def calculate_ways(self): 
         besucher_sqm_col = 'Besucher_je_qm_Vfl'
@@ -416,11 +439,10 @@ class NutzungenEinzelhandel(Nutzungen):
         vfl_col = 'Verkaufsflaeche_qm'
         wege_je_besucher_col = 'Wege_je_Besucher'
         id_flaeche_col = 'IDTeilflaeche'
+        vfl_tablename = 'Einzelhandel_Verkaufsflaechen'
+        sortimente_tablename = 'Einzelhandel_Sortimente'
         
         arcpy.AddMessage('Berechne Anzahl der Wege...')
-        
-        vfl_tablename = self.parent_tbx.tablename
-        sortimente_tablename = 'Einzelhandel_Sortimente'
         
         vfl_table_df = self.parent_tbx.table_to_dataframe(vfl_tablename)
         sortimente_df = self.parent_tbx.table_to_dataframe(

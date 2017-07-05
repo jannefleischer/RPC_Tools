@@ -145,7 +145,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
     
     def _open(self, params):
         self.df_acc_units = self.get_accommodation_units()
-        super(TbxNutzungenWohnen, self)._open(params)        
+        super(TbxNutzungenWohnen, self)._open(params)
         
     def get_accommodation_units(self):
         df_acc_units = self.table_to_dataframe(
@@ -175,7 +175,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
                     row, ignore_index=True)
         
         else:
-            # : update values
+            # update values
             for index, row in rows.iterrows():
                 gt = self.gebaeudetypen[row['IDGebaeudetyp']]
                 self.par[gt.param_we].value = row['WE']
@@ -463,8 +463,6 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
     _nutzungsart = Nutzungsart.EINZELHANDEL
     _duration_heading = '1) Voraussichtliche Eröffnung'
     _displayname_begin = u'Eröffnung'
-    tablename = 'Einzelhandel_Verkaufsflaechen'
-    _default_duration = 1
 
     @property
     def Tool(self):
@@ -476,9 +474,11 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
 
     def _getParameterInfo(self):
         params = super(TbxNutzungenEinzelhandel, self)._getParameterInfo()
-
+        # no duration needed as the shops are assumed to be finished instantly
+        self.remove_parameter('dauer_aufsiedlung')
+        
         heading = u'2) Verkaufsflächen'
-
+        
         for srt in self.sortimente.itervalues():
             assert isinstance(srt, Sortiment)
             # Verkaufsfläche nach Sortiment
@@ -495,51 +495,57 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
 
         return params
 
-    def update_teilflaechen_inputs(self, flaechen_id, flaechenname):
-        """update all inputs based on currently selected teilflaeche"""
-        super(TbxNutzungenEinzelhandel, self).update_teilflaechen_inputs(
-            flaechen_id,flaechenname)
-        columns = ['IDSortiment', 'Verkaufsflaeche_qm']
-        pkey = dict(IDTeilflaeche=flaechen_id)
-        rows = self.query_table(self.tablename,
-                                columns,
-                                pkey=pkey)
-
+    def _open(self, params):
+        self.df_sqm = self.get_sqm()
+        super(TbxNutzungenEinzelhandel, self)._open(params)
+        
+    def get_sqm(self):
+        df_sales_areas = self.table_to_dataframe(
+            'Einzelhandel_Verkaufsflaechen')
+        return df_sales_areas
+    
+    def set_selected_area(self):
+        """update all inputs based on currently selected area"""
+        super(TbxNutzungenEinzelhandel, self).set_selected_area()
+        area, idx = self.get_selected_area()
+        
+        sales_idx = self.df_sqm['IDTeilflaeche'] == area['id_teilflaeche']
+        rows = self.df_sqm[sales_idx]
         # if there are no values defined yet, set to default values
-        if not rows:
+        if len(rows) == 0:
+            columns=['IDTeilflaeche', 'IDSortiment', 'Verkaufsflaeche_qm']
             for srt in self.sortimente.itervalues():
                 self.par[srt.param_vfl].value = 0
+                row = pd.DataFrame([[area['id_teilflaeche'], srt.typ_id, 0]],
+                                   columns=columns)
+                self.df_sqm = self.df_sqm.append(
+                    row, ignore_index=True)
 
-        # otherwise, update parameters from query
-        for row in rows:
-            srt = self.sortimente[row[0]]
-            self.par[srt.param_vfl].value = row[1]
-            
-    def commit_tfl_changes(self):
-        """"""
-        super(TbxNutzungenEinzelhandel, self).commit_tfl_changes()
-        tfl = self.par._current_tfl
-        sqm_sum = 0
+        else:
+            # update values
+            for index, row in rows.iterrows():
+                srt = self.sortimente[row['IDSortiment']]
+                self.par[srt.param_vfl].value = row['Verkaufsflaeche_qm']
+
+    def _update_row(self, area, srt_typ, sqm):
+        area_id = area['id_teilflaeche']
+        row_idx = ((self.df_sqm['IDTeilflaeche'] == area['id_teilflaeche']).values &
+                   (self.df_sqm['IDSortiment'] == srt_typ).values)
+        self.df_sqm.loc[row_idx, 'Verkaufsflaeche_qm'] = sqm
+
+    def _updateParameters(self, params):
+        params = super(TbxNutzungenEinzelhandel, self)._updateParameters(params)
+        area, area_idx = self.get_selected_area()
+        
         for srt in self.sortimente.itervalues():
-            assert isinstance(srt, Sortiment)
-            pkey = dict(IDTeilflaeche=tfl.flaechen_id,
-                        IDSortiment=srt.typ_id)
-            sqm = self.par[srt.param_vfl].value
-            column_values = dict(
-                NameSortiment=srt.kurzname,
-                Verkaufsflaeche_qm=sqm,
-            )
-            r = self.upsert_row_in_table(
-                self.tablename, column_values, pkey)
-            sqm_sum += sqm
-        
-        self.update_table('Teilflaechen_Plangebiet',
-                          column_values={'VF_gesamt': sqm_sum}, 
-                          where='id_teilflaeche={}'.format(tfl.flaechen_id))
-        
+            if params.changed(srt.param_vfl):
+                sqm = self.par[srt.param_vfl].value
+                self._update_row(area, srt.typ_id, sqm)
+
+        return params
 
 if __name__ == '__main__':
-    t = TbxNutzungenGewerbe()
+    t = TbxNutzungenEinzelhandel()
     t.getParameterInfo()
     t.set_active_project()
     t.open()
