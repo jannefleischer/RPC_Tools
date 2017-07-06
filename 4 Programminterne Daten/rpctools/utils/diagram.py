@@ -16,23 +16,23 @@ from rpctools.utils.encoding import encode
 class Diagram(object):
     _workspace = None
     
-    def __init__(self, projectname=None, title='Diagramm'):
+    def __init__(self, **kwargs):
         """
         title : str
         """
         super(Diagram, self).__init__()
-        self.projectname = projectname
-        self.title = title
+        self.kwargs = kwargs
         self.tbx = DummyTbx()
         
-    def create(self, **kwargs):
+    def create(self):
         '''
         create a plot
         
         kwargs: other optional parameters the subclassing diagram needs
         '''    
         self.tbx._getParameterInfo()
-        self.tbx.set_active_project(projectname=self.projectname)
+        projectname = self.kwargs['projectname'] if 'projectname' in self.kwargs else None
+        self.tbx.set_active_project(projectname=projectname)
         if self._workspace:
             self.tbx.folders._workspace = self._workspace
 
@@ -42,15 +42,15 @@ class Diagram(object):
 
 class ArcpyDiagram(Diagram):
     
-    def __init__(self, projectname=None, title='Diagramm'):
+    def __init__(self, **kwargs):
         """
         title : str
         """
-        super(ArcpyDiagram, self).__init__(projectname=projectname, title=title)
+        super(ArcpyDiagram, self).__init__(**kwargs)
         self.graph = None
         self.template = None
         
-    def create(self, **kwargs):
+    def create(self):
         '''
         create a plot
         
@@ -62,8 +62,8 @@ class ArcpyDiagram(Diagram):
             
         kwargs: other optional parameters the subclassing diagram needs
         '''
-        super(ArcpyDiagram, self).create(**kwargs)
-        self.graph, self.template = self._create(**kwargs)
+        super(ArcpyDiagram, self).create()
+        self.graph, self.template = self._create(**self.kwargs)
 
     def _create(self, **kwargs):
         """to be implemented by subclasses,
@@ -84,11 +84,11 @@ class MatplotDiagram(Diagram):
     # (matplotlib needs to be set to PS, as tkinter causes errors and
     # crashes within arcmap)
     plt = plt
-    def __init__(self, projectname=None, title='Diagramm'):
+    def __init__(self, **kwargs):
         """
         title : str
         """
-        super(MatplotDiagram, self).__init__(projectname=projectname, title=title)
+        super(MatplotDiagram, self).__init__(**kwargs)
         self.figure = None
         
     def show(self, external=True):
@@ -105,15 +105,15 @@ class MatplotDiagram(Diagram):
         '''
         if not self.figure:
             self.create()
-        filename = os.path.join(self.tbx.folders.TEMPORARY_GDB_PATH, 
-                                '{}diagram.pickle'.format(
-                                    self.__class__.__name__))
         if external:
+            filename = os.path.join(self.tbx.folders.TEMPORARY_GDB_PATH, 
+                                    '{}diagram.pickle'.format(
+                                        self.__class__.__name__))
             self.show_external(self.figure, filename)
         else: 
             self.plt.show()
         
-    def create(self, **kwargs):
+    def create(self):
         '''
         create a plot
         
@@ -125,8 +125,8 @@ class MatplotDiagram(Diagram):
             
         kwargs: other optional parameters the subclassing diagram needs
         '''
-        super(MatplotDiagram, self).create(**kwargs)
-        self.figure = self._create(**kwargs)
+        super(MatplotDiagram, self).create()        
+        self.figure = self._create(**self.kwargs)
 
     def show_external(self, plot, filename):
         if plot is None:

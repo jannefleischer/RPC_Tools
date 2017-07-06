@@ -8,12 +8,13 @@ from rpctools.utils.diagram import ArcpyDiagram
 class DiaTeilflaechen(ArcpyDiagram):
     _workspace = 'FGDB_Definition_Projekt.gdb'
     
-    def _create(self):
+    def _create(self, **kwargs):
         """
         Diagramm für Teilflächen
         """
         # Erstelle Diagramm Teilflaechen nach Hektar
-        project_name = self.tbx.par.get_projectname()
+        project_name = kwargs['project_name'] if 'project_name' in kwargs \
+            else self.tbx.par.get_projectname()
         title = encode(
             "{}: Teilflächen des Plangebiets (Bruttofläche)"
             .format(project_name))
