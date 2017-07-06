@@ -52,41 +52,12 @@ class TbxProjektAnlegen(TbxProjektVerwaltung):
         p.datatype = 'GPFeatureLayer'
         p.value = self.folders.TEMPLATE_FLAECHEN
 
-        # Beginn_des_Betrachtungszeitraumes
-        p = self.add_parameter('begin')
-        p.name = u'Beginn_des_Betrachtungszeitraumes'
-        p.displayName = u'Beginn des Betrachtungszeitraumes'
-        p.parameterType = 'Required'
-        p.direction = 'Input'
-        p.datatype = 'GPLong'
-        p.filter.type = 'Range'
-        p.filter.list = [2010, 2050]
-        p.value = datetime.datetime.now().year
-
-        # Ende_des_Betrachtungszeitraumes
-        p = self.add_parameter('end')
-        p.name = u'Ende_des_Betrachtungszeitraumes'
-        p.displayName = u'Ende des Betrachtungszeitraumes'
-        p.parameterType = 'Required'
-        p.direction = 'Input'
-        p.datatype = u'GPLong'
-        p.filter.type = 'Range'
-
-        #Eingaben zu Beginn deaktiviere/füllen
-        params.end.filter.list = [2010, 2050]
-        params.end.value = 2050
-
         return params
 
     def _updateParameters(self, params):
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
         has been changed."""
-        if self.par.changed('begin', 'end'):
-            # Ende des Betrachtungszeitraumes prüfen
-            # und ggf. auf ein Jahr nach Beginn setzen
-            if params.end.value <= params.begin.value:
-                params.end.value = params.begin.value + 1
 
 
 class TbxProjektKopieren(TbxProjektVerwaltung):

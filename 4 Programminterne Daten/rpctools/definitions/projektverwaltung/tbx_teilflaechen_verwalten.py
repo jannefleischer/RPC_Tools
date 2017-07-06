@@ -12,33 +12,6 @@ from rpctools.definitions.projektverwaltung.teilflaeche_verwalten import (
 from rpctools.utils.constants import Nutzungsart
 
 
-class Teilflaeche(OrderedDict):
-    """Teilfläche with some attributes"""
-    def __init__(self, flaechen_id, name, ha, ags):
-        """
-        Parameters
-        ----------
-        flaechen_id : int
-        name : str
-        ha : float
-        ags : str
-        """
-        super(Teilflaeche, self).__init__()
-        self.flaechen_id = flaechen_id
-        self.name = name
-        self.ha = ha
-        self.ags = ags
-        # set the values as keys of the dict
-        self.update(((v, k) for (k, v) in self.__dict__.iteritems()
-                     if not k.startswith('_')))
-
-    @property
-    def where_clause(self):
-        """"""
-        where = '"id_teilflaeche" = {}'.format(self.flaechen_id)
-        return where
-
-
 class TbxFlaechendefinition(Tbx):
     # filters the available teilflaechen by the id of the nutzungsart
     # (None for access to all teilflaechen)

@@ -19,6 +19,7 @@ import shutil
 import gc
 import arcpy
 import numpy as np
+from datetime import datetime
 
 from rpctools.utils.params import Tool
 from rpctools.utils.spatial_lib import get_ags
@@ -81,8 +82,6 @@ class ProjektAnlegen(Projektverwaltung):
         project_name = self.projectname
 
         flaeche = self.par.shapefile.value
-        beginn_betrachtung = self.par.begin.value
-        ende_betrachtung = self.par.end.value
         project_path = self.folders.get_projectpath(check=False)
 
         self.copy_template(project_path)
@@ -96,15 +95,12 @@ class ProjektAnlegen(Projektverwaltung):
         if not self._success:
             return
         self.calculate_teilflaechen_attributes(tfl,
-                                               beginn_betrachtung,
                                                ags_projekt,
                                                gemeindename_projekt)
 
         self.set_source_xy()
         self.set_projektrahmendaten(ags_projekt,
                                     project_name,
-                                    beginn_betrachtung,
-                                    ende_betrachtung,
                                     gemeindename_projekt)
 
         self.add_minimap(project_path, gdbPfad)
@@ -119,8 +115,6 @@ class ProjektAnlegen(Projektverwaltung):
     def set_projektrahmendaten(self,
                                ags_projekt,
                                project_name,
-                               beginn_betrachtung,
-                               ende_betrachtung,
                                gemeindename_projekt):
         """add project-data to Projektrahmendaten"""
         arcpy.SetProgressorLabel('Projektrahmendaten berechnen')
@@ -135,8 +129,6 @@ class ProjektAnlegen(Projektverwaltung):
 
         cursor = arcpy.InsertCursor(projektrahmendaten)
         row = cursor.newRow()
-        row.BEGINN_BETRACHTUNGSZEITRAUM = beginn_betrachtung
-        row.ENDE_BETRACHTUNGSZEITRAUM = ende_betrachtung
         row.GEMEINDENAME = gemeindename_projekt
         row.PROJEKTNAME = project_name
         row.AGS = ags_projekt
@@ -146,7 +138,6 @@ class ProjektAnlegen(Projektverwaltung):
 
     def calculate_teilflaechen_attributes(self,
                                           tfl,
-                                          beginn_betrachtung,
                                           ags_projekt,
                                           gemeindename_projekt):
         """Attribute berechnen"""
@@ -171,7 +162,7 @@ class ProjektAnlegen(Projektverwaltung):
             row.setValue("Name", "Flaeche_" + str(i + 1))
             row.setValue("Aufsiedlungsdauer", 1)
             row.setValue("validiert", 0)
-            row.setValue("Beginn_Nutzung", beginn_betrachtung)
+            row.setValue("Beginn_Nutzung", datetime.now().year)
             row.setValue("ags_bkg", ags_projekt)
             row.setValue("gemeinde_name", gemeindename_projekt)
             row.setValue("WE_gesamt", 0)

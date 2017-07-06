@@ -28,6 +28,7 @@ class TbxNutzungen(TbxFlaechendefinition):
     _nutzungsart = Nutzungsart.UNDEFINIERT
     _duration_heading = None
     _displayname_begin = u'Beginn der Aufsiedlung (Jahreszahl)'
+    _max_duration = 20
 
     @property
     def label(self):
@@ -61,7 +62,7 @@ class TbxNutzungen(TbxFlaechendefinition):
         param.datatype = u'Long'
         param.value = 1
         param.filter.type = 'Range'
-        param.filter.list = [1, 20]
+        param.filter.list = [1, self._max_duration]
         param.category = self._duration_heading
 
         return self.par
@@ -207,6 +208,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     _nutzungsart = Nutzungsart.GEWERBE
     _duration_heading = "1) Bezugszeitraum"
     _displayname_begin = u'Beginn des Bezugs (Jahreszahl)'
+    _max_duration = 15
 
     # properties derived from base tables
     _gewerbegebietstypen = None

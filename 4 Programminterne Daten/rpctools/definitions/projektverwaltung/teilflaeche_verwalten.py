@@ -16,7 +16,7 @@ class TeilflaechenVerwalten(Tool):
     
     def add_outputs(self):
         fc = "Teilflaechen_Plangebiet"
-        layer = "Teilflächen des Plangebiets"
+        layer = "Teilflaechen des Plangebiets"
         self.output.add_layer("projektdefinition", layer, fc)
         self.output.add_diagram(DiaTeilflaechen())
 

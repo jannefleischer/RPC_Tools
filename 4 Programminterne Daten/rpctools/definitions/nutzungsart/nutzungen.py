@@ -51,6 +51,7 @@ class Nutzungen(Tool):
         
         
 class NutzungenWohnen(Nutzungen):
+    BETRACHTUNGSZEITRAUM_JAHRE = 30
 
     def run(self):
         """"""
@@ -233,8 +234,6 @@ class NutzungenWohnen(Nutzungen):
         wohnen_struct_df = tbx.table_to_dataframe(wohnen_struct_table)
         # calc. structure grouped by flaechen id
         grouped_we = wohnen_we_df.groupby(id_flaeche_col)
-        end = tbx.query_table(project_table,
-                              columns=['Ende_Betrachtungszeitraum'])[0][0]
         for g in grouped_we:
             wohnen_ew_group = g[1]
             flaechen_id = wohnen_ew_group[id_flaeche_col].unique()[0]
@@ -242,6 +241,7 @@ class NutzungenWohnen(Nutzungen):
                 flaechen_table,
                 columns=['Beginn_Nutzung', 'Aufsiedlungsdauer'],
                 where='id_teilflaeche={}'.format(flaechen_id))[0]
+            end = begin + self.BETRACHTUNGSZEITRAUM_JAHRE - 1
             flaechen_template = pd.DataFrame()
             geb_types = wohnen_ew_group[geb_typ_col].values
             flaechen_template[geb_typ_col] = geb_types            
@@ -261,6 +261,7 @@ class NutzungenWohnen(Nutzungen):
         
 
 class NutzungenGewerbe(Nutzungen):
+    BETRACHTUNGSZEITRAUM_JAHRE = 15
     
     def run(self):
         self.update_tables()
@@ -311,8 +312,7 @@ class NutzungenGewerbe(Nutzungen):
                 columns=['Beginn_Nutzung', 'Aufsiedlungsdauer'],
                 where='id_teilflaeche={}'.format(flaechen_id))[0]
         
-        end = tbx.query_table(project_table,
-                              columns=['Ende_Betrachtungszeitraum'])[0][0]
+        end = begin + self.BETRACHTUNGSZEITRAUM_JAHRE - 1
     
         # empty the bewohner table (results will be stored there)
         tbx.delete_rows_in_table(jobs_year_table,
