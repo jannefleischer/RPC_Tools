@@ -27,7 +27,6 @@ class TbxNetzKostenaufteilung(Tbx):
     _df_results = pd.DataFrame(index=['EH', 'BU', 'EN'],
                                columns=['owner', 'community', 'users'],
                                data=0, dtype='int')
-    _df_defaults = ["other", "benutzerdefinierte Aufteilung"]  # existiert noch nicht: self.table_to_dataframe('Aufteilungsregeln', _workspace)
 
     _df_results.loc[:, 'owner'] = 100
     _df_dummy_values = pd.DataFrame(index=['EH', 'BU', 'EN'],
@@ -79,6 +78,10 @@ class TbxNetzKostenaufteilung(Tbx):
     def _getParameterInfo(self):
         params = self.par
         projekte = self.folders.get_projects()
+        self.df_defaults = self.table_to_dataframe(
+            'Aufteilungsregeln', workspace='FGDB_Kosten_Tool.gdb',
+            is_base_table=True)
+
 
         category_EH = "Einmalige Herstellung"
         category_BU = "Betrieb und Unterhaltung"
@@ -237,3 +240,12 @@ class TbxNetzKostenaufteilung(Tbx):
         self.add_dependency(['owner_EN', 'community_EN', 'users_EN'], 100)
 
         return params
+
+
+if __name__ == '__main__':
+    t = TbxNetzKostenaufteilung()
+    t._getParameterInfo()
+    t.par.project.value = t.config.active_project
+    t._open(t.par)
+    t._updateParameters(t.par)
+    t.execute()
