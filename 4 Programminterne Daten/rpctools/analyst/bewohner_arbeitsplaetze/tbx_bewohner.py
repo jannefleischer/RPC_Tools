@@ -14,10 +14,12 @@ class Bewohner(Tool):
     _workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
     
     def add_outputs(self):
-        tfl = self.parent_tbx.get_teilflaeche(self.par.teilflaeche.value)
-        diagram = BewohnerEntwicklung()
-        diagram.create(flaechen_id=tfl.flaechen_id,
-                       flaechen_name=tfl.name)
+        area, idx = self.parent_tbx.get_selected_area()
+        #area = 
+        diagram = BewohnerEntwicklung(
+            flaechen_id=area['id_teilflaeche'],
+            flaechen_name=area['Name'])
+        diagram.create()
         self.output.add_diagram(diagram)
 
     def run(self):
@@ -35,16 +37,14 @@ class TbxBewohner(TbxFlaechendefinition):
     def label(self):
         return u'Bewohnerzahl schätzen'
     
-    def _getParameterInfo(self):
-        params = super(TbxBewohner, self)._getParameterInfo()
-        # TbxFlaechendefinition adds workspace to temp. management, not required
-        # here (no settings are made)
-        self.remove_temporary_management()
-        return params    
+    def set_selected_area(self):
+        pass
     
 if __name__ == '__main__':
     t = TbxBewohner()
     params = t.getParameterInfo()
     t.set_active_project()
-    t.update_teilflaechen(nutzungsart=1)
+    t.open()
+    t.execute()
+    #t.update_teilflaechen(nutzungsart=1)
     t.show_outputs(show_layers=False)

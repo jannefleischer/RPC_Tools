@@ -16,16 +16,17 @@ class Arbeitsplaetze(Tool):
     _workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
     
     def add_outputs(self):
-        tfl = self.parent_tbx.get_teilflaeche(self.par.teilflaeche.value)
-        diagram = ArbeitsplatzEntwicklung()
-        diagram.create(flaechen_id=tfl.flaechen_id,
-                       flaechen_name=tfl.name)
+    
+        area, idx = self.parent_tbx.get_selected_area()
+        #area = 
+        diagram = ArbeitsplatzEntwicklung(
+            flaechen_id=area['id_teilflaeche'],
+            flaechen_name=area['Name'])
         self.output.add_diagram(diagram)
         
-        diagram.show()
-        diagram = BranchenAnteile()
-        diagram.create(flaechen_id=tfl.flaechen_id,
-                       flaechen_name=tfl.name)
+        diagram = BranchenAnteile(
+            flaechen_id=area['id_teilflaeche'],
+            flaechen_name=area['Name'])
         self.output.add_diagram(diagram)
 
     def run(self):
@@ -42,9 +43,13 @@ class TbxArbeitsplaetze(TbxFlaechendefinition):
     @property
     def label(self):
         return u'Arbeitsplätze schätzen'
+    
+    def set_selected_area(self):
+        pass
 
 if __name__ == '__main__':
     t = TbxArbeitsplaetze()
     params = t.getParameterInfo()
-    t.par.projectname.value = t.config.active_project
-    t.tool.main(t.par, None)
+    t.set_active_project()
+    t.open()
+    t.execute()
