@@ -19,14 +19,13 @@ class DiaTeilflaechen(ArcpyDiagram):
             .format(project_name))
         input_template = self.tbx.folders.get_diagram_template(
             'Teilflaechen_Hektar')
-        input_data = self.tbx.folders.get_table('Teilflaechen_Plangebiet',
-                                            check=False)
+        
         # Create the graph
         graph = arcpy.Graph()
         mxd = arcpy.mapping.MapDocument("CURRENT")
         project_layer = self.tbx.output.get_projectlayer()
         input_data = arcpy.mapping.ListLayers(project_layer,
-                                              "Teilflaechen_Plangebiet",
+                                              "Teilflaechen des Plangebiets",
                                               mxd.activeDataFrame)[0]
         # Add a vertical bar series to the graph
         graph.addSeriesBarVertical(dataSrc=input_data,

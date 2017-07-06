@@ -457,6 +457,8 @@ class Output(object):
             replaces columns in label expressions, keys are the old values and
             the values the new ones to replace them with
         """
+        if not name:
+            name = template_layer
         layer = Layer(groupname, template_layer, name=name, 
                       featureclass=featureclass,
                       disable_other=disable_other, subgroup=subgroup, 
@@ -481,36 +483,39 @@ class Output(object):
         for diagram in self.diagrams:
             diagram.show()
         
-    def show_layers(self):
+    def show_layers(self, redraw=True):
         '''show available layers'''
         for layer in self.layers:
-            self._show_layer(layer)
+            self._show_layer(layer, redraw=redraw)
             
     def clear(self):
         '''remove all outputs (diagrams, layers etc.)'''
         self.diagrams = []
         self.layers = []
 
-    def _show_layer(self, layer):
+    def _show_layer(self, layer, redraw=True):
         """show the layer by adding it to the TOC of ArcGIS"""
+        current_mxd = arcpy.mapping.MapDocument("CURRENT")
+        current_dataframe = current_mxd.activeDataFrame
+        self.set_backgroundgrouplayer(current_dataframe)
+    
+        if not redraw and self.layer_exists(layer.name):
+            arcpy.RefreshActiveView()
+            return
         
         projektname = self.projectname
         
         group = self.module.get_label(layer.groupname)
-        current_mxd = arcpy.mapping.MapDocument("CURRENT")
-        current_dataframe = current_mxd.activeDataFrame
         current_dataframe.geographicTransformations = ['DHDN_To_WGS_1984_5x',
                                                        'DHDN_To_ETRS_1989_5']
-
-
+        
         # Layer-Gruppen hinuzfuegen, falls nicht vorhanden
         self.set_projectlayer(projektname)
         project_layer = self.get_projectlayer(projektname)
-        self.set_backgroundgrouplayer(current_dataframe)
-
+    
         # Template Layer laden
         template_layer = self.folders.get_layer(layer.template_layer,
-                                                layer.template_folder)
+                                                    layer.template_folder)
         #arcpy.AddMessage(template_layer)
         source_layer = arcpy.mapping.Layer(template_layer)
 
@@ -556,15 +561,12 @@ class Output(object):
         if layer.zoom:
             ext = new_layer.getExtent()
             current_dataframe.extent = ext
-        arcpy.RefreshActiveView()
-        arcpy.RefreshTOC()
 
         if layer.disable_other == True:
             for lyr in arcpy.mapping.ListLayers(project_layer):
                 lyr.visible = False
         new_layer.visible = True
-        if layer.name:
-            new_layer.name = layer.name
+        new_layer.name = layer.name
         if layer.query:
             new_layer.definitionQuery = layer.query
         if layer.subgroup != "":
@@ -593,6 +595,7 @@ class Output(object):
         target_grouplayer.visible = True
         if layer.in_project:
             project_layer.visible = True
+
         self.sort_layers()
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()

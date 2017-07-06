@@ -70,6 +70,7 @@ class Output(ToolboxWrapper):
     __metaclass__ = Singleton
     _show_layers = True
     _show_diagrams = True
+    _redraw = False
     def show(self):
         self.tbx.set_active_project()
         valid, msg = self.tbx.validate_active_project()
@@ -77,7 +78,8 @@ class Output(ToolboxWrapper):
             pythonaddins.MessageBox(msg, 'Fehler', 0)
             return
         self.tbx.show_outputs(show_layers=self._show_layers, 
-                              show_diagrams=self._show_diagrams)
+                              show_diagrams=self._show_diagrams,
+                              redraw=self._redraw)
         
     def onClick(self):
         self.show()

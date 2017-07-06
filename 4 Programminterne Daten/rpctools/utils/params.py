@@ -136,8 +136,11 @@ class Dependency(object):
                 names of the parameters depending on each other
         target_value : the targeted value
         type : str, optional
-                the type of the dependency (atm only sum, may be extended to
-                other cases in the future)
+               the type of the dependency
+               'sum' - sum parameter values up to given target_value
+                      (adding/subtracting from bottom to top)
+               'distributed_sum' - same as 'sum' but adding/subtracting weighted
+                    from all other parameters at the same time
         """
 
         self.param_names = param_names
@@ -265,11 +268,27 @@ class Tbx(object):
     def output(self):
         return self.tool.output
     
-    def show_outputs(self, show_layers=True, show_diagrams=True):
+    def show_outputs(self, show_layers=True, show_diagrams=True, redraw=True):
+        '''
+        show the outputs of the tool (as defined in add_outputs() of Tool)
+
+        Parameters
+        ----------
+        show_layers : bool, default: True
+                show the defined layers
+        show_diagrams : bool, default: True
+                show the defined diagrams
+        redraw : bool, default: True
+                if False don't add the layers if they are already in TOC
+        Returns
+        -------
+        parameter : arcpy.Parameter-instance
+        
+        '''
         self.output.clear()
         self.tool.add_outputs()
         if show_layers:
-            self.output.show_layers()
+            self.output.show_layers(redraw=redraw)
         if show_diagrams:
             self.output.show_diagrams()
 
@@ -436,11 +455,15 @@ class Tbx(object):
         param_names : list,
                qualified names of the parameters
 
-        target_sum : int
+        target_value : int
                the target value the parameters sum up to
 
         type : str, optional
-               only 'sum' supported atm
+               'sum' - sum parameter values up to given target_value
+                      (adding/subtracting from bottom to top)
+               'distributed_sum' - same as 'sum' but adding/subtracting weighted
+                    from all other parameters at the same time (not fully
+                    functional atm, needs to be fixed)
         """
         dependency = Dependency(param_names, target_value, type=type)
         self._dependencies.append(dependency)
