@@ -10,15 +10,32 @@ import pandas as pd
 
 
 class NetzKostenaufteilung(Tool):
+    _workspace = 'FGDB_Kosten.gdb'
+    _param_projectname = 'project'
+
     def add_outputs(self):
         pass
     def run(self):
-        pass
+        tbx = self.parent_tbx
+        arcpy.AddMessage(tbx._df_results)
+        return
 
 
 
 class TbxNetzKostenaufteilung(Tbx):
     _workspace = 'FGDB_Kosten.gdb'
+    _df_results = pd.DataFrame(index=['EH', 'BU', 'EN'],
+                               columns=['owner', 'community', 'users'],
+                               data=0, dtype='int')
+    _df_defaults = ["other", "benutzerdefinierte Aufteilung"]  # existiert noch nicht: self.table_to_dataframe('Aufteilungsregeln', _workspace)
+
+    _df_results.loc[:, 'owner'] = 100
+    _df_dummy_values = pd.DataFrame(index=['EH', 'BU', 'EN'],
+                               columns=['owner', 'community', 'users'],
+                               data=0, dtype='int')
+    _df_dummy_values.loc[:, 'owner'] = 100
+    _df_dummy_values = _df_dummy_values.astype(int, copy=False)
+
     @property
     def label(self):
         return encode(u'Kostenaufteilung festlegen')
@@ -28,15 +45,41 @@ class TbxNetzKostenaufteilung(Tbx):
         return NetzKostenaufteilung
 
     def _open(self, params):
-        pass
+        params.default_EH.value = self._df_defaults[0]
+        # set params:
+        params.community_EH.value = self._df_dummy_values.loc['EH', 'community']
+        params.owner_EH.value = self._df_dummy_values.loc['EH', 'owner']
+        params.users_EH.value = self._df_dummy_values.loc['EH', 'users']
+        params.community_BU.value = self._df_dummy_values.loc['BU', 'community']
+        params.owner_BU.value = self._df_dummy_values.loc['BU', 'owner']
+        params.users_BU.value = self._df_dummy_values.loc['BU', 'users']
+        params.community_EN.value = self._df_dummy_values.loc['EN', 'community']
+        params.owner_EN.value = self._df_dummy_values.loc['EN', 'owner']
+        params.users_EN.value = self._df_dummy_values.loc['EN', 'users']
+
 
     def _updateParameters(self, params):
+        # EH
+        if self.par.changed('community_EH', 'owner_EH', 'users_EH'):
+            self._df_results.loc['EH', 'community'] = params.community_EH.value
+            self._df_results.loc['EH', 'owner'] = params.owner_EH.value
+            self._df_results.loc['EH', 'users'] = params.users_EH.value
+        # BU
+        if self.par.changed('community_BU', 'owner_BU', 'users_BU'):
+            self._df_results.loc['BU', 'community'] = params.community_BU.value
+            self._df_results.loc['BU', 'owner'] = params.owner_BU.value
+            self._df_results.loc['BU', 'users'] = params.users_BU.value
+        # EN
+        if self.par.changed('community_EN', 'owner_EN', 'users_EN'):
+            self._df_results.loc['EN', 'community'] = params.community_EN.value
+            self._df_results.loc['EN', 'owner'] = params.owner_EN.value
+            self._df_results.loc['EN', 'users'] = params.users_EN.value
         return params
 
     def _getParameterInfo(self):
-        df_defaults = ["benutzerdefinierte Aufteilung"]  # existiert noch nicht: self.table_to_dataframe('Aufteilungsregeln', _workspace)
         params = self.par
         projekte = self.folders.get_projects()
+
         category_EH = "Einmalige Herstellung"
         category_BU = "Betrieb und Unterhaltung"
         category_EN = "Erneuerung"
@@ -50,6 +93,7 @@ class TbxNetzKostenaufteilung(Tbx):
         p.filter.list = projekte
         if projekte:
             p.value = projekte[0]
+
         # Netz
         p = self.add_parameter('network')
         p.name = u'network'.encode('cp1252')
@@ -61,6 +105,7 @@ class TbxNetzKostenaufteilung(Tbx):
                    "Straße (äußere Erschließung)", "Kanalisation",
                    "Trinkwasser", "Elektrizität"]
         p.filter.list = network
+        p.value = network[0]
 
         # category = EH
         # Nachfolgende Werte setzen auf
@@ -70,8 +115,8 @@ class TbxNetzKostenaufteilung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = df_defaults
-        p.value = df_defaults[0]
+        p.filter.list = self._df_defaults
+        p.value = self._df_defaults[0]
         p.category = category_EH
         # Grundstücksbesitzer
         p = self.add_parameter("owner_EH")
@@ -103,6 +148,7 @@ class TbxNetzKostenaufteilung(Tbx):
         p.filter.type = "Range"
         p.filter.list = [0, 100]
         p.category = category_EH
+        self.add_dependency(['owner_EH', 'community_EH', 'users_EH'], 100)
 
         # category = BU
         # Nachfolgende Werte setzen auf
@@ -112,8 +158,8 @@ class TbxNetzKostenaufteilung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = df_defaults
-        p.value = df_defaults[0]
+        p.filter.list = self._df_defaults
+        p.value = self._df_defaults[0]
         p.category = category_BU
         # Grundstücksbesitzer
         p = self.add_parameter("owner_BU")
@@ -145,6 +191,7 @@ class TbxNetzKostenaufteilung(Tbx):
         p.filter.type = "Range"
         p.filter.list = [0, 100]
         p.category = category_BU
+        self.add_dependency(['owner_BU', 'community_BU', 'users_BU'], 100)
 
         # category = EN
         # Nachfolgende Werte setzen auf
@@ -154,8 +201,8 @@ class TbxNetzKostenaufteilung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = df_defaults
-        p.value = df_defaults[0]
+        p.filter.list = self._df_defaults
+        p.value = self._df_defaults[0]
         p.category = category_EN
         # Grundstücksbesitzer
         p = self.add_parameter("owner_EN")
@@ -187,5 +234,6 @@ class TbxNetzKostenaufteilung(Tbx):
         p.filter.type = "Range"
         p.filter.list = [0, 100]
         p.category = category_EN
+        self.add_dependency(['owner_EN', 'community_EN', 'users_EN'], 100)
 
         return params
