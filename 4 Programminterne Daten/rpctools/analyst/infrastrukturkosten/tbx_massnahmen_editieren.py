@@ -121,8 +121,8 @@ class TbxMassnahmenEditieren(Tbx):
         p.direction = 'Input'
         p.datatype = u'GPLong'
         p.filter.type = 'Range'
-        p.filter.list = [0, 100]
-        p.value = 0
+        p.filter.list = [1, 100]
+        p.value = 1
         
         param = self.add_parameter('do_delete')
         param.name = encode(u'Löschen')
@@ -156,7 +156,7 @@ class TbxMassnahmenEditieren(Tbx):
         new_measure['Kosten_EH_EUR'] = 0.
         new_measure['Kosten_BU_EUR'] = 0.
         new_measure['Kosten_EN_EUR'] = 0.
-        new_measure['Lebensdauer'] = 0
+        new_measure['Lebensdauer'] = 1
         # default: "Straße (innere Erschließung)"
         new_measure['IDNetz'] = 1
         new_measure['IDNetzelement'] = 13
@@ -308,11 +308,18 @@ class TbxMassnahmenEditieren(Tbx):
             self.par.projectname.setErrorMessage(msg)
     
 if __name__ == '__main__':
+    from time import time
+    start = time()
     t = TbxMassnahmenEditieren()
-    t._getParameterInfo()
+    print('init: {}s'.format(time() - start))
+    start = time()
+    t.getParameterInfo()
+    print('_getParameterInfo: {}s'.format(time() - start))
     t.set_active_project()
     #t.add_measure_to_db('Test add', (3544252, 5925427))
+    start = time()
     t.open()
+    print('open: {}s'.format(time() - start))
     t.update_measures_list(idx=5)
     t._updateParameters(None)
     t.execute()

@@ -88,9 +88,9 @@
                 <Tool caption="Stromleitung hinzuf&#252;gen" category="ProjektCheck" class="Stromleitung" id="rpc_tools.stromleitung" image="Images\Stromleitung.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Button caption="Ausgew&#228;hlte Netzelemente l&#246;schen" category="ProjektCheck" class="NetzabschnittLoeschen" id="rpc_tools.netzabschnitt_loeschen" image="Images\ArcScanRasterPaintingDrawLineTool16.png" message="" tip="">
+                <Tool caption="Netzlinien ausw&#228;hlen und l&#246;schen" category="ProjektCheck" class="NetzabschnittLoeschen" id="rpc_tools.netzabschnitt_loeschen" image="Images\TinEditingTinBreaklineDelete16.png" message="" tip="">
                     <Help heading="" />
-                </Button>
+                </Tool>
                 <Button caption="Infrastrukturmengen bilanzieren" category="ProjektCheck" class="InfrastrukturmengenBilanzieren" id="rpc_tools.infrastrukturmengen_bilanzieren" image="Images\400000-ruler.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -472,12 +472,6 @@
                         <Button refID="rpc_tools.uzvr" />
                     </Items>
                 </Menu>
-                <Menu caption="Netzelement l&#246;schen" category="ProjektCheck" id="rpc_tools.loeschen_erschliessung" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Button refID="rpc_tools.netzabschnitt_loeschen" />
-                        <Button refID="rpc_tools.punktuelle_massnahme_loeschen" />
-                    </Items>
-                </Menu>
                 <Menu caption="Erschlie&#223;ungsnetze skizzieren" category="ProjektCheck" id="rpc_tools.menu_erschliessungsnetze_skizzieren" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>                    
                         <Tool refID="rpc_tools.anliegerstrasse_innere" />
@@ -489,7 +483,7 @@
                         <Tool refID="rpc_tools.kanal_nur_schmutzwasser" />
                         <Tool refID="rpc_tools.trinkwasserleitung"  separator="true"/>
                         <Tool refID="rpc_tools.stromleitung"  separator="true"/>
-                        <Menu refID="rpc_tools.loeschen_erschliessung"  separator="true"/>
+                        <Tool refID="rpc_tools.netzabschnitt_loeschen" separator="true"/>
                     </Items>
                 </Menu>
                 <Menu caption="Punktuelle Ma&#223;nahmen" category="ProjektCheck" id="rpc_tools.menu_punktuelle_massnahmen" isRootMenu="false" isShortcutMenu="true" separator="true">

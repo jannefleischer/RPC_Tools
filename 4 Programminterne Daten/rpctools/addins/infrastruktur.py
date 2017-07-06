@@ -11,7 +11,7 @@ __all__ = [
     "SammelstrasseAeussere", "SammelstrasseInnere", 
     "KanalMischsystem", "KanalNurSchmutzwasser", "KanalTrennsystem",
     "Trinkwasserleitung", "Stromleitung", 
-    "NetzabschnittLoeschen", "PunktuelleMassnahmeLoeschen",
+    "NetzabschnittLoeschen",
     "InfrastrukturmengenBilanzieren", "ElektrizitaetKostenaufteilung", 
     "GesamtkostenErmitteln", "KanalisationKostenaufteilung",
     "KostenNachKostentraegernAuswerten", "KostenProWEBzwAPVergleichen",
@@ -46,13 +46,20 @@ class InfrastructureDrawingTool(object):
         table = folders.get_table(tablename,
                                   workspace='FGDB_Kosten.gdb',
                                   project=project)
-        columns = (["SHAPE@", 'IDNetzelement', 'IDNetz'] +
+        columns = (['id', "SHAPE@", 'IDNetzelement', 'IDNetz'] +
                    additional_columns.keys())
+        cursor = arcpy.da.SearchCursor(table, ['id'])
+        ids = [row[0] for row in cursor]
+        id = 1 if not ids else max(ids) + 1
         cursor = arcpy.da.InsertCursor(
             table, columns)
-        cursor.insertRow([shape, element_id, netz_id] +
-                         additional_columns.values())
-        del(cursor)
+        try:
+            cursor.insertRow([id, shape, element_id, netz_id] +
+                             additional_columns.values())
+        except Exception as e:
+            print(e)
+        finally:
+            del(cursor)
         arcpy.RefreshActiveView()
 
     def get_ids(self, tablename):
@@ -219,21 +226,41 @@ def delete_selected_elements(layer_name):
         arcpy.DeleteFeatures_management(layer)
 
 
-class NetzabschnittLoeschen(object):
+class NetzabschnittLoeschen(InfrastructureDrawingTool):
     def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        delete_selected_elements(u'Erschließungsnetz')
-
-
-class PunktuelleMassnahmeLoeschen(object):
-    """Implementation for rpc_tools.punktuelle_massnahme_loeschen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        delete_selected_elements(u'Erschließungsnetz - punktuelle Maßnahmen')
+        super(NetzabschnittLoeschen, self).__init__()
+        self.shape = "Rectangle"
+    
+    def onRectangle(self, rectangle):
+        xmin, ymin = rectangle.XMin, rectangle.YMin
+        xmax, ymax = rectangle.XMax, rectangle.YMax
+        project=config.active_project
+        lines = folders.get_table('Erschliessungsnetze_Linienelemente',
+                                  workspace='FGDB_Kosten.gdb',
+                                  project=project)
+        fc_bbox = 'in_memory/rectangle'
+        fc_clipped = 'in_memory/clipped_lines'
+        poly_points = arcpy.Array([
+            arcpy.Point(xmin, ymin),
+            arcpy.Point(xmin, ymax),
+            arcpy.Point(xmax, ymax),
+            arcpy.Point(xmax, ymin),
+            arcpy.Point(xmin, ymin)
+        ])        
+        bbox_poly = arcpy.Polygon(poly_points)
+        arcpy.CopyFeatures_management([bbox_poly], fc_bbox)
+        arcpy.Clip_analysis(lines, fc_bbox, fc_clipped)
+        cursor = arcpy.da.SearchCursor(fc_clipped, ['id', 'IDNetzelement'])
+        del_ids = [id for id, element in cursor]
+        del(cursor)
+        cursor = arcpy.da.UpdateCursor(lines, 'id')
+        for row in cursor:
+            if row[0] in del_ids:
+                cursor.deleteRow()
+        del(cursor)
+        arcpy.Delete_management(fc_bbox)
+        arcpy.Delete_management(fc_clipped)
+        arcpy.RefreshActiveView()
 
 
 class InfrastrukturmengenBilanzieren(ToolboxButton):
