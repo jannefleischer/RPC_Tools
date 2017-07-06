@@ -154,6 +154,8 @@ class Dependency(object):
         """
         if self.type == 'sum':
             self._set_sum(params)
+        elif self.type == 'distributed_sum':
+            self._set_distributed_sum(params)
 
     def _set_sum(self, params):
         """set values of dependent parameters to sum up to target value"""
@@ -179,6 +181,48 @@ class Dependency(object):
                     new_val = self.target_value
                 difference = difference + old_val - new_val
                 param.value = new_val
+
+    def _set_distributed_sum(self, params):
+        """set values of dependent parameters to sum up to target value;
+        ToDo: needs to be fixed
+        """
+        actual_sum = 0
+        altered_param = None
+        
+        values = []
+        for name in self.param_names:
+            param = params[name]
+            # get values, mark an altered parameter with NaN
+            value = np.nan if params.changed(name) else param.value
+            values.append(value)
+            actual_sum += param.value
+        
+        # continue only if ONE parameter is changed
+        if np.isnan(values).sum() != 1:
+            return
+        
+        # anteil an differenz
+        difference = self.target_value - actual_sum
+        if not difference:
+            return
+        if difference > 0:
+            values = 100 - np.array(values)
+        nansum = np.nansum(values)
+        # subtract weighted difference
+        res = values / nansum * (nansum - abs(difference))
+        res = res.round()
+        # add/subtract rounding errors to/from highest value
+        rdiff = nansum - abs(difference) - np.nansum(res)
+        res[np.nanargmax(res)] -= rdiff
+        if difference > 0:
+            res = 100 - np.array(res)
+
+        for i, name in enumerate(self.param_names):
+            new_val = res[i]
+            if np.isnan(new_val):
+                continue        
+            param = params[name]
+            param.value = int(new_val)
 
 
 class Tbx(object):
