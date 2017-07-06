@@ -4,13 +4,13 @@ from rpctools.analyst.einnahmen import (tbx_wanderungssalden_schaetzen_Einwohner
                                         tbx_wanderungssalden_bearbeiten,
                                        tbx_wanderungssalden_schaetzen_Arbeit,
                                         tbx_Einkommensteuer,
-##                                        tbx_Ergebnisinterpretation,
+                                        tbx_Ergebnisinterpretation,
                                         tbx_Familienleistungsausgleich,
-##                                        tbx_Gesamtsumme,
+                                        tbx_Gesamtsumme,
                                        tbx_Gewerbesteuer_kontrollieren,
-##                                        tbx_Gewerbesteuer_schaetzen,
-                                          tbx_grundsteuer
-##                                        tbx_Umsatzsteuer
+                                        tbx_Gewerbesteuer_schaetzen,
+                                          tbx_grundsteuer,
+                                        tbx_Umsatzsteuer
 )
 
 
@@ -19,13 +19,13 @@ reload(tbx_wanderungssalden_schaetzen_Einwohner)
 reload(tbx_wanderungssalden_bearbeiten)
 reload(tbx_wanderungssalden_schaetzen_Arbeit)
 reload(tbx_Einkommensteuer)
-##reload(tbx_Ergebnisinterpretation)
+reload(tbx_Ergebnisinterpretation)
 reload(tbx_Familienleistungsausgleich)
-##reload(tbx_Gesamtsumme)
+reload(tbx_Gesamtsumme)
 reload(tbx_Gewerbesteuer_kontrollieren)
-##reload(tbx_Gewerbesteuer_schaetzen)
+reload(tbx_Gewerbesteuer_schaetzen)
 reload(tbx_grundsteuer)
-##reload(tbx_Umsatzsteuer)
+reload(tbx_Umsatzsteuer)
 
 from rpctools.analyst.einnahmen.tbx_wanderungssalden_schaetzen_Einwohner import TbxWanderungssalden1
 from rpctools.analyst.einnahmen.tbx_wanderungssalden_schaetzen_Arbeit import TbxWanderungssalden2
@@ -35,7 +35,10 @@ from rpctools.analyst.einnahmen.tbx_grundsteuer import TbxGrundsteuer
 from rpctools.analyst.einnahmen.tbx_Einkommensteuer import TbxEinkommensteuer
 from rpctools.analyst.einnahmen.tbx_Familienleistungsausgleich import TbxFLA
 from rpctools.analyst.einnahmen.tbx_Gewerbesteuer_kontrollieren import TbxKontrolleGewerbesteuer
-
+from rpctools.analyst.einnahmen.tbx_Gewerbesteuer_schaetzen import TbxGewerbesteuer
+from rpctools.analyst.einnahmen.tbx_Umsatzsteuer import TbxUmsatzsteuer
+from rpctools.analyst.einnahmen.tbx_Gesamtsumme import TbxGesamtsumme
+from rpctools.analyst.einnahmen.tbx_Ergebnisinterpretation import TbxErgebnisinterpretation
 
 class Toolbox(object):
     def __init__(self):
@@ -49,5 +52,9 @@ class Toolbox(object):
                     TbxGrundsteuer,
                     TbxEinkommensteuer,
                     TbxFLA,
-                    TbxKontrolleGewerbesteuer
+                    TbxKontrolleGewerbesteuer,
+                    TbxGewerbesteuer,
+                    TbxUmsatzsteuer,
+                    TbxGesamtsumme,
+                    TbxErgebnisinterpretation
         ]

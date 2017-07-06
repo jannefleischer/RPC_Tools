@@ -58,7 +58,7 @@ class TbxKontrolleGewerbesteuer(Tbx):
                                 columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
                                 workspace='FGDB_Einnahmen.gdb')
         for row in cursor:
-            if row[0] == u"Wanderung Beschäftigte" and row[1] is None:
+            if row[0] == u"Wanderung Beschaeftigte" and row[1] is None:
                 par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Beschäftigte berechnet!')
 
         where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.WOHNEN, Nutzungsart.EINZELHANDEL)

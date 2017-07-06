@@ -143,5 +143,5 @@ def install_packages(python_path):
 
 
 if __name__ == '__main__':
-    install_packages('C:\\Python27-ArcGIS\\ArcGIS10.4')
+    install_packages('C:\Python27\ArcGIS10.5')
     #install_packages('C:\\Python27-ArcGIS\\ArcGISx6410.4')

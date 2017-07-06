@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import arcpy
-
+from rpctools.utils.constants import Nutzungsart
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 from rpctools.analyst.einnahmen.script_Gewerbesteuer_schaetzen import Gewerbesteuer
 
 class TbxGewerbesteuer(Tbx):
-    """Toolbox Wanderungssalden für Einnahmen"""
+    """ToolboxGewerbesteuer"""
 
     @property
     def label(self):
@@ -40,8 +40,8 @@ class TbxGewerbesteuer(Tbx):
                                 columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
                                 workspace='FGDB_Einnahmen.gdb')
         for row in cursor:
-            if row[0] == u"Wanderung Beschäftigte" and row[1] is None:
-                par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden fÃ¼r Beschäftigte berechnet!')
+            if row[0] == u"Wanderung Beschaeftigte" and row[1] is None:
+                par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden fÃ¼r BeschÃ¤ftigte berechnet!')
 
         where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.WOHNEN, Nutzungsart.EINZELHANDEL)
         if par.changed('name'):
@@ -51,8 +51,8 @@ class TbxGewerbesteuer(Tbx):
                                     workspace='FGDB_Definition_Projekt.gdb',
                                     where=where)
             if not rows:
-                par.name.setErrorMessage(u'In diesem Projekt sind keine Gewerbe- oder Einzelhandelsflächen definiert!')
+                par.name.setErrorMessage(u'In diesem Projekt sind keine Gewerbe- oder EinzelhandelsflÃ¤chen definiert!')
                 par.gemeinde.enabled = False
                 par.gemeinde.filter.list = []
-                par.gemeinde.value = (u'Projekt enthält keine Flächen mit der '
-                                      u'benötigten Nutzungsart')
+                par.gemeinde.value = (u'Projekt enthÃ¤lt keine Flï¿½chen mit der '
+                                      u'benï¿½tigten Nutzungsart')

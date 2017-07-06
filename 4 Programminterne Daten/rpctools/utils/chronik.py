@@ -13,18 +13,18 @@ def set_chronicle(step, table):
 
 def compare_chronicle(step1, step2, table):
 
-    cursor = arcpy.da.SearchCursor(table, ["Arbeitsschritt", "Letzte_Nutzung"])
+    where = '"Arbeitsschritt"'+" ='"+ step1 + "'"
+    cursor = arcpy.da.SearchCursor(table, ["Arbeitsschritt", "Letzte_Nutzung"], where)
     for schritt in cursor:
-        if schritt[0] == step1:
-            date1 = schritt[1]
+        date1 = schritt[1]
 
     if date1 is None:
         date1 = datetime.datetime(1, 1, 1)
 
-    cursor = arcpy.da.SearchCursor(table, ["Arbeitsschritt", "Letzte_Nutzung"])
+    where = '"Arbeitsschritt"'+" ='"+ step2 + "'"
+    cursor = arcpy.da.SearchCursor(table, ["Arbeitsschritt", "Letzte_Nutzung"], where)
     for schritt in cursor:
-        if schritt[0] == step2:
-            date2 = schritt[1]
+        date2 = schritt[1]
 
     if date2 is None:
         date2 = datetime.datetime(1, 1, 1)

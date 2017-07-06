@@ -53,7 +53,7 @@ class TbxGrundsteuer(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPLong'
         param.filter.type = 'Range'
-        param.filter.list = [50, 500]
+        param.filter.list = [30, 500]
         param.category = heading
 
         param = params.slider3 = arcpy.Parameter()
@@ -63,7 +63,7 @@ class TbxGrundsteuer(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPLong'
         param.filter.type = 'Range'
-        param.filter.list = [50, 500]
+        param.filter.list = [30, 500]
         param.category = heading
 
         param = params.slider4 = arcpy.Parameter()
@@ -73,7 +73,7 @@ class TbxGrundsteuer(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPLong'
         param.filter.type = 'Range'
-        param.filter.list = [50, 500]
+        param.filter.list = [30, 500]
         param.category = heading
 
         param = params.slider5 = arcpy.Parameter()
@@ -83,7 +83,7 @@ class TbxGrundsteuer(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPLong'
         param.filter.type = 'Range'
-        param.filter.list = [50, 500]
+        param.filter.list = [30, 500]
         param.category = heading
 
 
@@ -96,7 +96,7 @@ class TbxGrundsteuer(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPLong'
         param.filter.type = 'Range'
-        param.filter.list = [0, 800]
+        param.filter.list = [30, 800]
         param.category = heading
 
         param = params.slider7 = arcpy.Parameter()
@@ -106,7 +106,7 @@ class TbxGrundsteuer(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPLong'
         param.filter.type = 'Range'
-        param.filter.list = [300, 3000]
+        param.filter.list = [300, 2000]
         param.category = heading
 
 

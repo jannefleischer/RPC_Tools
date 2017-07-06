@@ -4,18 +4,19 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.analyst.einnahmen.Steuersalden import Steuersalden
+from rpctools.analyst.einnahmen.script_Umsatzsteuer import Umsatzsteuer
+import rpctools.utils.chronik as c
 
 class TbxUmsatzsteuer(Tbx):
-    """Toolbox Wanderungssalden für Einnahmen"""
+    """Toolbox Umsatzsteuer für Einnahmen"""
 
     @property
     def label(self):
-        return u'Schritt 2: Steuersalden schätzen'
+        return u'Umsatzsteuer'
 
     @property
     def Tool(self):
-        return Steuersalden
+        return Umsatzsteuer
 
     def _getParameterInfo(self):
 
@@ -32,31 +33,21 @@ class TbxUmsatzsteuer(Tbx):
 
         return par
 
-    def _updateParameters(self, params):
+    def _updateMessages(self, params):
 
         par = self.par
-        projects = self.folders.get_projects()
-        projects_wohnen_gewerbe = []
 
-        for project in projects:
-            table_teilflaechen = self.folders.get_table(
-                tablename='Teilflaechen_Plangebiet',
-                workspace="FGDB_Definition_Projekt.gdb",
-                project=project)
-            fields = "Nutzungsart"
-            cursor = arcpy.da.SearchCursor(table_teilflaechen, fields)
-            wohnen_gewerbe_exists = False
 
-            for flaeche in cursor:
-                if flaeche[0] == 1 or flaeche[0] == 2:
-                    wohnen_gewerbe_exists = True
+        cursor = self.query_table(table_name = 'Chronik_Nutzung',
+                                columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
+                                workspace='FGDB_Einnahmen.gdb')
+        for row in cursor:
+            if row[0] == u"Wanderung Beschaeftigte" and row[1] is None:
+                par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Beschäftigte berechnet!')
+            if row[0] == u"Gewerbesteuer" and row[1] is None:
+                par.name.setErrorMessage(u'Es wurde noch keine Gewerbesteuer berechnet!')
 
-            if wohnen_gewerbe_exists == True:
-                projects_wohnen_gewerbe.append(project)
-
-        par.name.filter.list = projects_wohnen_gewerbe
-        if projects_wohnen_gewerbe:
-            par.name.value = projects_wohnen_gewerbe[0]
-        else:
-            par.name.value = None
-            par.name.filter.enabled = False
+        table = self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=par.name.value)
+        vergleich = c.compare_chronicle(u"Gewerbesteuer", u"Wanderung Beschaeftigte", table)
+        if not vergleich:
+            par.name.setErrorMessage(u'Die Gewerbesteuer muss zuerst (erneut) berechnet werden!')

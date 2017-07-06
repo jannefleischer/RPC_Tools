@@ -96,7 +96,7 @@ class Einkommensteuer(Tool):
         fields = ['ESt', 'Einw_Saldo']
         cursor = arcpy.da.UpdateCursor(tablepath_bilanz, fields)
         for gemeinde in cursor:
-            gemeinde[0] = ESt_pro_Bewohner * gemeinde[1]
+            gemeinde[0] = round(ESt_pro_Bewohner * gemeinde[1])
             cursor.updateRow(gemeinde)
 
         c.set_chronicle("Einkommensteuer", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))

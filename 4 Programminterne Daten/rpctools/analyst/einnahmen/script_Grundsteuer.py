@@ -260,7 +260,7 @@ class Grundsteuer(Tool):
         cursor = arcpy.da.UpdateCursor(table_bilanzen, fields)
         for row in cursor:
             if row[0] == ags:
-                row[1] = GRUNDSTEUERAUFKOMMEN
+                row[1] = round(GRUNDSTEUERAUFKOMMEN)
             else:
                 row[1] = 0
             cursor.updateRow(row)

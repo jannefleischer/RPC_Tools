@@ -4,7 +4,7 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.analyst.flaeche_oekologie.script_Bodenbedeckung_kontrollieren import Integrationsgrad
+from rpctools.analyst.flaeche_oekologie.script_Integrationsgrad import Integrationsgrad
 from rpctools.utils.constants import Nutzungsart
 
 class TbxIntegrationsgrad(Tbx):

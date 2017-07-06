@@ -4,7 +4,7 @@ import os
 import sys
 
 import arcpy
-
+from rpctools.utils.constants import Nutzungsart
 from rpctools.utils.params import Tool
 import rpctools.utils.chronik as c
 from rpctools.utils.encoding import encode
@@ -56,7 +56,7 @@ class Gewerbesteuer(Tool):
         for row1 in cursor1:
             ags = row1[2]
             ags2 = ags[0:2]
-            if teilflaeche[0] == Nutzungsart.GEWERBE:
+            if row1[0] == Nutzungsart.GEWERBE and not gewerbe_vorhanden:
                 gewerbe_vorhanden = True
                 Summe_Arbeitsplatzschaetzungen = 0
                 fields2 = ['anzahl_jobs_schaetzung']
@@ -74,12 +74,12 @@ class Gewerbesteuer(Tool):
 
                 Korrekturfaktor_AP = Reale_Summe_AP / Summe_Arbeitsplatzschaetzungen
 
-                fields4 = ['anzahl_jobs_schaetzung', 'branche']
+                fields4 = ['anzahl_jobs_schaetzung', 'IDBranche']
                 cursor4 = arcpy.da.SearchCursor(table_gewerbeanteile, fields4)
                 for row4 in cursor4:
                     Messbetrag = 0
                     fields5 = ['AGS2', 'IDBranche', 'GewStMessbetrag_pro_Arbeitsplatz']
-                    where1 = '"AGS2"' + "='" + ags2 + "'" + " AND " + '"IDBranche"' + "='" + row4[1] + "'"
+                    where1 = '"AGS2"' + "='" + ags2 + "'" + " AND " + '"IDBranche"' + "=" + str(row4[1])
                     table_messbetrag_pro_ap = self.folders.get_base_table("FGDB_Einnahmen_Tool.gdb", "GewSt_Messbetrag_pro_Arbeitsplatz")
                     cursor5 = arcpy.da.SearchCursor(table_messbetrag_pro_ap, fields5, where1)
                     for branche in cursor5:
@@ -88,10 +88,10 @@ class Gewerbesteuer(Tool):
                     Messbetrag = cursor4[0] * Korrekturfaktor_AP * Messbetrag_pro_Arbeitsplatz
                     gewerbe_messbetrag += Messbetrag
 
-            if teilflaeche[0] == Nutzungsart.EINZELHANDEL:
+            if row1[0] == Nutzungsart.EINZELHANDEL:
                 einzelhandel_vorhanden = True
-                fields6 = ['Verkaufsflaeche_qm', 'ID_Teilflaeche', 'IDSortiment']
-                where2 = '"ID_Teilflaeche"' + "='" + row1[1] + "'"
+                fields6 = ['Verkaufsflaeche_qm', 'IDTeilflaeche', 'IDSortiment']
+                where2 = '"IDTeilflaeche"' + "=" + str(row1[1])
                 table_verkaufsflaechen = self.folders.get_table('Einzelhandel_Verkaufsflaechen', "FGDB_Definition_Projekt.gdb")
                 cursor6 = arcpy.da.SearchCursor(table_verkaufsflaechen, fields6, where2)
                 for row6 in cursor6:
@@ -99,7 +99,7 @@ class Gewerbesteuer(Tool):
                     verkaufsflaeche = row6[0]
 
                     fields7 = ['GewStMessbetrag_pro_qm_Verkaufsflaeche', 'ID_Sortiment']
-                    where3 = '"ID_Sortiment"' + "='" + row6[2] + "'"
+                    where3 = '"ID_Sortiment"' + "=" + str(row6[2])
                     table_messbetrag_pro_qm = self.folders.get_base_table("FGDB_Einnahmen_Tool.gdb", "GewSt_Messbetrag_und_SvB_pro_qm_Verkaufsflaeche")
                     cursor7 = arcpy.da.SearchCursor(table_messbetrag_pro_qm, fields7, where3)
                     for row7 in cursor7:
@@ -124,7 +124,7 @@ class Gewerbesteuer(Tool):
             cursor = arcpy.da.SearchCursor(table_verkaufsflaechen, fields)
             for verkaufsflaeche in cursor:
                 fields2 = ['SvB_pro_qm_Verkaufsflaeche', 'ID_Sortiment']
-                where2 = '"ID_Sortiment"' + "='" + verkaufsflaeche[1] + "'"
+                where2 = '"ID_Sortiment"' + "=" + str(verkaufsflaeche[1])
                 cursor2 = arcpy.da.SearchCursor(table_messbetrag_pro_qm, fields2, where2)
                 for row in cursor2:
                     SvB_Verkaufsflaechen += verkaufsflaeche[0] * row[0]
@@ -136,9 +136,9 @@ class Gewerbesteuer(Tool):
         cursor = arcpy.da.UpdateCursor(table_bilanzen, fields)
         for row in cursor:
             if row[0] == ags:
-                row[1] = Bewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100) * (row[3] + SvB_Verkaufsflaechen) / (SvB_Branchen + SvB_Verkaufsflaechen)
+                row[1] = round(Bewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100) * (row[3] + SvB_Verkaufsflaechen) / (SvB_Branchen + SvB_Verkaufsflaechen))
             else:
-                row[1] = Bewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100) * row[3] / (SvB_Branchen + SvB_Verkaufsflaechen)
+                row[1] = round(Bewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100) * row[3] / (SvB_Branchen + SvB_Verkaufsflaechen))
             cursor.updateRow(row)
 
         c.set_chronicle("Gewerbesteuer", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
