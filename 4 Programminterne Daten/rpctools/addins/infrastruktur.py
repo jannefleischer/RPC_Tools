@@ -5,6 +5,7 @@ import os
 
 from rpctools.addins.common import ToolboxButton, folders, config
 from rpctools.addins.outputs import ErschliessungsnetzeAnzeigen
+from rpctools.utils.output import ArcpyEnv
 
 __all__ = [
     "AnliegerstrasseInnere", "AnliegerstrasseAeussere",
@@ -248,8 +249,9 @@ class NetzabschnittLoeschen(InfrastructureDrawingTool):
             arcpy.Point(xmin, ymin)
         ])        
         bbox_poly = arcpy.Polygon(poly_points)
-        arcpy.CopyFeatures_management([bbox_poly], fc_bbox)
-        arcpy.Clip_analysis(lines, fc_bbox, fc_clipped)
+        with ArcpyEnv(addOutputsToMap=False):
+            arcpy.CopyFeatures_management([bbox_poly], fc_bbox)
+            arcpy.Clip_analysis(lines, fc_bbox, fc_clipped)
         cursor = arcpy.da.SearchCursor(fc_clipped, ['id', 'IDNetzelement'])
         del_ids = [id for id, element in cursor]
         del(cursor)
