@@ -17,23 +17,20 @@ class NetzKostenaufteilung(Tool):
         pass
     def run(self):
         tbx = self.parent_tbx
-        arcpy.AddMessage(tbx._df_results)
+        arcpy.AddMessage(tbx.df_results)
         return
 
 
 
 class TbxNetzKostenaufteilung(Tbx):
     _workspace = 'FGDB_Kosten.gdb'
-    _df_results = pd.DataFrame(index=['EH', 'BU', 'EN'],
-                               columns=['owner', 'community', 'users'],
-                               data=0, dtype='int')
-
-    _df_results.loc[:, 'owner'] = 100
-    _df_dummy_values = pd.DataFrame(index=['EH', 'BU', 'EN'],
-                               columns=['owner', 'community', 'users'],
-                               data=0, dtype='int')
-    _df_dummy_values.loc[:, 'owner'] = 100
-    _df_dummy_values = _df_dummy_values.astype(int, copy=False)
+    _netztyp = None
+    #_df_results.loc[:, 'owner'] = 100
+    #_df_dummy_values = pd.DataFrame(index=['EH', 'BU', 'EN'],
+                               #columns=['owner', 'community', 'users'],
+                               #data=0, dtype='int')
+    #_df_dummy_values.loc[:, 'owner'] = 100
+    #_df_dummy_values = _df_dummy_values.astype(int, copy=False)
 
     @property
     def label(self):
@@ -44,43 +41,85 @@ class TbxNetzKostenaufteilung(Tbx):
         return NetzKostenaufteilung
 
     def _open(self, params):
-        params.default_EH.value = self._df_defaults[0]
+        params.default_EH.value = self.initial_settings[0]
+        params.default_BU.value = self.initial_settings[0]
+        params.default_EN.value = self.initial_settings[0]
         # set params:
-        params.community_EH.value = self._df_dummy_values.loc['EH', 'community']
-        params.owner_EH.value = self._df_dummy_values.loc['EH', 'owner']
-        params.users_EH.value = self._df_dummy_values.loc['EH', 'users']
-        params.community_BU.value = self._df_dummy_values.loc['BU', 'community']
-        params.owner_BU.value = self._df_dummy_values.loc['BU', 'owner']
-        params.users_BU.value = self._df_dummy_values.loc['BU', 'users']
-        params.community_EN.value = self._df_dummy_values.loc['EN', 'community']
-        params.owner_EN.value = self._df_dummy_values.loc['EN', 'owner']
-        params.users_EN.value = self._df_dummy_values.loc['EN', 'users']
+        params.community_EH.value = self.df_results.loc['EH', 'Anteil_GEM']
+        params.owner_EH.value = self.df_results.loc['EH', 'Anteil_GSB']
+        params.users_EH.value = self.df_results.loc['EH', 'Anteil_ALL']
+        params.community_BU.value = self.df_results.loc['BU', 'Anteil_GEM']
+        params.owner_BU.value = self.df_results.loc['BU', 'Anteil_GSB']
+        params.users_BU.value = self.df_results.loc['BU', 'Anteil_ALL']
+        params.community_EN.value = self.df_results.loc['EN', 'Anteil_GEM']
+        params.owner_EN.value = self.df_results.loc['EN', 'Anteil_GSB']
+        params.users_EN.value = self.df_results.loc['EN', 'Anteil_ALL']
 
 
     def _updateParameters(self, params):
+        # check if other default settings were choosen
+        if self.par.changed('default_EH'):
+            if params.default_EH.value != u"benutzerdefinierte Einstellungen":
+                params.community_EH.value =  self._df_defaults.loc[params.default_EH.value, "Anteil_GEM"]
+                params.owner_EH.value =  self._df_defaults.loc[params.default_EH.value, "Anteil_GSB"]
+                params.users_EH.value =  self._df_defaults.loc[params.default_EH.value, "Anteil_ALL"]
+        if self.par.changed('default_BU'):
+            if params.default_BU.value != u"benutzerdefinierte Einstellungen":
+                params.community_BU.value =  self._df_defaults.loc[params.default_BU.value, "Anteil_GEM"]
+                params.owner_BU.value =  self._df_defaults.loc[params.default_BU.value, "Anteil_GSB"]
+                params.users_BU.value =  self._df_defaults.loc[params.default_BU.value, "Anteil_ALL"]
+        if self.par.changed('default_EN'):
+            if params.default_EN.value != u"benutzerdefinierte Einstellungen":
+                params.community_EN.value =  self._df_defaults.loc[params.default_EN.value, "Anteil_GEM"]
+                params.owner_EN.value =  self._df_defaults.loc[params.default_EN.value, "Anteil_GSB"]
+                params.users_EN.value =  self._df_defaults.loc[params.default_EN.value, "Anteil_ALL"]
+        # check if range-filter has changed
         # EH
-        if self.par.changed('community_EH', 'owner_EH', 'users_EH'):
-            self._df_results.loc['EH', 'community'] = params.community_EH.value
-            self._df_results.loc['EH', 'owner'] = params.owner_EH.value
-            self._df_results.loc['EH', 'users'] = params.users_EH.value
+
+        self.df_results.loc['EH', 'Anteil_GEM'] = params.community_EH.value
+        self.df_results.loc['EH', 'Anteil_GSB'] = params.owner_EH.value
+        self.df_results.loc['EH', 'Anteil_ALL'] = params.users_EH.value
+        if not self.par.changed('default_EH'):
+            params.default_EH.value = u"benutzerdefinierte Einstellungen"
         # BU
-        if self.par.changed('community_BU', 'owner_BU', 'users_BU'):
-            self._df_results.loc['BU', 'community'] = params.community_BU.value
-            self._df_results.loc['BU', 'owner'] = params.owner_BU.value
-            self._df_results.loc['BU', 'users'] = params.users_BU.value
+
+        self.df_results.loc['BU', 'Anteil_GEM'] = params.community_BU.value
+        self.df_results.loc['BU', 'Anteil_GSB'] = params.owner_BU.value
+        self.df_results.loc['BU', 'Anteil_ALL'] = params.users_BU.value
+        if not self.par.changed('default_BU'):
+            params.default_BU.value = u"benutzerdefinierte Einstellungen"
         # EN
-        if self.par.changed('community_EN', 'owner_EN', 'users_EN'):
-            self._df_results.loc['EN', 'community'] = params.community_EN.value
-            self._df_results.loc['EN', 'owner'] = params.owner_EN.value
-            self._df_results.loc['EN', 'users'] = params.users_EN.value
+
+        self.df_results.loc['EN', 'Anteil_GEM'] = params.community_EN.value
+        self.df_results.loc['EN', 'Anteil_GSB'] = params.owner_EN.value
+        self.df_results.loc['EN', 'Anteil_ALL'] = params.users_EN.value
+        if not self.par.changed('default_EN'):
+            params.default_EN.value = u"benutzerdefinierte Einstellungen"
+
         return params
 
     def _getParameterInfo(self):
         params = self.par
         projekte = self.folders.get_projects()
-        self.df_defaults = self.table_to_dataframe(
-            'Aufteilungsregeln', workspace='FGDB_Kosten_Tool.gdb',
-            is_base_table=True)
+        # get initial data
+        self.initial_settings = [u"Investoren / Grundstücksbesitzer zahlen alles"] * 3
+        self._df_defaults = self.table_to_dataframe('Aufteilungsregeln', columns=[],
+                                                   workspace='FGDB_Kosten_Tool.gdb',
+                                                   where=None,
+                                                   pkey='',
+                                                   project='',
+                                                   is_base_table=True)
+        self._df_defaults.index = self._df_defaults["Aufteilungsregel"]
+        self._df_defaults.loc[:, ["Anteil_GSB", "Anteil_GEM", "Anteil_ALL"]] = \
+            self._df_defaults.loc[:, ["Anteil_GSB", "Anteil_GEM", "Anteil_ALL"]].astype(int)
+        self.df_results = self._df_defaults.loc[self.initial_settings,
+                                                ["Anteil_GSB", "Anteil_GEM",
+                                                 "Anteil_ALL"]].copy()
+        self.df_results.index = ["EH", "BU", "EN"]
+        self.df_results = self.df_results.astype(int)
+
+        default_list = list(self._df_defaults.Aufteilungsregel)
+        default_list.append(u"benutzerdefinierte Einstellungen")
 
 
         category_EH = "Einmalige Herstellung"
@@ -118,8 +157,7 @@ class TbxNetzKostenaufteilung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = self._df_defaults
-        p.value = self._df_defaults[0]
+        p.filter.list = default_list
         p.category = category_EH
         # Grundstücksbesitzer
         p = self.add_parameter("owner_EH")
@@ -161,8 +199,7 @@ class TbxNetzKostenaufteilung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = self._df_defaults
-        p.value = self._df_defaults[0]
+        p.filter.list = default_list
         p.category = category_BU
         # Grundstücksbesitzer
         p = self.add_parameter("owner_BU")
@@ -204,8 +241,7 @@ class TbxNetzKostenaufteilung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = self._df_defaults
-        p.value = self._df_defaults[0]
+        p.filter.list = default_list
         p.category = category_EN
         # Grundstücksbesitzer
         p = self.add_parameter("owner_EN")
@@ -241,6 +277,8 @@ class TbxNetzKostenaufteilung(Tbx):
 
         return params
 
+class TbxNetzKostenaufteilungInnere(TbxNetzKostenaufteilung):
+    _netztyp = 1
 
 if __name__ == '__main__':
     t = TbxNetzKostenaufteilung()
