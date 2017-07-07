@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from rpctools.utils.config import Folders
 from rpctools.utils.spatial_lib import clip_raster
 from rpctools.utils.spatial_lib import Point
@@ -146,8 +147,7 @@ class DistanceRouting(object):
         arcpy.Delete_management(dist_raster)
         return distances
 
-    def _request_dist_raster(self, origin):
-        err = 'Fehler bei der Anfrage. Liegt der Punkt innerhalb Deutschlands?'
+    def _request_dist_raster(self, origin):        
         if origin.epsg != self.epsg:
             origin.transform(self.epsg) 
         params = {
@@ -161,19 +161,31 @@ class DistanceRouting(object):
             'cutoffMinutes': 20
         }
         start = time.time()
-        r = requests.post(self.URL, params=params)
+        err_msg = (u'Der Server meldet einen Fehler bei der Berechnung. '
+                   u'Bitte überprüfen Sie die Lage des Punktes '
+                   u'(innerhalb Deutschlands).')
+        try:
+            r = requests.post(self.URL, params=params)
+            r.raise_for_status()
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout):
+            arcpy.AddError(
+                u'Der Server antwortet nicht. Möglicherweise ist er nicht aktiv '
+                u'oder überlastet.')
+            return None
+        except requests.exceptions.HTTPError:
+            arcpy.AddError(err_msg)
+            return None
         print('request post {}s'.format(time.time() - start))
+        
         try: 
             id = r.json()['id']
         except:
-            arcpy.AddError(err)
+            arcpy.AddError(err_msg)
             return None
-        #url = '{url}/{id}/indicator?targets=Siedlungszellen_FeaturesToJS&detail=true'.format(url=self.URL, id=id)
         url = '{url}/{id}/raster'.format(url=self.URL, id=id)
 
         params = {
-            #'width': 5000,
-            #'height': 3000,
             'resolution': 300,
             'crs': 'EPSG:{}'.format('31467'),
         }
@@ -188,7 +200,7 @@ class DistanceRouting(object):
                 r.raw.decode_content = True
                 shutil.copyfileobj(r.raw, f)
         else:
-            arcpy.AddError(err)
+            arcpy.AddError('Das angefragte Distanzraster ist fehlerhaft.')
             return None
         return out_raster
 
