@@ -93,7 +93,7 @@ class Wanderungssalden2(Tool):
 
         arcpy.Intersect_analysis([wanderungssalden, pfad_buffer], pfad_verschnitt)
 
-        # Parameter: Exponentialfaktoren für Umzugsweiten Wohnen und Gewerbe
+        # Parameter: Exponentialfaktoren für Umzugsweiten Gewerbe
         exponentialfaktor_gewerbe = -0.13
         konstant_bis_km_gewerbe = 3
 
@@ -161,49 +161,26 @@ class Wanderungssalden2(Tool):
             gemeinde[2] = gemeinde[0] + gemeinde[1]
             cursor.updateRow(gemeinde)
 
-        #Prüfen, ob Gewerbe  existieren
-        wohnen_exists = False
-        gewerbe_exists = False
 
-        table_teilflaechen = self.folders.get_table(
-            tablename='Teilflaechen_Plangebiet',
-            workspace="FGDB_Definition_Projekt.gdb",
-            project=projektname)
-        fields = "Nutzungsart"
-        cursor = arcpy.da.SearchCursor(table_teilflaechen, fields)
-        wohnen_gewerbe_exists = False
+        #Gesamtsumme der Salden auf 0 setzen
+        summe_ueber_alle_salden = 0
+        fields = ["SvB_Saldo"]
+        cursor = arcpy.da.SearchCursor(wanderungssalden, fields)
+        for gemeinde in cursor:
+            summe_ueber_alle_salden += gemeinde[0]
 
-        for flaeche in cursor:
-            if flaeche[0] == 2:
-                gewerbe_exists = True
-
-        groupname = "einnahmen"
-        tbl_wanderungssalden = self.folders.get_table("Gemeindebilanzen")
-        folder = "einnahmen"
-        disable_other = False
-
-##        #Gewerbesaldo-Layer hinzufügen
-##        if gewerbe_exists:
-##            subgroup = "Wanderungssalden Erwerbstätige"
-##            lyrnames = ["Wanderungssalden Erwerbstätige"]
-##            for layername in lyrnames:
-##                self.output.replace_output(
-##                    groupname, tbl_wanderungssalden, layername,
-##                    folder, subgroup, disable_other)
-##
-##    #   Symbology anpassen
-##        mxd = arcpy.mapping.MapDocument("CURRENT")
-##        negative_saldos = [
-##            "Negative Wanderungssalden Einwohner",
-##            "Negative Wanderungssalden Erwerbstätige",
-##        ]
-##        projekt_layer = self.output.get_projectlayer(projektname)
-##        for layername in negative_saldos:
-##            self.output.reclassify_layer(projekt_layer, layername)
-##        arcpy.RefreshTOC()
+        if summe_ueber_alle_salden != 0:
+            fields = ["SvB_Saldo", "AGS"]
+            cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
+            for gemeinde in cursor:
+                if gemeinde[1] == ags_projekt and summe_ueber_alle_salden > 0:
+                    gemeinde[0] -= summe_ueber_alle_salden
+                elif gemeinde[1] == ags_projekt and summe_ueber_alle_salden < 0:
+                    gemeinde[0] += summe_ueber_alle_salden
+                cursor.updateRow(gemeinde)
 
 
-
+        c.set_chronicle("Wanderung Beschaeftigte", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
 
 
 

@@ -42,6 +42,21 @@ class TbxSaldenbearbeiten(Tbx):
         par.saldo.direction = 'Input'
         par.saldo.datatype = u'GPLong'
 
+        par.summe = arcpy.Parameter()
+        par.summe.name = u'Summe'
+        par.summe.displayName = u' Gesamtsumme der Wanderungssalden'
+        par.summe.parameterType = 'Required'
+        par.summe.datatype = u'GPLong'
+        par.summe.enabled = False
+
+        par.kontrolle = arcpy.Parameter()
+        par.kontrolle.name = u'kontrolle'
+        par.kontrolle.displayName = u'Wanderungssalden so aktualisieren, dass die Gesamtsumme 0 beträgt'
+        par.kontrolle.parameterType = 'Optional'
+        par.kontrolle.datatype = u'GPBoolean'
+
+
+
         return par
 
     def _updateParameters(self, params):
@@ -67,6 +82,20 @@ class TbxSaldenbearbeiten(Tbx):
                     gemeinden.append(u"{} || Saldo: {}".format(
                         gem_name, saldo))
                 par.gemeinde.filter.list = sorted(gemeinden)
+
+        if (par.changed('saldo') or par.changed('name') or par.changed('gemeinde')) and par.gemeinde.value != None:
+            target_gemeinde = par.gemeinde.value
+            target_gemeinde_kurz = target_gemeinde.split(" ||")[0]
+            summe = 0
+            fields = [self._saldo_field, "GEN"]
+            rows = self.query_table('Gemeindebilanzen', fields,
+                                    workspace='FGDB_Einnahmen.gdb')
+            for saldo in rows:
+                if saldo[1] == target_gemeinde_kurz and par.saldo.value != None:
+                    summe += par.saldo.value
+                else:
+                    summe += saldo[0]
+            par.summe.value = summe
 
 
 class TbxEWSaldenbearbeiten(TbxSaldenbearbeiten):

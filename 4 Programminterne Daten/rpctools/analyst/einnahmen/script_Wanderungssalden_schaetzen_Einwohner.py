@@ -90,7 +90,7 @@ class Wanderungssalden1(Tool):
 
         arcpy.Intersect_analysis([wanderungssalden, pfad_buffer], pfad_verschnitt)
 
-        # Parameter: Exponentialfaktoren für Umzugsweiten Wohnen und Gewerbe
+        # Parameter: Exponentialfaktoren für Umzugsweiten Wohnen
         exponentialfaktor_wohnen = -0.1
         konstant_bis_km_wohnen = 3
 
@@ -156,6 +156,23 @@ class Wanderungssalden1(Tool):
                 gemeinde[0] = 0
             gemeinde[2] = gemeinde[0] + gemeinde[1]
             cursor.updateRow(gemeinde)
+
+        #Gesamtsumme der Salden auf 0 setzen
+        summe_ueber_alle_salden = 0
+        fields = ["Einw_Saldo"]
+        cursor = arcpy.da.SearchCursor(wanderungssalden, fields)
+        for gemeinde in cursor:
+            summe_ueber_alle_salden += gemeinde[0]
+
+        if summe_ueber_alle_salden != 0:
+            fields = ["Einw_Saldo", "AGS"]
+            cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
+            for gemeinde in cursor:
+                if gemeinde[1] == ags_projekt and summe_ueber_alle_salden > 0:
+                    gemeinde[0] -= summe_ueber_alle_salden
+                elif gemeinde[1] == ags_projekt and summe_ueber_alle_salden < 0:
+                    gemeinde[0] += summe_ueber_alle_salden
+                cursor.updateRow(gemeinde)
 
 
         c.set_chronicle("Wanderung Einwohner", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))

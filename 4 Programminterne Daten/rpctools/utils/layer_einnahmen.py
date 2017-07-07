@@ -5,13 +5,13 @@ import os
 
 def get_values(spalte, projekt):
     values = []
-    
+
     folders = config.Folders()
     path_gemeindebilanzen = folders.get_table('Gemeindebilanzen', "FGDB_Einnahmen.gdb", projekt)
     cursor = arcpy.da.SearchCursor(path_gemeindebilanzen, spalte)
     for row in cursor:
         values.append(row[0])
-    
+
     return values
 
 def get_symbology(gemeindewerte, vorzeichen):
@@ -24,7 +24,6 @@ def get_symbology(gemeindewerte, vorzeichen):
         gemeinde_values.sort(reverse = True)
     else:
         gemeinde_values.sort()
-    arcpy.AddMessage(str(gemeinde_values))
     ref_value = gemeinde_values[x]
     folders = config.Folders()
     if vorzeichen == 1:
@@ -37,7 +36,6 @@ def get_symbology(gemeindewerte, vorzeichen):
     arcpy.AddMessage("ref: " + str(ref_value))
     if vorzeichen == 1:
         for symbology in cursor:
-            arcpy.AddMessage(str(symbology[1]))
             if symbology_layer is None and symbology[1] >= ref_value:
                 symbology_layer = symbology[0]
         if symbology_layer == None:
