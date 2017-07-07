@@ -210,6 +210,8 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     _displayname_begin = u'Beginn des Bezugs (Jahreszahl)'
     _max_duration = 15
 
+    # Default Gewerbegebietstyp
+    _default_typ_id = 2
 
     def __init__(self):
         super(TbxNutzungenGewerbe, self).__init__()
@@ -229,6 +231,8 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         )
         
         # extend the commercial types
+        default_idx = self.df_comm_types['IDGewerbegebietstyp'] == self._default_typ_id
+        self.df_comm_types.loc[default_idx, 'Name_Gewerbegebietstyp'] += ' (default)'    
         custom_row = pd.DataFrame(columns=self.df_comm_types.columns)        
         custom_row['IDGewerbegebietstyp'] = [Gewerbegebietstyp.BENUTZERDEFINIERT]
         custom_row['Name_Gewerbegebietstyp'] = ['Benutzerdefiniert']
@@ -342,11 +346,20 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         for branche in self.branchen.itervalues():
             row_idx = a_idx & (self.df_shares['IDBranche'] == branche.id)
             share = self.par[branche.param_gewerbenutzung].value
-            self.df_shares.loc[row_idx, 'anteil'] = share
-            self.df_shares.loc[row_idx, 'dichtekennwert_ap_pro_ha_brutto'] = \
-                branche.jobs_per_ha
-            self.df_shares.loc[row_idx, 'anzahl_jobs_schaetzung'] = \
-                branche.estimated_jobs
+            data = {
+                'IDTeilflaeche': area_id,
+                'IDBranche': branche.id, 
+                'anteil': share,
+                'dichtekennwert_ap_pro_ha_brutto': branche.jobs_per_ha,
+                'anzahl_jobs_schaetzung': branche.estimated_jobs
+            }
+            # row doesn't exist -> create new one and append it
+            if row_idx.sum() == 0:
+                row = pd.DataFrame(data, index=[0])
+                self.df_shares = self.df_shares.append(row, ignore_index=True)
+            else:
+                for k, v in data.iteritems():
+                    self.df_shares.loc[row_idx, k] = v
 
     def _updateParameters(self, params):
         params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
@@ -362,14 +375,12 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             if id_gewerbe != Gewerbegebietstyp.BENUTZERDEFINIERT:
                 self.set_gewerbe_presets(id_gewerbe)
                 altered = True
-        else:
-            # check if one of the branchenanteile changed
-            if any(map(self.par.changed,
-                       [branche.param_gewerbenutzung
-                        for branche in self.branchen.values()])):
-                # set selection to "benutzerdefiniert" and recalc. jobs
-                self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
-                altered = True
+        # check if one of the branchenanteile changed
+        elif self.par.changed(*[branche.param_gewerbenutzung
+                      for branche in self.branchen.values()]):
+            # set selection to "benutzerdefiniert" and recalc. jobs
+            self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
+            altered = True
 
         auto_idx = self.par.auto_select.filter.list.index(
             self.par.auto_select.value)
@@ -392,6 +403,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             idx = self.df_jobs['IDTeilflaeche'] == area['id_teilflaeche']
             n_jobs = params.arbeitsplaetze_insgesamt.value
             self.df_jobs.loc[idx, 'Arbeitsplaetze'] = n_jobs
+            self.df_areas.loc[area_idx, 'AP_gesamt'] = n_jobs
                 
         return params
 
@@ -428,13 +440,8 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         rows = self.df_shares[share_idx]
         # if there are no values defined yet, set to default values
         if len(rows) == 0:
-            columns=['IDTeilflaeche', 'IDBranche', 'anteil']
-            for branche in self.branchen.itervalues():
-                share = branche.default_gewerbenutzung
-                self.par[branche.param_gewerbenutzung].value = share
-                row = pd.DataFrame([[area['id_teilflaeche'], branche.id, share]],
-                                   columns=columns)
-                self.df_shares = self.df_shares.append(row, ignore_index=True)
+            self.set_gewerbe_presets(self._default_typ_id)
+            self._update_shares(area)
         # update values
         else: 
             for index, row in rows.iterrows():
@@ -555,6 +562,7 @@ if __name__ == '__main__':
     t.set_active_project()
     t.validate_inputs()
     t.open()
+    t.par.area.value = '"Flaeche_4" (4) | Buxtehude | 12.05 ha | Gewerbe'
     t._updateParameters(t.par)
     t.execute()
     #t.commit_tfl_changes()
