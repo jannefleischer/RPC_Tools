@@ -102,9 +102,10 @@ class Salden_bearbeiten2(Tool):
                 fields = ["SvB_Saldo", "AGS"]
                 cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
                 for gemeinde in cursor:
-                    if gemeinde[1] == ags_projekt:
+                    if gemeinde[1] != ags_projekt:
                         gemeinde[0] -= saldo_summe
-                    cursor.updateRow(gemeinde)
+                        cursor.updateRow(gemeinde)
+                        break
 
 
         arcpy.RefreshActiveView()

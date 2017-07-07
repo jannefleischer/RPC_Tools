@@ -95,18 +95,19 @@ class Salden_bearbeiten(Tool):
                                 gemeinde[1] -= saldo_summe
                             cursor.updateRow(gemeinde)
 
-            #Gesamtsumme der Salden auf 0 setzen
+            #Übrige Personen von größter Gemeinde (nicht Projekt-Gemeinde) abziehen
             saldo_summe = 0
             cursor_saldo = arcpy.da.SearchCursor(wanderungssalden, fields_saldo)
             for gemeinde in cursor_saldo:
                 saldo_summe += gemeinde[0]
             if saldo_summe != 0:
                 fields = ["Einw_Saldo", "AGS"]
-                cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
+                cursor = arcpy.da.UpdateCursor(in_table=wanderungssalden, field_names=fields, sql_clause=(None, 'ORDER BY Einw_Saldo DESC'))
                 for gemeinde in cursor:
-                    if gemeinde[1] == ags_projekt:
+                    if gemeinde[1] != ags_projekt:
                         gemeinde[0] -= saldo_summe
-                    cursor.updateRow(gemeinde)
+                        cursor.updateRow(gemeinde)
+                        break
 
 
 
