@@ -65,7 +65,7 @@ class Tool(object):
     _workspace = None
     """the name of the default database of the tool"""
 
-    def __init__(self, params, parent_tbx):
+    def __init__(self, params=None, parent_tbx=None, projectname=None):
         """
         Parameters
         ----------
@@ -73,11 +73,24 @@ class Tool(object):
         parent_tbx: Tbx object, the toolbox the Tool belongs to
                     (=the calling toolbox)
         """
-        self.par = params
+        self.par = params if params is not None else Params()
         self.mes = Message()
-        self.parent_tbx = parent_tbx
         self.folders = ToolFolders(params=self.par)
+            
+        if projectname:
+            self.folders._projectname = projectname
+        self.folders._workspace = self._workspace
         self.output = Output(params)
+        
+        # create a dummy toolbox, so that a tool may be able to function 
+        # without a 'real' one
+        if not parent_tbx:
+            parent_tbx = DummyTbx()
+            parent_tbx.tool = self
+            parent_tbx.folders = Folders(projectname=self.folders._projectname,
+                                         workspace=self._workspace)
+        
+        self.parent_tbx = parent_tbx         
 
     def main(self, par, parameters=None, messages=None):
         """
