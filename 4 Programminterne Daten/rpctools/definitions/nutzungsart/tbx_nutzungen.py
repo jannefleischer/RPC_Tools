@@ -210,10 +210,6 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     _displayname_begin = u'Beginn des Bezugs (Jahreszahl)'
     _max_duration = 15
 
-    # properties derived from base tables
-    _gewerbegebietstypen = None
-    _presets = None
-    _dichtekennwerte = None
 
     def __init__(self):
         super(TbxNutzungenGewerbe, self).__init__()
@@ -231,6 +227,13 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             workspace='FGDB_Definition_Projekt_Tool.gdb',
             is_base_table=True
         )
+        
+        # extend the commercial types
+        custom_row = pd.DataFrame(columns=self.df_comm_types.columns)        
+        custom_row['IDGewerbegebietstyp'] = [Gewerbegebietstyp.BENUTZERDEFINIERT]
+        custom_row['Name_Gewerbegebietstyp'] = ['Benutzerdefiniert']
+        self.df_comm_types = self.df_comm_types.append(
+            custom_row, ignore_index=True).sort('IDGewerbegebietstyp')
         
         self.df_presets = self.table_to_dataframe(
             'Vorschlagswerte_Branchenstruktur',

@@ -29,21 +29,24 @@ class TeilflaechenVerwalten(Tool):
             tou_id = area['Nutzungsart']
             area_id = area['id_teilflaeche']            
             
+            # remove table entries eventually stored for this area
+            # (may exist if it was defined as a different type before)
             if tou_id != Nutzungsart.WOHNEN:
                 tables = ['Wohnen_WE_in_Gebaeudetypen',
                           'Wohnen_Struktur_und_Alterung_WE']
                 for table in tables:
                     self.parent_tbx.delete_rows_in_table(
                         table, pkey=dict(IDTeilflaeche=area_id))
-            if tou_id != Nutzungsart.GEWERBE:
+            elif tou_id != Nutzungsart.GEWERBE:
                 tables = ['Gewerbe_Anteile', 'Gewerbe_Arbeitsplaetze']
                 for table in tables:
                     self.parent_tbx.delete_rows_in_table(
                         table, pkey=dict(IDTeilflaeche=area_id))
-            if tou_id != Nutzungsart.EINZELHANDEL:
+            elif tou_id != Nutzungsart.EINZELHANDEL:
                 table = 'Einzelhandel_Verkaufsflaechen'
                 self.parent_tbx.delete_rows_in_table(
                     table, pkey=dict(IDTeilflaeche=area_id))
+                # delete markets eventually belonging to the area
                 if not market_tool:
                     market_tool = MarktEinlesen(projectname=self.projectname)
                 market_tool.delete_area_market(area_id)
