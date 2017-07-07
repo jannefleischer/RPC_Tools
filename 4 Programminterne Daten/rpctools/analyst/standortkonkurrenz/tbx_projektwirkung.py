@@ -41,9 +41,9 @@ class ProjektwirkungMarkets(Tool):
         planfall_idx = (id_nullfall != id_planfall) & (id_planfall > 0)
         
         for index, plan_market in df_markets[planfall_idx].iterrows():
-            layer_name = '{n} {m} ({i})'.format(n=layer,
-                                                m=plan_market['name'],
-                                                i=plan_market['id'])
+            layer_name = u'{n} {m} ({i})'.format(n=layer,
+                                                 m=plan_market['name'],
+                                                 i=plan_market['id'])
             self.output.add_layer(group_layer, layer, fc_maerkte,
                                   query='id_markt={}'.format(
                                       plan_market['id']),

@@ -148,6 +148,7 @@ if __name__ == '__main__':
     t = TbxProjektAnlegen()
     params = t.getParameterInfo()
     t.par.name.value = 'Test918'
+    t.show_outputs()
     t.execute()
     t.print_tool_parameters()
 

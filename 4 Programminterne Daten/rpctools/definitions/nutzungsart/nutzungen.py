@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
-
-from rpctools.utils.params import Tool
 import arcpy
 import pandas as pd
+
+from rpctools.utils.params import Tool
+from rpctools.analyst.standortkonkurrenz.osm_einlesen import Supermarket
+from rpctools.analyst.standortkonkurrenz.tbx_osm_markteinlesen import MarktEinlesen
+
 
 class Nutzungen(Tool):
     _param_projectname = 'projectname'
@@ -420,17 +423,45 @@ class NutzungenEinzelhandel(Nutzungen):
         
         grouped = self.parent_tbx.df_sqm.groupby(by='IDTeilflaeche')
         
-        # sum up the sales areas and write them to db
-        sums = grouped['Verkaufsflaeche_qm'].sum()
-        for index, area in self.parent_tbx.df_areas.iterrows():
-            if area['id_teilflaeche'] in sums:
-                s = sums[area['id_teilflaeche']]
-                self.parent_tbx.df_areas.loc[index, 'VF_gesamt'] = s
+        arcpy.AddMessage(u'Füge die Lebensmittel-Verkaufsflächen '
+                         u'repräsentierende Märkte hinzu...')
+        market_tool = MarktEinlesen(projectname=self.projectname)
+        for id, group in grouped:
+            idx = self.parent_tbx.df_areas['id_teilflaeche'] == id
+            area = self.parent_tbx.df_areas[idx].iloc[0]
+            sum_sqm = group['Verkaufsflaeche_qm'].sum()
+            self.parent_tbx.df_areas.loc[idx, 'VF_gesamt'] = sum_sqm
+            
+            # add a market that corresponds to the area
+            # 'Lebensmittel' only
+            id_lm = 1
+            vkfl_lebensmittel = group[
+                group['IDSortiment'] == id_lm]['Verkaufsflaeche_qm'].values[0]
+            market_tool.delete_area_market(id)
+            
+            if vkfl_lebensmittel > 0:        
+                name = u'Neuer Lebensmittelmarkt auf Fläche "{}"'.format(
+                    area['Name'])
+                arcpy.AddMessage(u'  - {} mit {} m² Verkaufsfläche'.format(
+                    name, vkfl_lebensmittel))
+                x, y = area['Shape']
+                market = Supermarket(id,
+                                     x, y,
+                                     name=name,
+                                     kette='unbekannt', 
+                                     vkfl=vkfl_lebensmittel,
+                                     id_teilflaeche=id, 
+                                     epsg=self.parent_tbx.config.epsg)
+                market = market_tool.set_betriebstyp_vkfl([market])[0]
+                market_tool.markets_to_db([market], planfall=True)
         
         self.parent_tbx.dataframe_to_table(
             'Teilflaechen_Plangebiet',
             self.parent_tbx.df_areas, ['id_teilflaeche'],
-            upsert=False)
+            upsert=False)        
+    
+        arcpy.AddMessage(u'Aktualisiere die AGS der Märkte...')
+        market_tool.set_ags()
         
     def calculate_ways(self): 
         besucher_sqm_col = 'Besucher_je_qm_Vfl'
@@ -450,7 +481,7 @@ class NutzungenEinzelhandel(Nutzungen):
             is_base_table=True)
         # column names of the ids differ -> rename one of them
         sortimente_df.rename(
-            columns={'ID_Sortiment_ProjektCheck': id_sort_col}, inplace=True)        
+            columns={'ID_Sortiment_ProjektCheck': id_sort_col}, inplace=True)
         joined = vfl_table_df.merge(sortimente_df, on=id_sort_col,
                                     how='inner')
         

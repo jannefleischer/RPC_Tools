@@ -7,6 +7,7 @@ from collections import OrderedDict
 from rpctools.utils.params import Tool
 from rpctools.diagrams.diagram_teilflaechen import DiaTeilflaechen
 from rpctools.utils.constants import Nutzungsart
+from rpctools.analyst.standortkonkurrenz.tbx_osm_markteinlesen import MarktEinlesen
 
 
 class TeilflaechenVerwalten(Tool):
@@ -22,11 +23,11 @@ class TeilflaechenVerwalten(Tool):
 
     def run(self):
         df_areas = self.parent_tbx.df_areas
-        
+        market_tool = None
         # delete rows not corresponding to set type of use wohnen/gewerbe/einzelhandel
         for index, area in df_areas.iterrows():
             tou_id = area['Nutzungsart']
-            area_id = area['id_teilflaeche']
+            area_id = area['id_teilflaeche']            
             
             if tou_id != Nutzungsart.WOHNEN:
                 tables = ['Wohnen_WE_in_Gebaeudetypen',
@@ -43,6 +44,9 @@ class TeilflaechenVerwalten(Tool):
                 table = 'Einzelhandel_Verkaufsflaechen'
                 self.parent_tbx.delete_rows_in_table(
                     table, pkey=dict(IDTeilflaeche=area_id))
+                if not market_tool:
+                    market_tool = MarktEinlesen(projectname=self.projectname)
+                market_tool.delete_area_market(area_id)
         
         self.parent_tbx.dataframe_to_table('Teilflaechen_Plangebiet',
                                            df_areas, ['id_teilflaeche'],

@@ -14,10 +14,10 @@ import arcpy
 
 class Supermarket(Point):
     """A Supermarket"""
-    __slots__ = ['id', 'x', 'y', 'id_betriebstyp', 'id_kette', 
-                 'name', 'kette', 'shop', 'typ', 'geom', 'vkfl']
+    __slots__ = ['id', 'x', 'y', 'id_betriebstyp', 'id_kette', 'name',
+                 'kette', 'shop', 'typ', 'geom', 'vkfl', 'id_teilflaeche']
     def __init__(self, id, x, y, name, kette, shop=None, typ=None, vkfl=None, 
-                 id_betriebstyp=1, epsg=4326, 
+                 id_betriebstyp=1, epsg=4326, id_teilflaeche=-1, id_kette=0, 
                  **kwargs):
         super(Supermarket, self).__init__(x, y, id=id, epsg=epsg)
         self.id_betriebstyp = id_betriebstyp
@@ -28,6 +28,7 @@ class Supermarket(Point):
         self.typ = typ
         self.vkfl = vkfl
         self.geom = None
+        self.id_teilflaeche = id_teilflaeche
 
     def __repr__(self):
         return u'{},{}'.format(self.kette, self.name)
