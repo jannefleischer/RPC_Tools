@@ -18,7 +18,10 @@ class Arbeitsplaetze(Tool):
     def add_outputs(self):
     
         area, idx = self.parent_tbx.get_selected_area()
-        #area = 
+        if area['AP_gesamt'] == 0:
+            arcpy.AddError(u'Die Detailangaben zu Teilfläche "{}" fehlen!'
+                           .format(area['Name']))
+            return
         diagram = ArbeitsplatzEntwicklung(
             flaechen_id=area['id_teilflaeche'],
             flaechen_name=area['Name'])

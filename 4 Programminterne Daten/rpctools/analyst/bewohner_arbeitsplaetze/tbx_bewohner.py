@@ -14,8 +14,12 @@ class Bewohner(Tool):
     _workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
     
     def add_outputs(self):
+        
         area, idx = self.parent_tbx.get_selected_area()
-        #area = 
+        if area['WE_gesamt'] == 0:
+            arcpy.AddError(u'Die Detailangaben zu Teilfläche "{}" fehlen!'
+                           .format(area['Name']))
+            return
         diagram = BewohnerEntwicklung(
             flaechen_id=area['id_teilflaeche'],
             flaechen_name=area['Name'])
