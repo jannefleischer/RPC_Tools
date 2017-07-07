@@ -90,7 +90,27 @@ class TbxFlaechendefinition(Tbx):
             gemeinde=area['gemeinde_name'], 
             tou=type_of_use
         )
+        suffix = ''
+        if self._nutzungsart == Nutzungsart.WOHNEN:
+            n = area['WE_gesamt'] or 'NICHT DEFINIERT'
+            suffix = ' | Wohneinheiten: {}'.format(n)
+        if self._nutzungsart == Nutzungsart.GEWERBE:
+            n = area['AP_gesamt'] or 'NICHT DEFINIERT'
+            suffix = u' | Arbeitsplätze: {}'.format(n)
+        if self._nutzungsart == Nutzungsart.EINZELHANDEL:
+            n = u'{} m²'.format(area['VF_gesamt']) if area['VF_gesamt'] \
+                else 'NICHT DEFINIERT'
+            suffix = u' | Verkaufsfläche: {}'.format(n)
+        pretty += suffix
         return pretty
+    
+    def update_pretty_name(self):
+        area, idx = self.get_selected_area()
+        # something changed -> update pretty representation of selected area 
+        # and update list as well (to show new pretty repr.)
+        pretty = self.get_pretty_area_name(area)
+        self.df_areas.loc[idx, 'pretty'] = pretty
+        self.update_area_list()        
     
     def update_area_list(self, idx=None):
         """update the list of areas and select the area with index if given"""
@@ -187,14 +207,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
             self.df_areas.loc[idx, 'Nutzungsart'] = tou_id
         
         if params.changed('name') or params.changed('type_of_use'):
-            # get area again because Series is just a copy of the row of Dataframe
-            # which was changed
-            area = self.df_areas.loc[idx]
-            # something changed -> update pretty representation of selected area 
-            # and update list as well (to show new pretty repr.)
-            pretty = self.get_pretty_area_name(area)
-            self.df_areas.loc[idx, 'pretty'] = pretty
-            self.update_area_list()
+            self.update_pretty_name()
 
         return params
 

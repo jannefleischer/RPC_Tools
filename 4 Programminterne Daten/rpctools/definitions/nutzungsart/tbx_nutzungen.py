@@ -192,14 +192,21 @@ class TbxNutzungenWohnen(TbxNutzungen):
         params = super(TbxNutzungenWohnen, self)._updateParameters(params)
         area, area_idx = self.get_selected_area()
         
+        we_changed = False
         for gt in self.gebaeudetypen.itervalues():
             if params.changed(gt.param_we):
                 self._update_row(area, gt.typ_id, 'WE',
                                  self.par[gt.param_we].value)
+                we_changed = True
             elif params.changed(gt.param_ew_je_we):
                 self._update_row(area, gt.typ_id, 'EW_je_WE',
                                  self.par[gt.param_ew_je_we].value)
-
+        
+        if we_changed:
+            we_idx = self.df_acc_units['IDTeilflaeche'] == area['id_teilflaeche']
+            sums = self.df_acc_units[we_idx]['WE'].sum()
+            self.df_areas.loc[area_idx, 'WE_gesamt'] = sums
+            self.update_pretty_name()
         return params    
 
 
@@ -404,6 +411,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             n_jobs = params.arbeitsplaetze_insgesamt.value
             self.df_jobs.loc[idx, 'Arbeitsplaetze'] = n_jobs
             self.df_areas.loc[area_idx, 'AP_gesamt'] = n_jobs
+            self.update_pretty_name()
                 
         return params
 
@@ -549,20 +557,26 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         params = super(TbxNutzungenEinzelhandel, self)._updateParameters(params)
         area, area_idx = self.get_selected_area()
         
+        altered = False
         for srt in self.sortimente.itervalues():
             if params.changed(srt.param_vfl):
                 sqm = self.par[srt.param_vfl].value
                 self._update_row(area, srt.typ_id, sqm)
+                altered = True
 
+        if altered: 
+            sqm_idx = self.df_sqm['IDTeilflaeche'] == area['id_teilflaeche']
+            sums = self.df_sqm[sqm_idx]['Verkaufsflaeche_qm'].sum()
+            self.df_areas.loc[area_idx, 'VF_gesamt'] = sums
+            self.update_pretty_name()
         return params
 
 if __name__ == '__main__':
-    t = TbxNutzungenGewerbe()
+    t = TbxNutzungenWohnen()
     t.getParameterInfo()
     t.set_active_project()
     t.validate_inputs()
     t.open()
-    t.par.area.value = '"Flaeche_4" (4) | Buxtehude | 12.05 ha | Gewerbe'
     t._updateParameters(t.par)
     t.execute()
     #t.commit_tfl_changes()

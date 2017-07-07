@@ -79,15 +79,6 @@ class NutzungenWohnen(Nutzungen):
             ['IDTeilflaeche', 'IDGebaeudetyp'],
             upsert=True)
         
-        grouped = self.parent_tbx.df_acc_units.groupby(by='IDTeilflaeche')
-        
-        # sum up the accomodation units and write them to db
-        sums = grouped['WE'].sum()
-        for index, area in self.parent_tbx.df_areas.iterrows():
-            if area['id_teilflaeche'] in sums:
-                s = sums[area['id_teilflaeche']]
-                self.parent_tbx.df_areas.loc[index, 'WE_gesamt'] = s
-        
         self.parent_tbx.dataframe_to_table(
             'Teilflaechen_Plangebiet',
             self.parent_tbx.df_areas, ['id_teilflaeche'],
@@ -431,8 +422,6 @@ class NutzungenEinzelhandel(Nutzungen):
         for id, group in grouped:
             idx = self.parent_tbx.df_areas['id_teilflaeche'] == id
             area = self.parent_tbx.df_areas[idx].iloc[0]
-            sum_sqm = group['Verkaufsflaeche_qm'].sum()
-            self.parent_tbx.df_areas.loc[idx, 'VF_gesamt'] = sum_sqm
             
             # add a market that corresponds to the area
             # 'Lebensmittel' only
