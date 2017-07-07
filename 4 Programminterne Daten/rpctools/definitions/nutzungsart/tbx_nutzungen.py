@@ -401,7 +401,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             else:
                 params.arbeitsplaetze_insgesamt.enabled = True
         
-        if altered:
+        if altered and auto_idx == 0:
             n_jobs = self.estimate_jobs()
             params.arbeitsplaetze_insgesamt.value = n_jobs
             self._update_shares(area)
