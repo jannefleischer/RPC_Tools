@@ -101,7 +101,7 @@ def kostenaufteilung_startwerte(project):
     df_cost_allocation_initial = tbx.table_to_dataframe(
         'Kostenaufteilung_Startwerte', columns=[],
         workspace='FGDB_Kosten_Tool.gdb', where=None, is_base_table=True)
-    tbx.dataframe_to_table(table, df_cost_allocation, pkeys=['ID'],
+    tbx.dataframe_to_table(table, df_cost_allocation_initial, pkeys=['OBJECTID'],
                            workspace='FGDB_Kosten.gdb', upsert=True)
 
 
