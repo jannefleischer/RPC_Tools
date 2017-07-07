@@ -547,7 +547,7 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         return params
 
 if __name__ == '__main__':
-    t = TbxNutzungenEinzelhandel()
+    t = TbxNutzungenGewerbe()
     t.getParameterInfo()
     t.set_active_project()
     t.validate_inputs()

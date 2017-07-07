@@ -350,6 +350,8 @@ class NutzungenGewerbe(Nutzungen):
         
         perc_table_df = tbx.table_to_dataframe(
             perc_table, where='IDTeilflaeche={}'.format(flaechen_id))
+        if len(perc_table_df) == 0:
+            return
         
         perc_res_df = pd.DataFrame()
         perc_res_df['IDBranche'] = perc_table_df['IDBranche']

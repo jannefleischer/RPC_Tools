@@ -163,7 +163,7 @@ class DistanceRouting(object):
         start = time.time()
         err_msg = (u'Der Server meldet einen Fehler bei der Berechnung. '
                    u'Bitte überprüfen Sie die Lage des Punktes '
-                   u'(innerhalb Deutschlands).')
+                   u'(muss innerhalb Deutschlands liegen).')
         try:
             r = requests.post(self.URL, params=params)
             r.raise_for_status()
