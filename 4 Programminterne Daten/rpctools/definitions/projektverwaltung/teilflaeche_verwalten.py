@@ -23,11 +23,25 @@ class TeilflaechenVerwalten(Tool):
 
     def run(self):
         df_areas = self.parent_tbx.df_areas
+        df_areas_old = self.parent_tbx.table_to_dataframe('Teilflaechen_Plangebiet')
         market_tool = None
-        # delete rows not corresponding to set type of use wohnen/gewerbe/einzelhandel
+        # delete former entries when type of use was changed
         for index, area in df_areas.iterrows():
             tou_id = area['Nutzungsart']
-            area_id = area['id_teilflaeche']            
+            area_id = area['id_teilflaeche']
+            tou_changed = (df_areas.loc[index]['Nutzungsart'] !=
+                           df_areas_old.loc[index]['Nutzungsart'])
+            
+            if not tou_changed:
+                continue
+            arcpy.AddMessage(u'Die Nutzungsart von Fläche "{}" hat sich '
+                             u'geändert. Bereinige eventuelle bereits '
+                             u'berechnete Ergebnisse und Einstellungen...'
+                             .format(area['Name']))
+            
+            df_areas.loc[index, 'Wege_gesamt'] = 0
+            df_areas.loc[index, 'Wege_MIV'] = 0
+            df_areas.loc[index, 'ew'] = 0
             
             # remove table entries eventually stored for this area
             # (may exist if it was defined as a different type before)
@@ -37,15 +51,18 @@ class TeilflaechenVerwalten(Tool):
                 for table in tables:
                     self.parent_tbx.delete_rows_in_table(
                         table, pkey=dict(IDTeilflaeche=area_id))
-            elif tou_id != Nutzungsart.GEWERBE:
+                df_areas.loc[index, 'WE_gesamt'] = 0
+            if tou_id != Nutzungsart.GEWERBE:
                 tables = ['Gewerbe_Anteile', 'Gewerbe_Arbeitsplaetze']
                 for table in tables:
                     self.parent_tbx.delete_rows_in_table(
                         table, pkey=dict(IDTeilflaeche=area_id))
-            elif tou_id != Nutzungsart.EINZELHANDEL:
+                df_areas.loc[index, 'AP_gesamt'] = 0
+            if tou_id != Nutzungsart.EINZELHANDEL:
                 table = 'Einzelhandel_Verkaufsflaechen'
                 self.parent_tbx.delete_rows_in_table(
                     table, pkey=dict(IDTeilflaeche=area_id))
+                df_areas.loc[index, 'VF_gesamt'] = 0
                 # delete markets eventually belonging to the area
                 if not market_tool:
                     market_tool = MarktEinlesen(projectname=self.projectname)
