@@ -52,12 +52,11 @@ class MarktEinlesen(Tool):
             arcpy.TruncateTable_management(self.folders.get_table(res_table))
             
         df = self.parent_tbx.table_to_dataframe('Maerkte')
-        max_id = df['id'].max() if len(df) > 0 else 0
-        
-        id_nullfall = 0 if planfall else markt.id_betriebstyp
+        max_id = df['id'].max() if len(df) > 0 else 0        
             
         with arcpy.da.InsertCursor(table, columns) as rows:
-            for i, markt in enumerate(supermarkets):
+            for i, markt in enumerate(supermarkets):            
+                id_nullfall = 0 if planfall else markt.id_betriebstyp
                 if markt.name is None:
                     continue
                 markt.create_geom()
