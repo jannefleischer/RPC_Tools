@@ -22,11 +22,17 @@ class MarktEinlesen(Tool):
     def add_outputs(self):
         group_layer = ("standortkonkurrenz")
         fc = 'Maerkte'
-        layer_nullfall = 'Märkte Nullfall'
-        layer_planfall = 'Märkte Planfall'
+        folder = 'Standortkonkurrenz'
+        layer_nullfall = 'Märkte im Bestand'
+        layer_changed = 'veränderte Märkte im Bestand'
+        layer_planfall = 'geplante Märkte'
     
-        self.output.add_layer(group_layer, layer_nullfall, fc, zoom=False)
-        self.output.add_layer(group_layer, layer_planfall, fc, zoom=False)
+        self.output.add_layer(group_layer, layer_nullfall, fc,
+                              template_folder=folder, zoom=False)
+        self.output.add_layer(group_layer, layer_changed, fc,
+                              template_folder=folder, zoom=False)
+        self.output.add_layer(group_layer, layer_planfall, fc,
+                              template_folder=folder, zoom=False)
 
     def markets_to_db(self, supermarkets, truncate=False, planfall=False):
         """Create the point-features for supermarkets"""
@@ -175,9 +181,6 @@ class MarktEinlesen(Tool):
         # delete the market
         self.parent_tbx.delete_rows_in_table(
             'Maerkte', where=where)
-            
-        
-        
 
 
 class OSMMarktEinlesen(MarktEinlesen):

@@ -205,22 +205,22 @@
                 <Tool caption="bestehenden Markt hinzuf&#252;gen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="bestehenden Markt bearbeiten/entfernen" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
+                <Tool caption="bestehenden Markt bearbeiten/entfernen" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="bestehenden Markt erweitern" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_erweitern" image="" message="" tip="">
+                <Tool caption="bestehenden Markt erweitern/schlie&#223;en" category="ProjektCheck" class="PlanfallMarktErweiterung" id="rpc_tools.planfall_erweitern" image="Images\GenericPencilTarget16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
                 <Tool caption="geplanten Markt hinzuf&#252;gen" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_hinzu" image="Images\GreenPin16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="geplanten Markt bearbeiten/entfernen" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
+                <Tool caption="geplanten Markt bearbeiten/entfernen" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
                 <Tool caption="Versorgungsbereich zeichnen" category="ProjektCheck" class="ZentrumHinzu" id="rpc_tools.zentrum_hinzu" image="Images\GenericPencilArea16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Versorgungsbereich bearbeiten/entfernen" category="ProjektCheck" class="ZentrumBearbeiten" id="rpc_tools.zentrum_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
+                <Tool caption="Versorgungsbereich bearbeiten/entfernen" category="ProjektCheck" class="ZentrumBearbeiten" id="rpc_tools.zentrum_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
                 <Button caption="Projektwirkung sch&#228;tzen" category="ProjektCheck" class="StandortkonkurrenzProjektwirkung" id="rpc_tools.standortkonkurrenz_projektwirkung" image="Images\GenericCalculator16.png" message="" tip="">
@@ -573,7 +573,7 @@
                 <Menu caption="Ver&#228;nderungen durch Planung" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_planfall" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Tool refID="rpc_tools.planfall_erweitern" />
-                        <Tool refID="rpc_tools.planfall_hinzu" />
+                        <Tool refID="rpc_tools.planfall_hinzu" separator="true"/>
                         <Tool refID="rpc_tools.planfall_bearbeiten" />
                     </Items>
                 </Menu>

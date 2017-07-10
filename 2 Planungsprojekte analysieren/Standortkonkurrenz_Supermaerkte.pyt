@@ -10,7 +10,7 @@
 from rpctools.analyst.standortkonkurrenz.tbx_osm_markteinlesen import TbxOSMMarktEinlesen
 from rpctools.analyst.standortkonkurrenz.tbx_projektwirkung import TbxProjektwirkungMarkets
 from rpctools.analyst.standortkonkurrenz.tbx_edit_markets import (
-    TbxEditMarketsPlanfall, TbxEditMarketsNullfall)
+    TbxEditMarketsPlanfall, TbxEditMarketsNullfall, TbxExtendMarkets)
 from rpctools.analyst.standortkonkurrenz.tbx_create_template import TbxCreateTemplate
 from rpctools.analyst.standortkonkurrenz.tbx_versorgungsbereiche import TbxEditCenters
 from rpctools.analyst.standortkonkurrenz.tbx_maerkte_importieren import (
@@ -28,6 +28,7 @@ class Toolbox(object):
                       TbxEditMarketsNullfall, 
                       TbxEditMarketsPlanfall,
                       TbxEditCenters,
+                      TbxExtendMarkets, 
                       TbxMaerkteImportierenDatei, 
                       TbxMaerkteImportierenFeatureClass]
 

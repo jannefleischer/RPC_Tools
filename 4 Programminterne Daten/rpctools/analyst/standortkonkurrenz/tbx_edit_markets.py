@@ -9,6 +9,7 @@ import pandas as pd
 
 NULLFALL = 0
 PLANFALL = 1
+CHANGE = 2
 
 
 class EditMarkets(Tool):
@@ -73,29 +74,30 @@ class TbxEditMarkets(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.filter.list = []
-        
-        param = self.add_parameter('name')
-        param.name = encode(u'Name')
-        param.displayName = encode(u'Name des Marktes')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPString'
-        
-        # Handelsketten
-        
+
         self.chains_df = self.table_to_dataframe(
             'Ketten',
             workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
             is_base_table=True
         )        
-    
-        param = self.add_parameter('chain')
-        param.name = encode(u'Kette')
-        param.displayName = encode(u'Handelskette')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPString'
-        param.filter.list = sorted(self.chains_df['name'].values.tolist())
+                
+        if self.setting != CHANGE:
+            param = self.add_parameter('name')
+            param.name = encode(u'Name')
+            param.displayName = encode(u'Name des Marktes')
+            param.parameterType = 'Required'
+            param.direction = 'Input'
+            param.datatype = u'GPString'
+            
+            # Handelsketten
+            
+            param = self.add_parameter('chain')
+            param.name = encode(u'Kette')
+            param.displayName = encode(u'Handelskette')
+            param.parameterType = 'Required'
+            param.direction = 'Input'
+            param.datatype = u'GPString'
+            param.filter.list = sorted(self.chains_df['name'].values.tolist())
         
         # Betriebstypen
 
@@ -121,6 +123,15 @@ class TbxEditMarkets(Tbx):
                                                 details=details)
             pretty_names.append(pretty)
         self.types_df['pretty'] = pretty_names
+        
+        # add a row for closing markets
+        if self.setting == CHANGE:
+            # extend the commercial types
+            custom_row = pd.DataFrame(columns=self.types_df.columns)
+            custom_row['id_betriebstyp'] = [0]
+            custom_row['pretty'] = custom_row['name'] = [u'Schließung']
+            self.types_df = self.types_df.append(
+                custom_row, ignore_index=True).sort('id_betriebstyp')
     
         param = self.add_parameter('type_name')
         param.name = encode(u'Betriebstyp')
@@ -128,21 +139,30 @@ class TbxEditMarkets(Tbx):
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-        param.filter.list = pretty_names
+        param.filter.list = self.types_df['pretty'].values.tolist()
     
-        param = self.add_parameter('do_delete')
-        param.name = encode(u'Löschen')
-        param.displayName = encode(u'Markt entfernen')
-        param.parameterType = 'Optional'
-        param.direction = 'Input'
-        param.datatype = u'GPBoolean'
-    
-        param = self.add_parameter('delete_all')
-        param.name = encode(u'Alle Löschen')
-        param.displayName = encode(u'alle Märkte entfernen')
-        param.parameterType = 'Optional'
-        param.direction = 'Input'
-        param.datatype = u'GPBoolean'
+        if self.setting != CHANGE:
+            param = self.add_parameter('do_delete')
+            param.name = encode(u'Löschen')
+            param.displayName = encode(u'Markt entfernen')
+            param.parameterType = 'Optional'
+            param.direction = 'Input'
+            param.datatype = u'GPBoolean'
+        
+            param = self.add_parameter('delete_all')
+            param.name = encode(u'Alle Löschen')
+            param.displayName = encode(u'alle Märkte entfernen')
+            param.parameterType = 'Optional'
+            param.direction = 'Input'
+            param.datatype = u'GPBoolean'
+            
+        else:
+            param = self.add_parameter('do_close')
+            param.name = encode(u'close')
+            param.displayName = encode(u'Markt schließen')
+            param.parameterType = 'Optional'
+            param.direction = 'Input'
+            param.datatype = u'GPBoolean'
         
         self.markets_df = []
         return self.par
@@ -155,8 +175,8 @@ class TbxEditMarkets(Tbx):
             return df_markets
         id_nullfall = df_markets['id_betriebstyp_nullfall']
         id_planfall = df_markets['id_betriebstyp_planfall']
-        nullfall_idx = (id_nullfall == id_planfall) & (id_nullfall > 0)
-        if self.setting == NULLFALL:
+        nullfall_idx = id_nullfall > 0
+        if self.setting in [NULLFALL, CHANGE]:
             return df_markets[nullfall_idx]
         else:
             return df_markets[np.logical_not(nullfall_idx)]
@@ -176,6 +196,7 @@ class TbxEditMarkets(Tbx):
         new_market['id'] = new_id
         new_market['name'] = name
         new_market['SHAPE'] = [coords]
+        new_market['id_teilflaeche'] = -1
         if self.setting == NULLFALL:
             # market exists in nullfall
             new_market['id_betriebstyp_nullfall'] = 1
@@ -215,44 +236,62 @@ class TbxEditMarkets(Tbx):
     def get_pretty_market_name(self, market):
         '''assemble a meaningful name for the market incl. name and additional
         informations'''
-        betriebstyp_col = 'id_betriebstyp_nullfall' \
-            if self.setting == NULLFALL else 'id_betriebstyp_planfall'
+        # type before doesn't matter in planfall (it's zero and not in list)
+        if self.setting in [NULLFALL, CHANGE]:
+            type_before = self.types_df['name'][
+                self.types_df['id_betriebstyp'] ==
+                market['id_betriebstyp_nullfall']].values[0]
+        a_idx = (self.types_df['id_betriebstyp'] ==
+                 market['id_betriebstyp_planfall'])
+        # closing is not listed in Nullfall
+        if a_idx.sum() == 0:
+            type_after = u'Schließung'
+        else:
+            type_after = self.types_df['name'][a_idx].values[0]
+        
+        type_name = type_before if self.setting in [NULLFALL, CHANGE] \
+            else type_after
+
         chain_name = self.chains_df['name'][
-            self.chains_df['id_kette'] == market['id_kette']].values[0]        
-        typ_name = self.types_df['name'][
-            self.types_df['id_betriebstyp'] == \
-            market[betriebstyp_col]].values[0]
+            self.chains_df['id_kette'] == market['id_kette']].values[0]
         pretty = u'"{name}" ({id}) - {typ} ({chain})'.format(
-            id=market['id'], name=market['name'], typ=typ_name, 
+            id=market['id'], name=market['name'], typ=type_name, 
             chain=chain_name)
+        if self.setting in [NULLFALL, CHANGE] and type_before != type_after:
+            pretty += u' -> geplant: {}'.format(type_after)
         if market['do_delete']:
             pretty += u' - WIRD ENTFERNT'
         return pretty
     
     def set_selected_market_inputs(self):
         '''set all input fields to match data of currently selected market'''
-        self.par.delete_all.value = False
-        betriebstyp_col = 'id_betriebstyp_nullfall' \
-            if self.setting == NULLFALL else 'id_betriebstyp_planfall'
         market_idx = self.markets_df['pretty'] == self.par.markets.value
         market = self.markets_df.loc[market_idx]
-        self.par.name.value = market['name'].values[0]
-        chain_name = self.chains_df['name'][
-            self.chains_df['id_kette'] == market['id_kette'].values[0]]
-        self.par.chain.value = chain_name.values[0]        
-        typ_pretty = self.types_df['pretty'][
-            self.types_df['id_betriebstyp'] ==
-            market[betriebstyp_col].values[0]]
+        betriebstyp_col = 'id_betriebstyp_nullfall' \
+            if self.setting == NULLFALL else 'id_betriebstyp_planfall'
+        pretty_idx = (self.types_df['id_betriebstyp'] ==
+                      market[betriebstyp_col].values[0])
+        typ_pretty = self.types_df['pretty'][pretty_idx]
         self.par.type_name.value = typ_pretty.values[0]
-        do_delete = market['do_delete'].values[0]
-        # strange: can't assign the bool of do_delete directly, arcpy is
-        # ignoring it
-        self.par.do_delete.value = True if do_delete else False
+        
+        if self.setting != CHANGE:
+            self.par.delete_all.value = False
+            self.par.name.value = market['name'].values[0]
+            chain_name = self.chains_df['name'][
+                self.chains_df['id_kette'] == market['id_kette'].values[0]]
+            self.par.chain.value = chain_name.values[0]        
+            do_delete = market['do_delete'].values[0]
+            # strange: can't assign the bool of do_delete directly, arcpy is
+            # ignoring it
+            self.par.do_delete.value = True if do_delete else False
+        else:
+            do_close = market['id_betriebstyp_planfall'].values[0] == 0
+            self.par.do_close.value = True if do_close else False
     
     def validate_inputs(self):
         df_markets = self.get_markets()
         if len(df_markets) == 0:
-            if self.setting == NULLFALL:
+            if self.setting in [NULLFALL, CHANGE]:
                 msg = (u'Es sind keine Märkte im Bestand vorhanden. '
                        u'Bitte lesen Sie zunächst Märkte ein oder fügen Sie '
                        u'sie dem Bestand manuell hinzu.')
@@ -341,11 +380,45 @@ class TbxEditMarketsPlanfall(TbxEditMarkets):
     _label = encode(u'geplante Märkte bearbeiten')
 
 
+class TbxExtendMarkets(TbxEditMarkets):
+    setting = CHANGE
+    _label = encode(u'Bestehende Märkte im Planfall verändern')
+
+    def _updateParameters(self, params):
+        if len(self.markets_df) == 0:
+            return
+        market_idx = self.markets_df['pretty'] == self.par.markets.value
+        altered = False
+        if self.par.changed('type_name'):
+            id_typ = self.types_df['id_betriebstyp'][
+                self.types_df['pretty'] == self.par.type_name.value].values[0]
+            
+            self.markets_df.loc[market_idx, 'id_betriebstyp_planfall'] = id_typ
+            altered = True
+        elif self.par.changed('do_close'):
+            if self.par.do_close.value:
+                self.markets_df.loc[market_idx, 'id_betriebstyp_planfall'] = 0
+            else:
+                self.markets_df.loc[market_idx, 'id_betriebstyp_planfall'] = \
+                    self.markets_df.loc[market_idx, 'id_betriebstyp_nullfall']
+            altered = True
+        if altered:
+            i = np.where(market_idx == True)[0][0]
+            pretty = self.get_pretty_market_name(
+                self.markets_df.iloc[i])
+            self.markets_df.loc[market_idx, 'pretty'] = pretty
+            self.update_market_list()
+            
+        # market changed -> change values of input fields
+        if self.par.changed('markets') or altered:
+            self.set_selected_market_inputs()
+        return params
+    
 if __name__ == '__main__':
-    t = TbxEditMarketsNullfall()
+    t = TbxExtendMarkets()
     t._getParameterInfo()
     t.set_active_project()
-    t.add_market_to_db('Test add', (3544252, 5925427))
+    #t.add_market_to_db('Test add', (3544252, 5925427))
     t.open()
     t._updateParameters(None)
     t.execute()

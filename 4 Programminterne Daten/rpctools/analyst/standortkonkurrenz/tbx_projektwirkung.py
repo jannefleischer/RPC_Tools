@@ -24,6 +24,7 @@ class ProjektwirkungMarkets(Tool):
     
     def add_outputs(self):
         # Add Layers
+        folder = 'Standortkonkurrenz'
         group_layer = ("standortkonkurrenz")
         fc_maerkte = 'Maerkte'
         layer_maerkte = u'Umsatzveränderung Märkte'
@@ -31,7 +32,8 @@ class ProjektwirkungMarkets(Tool):
         layer_vb = u'Umsatzveränderung Versorgungsbereiche'
         layer_gem = u'Umsatzveränderung Gemeinden'
     
-        self.output.add_layer(group_layer, layer_maerkte, fc_maerkte, zoom=False)
+        self.output.add_layer(group_layer, layer_maerkte, fc_maerkte, 
+                              template_folder=folder, zoom=False)
     
         layer = 'Kaufkraftbindung'
         betriebstyp_col = 'id_betriebstyp_nullfall'
@@ -48,10 +50,13 @@ class ProjektwirkungMarkets(Tool):
                                   query='id_markt={}'.format(
                                       plan_market['id']),
                                   name=layer_name, 
+                                  template_folder=folder,
                                   zoom=False)
             
-        self.output.add_layer(group_layer, layer_vb, fc_zentren, zoom=False)
-        self.output.add_layer(group_layer, layer_gem, fc_zentren, zoom=False)
+        self.output.add_layer(group_layer, layer_vb, fc_zentren, 
+                              template_folder=folder, zoom=False)
+        self.output.add_layer(group_layer, layer_gem, fc_zentren,
+                              template_folder=folder, zoom=False)
     
     def run(self):
         folders = Folders(self.par)

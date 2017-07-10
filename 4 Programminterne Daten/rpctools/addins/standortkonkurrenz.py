@@ -8,7 +8,7 @@ __all__ = [
     "TemplateEinlesenDatei", "TemplateEinlesenFeatureClass", 
     "MarktBearbeiten", "MarktHinzu", "BestandMarktBearbeiten",
     "PlanfallMarktBearbeiten", "BestandMarktHinzu",
-    "PlanfallMarktHinzu", "PlanfallMarktErweitern",
+    "PlanfallMarktHinzu", "PlanfallMarktErweiterung",
     "ZentrumBearbeiten", "ZentrumHinzu", "StandortkonkurrenzProjektwirkung"
 ]
 
@@ -80,6 +80,10 @@ class PlanfallMarktBearbeiten(MarktBearbeiten):
     _toolbox_name = 'TbxEditMarketsPlanfall'
 
 
+class PlanfallMarktErweiterung(MarktBearbeiten):
+    _toolbox_name = 'TbxExtendMarkets'
+
+
 class BestandMarktHinzu(MarktHinzu):
     _toolbox_name = 'TbxEditMarketsNullfall'
     _new_market_name = 'unbenannter Markt im Bestand'
@@ -90,8 +94,6 @@ class PlanfallMarktHinzu(MarktHinzu):
     _new_market_name = 'unbenannter geplanter Markt'
 
 
-class PlanfallMarktErweitern(object):
-    pass
 
 
 class ZentrumBearbeiten(ToolboxButton):
