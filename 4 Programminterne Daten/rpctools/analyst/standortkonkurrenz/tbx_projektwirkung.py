@@ -71,9 +71,13 @@ class ProjektwirkungMarkets(Tool):
         
         arcpy.AddMessage(u'Ermittle angrenzende Gemeinden...')
         self.communities_to_centers(bbox)
-    
-        arcpy.AddMessage(u'Aktualisiere Siedlungszellen der Teilflächen...')
-        self.update_tfl_points()
+        
+        # when cells were not recalculated (including Kaufkraft)
+        # do it again (number of inhabitants may have changed by the user 
+        # since last calc.)
+        if not self.recalculate:
+            arcpy.AddMessage(u'Aktualisiere Siedlungszellen der Teilflächen...')
+            self.update_tfl_points()
         
         arcpy.AddMessage(u'Berechne Erreichbarkeiten der Märkte...')
         self.calculate_distances(df_markets, bbox)
@@ -111,8 +115,8 @@ class ProjektwirkungMarkets(Tool):
             sz_points = zensus_points + tfl_points
             arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
             self.zensus_to_db(sz_points)
-            active_project = self.parent_tbx.config.active_project
-            zensus.add_kk(sz_points, active_project)
+            project = self.parent_tbx.folders.projectname
+            zensus.add_kk(sz_points, project)
             # TODO: Update instead of rewrite
             self.zensus_to_db(sz_points)
         else:
@@ -193,11 +197,24 @@ class ProjektwirkungMarkets(Tool):
             'Teilflaechen_Plangebiet',
             columns=['id_teilflaeche', 'ew'], 
             workspace='FGDB_Definition_Projekt.gdb')
-        for index, tfl in df_tfl.iterrows():
-            self.parent_tbx.update_table(
-                'Siedlungszellen',
-                column_values={'ew': tfl['ew']},
-                where='id_teilflaeche={}'.format(tfl['id_teilflaeche']))
+        df_tfl_cells = self.parent_tbx.table_to_dataframe(
+            'Siedlungszellen', columns=['SHAPE', 'id', 'kk', 'id_teilflaeche'],
+            where='id_teilflaeche >= 0'
+        )
+        # update number of inhabitants by merging with areas
+        joined = df_tfl_cells.merge(df_tfl, on='id_teilflaeche')
+        # add_kk only needs the ids and number of inhabitants but
+        # not the coord (not nice, but works)
+        points = [ZensusCell(0, 0, id=id, ew=ew)
+                  for id, ew in zip(joined['id'].values,
+                                    joined['ew'].values)]
+        zensus = Zensus()
+        project = self.parent_tbx.folders.projectname
+        zensus.add_kk(points, project)
+        kk = [point.kk for point in points]
+        joined['kk'] = kk
+        self.parent_tbx.dataframe_to_table(
+            'Siedlungszellen', joined, ['id'])
     
     def calculate_distances(self, markets, bbox):
         '''calculate distances between settlement points and markets and
