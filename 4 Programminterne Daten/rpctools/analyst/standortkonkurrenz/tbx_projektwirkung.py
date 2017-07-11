@@ -312,13 +312,14 @@ class ProjektwirkungMarkets(Tool):
             fm.addInputField(tmp_markets, field)
             fieldmappings.addFieldMap(fm)
         fm_c = arcpy.FieldMap()
-        # the table assigned to the fieldmapping is ignored by dumbass arcpy, he 
+        # the table assigned to the fieldmapping is ignored by dumbass arcpy,  
         # arcpy always takes markets_table anyway (so the need to delete before)
         fm_c.addInputField(centers_table, 'id')
         fieldmappings.addFieldMap(fm_c)
         
-        arcpy.SpatialJoin_analysis(tmp_markets, centers_table, tmp_join,
+        arcpy.SpatialJoin_analysis(tmp_markets,centers_table, tmp_join,
                                    join_type='KEEP_COMMON',
+                                   join_operation='JOIN_ONE_TO_MANY', 
                                    field_mapping=fieldmappings, 
                                    match_option='WITHIN')
         columns = ['id'] + umsatz_fields
@@ -444,7 +445,7 @@ if __name__ == "__main__":
     t = TbxProjektwirkungMarkets()
     t.getParameterInfo()
     t.set_active_project()
-    t.par.recalculate.value = True
+    t.par.recalculate.value = False
     #t.show_outputs()
     t.execute()
 
