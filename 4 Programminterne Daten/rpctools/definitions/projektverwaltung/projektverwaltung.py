@@ -423,7 +423,7 @@ class ProjektLoeschen(Tool):
     def run(self):
         # prevent eventual locks
         gc.collect()
-
+        self.fragments_left = []
         arcpy.AddMessage(encode('Lösche Projekte'))
 
         projects_to_delete = self.par.projekte.values
@@ -438,6 +438,13 @@ class ProjektLoeschen(Tool):
             self.remove_project_from_output(project)
             self.projekt_loeschen(project)
         config = self.parent_tbx.config
+        if len(self.fragments_left) > 0:
+            arcpy.AddError(u'Folgende Projekte konnten aufgrund von '
+                           u'Schemasperren nicht restlos entfernt werden:')
+            arcpy.AddError(', '.join(self.fragments_left))
+            arcpy.AddError('Bitte starten Sie ArcMap neu und '
+                           'versuchen Sie es erneut!')
+            
         # change active project, if it was deleted
         if config.active_project in projects_to_delete:
             projects = self.folders.get_projects()
@@ -494,6 +501,11 @@ class ProjektLoeschen(Tool):
             arcpy.AddMessage("Projektordner gelöscht \n")
         else:
             arcpy.AddMessage("Projektordner " + project_name + " nicht gefunden \n")
-
-        arcpy.AddMessage("*********************************************************************************")
-        arcpy.AddMessage("Das Projekt " + project_name + " wurde erfolgreich entfernt \n")
+        
+        arcpy.AddMessage("*" * 45)
+        if arcpy.Exists(projektPfad):
+            self.fragments_left.append(project_name)
+            arcpy.AddError(u'Projekt {p} konnte nicht vollständig gelöscht '
+                           u'werden.'.format(p=project_name))
+        else:
+            arcpy.AddMessage("Das Projekt " + project_name + " wurde erfolgreich entfernt \n")
