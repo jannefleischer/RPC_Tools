@@ -35,7 +35,6 @@ class ProjektwirkungMarkets(Tool):
         self.output.add_layer(group_layer, layer_maerkte, fc_maerkte, 
                               template_folder=folder, zoom=False)
     
-        layer = 'Kaufkraftbindung'
         betriebstyp_col = 'id_betriebstyp_nullfall'
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
         id_nullfall = df_markets['id_betriebstyp_nullfall']
@@ -43,15 +42,16 @@ class ProjektwirkungMarkets(Tool):
         planfall_idx = (id_nullfall != id_planfall) & (id_planfall > 0)
         
         for index, plan_market in df_markets[planfall_idx].iterrows():
-            layer_name = u'{n} {m} ({i})'.format(n=layer,
-                                                 m=plan_market['name'],
-                                                 i=plan_market['id'])
-            self.output.add_layer(group_layer, layer, fc_maerkte,
-                                  query='id_markt={}'.format(
-                                      plan_market['id']),
-                                  name=layer_name, 
-                                  template_folder=folder,
-                                  zoom=False)
+            for layer in ['Kaufkraftbindung', 'Erreichbarkeit']:
+                layer_name = u'{n} {m} ({i})'.format(n=layer,
+                                                     m=plan_market['name'],
+                                                     i=plan_market['id'])
+                self.output.add_layer(group_layer, layer, fc_maerkte,
+                                      query='id_markt={}'.format(
+                                          plan_market['id']),
+                                      name=layer_name, 
+                                      template_folder=folder,
+                                      zoom=False)
             
         self.output.add_layer(group_layer, layer_vb, fc_zentren, 
                               template_folder=folder, zoom=False)
@@ -75,8 +75,7 @@ class ProjektwirkungMarkets(Tool):
         arcpy.AddMessage(u'Aktualisiere Siedlungszellen der Teilflächen...')
         self.update_tfl_points()
         
-        arcpy.AddMessage(u'Berechne Entfernungen der Märkte '
-                         u'zu den Siedlungszellen...')
+        arcpy.AddMessage(u'Berechne Erreichbarkeiten der Märkte...')
         self.calculate_distances(df_markets, bbox)
 
         # reload markets
@@ -445,6 +444,7 @@ if __name__ == "__main__":
     t = TbxProjektwirkungMarkets()
     t.getParameterInfo()
     t.set_active_project()
+    t.par.recalculate.value = True
     #t.show_outputs()
     t.execute()
 

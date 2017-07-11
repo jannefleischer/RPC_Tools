@@ -154,16 +154,18 @@ class DistanceRouting(object):
             'batch': True,
             'routerId': self.ROUTER,
             'fromPlace': "{},{}".format(origin.y, origin.x),
-            'toPlace': "{},{}".format(origin.y, origin.x),
-            'mode': 'CAR',
+            'mode': 'WALK, CAR',
             'maxWalkDistance': 5000,
             'maxPreTransitTime': 1200,
-            'cutoffMinutes': 20
+            'cutoffMinutes': 20,
+            'searchRadiusM': 1000
         }
         start = time.time()
         err_msg = (u'Der Server meldet einen Fehler bei der Berechnung. '
                    u'Bitte überprüfen Sie die Lage des Punktes '
-                   u'(muss innerhalb Deutschlands liegen).')
+                   u'(innerhalb Deutschlands und max. {}m '
+                   u'vom bestehenden Straßennetz entfernt)'
+                   .format(params['searchRadiusM']))
         try:
             r = requests.post(self.URL, params=params)
             r.raise_for_status()
