@@ -17,7 +17,45 @@ from os.path import join
 import subprocess
 from collections import OrderedDict
 import arcpy
+import _winreg
 
+min_requirement = 10.4
+
+def get_python_path():
+    try:
+        esri_reg_path = r'SOFTWARE\WOW6432Node\ESRI'
+        arcgis_key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
+                                     os.path.join(esri_reg_path, 'ArcGIS'),
+                                     0)
+        version = _winreg.QueryValueEx(arcgis_key, 'RealVersion')[0][:4]
+        if float(version) < min_requirement:
+            raise Exception('AddIn unterstützt ArcGIS ab Version {}'
+                            .format(min_requirement))
+        
+        desktop_reg_path = os.path.join(esri_reg_path,
+                                       'Desktop{v}'.format(v=version))
+        desktop_key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
+                                     desktop_reg_path,
+                                     0)
+        desktop_dir = _winreg.QueryValueEx(desktop_key, 'InstallDir')[0]
+        
+        python_reg_path = os.path.join(esri_reg_path,
+                                       'Python{v}'.format(v=version))
+        python_key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
+                                     python_reg_path,
+                                     0)
+        python_dir = _winreg.QueryValueEx(python_key, 'PythonDir')[0]
+        
+        # is desktop installation 64-Bit?
+        is_64b = os.path.exists(os.path.join(desktop_dir, "bin64"))
+        bitstr = 'x64' if is_64b else ''
+        
+        python_path = os.path.join(python_dir, 'ArcGIS{b}{v}'
+                                   .format(b=bitstr, v=version))
+        return python_path
+    except WindowsError:
+        print 'Keine ArcGIS-Pythoninstallation gefunden.'
+        return None
 
 def install_packages(python_path):
 
@@ -143,5 +181,7 @@ def install_packages(python_path):
 
 
 if __name__ == '__main__':
-    install_packages('C:\Python27\ArcGIS10.5')
+    python_path = get_python_path()
+    if python_path:
+        install_packages(python_path)
     #install_packages('C:\\Python27-ArcGIS\\ArcGISx6410.4')
