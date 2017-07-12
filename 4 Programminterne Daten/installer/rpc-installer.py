@@ -159,11 +159,6 @@ def install_packages(python_path):
         ret = process.wait()
         if ret:
             log("Paket " + package + " konnte ggf. nicht installiert werden." + "\n")
-        try:
-            new_package = __import__(package)
-            log("Paket " + package + " wurde installiert." + "\n")
-        except:
-            log("Paket " + package + " konnte nicht installiert werden." + "\n")
 
     # install rpctools package
     # ToDo: Finally change from --editable to wheel
