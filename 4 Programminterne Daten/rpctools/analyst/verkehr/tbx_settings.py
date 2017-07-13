@@ -3,6 +3,7 @@ from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 from rpctools.utils.constants import Nutzungsart as nart
 import arcpy
+import os
 
 class Settings(Tool):
     _workspace = 'FGDB_Verkehr.gdb'
@@ -34,9 +35,9 @@ class Settings(Tool):
         arcpy.AddMessage("initialisiertes Verkehrsaufkommen wird gelöscht")
         self.remove_output()
         # delete pickle file
-        pickle_path = self.folders.get_otp_pickle_filename()
-        if arcpy.Exists(pickle_path):
-            arcpy.Delete_management(pickle_path)
+        pickle_path = self.folders.get_otp_pickle_filename(check=False)
+        if os.path.exists(pickle_path):
+            os.remove(pickle_path)
 
     def remove_output(self):
         mxd = arcpy.mapping.MapDocument("CURRENT")
