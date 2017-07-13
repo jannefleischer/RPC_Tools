@@ -280,16 +280,15 @@ class KostenkennwerteKontrollieren(ToolboxButton):
     _toolbox_name = 'TbxKostenkennwerteKontrollieren'
 
 
+class GesamtkostenErmitteln(ToolboxButton):
+    """Implementation for rpc_tools.gesamtkosten_ermitteln (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxGesamtkosten'
+
+
 class ElektrizitaetKostenaufteilung(object):
     """Implementation for rpc_tools.elektrizitaet_kostenaufteilung (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class GesamtkostenErmitteln(object):
-    """Implementation for rpc_tools.gesamtkosten_ermitteln (Button)"""
     def __init__(self):
         self.enabled = True
         self.checked = False

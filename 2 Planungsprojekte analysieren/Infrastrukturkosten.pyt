@@ -8,6 +8,8 @@ from rpctools.analyst.infrastrukturkosten.tbx_flaechenbilanz import \
      TbxFlaechenbilanz
 from rpctools.analyst.infrastrukturkosten.tbx_massnahmen_editieren import \
      TbxMassnahmenEditieren
+from rpctools.analyst.infrastrukturkosten.tbx_gesamtkosten import \
+     TbxGesamtkosten
 from rpctools.analyst.infrastrukturkosten.tbx_infrastrukturmengenbilanz import \
      TbxInfrastrukturmengenBilanz
 from rpctools.analyst.infrastrukturkosten.tbx_kostenkennwerte_kontrollieren \
@@ -25,6 +27,7 @@ class Toolbox(object):
                       TbxMassnahmenEditieren,
                       TbxInfrastrukturmengenBilanz,
                       TbxFlaechenbilanz,
+                      TbxGesamtkosten, 
                       TbxInfrastrukturkostenermittlung,
                       TbxKostenaufteilungsregeln,
                       TbxNetzKostenaufteilung, ]
