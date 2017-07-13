@@ -16,19 +16,20 @@ class Ueberschneidungen(Tool):
         params = self.par
 
         if params.label.value == 1:
-            path = self.folders.get_layer("Waldgebiete", "oekologie")
+            path = "Waldgebiete"
         elif params.label.value == 2:
-            path = self.folders.get_layer("Naturschutzgebiete", "oekologie")
+            path = "Naturschutzgebiete"
         elif params.label.value == 3:
-            path = self.folders.get_layer("landschaftsschutzgebiete", "oekologie")
+            path = "Landschaftsschutzgebiete"
         elif params.label.value == 4:
-            path = self.folders.get_layer("Wasserflaechen", "oekologie")
+            path = "Wasserflaechen"
 
-        self.output.add_layer(groupname = "oekologie", template_layer = path, zoom=False)
+        self.output.add_layer(groupname = "oekologie", template_layer = path, template_folder="oekologie", zoom=False)
 
     def run(self):
         params = self.par
         projekt = self.projectname
+        arcpy.AddMessage(self.par.label.value)
 
 
 
