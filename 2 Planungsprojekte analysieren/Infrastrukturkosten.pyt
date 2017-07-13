@@ -22,6 +22,7 @@ class Toolbox(object):
         self.label = u'Infrastrukturkosten'
         self.alias = ''
         self.tools = [TbxKostenkennwerteKontrollieren,
+                      TbxMassnahmenEditieren,
                       TbxInfrastrukturmengenBilanz,
                       TbxFlaechenbilanz,
                       TbxInfrastrukturkostenermittlung,
