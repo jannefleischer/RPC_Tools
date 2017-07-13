@@ -153,9 +153,9 @@ class TbxMassnahmenEditieren(Tbx):
         new_measure['Bezeichnung'] = name
         new_measure['SHAPE'] = [coords]
         
-        new_measure['Kosten_EH_EUR'] = 0.
-        new_measure['Kosten_BU_EUR'] = 0.
-        new_measure['Kosten_EN_EUR'] = 0.
+        new_measure['Euro_EH'] = 0.
+        new_measure['Cent_BU'] = 0.
+        new_measure['Euro_EN'] = 0.
         new_measure['Lebensdauer'] = 1
         # default: "Straße (innere Erschließung)"
         new_measure['IDNetz'] = 1
@@ -223,9 +223,9 @@ class TbxMassnahmenEditieren(Tbx):
         measure = self.df_measures.loc[measure_idx]
         
         self.par.name.value = measure['Bezeichnung'].values[0]
-        self.par.kosten_eh.value = measure['Kosten_EH_EUR'].values[0]
-        self.par.kosten_bu.value = measure['Kosten_BU_EUR'].values[0]
-        self.par.kosten_en.value = measure['Kosten_EN_EUR'].values[0]
+        self.par.kosten_eh.value = measure['Euro_EH'].values[0]
+        self.par.kosten_bu.value = measure['Cent_BU'].values[0] / 100
+        self.par.kosten_en.value = measure['Euro_EN'].values[0]
         # a big arcpy mystery again: cast to int required else
         # arcpy just ignores setting the value
         self.par.lebensdauer.value = int(measure['Lebensdauer'].values[0])
@@ -255,13 +255,13 @@ class TbxMassnahmenEditieren(Tbx):
                 measure_idx, 'Bezeichnung'] = self.par.name.value
         elif self.par.changed('kosten_eh'):
             self.df_measures.loc[
-                measure_idx, 'Kosten_EH_EUR'] = self.par.kosten_eh.value
+                measure_idx, 'Euro_EH'] = self.par.kosten_eh.value
         elif self.par.changed('kosten_bu'):
             self.df_measures.loc[
-                measure_idx, 'Kosten_BU_EUR'] = self.par.kosten_bu.value
+                measure_idx, 'Cent_BU'] = self.par.kosten_bu.value * 100
         elif self.par.changed('kosten_en'):
             self.df_measures.loc[
-                measure_idx, 'Kosten_EN_EUR'] = self.par.kosten_en.value
+                measure_idx, 'Euro_EN'] = self.par.kosten_en.value
         elif self.par.changed('lebensdauer'):
             self.df_measures.loc[
                 measure_idx, 'Lebensdauer'] = self.par.lebensdauer.value

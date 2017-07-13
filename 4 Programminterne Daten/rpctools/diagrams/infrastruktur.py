@@ -69,7 +69,7 @@ class MassnahmenKosten(MatplotDiagram):
         costs = []
         for id_netz, grouped_df in grouped:
             categories.append(grouped_df['Netz'].values[0])
-            costs.append(grouped_df['Kosten_EH_EUR'].sum())
+            costs.append(grouped_df['Euro_EH'].sum())
             
         figure, ax = self.plt.subplots(figsize=(8, 4))
         y_pos = np.arange(len(categories))
