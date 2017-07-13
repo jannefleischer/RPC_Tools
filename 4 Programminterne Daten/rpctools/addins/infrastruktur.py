@@ -273,6 +273,13 @@ class InfrastrukturmengenBilanzieren(ToolboxButton):
     _do_show = False
 
 
+class KostenkennwerteKontrollieren(ToolboxButton):
+    """Implementation for rpc_tools.kostenkennwerte_kontrollieren (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxKostenkennwerteKontrollieren'
+
+
 class ElektrizitaetKostenaufteilung(object):
     """Implementation for rpc_tools.elektrizitaet_kostenaufteilung (Button)"""
     def __init__(self):
@@ -307,14 +314,6 @@ class KostenNachKostentraegernAuswerten(object):
 
 class KostenProWEBzwAPVergleichen(object):
     """Implementation for rpc_tools.kosten_pro_we_bzw_ap_vergleichen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class KostenkennwerteKontrollieren(object):
-    """Implementation for rpc_tools.kostenkennwerte_kontrollieren (Button)"""
     def __init__(self):
         self.enabled = True
         self.checked = False
