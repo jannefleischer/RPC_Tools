@@ -83,10 +83,48 @@ class MassnahmenKosten(MatplotDiagram):
         
         return ax
 
+
+class GesamtkostenDiagramm(MatplotDiagram):
+    
+    def _create(self, **kwargs):
+        workspace = 'FGDB_Kosten.gdb'
+        table = 'Gesamtkosten'
+        self.title = u"{}: Gesamtkosten der infrastrukturellen Maßnahmen".format(
+            self.tbx.par.get_projectname())
+        x_label = u"Kosten für Netzerweiterungen und punktuelle Maßnahmen"
+        
+        df_costs = self.tbx.table_to_dataframe(
+            table, workspace=workspace
+        )
+        
+        u, u_idx = np.unique(df_costs['Netz'], return_index=True)
+        categories = df_costs['Netz'][np.sort(u_idx)]
+        
+        pos_idx = np.arange(len(categories))
+        
+        bar_width = 0.2
+        
+        figure, ax = self.plt.subplots(figsize=(8, 4))
+        grouped = df_costs.groupby(by='IDKostenphase')
+        phase_names = []
+        for i, (phase_id, group) in enumerate(grouped):
+            costs = group['Euro']
+            ax.barh(pos_idx + i * bar_width, costs, height=bar_width,
+                    align='center')
+            phase_names.append(group['Kostenphase'].values[0])
+            
+        ax.set_yticks(pos_idx + bar_width / 3)
+        ax.set_yticklabels(categories)
+        ax.set_title(self.title)
+        ax.set_xlabel(x_label)
+        ax.xaxis.set_major_formatter(mticker.FormatStrFormatter(u'%d €'))
+        ax.xaxis.grid(True, which='major')
+        
+        ax.legend(phase_names, loc='upper right')
+        return ax
+
+
 if __name__ == "__main__":
-    netz_diagram = Netzlaenge()
-    netz_diagram.create()
-    netz_diagram.show()
-    kosten_diagram = MassnahmenKosten()
+    kosten_diagram = GesamtkostenDiagramm()
     kosten_diagram.create()
     kosten_diagram.show()

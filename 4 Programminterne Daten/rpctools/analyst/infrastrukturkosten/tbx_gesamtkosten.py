@@ -7,6 +7,7 @@ import numpy as np
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
+from rpctools.diagrams.infrastruktur import GesamtkostenDiagramm
 from rpctools.analyst.infrastrukturkosten.kostenkennwerte \
      import kostenkennwerte
 
@@ -17,7 +18,10 @@ class Gesamtkosten(Tool):
     _table = 'Gesamtkosten'
     
     def add_outputs(self):
-        pass
+        kosten_diagram = GesamtkostenDiagramm()
+        kosten_diagram.create()
+        
+        self.output.add_diagram(kosten_diagram)
     
     def run(self):
         arcpy.AddMessage('Bereite Ausgangsdaten auf...')
@@ -130,4 +134,5 @@ if __name__ == "__main__":
     t.getParameterInfo()
     t.set_active_project()
     t.open()
+    t.show_outputs()
     t.execute()
