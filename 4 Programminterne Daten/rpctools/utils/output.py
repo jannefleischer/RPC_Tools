@@ -397,8 +397,6 @@ class Output(object):
             addLayer = arcpy.mapping.Layer(group_layer_template)
             arcpy.mapping.AddLayerToGroup(
                 dataframe, project_layer, addLayer, "BOTTOM")
-            arcpy.RefreshActiveView()
-            arcpy.RefreshTOC()
 
     def set_subgrouplayer(self,
                           group,
@@ -564,6 +562,7 @@ class Output(object):
         # Untergruppen hinzufügen
         if layer.in_project:
             self.set_grouplayer(group, project_layer, current_dataframe)
+            #for l in self.get_layers(group)[0]: l.visible = True
             if layer.subgroup != "":
                 self.set_subgrouplayer(group, layer.subgroup,
                                        project_layer, current_dataframe)
@@ -643,9 +642,12 @@ class Output(object):
         group_names = [g.name for g in groups]
         # labels have already the desired sorting
         labels = np.array(self.module.get_labels())
+        toc_unsorted = np.array(group_names)[np.in1d(group_names, labels)]
         # get groups that are also in project labels, retaining order of labels
         names_sorted = np.array(labels)[np.in1d(labels, group_names)]
-        if len(names_sorted) == 1:
+        # no need to sort if only one group or already sorted
+        if (len(names_sorted) == 1 or
+            (toc_unsorted != names_sorted).sum() == 0):
             return
         layers_sorted = [groups[group_names.index(n)] for n in names_sorted]
         
