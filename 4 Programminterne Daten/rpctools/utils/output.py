@@ -279,8 +279,6 @@ class Output(object):
             addLayer = arcpy.mapping.Layer(group_layer_template)
             addLayer.name = projektname
             arcpy.mapping.AddLayer(current_dataframe, addLayer, "TOP")
-            arcpy.RefreshActiveView()
-            arcpy.RefreshTOC()
 
     def get_projectlayer(self, projectname=None):
         """
@@ -422,8 +420,6 @@ class Output(object):
                 project_layer, group, dataframe)[0]
             arcpy.mapping.AddLayerToGroup(
                 dataframe, target_grouplayer, addLayer, "BOTTOM")
-            arcpy.RefreshActiveView()
-            arcpy.RefreshTOC()
             
     def add_layer(self,
                   groupname,
@@ -506,6 +502,8 @@ class Output(object):
         '''show all available outputs (diagrams, layers etc.)'''
         self.show_layers()
         self.show_diagrams()
+        arcpy.RefreshActiveView()
+        arcpy.RefreshTOC()
         
     def show_diagrams(self):
         '''show available diagrams'''
@@ -631,8 +629,6 @@ class Output(object):
             project_layer.visible = True
 
         self.sort_layers()
-        arcpy.RefreshActiveView()
-        arcpy.RefreshTOC()
         
     def sort_layers(self):
         project_layer = self.get_projectlayer()
@@ -784,8 +780,6 @@ class Output(object):
         """
         with ArcpyEnv(addOutputsToMap=True, overwriteOutput=True):
             arcpy.MakeGraph_management(input_template, graph, out_graph_name)
-        arcpy.RefreshActiveView()
-        arcpy.RefreshTOC()
 
 
 if __name__ == '__main__':
