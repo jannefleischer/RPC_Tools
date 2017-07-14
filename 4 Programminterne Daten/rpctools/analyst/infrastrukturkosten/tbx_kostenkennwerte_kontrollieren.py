@@ -3,8 +3,7 @@ import arcpy
 
 from rpctools.utils.params import Tbx, Tool, Folders
 from rpctools.utils.encoding import encode
-from rpctools.analyst.infrastrukturkosten.kostenkennwerte \
-     import kostenkennwerte
+from rpctools.analyst.infrastrukturkosten.kostenkennwerte_hilfsfunktionen import kostenkennwerte
 import numpy as np
 import pandas as pd
 
