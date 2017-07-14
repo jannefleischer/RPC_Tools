@@ -21,7 +21,7 @@ class Fahrplaene(Tool):
         idx = self.par.selected_index('stops')
         id = self.parent_tbx.df_stops['id'].values[idx]
         url = query.get_timetable_url(id)
-        arcpy.AddMessage('Die Abfahrtszeiten werden im Browser angezeigt!')
+        arcpy.AddMessage('\nDIE ABFAHRTSZEITEN WERDEN EXTERN IM BROWSER ANGEZEIGT!\n')
         webbrowser.open(url, new=1, autoraise=True)
 
 class TbxHaltestellen(Tbx):

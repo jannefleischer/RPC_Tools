@@ -19,6 +19,8 @@ class CreateTemplate(Tool):
         path = self.par.folder.value.value
         template = MarketTemplate(typ, path, epsg=self.parent_tbx.config.epsg)
         template.create()
+        
+        arcpy.AddMessage('Template wird geöffnet, bitte warten...')
         template.open()
 
 
