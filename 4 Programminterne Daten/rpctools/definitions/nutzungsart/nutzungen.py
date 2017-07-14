@@ -355,8 +355,9 @@ class NutzungenGewerbe(Nutzungen):
         perc_res_df['Anteil'] /= perc_res_df['Anteil'].sum()
         perc_res_df['IDTeilflaeche'] = flaechen_id
         
-        tbx.insert_dataframe_in_table(perc_res_table, perc_res_df,
-                                      workspace=results_workspace)
+        tbx.dataframe_to_table(perc_res_table, perc_res_df,
+                               ['IDTeilflaeche', 'IDBranche'], 
+                               workspace=results_workspace, upsert=True)
         
     def calculate_ways(self):
         pkw_perc_col = 'Anteil_Pkw_Fahrer'
