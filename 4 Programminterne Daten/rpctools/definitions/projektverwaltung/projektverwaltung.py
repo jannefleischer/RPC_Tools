@@ -99,9 +99,6 @@ class ProjektAnlegen(Projektverwaltung):
                                     project_name,
                                     gemeindename_projekt)
 
-        self.add_minimap(project_path, gdbPfad)
-
-
         # output information to user
         arcpy.AddMessage("Basisdaten erfolgreich kopiert \n")
 
@@ -252,59 +249,6 @@ class ProjektAnlegen(Projektverwaltung):
                              "nutzen Sie die 'Projekt löschen' Funktion in " +
                              "der Toolbox")
             sys.exit()
-
-    def add_minimap(self, project_path, gdbPfad):
-        """Minimap erzeugen"""
-        arcpy.SetProgressorLabel('Minimap erzeugen')
-        arcpy.SetProgressorPosition(60)
-
-        schrittmeldung = 'Erzeuge Uebersichtskarte \n'
-        arcpy.AddMessage(schrittmeldung)
-        print schrittmeldung
-
-        # Kopiere Template.mxd
-        template_folder = join(self.folders.MXDS, "Style_Minimap")
-        template = join(template_folder, "template.mxd")
-        mxd_template = arcpy.mapping.MapDocument(template)
-        ausgabeordner_img = join(project_path,
-                                 self.folders._AUSGABE_PATH, 'Abbildungen')
-        os.makedirs(ausgabeordner_img)
-        mxdpfad = join(ausgabeordner_img, 'Definition_Projekt.mxd')
-        mxd_template.saveACopy(mxdpfad)
-
-        arcpy.SetProgressorPosition(70)
-
-        # Ersetze Datenquelle
-        minimap_mxd = arcpy.mapping.MapDocument(mxdpfad)
-        templatepath = join(template_folder, "template.gdb")
-        resultpath = gdbPfad
-        minimap_mxd.findAndReplaceWorkspacePaths(templatepath, resultpath)
-
-        arcpy.SetProgressorPosition(80)
-
-        # Setze Viewport neu
-        df = arcpy.mapping.ListDataFrames(minimap_mxd)[0]
-        gebietLayer = arcpy.mapping.ListLayers(
-            minimap_mxd, "Teilflaechen_Plangebiet", df)[0]
-        arcpy.SelectLayerByAttribute_management(
-            gebietLayer, "NEW_SELECTION", "\"OBJECTID\" > 0")
-        df.extent = gebietLayer.getSelectedExtent(False)
-        arcpy.SelectLayerByAttribute_management(gebietLayer, "CLEAR_SELECTION")
-        df.scale = df.scale * 1.4
-
-        arcpy.RefreshActiveView()
-        minimap_mxd.save()
-        del mxd_template
-
-        arcpy.SetProgressorPosition(90)
-
-        # Exportiere Ergebnis
-        minimap = join(ausgabeordner_img, 'Minimap.jpg')
-        arcpy.mapping.ExportToJPEG(
-            minimap_mxd,
-            minimap,
-            "PAGE_LAYOUT",
-            resolution=150)
 
     def get_gemeinde(self, tfl, id_column, max_dist):
         """Verschneide Teilflächen mit Gemeinde"""
