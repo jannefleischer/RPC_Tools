@@ -58,7 +58,7 @@ class TbxNetzKostenaufteilung(Tbx):
             params_to_set.append(id_default)
             self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), ["Anteil_GSB", "Anteil_GEM", "Anteil_ALL", "Kostenregel", "IDKostenregel"]] = params_to_set
 
-    def change_network(self, params):
+    def load_network(self, params):
         for id_to_set in range(1, 4):
             if id_to_set == 1:
                 params_to_set = [params.default_EH, params.owner_EH, params.community_EH, params.users_EH]
@@ -98,33 +98,24 @@ class TbxNetzKostenaufteilung(Tbx):
             self.df_results.loc[(self.df_results.IDNetz == self._netztyp) & (self.df_results.IDKostenphase == id_to_set), ['Anteil_GSB', 'Anteil_GEM', 'Anteil_ALL', 'Kostenregel', 'IDKostenregel']] = \
                 [owner.value, community.value, users.value, default.value, id_default]
 
-
-            #owner.value = int(self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), 'Anteil_GSB'])
-            #community.value = int(self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), 'Anteil_GEM'])
-            #users.value = int(self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), 'Anteil_ALL'])
-
-
     def _open(self, params):
         # get initial data
         kostenaufteilung_startwerte(self.par.get_projectname())
+        params.network.value = self._df_netzwork_id.loc[self._df_netzwork_id.IDNetz == self._netztyp, 'Netz'].values[0]
         self.df_results = self.table_to_dataframe('Kostenaufteilung', workspace=self._workspace)
         self.df_results = self.df_results.astype(int)
         self.df_results = pd.merge(self.df_results, self._df_defaults.loc[:, ['IDKostenregel', 'Kostenregel']], on='IDKostenregel')
-        params.default_EH.value = self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 1), 'Kostenregel'].values[0]
-        params.default_BU.value = self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 2), 'Kostenregel'].values[0]
-        params.default_EN.value = self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 3), 'Kostenregel'].values[0]
-        # set params:
-        self.load_defaults(params, [1, 2, 3])
+        self.load_network(params)
 
 
     def _updateParameters(self, params):
         if not self._has_been_opened:
             self._has_been_opened = True
-            #return params
+            return params
         if self.par.changed('network'):
             network_id = int(self._df_netzwork_id.loc[self._df_netzwork_id.Netz == params.network.value, 'IDNetz'])
             self._netztyp = network_id
-            self.change_network(params)
+            self.load_network(params)
         # check if other default settings were choosen
         if self.par.changed('default_EH'):
             if params.default_EH.value != u"benutzerdefinierte Einstellungen":
@@ -193,11 +184,7 @@ class TbxNetzKostenaufteilung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        network = ["Straße (innere Erschließung)",
-                   "Straße (äußere Erschließung)", "Kanalisation",
-                   "Trinkwasser", "Elektrizität"]
-        p.filter.list = network
-        p.value = network[0]
+        p.filter.list = list(self._df_netzwork_id.Netz)
 
         # category = EH
         # Nachfolgende Werte setzen auf
@@ -329,11 +316,20 @@ class TbxNetzKostenaufteilung(Tbx):
 
 class TbxNetzKostenaufteilungInnere(TbxNetzKostenaufteilung):
     _netztyp = 1
+class TbxNetzKostenaufteilungAuessere(TbxNetzKostenaufteilung):
+    _netztyp = 2
+class TbxNetzKostenaufteilungKanalisation(TbxNetzKostenaufteilung):
+    _netztyp = 3
+class TbxNetzKostenaufteilungTrinkwasser(TbxNetzKostenaufteilung):
+    _netztyp = 4
+class TbxNetzKostenaufteilungElektrizitaet(TbxNetzKostenaufteilung):
+    _netztyp = 5
 
 if __name__ == '__main__':
     t = TbxNetzKostenaufteilung()
     t._getParameterInfo()
     t.par.project.value = t.config.active_project
+    t._updateParameters(t.par)
     t._open(t.par)
     t._updateParameters(t.par)
     t.execute()
