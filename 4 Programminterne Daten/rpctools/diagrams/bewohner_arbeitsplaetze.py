@@ -30,6 +30,8 @@ class BewohnerEntwicklung(MatplotDiagram):
         ax = transformed.plot(kind='bar', stacked=True, figsize=(15, 8),
                               color=colors, title=self.title)
         ax.set_xticklabels(xticks, rotation=45)
+        ax.set_ylabel(u'Anzahl Personen')
+        ax.set_ylim(bottom=0)
         return ax
 
 
@@ -99,12 +101,12 @@ class BranchenAnteile(MatplotDiagram):
         return ax
 
 if __name__ == "__main__":
-    #diagram = BewohnerEntwicklung()
-    #diagram.create(projectname='1', flaechen_id=1, flaechen_name=u'Testfläche')
-    #diagram.show()
+    diagram = BewohnerEntwicklung(projectname='Test', flaechen_id=1, flaechen_name=u'Testfläche')
+    diagram.create()
+    diagram.show()
     #diagram = ArbeitsplatzEntwicklung()
     #diagram.create(projectname='Test2', flaechen_id=1, flaechen_name=u'Testfläche')
     #diagram.show()
-    diagram = BranchenAnteile()
-    diagram.create(flaechen_id=2, flaechen_name=u'bla')
+    diagram = BranchenAnteile(flaechen_id=2, flaechen_name=u'bla')
+    diagram.create()
     diagram.show()
