@@ -30,4 +30,10 @@ class HaltestellenAnzeigen(Output):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Erreichbarkeit.pyt'
     _toolbox_name = 'TbxHaltestellenZentraleOrte'
+    
+
+class AnbindungspunkteAnzeigen(Output):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Verkehrserzeugung.pyt'
+    _toolbox_name = 'TbxSetSource'
 

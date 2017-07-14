@@ -1,4 +1,5 @@
 from rpctools.addins.common import ToolboxButton, folders, config
+from rpctools.addins.outputs import AnbindungspunkteAnzeigen
 
 __all__ = ['InitialRouting', 'RoutingSettings',
            'WeightedRouting', 'Anbindungspunkt']
@@ -32,12 +33,11 @@ class Anbindungspunkt(ToolboxButton):
         self.enabled = True
         self.shape = 'NONE'
         self.cursor = 3
+        self.output = AnbindungspunkteAnzeigen()
         
     def onClick(self, coord=None):
-        if coord is None:
-            return
-        config.active_coord = coord
-        super(Anbindungspunkt, self).onClick()
+        self.output.show()
 
     def onMouseDownMap(self, x, y, button, shift):
-        self.onClick((x, y))
+        config.active_coord = (x, y)
+        super(Anbindungspunkt, self).onClick()

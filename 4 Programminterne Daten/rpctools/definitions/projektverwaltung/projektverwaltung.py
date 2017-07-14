@@ -366,7 +366,8 @@ class ProjektAnlegen(Projektverwaltung):
             shape = arcpy.Point(shape_x, shape_y)
             toolbox.upsert_row_in_table(
                 table_name=out_table,
-                column_values={'Shape': shape, 'id_teilflaeche': area},
+                column_values={'Shape': shape,
+                               'id_teilflaeche': area},
                 pkey={'id_teilflaeche': area},
                 workspace=out_workspace)
 
