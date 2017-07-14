@@ -64,13 +64,13 @@ class NutzungenWohnen(Nutzungen):
         self.update_wege_projekt()        
         
         tfl_table = self.parent_tbx.query_table(
-            'Teilflaechen_Plangebiet', columns='id_teilflaeche', 
+            'Teilflaechen_Plangebiet', columns=['id_teilflaeche', 'Name'], 
             where='Nutzungsart = {}'.format(self.parent_tbx._nutzungsart))
-        ids = [i[0] for i in tfl_table]
+        tfl = [t for t in tfl_table]
         arcpy.AddMessage(u'Berechne Entwicklung der Bewohnerzahl '
                          u'der Teilflächen')
-        for flaechen_id in ids:
-            self.calculate_development(flaechen_id)
+        for flaechen_id, name in tfl:
+            self.calculate_development(flaechen_id, name)
             
     def update_tables(self):
         self.parent_tbx.dataframe_to_table(
@@ -85,7 +85,7 @@ class NutzungenWohnen(Nutzungen):
             upsert=False)
         
         
-    def calculate_development(self, flaechen_id): 
+    def calculate_development(self, flaechen_id, name): 
         """"""
         tbx = self.parent_tbx
         
@@ -123,7 +123,9 @@ class NutzungenWohnen(Nutzungen):
             wohnen_struct_table, pkey={flaechen_col: flaechen_id})
         
         if len(wohnen_struct_df) == 0:
-            arcpy.AddError('Keine Definitionen gefunden.')
+            arcpy.AddMessage(u'Achtung: Die Wohneinheiten der Fläche "{}" '
+                             u'wurden noch nicht definiert. Die Teilfläche '
+                             u'wird ignoriert.'.format(name))
             return
         
         # corresponding SQL: Einwohner_pro_WE INNER JOIN 
@@ -419,6 +421,7 @@ class NutzungenEinzelhandel(Nutzungen):
         arcpy.AddMessage(u'Füge die Lebensmittel-Verkaufsflächen '
                          u'repräsentierende Märkte hinzu...')
         market_tool = MarktEinlesen(projectname=self.projectname)
+        do_update_ags = False
         for id, group in grouped:
             idx = self.parent_tbx.df_areas['id_teilflaeche'] == id
             area = self.parent_tbx.df_areas[idx].iloc[0]
@@ -430,7 +433,7 @@ class NutzungenEinzelhandel(Nutzungen):
                 group['IDSortiment'] == id_lm]['Verkaufsflaeche_qm'].values[0]
             market_tool.delete_area_market(id)
             
-            if vkfl_lebensmittel > 0:        
+            if vkfl_lebensmittel > 0:
                 name = u'Neuer Lebensmittelmarkt auf Fläche "{}"'.format(
                     area['Name'])
                 arcpy.AddMessage(u'  - {} mit {} m² Verkaufsfläche'.format(
@@ -445,14 +448,18 @@ class NutzungenEinzelhandel(Nutzungen):
                                      epsg=self.parent_tbx.config.epsg)
                 market = market_tool.set_betriebstyp_vkfl([market])[0]
                 market_tool.markets_to_db([market], planfall=True)
+                # market added -> update ags for all markets (no function for
+                # single update implemented yet)
+                do_update_ags = True
         
         self.parent_tbx.dataframe_to_table(
             'Teilflaechen_Plangebiet',
             self.parent_tbx.df_areas, ['id_teilflaeche'],
             upsert=False)        
     
-        arcpy.AddMessage(u'Aktualisiere die AGS der Märkte...')
-        market_tool.set_ags()
+        if do_update_ags:
+            arcpy.AddMessage(u'Aktualisiere die AGS der Märkte...')
+            market_tool.set_ags()
         
     def calculate_ways(self): 
         besucher_sqm_col = 'Besucher_je_qm_Vfl'
