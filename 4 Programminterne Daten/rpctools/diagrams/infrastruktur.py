@@ -5,7 +5,7 @@ from rpctools.utils.diagram import MatplotDiagram
 import matplotlib.ticker as mticker
 
 
-class Netzlaenge(MatplotDiagram):
+class NetzlaengenDiagramm(MatplotDiagram):
     
     def _create(self, **kwargs):
         line_table = 'Erschliessungsnetze_Linienelemente'
@@ -33,7 +33,8 @@ class Netzlaenge(MatplotDiagram):
             categories.append(grouped_df['Netz'].values[0])
             lengths.append(grouped_df['SHAPE_Length'].sum())
             
-        figure, ax = self.plt.subplots(figsize=(8, 4))
+        figure, ax = self.plt.subplots(figsize=(10, 5))
+        ax.tick_params(axis='both', which='major', labelsize=9)
         y_pos = np.arange(len(categories))
         ax.barh(y_pos, lengths, height=0.3, align='center')
         ax.set_yticks(y_pos)
@@ -41,11 +42,14 @@ class Netzlaenge(MatplotDiagram):
         ax.set_title(self.title)
         ax.set_xlabel(x_label)
         ax.xaxis.grid(True, which='major')
+        box = ax.get_position()
+        ax.set_position([box.x0 + box.width * 0.12, box.y0,
+                         box.width * 0.88, box.height])
         
         return ax
     
 
-class MassnahmenKosten(MatplotDiagram):
+class MassnahmenKostenDiagramm(MatplotDiagram):
     
     def _create(self, **kwargs):
         point_table = 'Erschliessungsnetze_Punktelemente'
@@ -71,15 +75,19 @@ class MassnahmenKosten(MatplotDiagram):
             categories.append(grouped_df['Netz'].values[0])
             costs.append(grouped_df['Euro_EH'].sum())
             
-        figure, ax = self.plt.subplots(figsize=(8, 4))
+        figure, ax = self.plt.subplots(figsize=(10, 5))
         y_pos = np.arange(len(categories))
         ax.barh(y_pos, costs, height=0.3, align='center')
+        ax.tick_params(axis='both', which='major', labelsize=9)
         ax.set_yticks(y_pos)
         ax.set_yticklabels(categories)
         ax.set_title(self.title)
         ax.set_xlabel(x_label)
         ax.xaxis.set_major_formatter(mticker.FormatStrFormatter(u'%d €'))
         ax.xaxis.grid(True, which='major')
+        box = ax.get_position()
+        ax.set_position([box.x0 + box.width * 0.12, box.y0,
+                         box.width * 0.88, box.height])
         
         return ax
 
@@ -104,7 +112,8 @@ class GesamtkostenDiagramm(MatplotDiagram):
         
         bar_width = 0.2
         
-        figure, ax = self.plt.subplots(figsize=(8, 4))
+        figure, ax = self.plt.subplots(figsize=(10, 6))
+        self.plt.gca().invert_yaxis()
         grouped = df_costs.groupby(by='IDKostenphase')
         phase_names = []
         for i, (phase_id, group) in enumerate(grouped):
@@ -113,6 +122,8 @@ class GesamtkostenDiagramm(MatplotDiagram):
                     align='center')
             phase_names.append(group['Kostenphase'].values[0])
             
+        
+        ax.tick_params(axis='both', which='major', labelsize=9)
         ax.set_yticks(pos_idx + bar_width / 3)
         ax.set_yticklabels(categories)
         ax.set_title(self.title)
@@ -120,11 +131,24 @@ class GesamtkostenDiagramm(MatplotDiagram):
         ax.xaxis.set_major_formatter(mticker.FormatStrFormatter(u'%d €'))
         ax.xaxis.grid(True, which='major')
         
-        ax.legend(phase_names, loc='upper right')
+        #ax.legend(phase_names, loc='upper right') 
+        box = ax.get_position()
+        
+        ax.set_position([box.x0 + box.width * 0.12, box.y0 + box.height * 0.2,
+                         box.width * 0.88, box.height * 0.8])
+        
+        # Put a legend to the right of the current axis
+        ax.legend(phase_names, loc='center left', bbox_to_anchor=(0, -0.3))
         return ax
 
 
 if __name__ == "__main__":
+    kosten_diagram = MassnahmenKostenDiagramm()
+    kosten_diagram.create()
+    kosten_diagram.show()
+    kosten_diagram = NetzlaengenDiagramm()
+    kosten_diagram.create()
+    kosten_diagram.show()
     kosten_diagram = GesamtkostenDiagramm()
     kosten_diagram.create()
     kosten_diagram.show()

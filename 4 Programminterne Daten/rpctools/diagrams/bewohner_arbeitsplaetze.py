@@ -94,7 +94,7 @@ class BranchenAnteile(MatplotDiagram):
         ax.legend(joined['Name_Branche_Projektcheck'], loc='upper center',
                   bbox_to_anchor=(0.5, 0.1))
         box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width, box.height])        
+        ax.set_position([box.x0, box.y0, box.width, box.height])
         
         return ax
 

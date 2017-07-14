@@ -19,7 +19,6 @@ class Gesamtkosten(Tool):
     
     def add_outputs(self):
         kosten_diagram = GesamtkostenDiagramm()
-        kosten_diagram.create()
         
         self.output.add_diagram(kosten_diagram)
     

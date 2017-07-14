@@ -6,7 +6,7 @@ from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 import pandas as pd
 import numpy as np
-from rpctools.diagrams.infrastruktur import MassnahmenKosten, Netzlaenge
+from rpctools.diagrams.infrastruktur import MassnahmenKostenDiagramm, NetzlaengenDiagramm
 
 
 class InfrastrukturmengenBilanz(Tool):
@@ -23,11 +23,9 @@ class InfrastrukturmengenBilanz(Tool):
         layer = "Erschließungsnetz - punktuelle Maßnahmen" 
         self.output.add_layer(group_layer, layer, fc, zoom=False)
         
-        kosten_diagram = MassnahmenKosten()
-        kosten_diagram.create()
+        kosten_diagram = MassnahmenKostenDiagramm()
     
-        netz_diagram = Netzlaenge()
-        netz_diagram.create()
+        netz_diagram = NetzlaengenDiagramm()
         
         self.output.add_diagram(kosten_diagram, netz_diagram)
         
