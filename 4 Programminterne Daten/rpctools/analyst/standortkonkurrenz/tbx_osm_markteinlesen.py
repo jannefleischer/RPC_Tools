@@ -33,6 +33,8 @@ class MarktEinlesen(Tool):
                               template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_planfall, fc,
                               template_folder=folder, zoom=False)
+        
+        self.output.hide_layer('projektdefinition')
 
     def markets_to_db(self, supermarkets, truncate=False, planfall=False):
         """Create the point-features for supermarkets"""

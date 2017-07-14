@@ -26,8 +26,9 @@ class DiaTeilflaechen(ArcpyDiagram):
         mxd = arcpy.mapping.MapDocument("CURRENT")
         project_layer = self.tbx.output.get_projectlayer()
         input_data = arcpy.mapping.ListLayers(project_layer,
-                                              "Teilflaechen des Plangebiets",
+                                              "Nutzungen des Plangebiets",
                                               mxd.activeDataFrame)[0]
+        del(mxd)
         # Add a vertical bar series to the graph
         graph.addSeriesBarVertical(dataSrc=input_data,
                                    fieldY="Flaeche_ha",

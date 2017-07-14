@@ -41,12 +41,8 @@ class Projektverwaltung(Tool):
         # add Teilflächen
         fc = "Teilflaechen_Plangebiet"
         layer = "Teilflaechen des Plangebiets"
-        self.output.add_layer("projektdefinition", layer, fc)
-
-        # add OpenStreetmap
-        layer = "OpenStreetMap"
-        self.output.add_layer("hintergrundkarten", layer,
-                        zoom=False, in_project=False)
+        self.output.add_layer("projektdefinition", layer, fc,
+                              name=u"Nutzungen des Plangebiets")
 
         diagram = DiaTeilflaechen(projectname=self.par.name.value)
         self.output.add_diagram(diagram)

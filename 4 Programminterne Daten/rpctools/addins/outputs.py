@@ -10,7 +10,7 @@ class ProjektAnzeigen(Output):
 class ErschliessungsnetzeAnzeigen(Output):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Infrastrukturkosten.pyt'
-    _toolbox_name = 'TbxInfrastrukturmengenBilanz'
+    _toolbox_name = 'TbxMassnahmenEditieren'
     _show_diagrams = False
 
 

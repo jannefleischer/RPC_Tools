@@ -14,14 +14,6 @@ class InfrastrukturmengenBilanz(Tool):
     _workspace = 'FGDB_Kosten.gdb'
     
     def add_outputs(self):
-        group_layer = 'infrastruktur'
-        fc = 'Erschliessungsnetze_Linienelemente'
-        layer = "Erschließungsnetz"
-        self.output.add_layer(group_layer, layer, fc, zoom=False)
-    
-        fc = 'Erschliessungsnetze_Punktelemente'
-        layer = "Erschließungsnetz - punktuelle Maßnahmen" 
-        self.output.add_layer(group_layer, layer, fc, zoom=False)
         
         kosten_diagram = MassnahmenKostenDiagramm()
     

@@ -13,7 +13,16 @@ class MassnahmenEditieren(Tool):
     _workspace = 'FGDB_Kosten.gdb'
     
     def add_outputs(self):
-        pass
+        group_layer = 'infrastruktur'
+        fc = 'Erschliessungsnetze_Linienelemente'
+        layer = "Erschließungsnetz"
+        self.output.add_layer(group_layer, layer, fc, zoom=False)
+    
+        fc = 'Erschliessungsnetze_Punktelemente'
+        layer = "Erschließungsnetz - punktuelle Maßnahmen" 
+        self.output.add_layer(group_layer, layer, fc, zoom=False)
+        
+        self.output.hide_layer('projektdefinition')
     
     def run(self):
         df_measures = self.parent_tbx.df_measures
