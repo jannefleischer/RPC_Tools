@@ -95,18 +95,27 @@ class BranchenAnteile(MatplotDiagram):
         ax.set_ylabel('')
         ax.legend(joined['Name_Branche_Projektcheck'], loc='upper center',
                   bbox_to_anchor=(0.5, 0.1))
+        # didn't find a way to pass custom colors directly
+        for color, handle in zip(colors, ax.get_legend().legendHandles):
+            handle.set_color(color)
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width, box.height])
         
         return ax
 
 if __name__ == "__main__":
-    diagram = BewohnerEntwicklung(projectname='Test', flaechen_id=1, flaechen_name=u'Testfläche')
-    diagram.create()
-    diagram.show()
+    #diagram = BewohnerEntwicklung(projectname='Test', flaechen_id=1, flaechen_name=u'Testfläche')
+    #diagram.create()
+    #diagram.show()
     #diagram = ArbeitsplatzEntwicklung()
     #diagram.create(projectname='Test2', flaechen_id=1, flaechen_name=u'Testfläche')
     #diagram.show()
+    diagram = BranchenAnteile(flaechen_id=2, flaechen_name=u'bla')
+    diagram.create()
+    diagram.show()
+    diagram = BranchenAnteile(flaechen_id=2, flaechen_name=u'bla')
+    diagram.create()
+    diagram.show()
     diagram = BranchenAnteile(flaechen_id=2, flaechen_name=u'bla')
     diagram.create()
     diagram.show()
