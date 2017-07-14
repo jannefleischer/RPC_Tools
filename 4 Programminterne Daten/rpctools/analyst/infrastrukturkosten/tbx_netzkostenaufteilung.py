@@ -95,6 +95,7 @@ class TbxNetzKostenaufteilung(Tbx):
                 self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 1), 'Aufteilungsregel'] = params.default_EH.value
                 id_kostenregel = self._df_defaults.loc[self._df_defaults["Aufteilungsregel"] == params.default_EH.value, 'IDKostenregel'].values[0]
                 self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 1), 'IDKostenregel'] = id_kostenregel
+                # xxx Here is the problem!
                 self.set_params(params, [1])
                 self.update_df(params, [1])
         if self.par.changed('default_BU'):
