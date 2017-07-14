@@ -17,7 +17,12 @@ class NetzKostenaufteilung(Tool):
         pass
     def run(self):
         tbx = self.parent_tbx
-        arcpy.AddMessage(tbx.df_results)
+        df_results = tbx.df_results
+        df_results = df_results.drop("Kostenregel", axis=1)
+        arcpy.AddMessage("Änderungen werden in datenbank übertragen")
+        tbx.dataframe_to_table('Kostenaufteilung', df_results,
+                               pkeys=["IDNetz", "IDKostenphase"], workspace=self._workspace,
+                               upsert=False)
         return
 
 
