@@ -295,15 +295,15 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         heading = u'3) Voraussichtliche Anzahl an Arbeitsplätzen'
 
         # Arbeitsplatzzahl schätzen
-        param = self.add_parameter('auto_select')
+        param = self.add_parameter('auto')
         param.name = u'Arbeitsplatzzahl schätzen'
         param.displayName = encode(u'Vorgehen zur Schätzung der Zahl der '
                                    u'Arbeitsplätze nach Vollbezug')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-        param.filter.list = [u'Arbeitsplatzzahl automatisch schätzen',
-                             u'Eigenen Wert eingeben']
+        param.filter.list = [u'Eigenen Wert eingeben',
+                             u'Arbeitsplatzzahl automatisch schätzen']
         param.value = param.filter.list[0]
         param.category = heading
 
@@ -389,19 +389,19 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
             altered = True
 
-        auto_idx = self.par.auto_select.filter.list.index(
-            self.par.auto_select.value)
+        auto_idx = self.par.auto.filter.list.index(
+            self.par.auto.value)
 
-        if self.par.changed('auto_select'):
+        if self.par.changed('auto'):
             # auto calc. entry
-            if auto_idx == 0:
+            if auto_idx:
                 altered = True
                 params.arbeitsplaetze_insgesamt.enabled = False
             # manual entry
             else:
                 params.arbeitsplaetze_insgesamt.enabled = True
         
-        if altered and auto_idx == 0:
+        if altered and auto_idx:
             n_jobs = self.estimate_jobs()
             params.arbeitsplaetze_insgesamt.value = n_jobs
             self._update_shares(area)
@@ -410,6 +410,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             idx = self.df_jobs['IDTeilflaeche'] == area['id_teilflaeche']
             n_jobs = params.arbeitsplaetze_insgesamt.value
             self.df_jobs.loc[idx, 'Arbeitsplaetze'] = n_jobs
+            self.df_jobs.loc[idx, 'ist_geschaetzt'] = auto_idx
             self.df_areas.loc[area_idx, 'AP_gesamt'] = n_jobs
             self.update_pretty_name()
                 
@@ -465,14 +466,21 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             row = pd.DataFrame([[area['id_teilflaeche'], n_jobs]],
                                columns=columns)
             self.df_jobs = self.df_jobs.append(row, ignore_index=True)
+            self.par.auto.value = self.par.auto.filter.list[1]
         else:
+            self.par.auto.value = self.par.auto.filter.list[1] \
+                if rows['ist_geschaetzt'].values[0] \
+                else self.par.auto.filter.list[0]
             n_jobs = int(rows['Arbeitsplaetze'].values[0])
             
-        auto_idx = self.par.auto_select.filter.list.index(
-            self.par.auto_select.value)
+        auto_idx = self.par.auto.filter.list.index(
+            self.par.auto.value)
         # not custom settings -> estimate
-        if auto_idx == 0:
+        if auto_idx:
             n_jobs = self.estimate_jobs()
+            self.par.arbeitsplaetze_insgesamt.enabled = False
+        else:
+            self.par.arbeitsplaetze_insgesamt.enabled = True
 
         self.par.arbeitsplaetze_insgesamt.value = n_jobs
         self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
@@ -572,7 +580,7 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         return params
 
 if __name__ == '__main__':
-    t = TbxNutzungenWohnen()
+    t = TbxNutzungenGewerbe()
     t.getParameterInfo()
     t.set_active_project()
     t.validate_inputs()
