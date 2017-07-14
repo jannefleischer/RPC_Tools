@@ -181,6 +181,7 @@ class Layer(object):
                  template_layer,
                  name='', 
                  featureclass='',
+                 workspace='', 
                  template_folder='', 
                  disable_other=False,
                  subgroup="",
@@ -201,6 +202,7 @@ class Layer(object):
         self.name = name
         self.symbology = symbology
         self.label_replace = label_replace
+        self.workspace = workspace
 
 
 class Output(object):    
@@ -224,17 +226,19 @@ class Output(object):
         self.define_outputs()
 
     def add_layer_groups(self):
-        root = self.module        
+        root = self.module
         background = root.add('hintergrundkarten',
                               'Hintergrundkarten Projekt-Check')
-        
+    
         # project specific layers
         # order of adding will represent order in TOC! (first added -> on top)
+        root.add("projektdefinition", u"Projektdefinition")
         root.add("bevoelkerung",
                  u"Wirkungsbereich 1 - Bewohner und Arbeitsplaetze")
         root.add("erreichbarkeit",
                  u"Wirkungsbereich 2 - Erreichbarkeit")
         root.add("verkehr", u"Wirkungsbereich 3 - Verkehr im Umfeld")
+        root.add("oekologie", u"Wirkungsbereich 4 - Fläche und Ökologie")
         root.add("infrastruktur",
                  u"Wirkungsbereich 5 - Infrastrukturfolgekosten")
         root.add("einnahmen",
@@ -242,10 +246,7 @@ class Output(object):
         root.add("standortkonkurrenz",
                  u"Wirkungsbereich 7 - Standortkonkurrenz "
                  u"Lebensmitteleinzelhandel")
-        
-        root.add("projektdefinition", u"Projektdefinition")
-        
-        root.add("oekologie", u"Wirkungsbereich 4 - Fläche und Ökologie")
+        root.add("hintergrund", u"Hintergrund")
     
     def define_outputs(self):
         '''define the output layers here, has to be implemented in subclasses'''
@@ -346,13 +347,39 @@ class Output(object):
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         dataframe = dataframe or current_mxd.activeDataFrame
         hintergrund = self.module.get_label("hintergrundkarten")
-        if not arcpy.mapping.ListLayers( current_mxd,
-                                         hintergrund,
-                                         dataframe):
+        if not arcpy.mapping.ListLayers(current_mxd,
+                                        hintergrund,
+                                        dataframe):
             group_layer_template = self.folders.get_layer(
                 layername=hintergrund, folder='toc', enhance=True)
             addLayer = arcpy.mapping.Layer(group_layer_template)
             arcpy.mapping.AddLayer(dataframe, addLayer, "BOTTOM")
+    
+    def add_osm_layer(self): 
+        # add OpenStreetmap
+        layer = "OpenStreetMap"
+        self.add_layer("hintergrundkarten", layer,
+                       zoom=False, in_project=False)
+
+    def add_project_contour(self): 
+        # add contours
+        fc = "Teilflaechen_Plangebiet"
+        layer = "Umriss des Plangebiets"
+        self.add_layer("hintergrund", layer, fc,
+                       workspace='FGDB_Definition_Projekt.gdb',
+                       zoom=False)
+        
+    def hide_layer(self, layername):
+        '''hide layer(s) in TOC matching given name,
+        layername may also be the placeholder group-name (e.g. bevoelkerung)'''
+        if not self.layer_exists(layername):
+            try:
+                layername = self.module.get_label(layer.groupname)
+            except:
+                return
+        else:
+            for l in self.get_layers(layername):
+                l.visible = False
 
     def set_grouplayer(self, group,
                        project_layer=None,
@@ -404,6 +431,7 @@ class Output(object):
                   groupname,
                   template_layer,
                   featureclass='',
+                  workspace='', 
                   template_folder='', 
                   name='', 
                   disable_other=False,
@@ -427,6 +455,9 @@ class Output(object):
         featureclass : str, optional
             the name of the feature class table,
             which should be linked to the layer
+        
+        workspace : str, optional (Default = workspace of Tool)
+            the workspace the featureclass is in
             
         name: str, optional
             name of the layer in TOC (defaults to name of template layer)
@@ -460,11 +491,11 @@ class Output(object):
         if not name:
             name = template_layer
         layer = Layer(groupname, template_layer, name=name, 
-                      featureclass=featureclass,
+                      featureclass=featureclass, workspace=workspace, 
                       disable_other=disable_other, subgroup=subgroup, 
                       in_project=in_project, zoom=zoom, query=query, 
                       template_folder=template_folder, symbology=symbology,
-                      label_replace=label_replace)        
+                      label_replace=label_replace)
         self.layers.append(layer)
         
     def add_diagram(self, *args):
@@ -485,6 +516,9 @@ class Output(object):
         
     def show_layers(self, redraw=True):
         '''show available layers'''
+        # always add an osm layer and the contours of the areas background
+        self.add_osm_layer()
+        self.add_project_contour()
         for layer in self.layers:
             self._show_layer(layer, redraw=redraw)
             
@@ -515,13 +549,14 @@ class Output(object):
     
         # Template Layer laden
         template_layer = self.folders.get_layer(layer.template_layer,
-                                                    layer.template_folder)
+                                                layer.template_folder)
         #arcpy.AddMessage(template_layer)
         source_layer = arcpy.mapping.Layer(template_layer)
 
         # Datasource des Layers auf die gewünschte FeatureClass setzen
         if layer.featureclass:
-            featureclass = self.folders.get_table(layer.featureclass)
+            featureclass = self.folders.get_table(layer.featureclass,
+                                                  workspace=layer.workspace)
             source_ws = source_layer.workspacePath
             target_ws = arcpy.Describe(featureclass).path
             source_layer.findAndReplaceWorkspacePath(source_ws, target_ws)
