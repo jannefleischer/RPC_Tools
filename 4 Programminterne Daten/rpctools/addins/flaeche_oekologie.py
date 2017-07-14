@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from rpctools.addins.common import ToolboxButton, folders, config
+import arcpy
 
 __all__ = [
     "Waldgebiete", "Naturschutzgebiete",
     "Landschaftsschutzgebiete", "Wasserschutzgebiete",
-    "Bodenveraenderung", "Wohnflaechendichte", "Integrationsgrad",
+    "Bodenveraenderung", "Wohnflaechendichte",
+    "IntegrationsgradAnzeigen", "GrenzlinieEinzeichnen", "GrenzlinieLoeschen", 
     "UZVR",
     "NullfallUeberbauteFlaechen", "NullfallNatuerlicheWasserflaeche",
     "NullfallPlatten", "NullfallBaeumeStraeucher",
@@ -75,18 +77,26 @@ class Wohnflaechendichte(ToolboxButton):
     _toolbox_name = 'TbxWohnflaeche'
 
 
-class Integrationsgrad(ToolboxButton):
-    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
+class IntegrationsgradAnzeigen(ToolboxButton):
+    """Implementation for rpc_tools.integrationsgrad_anzeigen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Flaeche und Oekologie.pyt'
     _toolbox_name = 'TbxIntegrationsgrad'
 
 
+class GrenzlinieEinzeichnen(object):
+    """Implementation for rpc_tools.grenzlinie_einzeichnen (Tool)"""
+
+
+class GrenzlinieLoeschen(object):
+    """Implementation for rpc_tools.grenzlinie_loeschen (Tool)"""
+
+
 class UZVR(ToolboxButton):
-    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Flaeche und Oekologie.pyt'
     _toolbox_name = 'TbxUZVR'
+
 
 class Draw_Bodenbedeckung(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH

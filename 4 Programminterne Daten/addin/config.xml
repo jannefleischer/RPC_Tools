@@ -254,7 +254,13 @@
                 <Button caption="Wohnfl&#228;chendichte vergleichen" category="ProjektCheck" class="Wohnflaechendichte" id="rpc_tools.wohnflaechendichte" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Integrationsgrad" category="ProjektCheck" class="Integrationsgrad" id="rpc_tools.integrationsgrad" image="" message="" tip="">
+                <Tool caption="Grenzlinie einzeichnen" category="ProjektCheck" class="GrenzlinieEinzeichnen" id="rpc_tools.grenzlinie_einzeichnen" image="" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Tool caption="Grenzlinie l&#246;schen" category="ProjektCheck" class="GrenzlinieLoeschen" id="rpc_tools.grenzlinie_loeschen" image="" message="" tip="">
+                    <Help heading="" />
+                </Tool>
+                <Button caption="Integrationsgrad anzeigen" category="ProjektCheck" class="IntegrationsgradAnzeigen" id="rpc_tools.integrationsgrad_anzeigen" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Bewertung UZVR" category="ProjektCheck" class="UZVR" id="rpc_tools.uzvr" image="" message="" tip="">
@@ -462,13 +468,20 @@
                         <Button refID="rpc_tools.boden_kontrollieren" />
                         <Button refID="rpc_tools.bodenveraenderung" />
                     </Items>
+                </Menu>                
+                <Menu caption="Integrationsgrad" category="ProjektCheck" id="rpc_tools.menu_integrationsgrad" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Tool refID="rpc_tools.grenzlinie_einzeichnen" />
+                        <Tool refID="rpc_tools.grenzlinie_loeschen" />
+                        <Button refID="rpc_tools.integrationsgrad_anzeigen" />
+                    </Items>
                 </Menu>
                 <Menu caption="Fl&#228;che und &#214;kologie" category="ProjektCheck" id="rpc_tools.menu_flaeche_und_oekologie" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Menu refID="rpc_tools.menu_ueberschneidungen" />
                         <Menu refID="rpc_tools.menu_bodenbedeckung" />
                         <Button refID="rpc_tools.wohnflaechendichte" />
-                        <Button refID="rpc_tools.integrationsgrad" />
+                        <Menu refID="rpc_tools.menu_integrationsgrad" />
                         <Button refID="rpc_tools.uzvr" />
                     </Items>
                 </Menu>
