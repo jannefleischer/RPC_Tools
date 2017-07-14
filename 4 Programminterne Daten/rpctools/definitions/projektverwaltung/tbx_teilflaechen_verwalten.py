@@ -92,13 +92,13 @@ class TbxFlaechendefinition(Tbx):
         )
         suffix = ''
         if self._nutzungsart == Nutzungsart.WOHNEN:
-            n = area['WE_gesamt'] or 'NICHT DEFINIERT'
+            n = int(area['WE_gesamt']) or 'NICHT DEFINIERT'
             suffix = ' | Wohneinheiten: {}'.format(n)
         if self._nutzungsart == Nutzungsart.GEWERBE:
-            n = area['AP_gesamt'] or 'NICHT DEFINIERT'
+            n = int(area['AP_gesamt']) or 'NICHT DEFINIERT'
             suffix = u' | Arbeitsplätze: {}'.format(n)
         if self._nutzungsart == Nutzungsart.EINZELHANDEL:
-            n = u'{} m²'.format(area['VF_gesamt']) if area['VF_gesamt'] \
+            n = u'{} m²'.format(int(area['VF_gesamt'])) if area['VF_gesamt'] \
                 else 'NICHT DEFINIERT'
             suffix = u' | Verkaufsfläche: {}'.format(n)
         pretty += suffix
