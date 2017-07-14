@@ -8,8 +8,7 @@ import numpy as np
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 from rpctools.diagrams.infrastruktur import GesamtkostenDiagramm
-from rpctools.analyst.infrastrukturkosten.kostenkennwerte \
-     import kostenkennwerte
+from rpctools.analyst.infrastrukturkosten.kostenkennwerte_hilfsfunktionen import kostenkennwerte
 
 
 class Gesamtkosten(Tool):
