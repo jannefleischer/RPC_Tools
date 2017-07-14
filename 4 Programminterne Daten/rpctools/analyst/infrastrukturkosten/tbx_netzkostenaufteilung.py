@@ -64,6 +64,9 @@ class TbxNetzKostenaufteilung(Tbx):
             self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), ["Anteil_GSB", "Anteil_GEM", "Anteil_ALL", "Kostenregel", "IDKostenregel"]] = params_to_set
 
     def load_network(self, params):
+        """
+        set params for another networkID
+        params: params"""
         for id_to_set in range(1, 4):
             if id_to_set == 1:
                 params_to_set = [params.default_EH, params.owner_EH, params.community_EH, params.users_EH]
