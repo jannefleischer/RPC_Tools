@@ -9,11 +9,11 @@ from rpctools.utils.output import ArcpyEnv
 
 __all__ = [
     "AnliegerstrasseInnere", "AnliegerstrasseAeussere",
-    "SammelstrasseAeussere", "SammelstrasseInnere", 
+    "SammelstrasseAeussere", "SammelstrasseInnere",
     "KanalMischsystem", "KanalNurSchmutzwasser", "KanalTrennsystem",
-    "Trinkwasserleitung", "Stromleitung", 
+    "Trinkwasserleitung", "Stromleitung",
     "NetzabschnittLoeschen",
-    "InfrastrukturmengenBilanzieren", "ElektrizitaetKostenaufteilung", 
+    "InfrastrukturmengenBilanzieren", "ElektrizitaetKostenaufteilung",
     "GesamtkostenErmitteln", "KanalisationKostenaufteilung",
     "KostenNachKostentraegernAuswerten", "KostenProWEBzwAPVergleichen",
     "KostenkennwerteKontrollieren", "StrasseAeussereKostenaufteilung",
@@ -36,12 +36,12 @@ class InfrastructureDrawingTool(object):
         self.netz_ids = dict([row for row in cursor])
         self.cursor = 3
         self.output = ErschliessungsnetzeAnzeigen()
-        
+
     def onClick(self):
         self.output.show()
 
     def commit_geometry(self, tablename, shape, element_id, additional_columns={}):
-        """insert geometry with spec. id into given table """        
+        """insert geometry with spec. id into given table """
         netz_id = self.netz_ids[element_id]
         project=config.active_project
         table = folders.get_table(tablename,
@@ -93,7 +93,7 @@ class Beschreibung(ToolboxButton):
     def onClick(self):
         config.active_coord = None
         self._open()
-    
+
     def _open(self):
         # no way to directly tell the toolbox the id of the measure
         # -> take the Config-singleton as a container to pass it
@@ -125,7 +125,7 @@ class InfrastructurePointTool(InfrastructureDrawingTool, Beschreibung):
         )
         config.active_coord = (x, y)
         self._open()
-    
+
     def onClick(self):
         pass
 
@@ -186,7 +186,7 @@ class PunktMassnahmeBearbeiten(ToolboxButton):
         self.shape = 'NONE'
         self.cursor = 3
         self.output = ErschliessungsnetzeAnzeigen()
-        
+
     def onClick(self, coord=None):
         self.output.show()
 
@@ -196,7 +196,7 @@ class PunktMassnahmeBearbeiten(ToolboxButton):
 
 
 class PunktMassnahmeHinzu(PunktMassnahmeBearbeiten):
-    
+
     def onMouseDownMap(self, x, y, button, shift):
         tbx = self.tbx
         tbx.set_active_project()
@@ -231,7 +231,7 @@ class NetzabschnittLoeschen(InfrastructureDrawingTool):
     def __init__(self):
         super(NetzabschnittLoeschen, self).__init__()
         self.shape = "Rectangle"
-    
+
     def onRectangle(self, rectangle):
         xmin, ymin = rectangle.XMin, rectangle.YMin
         xmax, ymax = rectangle.XMax, rectangle.YMax
@@ -247,7 +247,7 @@ class NetzabschnittLoeschen(InfrastructureDrawingTool):
             arcpy.Point(xmax, ymax),
             arcpy.Point(xmax, ymin),
             arcpy.Point(xmin, ymin)
-        ])        
+        ])
         bbox_poly = arcpy.Polygon(poly_points)
         with ArcpyEnv(addOutputsToMap=False):
             arcpy.CopyFeatures_management([bbox_poly], fc_bbox)
@@ -286,23 +286,6 @@ class GesamtkostenErmitteln(ToolboxButton):
     _pyt_file = 'Infrastrukturkosten.pyt'
     _toolbox_name = 'TbxGesamtkosten'
 
-
-class ElektrizitaetKostenaufteilung(object):
-    """Implementation for rpc_tools.elektrizitaet_kostenaufteilung (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
-class KanalisationKostenaufteilung(object):
-    """Implementation for rpc_tools.kanalisation_kostenaufteilung (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
-
 class KostenNachKostentraegernAuswerten(object):
     """Implementation for rpc_tools.kosten_nach_kostentraegern_auswerten (Button)"""
     def __init__(self):
@@ -319,26 +302,33 @@ class KostenProWEBzwAPVergleichen(object):
     def onClick(self):
         pass
 
-class StrasseAeussereKostenaufteilung(object):
+class StrasseAeussereKostenaufteilung(ToolboxButton):
     """Implementation for rpc_tools.strasse_aeussere_kostenaufteilung (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxNetzKostenaufteilungAuessere'
 
-class StrasseInnereKostenaufteilung(object):
+
+class StrasseInnereKostenaufteilung(ToolboxButton):
     """Implementation for rpc_tools.strasse_innere_kostenaufteilung (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxNetzKostenaufteilungInnere'
 
-class TrinkwasserKostenaufteilung(object):
+class TrinkwasserKostenaufteilung(ToolboxButton):
     """Implementation for rpc_tools.trinkwasser_kostenaufteilung (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxNetzKostenaufteilungTrinkwasser'
+
+class ElektrizitaetKostenaufteilung(ToolboxButton):
+    """Implementation for rpc_tools.elektrizitaet_kostenaufteilung (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxNetzKostenaufteilungElektrizitaet'
+
+class KanalisationKostenaufteilung(ToolboxButton):
+    """Implementation for rpc_tools.kanalisation_kostenaufteilung (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxNetzKostenaufteilungKanalisation'

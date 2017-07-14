@@ -15,7 +15,12 @@ from rpctools.analyst.infrastrukturkosten.tbx_infrastrukturmengenbilanz import \
 from rpctools.analyst.infrastrukturkosten.tbx_kostenkennwerte_kontrollieren \
      import TbxKostenkennwerteKontrollieren
 from rpctools.analyst.infrastrukturkosten.tbx_netzkostenaufteilung \
-     import TbxNetzKostenaufteilung
+     import TbxNetzKostenaufteilung, TbxNetzKostenaufteilungInnere, \
+     TbxNetzKostenaufteilungAuessere, TbxNetzKostenaufteilungKanalisation, \
+     TbxNetzKostenaufteilungTrinkwasser, TbxNetzKostenaufteilungElektrizitaet
+
+
+
 
 
 
@@ -27,7 +32,12 @@ class Toolbox(object):
                       TbxMassnahmenEditieren,
                       TbxInfrastrukturmengenBilanz,
                       TbxFlaechenbilanz,
-                      TbxGesamtkosten, 
+                      TbxGesamtkosten,
                       TbxInfrastrukturkostenermittlung,
                       TbxKostenaufteilungsregeln,
-                      TbxNetzKostenaufteilung, ]
+                      TbxNetzKostenaufteilung,
+                      TbxNetzKostenaufteilungInnere,
+                      TbxNetzKostenaufteilungAuessere,
+                      TbxNetzKostenaufteilungKanalisation,
+                      TbxNetzKostenaufteilungTrinkwasser,
+                      TbxNetzKostenaufteilungElektrizitaet]
