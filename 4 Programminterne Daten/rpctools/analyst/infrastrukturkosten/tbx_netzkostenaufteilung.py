@@ -35,7 +35,7 @@ class TbxNetzKostenaufteilung(Tbx):
     def Tool(self):
         return NetzKostenaufteilung
 
-    def update_df(self, params, id_kostenphase):
+    def params_to_results(self, params, id_kostenphase):
         """
         update df_results with toolbox values
         id_kostenphase : list
@@ -43,16 +43,38 @@ class TbxNetzKostenaufteilung(Tbx):
 
         for id_to_set in id_kostenphase:
             if id_to_set == 1:
-                params_to_set = [params.owner_EH.value, params.community_EH.value, params.users_EH.value]
+                params_to_set = [params.owner_EH.value, params.community_EH.value, params.users_EH.value, params.default_EH.value]
             elif id_to_set == 2:
-                params_to_set = [params.owner_BU.value, params.community_BU.value, params.users_BU.value]
+                params_to_set = [params.owner_BU.value, params.community_BU.value, params.users_BU.value, params.default_BU.value]
             elif id_to_set == 3:
-                params_to_set = [params.owner_EN.value, params.community_EN.value, params.users_EN.value]
-            self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), ["Anteil_GSB", "Anteil_GEM", "Anteil_ALL"]] = params_to_set
+                params_to_set = [params.owner_EN.value, params.community_EN.value, params.users_EN.value, params.default_EN.value]
+            default = params_to_set[3]
 
+            if default == "benutzerdefinierte Einstellungen":
+                id_default = 99
+            else:
+                id_default = self._df_defaults.loc[default, 'IDKostenregel']
 
+            params_to_set.append(id_default)
+            self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), ["Anteil_GSB", "Anteil_GEM", "Anteil_ALL", "Kostenregel", "IDKostenregel"]] = params_to_set
 
-    def set_params(self, params, id_kostenphase):
+    def change_network(self, params):
+        for id_to_set in range(1, 4):
+            if id_to_set == 1:
+                params_to_set = [params.default_EH, params.owner_EH, params.community_EH, params.users_EH]
+            elif id_to_set == 2:
+                params_to_set = [params.default_BU, params.owner_BU, params.community_BU, params.users_BU]
+            elif id_to_set == 3:
+                params_to_set = [params.default_EN, params.owner_EN, params.community_EN, params.users_EN]
+
+            # set the toolbox parameters
+            default, owner, community, users = params_to_set
+            owner.value = int(self.df_results.loc[(self.df_results.IDNetz == self._netztyp) & (self.df_results.IDKostenphase == id_to_set), 'Anteil_GSB'])
+            community.value = int(self.df_results.loc[(self.df_results.IDNetz == self._netztyp) & (self.df_results.IDKostenphase == id_to_set), 'Anteil_GEM'])
+            users.value = int(self.df_results.loc[(self.df_results.IDNetz == self._netztyp) & (self.df_results.IDKostenphase == id_to_set), 'Anteil_ALL'])
+            default.value = self.df_results.loc[(self.df_results.IDNetz == self._netztyp) & (self.df_results.IDKostenphase == id_to_set), 'Kostenregel'].values[0]
+
+    def load_defaults(self, params, id_kostenphase):
         """
         sets the toolbox values for EH:1, BU:2 or EN:3
         params : params
@@ -60,16 +82,26 @@ class TbxNetzKostenaufteilung(Tbx):
         """
         for id_to_set in id_kostenphase:
             if id_to_set == 1:
-                params_to_set = [params.owner_EH, params.community_EH, params.users_EH]
+                params_to_set = [params.default_EH, params.owner_EH, params.community_EH, params.users_EH]
             elif id_to_set == 2:
-                params_to_set = [params.owner_BU, params.community_BU, params.users_BU]
+                params_to_set = [params.default_BU, params.owner_BU, params.community_BU, params.users_BU]
             elif id_to_set == 3:
-                params_to_set = [params.owner_EN, params.community_EN, params.users_EN]
+                params_to_set = [params.default_EN, params.owner_EN, params.community_EN, params.users_EN]
 
-            owner, community, users = params_to_set
-            owner.value = int(self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), 'Anteil_GSB'])
-            community.value = int(self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), 'Anteil_GEM'])
-            users.value = int(self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), 'Anteil_ALL'])
+            # set the toolbox parameters
+            default, owner, community, users = params_to_set
+            owner.value = int(self._df_defaults.loc[(self._df_defaults.Kostenregel == default.value), 'Anteil_GSB'])
+            community.value = int(self._df_defaults.loc[(self._df_defaults.Kostenregel == default.value), 'Anteil_GEM'])
+            users.value = int(self._df_defaults.loc[(self._df_defaults.Kostenregel == default.value), 'Anteil_ALL'])
+            # update the results dataframe
+            id_default = self._df_defaults.loc[default.value, 'IDKostenregel']
+            self.df_results.loc[(self.df_results.IDNetz == self._netztyp) & (self.df_results.IDKostenphase == id_to_set), ['Anteil_GSB', 'Anteil_GEM', 'Anteil_ALL', 'Kostenregel', 'IDKostenregel']] = \
+                [owner.value, community.value, users.value, default.value, id_default]
+
+
+            #owner.value = int(self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), 'Anteil_GSB'])
+            #community.value = int(self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), 'Anteil_GEM'])
+            #users.value = int(self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == id_to_set), 'Anteil_ALL'])
 
 
     def _open(self, params):
@@ -77,73 +109,69 @@ class TbxNetzKostenaufteilung(Tbx):
         kostenaufteilung_startwerte(self.par.get_projectname())
         self.df_results = self.table_to_dataframe('Kostenaufteilung', workspace=self._workspace)
         self.df_results = self.df_results.astype(int)
-        self.df_results = pd.merge(self.df_results, self._df_defaults.loc[:, ['IDKostenregel', 'Aufteilungsregel']], on='IDKostenregel')
-        params.default_EH.value = self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 1), 'Aufteilungsregel'].values[0]
-        params.default_BU.value = self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 2), 'Aufteilungsregel'].values[0]
-        params.default_EN.value = self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 3), 'Aufteilungsregel'].values[0]
+        self.df_results = pd.merge(self.df_results, self._df_defaults.loc[:, ['IDKostenregel', 'Kostenregel']], on='IDKostenregel')
+        params.default_EH.value = self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 1), 'Kostenregel'].values[0]
+        params.default_BU.value = self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 2), 'Kostenregel'].values[0]
+        params.default_EN.value = self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 3), 'Kostenregel'].values[0]
         # set params:
-        self.set_params(params, [1, 2, 3])
+        self.load_defaults(params, [1, 2, 3])
 
 
     def _updateParameters(self, params):
         if not self._has_been_opened:
             self._has_been_opened = True
-            return params
+            #return params
+        if self.par.changed('network'):
+            network_id = int(self._df_netzwork_id.loc[self._df_netzwork_id.Netz == params.network.value, 'IDNetz'])
+            self._netztyp = network_id
+            self.change_network(params)
         # check if other default settings were choosen
         if self.par.changed('default_EH'):
             if params.default_EH.value != u"benutzerdefinierte Einstellungen":
-                self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 1), 'Aufteilungsregel'] = params.default_EH.value
-                id_kostenregel = self._df_defaults.loc[self._df_defaults["Aufteilungsregel"] == params.default_EH.value, 'IDKostenregel'].values[0]
-                self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 1), 'IDKostenregel'] = id_kostenregel
-                # xxx Here is the problem!
-                self.set_params(params, [1])
-                self.update_df(params, [1])
+                self.load_defaults(params, [1])
         if self.par.changed('default_BU'):
             if params.default_BU.value != u"benutzerdefinierte Einstellungen":
-                self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 2), 'Aufteilungsregel'] = params.default_BU.value
-                id_kostenregel = self._df_defaults.loc[self._df_defaults["Aufteilungsregel"] == params.default_BU.value, 'IDKostenregel'].values[0]
-                self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 2), 'IDKostenregel'] = id_kostenregel
-                self.set_params(params, [2])
-                self.update_df(params, [2])
+                self.load_defaults(params, [2])
         if self.par.changed('default_EN'):
             if params.default_EN.value != u"benutzerdefinierte Einstellungen":
-                self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 3), 'Aufteilungsregel'] = params.default_EN.value
-                id_kostenregel = self._df_defaults.loc[self._df_defaults["Aufteilungsregel"] == params.default_EN.value, 'IDKostenregel'].values[0]
-                self.df_results.loc[(self.df_results["IDNetz"] == self._netztyp) & (self.df_results["IDKostenphase"] == 3), 'IDKostenregel'] = id_kostenregel
-                self.set_params(params, [3])
-                self.update_df(params, [3])
+                self.load_defaults(params, [3])
         # check if range-filter has changed
         # EH
         if self.par.changed('community_EH', 'owner_EH', 'users_EH'):
-            self.update_df(params, [1])
             params.default_EH.value = u"benutzerdefinierte Einstellungen"
+            self.params_to_results(params, [1])
         # BU
         if self.par.changed('community_BU', 'owner_BU', 'users_BU'):
-            self.update_df(params, [2])
             params.default_BU.value = u"benutzerdefinierte Einstellungen"
-        # EN
+            self.params_to_results(params, [2])
+            # EN
         if self.par.changed('community_EN', 'owner_EN', 'users_EN'):
-            self.update_df(params, [3])
             params.default_EN.value = u"benutzerdefinierte Einstellungen"
+            self.params_to_results(params, [3])
         return params
 
     def _getParameterInfo(self):
         params = self.par
         projekte = self.folders.get_projects()
+        # load default setting from table Aufteilungsregeln
         self._df_defaults = self.table_to_dataframe('Aufteilungsregeln', columns=[],
                                                    workspace='FGDB_Kosten_Tool.gdb',
                                                    where=None,
                                                    pkey='',
                                                    project='',
                                                    is_base_table=True)
-        self._df_defaults.rename(columns={'IDAufteilungsregel': 'IDKostenregel',}, inplace=True)
-        self._df_defaults.index = self._df_defaults["Aufteilungsregel"]
+        self._df_defaults.rename(columns={'IDAufteilungsregel': 'IDKostenregel', 'Aufteilungsregel': 'Kostenregel',}, inplace=True)
+        self._df_defaults.index = self._df_defaults["Kostenregel"]
         self._df_defaults.loc[:, ["Anteil_GSB", "Anteil_GEM", "Anteil_ALL"]] = \
             self._df_defaults.loc[:, ["Anteil_GSB", "Anteil_GEM", "Anteil_ALL"]].astype(int)
-        default_list = list(self._df_defaults.Aufteilungsregel)
+        # filter list for Kostenregel
+        default_list = list(self._df_defaults.Kostenregel)
         default_list.append(u"benutzerdefinierte Einstellungen")
-
-
+        # dataframe for network and networkID
+        self._df_netzwork_id = self.table_to_dataframe(
+            'Netze_und_Netzelemente', columns=['IDNetz', 'Netz'],
+            workspace='FGDB_Kosten_Tool.gdb', is_base_table=True)
+        self._df_netzwork_id = self._df_netzwork_id.drop_duplicates()
         category_EH = "Einmalige Herstellung"
         category_BU = "Betrieb und Unterhaltung"
         category_EN = "Erneuerung"
