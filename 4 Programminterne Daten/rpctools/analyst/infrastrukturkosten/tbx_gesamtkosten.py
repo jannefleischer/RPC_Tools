@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import arcpy
-import webbrowser
 import pandas as pd
 import numpy as np
 
@@ -14,7 +13,9 @@ from rpctools.analyst.infrastrukturkosten.kostenkennwerte_hilfsfunktionen import
 class Gesamtkosten(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Kosten.gdb'
-    _table = 'Gesamtkosten'
+    _costs_results_table = 'Gesamtkosten'
+    
+    years = 20
     
     def add_outputs(self):
         kosten_diagram = GesamtkostenDiagramm()
@@ -39,26 +40,22 @@ class Gesamtkosten(Tool):
             is_base_table=True)
         self.df_elements.drop_duplicates(inplace=True)
 
-        self.df_phases = pd.DataFrame(
-            [{'IDKostenphase': 1,
-              'Kostenphase': 'Erstmalige Herstellung'},
-             {'IDKostenphase': 2,
-              'Kostenphase': u'Betrieb und Unterhaltung für die ersten 20 Jahre'}, 
-             {'IDKostenphase': 3,
-              'Kostenphase': u'Erneuerung (Rücklagen) für die ersten 20 Jahre'}
-             ]
-        )        
+        self.df_phases = self.parent_tbx.table_to_dataframe(
+            'Kostenphasen', workspace='FGDB_Kosten_Tool.gdb',
+            is_base_table=True)
     
-        arcpy.AddMessage(u'Berechne Gesamtkosten der Phasen\n{}...'
-                         .format(', \n'.join(self.df_phases['Kostenphase'].tolist())))
-        self.parent_tbx.delete_rows_in_table(self._table)
-        self.calculate()
+        arcpy.AddMessage(u'Berechne Gesamtkosten der Phasen {}\n{}...'
+                         .format(
+                             u' für die ersten {} Jahre'.format(self.years), 
+                             u', \n'.join(self.df_phases['Kostenphase'].tolist())
+                         ))
+        self.parent_tbx.delete_rows_in_table(self._costs_results_table)
+        self.calculate_phases()
         
-    def calculate(self):
-        phase_name = 'Erstmalige Herstellung'
+    def calculate_phases(self):
 
         df_results = self.parent_tbx.table_to_dataframe(
-            self._table)        
+            self._costs_results_table)
         #line_results = pd.DataFrame(columns=self.df_results.columns)
         #point_results = line_results.copy(deep=True)
         
@@ -72,9 +69,9 @@ class Gesamtkosten(Tool):
                     if phase_id == 1:
                         costs = group['Euro_EH']
                     elif phase_id == 2:
-                        costs = 0.2 * group['Cent_BU']
+                        costs = self.years * group['Cent_BU'] / 100.
                     elif phase_id == 3:
-                        costs = 20 * group['Euro_EN'] / group['Lebensdauer']
+                        costs = self.years * group['Euro_EN'] / group['Lebensdauer']
                     else:
                         raise Exception('phase {} not defined'.format(phase_id))
                     
@@ -95,7 +92,7 @@ class Gesamtkosten(Tool):
         df_results.reset_index(inplace=True)
         df_results = df_results.merge(self.df_phases, on='IDKostenphase')
         df_results = df_results.merge(self.df_elements, on='IDNetz')
-        self.parent_tbx.insert_dataframe_in_table(self._table, df_results)
+        self.parent_tbx.insert_dataframe_in_table(self._costs_results_table, df_results)
 
 
 class TbxGesamtkosten(Tbx):

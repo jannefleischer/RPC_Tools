@@ -512,6 +512,8 @@ class Output(object):
         
     def show_layers(self, redraw=True):
         '''show available layers'''
+        if len(self.layers) == 0:
+            return
         # always add an osm layer and the contours of the areas background
         self.add_osm_layer()
         self.add_project_contour()

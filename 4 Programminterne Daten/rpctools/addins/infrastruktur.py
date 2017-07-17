@@ -286,13 +286,13 @@ class GesamtkostenErmitteln(ToolboxButton):
     _pyt_file = 'Infrastrukturkosten.pyt'
     _toolbox_name = 'TbxGesamtkosten'
 
-class KostenNachKostentraegernAuswerten(object):
+
+class KostenNachKostentraegernAuswerten(ToolboxButton):
     """Implementation for rpc_tools.kosten_nach_kostentraegern_auswerten (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxKostentraegerAuswerten'
+
 
 class KostenProWEBzwAPVergleichen(object):
     """Implementation for rpc_tools.kosten_pro_we_bzw_ap_vergleichen (Button)"""
