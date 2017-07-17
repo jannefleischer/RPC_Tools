@@ -41,7 +41,6 @@ class KostentraegerAuswerten(Gesamtkosten):
 
 
 class TbxKostentraegerAuswerten(Tbx):
-    _table = 'Gesamtkosten'
 
     @property
     def label(self):

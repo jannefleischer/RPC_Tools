@@ -140,9 +140,66 @@ class GesamtkostenDiagramm(MatplotDiagram):
         # Put a legend to the right of the current axis
         ax.legend(phase_names, loc='center left', bbox_to_anchor=(0, -0.3))
         return ax
+    
 
+class KostentraegerDiagramm(MatplotDiagram):
+    
+    def _create(self, **kwargs):
+        workspace = 'FGDB_Kosten.gdb'
+        table = 'Gesamtkosten_nach_Traeger'
+        self.title = (u"{}: Aufteilung der Gesamtkosten"
+                      u"auf die Kostenträger".format(
+                          self.tbx.par.get_projectname()))
+        x_label = u"Kosten für Netzerweiterungen und punktuelle Maßnahmen"
+        
+        df_shares = self.tbx.table_to_dataframe(
+            table, workspace=workspace
+        )
+        
+        df_shareholders = self.tbx.table_to_dataframe(
+            'Kostentraeger', workspace='FGDB_Kosten_Tool.gdb',
+            is_base_table=True
+        )
+        categories = df_shareholders['Kostentraeger']
+        cols = df_shareholders['spalte']
+        
+        pos_idx = np.arange(len(categories))
+        
+        bar_width = 0.5
+        
+        figure, ax = self.plt.subplots(figsize=(10, 6))
+        self.plt.gca().invert_yaxis()
+        
+        
+        summed = np.zeros(len(cols))
+        for index, net_share in df_shares.iterrows():
+            data = []
+            for i, col in enumerate(cols):
+                data.append(net_share[col])
+            ax.barh(pos_idx, data, left=summed, height=bar_width)
+            summed += data
+        
+        ax.tick_params(axis='both', which='major', labelsize=9)
+        ax.set_yticks(pos_idx)
+        ax.set_yticklabels(categories)
+        ax.set_title(self.title)
+        ax.set_xlabel(x_label)
+        ax.xaxis.set_major_formatter(mticker.FormatStrFormatter(u'%d €'))
+        ax.xaxis.grid(True, which='major')
+        
+        box = ax.get_position()
+        
+        ax.set_position([box.x0 + box.width * 0.2, box.y0 + box.height * 0.2,
+                         box.width * 0.8, box.height * 0.8])
+        
+        # Put the legend to the right of the current axis
+        ax.legend(df_shares['Netz'], loc='center left', bbox_to_anchor=(0, -0.3))
+        return ax
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
+    kosten_diagram = KostentraegerDiagramm()
+    kosten_diagram.create()
+    kosten_diagram.show()    
     kosten_diagram = MassnahmenKostenDiagramm()
     kosten_diagram.create()
     kosten_diagram.show()
