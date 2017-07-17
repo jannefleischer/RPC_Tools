@@ -100,19 +100,19 @@
                 <Button caption="Gesamtkosten ermitteln" category="ProjektCheck" class="GesamtkostenErmitteln" id="rpc_tools.gesamtkosten_ermitteln" image="Images\450000-chart.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Stra&#223;e (innere Erschlie&#223;ung)" category="ProjektCheck" class="StrasseInnereKostenaufteilung" id="rpc_tools.strasse_innere_kostenaufteilung" image="" message="" tip="">
+                <Button caption="Stra&#223;e (innere Erschlie&#223;ung)" category="ProjektCheck" class="StrasseInnereKostenaufteilung" id="rpc_tools.strasse_innere_kostenaufteilung" image="Images\Driving.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Stra&#223;e (&#228;u&#223;ere Erschlie&#223;ung)" category="ProjektCheck" class="StrasseAeussereKostenaufteilung" id="rpc_tools.strasse_aeussere_kostenaufteilung" image="" message="" tip="">
+                <Button caption="Stra&#223;e (&#228;u&#223;ere Erschlie&#223;ung)" category="ProjektCheck" class="StrasseAeussereKostenaufteilung" id="rpc_tools.strasse_aeussere_kostenaufteilung" image="Images\Driving.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Kanalisation" category="ProjektCheck" class="KanalisationKostenaufteilung" id="rpc_tools.kanalisation_kostenaufteilung" image="" message="" tip="">
+                <Button caption="Kanalisation" category="ProjektCheck" class="KanalisationKostenaufteilung" id="rpc_tools.kanalisation_kostenaufteilung" image="Images\Kanal Mischsystem.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Trinkwasser" category="ProjektCheck" class="TrinkwasserKostenaufteilung" id="rpc_tools.trinkwasser_kostenaufteilung" image="" message="" tip="">
+                <Button caption="Trinkwasser" category="ProjektCheck" class="TrinkwasserKostenaufteilung" id="rpc_tools.trinkwasser_kostenaufteilung" image="Images\Trinkwasserleitung.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Elektrizit&#228;t" category="ProjektCheck" class="ElektrizitaetKostenaufteilung" id="rpc_tools.elektrizitaet_kostenaufteilung" image="" message="" tip="">
+                <Button caption="Elektrizit&#228;t" category="ProjektCheck" class="ElektrizitaetKostenaufteilung" id="rpc_tools.elektrizitaet_kostenaufteilung" image="Images\Stromleitung.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Kosten nach Kostentr&#228;gern auswerten" category="ProjektCheck" class="KostenNachKostentraegernAuswerten" id="rpc_tools.kosten_nach_kostentraegern_auswerten" image="Images\450500-pie-chart.png" message="" tip="">
