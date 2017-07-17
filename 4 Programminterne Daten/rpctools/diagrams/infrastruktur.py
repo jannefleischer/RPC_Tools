@@ -167,16 +167,17 @@ class KostentraegerDiagramm(MatplotDiagram):
         
         bar_width = 0.5
         
-        figure, ax = self.plt.subplots(figsize=(10, 6))
+        figure, ax = self.plt.subplots(figsize=(12, 5))
         self.plt.gca().invert_yaxis()
-        
+    
+        colors = self.plt.cm.Paired(np.linspace(0, 1, len(df_shares)))
         
         summed = np.zeros(len(cols))
-        for index, net_share in df_shares.iterrows():
+        for j, (index, net_share) in enumerate(df_shares.iterrows()):
             data = []
             for i, col in enumerate(cols):
                 data.append(net_share[col])
-            ax.barh(pos_idx, data, left=summed, height=bar_width)
+            ax.barh(pos_idx, data, left=summed, height=bar_width, color=colors[j])
             summed += data
         
         ax.tick_params(axis='both', which='major', labelsize=9)
@@ -189,11 +190,14 @@ class KostentraegerDiagramm(MatplotDiagram):
         
         box = ax.get_position()
         
-        ax.set_position([box.x0 + box.width * 0.2, box.y0 + box.height * 0.2,
-                         box.width * 0.8, box.height * 0.8])
+        ax.set_position([box.x0 + box.width * 0.2, box.y0 + box.height * 0.25,
+                         box.width * 0.8, box.height * 0.75])
         
         # Put the legend to the right of the current axis
-        ax.legend(df_shares['Netz'], loc='center left', bbox_to_anchor=(0, -0.3))
+        ax.legend(df_shares['Netz'], loc='center left', bbox_to_anchor=(0, -0.35))
+        # didn't find a way to pass custom colors directly
+        for color, handle in zip(colors, ax.get_legend().legendHandles):
+            handle.set_color(color)        
         return ax
 
 if __name__ == "__main__":    
