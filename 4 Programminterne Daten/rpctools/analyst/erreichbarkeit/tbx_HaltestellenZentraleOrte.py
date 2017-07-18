@@ -5,6 +5,7 @@ import arcpy
 import pandas as pd
 from datetime import datetime, date, timedelta
 import numpy as np
+import requests
 
 from rpctools.utils.params import Tbx, Tool, DummyTbx
 from rpctools.utils.encoding import encode
@@ -70,7 +71,12 @@ class HaltestellenZentraleOrte(Tool):
         self.query = BahnQuery(date=next_working_day())
         arcpy.AddMessage('Berechne die zentralen Orte und Haltestellen '
                          'in der Umgebung...')
-        self.write_centers_stops()
+        try:
+            self.write_centers_stops()
+        except requests.exceptions.ConnectionError:
+            arcpy.AddError('Die Website der Bahn wurde nicht erreicht. '
+                           'Bitte überprüfen Sie Ihre Internetverbindung!')
+            return
         arcpy.AddMessage('Ermittle die Anzahl der Abfahrten je Haltestelle...')
         self.update_departures(projectarea_only=True)
         
@@ -80,7 +86,7 @@ class HaltestellenZentraleOrte(Tool):
         '''
         # truncate tables, will be filled in progress
         self.parent_tbx.delete_rows_in_table('Zentrale_Orte')
-        self.parent_tbx.delete_rows_in_table('Haltestellen')        
+        self.parent_tbx.delete_rows_in_table('Haltestellen')
         
         centroid = get_project_centroid(self.par.projectname.value)
         df_central = self.parent_tbx.table_to_dataframe(
@@ -105,12 +111,16 @@ class HaltestellenZentraleOrte(Tool):
                 t_p = Point(point[0], point[1],
                             epsg=self.parent_tbx.config.epsg)
                 t_p.transform(4326)
-                closest = self.query.stops_near(t_p, n=1)[0]
-                stops.append(closest)
+                stops_near = self.query.stops_near(t_p, n=1)
+                if len(stops_near) > 0:
+                    closest = stops_near[0]
+                    stops.append(closest)
             return stops
             
         oz_stops = get_closest_stops(oz_points)
         mz_stops = get_closest_stops(mz_points)
+        if (len(oz_stops) + len(mz_stops)) == 0:
+            return
         
         df_oz_within['id_haltestelle'] = [s.id for s in oz_stops]
         df_mz_within['id_haltestelle'] = [s.id for s in mz_stops]

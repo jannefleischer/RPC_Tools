@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
 import arcpy
+import requests
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
@@ -63,8 +64,13 @@ class ErreichbarkeitOEPNV(Tool):
                     arcpy.AddMessage(u'   bereits berechnet, wird übersprungen')
                     continue
             
-            (duration, departure,
-             changes, modes) = query.routing(origin, destination, self.times)
+            try:
+                (duration, departure,
+                 changes, modes) = query.routing(origin, destination, self.times)
+            except requests.exceptions.ConnectionError:
+                arcpy.AddError('Die Website der Bahn wurde nicht erreicht. '
+                               'Bitte überprüfen Sie Ihre Internetverbindung!')
+                return
             # just appending results to existing table to write them later
             df_centers.loc[index, 'id_origin'] = id_origin
             df_centers.loc[index, 'id_destination'] = id_destination
@@ -111,10 +117,6 @@ class TbxErreichbarkeitOEPNV(TbxHaltestellen):
 
 
 if __name__ == "__main__":
-    from rpctools.analyst.erreichbarkeit.tbx_fahrplaene import TbxFahrplaene
-    t1 = TbxFahrplaene()
-    a = t1.getParameterInfo()
-    t1.open()
     
     t = TbxErreichbarkeitOEPNV()
     b = t.getParameterInfo()
