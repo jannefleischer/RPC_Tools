@@ -16,10 +16,7 @@ class TeilflaechenVerwalten(Tool):
     _workspace = 'FGDB_Definition_Projekt.gdb'
     
     def add_outputs(self):
-        fc = "Teilflaechen_Plangebiet"
-        layer = "Teilflaechen des Plangebiets"
-        self.output.add_layer("projektdefinition", layer, fc,
-                              name=u"Nutzungen des Plangebiets")
+        arcpy.RefreshActiveView()
 
     def run(self):
         df_areas = self.parent_tbx.df_areas
