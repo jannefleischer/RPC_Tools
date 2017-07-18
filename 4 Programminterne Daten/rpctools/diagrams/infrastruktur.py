@@ -226,22 +226,31 @@ class VegleichsDiagramm(MatplotDiagram):
             where='IDNutzungsart={}'.format(self._type_of_use),
             is_base_table=True
         )
+        df_costs = self.tbx.table_to_dataframe(
+            'Gesamtkosten',
+            workspace='FGDB_Kosten.gdb'
+        )
+        
         # there is only one row for each type of use
         df_reference = df_reference.iloc[0]
-        summed = int(df_areas[self._column].sum() / 1000) * 1000
+        x = df_areas[self._column].sum()
+        total_costs = df_costs['Euro'].sum()
+        costs_per_x = int((total_costs / x) / 1000) * 1000
         reference = df_reference['Wert']
         
         categories = [
+            u'Vergleichswert (Schätzung):\n{}'
+            .format(df_reference['Beschreibung']), 
             u'Projekt "{}" (alle Netze, \nKostenphasen und Kostenträger)'
-            .format(self.tbx.par.get_projectname()),
-            u'Vergleichswert (Schätzung):\n{}'.format(df_reference['Beschreibung'])
+            .format(self.tbx.par.get_projectname())
         ]
         categories = ['\n'.join(wrap(c, 40)) for c in categories]
         
-        figure, ax = self.plt.subplots(figsize=(10, 5))
+        figure, ax = self.plt.subplots(figsize=(9, 4))
         y_pos = np.arange(len(categories))
         
-        ax.barh(y_pos, [summed, reference], height=0.3, align='center')
+        ax.barh(y_pos, [reference, costs_per_x], height=0.3, align='center',
+                color=[ '#99aaff', '#2c64ff'])
         
         ax.tick_params(axis='both', which='major', labelsize=9)
         ax.set_yticks(y_pos)
@@ -269,10 +278,10 @@ class VergleichAPDiagramm(VegleichsDiagramm):
 
 
 if __name__ == "__main__":
-    diagram = VergleichWEDiagramm()
+    diagram = VergleichAPDiagramm()
     diagram.create()
     diagram.show()    
-    diagram = VergleichAPDiagramm()
+    diagram = VergleichWEDiagramm()
     diagram.create()
     diagram.show()    
     diagram = KostentraegerDiagramm()
