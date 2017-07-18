@@ -57,7 +57,7 @@ class SetSource(Tool):
         layers = sum([layers1, layers2], [])
         for layer in layers:
             arcpy.mapping.RemoveLayer(df, layer)
-        del mxd
+        del(mxd)
 
 
 class TbxSetSource(TbxFlaechendefinition):

@@ -279,6 +279,9 @@ class Output(object):
             addLayer = arcpy.mapping.Layer(group_layer_template)
             addLayer.name = projektname
             arcpy.mapping.AddLayer(current_dataframe, addLayer, "TOP")
+            del(addLayer)
+        del(current_dataframe)
+        del(current_mxd)
 
     def get_projectlayer(self, projectname=None):
         """
@@ -297,7 +300,8 @@ class Output(object):
         for layer in layers:
             if layer.isGroupLayer:
                 projectlayer = layer
-
+        del(current_dataframe)
+        del(current_mxd)
         return projectlayer
     
     @staticmethod
@@ -352,6 +356,8 @@ class Output(object):
                 layername=hintergrund, folder='toc', enhance=True)
             addLayer = arcpy.mapping.Layer(group_layer_template)
             arcpy.mapping.AddLayer(dataframe, addLayer, "BOTTOM")
+            del(addLayer)
+        del(current_mxd)
     
     def add_osm_layer(self): 
         # add OpenStreetmap
@@ -395,6 +401,8 @@ class Output(object):
             addLayer = arcpy.mapping.Layer(group_layer_template)
             arcpy.mapping.AddLayerToGroup(
                 dataframe, project_layer, addLayer, "BOTTOM")
+            del(addLayer)
+        del(current_mxd)
 
     def set_subgrouplayer(self,
                           group,
@@ -420,6 +428,10 @@ class Output(object):
                 project_layer, group, dataframe)[0]
             arcpy.mapping.AddLayerToGroup(
                 dataframe, target_grouplayer, addLayer, "BOTTOM")
+            del(addLayer)
+            del(target_grouplayer)
+        del(current_dataframe)
+        del(current_mxd)
             
     def add_layer(self,
                   groupname,
@@ -631,6 +643,9 @@ class Output(object):
             project_layer.visible = True
 
         self.sort_layers()
+        del(current_dataframe)
+        del(new_layer)
+        del(current_mxd)
         
     def sort_layers(self):
         project_layer = self.get_projectlayer()
@@ -700,7 +715,9 @@ class Output(object):
                                                     layer, current_dataframe)
             if layer_exists:
                 arcpy.mapping.RemoveLayer(current_dataframe, layer_exists[0])
-
+            
+        del(current_dataframe)
+        del(current_mxd)
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
 
@@ -765,6 +782,8 @@ class Output(object):
         df.spatialReference = sr
         df.geographicTransformations = [self.config.transformation]
         arcpy.RefreshActiveView()
+        del(mxd)
+        del(df)
 
     @staticmethod
     def add_graph(input_template, graph, out_graph_name):

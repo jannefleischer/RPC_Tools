@@ -113,6 +113,8 @@ class MarketTemplate(object):
             mxd = arcpy.mapping.MapDocument("CURRENT")
             df = arcpy.mapping.ListDataFrames(mxd,"*")[0]
             arcpy.mapping.AddLayer(df, layer, "TOP")
+            del(mxd)
+            del(df)
 
     @staticmethod
     def _create_csv_template(file_path, fields, delimiter=';'):

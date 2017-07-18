@@ -423,7 +423,8 @@ class ProjektLoeschen(Tool):
             project_layer = self.output.get_projectlayer(project)
             for lyr in arcpy.mapping.ListLayers(project_layer, "", df):
                 arcpy.mapping.RemoveLayer(df, lyr)
-        del mxd
+            del(project_layer)
+        del(mxd)
 
     def projekt_loeschen(self, project_name):
         arcpy.AddMessage("Projektname: " + project_name)

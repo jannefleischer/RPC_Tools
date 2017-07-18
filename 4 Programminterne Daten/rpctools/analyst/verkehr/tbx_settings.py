@@ -47,6 +47,7 @@ class Settings(Tool):
         layers = sum([layers1, layers2], [])
         for layer in layers:
             arcpy.mapping.RemoveLayer(df, layer)
+        del(mxd)
 
 class TbxSettings(Tbx):
 
