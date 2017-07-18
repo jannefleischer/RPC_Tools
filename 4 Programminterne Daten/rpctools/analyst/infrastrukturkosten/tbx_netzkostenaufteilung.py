@@ -77,10 +77,15 @@ class TbxNetzKostenaufteilung(Tbx):
 
             # set the toolbox parameters
             default, owner, community, users = params_to_set
-            owner.value = int(self.df_results.loc[(self.df_results.IDNetz == self._netztyp) & (self.df_results.IDKostenphase == id_to_set), 'Anteil_GSB'])
-            community.value = int(self.df_results.loc[(self.df_results.IDNetz == self._netztyp) & (self.df_results.IDKostenphase == id_to_set), 'Anteil_GEM'])
-            users.value = int(self.df_results.loc[(self.df_results.IDNetz == self._netztyp) & (self.df_results.IDKostenphase == id_to_set), 'Anteil_ALL'])
-            default.value = self.df_results.loc[(self.df_results.IDNetz == self._netztyp) & (self.df_results.IDKostenphase == id_to_set), 'Kostenregel'].values[0]
+            idx = ((self.df_results.IDNetz == self._netztyp) &
+                   (self.df_results.IDKostenphase == id_to_set))
+            id_rule = self.df_results.loc[idx, 'IDKostenregel'].values[0]
+            
+            owner.value = int(self.df_results.loc[idx, 'Anteil_GSB'])
+            community.value = int(self.df_results.loc[idx, 'Anteil_GEM'])
+            users.value = int(self.df_results.loc[idx, 'Anteil_ALL'])
+            default.value = self.df_results.loc[idx, 'Kostenregel'].values[0] \
+                if id_rule < 99 else u"benutzerdefinierte Einstellungen"
 
     def load_defaults(self, params, id_kostenphase):
         """
@@ -112,7 +117,9 @@ class TbxNetzKostenaufteilung(Tbx):
         params.network.value = self._df_netzwork_id.loc[self._df_netzwork_id.IDNetz == self._netztyp, 'Netz'].values[0]
         self.df_results = self.table_to_dataframe('Kostenaufteilung', workspace=self._workspace)
         self.df_results = self.df_results.astype(int)
-        self.df_results = pd.merge(self.df_results, self._df_defaults.loc[:, ['IDKostenregel', 'Kostenregel']], on='IDKostenregel')
+        rules = self._df_defaults[['IDKostenregel', 'Kostenregel']]
+        self.df_results = pd.merge(self.df_results, rules,
+                                   on='IDKostenregel', how='left')
         self.load_network(params)
 
 
@@ -337,7 +344,7 @@ if __name__ == '__main__':
     t = TbxNetzKostenaufteilung()
     t._getParameterInfo()
     t.par.project.value = t.config.active_project
-    t._updateParameters(t.par)
-    t._open(t.par)
+    t.open()
+    t._has_been_opened = False
     t._updateParameters(t.par)
     t.execute()
