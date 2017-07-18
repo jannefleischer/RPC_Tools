@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+
 from rpctools.addins.common import ToolboxButton, folders, config
 from rpctools.addins.outputs import ProjektAnzeigen
+import pythonaddins
 
 __all__ = ['ProjektAnlegen', 'ProjektAuswahl',
            'ProjektKopieren', 'ProjektLoeschen',
@@ -38,7 +41,13 @@ class ProjektAuswahl(ProjektAnzeigen):
         if project is None:
             project = self.value
         config.active_project = project
-        self.show()
+        try:
+            self.show()
+        except IOError:
+            msg = (u'Das Projekt ist fehlerhaft aufgrund fehlender Daten.\n'
+                   u'Bitte löschen Sie es bei Gelegenheit!')
+            pythonaddins.MessageBox(msg, 'Fehler', 0)
+            self.onSelChange('')
 
     def onFocus(self, focused):
         if focused:
