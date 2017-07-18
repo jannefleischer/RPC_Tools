@@ -134,8 +134,8 @@ class ZentrumHinzu(ZentrumBearbeiten):
         polygon = arcpy.Polygon(array)
         tbx.add_center_to_db(self._new_center_name, polygon)
         arcpy.RefreshActiveView()
-        config.active_coord = (first.X, first.Y)
-        super(ZentrumBearbeiten, self).onClick()
+        #config.active_coord = (first.X, first.Y)
+        #super(ZentrumBearbeiten, self).onClick()
 
     def onMouseDownMap(self, x, y, button, shift): 
         pass

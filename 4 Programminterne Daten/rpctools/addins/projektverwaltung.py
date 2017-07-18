@@ -47,7 +47,7 @@ class ProjektAuswahl(ProjektAnzeigen):
             msg = (u'Das Projekt ist fehlerhaft aufgrund fehlender Daten.\n'
                    u'Bitte löschen Sie es bei Gelegenheit!')
             pythonaddins.MessageBox(msg, 'Fehler', 0)
-            self.onSelChange('')
+            config.active_project = self.value = ''
 
     def onFocus(self, focused):
         if focused:
