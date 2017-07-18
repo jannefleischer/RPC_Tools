@@ -18,8 +18,8 @@ class TeilflaechenVerwalten(Tool):
     def add_outputs(self):
         fc = "Teilflaechen_Plangebiet"
         layer = "Teilflaechen des Plangebiets"
-        self.output.add_layer("projektdefinition", layer, fc)
-        self.output.add_diagram(DiaTeilflaechen())
+        self.output.add_layer("projektdefinition", layer, fc,
+                              name=u"Nutzungen des Plangebiets")
 
     def run(self):
         df_areas = self.parent_tbx.df_areas

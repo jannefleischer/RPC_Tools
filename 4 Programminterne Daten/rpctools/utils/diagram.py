@@ -20,7 +20,7 @@ class Diagram(object):
         """
         title : str
         """
-        super(Diagram, self).__init__()
+        self.title = ''
         self.kwargs = kwargs
         self.tbx = DummyTbx()
         

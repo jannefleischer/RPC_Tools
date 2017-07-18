@@ -1025,7 +1025,7 @@ class Tbx(object):
         """
         where = where or self.get_where_clause(pkey)
         if not table_path or not arcpy.Exists(table_path):
-            return []
+            raise Exception('Die Tabelle existiert nicht')
         if not columns:
             columns = [f.name for f in arcpy.ListFields(table_path)]
         cursor = arcpy.da.SearchCursor(table_path, columns, where_clause=where)

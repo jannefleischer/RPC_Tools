@@ -3,6 +3,8 @@
 import numpy as np
 from rpctools.utils.diagram import MatplotDiagram
 import matplotlib.ticker as mticker
+from rpctools.utils.constants import Nutzungsart
+from textwrap import wrap
 
 
 class NetzlaengenDiagramm(MatplotDiagram):
@@ -190,7 +192,6 @@ class KostentraegerDiagramm(MatplotDiagram):
         ax.xaxis.grid(True, which='major')
         
         box = ax.get_position()
-        
         ax.set_position([box.x0 + box.width * 0.2, box.y0 + box.height * 0.25,
                          box.width * 0.8, box.height * 0.75])
         
@@ -201,16 +202,88 @@ class KostentraegerDiagramm(MatplotDiagram):
             handle.set_color(color)        
         return ax
 
-if __name__ == "__main__":    
-    kosten_diagram = KostentraegerDiagramm()
-    kosten_diagram.create()
-    kosten_diagram.show()    
-    kosten_diagram = MassnahmenKostenDiagramm()
-    kosten_diagram.create()
-    kosten_diagram.show()
-    kosten_diagram = NetzlaengenDiagramm()
-    kosten_diagram.create()
-    kosten_diagram.show()
-    kosten_diagram = GesamtkostenDiagramm()
-    kosten_diagram.create()
-    kosten_diagram.show()
+
+class VegleichsDiagramm(MatplotDiagram):
+    _column = None
+    _type_of_use = Nutzungsart.UNDEFINIERT
+    
+    
+    def _create(self, **kwargs):
+        self.title = (u'Vergleich: Erschließungskosten pro {} '
+                      u'(in den ersten 25 Jahren)'.format(self._unit))
+        x_label = (u'Gesamtkosten der Erschließung pro {} '
+                   u'(in den ersten 25 Jahren)'.format(self._unit))
+        
+        df_areas = self.tbx.table_to_dataframe(
+            'Teilflaechen_Plangebiet',
+            workspace='FGDB_Definition_Projekt.gdb',
+            columns=[self._column],
+            where='Nutzungsart={}'.format(self._type_of_use)
+        )
+        df_reference = self.tbx.table_to_dataframe(
+            'Vergleichswerte',
+            workspace='FGDB_Kosten_Tool.gdb',
+            where='IDNutzungsart={}'.format(self._type_of_use),
+            is_base_table=True
+        )
+        # there is only one row for each type of use
+        df_reference = df_reference.iloc[0]
+        summed = int(df_areas[self._column].sum() / 1000) * 1000
+        reference = df_reference['Wert']
+        
+        categories = [
+            u'Projekt "{}" (alle Netze, \nKostenphasen und Kostenträger)'
+            .format(self.tbx.par.get_projectname()),
+            u'Vergleichswert (Schätzung):\n{}'.format(df_reference['Beschreibung'])
+        ]
+        categories = ['\n'.join(wrap(c, 40)) for c in categories]
+        
+        figure, ax = self.plt.subplots(figsize=(10, 5))
+        y_pos = np.arange(len(categories))
+        
+        ax.barh(y_pos, [summed, reference], height=0.3, align='center')
+        
+        ax.tick_params(axis='both', which='major', labelsize=9)
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(categories)
+        ax.set_title(self.title)
+        ax.set_xlabel(x_label)
+        ax.xaxis.set_major_formatter(mticker.FormatStrFormatter(u'%d €'))
+        ax.xaxis.grid(True, which='major')
+        box = ax.get_position()
+        ax.set_position([box.x0 + box.width * 0.2, box.y0,
+                         box.width * 0.8, box.height])
+        return ax
+    
+
+class VergleichWEDiagramm(VegleichsDiagramm):
+    _column = 'WE_gesamt'
+    _type_of_use = Nutzungsart.WOHNEN
+    _unit = 'Wohneinheit'
+
+
+class VergleichAPDiagramm(VegleichsDiagramm):
+    _column = 'AP_gesamt'
+    _type_of_use = Nutzungsart.GEWERBE
+    _unit = 'Arbeitsplatz'
+
+
+if __name__ == "__main__":
+    diagram = VergleichWEDiagramm()
+    diagram.create()
+    diagram.show()    
+    diagram = VergleichAPDiagramm()
+    diagram.create()
+    diagram.show()    
+    diagram = KostentraegerDiagramm()
+    diagram.create()
+    diagram.show()    
+    diagram = MassnahmenKostenDiagramm()
+    diagram.create()
+    diagram.show()
+    diagram = NetzlaengenDiagramm()
+    diagram.create()
+    diagram.show()
+    diagram = GesamtkostenDiagramm()
+    diagram.create()
+    diagram.show()

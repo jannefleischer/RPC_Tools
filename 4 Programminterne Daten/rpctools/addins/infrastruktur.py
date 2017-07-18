@@ -294,13 +294,12 @@ class KostenNachKostentraegernAuswerten(ToolboxButton):
     _toolbox_name = 'TbxKostentraegerAuswerten'
 
 
-class KostenProWEBzwAPVergleichen(object):
+class KostenProWEBzwAPVergleichen(ToolboxButton):
     """Implementation for rpc_tools.kosten_pro_we_bzw_ap_vergleichen (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        pass
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Infrastrukturkosten.pyt'
+    _toolbox_name = 'TbxKostenVergleichen'
+
 
 class StrasseAeussereKostenaufteilung(ToolboxButton):
     """Implementation for rpc_tools.strasse_aeussere_kostenaufteilung (Button)"""
