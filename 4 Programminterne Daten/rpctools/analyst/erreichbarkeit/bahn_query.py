@@ -18,7 +18,7 @@ class Stop(Point):
 
 
 class BahnQuery(object):
-    reiseauskunft_url = 'http://reiseauskunft.bahn.de/bin/query.exe/dn' #?S="+bahn_start+"&Z="+ziel+"%20Hbf&date="+bahn_wochentag+"&time="+bahn_uhrzeit[0]+"&start=1"
+    reiseauskunft_url = 'http://reiseauskunft.bahn.de/bin/query.exe/dn' 
     mobile_url = 'http://mobile.bahn.de/bin/mobil/query.exe/dox'
     timetable_url = u'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn'
     
