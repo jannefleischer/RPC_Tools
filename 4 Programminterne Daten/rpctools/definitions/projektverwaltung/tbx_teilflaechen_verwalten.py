@@ -70,6 +70,9 @@ class TbxFlaechendefinition(Tbx):
         it's index in the list of areas
         '''
         area_idx = self.df_areas['pretty'] == self.par.area.value
+        # if user changed name in dropdown you won't find the name in the list
+        if area_idx.sum() == 0:
+            return None, -1
         idx = np.where(area_idx==True)[0][0]
         area = self.df_areas.iloc[idx]
         return area, idx
@@ -126,6 +129,8 @@ class TbxFlaechendefinition(Tbx):
             self._open(params)
 
         elif params.changed('area'):
+            if params.area.value not in params.area.filter.list:
+                return
             self.set_selected_area()
 
         return params
@@ -153,6 +158,12 @@ class TbxFlaechendefinition(Tbx):
         valid, msg = self.validate_inputs()
         if not valid:
             self.par.projectname.setErrorMessage(msg)
+        if params.area.value not in params.area.filter.list:
+            params.area.setErrorMessage(u'Bitte ändern Sie nicht den Namen der '
+                                        u'Fläche im Dropdown-Menü! Für diesen '
+                                        u'Fall ist in der Nutzungsdefinition ein '
+                                        u'eigenes Feld vorgesehen')
+
 
 class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
     """Toolbox to name Teilflächen and define their 'nutzungen'"""
@@ -190,6 +201,8 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
         params = super(TbxTeilflaecheVerwalten, self)._updateParameters(params)
 
         area, idx = self.get_selected_area()
+        if area is None:
+            return params
 
         #if params.changed('area') and self.par.area.filter.list:
             #selected, idx = self.get_selected_area()
@@ -218,11 +231,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
         type_of_use = self.df_types_of_use.loc[tou_idx]['nutzungsart'].values[0]
         self.par.name.value = area['Name']
         self.par.type_of_use.value = type_of_use
-
-    def _updateMessages(self, params):
-        valid, msg = self.validate_inputs()
-        if not valid:
-            self.par.projectname.setErrorMessage(msg)
+        
 
 if __name__ == '__main__':
 

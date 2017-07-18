@@ -75,6 +75,8 @@ class TbxNutzungen(TbxFlaechendefinition):
 
     def _updateParameters(self, params):
         area, idx = self.get_selected_area()
+        if area is None:
+            return params
         
         if self.par.changed('area'):
             self.set_selected_area()
@@ -191,6 +193,8 @@ class TbxNutzungenWohnen(TbxNutzungen):
     def _updateParameters(self, params):
         params = super(TbxNutzungenWohnen, self)._updateParameters(params)
         area, area_idx = self.get_selected_area()
+        if area is None:
+            return params
         
         we_changed = False
         for gt in self.gebaeudetypen.itervalues():
@@ -371,6 +375,8 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     def _updateParameters(self, params):
         params = super(TbxNutzungenGewerbe, self)._updateParameters(params)
         area, area_idx = self.get_selected_area()
+        if area is None:
+            return params
         altered = False
 
         # set presets
@@ -564,6 +570,8 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
     def _updateParameters(self, params):
         params = super(TbxNutzungenEinzelhandel, self)._updateParameters(params)
         area, area_idx = self.get_selected_area()
+        if area is None:
+            return params
         
         altered = False
         for srt in self.sortimente.itervalues():
@@ -580,7 +588,7 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         return params
 
 if __name__ == '__main__':
-    t = TbxNutzungenGewerbe()
+    t = TbxNutzungenEinzelhandel()
     t.getParameterInfo()
     t.set_active_project()
     t.validate_inputs()
