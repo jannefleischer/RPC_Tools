@@ -143,6 +143,7 @@ class GesamtkostenDiagramm(MatplotDiagram):
     
 
 class KostentraegerDiagramm(MatplotDiagram):
+    colors = ['#005CE6', '#002673', '#894444', '#73FFDF', '#FFFF00']
     
     def _create(self, **kwargs):
         workspace = 'FGDB_Kosten.gdb'
@@ -170,7 +171,7 @@ class KostentraegerDiagramm(MatplotDiagram):
         figure, ax = self.plt.subplots(figsize=(12, 5))
         self.plt.gca().invert_yaxis()
     
-        colors = self.plt.cm.Paired(np.linspace(0, 1, len(df_shares)))
+        colors = self.colors  #self.plt.cm.Paired(np.linspace(0, 1, len(df_shares)))
         
         summed = np.zeros(len(cols))
         for j, (index, net_share) in enumerate(df_shares.iterrows()):

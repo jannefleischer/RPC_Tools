@@ -7,13 +7,16 @@ from rpctools.utils.encoding import encode
 from rpctools.analyst.infrastrukturkosten.kostenkennwerte_hilfsfunktionen \
      import kostenaufteilung_startwerte
 from rpctools.analyst.infrastrukturkosten.tbx_gesamtkosten import Gesamtkosten
+from rpctools.diagrams.infrastruktur import KostentraegerDiagramm
 
 
 class KostentraegerAuswerten(Gesamtkosten):
     _shares_results_table = 'Gesamtkosten_nach_Traeger'
     
     def add_outputs(self):
-        pass
+        kosten_diagram = KostentraegerDiagramm()
+        
+        self.output.add_diagram(kosten_diagram)
     
     def run(self):
         super(KostentraegerAuswerten, self).run()
