@@ -71,7 +71,8 @@ class Gesamtkosten(Tool):
                     elif phase_id == 2:
                         costs = self.years * group['Cent_BU'] / 100.
                     elif phase_id == 3:
-                        costs = self.years * group['Euro_EN'] / group['Lebensdauer']
+                        costs = (self.years *
+                                 group['Euro_EN'] / group['Lebensdauer'])
                     else:
                         raise Exception('phase {} not defined'.format(phase_id))
                     
@@ -92,7 +93,8 @@ class Gesamtkosten(Tool):
         df_results.reset_index(inplace=True)
         df_results = df_results.merge(self.df_phases, on='IDKostenphase')
         df_results = df_results.merge(self.df_elements, on='IDNetz')
-        self.parent_tbx.insert_dataframe_in_table(self._costs_results_table, df_results)
+        self.parent_tbx.insert_dataframe_in_table(self._costs_results_table,
+                                                  df_results)
 
 
 class TbxGesamtkosten(Tbx):
