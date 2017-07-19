@@ -190,7 +190,7 @@ class MarketTemplate(object):
                     continue
                 lat, lon = location
                 market = Supermarket(i, lon, lat, name, kette, vkfl=vkfl,
-                                     epsg=4326)
+                                     adresse=address, epsg=4326)
                 market.transform(self.epsg)
             else:
                 x, y = row['Shape']

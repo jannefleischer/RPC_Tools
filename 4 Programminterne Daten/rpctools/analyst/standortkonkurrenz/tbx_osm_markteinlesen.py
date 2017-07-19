@@ -48,7 +48,9 @@ class MarktEinlesen(Tool):
             'id_kette', 
             'SHAPE@',
             'id_teilflaeche', 
-            'id']
+            'id',
+            'adresse'
+        ]
         table = self.folders.get_table(tablename)
         # remove results as well (distances etc.)
         res_table = self.folders.get_table('Beziehungen_Maerkte_Zellen')
@@ -76,7 +78,8 @@ class MarktEinlesen(Tool):
                         markt.id_kette, 
                         markt.geom,
                         markt.id_teilflaeche, 
-                        max_id + i + 1
+                        max_id + i + 1,
+                        markt.adresse
                     ))
 
     def set_ags(self):
