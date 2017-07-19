@@ -76,8 +76,17 @@ class Zensus(object):
         return bbox
 
     def add_kk(self, zensus_points, project):
-        base_kk = 2280
         folders = Folders()
+        default_table = folders.get_base_table(
+            table='Grundeinstellungen',
+            workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb'
+        )
+        cursor = arcpy.da.SearchCursor(
+            default_table, ['Wert'],
+            where_clause="Info = 'KK je Einwohner default'")
+        default_kk_index = cursor.next()[0]
+        del(cursor)
+        base_kk = 2280
         tmp_table = os.path.join(arcpy.env.scratchGDB, 'tmp_kk_join')
         kk_table = folders.get_base_table(
             workspace='FGDB_Basisdaten_deutschland.gdb',
@@ -100,6 +109,8 @@ class Zensus(object):
             if not kk_indices.has_key(zensus_cell.id):
                 continue
             kk_index = kk_indices[zensus_cell.id]
+            if kk_index is None:
+                kk_index = default_kk_index
             zensus_cell.kk_index = kk_index
             zensus_cell.kk = zensus_cell.ew * base_kk * kk_index / 100
 
