@@ -54,7 +54,7 @@ class Nutzungen(Tool):
         
         
 class NutzungenWohnen(Nutzungen):
-    BETRACHTUNGSZEITRAUM_JAHRE = 30
+    BETRACHTUNGSZEITRAUM_JAHRE = 25
 
     def run(self):
         """"""
@@ -119,6 +119,15 @@ class NutzungenWohnen(Nutzungen):
             ew_base_table, workspace='FGDB_Bewohner_Arbeitsplaetze_Tool.gdb',
             is_base_table=True)
         
+        # prepare the base table, take first years as reference for development
+        # over years
+        ref_year = 1    
+        ew_base_df['reference'] = 1
+        for geb_typ, group in ew_base_df.groupby('IDGebaeudetyp'):
+            reference = group[group['AlterWE'] == ref_year]['Einwohner'].sum()
+            ew_base_df.loc[ew_base_df['IDGebaeudetyp'] == geb_typ,
+                           'reference'] = reference
+        
         wohnen_struct_df = tbx.table_to_dataframe(
             wohnen_struct_table, pkey={flaechen_col: flaechen_id})
         
@@ -150,13 +159,14 @@ class NutzungenWohnen(Nutzungen):
         for g in grouped:
             group = g[1]
             entry = group_template.copy()
-            # corr. SQL:  Sum([Einwohner]*[Wohnungen])
-            n_bewohner = (group[ew_col] * group[wohnungen_col]).sum()
+            # corresponding SQL:  Sum([Einwohner]*[Wohnungen])
+            n_bewohner = (group[ew_col] * group[wohnungen_col]
+                          / group['reference']).sum()
             entry[n_bewohner_col] = [n_bewohner]
             entry[id_aclass_col] = group[id_aclass_col].unique()
             entry[aclass_col] = group[aclass_col].unique()
             entry[year_col] = group[year_col].unique()
-            bewohner_df = bewohner_df.append(entry)            
+            bewohner_df = bewohner_df.append(entry)
         
         tbx.insert_dataframe_in_table(
             bewohner_table, bewohner_df,
@@ -230,20 +240,19 @@ class NutzungenWohnen(Nutzungen):
         wohnen_struct_df = tbx.table_to_dataframe(wohnen_struct_table)
         # calc. structure grouped by flaechen id
         grouped_we = wohnen_we_df.groupby(id_flaeche_col)
-        for g in grouped_we:
-            wohnen_ew_group = g[1]
-            flaechen_id = wohnen_ew_group[id_flaeche_col].unique()[0]
+        for index, group in grouped_we:
+            flaechen_id = group[id_flaeche_col].unique()[0]
             begin, duration = tbx.query_table(
                 flaechen_table,
                 columns=['Beginn_Nutzung', 'Aufsiedlungsdauer'],
                 where='id_teilflaeche={}'.format(flaechen_id))[0]
             end = begin + self.BETRACHTUNGSZEITRAUM_JAHRE - 1
             flaechen_template = pd.DataFrame()
-            geb_types = wohnen_ew_group[geb_typ_col].values
-            flaechen_template[geb_typ_col] = geb_types            
+            geb_types = group[geb_typ_col].values
+            flaechen_template[geb_typ_col] = geb_types
             flaechen_template[id_flaeche_col] = flaechen_id
             flaechen_template['Wohnungen'] = (
-                wohnen_ew_group[we_col].values.astype(float) / duration)
+                group[we_col].values.astype(float) * group[ew_col] / duration)
             for j in range(begin, end + 1):
                 for i in range(1, duration + 1):
                     if j - begin + i - duration + 1 > 0:
