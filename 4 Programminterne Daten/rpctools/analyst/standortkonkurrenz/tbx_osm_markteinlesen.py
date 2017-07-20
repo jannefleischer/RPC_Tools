@@ -89,13 +89,13 @@ class MarktEinlesen(Tool):
         """
         markets = self.folders.get_table('Maerkte')
         ags = get_ags(markets, 'id')
-        cursor = arcpy.UpdateCursor(markets)
+        cursor = arcpy.da.UpdateCursor(markets, ['id', 'AGS'])
         for row in cursor:
             try:
                 a = ags[row[0]]
             except:
                 continue
-            row[1] = a
+            row[1] = a[0]
             cursor.updateRow(row)
         del cursor
 
