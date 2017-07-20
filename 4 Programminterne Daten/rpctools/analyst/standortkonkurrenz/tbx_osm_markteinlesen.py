@@ -4,6 +4,7 @@ import sys
 import arcpy
 import shutil
 import re
+import pandas as pd
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
@@ -88,10 +89,15 @@ class MarktEinlesen(Tool):
         """
         markets = self.folders.get_table('Maerkte')
         ags = get_ags(markets, 'id')
-        for id, ags_market in ags.iteritems():
-            self.parent_tbx.update_table('Maerkte',
-                                         column_values={'AGS': ags_market[0]},
-                                         where='id={}'.format(id))
+        cursor = arcpy.UpdateCursor(markets)
+        for row in cursor:
+            try:
+                a = ags[row[0]]
+            except:
+                continue
+            row[1] = a
+            cursor.updateRow(row)
+        del cursor
 
     def set_betriebstyp_vkfl(self, markets): 
         """
@@ -204,7 +210,8 @@ class OSMMarktEinlesen(MarktEinlesen):
         centroid = Point(x, y, epsg=epsg)
         arcpy.AddMessage('Sende Standortanfrage an Geoserver...')
         reader = OSMShopsReader(epsg=epsg)
-        markets = reader.get_shops(centroid, distance=self.par.radius.value,
+        markets = reader.get_shops(centroid,
+                                   distance=self.par.radius.value * 1000,
                                    count=self.par.count.value)
         arcpy.AddMessage(u'{} Märkte gefunden'.format(len(markets)))
         arcpy.AddMessage(u'Analysiere gefundene Märkte...'
@@ -244,13 +251,13 @@ class TbxOSMMarktEinlesen(Tbx):
         param = self.add_parameter('radius')
         param.name = encode(u'Radius')
         param.displayName = encode(u'maximale Entfernung der '
-                                   u'Märkte vom Plangebiet in Metern')
+                                   u'Märkte vom Plangebiet in Kilometern')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPLong'
         param.filter.type = 'Range'
-        param.filter.list = [0, 20000]
-        param.value = 5000
+        param.filter.list = [1, 100]
+        param.value = 5
 
         param = self.add_parameter('count')
         param.name = encode(u'Anzahl')
