@@ -95,7 +95,7 @@ class BranchenAnteile(MatplotDiagram):
         
         ax = joined['Anteil'].plot(kind='pie', labels=[''] * len(table_df),
                                    autopct='%.0f%%',
-                                   figsize=(8, 8), 
+                                   figsize=(8, 8), title=' ', 
                                    #shadow=True,
                                    #explode=[0.1] * len(table_df), 
                                    colors=colors)
@@ -106,10 +106,12 @@ class BranchenAnteile(MatplotDiagram):
                          fontsize=12)  #, fontweight='bold')
         
         ax.set_ylabel('')
+        ax.set_xlabel('')
         ax.legend(joined['Name_Branche_Projektcheck'], loc='upper center',
                   bbox_to_anchor=(0.5, 0.05))
         # didn't find a way to pass custom colors directly
         for color, handle in zip(colors, ax.get_legend().legendHandles):
+            handle.set_linewidth(2.0)
             handle.set_color(color)
         box = ax.get_position()
         ax.set_position([box.x0, box.y0 + box.y0 * 0.5, box.width, box.height])
