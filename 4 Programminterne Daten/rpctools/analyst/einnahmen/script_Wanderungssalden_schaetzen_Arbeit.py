@@ -170,11 +170,15 @@ class Wanderungssalden2(Tool):
         ap = 0
         bewohner = 0
         teilflaechen = self.folders.get_table("Teilflaechen_Plangebiet", "FGDB_Definition_Projekt.gdb")
+        rahmendaten = self.folders.get_table("Projektrahmendaten", "FGDB_Definition_Projekt.gdb")
+        cursor = arcpy.da.SearchCursor(rahmendaten,["AGS"])
+        for row in cursor:
+            ags_projekt = row[0]
         cursor = arcpy.da.SearchCursor(teilflaechen, ["ew", "AP_gesamt"])
         for flaeche in cursor:
             ap += flaeche[1]
             bewohner += flaeche[0]
-
+        #test
         cursor_gemeindebilanz = arcpy.da.UpdateCursor(wanderungssalden, ["AGS", "SvB_pro_Ew", "Einw_Fortzug", "SvB_Fortzug", "Einw_Zuzug", "SvB_Zuzug", "SvB_Saldo", "Einw_Saldo"])
         for gemeinde in cursor_gemeindebilanz:
             Summe_Wichtungsfaktoren_Gemeinde_Wohnen = 0
@@ -185,7 +189,8 @@ class Wanderungssalden2(Tool):
                     Summe_Wichtungsfaktoren_Gemeinde_Gewerbe += raum[2]
             gemeinde[2] = -1 * bewohner * Summe_Wichtungsfaktoren_Gemeinde_Wohnen / Summe_Wichtungsfaktoren_Gesamtraum_Wohnen
             gemeinde[3] = -1 * bewohner * Summe_Wichtungsfaktoren_Gemeinde_Gewerbe / Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe
-            if gemeinde[0] == "03359010":
+
+            if gemeinde[0] == ags_projekt:
                 gemeinde[4] = bewohner
                 gemeinde[5] = ap
             gemeinde[6] = gemeinde[3] + gemeinde[5]
