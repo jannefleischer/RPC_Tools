@@ -101,11 +101,6 @@ class NutzungenWohnen(Nutzungen):
         ew_col = 'Einwohner'
         wohnungen_col = 'Wohnungen'
         n_bewohner_col = 'Bewohner'
-
-        begin, duration = tbx.query_table(
-            'Teilflaechen_Plangebiet',
-            columns=['Beginn_Nutzung', 'Aufsiedlungsdauer'],
-            where='id_teilflaeche={}'.format(flaechen_id))[0]        
         
         # empty the bewohner table (results will be stored there)
         tbx.delete_rows_in_table(
@@ -128,7 +123,7 @@ class NutzungenWohnen(Nutzungen):
         # over years
         ew_base_df['reference'] = 1
         for geb_typ, group in ew_base_df.groupby('IDGebaeudetyp'):
-            reference = group[group['AlterWE'] == duration]['Einwohner'].sum()
+            reference = group[group['AlterWE'] == 3]['Einwohner'].sum()
             ew_base_df.loc[ew_base_df['IDGebaeudetyp'] == geb_typ,
                            'reference'] = reference
         
