@@ -125,7 +125,8 @@ class MatplotDiagram(Diagram):
             
         kwargs: other optional parameters the subclassing diagram needs
         '''
-        super(MatplotDiagram, self).create()        
+        super(MatplotDiagram, self).create()
+        self.plt.clf()
         self.figure = self._create(**self.kwargs)
 
     def show_external(self, plot, filename):
