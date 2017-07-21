@@ -21,7 +21,7 @@ class ProjektwirkungMarkets(Tool):
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     # ToDo: set this in toolbox?
     recalculate = False
-    
+
     def add_outputs(self):
         # Add Layers
         folder = 'Standortkonkurrenz'
@@ -31,16 +31,16 @@ class ProjektwirkungMarkets(Tool):
         fc_zentren = 'Zentren'
         layer_vb = u'Umsatzveränderung Versorgungsbereiche'
         layer_gem = u'Umsatzveränderung Gemeinden'
-    
-        self.output.add_layer(group_layer, layer_maerkte, fc_maerkte, 
+
+        self.output.add_layer(group_layer, layer_maerkte, fc_maerkte,
                               template_folder=folder, zoom=False)
-    
+
         betriebstyp_col = 'id_betriebstyp_nullfall'
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
         id_nullfall = df_markets['id_betriebstyp_nullfall']
         id_planfall = df_markets['id_betriebstyp_planfall']
         planfall_idx = (id_nullfall != id_planfall) & (id_planfall > 0)
-        
+
         for index, plan_market in df_markets[planfall_idx].iterrows():
             for layer in ['Kaufkraftbindung', 'Erreichbarkeit']:
                 layer_name = u'{n} {m} ({i})'.format(n=layer,
@@ -49,36 +49,36 @@ class ProjektwirkungMarkets(Tool):
                 self.output.add_layer(group_layer, layer, fc_maerkte,
                                       query='id_markt={}'.format(
                                           plan_market['id']),
-                                      name=layer_name, 
+                                      name=layer_name,
                                       template_folder=folder,
                                       zoom=False)
-            
-        self.output.add_layer(group_layer, layer_vb, fc_zentren, 
+
+        self.output.add_layer(group_layer, layer_vb, fc_zentren,
                               template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_gem, fc_zentren,
                               template_folder=folder, zoom=False)
-    
+
     def run(self):
         folders = Folders(self.par)
         self.recalculate = self.par.recalculate.value
-        
+
         if self.recalculate:
             self.parent_tbx.delete_rows_in_table('Beziehungen_Maerkte_Zellen')
             self.parent_tbx.delete_rows_in_table('Siedlungszellen')
-        
+
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
         bbox = self.calculate_zensus(df_markets)
-        
+
         arcpy.AddMessage(u'Ermittle angrenzende Gemeinden...')
         self.communities_to_centers(bbox)
-        
+
         # when cells were not recalculated (including Kaufkraft)
-        # do it again (number of inhabitants may have changed by the user 
+        # do it again (number of inhabitants may have changed by the user
         # since last calc.)
         if not self.recalculate:
             arcpy.AddMessage(u'Aktualisiere Siedlungszellen der Teilflächen...')
             self.update_tfl_points()
-        
+
         arcpy.AddMessage(u'Berechne Erreichbarkeiten der Märkte...')
         self.calculate_distances(df_markets, bbox)
 
@@ -86,7 +86,7 @@ class ProjektwirkungMarkets(Tool):
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
         df_zensus = self.parent_tbx.table_to_dataframe('Siedlungszellen')
         df_distances = self.parent_tbx.table_to_dataframe(
-            'Beziehungen_Maerkte_Zellen', 
+            'Beziehungen_Maerkte_Zellen',
             columns=['id_markt', 'id_siedlungszelle', 'distanz'])
         sales = Sales(df_distances, df_markets, df_zensus)
         arcpy.AddMessage('Berechne Nullfall...')
@@ -97,7 +97,11 @@ class ProjektwirkungMarkets(Tool):
         self.sales_to_db(kk_nullfall, kk_planfall)
         arcpy.AddMessage(u'Berechne Umsatzänderungen der Versorgungsbereiche...')
         self.update_centers()
-        
+
+        arcpy.AddMessage(u"Erstelle Distanzmatrix...")
+        self.create_distance_matrix()
+
+
     def calculate_zensus(self, markets):
         '''extract zensus points (incl. points for planned areas)
         and write them to the database'''
@@ -105,7 +109,7 @@ class ProjektwirkungMarkets(Tool):
         x, y = get_project_centroid(self.projectname)
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
         square_size = self.par.square_size.value * 1000
-        
+
         if (len(self.parent_tbx.query_table('Siedlungszellen')) == 0):
             arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
             zensus_points, bbox, max_id = zensus.cutout_area(
@@ -126,7 +130,7 @@ class ProjektwirkungMarkets(Tool):
         for p in bbox:
             p.transform(self.parent_tbx.config.epsg)
         return bbox
-    
+
     def communities_to_centers(self, bbox):
         '''get communities intersecting with bbox and write them as centers to
         the database'''
@@ -146,13 +150,13 @@ class ProjektwirkungMarkets(Tool):
         self.parent_tbx.delete_rows_in_table('Zentren',
                                              where='nutzerdefiniert=0')
         ids = self.parent_tbx.query_table('Zentren', columns='id')
-        max_id = np.array(ids).max() if len(ids) > 0 else 0 
+        max_id = np.array(ids).max() if len(ids) > 0 else 0
         # clip the communities with the bbox
         fc_bbox = 'in_memory/bbox'
         fc_clipped = 'in_memory/clipped'
-        if arcpy.Exists(fc_bbox):        
+        if arcpy.Exists(fc_bbox):
             arcpy.Delete_management(fc_bbox)
-        if arcpy.Exists(fc_clipped): 
+        if arcpy.Exists(fc_clipped):
             arcpy.Delete_management(fc_clipped)
         arcpy.CopyFeatures_management([bbox_poly], fc_bbox)
         arcpy.Clip_analysis(gemeinden, fc_bbox, fc_clipped)
@@ -173,7 +177,7 @@ class ProjektwirkungMarkets(Tool):
         del cursor
         arcpy.Delete_management(fc_bbox)
         arcpy.Delete_management(fc_clipped)
-    
+
     def get_tfl_points(self, start_id):
         '''get the centroids of the planned areas as zensus points, start_id
         is the id the first point gets (further areas ascending)'''
@@ -184,18 +188,18 @@ class ProjektwirkungMarkets(Tool):
         for index, tfl in df_tfl.iterrows():
             point = ZensusCell(tfl['INSIDE_X'], tfl['INSIDE_Y'],
                                epsg=self.parent_tbx.config.epsg, ew=tfl['ew'],
-                               id=start_id+i, 
+                               id=start_id+i,
                                tfl_id=tfl['id_teilflaeche'])
             points.append(point)
             i += 1
         return points
-    
+
     def update_tfl_points(self):
         '''update the number of inhabitants for points representing the
         planned areas'''
         df_tfl = self.parent_tbx.table_to_dataframe(
             'Teilflaechen_Plangebiet',
-            columns=['id_teilflaeche', 'ew'], 
+            columns=['id_teilflaeche', 'ew'],
             workspace='FGDB_Definition_Projekt.gdb')
         df_tfl_cells = self.parent_tbx.table_to_dataframe(
             'Siedlungszellen', columns=['SHAPE', 'id', 'kk', 'id_teilflaeche'],
@@ -215,7 +219,7 @@ class ProjektwirkungMarkets(Tool):
         joined['kk'] = kk
         self.parent_tbx.dataframe_to_table(
             'Siedlungszellen', joined, ['id'])
-    
+
     def calculate_distances(self, markets, bbox):
         '''calculate distances between settlement points and markets and
         write them to the database'''
@@ -240,7 +244,7 @@ class ProjektwirkungMarkets(Tool):
                 #distances = routing.get_distances(origin, destinations)
                 self.distances_to_db(market_id, destinations, distances)
             else:
-                arcpy.AddMessage(u'   bereits berechnet, wird übersprungen')        
+                arcpy.AddMessage(u'   bereits berechnet, wird übersprungen')
 
     def sales_to_db(self, kk_nullfall, kk_planfall):
         '''store the sales matrices in database'''
@@ -255,9 +259,9 @@ class ProjektwirkungMarkets(Tool):
         df_sales['id'] = df_sales.index
         df_sales['umsatz_differenz'] = ((df_sales['umsatz_planfall'] /
                                          df_sales['umsatz_nullfall']) * 100 - 100)
-        
+
         self.parent_tbx.dataframe_to_table('Maerkte', df_sales, pkeys=['id'])
-        
+
         # invert the pivoted tables
         kk_nullfall['id_markt'] = kk_nullfall.index
         kk_planfall['id_markt'] = kk_planfall.index
@@ -267,7 +271,7 @@ class ProjektwirkungMarkets(Tool):
         df_planfall = pd.melt(kk_planfall,
                               value_name='kk_strom_planfall',
                               id_vars='id_markt')
-        
+
         # join the results to the cell table
         cells = self.parent_tbx.table_to_dataframe('Beziehungen_Maerkte_Zellen')
         del cells['kk_strom_nullfall']
@@ -278,8 +282,8 @@ class ProjektwirkungMarkets(Tool):
                             on=['id_siedlungszelle', 'id_markt'], how='left')
         cells.fillna(0, inplace=True)
         cells.sort(['id_markt', 'id_siedlungszelle'], inplace=True)
-        
-        
+
+
         # should be identical, but take both anyway
         sum_null = cells.groupby('id_siedlungszelle',
                                  as_index=False)['kk_strom_nullfall'].sum()
@@ -287,7 +291,7 @@ class ProjektwirkungMarkets(Tool):
                                  as_index=False)['kk_strom_planfall'].sum()
         cells = cells.merge(sum_null, on=['id_siedlungszelle'],
                             suffixes=('', '_sum'))
-        cells = cells.merge(sum_plan, on=['id_siedlungszelle'], 
+        cells = cells.merge(sum_plan, on=['id_siedlungszelle'],
                             suffixes=('', '_sum'))
         cells['kk_bindung_nullfall'] = cells['kk_strom_nullfall'] * 100 / cells['kk_strom_nullfall_sum']
         cells['kk_bindung_planfall'] = cells['kk_strom_planfall'] * 100 / cells['kk_strom_planfall_sum']
@@ -300,7 +304,7 @@ class ProjektwirkungMarkets(Tool):
         arcpy.AddMessage(u'Schreibe Kenngrößen in Datenbank...')
         self.parent_tbx.insert_dataframe_in_table(
             'Beziehungen_Maerkte_Zellen', cells)
-        
+
     def update_centers(self):
         '''calculate the sales of the defined centers'''
         tmp_join = os.path.join(arcpy.env.scratchGDB, 'tmp_join')
@@ -309,35 +313,35 @@ class ProjektwirkungMarkets(Tool):
             arcpy.Delete_management(tmp_join)
         if arcpy.Exists(tmp_markets):
             arcpy.Delete_management(tmp_markets)
-        
+
         umsatz_fields = ['umsatz_nullfall', 'umsatz_planfall']
-            
+
         markets_table = self.parent_tbx.folders.get_table('Maerkte')
         centers_table = self.parent_tbx.folders.get_table('Zentren')
-        
+
         arcpy.CopyFeatures_management(markets_table, tmp_markets)
-        # you have to remove the id column to join because both tables have 
+        # you have to remove the id column to join because both tables have
         # column of same name
         arcpy.DeleteField_management(tmp_markets, 'id')
         # remove the planned markets, that did not exist in nullfall
         self.parent_tbx._delete_rows_in_table(tmp_markets,
                                               where='id_betriebstyp_nullfall=0')
-        
+
         fieldmappings = arcpy.FieldMappings()
         for field in umsatz_fields:
             fm = arcpy.FieldMap()
             fm.addInputField(tmp_markets, field)
             fieldmappings.addFieldMap(fm)
         fm_c = arcpy.FieldMap()
-        # the table assigned to the fieldmapping is ignored by dumbass arcpy,  
+        # the table assigned to the fieldmapping is ignored by dumbass arcpy,
         # arcpy always takes markets_table anyway (so the need to delete before)
         fm_c.addInputField(centers_table, 'id')
         fieldmappings.addFieldMap(fm_c)
-        
+
         arcpy.SpatialJoin_analysis(tmp_markets,centers_table, tmp_join,
                                    join_type='KEEP_COMMON',
-                                   join_operation='JOIN_ONE_TO_MANY', 
-                                   field_mapping=fieldmappings, 
+                                   join_operation='JOIN_ONE_TO_MANY',
+                                   field_mapping=fieldmappings,
                                    match_option='WITHIN')
         columns = ['id'] + umsatz_fields
         rows = self.parent_tbx._query_table(tmp_join,
@@ -348,7 +352,7 @@ class ProjektwirkungMarkets(Tool):
                                             summed['umsatz_nullfall']) - 100
         summed['id'] = summed.index
         self.parent_tbx.dataframe_to_table('Zentren', summed, pkeys=['id'])
-        
+
 
     def distances_to_db(self, market_id, destinations, distances):
         self.parent_tbx.delete_rows_in_table(
@@ -409,6 +413,44 @@ class ProjektwirkungMarkets(Tool):
 
         self.parent_tbx.insert_dataframe_in_table('Siedlungszellen', df)
 
+    def create_distance_matrix(self):
+        distance_path = self.folders.get_table("Beziehungen_Maerkte_Zellen", "FGDB_Standortkonkurrenz_Supermaerkte.gdb")
+        modul_path = self.folders.get_db("FGDB_Standortkonkurrenz_Supermaerkte.gdb")
+        markets_path = self.folders.get_table("Maerkte", "FGDB_Standortkonkurrenz_Supermaerkte.gdb")
+        matrix_path = os.path.join(modul_path, "Distanzmatrix")
+        arcpy.AddMessage("...Anzahl Maerkte ermitteln...")
+        cursor = arcpy.da.SearchCursor(markets_path, ["id"])
+        number_markets = 0
+        for row in cursor:
+            number_markets = row[0]
+        arcpy.AddMessage("...Distanzmatrix initialisieren...")
+        if arcpy.Exists(matrix_path):
+            arcpy.Delete_management(matrix_path)
+        arcpy.CreateTable_management(modul_path, "Distanzmatrix")
+        arcpy.AddField_management(matrix_path, "ID_Siedlungszelle", "LONG")
+
+        fields_insert = ["ID_Siedlungszelle"]
+        for number in range(1, number_markets + 1):
+            arcpy.AddField_management(matrix_path, "Markt_" + str(number), "LONG")
+            fields_insert.append("Markt_" + str(number))
+
+
+        cursor_distance = arcpy.da.SearchCursor(distance_path, ["id_markt","id_siedlungszelle","distanz"])
+        arcpy.AddMessage("...Distanzmatrix befuellen...")
+        used_cell = -1
+        new_cell = [-1] * (number_markets +1)
+        for cell in cursor_distance:
+            if cell[1] == used_cell or used_cell == -1:
+                #arcpy.AddMessage("Update: " + str(cell[1]))
+                new_cell[cell[0]] = cell[2]
+            else:
+                new_cell[0] = used_cell
+                cursor_matrix = arcpy.da.InsertCursor(matrix_path, fields_insert)
+                arcpy.AddMessage("Insert: " + str(new_cell[0]))
+                cursor_matrix.insertRow(new_cell)
+                new_cell = [-1] * (number_markets +1)
+                new_cell[cell[0]] = cell[2]
+            used_cell = cell[1]
 
 class TbxProjektwirkungMarkets(Tbx):
 
@@ -443,8 +485,8 @@ class TbxProjektwirkungMarkets(Tbx):
         p.direction = 'Input'
         p.datatype = u'GPLong'
         p.enabled = False
-        p.value = 20
-        
+        p.value = 40
+
         param = self.add_parameter('recalculate')
         param.name = encode(u'Neuberechnung')
         param.displayName = encode(u'Neuberechnung der Distanzen und '
