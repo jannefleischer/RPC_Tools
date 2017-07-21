@@ -19,6 +19,22 @@ class Wanderungssalden1(Tool):
     _workspace = 'FGDB_Einnahmen.gdb'
 
     def add_outputs(self):
+        self.output.delete_output("Einw_Saldo")
+
+        gemeinde_werte = lib_einnahmen.get_values(["Einw_Saldo"], self.projectname)
+
+        symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
+
+        self.output.add_layer(
+            groupname = "einnahmen",
+            featureclass = "Gemeindebilanzen",
+            template_layer = symbology,
+            template_folder = "einnahmen",
+            name = "Einw_Saldo",
+            disable_other = True,
+            symbology = {'valueField': "Einw_Saldo"},
+            label_replace = {'Einw_Saldo': 'Einw_Saldo'}
+        )
 
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
@@ -57,8 +73,9 @@ class Wanderungssalden1(Tool):
         path_distanzen = self.folders.get_base_table("FGDB_Einnahmen_Tool.gdb", "Wanderung_Entfernungswichtung")
         cursor = arcpy.da.SearchCursor(path_distanzen, ["Distance", "Wichtung_Wohnen", "Wichtung_Gewerbe"])
         for distanz in cursor:
-            Wichtungen_Wohnen[str(distanz[0])] = distanz[1]
-            Wichtungen_Gewerbe[str(distanz[0])] = distanz[2]
+            Wichtungen_Wohnen[str(int(distanz[0]))] = distanz[1]
+            Wichtungen_Gewerbe[str(int(distanz[0]))] = distanz[2]
+        arcpy.AddMessage(Wichtungen_Wohnen)
 
 
         #Anteile der Herkunftsgemeinden an Einwohner bestimmen
@@ -134,29 +151,44 @@ class Wanderungssalden1(Tool):
 
         Summe_Wichtungsfaktoren_Gesamtraum_Wohnen = 0
         Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe = 0
+        Summe_Wichtungsfaktoren_Gemeinde_Wohnen = 0
+        Summe_Wichtungsfaktoren_Gemeinde_Gewerbe = 0
         SvB_je_EW = 0
         herkunftsraeume = []
-        Entfernungswichtung_Wohnen = {"1500": 24.74, "2500": 6.575, "3500": 3.572, "4500":2.838, "6500": 1.554, "8500": 0.991, "11500": 0.656, "14500": 1.554, "18500": 0.991, "25000": 0.656}
-        Entfernungswichtung_Gewerbe = {"1500": 24.74, "2500": 6.575, "3500": 3.572, "4500":2.838, "6500": 1.554, "8500": 0.991, "11500": 0.656, "14500": 1.554, "18500": 0.991, "25000": 0.656}
+
         cursor_gemeindebilanz = arcpy.da.SearchCursor(wanderungssalden, ["AGS", "SvB_pro_Ew"])
         for gemeinde in cursor_gemeindebilanz:
-            Summe_Wichtungsfaktoren_Gemeinde_Wohnen = 0
-            Summe_Wichtungsfaktoren_Gemeinde_Gewerbe = 0
             where = '"AGS"' + "='" + gemeinde[0] +"'"
             cursor_Summe_Ew = arcpy.da.SearchCursor(pfad_Herkunftsraeume_mit_Ew, ["AGS", "Summe_Ew", "distance", "Shape_Area"], where)
             for gemeindeteil in cursor_Summe_Ew:
-                Wichtungsfaktor_Wohnen = gemeindeteil[1] * gemeindeteil[3] * Entfernungswichtung_Wohnen[str(gemeindeteil[2])]
-                Wichtungsfaktor_Gewerbe = gemeindeteil[1] * gemeinde[1] * gemeindeteil[3] * Entfernungswichtung_Gewerbe[str(gemeindeteil[2])]
+                if gemeindeteil[1] >= 1:
+                    Wichtungsfaktor_Wohnen = gemeindeteil[1] * gemeindeteil[3] * Wichtungen_Wohnen[str(int(gemeindeteil[2]))]
+                    Wichtungsfaktor_Gewerbe = gemeindeteil[1] * gemeinde[1] * gemeindeteil[3] * Wichtungen_Gewerbe[str(int(gemeindeteil[2]))]
+                    herkunftsraeume.append([gemeindeteil[0], Wichtungsfaktor_Wohnen, Wichtungsfaktor_Gewerbe])
+                    Summe_Wichtungsfaktoren_Gesamtraum_Wohnen += Wichtungsfaktor_Wohnen
+                    Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe += Wichtungsfaktor_Gewerbe
 
+        ap = 0
+        bewohner = 0
+        teilflaechen = self.folders.get_table("Teilflaechen_Plangebiet", "FGDB_Definition_Projekt.gdb")
+        cursor = arcpy.da.SearchCursor(teilflaechen, ["ew", "AP_gesamt"])
+        for flaeche in cursor:
+            ap += flaeche[1]
+            bewohner += flaeche[0]
 
-                Summe_Wichtungsfaktoren_Gemeinde_Wohnen += Wichtungsfaktor_Wohnen
-                Summe_Wichtungsfaktoren_Gemeinde_Gewerbe += Wichtungsfaktor_Gewerbe
-
-                Summe_Wichtungsfaktoren_Gesamtraum_Wohnen += Wichtungsfaktor_Wohnen
-                Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe += Wichtungsfaktor_Gewerbe
-
-
-
-
-
-
+        cursor_gemeindebilanz = arcpy.da.UpdateCursor(wanderungssalden, ["AGS", "SvB_pro_Ew", "Einw_Fortzug", "SvB_Fortzug", "Einw_Zuzug", "SvB_Zuzug", "SvB_Saldo", "Einw_Saldo"])
+        for gemeinde in cursor_gemeindebilanz:
+            Summe_Wichtungsfaktoren_Gemeinde_Wohnen = 0
+            Summe_Wichtungsfaktoren_Gemeinde_Gewerbe = 0
+            for raum in herkunftsraeume:
+                if raum[0] == gemeinde[0]:
+                    Summe_Wichtungsfaktoren_Gemeinde_Wohnen += raum[1]
+                    Summe_Wichtungsfaktoren_Gemeinde_Gewerbe += raum[2]
+            gemeinde[2] = -1 * bewohner * Summe_Wichtungsfaktoren_Gemeinde_Wohnen / Summe_Wichtungsfaktoren_Gesamtraum_Wohnen
+            gemeinde[3] = -1 * bewohner * Summe_Wichtungsfaktoren_Gemeinde_Gewerbe / Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe
+            if gemeinde[0] == "03359010":
+                gemeinde[4] = bewohner
+                gemeinde[5] = ap
+            gemeinde[6] = gemeinde[3] + gemeinde[5]
+            gemeinde[7] = gemeinde[4] + gemeinde[2]
+            cursor_gemeindebilanz.updateRow(gemeinde)
