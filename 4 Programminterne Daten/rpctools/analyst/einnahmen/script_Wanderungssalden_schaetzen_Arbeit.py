@@ -196,3 +196,6 @@ class Wanderungssalden2(Tool):
             gemeinde[6] = gemeinde[3] + gemeinde[5]
             gemeinde[7] = gemeinde[4] + gemeinde[2]
             cursor_gemeindebilanz.updateRow(gemeinde)
+
+        c.set_chronicle("Wanderung Einwohner", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
+        c.set_chronicle("Wanderung Beschaeftigte", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))

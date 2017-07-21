@@ -55,7 +55,7 @@ class Wanderungssalden1(Tool):
             arcpy.Delete_management("projektflaechen_lyr")
         arcpy.MakeFeatureLayer_management(projektflaechen, "projektflaechen_lyr")
 
-        fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "Wanderungsanteil_Ew", "Gewichtete_Ew"]
+        fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "Wanderungsanteil_Ew", "Gewichtete_Ew", "SvB_Zuzug", "SvB_Fortzug", "SvB_Saldo"]
         cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
         for gemeinde in cursor:
             gemeinde[0] = 0
@@ -63,6 +63,9 @@ class Wanderungssalden1(Tool):
             gemeinde[2] = 0
             gemeinde[3] = 0
             gemeinde[4] = 0
+            gemeinde[5] = 0
+            gemeinde[6] = 0
+            gemeinde[7] = 0
             cursor.updateRow(gemeinde)
 
 
@@ -190,10 +193,12 @@ class Wanderungssalden1(Tool):
                     Summe_Wichtungsfaktoren_Gemeinde_Gewerbe += raum[2]
             gemeinde[2] = -1 * bewohner * Summe_Wichtungsfaktoren_Gemeinde_Wohnen / Summe_Wichtungsfaktoren_Gesamtraum_Wohnen
             gemeinde[3] = -1 * bewohner * Summe_Wichtungsfaktoren_Gemeinde_Gewerbe / Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe
-
             if gemeinde[0] == ags_projekt:
                 gemeinde[4] = bewohner
                 gemeinde[5] = ap
             gemeinde[6] = gemeinde[3] + gemeinde[5]
             gemeinde[7] = gemeinde[4] + gemeinde[2]
             cursor_gemeindebilanz.updateRow(gemeinde)
+
+        c.set_chronicle("Wanderung Einwohner", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
+        c.set_chronicle("Wanderung Beschaeftigte", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
