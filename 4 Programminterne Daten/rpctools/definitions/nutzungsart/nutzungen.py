@@ -101,6 +101,11 @@ class NutzungenWohnen(Nutzungen):
         ew_col = 'Einwohner'
         wohnungen_col = 'Wohnungen'
         n_bewohner_col = 'Bewohner'
+
+        begin, duration = tbx.query_table(
+            'Teilflaechen_Plangebiet',
+            columns=['Beginn_Nutzung', 'Aufsiedlungsdauer'],
+            where='id_teilflaeche={}'.format(flaechen_id))[0]        
         
         # empty the bewohner table (results will be stored there)
         tbx.delete_rows_in_table(
@@ -119,12 +124,11 @@ class NutzungenWohnen(Nutzungen):
             ew_base_table, workspace='FGDB_Bewohner_Arbeitsplaetze_Tool.gdb',
             is_base_table=True)
         
-        # prepare the base table, take first years as reference for development
+        # prepare the base table, take duration as age reference for development
         # over years
-        ref_year = 1    
         ew_base_df['reference'] = 1
         for geb_typ, group in ew_base_df.groupby('IDGebaeudetyp'):
-            reference = group[group['AlterWE'] == ref_year]['Einwohner'].sum()
+            reference = group[group['AlterWE'] == duration]['Einwohner'].sum()
             ew_base_df.loc[ew_base_df['IDGebaeudetyp'] == geb_typ,
                            'reference'] = reference
         
@@ -180,7 +184,7 @@ class NutzungenWohnen(Nutzungen):
         geb_typ_table = 'Wohnen_Gebaeudetypen'
         flaechen_table = 'Teilflaechen_Plangebiet'
         wohnen_struct_table = 'Wohnen_Struktur_und_Alterung_WE'
-        project_table = 'Projektrahmendaten'        
+        project_table = 'Projektrahmendaten'
         geb_typ_col = 'IDGebaeudetyp'
         ew_col = 'EW_je_WE'
         reference_col = 'Ew_pro_WE_Referenz'
