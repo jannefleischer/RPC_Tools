@@ -61,6 +61,8 @@ class TbxSaldenbearbeiten(Tbx):
 
     def _updateParameters(self, params):
         par = self.par
+        path_gemeindebilanzen = os.path.join(self.folders.get_db('FGDB_Einnahmen.gdb'), "Gemeindebilanzen")
+
         if par.changed('name'):
             where = 'Nutzungsart = {}'.format(self._nutzungsart)
             rows = self.query_table('Teilflaechen_Plangebiet',
@@ -76,26 +78,58 @@ class TbxSaldenbearbeiten(Tbx):
                 par.gemeinde.enabled = True
                 gemeinden = []
                 fields = ["GEN", self._saldo_field]
-                rows = self.query_table('Gemeindebilanzen', fields,
-                                        workspace='FGDB_Einnahmen.gdb')
-                for gem_name, saldo in rows:
-                    gemeinden.append(u"{} || Saldo: {}".format(
-                        gem_name, saldo))
-                par.gemeinde.filter.list = sorted(gemeinden)
+                if arcpy.Exists(path_gemeindebilanzen):
+                    rows = self.query_table('Gemeindebilanzen', fields,
+                                            workspace='FGDB_Einnahmen.gdb')
+                    for gem_name, saldo in rows:
+                        gemeinden.append(u"{} || Saldo: {}".format(
+                            gem_name, saldo))
+                    par.gemeinde.filter.list = sorted(gemeinden)
 
         if (par.changed('saldo') or par.changed('name') or par.changed('gemeinde')) and par.gemeinde.value != None:
             target_gemeinde = par.gemeinde.value
             target_gemeinde_kurz = target_gemeinde.split(" ||")[0]
             summe = 0
             fields = [self._saldo_field, "GEN"]
-            rows = self.query_table('Gemeindebilanzen', fields,
-                                    workspace='FGDB_Einnahmen.gdb')
-            for saldo in rows:
-                if saldo[1] == target_gemeinde_kurz and par.saldo.value != None:
-                    summe += par.saldo.value
-                else:
-                    summe += saldo[0]
-            par.summe.value = summe
+
+            if arcpy.Exists(path_gemeindebilanzen):
+                rows = self.query_table('Gemeindebilanzen', fields,
+                                        workspace='FGDB_Einnahmen.gdb')
+                for saldo in rows:
+                    if saldo[1] == target_gemeinde_kurz and par.saldo.value != None:
+                        summe += par.saldo.value
+                    else:
+                        summe += saldo[0]
+                par.summe.value = summe
+
+    def _updateMessages(self, params):
+
+        par = self.par
+        gemeinde_saldo = par.gemeinde.value
+        gemeinde_saldo = gemeinde_saldo.split(" ||")[0]
+
+        pfad_rahmendaten = self.folders.get_table(
+            tablename='Projektrahmendaten',
+            workspace="FGDB_Definition_Projekt.gdb",
+            project=par.name.value)
+        cursor = arcpy.da.SearchCursor(pfad_rahmendaten, ["Gemeindename"])
+        for projekt in cursor:
+            gemeinde_projekt = projekt[0]
+
+        path_gemeindebilanzen = os.path.join(self.folders.get_db('FGDB_Einnahmen.gdb'), "Gemeindebilanzen")
+        if not arcpy.Exists(path_gemeindebilanzen):
+            par.name.setErrorMessage(u'Es müssen zuerst Wanderungssalden geschätzt werden, ehe diese bearbeitet werden können.')
+
+        where = 'Nutzungsart = {}'.format(self._nutzungsart)
+        rows = self.query_table('Teilflaechen_Plangebiet',
+                                ['Nutzungsart'],
+                                workspace='FGDB_Definition_Projekt.gdb',
+                                where=where)
+        if not rows:
+            par.gemeinde.setErrorMessage(u'Projekt enthält keine Flächen mit der benötigten Nutzungsart.')
+
+        if par.saldo.value > 0 and gemeinde_saldo != gemeinde_projekt:
+            par.saldo.setErrorMessage('Das Wanderungssaldo dieser Gemeinde darf nicht positiv sein.')
 
 
 class TbxEWSaldenbearbeiten(TbxSaldenbearbeiten):

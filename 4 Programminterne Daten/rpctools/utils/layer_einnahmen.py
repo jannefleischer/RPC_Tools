@@ -16,15 +16,18 @@ def get_values(spalte, projekt):
 
 def get_symbology(gemeindewerte, vorzeichen):
 
-    gemeinde_values = gemeindewerte
-    anzahl_gemeinden = len(gemeindewerte)
+    #gemeinde_values = gemeindewerte
+    gemeinde_values = [value for value in gemeindewerte if value != 0]
+    anzahl_gemeinden = len(gemeinde_values)
     x = int(math.floor((anzahl_gemeinden -1) / 7))
-
+    arcpy.AddMessage("x: " + str(x))
     if vorzeichen == 1:
-        gemeinde_values.sort(reverse = True)
+        gemeinde_values.sort()
     else:
         gemeinde_values.sort()
+    arcpy.AddMessage("Gemeindewerte sortiert: " + str(gemeinde_values))
     ref_value = gemeinde_values[x]
+    arcpy.AddMessage("ref: " + str(ref_value))
     folders = config.Folders()
     if vorzeichen == 1:
         symbology_path = folders.get_base_table("FGDB_Einnahmen_Tool.gdb", "Symbologien_VZ_ProjGem_pos")
@@ -33,11 +36,11 @@ def get_symbology(gemeindewerte, vorzeichen):
 
     cursor = arcpy.da.SearchCursor(symbology_path, ["Name_lyr_Vorlage", "Erster_Unterbrechungswert"])
     symbology_layer = None
-    arcpy.AddMessage("ref: " + str(ref_value))
     if vorzeichen == 1:
         for symbology in cursor:
-            if symbology_layer is None and symbology[1] >= ref_value:
+            if symbology[1] >= ref_value:
                 symbology_layer = symbology[0]
+        arcpy.AddMessage(symbology_layer)
         if symbology_layer == None:
             symbology_layer = "Skala_minus_10"
     else:
@@ -58,7 +61,7 @@ def create_gemeindebilanzen(self, projektname):
             return
         else:
         # Gemeinden im Umkreis ermitteln und speichern
-            km = 20
+            km = 25
             umkreis_km = str(km) + " Kilometers"
 
             workspace_basisdaten = folders.get_basedb('FGDB_Basisdaten_deutschland.gdb')

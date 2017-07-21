@@ -70,7 +70,7 @@ class Gewerbesteuer(Tool):
                 table_arbeitsplaetze = self.folders.get_table('Gewerbe_Arbeitsplaetze', "FGDB_Definition_Projekt.gdb")
                 cursor3 = arcpy.da.SearchCursor(table_arbeitsplaetze, fields3)
                 for row3 in cursor3:
-                    Summe_Arbeitsplatzschaetzungen += row3[0]
+                    Reale_Summe_AP += row3[0]
 
                 Korrekturfaktor_AP = Reale_Summe_AP / Summe_Arbeitsplatzschaetzungen
 
@@ -129,16 +129,17 @@ class Gewerbesteuer(Tool):
                 for row in cursor2:
                     SvB_Verkaufsflaechen += verkaufsflaeche[0] * row[0]
 
-        Bewerbesteuermessbetrag_pro_SvB_Projekt = Gewerbesteuermessbetrag_Projekt / (SvB_Branchen + SvB_Verkaufsflaechen)
+        Gewerbesteuermessbetrag_pro_SvB_Projekt = Gewerbesteuermessbetrag_Projekt / (SvB_Branchen + SvB_Verkaufsflaechen)
 
         table_bilanzen = self.folders.get_table("Gemeindebilanzen", "FGDB_Einnahmen.gdb")
         fields = ["AGS", "GewSt", "Hebesatz_GewSt", "SvB_Saldo"]
         cursor = arcpy.da.UpdateCursor(table_bilanzen, fields)
+
         for row in cursor:
             if row[0] == ags:
-                row[1] = round(Bewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100) * (row[3] + SvB_Verkaufsflaechen) / (SvB_Branchen + SvB_Verkaufsflaechen))
+                row[1] = round(Gewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100) * (row[3] + SvB_Verkaufsflaechen) / (SvB_Branchen + SvB_Verkaufsflaechen))
             else:
-                row[1] = round(Bewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100) * row[3] / (SvB_Branchen + SvB_Verkaufsflaechen))
+                row[1] = round(Gewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100) * row[3] / (SvB_Branchen + SvB_Verkaufsflaechen))
             cursor.updateRow(row)
 
         c.set_chronicle("Gewerbesteuer", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))

@@ -191,17 +191,6 @@ class TbxGrundsteuer(Tbx):
         for row in cursor:
             ags = row[0]
 
-        if int(ags) <= 10999999:
-            self.par.slider2.active = True
-            self.par.slider3.active = True
-            self.par.slider4.active = True
-            self.par.slider5.active = True
-        else:
-            self.par.slider2.active = False
-            self.par.slider3.active = False
-            self.par.slider4.active = False
-            self.par.slider5.active = False
-
         efh = 0
         fields = ["Gebaeudetyp", 'WE']
         cursor = self.query_table('Wohnen_WE_in_Gebaeudetypen', fields, "FGDB_Definition_Projekt.gdb")
@@ -209,12 +198,24 @@ class TbxGrundsteuer(Tbx):
             if row[0] == "Einfamilienhaus":
                 efh += row[1]
 
-        if efh == 0 or int(ags) < 11000000:
-            self.par.slider6.active = False
-            self.par.slider7.active = False
+        if int(ags) <= 10999999:
+            self.par.slider2.enabled  = True
+            self.par.slider3.enabled  = True
+            self.par.slider4.enabled  = True
+            self.par.slider5.enabled  = True
+            self.par.slider6.enabled  = False
+            self.par.slider7.enabled  = False
         else:
-            self.par.slider6.active = True
-            self.par.slider7.active = True
+            self.par.slider2.enabled  = False
+            self.par.slider3.enabled  = False
+            self.par.slider4.enabled  = False
+            self.par.slider5.enabled  = False
+            if efh > 0:
+                self.par.slider6.enabled  = True
+                self.par.slider7.enabled  = True
+            else:
+                self.par.slider6.enabled  = False
+                self.par.slider7.enabled  = False
 
 
         where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.GEWERBE, Nutzungsart.EINZELHANDEL)

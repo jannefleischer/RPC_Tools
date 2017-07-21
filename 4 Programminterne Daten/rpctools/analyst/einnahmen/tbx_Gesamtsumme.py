@@ -31,20 +31,32 @@ class TbxGesamtsumme(Tbx):
         par.name.datatype = u'GPString'
         par.name.filter.list = []
 
+        par.summe = arcpy.Parameter()
+        par.summe.name = u'Bestandteile'
+        par.summe.displayName = u'Bestandteile der Gesamtsumme'
+        par.summe.parameterType = 'Required'
+        par.summe.direction = 'Input'
+        par.summe.datatype = u'GPString'
+        par.summe.value = "Alles"
+        par.summe.enabled = False
+
         return par
 
-    def _updateMessages(self, params):
-
+    def _updateParameters(self, params):
         par = self.par
-
+        anzahl_bestandteile = 0
+        grundsteuer = ""
+        einkommensteuer = ""
+        fla = ""
+        gewerbesteuer = ""
+        umsatzsteuer = ""
 
         wohnen_vorhanden = False
         gewerbe_oder_einzelhandel_vorhanden = False
 
         cursor = self.query_table('Teilflaechen_Plangebiet',
                                 ['Nutzungsart'],
-                                workspace='FGDB_Definition_Projekt.gdb',
-                                where=where)
+                                workspace='FGDB_Definition_Projekt.gdb')
 
         for row in cursor:
             if row[0] == Nutzungsart.GEWERBE:
@@ -60,19 +72,72 @@ class TbxGesamtsumme(Tbx):
                                 workspace='FGDB_Einnahmen.gdb')
 
         for row in cursor:
-            if row[0] == "Grundsteuer" and row[1] is None:
-                par.name.setErrorMessage(u'Es wurde noch keine Grundsteuer berechnet!')
+            if row[0] == "Grundsteuer" and row[1] is not None:
+                if anzahl_bestandteile == 0:
+                    grundsteuer = "Grundsteuer"
+                else:
+                    grundsteuer = " + Grundsteuer"
+                anzahl_bestandteile += 1
+
+            if wohnen_vorhanden and row[0] == "Einkommensteuer" and not c.compare_chronicle("Wanderung Einwohner", "Einkommensteuer", table):
+                if anzahl_bestandteile == 0:
+                    einkommensteuer = "Einkommensteuer"
+                else:
+                    einkommensteuer = " + Einkommensteuer"
+                anzahl_bestandteile += 1
+
+            if wohnen_vorhanden and row[0] == "Familienleistungsausgleich"  and not c.compare_chronicle("Einkommensteuer", "Familienleistungsausgleich", table):
+                if anzahl_bestandteile == 0:
+                    fla = "Familienleistungsausgleich"
+                else:
+                    fla = " + Familienleistungsausgleich"
+                anzahl_bestandteile += 1
+
+            if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Gewerbesteuer" and not c.compare_chronicle("Wanderung Beschaeftigte", "Gewerbesteuer", table):
+                if anzahl_bestandteile == 0:
+                    gewerbesteuer = "Gewerbesteuer"
+                else:
+                    gewerbesteuer = " + Gewerbesteuer"
+                anzahl_bestandteile += 1
+            if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Umsatzsteuer" and not c.compare_chronicle("Gewerbesteuer", "Umsatzsteuer", table):
+                if anzahl_bestandteile == 0:
+                    umsatzsteuer = "Umsatzsteuer"
+                else:
+                    umsatzsteuer = " + Umsatzsteuer"
+                anzahl_bestandteile += 1
+
+        bestandteile = grundsteuer + einkommensteuer + fla + gewerbesteuer + umsatzsteuer
+        par.summe.value = bestandteile
+
+
+    def _updateMessages(self, params):
+
+        par = self.par
+
+        wohnen_vorhanden = False
+        gewerbe_oder_einzelhandel_vorhanden = False
+
+        cursor = self.query_table('Teilflaechen_Plangebiet',
+                                ['Nutzungsart'],
+                                workspace='FGDB_Definition_Projekt.gdb')
+
+        for row in cursor:
+            if row[0] == Nutzungsart.GEWERBE:
+                gewerbe_oder_einzelhandel_vorhanden = True
+            if row[0] == Nutzungsart.EINZELHANDEL:
+                gewerbe_oder_einzelhandel_vorhanden = True
+            if row[0] == Nutzungsart.WOHNEN:
+                wohnen_vorhanden = True
+
+        table = self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=par.name.value)
+        cursor = self.query_table(table_name = 'Chronik_Nutzung',
+                                columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
+                                workspace='FGDB_Einnahmen.gdb')
+
+        for row in cursor:
 
             if wohnen_vorhanden and row[0] == "Wanderung Einwohner" and row[1] is None:
                 par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Einwohner berechnet!')
-            if wohnen_vorhanden and row[0] == "Einkommensteuer" and not c.compare_chronicle("Einkommensteuer", "Wanderung Einwohner", table):
-                par.name.setErrorMessage(u'Es wurden noch keine Einkommensteuer berechnet!')
-            if wohnen_vorhanden and row[0] == "Familienleistungsausgleich"  and not c.compare_chronicle("Familienleistungsausgleich", "Einkommensteuer", table):
-                par.name.setErrorMessage(u'Es wurde noch kein Familienleistungsausgleich berechnet!')
 
             if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Wanderung Beschaeftigte" and row[1] is None:
                 par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Beschäftigte berechnet!')
-            if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Gewerbesteuer" and not c.compare_chronicle("Gewerbesteuer", "Wanderung Beschaeftigte", table):
-                par.name.setErrorMessage(u'Es wurde noch keine Gewerbesteuer berechnet!')
-            if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Umsatzsteuer" and not c.compare_chronicle("Umsatzsteuer", "Gewerbesteuer", table):
-                par.name.setErrorMessage(u'Es wurden noch keine Umsatzsteuer berechnet!')

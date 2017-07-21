@@ -20,23 +20,6 @@ class Wanderungssalden1(Tool):
 
     def add_outputs(self):
 
-        self.output.delete_output("Einw_Saldo")
-
-        gemeinde_werte = lib_einnahmen.get_values(["Einw_Saldo"], self.projectname)
-
-        symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
-
-        self.output.add_layer(
-            groupname = "einnahmen",
-            featureclass = "Gemeindebilanzen",
-            template_layer = symbology,
-            template_folder = "einnahmen",
-            name = "Einw_Saldo",
-            disable_other = True,
-            symbology = {'valueField': "Einw_Saldo"},
-            label_replace = {'Einw_Saldo': 'Einw_Saldo'}
-        )
-
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
 
@@ -66,114 +49,114 @@ class Wanderungssalden1(Tool):
             gemeinde[4] = 0
             cursor.updateRow(gemeinde)
 
-        km = 20
-        umkreis_km = str(km) + " Kilometers"
+
+        #Wichtungsfaktoren auslesen
+        Wichtungen_Gewerbe = {}
+        Wichtungen_Wohnen = {}
+
+        path_distanzen = self.folders.get_base_table("FGDB_Einnahmen_Tool.gdb", "Wanderung_Entfernungswichtung")
+        cursor = arcpy.da.SearchCursor(path_distanzen, ["Distance", "Wichtung_Wohnen", "Wichtung_Gewerbe"])
+        for distanz in cursor:
+            Wichtungen_Wohnen[str(distanz[0])] = distanz[1]
+            Wichtungen_Gewerbe[str(distanz[0])] = distanz[2]
 
 
-    # Anteile der Herkunftsgemeinden an Einwohner bestimmen
-
-        # Buffer um Teilflächen
-        pfad_buffer = os.path.join(workspace_projekt_einnahmen, "Buffer")
+        #Anteile der Herkunftsgemeinden an Einwohner bestimmen
+        pfad_buffer = os.path.join(workspace_projekt_einnahmen, "buffer_25km")
         if arcpy.Exists(pfad_buffer):
             arcpy.Delete_management(pfad_buffer)
 
-        arcpy.Buffer_analysis(
-            in_features = "projektflaechen_lyr",
-                                out_feature_class = pfad_buffer,
-                                buffer_distance_or_field = umkreis_km,
-                                dissolve_option = "ALL")
+        pfad_Rasterausschnitt = os.path.join(workspace_projekt_einnahmen, "Rasterausschnitt")
+        if arcpy.Exists(pfad_Rasterausschnitt):
+            arcpy.Delete_management(pfad_Rasterausschnitt)
 
-        # Verschneiden von Buffer und Gemeindebilanzen-Gemeinde-Layer
-        pfad_verschnitt = os.path.join(workspace_projekt_einnahmen, "Verschnitt")
-        if arcpy.Exists(pfad_verschnitt):
-            arcpy.Delete_management(pfad_verschnitt)
+        pfad_Rasterausschnitt_25km = os.path.join(workspace_projekt_einnahmen, "Rasterausschnitt_25km")
+        if arcpy.Exists(pfad_Rasterausschnitt_25km):
+            arcpy.Delete_management(pfad_Rasterausschnitt_25km)
 
-        arcpy.Intersect_analysis([wanderungssalden, pfad_buffer], pfad_verschnitt)
+        pfad_Punktlayer_25km_posWerte = os.path.join(workspace_projekt_einnahmen, "Punktlayer_25km_posWerte")
+        if arcpy.Exists(pfad_Punktlayer_25km_posWerte):
+            arcpy.Delete_management(pfad_Punktlayer_25km_posWerte)
 
-        # Parameter: Exponentialfaktoren für Umzugsweiten Wohnen
-        exponentialfaktor_wohnen = -0.1
-        konstant_bis_km_wohnen = 3
+        pfad_Entfernungsringe = os.path.join(workspace_projekt_einnahmen, "Entfernungsringe")
+        if arcpy.Exists(pfad_Entfernungsringe):
+            arcpy.Delete_management(pfad_Entfernungsringe)
 
-        # Mittelpunkt der Projektflaechen
-        table = 'Teilflaechen_Plangebiet'
-        columns = np.array(['Nutzungsart', 'Flaeche_ha', 'INSIDE_X', 'INSIDE_Y'])
-        Results = wmean.Read_FGDB(workspace_projekt_definition, table, columns)
-        Results.get_result_block()
-        gewichtete_koordinaten = wmean.calc_weighted_mean(Results.result_block)
-        x_projektflaeche = gewichtete_koordinaten[0]
-        y_projektflaeche = gewichtete_koordinaten[1]
+        pfad_Herkunftsraeume = os.path.join(workspace_projekt_einnahmen, "Herkunftsgebiete")
+        if arcpy.Exists(pfad_Herkunftsraeume):
+            arcpy.Delete_management(pfad_Herkunftsraeume)
 
-        # Gewichtete Einwohner bestimmen
-        gewichtete_ew_gesamt = 0
-        fields = ["AGS", "Einwohner", "Shape_Area", "Gewichtete_Ew", "GK3_X", "GK3_Y"]
-        cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
-        for gemeinde in cursor:
-            flaeche_verschnitt = 0
-            cursor_verschnitt = arcpy.da.SearchCursor(pfad_verschnitt, ["AGS", "Shape_Area"])
-            for gemeinde_verschnitt in cursor_verschnitt:
-                if gemeinde[0] == gemeinde_verschnitt[0]:
-                    flaeche_verschnitt += gemeinde_verschnitt[1]
-            entfernung_km = (((x_projektflaeche - gemeinde[4]) ** 2 +  (y_projektflaeche - gemeinde[5]) ** 2) ** 0.5) / 1000
-            # Einwohner
-            if entfernung_km < konstant_bis_km_wohnen:
-                entfernungsgewichtung_wohnen = 1
-            else:
-                entfernungsgewichtung_wohnen = np.exp((entfernung_km - konstant_bis_km_wohnen) * exponentialfaktor_wohnen)
-            gewichtete_ew = gemeinde[1] * (flaeche_verschnitt / gemeinde[2]) * entfernungsgewichtung_wohnen
-            gemeinde[3] = gewichtete_ew
-            gewichtete_ew_gesamt += gewichtete_ew
-            cursor.updateRow(gemeinde)
+        pfad_Herkunftsraeume_mit_Ew = os.path.join(workspace_projekt_einnahmen, "Herkunftsgebiete_mit_Ew")
+        if arcpy.Exists(pfad_Herkunftsraeume_mit_Ew):
+            arcpy.Delete_management(pfad_Herkunftsraeume_mit_Ew)
 
-        # Wanderungsanteile bestimmen
-        fields = ["Gewichtete_Ew", "Wanderungsanteil_Ew"]
-        cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
-        for gemeinde in cursor:
-
-            gemeinde[1] = gemeinde[0] / gewichtete_ew_gesamt
-            cursor.updateRow(gemeinde)
-
-        # Berechnung der Einwohner im Plangebiet
-        einwohner_projekt = rahmendaten.Bewohner_referenz_plangebiet(self, projektname)
-
-        # Bestimme AGS der Projektgemeinde
-        pfad_rahmendaten = self.folders.get_table(
-            tablename='Projektrahmendaten',
-            workspace="FGDB_Definition_Projekt.gdb",
-            project=projektname)
-        cursor = arcpy.da.SearchCursor(pfad_rahmendaten, ["AGS"])
-        for projekt in cursor:
-            ags_projekt = projekt[0]
+        pfad_zensusgrid = self.folders.ZENSUS_RASTER_FILE
+        pfad_bkggemeinden = self.folders.get_base_table("FGDB_Basisdaten_deutschland.gdb", "bkg_gemeinden")
 
 
-        #Ergebnis einfuegen
-        fields = ["Einw_Zuzug", "Einw_Fortzug", "Einw_Saldo", "Wanderungsanteil_Ew", "AGS"]
-        cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
-        for gemeinde in cursor:
-            gemeinde[1] = einwohner_projekt * gemeinde[3] * -1
-            if gemeinde[4] == ags_projekt:
-                gemeinde[0] = einwohner_projekt
-            else:
-                gemeinde[0] = 0
-            gemeinde[2] = gemeinde[0] + gemeinde[1]
-            cursor.updateRow(gemeinde)
+        #25km Buffer um Projektflaeche
+        arcpy.Buffer_analysis(projektflaechen, pfad_buffer, "25000 Meters", "FULL", "ROUND", "ALL", "", "PLANAR")
 
-        #Gesamtsumme der Salden auf 0 setzen
-        summe_ueber_alle_salden = 0
-        fields = ["Einw_Saldo"]
-        cursor = arcpy.da.SearchCursor(wanderungssalden, fields)
-        for gemeinde in cursor:
-            summe_ueber_alle_salden += gemeinde[0]
+        #Verschneidung mit Zensusraster
+        arcpy.Clip_management(pfad_zensusgrid, "7,05950279760912 51,2479511306414 9,96218940268301 53,7710632922632", pfad_Rasterausschnitt, pfad_buffer, "2147483647", "ClippingGeometry", "NO_MAINTAIN_EXTENT")
 
-        if summe_ueber_alle_salden != 0:
-            fields = ["Einw_Saldo", "AGS"]
-            cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
-            for gemeinde in cursor:
-                if gemeinde[1] == ags_projekt and summe_ueber_alle_salden > 0:
-                    gemeinde[0] -= summe_ueber_alle_salden
-                elif gemeinde[1] == ags_projekt and summe_ueber_alle_salden < 0:
-                    gemeinde[0] += summe_ueber_alle_salden
-                cursor.updateRow(gemeinde)
+        #Raterausschnitt in Punktlayer konvertieren
+        arcpy.RasterToPoint_conversion(pfad_Rasterausschnitt, pfad_Rasterausschnitt_25km, "Value")
+
+        #LeereSiedlungszellen entfernen
+        arcpy.Select_analysis(pfad_Rasterausschnitt_25km, pfad_Punktlayer_25km_posWerte, '"grid_code" > 0')
+
+        #Mehrere Buffer um Projektflaeche erzeugen
+        arcpy.MultipleRingBuffer_analysis(projektflaechen, pfad_Entfernungsringe, "1500;2500;3500;4500;6500;8500;11500;14500;18500;25000", "Meters", "distance", "ALL", "FULL")
+
+        #Buffer mit Gemeinden verschneiden
+        arcpy.Intersect_analysis([pfad_bkggemeinden, pfad_Entfernungsringe], pfad_Herkunftsraeume, "NO_FID", "", "INPUT")
+
+        #Verschneiden der Herkunftsraume mit den Summen der jeweiligen Punktfeatures
+
+        fieldmappings = arcpy.FieldMappings()
+        fieldmappings.addTable(pfad_Herkunftsraeume)
+        fieldmappings.addTable(pfad_Punktlayer_25km_posWerte)
+
+        gridcode_FieldIndex = fieldmappings.findFieldMapIndex("grid_code")
+        fieldmap = fieldmappings.getFieldMap(gridcode_FieldIndex)
+        field = fieldmap.outputField
+        field.name = "Summe_Ew"
+        field.aliasName = "Summe_Ew"
+        fieldmap.outputField = field
+        fieldmap.mergeRule = "sum"
+        fieldmappings.replaceFieldMap(gridcode_FieldIndex, fieldmap)
+
+        arcpy.SpatialJoin_analysis(pfad_Herkunftsraeume, pfad_Punktlayer_25km_posWerte, pfad_Herkunftsraeume_mit_Ew, "JOIN_ONE_TO_ONE", "KEEP_ALL", fieldmappings)
 
 
-        c.set_chronicle("Wanderung Einwohner", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
+        #SvB_je_EW
+
+        Summe_Wichtungsfaktoren_Gesamtraum_Wohnen = 0
+        Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe = 0
+        SvB_je_EW = 0
+        herkunftsraeume = []
+        Entfernungswichtung_Wohnen = {"1500": 24.74, "2500": 6.575, "3500": 3.572, "4500":2.838, "6500": 1.554, "8500": 0.991, "11500": 0.656, "14500": 1.554, "18500": 0.991, "25000": 0.656}
+        Entfernungswichtung_Gewerbe = {"1500": 24.74, "2500": 6.575, "3500": 3.572, "4500":2.838, "6500": 1.554, "8500": 0.991, "11500": 0.656, "14500": 1.554, "18500": 0.991, "25000": 0.656}
+        cursor_gemeindebilanz = arcpy.da.SearchCursor(wanderungssalden, ["AGS", "SvB_pro_Ew"])
+        for gemeinde in cursor_gemeindebilanz:
+            Summe_Wichtungsfaktoren_Gemeinde_Wohnen = 0
+            Summe_Wichtungsfaktoren_Gemeinde_Gewerbe = 0
+            where = '"AGS"' + "='" + gemeinde[0] +"'"
+            cursor_Summe_Ew = arcpy.da.SearchCursor(pfad_Herkunftsraeume_mit_Ew, ["AGS", "Summe_Ew", "distance", "Shape_Area"], where)
+            for gemeindeteil in cursor_Summe_Ew:
+                Wichtungsfaktor_Wohnen = gemeindeteil[1] * gemeindeteil[3] * Entfernungswichtung_Wohnen[str(gemeindeteil[2])]
+                Wichtungsfaktor_Gewerbe = gemeindeteil[1] * gemeinde[1] * gemeindeteil[3] * Entfernungswichtung_Gewerbe[str(gemeindeteil[2])]
+
+
+                Summe_Wichtungsfaktoren_Gemeinde_Wohnen += Wichtungsfaktor_Wohnen
+                Summe_Wichtungsfaktoren_Gemeinde_Gewerbe += Wichtungsfaktor_Gewerbe
+
+                Summe_Wichtungsfaktoren_Gesamtraum_Wohnen += Wichtungsfaktor_Wohnen
+                Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe += Wichtungsfaktor_Gewerbe
+
+
+
+
+
 

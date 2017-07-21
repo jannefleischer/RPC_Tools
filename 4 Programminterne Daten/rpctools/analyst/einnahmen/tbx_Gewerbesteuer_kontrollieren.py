@@ -84,3 +84,15 @@ class TbxKontrolleGewerbesteuer(Tbx):
                     gemeinden.append(u"{} || Hebesatz: {}".format(
                         gem_name, hebesteuer))
                 par.gemeinde.filter.list = sorted(gemeinden)
+
+        if par.changed('gemeinde'):
+
+            target_gemeinde = self.par.gemeinde.value
+            target_gemeinde_kurz = target_gemeinde.split(" ||")[0]
+
+            fields = ["GEN", "Hebesatz_GewSt"]
+            rows = self.query_table('Gemeindebilanzen', fields,
+                                    workspace='FGDB_Einnahmen.gdb')
+            for gemeinde in rows:
+                if gemeinde[0] == target_gemeinde_kurz:
+                    par.hebesatz.value = gemeinde[1]
