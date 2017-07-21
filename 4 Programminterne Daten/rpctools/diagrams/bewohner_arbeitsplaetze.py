@@ -83,14 +83,21 @@ class BranchenAnteile(MatplotDiagram):
             columns=['ID_Branche_Projektcheck', 'Name_Branche_Projektcheck'],
             is_base_table=True
         )
+        colors = self.plt.cm.Accent(np.linspace(0, 1, len(table_df)))
+        idx = table_df['Anteil'] > 0
+        table_df = table_df[idx]
+        colors = colors[idx]
+        
         branche_table_df.rename(
             columns={'ID_Branche_Projektcheck': 'IDBranche'}, inplace=True)
         joined = table_df.merge(branche_table_df, on='IDBranche')
         joined['Anteil'] *= 100
         
-        colors = self.plt.cm.Accent(np.linspace(0, 1, len(joined)))
-        ax = joined['Anteil'].plot(kind='pie', labels=[''] * 6, autopct='%.2f',
+        ax = joined['Anteil'].plot(kind='pie', labels=[''] * len(table_df),
+                                   autopct='%.0f%%',
                                    figsize=(8, 8), title=self.title,
+                                   #shadow=True,
+                                   #explode=[0.1] * len(table_df), 
                                    colors=colors)
         ax.set_ylabel('')
         ax.legend(joined['Name_Branche_Projektcheck'], loc='upper center',
