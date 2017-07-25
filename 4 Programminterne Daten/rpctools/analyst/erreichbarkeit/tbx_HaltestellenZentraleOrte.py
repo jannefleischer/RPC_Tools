@@ -30,7 +30,7 @@ def next_working_day(min_days_infront=2):
     ----------
     min_days_infront : int (default: 2)
        returned day will be at least n days infront
-       
+
     Returns
     -------
     day : datetime.date
@@ -58,15 +58,16 @@ def next_working_day(min_days_infront=2):
 class HaltestellenZentraleOrte(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Erreichbarkeit.gdb'
-    
+
     def add_outputs(self):
-        
+
         group_layer = ("erreichbarkeit")
         fc = 'Haltestellen'
         layer_nullfall = 'Haltestellen'
 
-        self.output.add_layer(group_layer, layer_nullfall, fc, zoom=False)
-    
+        self.output.add_layer(group_layer, layer_nullfall, fc,
+                              template_folder='Erreichbarkeit', zoom=False)
+
     def run(self):
         self.query = BahnQuery(date=next_working_day())
         arcpy.AddMessage('Berechne die zentralen Orte und Haltestellen '
@@ -79,7 +80,7 @@ class HaltestellenZentraleOrte(Tool):
             return
         arcpy.AddMessage('Ermittle die Anzahl der Abfahrten je Haltestelle...')
         self.update_departures(projectarea_only=True)
-        
+
     def write_centers_stops(self):
         '''get centers in radius around project centroid, write their closest
         stops and the stops near the project to the db
@@ -87,24 +88,24 @@ class HaltestellenZentraleOrte(Tool):
         # truncate tables, will be filled in progress
         self.parent_tbx.delete_rows_in_table('Zentrale_Orte')
         self.parent_tbx.delete_rows_in_table('Haltestellen')
-        
+
         centroid = get_project_centroid(self.par.projectname.value)
         df_central = self.parent_tbx.table_to_dataframe(
-            'Zentrale_Orte_Neu', 
+            'Zentrale_Orte_Neu',
             workspace='FGDB_Basisdaten_deutschland.gdb',
-            columns=['SHAPE', 'OBJECTID', 'GEN', 'OZ'], 
+            columns=['SHAPE', 'OBJECTID', 'GEN', 'OZ'],
             is_base_table=True
         )
         df_oz = df_central[df_central['OZ'] == 1]
         df_mz = df_central[df_central['OZ'] == 0]
-        
+
         oz_points = df_oz['SHAPE'].values
         mz_points = df_mz['SHAPE'].values
         oz_points, oz_within = points_within(centroid, oz_points, radius=70000)
         mz_points, mz_within = points_within(centroid, mz_points, radius=30000)
         df_oz_within = df_oz[oz_within]
         df_mz_within = df_mz[mz_within]
-        
+
         def get_closest_stops(points):
             stops = []
             for point in points:
@@ -116,30 +117,30 @@ class HaltestellenZentraleOrte(Tool):
                     closest = stops_near[0]
                     stops.append(closest)
             return stops
-            
+
         oz_stops = get_closest_stops(oz_points)
         mz_stops = get_closest_stops(mz_points)
         if (len(oz_stops) + len(mz_stops)) == 0:
             return
-        
+
         df_oz_within['id_haltestelle'] = [s.id for s in oz_stops]
         df_mz_within['id_haltestelle'] = [s.id for s in mz_stops]
-                
+
         df_within = pd.concat([df_oz_within, df_mz_within])
         df_within['name'] = df_within['GEN']
         df_within['id_zentraler_ort'] = df_within['OBJECTID']
-        
+
         self.parent_tbx.insert_dataframe_in_table('Zentrale_Orte', df_within)
-        
+
         p_centroid = Point(centroid[0], centroid[1],
                            epsg=self.parent_tbx.config.epsg)
         p_centroid.transform(4326)
         tfl_stops = self.query.stops_near(p_centroid, n=10)
-        
+
         self._stops_to_db(oz_stops)
         self._stops_to_db(mz_stops)
         self._stops_to_db(tfl_stops, is_project_stop=1)
-        
+
     def update_departures(self, projectarea_only=False):
         '''update the db-column 'abfahrten' of the stops with the number
         of departures
@@ -151,30 +152,30 @@ class HaltestellenZentraleOrte(Tool):
         n_departures = self.query.n_departures(ids)
         df_stops['abfahrten'] = n_departures
         self.parent_tbx.dataframe_to_table('Haltestellen', df_stops, ['id'])
-        
+
     def _stops_to_db(self, stops, is_project_stop=0):
         '''(warning: changes projection of point!)'''
         ids = []
         names = []
         shapes = []
         distances = []
-        
+
         for stop in stops:
             stop.transform(self.parent_tbx.config.epsg)
             shapes.append(arcpy.Point(stop.x, stop.y))
             ids.append(stop.id)
             names.append(stop.name)
             distances.append(stop.distance)
-            
+
         column_values = {
             'SHAPE': shapes,
             'id': ids,
             'name': names,
-            'flaechenzugehoerig': [is_project_stop] * len(stops), 
+            'flaechenzugehoerig': [is_project_stop] * len(stops),
             'abfahrten': [0] * len(stops),
             'fussweg': distances
         }
-        
+
         self.parent_tbx.insert_rows_in_table('Haltestellen',
                                              column_values=column_values)
 
