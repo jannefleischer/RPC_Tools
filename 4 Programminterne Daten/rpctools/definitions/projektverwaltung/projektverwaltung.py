@@ -50,25 +50,23 @@ class Projektverwaltung(Tool):
 
 class ProjektAnlegen(Projektverwaltung):
     """Projekt neu anlegen"""
-    _success = True
 
     def add_outputs(self):
-        if self._success:
+        if os.path.exists(self.folders.get_projectpath(check=False)):
             super(ProjektAnlegen, self).add_outputs()
 
     def run(self):
         """"""
         gc.collect()
         #self.output.define_projection()
-        self.projekt_anlegen()
-        # test if self.projekt_anlegen() was successful
-        # if not: AddMessage and delete project again
-        if self._success:
+        try:
+            self.projekt_anlegen()
             self.parent_tbx.config.active_project = self.projectname
-        else:
+        except Exception as e:
+            success = False
+            arcpy.AddError(e.message)
             arcpy.AddMessage("Fehlerhaftes Projekt wird wieder entfernt...")
             arcpy.Delete_management(self.folders.get_projectpath(check=False))
-
 
     def projekt_anlegen(self):
         """Projekt anlegen"""
@@ -88,8 +86,6 @@ class ProjektAnlegen(Projektverwaltung):
         ags_projekt, gemeindename_projekt = \
             self.get_gemeinde(tfl, 'OBJECTID', max_dist)
 
-        if not self._success:
-            return
         self.calculate_teilflaechen_attributes(tfl,
                                                ags_projekt,
                                                gemeindename_projekt)
@@ -179,6 +175,9 @@ class ProjektAnlegen(Projektverwaltung):
         # epsg-code or the
         config = self.parent_tbx.config
         sr1 = arcpy.Describe(flaeche).spatialReference
+        if not sr1.factoryCode:
+            raise Exception(u'Den Teilflächen fehlen Angaben zur Projektion. '
+                            u'Bitte definieren Sie die Projektion in der Quelle!')
         sr2 = arcpy.SpatialReference(config.epsg)
         possible_transformations = arcpy.ListTransformations(sr1, sr2)
         if not possible_transformations:
@@ -275,19 +274,17 @@ class ProjektAnlegen(Projektverwaltung):
                     dist = np.linalg.norm(np.subtract(XY_INSIDE[i], XY_INSIDE[j]))
                     distances.append(dist)
             if distances and max(distances) > max_dist:
-                arcpy.AddError("Der Abstand zwischen den Schwerpunkten der "
-                               "Teilflächen darf nicht größer "
-                               "als {} m sein!".format(max_dist))
-                self._success = False
+                raise Exception("Der Abstand zwischen den Schwerpunkten der "
+                                "Teilflächen darf nicht größer "
+                                "als {} m sein!".format(max_dist))
 
         # get AGS and Gemeindename and check if AGS is unique
         ags_gen = get_ags(tfl, id_column)
         ags_project = [ID[0] for ID in ags_gen.values()]
         gen_project =  [ID[1] for ID in ags_gen.values()]
         if len(np.unique(ags_project)) != 1:
-            arcpy.AddError("Die Teilflächen müssen in der selben Gemeinde"
-                             "liegen")
-            self._success = False
+            raise Exception("Die Teilflächen müssen in der selben Gemeinde"
+                            "liegen")
 
         return ags_project[0], gen_project[0]
 
@@ -385,7 +382,7 @@ class ProjektLoeschen(Tool):
             arcpy.AddError(', '.join(self.fragments_left))
             arcpy.AddError('Bitte starten Sie ArcMap neu und '
                            'versuchen Sie es erneut!')
-            
+
         # change active project, if it was deleted
         if config.active_project in projects_to_delete:
             projects = self.folders.get_projects()
@@ -443,7 +440,7 @@ class ProjektLoeschen(Tool):
             arcpy.AddMessage("Projektordner gelöscht \n")
         else:
             arcpy.AddMessage("Projektordner " + project_name + " nicht gefunden \n")
-        
+
         arcpy.AddMessage("*" * 45)
         if arcpy.Exists(projektPfad):
             self.fragments_left.append(project_name)
