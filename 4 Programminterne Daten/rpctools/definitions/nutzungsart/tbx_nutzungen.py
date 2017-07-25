@@ -468,7 +468,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         rows = self.df_jobs[job_idx]
         if len(rows) == 0:
             columns=['IDTeilflaeche', 'Arbeitsplaetze']
-            n_jobs = 0
+            n_jobs = self.estimate_jobs()
             row = pd.DataFrame([[area['id_teilflaeche'], n_jobs]],
                                columns=columns)
             self.df_jobs = self.df_jobs.append(row, ignore_index=True)
@@ -588,7 +588,7 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         return params
 
 if __name__ == '__main__':
-    t = TbxNutzungenWohnen()
+    t = TbxNutzungenGewerbe()
     t.getParameterInfo()
     t.set_active_project()
     t.validate_inputs()

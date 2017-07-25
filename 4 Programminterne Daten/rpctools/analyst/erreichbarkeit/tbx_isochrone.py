@@ -10,6 +10,7 @@ from rpctools.analyst.erreichbarkeit.routing_query import RoutingQuery
 class Isochrone(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Erreichbarkeit.gdb'
+    cutoff = None
 
     modes = {
         'CAR': ('Auto', 15),
@@ -24,18 +25,25 @@ class Isochrone(Tool):
                   'Isochrone Auto']
         fc = u'Isochrone'
         for layer in layers:
+            name = layer
+            # ToDo: get cutoff time from db instead of from run()
+            if self.cutoff:
+                name += ' ({} Minuten)'.format(self.cutoff)
             self.output.add_layer(group_layer, layer, fc,
+                                  name=name, 
                                   template_folder='Erreichbarkeit',
                                   zoom=False)
 
     def run(self):
         table = 'Isochrone'
-        column_values = {'modus': [], 'SHAPE@': []}
+        self.cutoff = self.par.cutoff.value
+        cutoff_sec = self.cutoff * 60
+        column_values = {'modus': [], 'SHAPE@': [],
+                         'cutoff': [self.cutoff] * len(self.modes)}
 
         self.parent_tbx.delete_rows_in_table(table)
         x, y = get_project_centroid(self.par.projectname.value)
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
-        cutoff_sec = self.par.cutoff.value * 60
         query = RoutingQuery()
         target_epsg = self.parent_tbx.config.epsg
         for mode, (name, speed) in self.modes.iteritems():
