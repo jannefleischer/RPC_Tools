@@ -17,14 +17,20 @@ class GeoserverQuery(object):
         'outputFormat': 'application/json',
         'srsname': 'EPSG:4326'
     }
+    
+    def __init__(self):
+        self.epsg = 3035
 
 
     def get_features(self, point, radius, categories, target_epsg):
         '''point has to be in epsg 31467!'''
+        if point.epsg != self.epsg:
+            point.transform(self.epsg)
         params = self.feature_params.copy()
         params['srsname'] = 'EPSG:{}'.format(target_epsg)
+        categories = [u"'{}'".format(c) for c in categories]
         cql_filter = (u'projektcheck_category IN ({cat}) '
-                      u'AND DWithin(geom,POINT({x} {y}), {radius}, meters)'
+                      u'AND DWithin(geom,POINT({y} {x}), {radius}, meters)'
                       .format(cat=u','.join(categories),
                               x=point.x, y=point.y,
                               radius=radius))
