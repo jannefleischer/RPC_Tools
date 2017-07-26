@@ -40,17 +40,19 @@ class Isochrone(Tool):
         cutoff_sec = self.cutoff * 60
         column_values = {'modus': [], 'SHAPE@': [],
                          'cutoff': [self.cutoff] * len(self.modes)}
-
-        self.parent_tbx.delete_rows_in_table(table)
         x, y = get_project_centroid(self.par.projectname.value)
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
         query = RoutingQuery()
         target_epsg = self.parent_tbx.config.epsg
         for mode, (name, speed) in self.modes.iteritems():
+            arcpy.AddMessage(u'Ermittle die Isochronen für den Modus "{}"'
+                             .format(name))
             iso_poly = query.get_isochrone(centroid, target_epsg,
                                            mode, cutoff_sec, speed)
             column_values['modus'].append(name)
             column_values['SHAPE@'].append(iso_poly)
+        arcpy.AddMessage('Schreibe die Isochronen in die Datenbank...')
+        self.parent_tbx.delete_rows_in_table(table)
         self.parent_tbx.insert_rows_in_table(table, column_values)
 
 

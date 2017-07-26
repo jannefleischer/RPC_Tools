@@ -3,6 +3,15 @@ import requests
 import json
 import arcpy
 
+from rpctools.utils.spatial_lib import Point
+
+
+class Feature(Point):
+    def __init__(self, x, y, name, category, id=None, epsg=4326):
+        super(Feature, self).__init__(x, y, id, epsg)
+        self.name = name
+        self.category = category
+
 
 class GeoserverQuery(object):
     feature_url = ('https://geoserver.ggr-planung.de/geoserver/projektcheck/wfs')
@@ -23,7 +32,7 @@ class GeoserverQuery(object):
 
 
     def get_features(self, point, radius, categories, target_epsg):
-        '''point has to be in epsg 31467!'''
+        '''return list of Features within given radius around point'''
         if point.epsg != self.epsg:
             point.transform(self.epsg)
         params = self.feature_params.copy()
@@ -37,4 +46,17 @@ class GeoserverQuery(object):
         params['CQL_FILTER'] = cql_filter
         r = requests.get(self.feature_url, params=params)
         r.raise_for_status()
-        return r
+        feat_dicts = r.json()['features']
+        features = []
+        for feat in feat_dicts:
+            geometry = feat['geometry']
+            coords = geometry['coordinates']
+            if geometry['type'] == 'Point':
+                x, y = coords
+            else:
+                x, y = coords[0]
+            category = feat['properties']['projektcheck_category']
+            name = feat['properties']['name'] or ''
+            feature = Feature(x, y, name, category, epsg=target_epsg)
+            features.append(feature)
+        return features

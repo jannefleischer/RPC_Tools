@@ -12,23 +12,37 @@ class Einrichtungen(Tool):
     _workspace = 'FGDB_Erreichbarkeit.gdb'
     cutoff = None
 
-    modes = {
-        'CAR': ('Auto', 15),
-        'BICYCLE': ('Fahrrad', 10),
-        'WALK': (u'zu Fuß', 3)
-    }
-
+    categories = [u'Kita', u'ÖPNV_Haltestelle', u'Autobahnanschlussstelle']
+    
     def add_outputs(self):
-        pass
+        group_layer = ("erreichbarkeit")
+        fc = 'Einrichtungen'
+        layer = 'Einrichtungen'
+        self.output.add_layer(group_layer, layer, fc,
+                              template_folder='Erreichbarkeit',
+                              zoom=True)
 
     def run(self):
         query = GeoserverQuery()
-        categories = [u'Kita', u'ÖPNV_Haltestelle', u'Autobahnanschlussstelle']
         radius = self.par.radius.value * 1000
         x, y = get_project_centroid(self.par.projectname.value)
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
         target_epsg = self.parent_tbx.config.epsg
-        features = query.get_features(centroid, radius, categories, target_epsg)
+        arcpy.AddMessage('Frage Geoserver an...')
+        features = query.get_features(centroid, radius,
+                                      self.categories, target_epsg)
+        arcpy.AddMessage('Schreibe {} Einrichtungen in die Datenbank...'
+                         .format(len(features)))
+        self.parent_tbx.delete_rows_in_table('Einrichtungen')
+        column_values = {'name': [], 'SHAPE': [], 'projektcheck_category': []}
+        for feat in features:
+            column_values['name'].append(feat.name)
+            feat.create_geom()
+            column_values['SHAPE'].append(feat.geom)
+            column_values['projektcheck_category'].append(feat.category)
+        
+        self.parent_tbx.insert_rows_in_table('Einrichtungen', column_values)
+        
 
 
 class TbxEinrichtungen(Tbx):
