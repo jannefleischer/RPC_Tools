@@ -169,7 +169,7 @@
 
                 <!-- VERKEHR -->
 
-                <Button caption="Verkehrsbelastung initialisieren" category="ProjektCheck" class="InitialRouting" id="rpc_tools.initial_routing" image="Images\RouteFastest16.png" message="" tip="">
+                <Button caption="Straßenverkehrsbelastung schätzen" category="ProjektCheck" class="InitialRouting" id="rpc_tools.initial_routing" image="Images\RouteFastest16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Kennwerte zum Verkehrsaufkommen" category="ProjektCheck" class="RoutingSettings" id="rpc_tools.routing_settings" image="Images\settings-4-16.png" message="" tip="">
@@ -468,7 +468,7 @@
                         <Button refID="rpc_tools.boden_kontrollieren" />
                         <Button refID="rpc_tools.bodenveraenderung" />
                     </Items>
-                </Menu>                
+                </Menu>
                 <Menu caption="Integrationsgrad" category="ProjektCheck" id="rpc_tools.menu_integrationsgrad" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Tool refID="rpc_tools.grenzlinie_einzeichnen" />
@@ -486,7 +486,7 @@
                     </Items>
                 </Menu>
                 <Menu caption="Erschlie&#223;ungsnetze skizzieren" category="ProjektCheck" id="rpc_tools.menu_erschliessungsnetze_skizzieren" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>                    
+                    <Items>
                         <Tool refID="rpc_tools.anliegerstrasse_innere" />
                         <Tool refID="rpc_tools.sammelstrasse_innere" />
                         <Tool refID="rpc_tools.anliegerstrasse_aeussere"  separator="true"/>
@@ -500,7 +500,7 @@
                     </Items>
                 </Menu>
                 <Menu caption="Punktuelle Ma&#223;nahmen" category="ProjektCheck" id="rpc_tools.menu_punktuelle_massnahmen" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>                    
+                    <Items>
                         <Tool refID="rpc_tools.massnahme_hinzu" />
                         <Tool refID="rpc_tools.massnahme_bearbeiten" />
                     </Items>
