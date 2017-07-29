@@ -11,7 +11,8 @@ import pandas as pd
 class Routing(Tool):
     _workspace = 'FGDB_Verkehr.gdb'
     _param_projectname = 'project'
-
+    _outer_circle = 2000
+    _n_segments = 24
     def add_outputs(self):
         # Add Layers
         self.output.add_layer('verkehr', 'Zielpunkte',
@@ -27,9 +28,8 @@ class Routing(Tool):
     def run(self):
         toolbox = self.parent_tbx
         # tbx settings
-        outer_circle = toolbox.par.outer.value
         inner_circle = toolbox.par.inner.value
-        n_segments = toolbox.par.dests.value
+        outer_circle = inner_circle + self._outer_circle
         #arcpy.Delete_management(tmp_table)
         # get data from Wege_je_nutzung table
         data_wjn = toolbox.query_table('Wege_je_nutzung',
@@ -57,7 +57,7 @@ class Routing(Tool):
 
             # calculate segments around centroid
             destinations = o.create_circle(source, dist=outer_circle,
-                                           n_segments=n_segments)
+                                           n_segments=self._n_segments)
             # calculate the routes to the segments
             for (lon, lat) in destinations:
                 destination = Point(lat, lon)

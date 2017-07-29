@@ -13,7 +13,7 @@ class TbxRouting(Tbx):
 
     @property
     def label(self):
-        return encode(u'Verkehrsbelastung initialisieren')
+        return encode(u'Straßenverkehrsbelastung schätzen')
 
     @property
     def Tool(self):
@@ -36,39 +36,17 @@ class TbxRouting(Tbx):
         if projekte:
             p.value = projekte[0]
 
-
-        # outer radius
-        p = self.add_parameter('outer')
-        p.name = u'outer_circle'
-        p.displayName = u'Radius des äußeren Kreises'
-        p.parameterType = 'Required'
-        p.direction = 'Input'
-        p.datatype = 'GPLong'
-        p.filter.type = 'Range'
-        p.filter.list = [0, 4000]
-        p.value = 3000
-
         # inner radius
         p = self.add_parameter('inner')
         p.name = u'inner_circle'
-        p.displayName = u'Radius des inneren Kreises'
+        p.displayName = u'Entfernung der Herkunfts-/Zielpunkte vom ' +\
+            u'Mittelpunkt des Plangebiets (in Metern Straßenentfernung)'
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'GPLong'
         p.filter.type = 'Range'
-        p.filter.list = [0, 1500]
-        p.value = 1000
-
-        # number of destinations
-        p = self.add_parameter('dests')
-        p.name = u'destinations'
-        p.displayName = u'Anzahl der Ziele auf dem äußeren Kreis'
-        p.parameterType = 'Required'
-        p.direction = 'Input'
-        p.datatype = 'GPLong'
-        p.filter.type = 'Range'
-        p.filter.list = [0, 360]
-        p.value = 18
+        p.filter.list = [1000, 3000]
+        p.value = 1500
 
         return params
 
