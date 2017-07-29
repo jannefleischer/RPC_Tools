@@ -3,8 +3,8 @@ from collections import OrderedDict
 import arcpy
 import numpy as np
 
-from rpctools.utils.config import Config, Folders
 
+from rpctools.utils.config import Config, Folders
 
 class ArcpyEnv(object):
     """
@@ -102,7 +102,7 @@ class LayerGroup(OrderedDict):
         label : str
         """
         return self[key].label
-    
+
     def get_labels(self):
         """
         return all labels in order of adding
@@ -179,16 +179,16 @@ class Layer(object):
     def __init__(self,
                  groupname,
                  template_layer,
-                 name='', 
+                 name='',
                  featureclass='',
-                 workspace='', 
-                 template_folder='', 
+                 workspace='',
+                 template_folder='',
                  disable_other=False,
                  subgroup="",
                  in_project=True,
                  query="",
                  symbology={},
-                 label_replace={}, 
+                 label_replace={},
                  zoom=True):
         self.groupname = groupname
         self.template_layer = template_layer
@@ -205,16 +205,16 @@ class Layer(object):
         self.workspace = workspace
 
 
-class Output(object):    
+class Output(object):
     """
     Add and update layers to the current ArcMap file.
     """
     _workspace = None
-    
+
     def __init__(self, params=None):
         self.config = Config()
         self.params = params
-        # no params object given -> take a fixed project name (the currently 
+        # no params object given -> take a fixed project name (the currently
         # active one)
         projectname = None if params is not None else self.config.active_project
         self.folders = Folders(params=params, workspace=self._workspace,
@@ -229,7 +229,7 @@ class Output(object):
         root = self.module
         background = root.add('hintergrundkarten',
                               'Hintergrundkarten Projekt-Check')
-    
+
         # project specific layers
         # order of adding will represent order in TOC! (first added -> on top)
         root.add("projektdefinition", u"Projektdefinition")
@@ -247,10 +247,10 @@ class Output(object):
                  u"Wirkungsbereich 7 - Standortkonkurrenz "
                  u"Lebensmitteleinzelhandel")
         root.add("hintergrund", u"Hintergrund")
-    
+
     def define_outputs(self):
         '''define the output layers here, has to be implemented in subclasses'''
-        
+
     @property
     def projectname(self):
         projectname = self.params.get_projectname() if self.params else \
@@ -303,13 +303,13 @@ class Output(object):
         del(current_dataframe)
         del(current_mxd)
         return projectlayer
-    
+
     @staticmethod
     def change_layers_workspace(source_ws, target_ws):
         """
         change the workspace in the current map that reference source_ws
         to target_ws
-    
+
         Parameters
         ----------
         source_ws : str
@@ -358,21 +358,21 @@ class Output(object):
             arcpy.mapping.AddLayer(dataframe, addLayer, "BOTTOM")
             del(addLayer)
         del(current_mxd)
-    
-    def add_osm_layer(self): 
+
+    def add_osm_layer(self):
         # add OpenStreetmap
         layer = "OpenStreetMap"
         self.add_layer("hintergrundkarten", layer,
                        zoom=False, in_project=False)
 
-    def add_project_contour(self): 
+    def add_project_contour(self):
         # add contours
         fc = "Teilflaechen_Plangebiet"
         layer = "Umriss des Plangebiets"
         self.add_layer("hintergrund", layer, fc,
                        workspace='FGDB_Definition_Projekt.gdb',
                        zoom=False)
-        
+
     def hide_layer(self, layername):
         '''hide layer(s) in TOC matching given name,
         layername may also be the placeholder group-name (e.g. bevoelkerung)'''
@@ -432,14 +432,14 @@ class Output(object):
             del(target_grouplayer)
         del(current_dataframe)
         del(current_mxd)
-            
+
     def add_layer(self,
                   groupname,
                   template_layer,
                   featureclass='',
-                  workspace='', 
-                  template_folder='', 
-                  name='', 
+                  workspace='',
+                  template_folder='',
+                  name='',
                   disable_other=False,
                   subgroup="",
                   in_project=True,
@@ -461,17 +461,17 @@ class Output(object):
         featureclass : str, optional
             the name of the feature class table,
             which should be linked to the layer
-        
+
         workspace : str, optional (Default = workspace of Tool)
             the workspace the featureclass is in
-            
+
         name: str, optional
             name of the layer in TOC (defaults to name of template layer)
-            
+
         query: str, optional
             query definition, defines which features are shown (e.g. id=10)
             (shows all features by default)
-            
+
         template_folder : str, optional
             a subfolder of the template_layer
 
@@ -486,7 +486,7 @@ class Output(object):
 
         zoom : bool, optional(Default = True)
             if True, zoom to layer extent
-            
+
         symbology : dictionary, optional
             sets symbology of layer on show, keys are the symbology-field and
             values the values to be set
@@ -496,32 +496,32 @@ class Output(object):
         """
         if not name:
             name = template_layer
-        layer = Layer(groupname, template_layer, name=name, 
-                      featureclass=featureclass, workspace=workspace, 
-                      disable_other=disable_other, subgroup=subgroup, 
-                      in_project=in_project, zoom=zoom, query=query, 
+        layer = Layer(groupname, template_layer, name=name,
+                      featureclass=featureclass, workspace=workspace,
+                      disable_other=disable_other, subgroup=subgroup,
+                      in_project=in_project, zoom=zoom, query=query,
                       template_folder=template_folder, symbology=symbology,
                       label_replace=label_replace)
         self.layers.append(layer)
-        
+
     def add_diagram(self, *args):
         '''add a diagram (or multiple diagrams), diagram has to be an
         instantiated subclass of Diagram'''
         for arg in args:
             self.diagrams.append(arg)
-        
+
     def show(self):
         '''show all available outputs (diagrams, layers etc.)'''
         self.show_layers()
         self.show_diagrams()
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
-        
+
     def show_diagrams(self):
         '''show available diagrams'''
         for diagram in self.diagrams:
             diagram.show()
-        
+
     def show_layers(self, redraw=True):
         '''show available layers'''
         if len(self.layers) == 0:
@@ -531,7 +531,7 @@ class Output(object):
         self.add_project_contour()
         for layer in self.layers:
             self._show_layer(layer, redraw=redraw)
-            
+
     def clear(self):
         '''remove all outputs (diagrams, layers etc.)'''
         self.diagrams = []
@@ -542,21 +542,21 @@ class Output(object):
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
         current_dataframe = current_mxd.activeDataFrame
         self.set_backgroundgrouplayer(current_dataframe)
-    
+
         if not redraw and self.layer_exists(layer.name):
             arcpy.RefreshActiveView()
             return
-        
+
         projektname = self.projectname
-        
+
         group = self.module.get_label(layer.groupname)
         current_dataframe.geographicTransformations = ['DHDN_To_WGS_1984_5x',
                                                        'DHDN_To_ETRS_1989_5']
-        
+
         # Layer-Gruppen hinuzfuegen, falls nicht vorhanden
         self.set_projectlayer(projektname)
         project_layer = self.get_projectlayer(projektname)
-    
+
         # Template Layer laden
         template_layer = self.folders.get_layer(layer.template_layer,
                                                 layer.template_folder)
@@ -617,27 +617,27 @@ class Output(object):
             new_layer.definitionQuery = layer.query
         if layer.subgroup != "":
             target_subgrouplayer.visible = True
-        
+
         # not all layers support symbology
-        try: 
+        try:
             sym = new_layer.symbology
             for f, v in layer.symbology.iteritems():
                 setattr(sym, f, v)
         except Exception as e:
             pass
             #print(e)
-    
+
         # same with labels
-        try: 
+        try:
             for label_class in new_layer.labelClasses:
                 exp = label_class.expression
                 for l, v in layer.label_replace.iteritems():
                     exp = exp.replace(l, v)
-                label_class.expression = exp    
+                label_class.expression = exp
         except Exception as e:
             pass
             #print(e)
-            
+
         target_grouplayer.visible = True
         if layer.in_project:
             project_layer.visible = True
@@ -646,7 +646,7 @@ class Output(object):
         del(current_dataframe)
         del(new_layer)
         del(current_mxd)
-        
+
     def sort_layers(self):
         project_layer = self.get_projectlayer()
         # groups currently in toc for active project
@@ -663,16 +663,16 @@ class Output(object):
             (toc_unsorted != names_sorted).sum() == 0):
             return
         layers_sorted = [groups[group_names.index(n)] for n in names_sorted]
-        
+
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = arcpy.mapping.ListDataFrames(mxd)[0]
         # arcpy doesn't know the layers anymore after being moved
-        # so take last layer (in label order) as reference and move other 
+        # so take last layer (in label order) as reference and move other
         # layers before it (ascending)
         ref_layer = layers_sorted[-1]
         for layer in layers_sorted[:-1]:
             arcpy.mapping.MoveLayer(df, ref_layer, layer, "BEFORE")
-        
+
     def layer_exists(self, layername):
         projektname = self.projectname
         current_mxd = arcpy.mapping.MapDocument("CURRENT")
@@ -715,7 +715,7 @@ class Output(object):
                                                     layer, current_dataframe)
             if layer_exists:
                 arcpy.mapping.RemoveLayer(current_dataframe, layer_exists[0])
-            
+
         del(current_dataframe)
         del(current_mxd)
         arcpy.RefreshActiveView()
@@ -802,7 +802,44 @@ class Output(object):
         with ArcpyEnv(addOutputsToMap=True, overwriteOutput=True):
             arcpy.MakeGraph_management(input_template, graph, out_graph_name)
 
+    def update_layersymbology(self, layername, num_classes=13, column='weight'):
+        """
+        update the class break values of layersymbology
+
+        Parameters
+        ----------
+        num_classes : int
+            number of classes of the new layersymbology
+        min_val : int or float
+            minimum class value
+        max_val : int or float
+            maximum class value
+        """
+        from rpctools.utils.params import DummyTbx
+        #get layer
+        mxd = arcpy.mapping.MapDocument('CURRENT')
+        lyr = arcpy.mapping.ListLayers(mxd, layername)
+        arcpy.AddMessage(lyr)
+        lyr = lyr[0]
+        data_source = lyr.dataSource
+        # get new classes
+        tbx = DummyTbx()
+        data = tbx._query_table(data_source, columns=[column])
+        min_val = int(min(data)[0])
+        max_val = int(max(data)[0]) + 1
+        new_classes = np.linspace(min_val, max_val, num=num_classes + 1)
+        new_classes = np.round(new_classes)
+        # update layer
+        lyr.symbology.classBreakValues = new_classes
+        lyr.symbology.reclassify()
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
+
+
 
 if __name__ == '__main__':
+    o = Output()
+    o.update_layersymbology(u'Zusätzliche PKW-Fahrten')
     import doctest
     doctest.testmod(verbose=True)
+

@@ -15,16 +15,19 @@ class Routing(Tool):
     _n_segments = 24
     def add_outputs(self):
         # Add Layers
-        self.output.add_layer('verkehr', 'Zielpunkte',
-                              featureclass='Zielpunkte',
-                              template_folder='Verkehr')
         self.output.add_layer('verkehr', 'Anbindungspunkte',
                               featureclass='Anbindungspunkte',
-                              template_folder='Verkehr')
+                              template_folder='Verkehr', zoom=False)
         self.output.add_layer('verkehr', 'links',
                               featureclass='links',
                               template_folder='Verkehr',
-                              name='Zusätzliche PKW-Fahrten')
+                              name='Zusätzliche PKW-Fahrten', zoom=True)
+        # layer ist noch nicht da...
+        # self.output.update_layersymbology(u'Zusätzliche PKW-Fahrten')
+        self.output.add_layer('verkehr', 'Zielpunkte',
+                              featureclass='Zielpunkte',
+                              template_folder='Verkehr', zoom=False)
+
     def run(self):
         toolbox = self.parent_tbx
         # tbx settings
