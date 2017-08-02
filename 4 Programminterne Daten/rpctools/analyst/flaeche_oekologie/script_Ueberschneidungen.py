@@ -30,7 +30,7 @@ class Ueberschneidungen(Tool):
             path = "Hochspannung"
 
         self.output.add_layer(groupname = "oekologie", template_layer = path, template_folder="oekologie", zoom=False, disable_other = False)
-        self.output.add_image("C:\\Temp\\hui.png", "Test")
+        #self.output.add_image("C:\\Temp\\hui.png", "Test")
 
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
