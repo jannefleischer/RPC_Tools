@@ -144,9 +144,9 @@ class Gewerbesteuer(Tool):
 
         for row in cursor:
             if row[0] == ags:
-                row[1] = round(Gewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100.0) * (row[3] + SvB_Verkaufsflaechen) / (SvB_Branchen + SvB_Verkaufsflaechen))
+                row[1] = round(Gewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100.0) * (row[3] + SvB_Verkaufsflaechen))
             else:
-                row[1] = round(Gewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100.0) * row[3] / (SvB_Branchen + SvB_Verkaufsflaechen))
+                row[1] = round(Gewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100.0) * row[3])
             cursor.updateRow(row)
 
         c.set_chronicle("Gewerbesteuer", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
