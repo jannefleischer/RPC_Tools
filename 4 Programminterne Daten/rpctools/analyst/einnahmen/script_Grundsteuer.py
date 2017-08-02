@@ -130,7 +130,7 @@ class Grundsteuer(Tool):
             rohmiete_rh = params.slider4.value / 100.0
             rohmiete_mfh = params.slider5.value / 100.0
         else:
-            rohmiete_efh, rohmiete_dh, rohmiete_rh, rohmiete_mfh = 0,46
+            rohmiete_efh, rohmiete_dh, rohmiete_rh, rohmiete_mfh = 0.46
 
 
         fields = ["AGS", "GemGroessKlass64"]
@@ -167,7 +167,7 @@ class Grundsteuer(Tool):
             for row in cursor:
                     umbauter_raum_m3 = row[1]
 
-            einheitswert_efh = 24/1.95583 * umbauter_raum_m3 + 550 + params.slider7.value * (params.slider6.value / 100)
+            einheitswert_efh = 24/1.95583 * umbauter_raum_m3 + 550 + params.slider7.value * (params.slider6.value / 100.0)
 
         if params.slider8.value != 0 or params.slider9.value != 0:
             einheitswert_gewerbe = (1685 * params.slider8.value + 800 * params.slider9.value) * 0.1554
@@ -252,7 +252,7 @@ class Grundsteuer(Tool):
             num = number + (multiple - 1)
             return num - (num % multiple)
 
-        GRUNDSTEUERAUFKOMMEN = (messbetrag_efh + messbetrag_dh + messbetrag_rh + messbetrag_mfh + messbetrag_gewerbe) * params.slider1.value / 100
+        GRUNDSTEUERAUFKOMMEN = (messbetrag_efh + messbetrag_dh + messbetrag_rh + messbetrag_mfh + messbetrag_gewerbe) * params.slider1.value / 100.0
         if GRUNDSTEUERAUFKOMMEN < 10:
             GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 1)
         else:
