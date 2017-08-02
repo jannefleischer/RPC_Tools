@@ -50,6 +50,7 @@ def get_symbology(gemeindewerte, vorzeichen):
         for symbology in cursor:
             if symbology[1] <= ref_value:
                 symbology_layer = symbology[0]
+    arcpy.AddMessage(str(symbology_layer))
     return str(symbology_layer)
 
 def create_gemeindebilanzen(self, projektname):
