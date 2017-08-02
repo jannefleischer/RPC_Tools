@@ -203,8 +203,8 @@ class Wanderungssalden1(Tool):
                 if raum[0] == gemeinde[0]:
                     Summe_Wichtungsfaktoren_Gemeinde_Wohnen += raum[1]
                     Summe_Wichtungsfaktoren_Gemeinde_Gewerbe += raum[2]
-            gemeinde[2] = -1 * bewohner * Randsummen_Wohnen[0] * Summe_Wichtungsfaktoren_Gemeinde_Wohnen / Summe_Wichtungsfaktoren_Gesamtraum_Wohnen
-            gemeinde[3] = -1 * ap * Randsummen_Gewerbe[0] * Summe_Wichtungsfaktoren_Gemeinde_Gewerbe / Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe
+            gemeinde[2] = -1 * (bewohner * Randsummen_Wohnen[1] * Summe_Wichtungsfaktoren_Gemeinde_Wohnen / Summe_Wichtungsfaktoren_Gesamtraum_Wohnen + 0.5)
+            gemeinde[3] = -1 * (ap * Randsummen_Gewerbe[1] * Summe_Wichtungsfaktoren_Gemeinde_Gewerbe / Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe + 0.5)
             if gemeinde[0] == ags_projekt:
                 gemeinde[4] = bewohner
                 gemeinde[5] = ap
@@ -227,10 +227,14 @@ class Wanderungssalden1(Tool):
         Differenz_AP = Summe_Zugeordneter_Zuzug_AP + Summe_Zugeordneter_Fortzug_AP
         
         #Neugruendungen (nur Gewerbe)
-        Neugruendungen_AP = int(ap * Randsummen_Gewerbe[2])
+        Neugruendungen_AP = int(ap * Randsummen_Gewerbe[3] + 0.5)
 
-        #Fortzüge aus dem restlichen Bundesgebiet/Welt (hier werde )
-
-
+        #Fortzüge aus dem restlichen Bundesgebiet/Welt (hier werden auch die Rundungsverluste ungebracht)
+        Fortzuege_restliches_Bundesgebiet_und_Welt_Ew = -1 * Differenz_Ew
+        Fortzuege_restliches_Bundesgebiet_und_Welt_AP = -1 * (Differenz_AP - Neugruendungen_AP)
+        arcpy.AddMessage("Wohnen: Fortzüge restliches Bundesgebiet = {0}".format(Fortzuege_restliches_Bundesgebiet_und_Welt_Ew))
+        arcpy.AddMessage("Gewerbe: Fortzüge restliches Bundesgebiet = {0}".format(Fortzuege_restliches_Bundesgebiet_und_Welt_AP))
+        arcpy.AddMessage("Gewerbe: Neugründungen = {0}".format(Neugruendungen_AP))
+        
         c.set_chronicle("Wanderung Einwohner", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
         c.set_chronicle("Wanderung Beschaeftigte", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
