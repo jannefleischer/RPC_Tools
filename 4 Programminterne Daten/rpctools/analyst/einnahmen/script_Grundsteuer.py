@@ -125,10 +125,10 @@ class Grundsteuer(Tool):
                 garagen_mfh = row[2]
 
         if int(ags) <= 10999999:
-            rohmiete_efh = params.slider2.value / 100
-            rohmiete_dh = params.slider3.value / 100
-            rohmiete_rh = params.slider4.value / 100
-            rohmiete_mfh = params.slider5.value / 100
+            rohmiete_efh = params.slider2.value / 100.0
+            rohmiete_dh = params.slider3.value / 100.0
+            rohmiete_rh = params.slider4.value / 100.0
+            rohmiete_mfh = params.slider5.value / 100.0
         else:
             rohmiete_efh, rohmiete_dh, rohmiete_rh, rohmiete_mfh = 0,46
 
@@ -255,7 +255,7 @@ class Grundsteuer(Tool):
         GRUNDSTEUERAUFKOMMEN = (messbetrag_efh + messbetrag_dh + messbetrag_rh + messbetrag_mfh + messbetrag_gewerbe) * params.slider1.value / 100
         if GRUNDSTEUERAUFKOMMEN < 10:
             GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 1)
-        else: 
+        else:
             if GRUNDSTEUERAUFKOMMEN < 1000:
                 GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 10)
             else:
