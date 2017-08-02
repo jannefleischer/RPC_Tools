@@ -81,6 +81,17 @@ class Wanderungssalden1(Tool):
         arcpy.AddMessage(Wichtungen_Wohnen)
 
 
+        #Randsummen Wanderung auslesen (Anteile innerhalb/außerhalb 25km und Neugründungen [nur Gewerbe])
+        Randsummen_Gewerbe = {}
+        Randsummen_Wohnen = {}
+        path_randsummen = self.folders.get_base_table("FGDB_Einnahmen_Tool.gdb", "Wanderung_Randsummen")
+        cursor = arcpy.da.SearchCursor(path_randsummen, ["IDWanderungstyp", "Anteil_Wohnen", "Anteil_Gewerbe"])
+        for randsumme in cursor:
+            Randsummen_Wohnen[randsumme[0]] = randsumme[1]
+            Randsummen_Gewerbe[randsumme[0]] = randsumme[2]
+        arcpy.AddMessage(Randsummen_Wohnen)
+
+
         #Anteile der Herkunftsgemeinden an Einwohner bestimmen
         pfad_buffer = os.path.join(workspace_projekt_einnahmen, "buffer_25km")
         if arcpy.Exists(pfad_buffer):
@@ -182,7 +193,8 @@ class Wanderungssalden1(Tool):
         for flaeche in cursor:
             ap += flaeche[1]
             bewohner += flaeche[0]
-        #test
+
+        #Aufteilung Fortzug (und Zuzug [nur Projektgemeinde])
         cursor_gemeindebilanz = arcpy.da.UpdateCursor(wanderungssalden, ["AGS", "SvB_pro_Ew", "Einw_Fortzug", "SvB_Fortzug", "Einw_Zuzug", "SvB_Zuzug", "SvB_Saldo", "Einw_Saldo"])
         for gemeinde in cursor_gemeindebilanz:
             Summe_Wichtungsfaktoren_Gemeinde_Wohnen = 0
@@ -191,14 +203,34 @@ class Wanderungssalden1(Tool):
                 if raum[0] == gemeinde[0]:
                     Summe_Wichtungsfaktoren_Gemeinde_Wohnen += raum[1]
                     Summe_Wichtungsfaktoren_Gemeinde_Gewerbe += raum[2]
-            gemeinde[2] = -1 * bewohner * Summe_Wichtungsfaktoren_Gemeinde_Wohnen / Summe_Wichtungsfaktoren_Gesamtraum_Wohnen
-            gemeinde[3] = -1 * bewohner * Summe_Wichtungsfaktoren_Gemeinde_Gewerbe / Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe
+            gemeinde[2] = -1 * bewohner * Randsummen_Wohnen[0] * Summe_Wichtungsfaktoren_Gemeinde_Wohnen / Summe_Wichtungsfaktoren_Gesamtraum_Wohnen
+            gemeinde[3] = -1 * ap * Randsummen_Gewerbe[0] * Summe_Wichtungsfaktoren_Gemeinde_Gewerbe / Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe
             if gemeinde[0] == ags_projekt:
                 gemeinde[4] = bewohner
                 gemeinde[5] = ap
             gemeinde[6] = gemeinde[3] + gemeinde[5]
             gemeinde[7] = gemeinde[4] + gemeinde[2]
             cursor_gemeindebilanz.updateRow(gemeinde)
+
+        #Summe der zugeordneten Fortzüge (innerhalb 25 km) und Zuzüge [jeweils inkl. Rundungseffekte]
+        Summe_Zugeordneter_Fortzug_Ew = 0
+        Summe_Zugeordneter_Zuzug_Ew = 0
+        Summe_Zugeordneter_Fortzug_AP = 0
+        Summe_Zugeordneter_Zuzug_AP = 0
+        cursor_summe = arcpy.da.SearchCursor(wanderungssalden, ["AGS", "SvB_pro_Ew", "Einw_Fortzug", "SvB_Fortzug", "Einw_Zuzug", "SvB_Zuzug", "SvB_Saldo", "Einw_Saldo"])
+        for gemeinde in cursor_summe:
+            Summe_Zugeordneter_Fortzug_Ew += gemeinde[2]
+            Summe_Zugeordneter_Zuzug_Ew += gemeinde[4]
+            Summe_Zugeordneter_Fortzug_AP += gemeinde[3]
+            Summe_Zugeordneter_Zuzug_AP += gemeinde[5]
+        Differenz_Ew = Summe_Zugeordneter_Zuzug_Ew + Summe_Zugeordneter_Fortzug_Ew
+        Differenz_AP = Summe_Zugeordneter_Zuzug_AP + Summe_Zugeordneter_Fortzug_AP
+        
+        #Neugruendungen (nur Gewerbe)
+        Neugruendungen_AP = int(ap * Randsummen_Gewerbe[2])
+
+        #Fortzüge aus dem restlichen Bundesgebiet/Welt (hier werde )
+
 
         c.set_chronicle("Wanderung Einwohner", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
         c.set_chronicle("Wanderung Beschaeftigte", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))

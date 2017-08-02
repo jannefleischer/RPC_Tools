@@ -188,7 +188,7 @@ class Wanderungssalden2(Tool):
                     Summe_Wichtungsfaktoren_Gemeinde_Wohnen += raum[1]
                     Summe_Wichtungsfaktoren_Gemeinde_Gewerbe += raum[2]
             gemeinde[2] = -1 * bewohner * Summe_Wichtungsfaktoren_Gemeinde_Wohnen / Summe_Wichtungsfaktoren_Gesamtraum_Wohnen
-            gemeinde[3] = -1 * bewohner * Summe_Wichtungsfaktoren_Gemeinde_Gewerbe / Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe
+            gemeinde[3] = -1 * ap * Summe_Wichtungsfaktoren_Gemeinde_Gewerbe / Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe
 
             if gemeinde[0] == ags_projekt:
                 gemeinde[4] = bewohner
