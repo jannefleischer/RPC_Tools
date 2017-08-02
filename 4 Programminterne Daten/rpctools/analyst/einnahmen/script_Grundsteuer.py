@@ -153,10 +153,10 @@ class Grundsteuer(Tool):
             if row[1] == 4:
                 multiplikator_mfh = row[2]
 
-        einheitswert_efh = (12 * rohmiete_efh + garagen_efh) * multiplikator_efh
-        einheitswert_dh = (12 * rohmiete_dh + garagen_dh) * multiplikator_dh
-        einheitswert_rh = (12 * rohmiete_rh + garagen_rh) * multiplikator_rh
-        einheitswert_mfh = (12 * rohmiete_mfh + garagen_mfh) * multiplikator_mfh
+        einheitswert_efh = (12 * rohmiete_efh * wohnflaeche_efh + garagen_efh) * multiplikator_efh
+        einheitswert_dh = (12 * rohmiete_dh * wohnflaeche_dh + garagen_dh) * multiplikator_dh
+        einheitswert_rh = (12 * rohmiete_rh * wohnflaeche_rh + garagen_rh) * multiplikator_rh
+        einheitswert_mfh = (12 * rohmiete_mfh * wohnflaeche_mfh + garagen_mfh) * multiplikator_mfh
 
 
         if int(ags) >= 11000000:
@@ -191,6 +191,8 @@ class Grundsteuer(Tool):
                 we_rh += row[1]
             if row[0] == 4:
                 we_mfh += row[1]
+
+        arcpy.AddMessage("Einheitswert EFH = {}".format(einheitswert_efh))
 
 
         if einheitswert_efh <= 38346:
