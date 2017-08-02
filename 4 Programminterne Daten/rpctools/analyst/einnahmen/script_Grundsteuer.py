@@ -253,10 +253,16 @@ class Grundsteuer(Tool):
             return num - (num % multiple)
 
         GRUNDSTEUERAUFKOMMEN = (messbetrag_efh + messbetrag_dh + messbetrag_rh + messbetrag_mfh + messbetrag_gewerbe) * params.slider1.value / 100
-        if GRUNDSTEUERAUFKOMMEN < 500:
-            GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 100)
-        else:
-            GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 1000)
+        if GRUNDSTEUERAUFKOMMEN < 10:
+            GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 1)
+        else: 
+            if GRUNDSTEUERAUFKOMMEN < 1000:
+                GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 10)
+            else:
+                if GRUNDSTEUERAUFKOMMEN < 10000:
+                    GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 100)
+                else:
+                    GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 1000)
         table_bilanzen = self.folders.get_table("Gemeindebilanzen", "FGDB_Einnahmen.gdb")
         fields = ["AGS", "GrSt"]
         cursor = arcpy.da.UpdateCursor(table_bilanzen, fields)
