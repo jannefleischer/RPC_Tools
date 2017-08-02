@@ -39,7 +39,7 @@ class Ueberschneidungen(Tool):
     def run(self):
         params = self.par
         projekt = self.projectname
-        self.output.enable_layer('projektdefinition')
+        #self.output.enable_layer('projektdefinition')
 
 
 

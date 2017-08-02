@@ -43,7 +43,7 @@ class Gesamtsumme(Tool):
 
         tablepath_bilanz = self.folders.get_table('Gemeindebilanzen', "FGDB_Einnahmen.gdb")
         fields = self.parent_tbx.spalten
-        arcpy.AddMessage(fields)
+        #arcpy.AddMessage(fields)
         cursor_bilanz = arcpy.da.UpdateCursor(tablepath_bilanz, fields)
         for gemeinde in cursor_bilanz:
             gemeinde[0] = 0
