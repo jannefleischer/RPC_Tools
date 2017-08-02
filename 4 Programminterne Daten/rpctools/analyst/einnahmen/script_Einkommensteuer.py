@@ -85,18 +85,29 @@ class Einkommensteuer(Tool):
 
         Einkommensteuer_gesamt = we_efh * ESt_pro_WE_efh + we_dh * ESt_pro_WE_dh + we_rh * ESt_pro_WE_rh + we_mfh * ESt_pro_WE_mfh
         Gesamtzahl_Bewohner = 0
-        fields = ['AGS', 'Einw_Zuzug']
-        where_clause = '"AGS"' + "='" + ags + "'"
-        tablepath_bilanz = self.folders.get_table('Gemeindebilanzen', "FGDB_Einnahmen.gdb")
-        cursor = arcpy.da.SearchCursor(tablepath_bilanz, fields, where_clause)
-        for row in cursor:
-            Gesamtzahl_Bewohner = row[1]
+        fields = ['ew']
+        tablepath_teilflaechen = self.folders.get_table('Teilflaechen_Plangebiet', "FGDB_Definition_Projekt.gdb")
+        cursor = arcpy.da.SearchCursor(tablepath_teilflaechen, fields)
+        for teilflaeche in cursor:
+            Gesamtzahl_Bewohner += teilflaeche[0]
         ESt_pro_Bewohner = Einkommensteuer_gesamt / Gesamtzahl_Bewohner
 
+        tablepath_bilanz = self.folders.get_table('Gemeindebilanzen', "FGDB_Einnahmen.gdb")
         fields = ['ESt', 'Einw_Saldo']
         cursor = arcpy.da.UpdateCursor(tablepath_bilanz, fields)
         for gemeinde in cursor:
-            gemeinde[0] = round(ESt_pro_Bewohner * gemeinde[1])
+            Est_Gemeindebilanz = ESt_pro_Bewohner * gemeinde[1]
+            if abs(Est_Gemeindebilanz) < 10:
+                Est_Gemeindebilanz = round(Est_Gemeindebilanz, 0)
+            else:
+                if abs(Est_Gemeindebilanz) < 1000:
+                    Est_Gemeindebilanz = round(Est_Gemeindebilanz, -1)
+                else:
+                    if abs(Est_Gemeindebilanz) < 10000:
+                        Est_Gemeindebilanz = round(Est_Gemeindebilanz, -2)
+                    else:
+                        Est_Gemeindebilanz = round(Est_Gemeindebilanz, -3)
+            gemeinde[0] = Est_Gemeindebilanz
             cursor.updateRow(gemeinde)
 
         c.set_chronicle("Einkommensteuer", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
