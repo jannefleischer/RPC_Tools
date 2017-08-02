@@ -55,7 +55,18 @@ class Familienleistungsausgleich(Tool):
             cursor2 = arcpy.da.SearchCursor(tablepath_landesfaktor, fields2, where)
             for land in cursor2:
                 landesfaktor = land[1]
-            gemeinde[0] = round(gemeinde[1] * landesfaktor)
+            FLA_Gemeindebilanz = gemeinde[1] * landesfaktor
+            if abs(FLA_Gemeindebilanz) < 10:
+                FLA_Gemeindebilanz = round(FLA_Gemeindebilanz, 0)
+            else:
+                if abs(FLA_Gemeindebilanz) < 1000:
+                    FLA_Gemeindebilanz = round(FLA_Gemeindebilanz, -1)
+                else:
+                    if abs(FLA_Gemeindebilanz) < 10000:
+                        FLA_Gemeindebilanz = round(FLA_Gemeindebilanz, -2)
+                    else:
+                        FLA_Gemeindebilanz = round(FLA_Gemeindebilanz, -3)
+            gemeinde[0] = FLA_Gemeindebilanz
             cursor.updateRow(gemeinde)
 
         c.set_chronicle("Einkommensteuer", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))

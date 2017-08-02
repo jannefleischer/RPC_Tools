@@ -52,4 +52,4 @@ class TbxFLA(Tbx):
         table = self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=par.name.value)
 
         if c.compare_chronicle("Einkommensteuer", "Wanderung Einwohner", table) == False:
-            par.name.setErrorMessage(u'Es muss zuerst die EInkommensteuer berechnet werden!')
+            par.name.setErrorMessage(u'Es muss zuerst die Einkommensteuer berechnet werden!')
