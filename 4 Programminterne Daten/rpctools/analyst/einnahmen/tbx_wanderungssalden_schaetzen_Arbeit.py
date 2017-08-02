@@ -31,20 +31,26 @@ class TbxWanderungssalden2(Tbx):
         par.name.datatype = u'GPString'
         par.name.filter.list = []
 
+        par.aktualisieren = arcpy.Parameter()
+        par.aktualisieren.name = u'aktualisieren'
+        par.aktualisieren.displayName = u'Neuberechnung der Wanderungssalden erzwingen'
+        par.aktualisieren.parameterType = 'Optional'
+        par.aktualisieren.datatype = u'GPBoolean'
+
         return par
 
     def _updateMessages(self, params):
         par = self.par
 
-        where = 'Nutzungsart = {}'.format(Nutzungsart.GEWERBE)
-
-        rows = self.query_table('Teilflaechen_Plangebiet',
-                                ['Nutzungsart'],
-                                workspace='FGDB_Definition_Projekt.gdb',
-                                where=where)
-
-        if not rows:
-            par.name.setErrorMessage(u'In diesem Projekt sind keine Gewerbeflächen definiert!')
+##        where = 'Nutzungsart = {}'.format(Nutzungsart.GEWERBE)
+##
+##        rows = self.query_table('Teilflaechen_Plangebiet',
+##                                ['Nutzungsart'],
+##                                workspace='FGDB_Definition_Projekt.gdb',
+##                                where=where)
+##
+##        if not rows:
+##            par.name.setErrorMessage(u'In diesem Projekt sind keine Gewerbeflächen definiert!')
 
 
 if __name__ == '__main__':

@@ -31,25 +31,25 @@ def get_python_path():
         if float(version) < min_requirement:
             raise Exception('AddIn unterstützt ArcGIS ab Version {}'
                             .format(min_requirement))
-        
+
         desktop_reg_path = os.path.join(esri_reg_path,
                                        'Desktop{v}'.format(v=version))
         desktop_key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
                                      desktop_reg_path,
                                      0)
         desktop_dir = _winreg.QueryValueEx(desktop_key, 'InstallDir')[0]
-        
+
         python_reg_path = os.path.join(esri_reg_path,
                                        'Python{v}'.format(v=version))
         python_key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
                                      python_reg_path,
                                      0)
         python_dir = _winreg.QueryValueEx(python_key, 'PythonDir')[0]
-        
+
         # is desktop installation 64-Bit?
         is_64b = os.path.exists(os.path.join(desktop_dir, "bin64"))
         bitstr = 'x64' if is_64b else ''
-        
+
         python_path = os.path.join(python_dir, 'ArcGIS{b}{v}'
                                    .format(b=bitstr, v=version))
         return python_path
@@ -183,5 +183,6 @@ def install_packages(python_path):
 if __name__ == '__main__':
     python_path = get_python_path()
     if python_path:
-        install_packages(python_path)
-    #install_packages('C:\\Python27-ArcGIS\\ArcGISx6410.4')
+        print(python_path)
+    install_packages('C:\\Python27\\ArcGISx6410.5')
+    install_packages('C:\\Python27\\ArcGIS10.5')

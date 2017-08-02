@@ -41,15 +41,16 @@ class Gesamtsumme(Tool):
         params = self.par
         projektname = self.projectname
 
-
         tablepath_bilanz = self.folders.get_table('Gemeindebilanzen', "FGDB_Einnahmen.gdb")
-        fields = ["Summe_Einnahmenbilanz", "GrSt", "ESt", "FamLeistAusgl", "GewSt", "USt"]
-
-
+        fields = self.parent_tbx.spalten
+        arcpy.AddMessage(fields)
         cursor_bilanz = arcpy.da.UpdateCursor(tablepath_bilanz, fields)
         for gemeinde in cursor_bilanz:
-            gemeinde[0] = round(gemeinde[1] + gemeinde[2] + gemeinde[3] + gemeinde[4] + gemeinde[5])
-            cursor.updateRow(gemeinde)
+            gemeinde[0] = 0
+            for spalte in range (1, len(fields)):
+                arcpy.AddMessage(gemeinde[spalte])
+                gemeinde[0] += gemeinde[spalte]
+            cursor_bilanz.updateRow(gemeinde)
 
         c.set_chronicle("Gesamtbilanz", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
 

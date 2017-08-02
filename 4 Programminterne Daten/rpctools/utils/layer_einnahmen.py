@@ -19,15 +19,18 @@ def get_symbology(gemeindewerte, vorzeichen):
     #gemeinde_values = gemeindewerte
     gemeinde_values = [value for value in gemeindewerte if value != 0]
     anzahl_gemeinden = len(gemeinde_values)
-    x = int(math.floor((anzahl_gemeinden -1) / 7))
-    arcpy.AddMessage("x: " + str(x))
-    if vorzeichen == 1:
-        gemeinde_values.sort()
+    if anzahl_gemeinden > 0:
+        x = int(math.floor((anzahl_gemeinden -1) / 7))
+        #arcpy.AddMessage("x: " + str(x))
+        if vorzeichen == 1:
+            gemeinde_values.sort()
+        else:
+            gemeinde_values.sort()
+        #arcpy.AddMessage("Gemeindewerte sortiert: " + str(gemeinde_values))
+        ref_value = gemeinde_values[x]
     else:
-        gemeinde_values.sort()
-    arcpy.AddMessage("Gemeindewerte sortiert: " + str(gemeinde_values))
-    ref_value = gemeinde_values[x]
-    arcpy.AddMessage("ref: " + str(ref_value))
+        ref_value = 0
+    #arcpy.AddMessage("ref: " + str(ref_value))
     folders = config.Folders()
     if vorzeichen == 1:
         symbology_path = folders.get_base_table("FGDB_Einnahmen_Tool.gdb", "Symbologien_VZ_ProjGem_pos")
@@ -40,7 +43,7 @@ def get_symbology(gemeindewerte, vorzeichen):
         for symbology in cursor:
             if symbology[1] >= ref_value:
                 symbology_layer = symbology[0]
-        arcpy.AddMessage(symbology_layer)
+        #arcpy.AddMessage(symbology_layer)
         if symbology_layer == None:
             symbology_layer = "Skala_minus_10"
     else:
@@ -87,8 +90,6 @@ def create_gemeindebilanzen(self, projektname):
                 if not field.name in columns_kept:
                     arcpy.DeleteField_management(gemeindebilanzen, field.name)
 
-
-
         # Hinzuf?gen leerer Spalten zu Gemeindebilanzen
             arcpy.AddField_management(gemeindebilanzen, "Gewichtete_Ew", "DOUBLE")
             arcpy.AddField_management(gemeindebilanzen, "Gewichtete_SvB", "DOUBLE")
@@ -105,6 +106,7 @@ def create_gemeindebilanzen(self, projektname):
             arcpy.AddField_management(gemeindebilanzen, "FamLeistAusgl", "DOUBLE")
             arcpy.AddField_management(gemeindebilanzen, "GewSt", "DOUBLE")
             arcpy.AddField_management(gemeindebilanzen, "USt", "DOUBLE")
+            arcpy.AddField_management(gemeindebilanzen, "Summe_Einnahmenbilanz", "DOUBLE")
 
 
 

@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from rpctools.addins.common import ToolboxButton, folders, config
+from rpctools.addins.outputs import BodenbedeckungAnzeigen
+from rpctools.addins.outputs import GrenzlinieAnzeigen
 import arcpy
 
 __all__ = [
     "Waldgebiete", "Naturschutzgebiete",
     "Landschaftsschutzgebiete", "Wasserschutzgebiete",
+    "Freiraeume", "Bodenversiegelung", "Hochspannung",
     "Bodenveraenderung", "Wohnflaechendichte",
-    "IntegrationsgradAnzeigen", "GrenzlinieEinzeichnen", "GrenzlinieLoeschen", 
+    "IntegrationsgradAnzeigen", "GrenzlinieEinzeichnen", "GrenzlinieLoeschen",
     "UZVR",
     "NullfallUeberbauteFlaechen", "NullfallNatuerlicheWasserflaeche",
     "NullfallPlatten", "NullfallBaeumeStraeucher",
@@ -17,7 +20,8 @@ __all__ = [
     "PlanfallPlatten", "PlanfallBaeumeStraeucher",
     "PlanfallStauden", "PlanfallWiese", "PlanfallRasen",
     "PlanfallRasengittersteine", "PlanfallBeton", "PlanfallAcker",
-    "PlanfallKleinpflaster", "BodenKontrollieren", "BodenEntfernen"
+    "PlanfallKleinpflaster", "BodenKontrollieren", "BodenEntfernen",
+    "BodenAnzeigen"
 ]
 
 
@@ -25,6 +29,7 @@ class Waldgebiete(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Flaeche und Oekologie.pyt'
+    _do_show = False
     _toolbox_name = 'TbxLayerWald'
 
 
@@ -32,6 +37,7 @@ class Naturschutzgebiete(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Flaeche und Oekologie.pyt'
+    _do_show = False
     _toolbox_name = 'TbxLayerNatur'
 
 
@@ -39,6 +45,7 @@ class Landschaftsschutzgebiete(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Flaeche und Oekologie.pyt'
+    _do_show = False
     _toolbox_name = 'TbxLayerLandschaft'
 
 
@@ -46,12 +53,43 @@ class Wasserschutzgebiete(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Flaeche und Oekologie.pyt'
+    _do_show = False
     _toolbox_name = 'TbxLayerWasser'
+
+class Freiraeume(ToolboxButton):
+    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = u'Flaeche und Oekologie.pyt'
+    _do_show = False
+    _toolbox_name = 'TbxLayerFreiraum'
+
+class Bodenversiegelung(ToolboxButton):
+    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = u'Flaeche und Oekologie.pyt'
+    _do_show = False
+    _toolbox_name = 'TbxLayerBodenversiegelung'
+
+class Hochspannung(ToolboxButton):
+    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = u'Flaeche und Oekologie.pyt'
+    _do_show = False
+    _toolbox_name = 'TbxLayerHochspannung'
+
+
+class BodenAnzeigen(ToolboxButton):
+    """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _do_show = False
+    _pyt_file = u'Flaeche und Oekologie.pyt'
+    _toolbox_name = 'TbxBodenAnzeigen'
 
 
 class BodenEntfernen(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
+    _do_show = False
     _pyt_file = u'Flaeche und Oekologie.pyt'
     _toolbox_name = 'TbxBodenKontrolle'
 
@@ -84,12 +122,46 @@ class IntegrationsgradAnzeigen(ToolboxButton):
     _toolbox_name = 'TbxIntegrationsgrad'
 
 
-class GrenzlinieEinzeichnen(object):
+class GrenzlinieEinzeichnen(ToolboxButton):
     """Implementation for rpc_tools.grenzlinie_einzeichnen (Tool)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Flaeche und Oekologie.pyt'
+    _toolbox_name = 'TbxIntegrationsgrad'
+
+    def __init__(self):
+        super(GrenzlinieEinzeichnen, self).__init__()
+        self.enabled = True
+        self.cursor = 3
+        self.shape = 'Line'
+        self.output = GrenzlinieAnzeigen()
+
+    def onClick(self, coord=None):
+        self.output.show()
+
+    def onLine(self, line_geometry):
+        tbx = self.tbx
+        tbx.set_active_project()
+
+##        array = arcpy.Array()
+##        points = line_geometry.getPart(0)
+##        for point in points:
+##            array.add(point)
+##        first = line_geometry.firstPoint
+##        array.add(first)
+        #polyline = arcpy.Polyline(array)
+        tbx.grenzlinie_eintragen(line_geometry)
+        arcpy.RefreshActiveView()
+
+    def onMouseDownMap(self, x, y, button, shift):
+        pass
 
 
-class GrenzlinieLoeschen(object):
+class GrenzlinieLoeschen(ToolboxButton):
     """Implementation for rpc_tools.grenzlinie_loeschen (Tool)"""
+    _path = folders.ANALYST_PYT_PATH
+    _do_show = False
+    _pyt_file = u'Flaeche und Oekologie.pyt'
+    _toolbox_name = 'TbxIntegrationsgrad_loeschen'
 
 
 class UZVR(ToolboxButton):
@@ -110,14 +182,14 @@ class Draw_Bodenbedeckung(ToolboxButton):
         self.bodenbedeckung = 0
         self.planfall = False
         self.shape = 'Line'
-        #self.output = BodenbedeckungAnzeigen()
+        self.output = BodenbedeckungAnzeigen()
 
     def onClick(self, coord=None):
-        #self.output.show()
-        pass
+        self.output.show()
 
     def onLine(self, line_geometry):
         tbx = self.tbx
+        tbx.anzeige_an = True
         tbx.set_active_project()
         array = arcpy.Array()
         points = line_geometry.getPart(0)
@@ -128,8 +200,6 @@ class Draw_Bodenbedeckung(ToolboxButton):
         polygon = arcpy.Polygon(array)
         tbx.bodenbedeckung_eintragen(polygon, self.bodenbedeckung, self.planfall)
         arcpy.RefreshActiveView()
-        config.active_coord = (first.X, first.Y)
-        super(Draw_Bodenbedeckung, self).onClick()
 
     def onMouseDownMap(self, x, y, button, shift):
         pass

@@ -1,86 +1,114 @@
 # -*- coding: utf-8 -*-
 
+import os
+import sys
 import arcpy
+import rpctools.utils.chronik as c
+from rpctools.utils.params import Tool
 
-from rpctools.utils.params import Tbx
-from rpctools.utils.encoding import encode
-from rpctools.analyst.einnahmen.script_Gewerbesteuer_kontrollieren import HebesaetzeKontrolle
-from rpctools.utils.constants import Nutzungsart
+class Wohnflaechendichte(Tool):
+    """Wohnflaechendichte-Tool"""
 
-class TbxWohnflaeche(Tbx):
-    """Toolbox Wanderungssalden für Einnahmen"""
+    _param_projectname = 'name'
+    _workspace = 'FGDB_Einnahmen.gdb'
 
-    @property
-    def label(self):
-        return u'Wohnflächendichte vergleichen'
+    def add_outputs(self):
+        self.output.delete_output("Gesamtsumme")
 
-    @property
-    def Tool(self):
-        return HebesaetzeKontrolle
+        gemeinde_werte = lib_einnahmen.get_values(["Summe_Einnahmenbilanz"], self.projectname)
 
-    def _getParameterInfo(self):
+        symbology = lib_einnahmen.get_symbology(gemeinde_werte, 1)
+
+        self.output.add_layer(
+            groupname = "einnahmen",
+            featureclass = "Gemeindebilanzen",
+            template_layer = symbology,
+            template_folder = "einnahmen",
+            name = "Gesamtsumme",
+            disable_other = True,
+            symbology = {'valueField': "Summe_Einnahmenbilanz"},
+            label_replace = {'Einw_Saldo': 'Summe_Einnahmenbilanz'}
+        )
+
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
+
+    def run(self):
+        """run Wohnflaechendichte Tool"""
 
         par = self.par
+        projektname = self.projectname
+        tablepath_wohnflaeche = self.folders.get_table('Wohnflaechendichte', "FGDB_Flaeche_und_Oekologie.gdb")
+        tablepath_de = self.folders.get_base_table("FGDB_Flaeche_und_Oekologie_Tool.gdb", 'GrundlagenDE')
+        tablepath_wohngebaeude = self.folders.get_table('Wohnen_WE_in_Gebaeudetypen', "FGDB_Definition_Projekt.gdb")
+        table_teilflaechen = self.folders.get_table("Teilflaechen_Plangebiet", "FGDB_Definition_Projekt.gdb")
+        tablepath_rahmendaten = self.folders.get_table("Projektrahmendaten", "FGDB_Definition_Projekt.gdb")
 
-        # Projektname
-        par.name = arcpy.Parameter()
-        par.name.name = u'Projektname'
-        par.name.displayName = u'Projektname'
-        par.name.parameterType = 'Required'
-        par.name.direction = 'Input'
-        par.name.datatype = u'GPString'
-        par.name.filter.list = []
+        mean_wohnflaeche_efh = par.flaeche_efh.value
+        mean_wohnflaeche_dh = par.flaeche_dh.value
+        mean_wohnflaeche_rh = par.flaeche_rh.value
+        mean_wohnflaeche_mfh = par.flaeche_mfh.value
 
-        par.gemeinde = arcpy.Parameter()
-        par.gemeinde.name = u'Gemeinde'
-        par.gemeinde.displayName = u'Gemeinden'
-        par.gemeinde.parameterType = 'Required'
-        par.gemeinde.direction = 'Input'
-        par.gemeinde.datatype = u'GPString'
-        par.gemeinde.filter.list = []
+        we_efh = 0
+        we_dh = 0
+        we_rh = 0
+        we_mfh = 0
 
-        par.hebesatz = arcpy.Parameter()
-        par.hebesatz.name = u'Hebesatz'
-        par.hebesatz.displayName = u'Hebesatz für die Gewerbesteuer (von-Hundert-Satz)'
-        par.hebesatz.parameterType = 'Required'
-        par.hebesatz.direction = 'Input'
-        par.hebesatz.datatype = u'GPLong'
-        par.hebesatz.filter.type = 'Range'
-        par.hebesatz.filter.list = [100, 600]
-        par.hebesatz.value = 250
+        cursor = arcpy.da.SearchCursor(tablepath_wohngebaeude, ["IDTeilflaeche", "IDGebaeudetyp", "WE"])
+        for gebaeude in cursor:
+            if gebaeude[0] == self.parent_tbx.id_teilflaeche:
+                if gebaeude[1] == 1:
+                    we_efh += gebaeude[2]
+                if gebaeude[1] == 2:
+                    we_efh += gebaeude[2]
+                if gebaeude[1] == 3:
+                    we_efh += gebaeude[2]
+                if gebaeude[1] == 4:
+                    we_efh += gebaeude[2]
 
-        return par
+        wohnflaeche_efh_qm = mean_wohnflaeche_efh * we_efh
+        wohnflaeche_dh_qm = mean_wohnflaeche_dh * we_dh
+        wohnflaeche_rh_qm = mean_wohnflaeche_rh * we_rh
+        wohnflaeche_mfh_qm = mean_wohnflaeche_mfh * we_mfh
 
-    def _updateParameters(self, params):
-        par = self.par
+        wohnflaeche_gesamt_qm = wohnflaeche_efh_qm + wohnflaeche_dh_qm + wohnflaeche_rh_qm + wohnflaeche_mfh_qm
 
-        cursor = self.query_table(table_name = 'Chronik_Nutzung',
-                                columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
-                                workspace='FGDB_Einnahmen.gdb')
+        teilflaeche_gesamt_qm = 0
+        cursor = arcpy.da.SearchCursor(table_teilflaechen, ["id_teilflaeche", "Flaeche_ha"])
+        for teilflaeche in cursor:
+            if teilflaeche[0] == self.parent_tbx.id_teilflaeche:
+                teilflaeche_gesamt_qm = teilflaeche[1] * 10000
+
+        wohnflaechendichte_projekt = round((wohnflaeche_gesamt_qm / teilflaeche_gesamt_qm) * 100)
+        self.wohnflaechendichte_projekt = int(wohnflaechendichte_projekt)
+
+        ags_projekt = ""
+        cursor = arcpy.da.SearchCursor(tablepath_rahmendaten, "AGS")
         for row in cursor:
-            if row[0] == u"Wanderung Beschäftigte" and row[1] is None:
-                par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Beschäftigte berechnet!')
+            ags_projekt = row[0]
+            ags_kreis = ags_projekt[0:5]
 
-        where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.WOHNEN, Nutzungsart.EINZELHANDEL)
-        if par.changed('name'):
-            where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.WOHNEN, Nutzungsart.EINZELHANDEL)
-            rows = self.query_table('Teilflaechen_Plangebiet',
-                                    ['Nutzungsart'],
-                                    workspace='FGDB_Definition_Projekt.gdb',
-                                    where=where)
-            if not rows:
-                par.name.setErrorMessage(u'In diesem Projekt sind keine Gewerbe- oder Einzelhandelsflächen definiert!')
-                par.gemeinde.enabled = False
-                par.gemeinde.filter.list = []
-                par.gemeinde.value = (u'Projekt enthält keine Flächen mit der '
-                                      u'benötigten Nutzungsart')
-            else:
-                par.gemeinde.enabled = True
-                gemeinden = []
-                fields = ["GEN", "Hebesatz_GewSt"]
-                rows = self.query_table('Gemeindebilanzen', fields,
-                                        workspace='FGDB_Einnahmen.gdb')
-                for gem_name, hebesteuer in rows:
-                    gemeinden.append(u"{} || Hebesatz: {}".format(
-                        gem_name, hebesteuer))
-                par.gemeinde.filter.list = sorted(gemeinden)
+        wohnflaechendichte_kreis = 0
+        kreistyp = 0
+        fields = ["AGS", "Siedlungsstruktureller_Kreistyp", "Wohnflaeche_in_Wohngebaeuden_in_qm", "Gebaeude_und_Freiflaeche_Wohnen_in_ha"]
+        where = '"AGS"' + "='" + ags_kreis  + "'"
+        cursor = arcpy.da.SearchCursor(tablepath_de, fields, where)
+        for kreis in cursor:
+            kreistyp = kreis[1]
+            wohnflaechendichte_kreis = round(kreis[2] / (kreis[3] * 10000) * 100)
+        self.wohnflaechendichte_kreis = int(wohnflaechendichte_kreis)
+
+        wohnflaechendichte_kreise = 0
+        anzahl_kreise = 0
+        where = '"Siedlungsstruktureller_Kreistyp"' + "=" + str(kreistyp)
+        cursor = arcpy.da.SearchCursor(tablepath_de, fields, where)
+        for kreis in cursor:
+            wohnflaechendichte_kreise += kreis[2] / (kreis[3] * 10000) * 100
+            anzahl_kreise += 1
+        wohnflaechendichte_kreistyp = round(wohnflaechendichte_kreise / anzahl_kreise)
+        self.wohnflaechendichte_kreistyp = int(wohnflaechendichte_kreistyp)
+
+        arcpy.AddMessage("Projektflaeche: " + str(self.wohnflaechendichte_projekt))
+        arcpy.AddMessage("Kreis: " + str(self.wohnflaechendichte_kreis))
+        arcpy.AddMessage("Kreistyp: " + str(self.wohnflaechendichte_kreistyp))
+

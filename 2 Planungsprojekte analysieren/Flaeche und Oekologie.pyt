@@ -17,7 +17,10 @@ reload(tbx_wohnflaechendichte)
 
 from rpctools.analyst.flaeche_oekologie.tbx_Bodenbedeckung_bewerten import TbxBodenBewertung
 from rpctools.analyst.flaeche_oekologie.tbx_Bodenbedeckung_kontrollieren import TbxBodenKontrolle
+from rpctools.analyst.flaeche_oekologie.tbx_Bodenbedeckung_kontrollieren import TbxBodenEntfernen
+from rpctools.analyst.flaeche_oekologie.tbx_Bodenbedeckung_kontrollieren import TbxBodenAnzeigen
 from rpctools.analyst.flaeche_oekologie.tbx_Integrationsgrad import TbxIntegrationsgrad
+from rpctools.analyst.flaeche_oekologie.tbx_Integrationsgrad import TbxIntegrationsgrad_loeschen
 from rpctools.analyst.flaeche_oekologie.tbx_UZVR import TbxUZVR
 from rpctools.analyst.flaeche_oekologie.tbx_wohnflaechendichte import TbxWohnflaeche
 
@@ -25,6 +28,9 @@ from rpctools.analyst.flaeche_oekologie.tbx_Ueberschneidungen import TbxLayerWal
 from rpctools.analyst.flaeche_oekologie.tbx_Ueberschneidungen import TbxLayerNatur
 from rpctools.analyst.flaeche_oekologie.tbx_Ueberschneidungen import TbxLayerLandschaft
 from rpctools.analyst.flaeche_oekologie.tbx_Ueberschneidungen import TbxLayerWasser
+from rpctools.analyst.flaeche_oekologie.tbx_Ueberschneidungen import TbxLayerFreiraum
+from rpctools.analyst.flaeche_oekologie.tbx_Ueberschneidungen import TbxLayerBodenversiegelung
+from rpctools.analyst.flaeche_oekologie.tbx_Ueberschneidungen import TbxLayerHochspannung
 
 class Toolbox(object):
     def __init__(self):
@@ -38,7 +44,13 @@ class Toolbox(object):
                       TbxLayerWald,
                       TbxLayerNatur,
                       TbxLayerLandschaft,
-                      TbxLayerWasser
+                      TbxLayerWasser,
+                      TbxLayerFreiraum,
+                      TbxLayerBodenversiegelung,
+                      TbxLayerHochspannung,
+                      TbxBodenAnzeigen,
+                      TbxBodenEntfernen,
+                      TbxIntegrationsgrad_loeschen
                       ]
 
 

@@ -24,16 +24,27 @@ class MaerkteAnzeigen(Output):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxOSMMarktEinlesen'
-    
+
 
 class HaltestellenAnzeigen(Output):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Erreichbarkeit.pyt'
     _toolbox_name = 'TbxHaltestellenZentraleOrte'
-    
+
 
 class AnbindungspunkteAnzeigen(Output):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Verkehrserzeugung.pyt'
     _toolbox_name = 'TbxSetSource'
+
+class BodenbedeckungAnzeigen(Output):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Flaeche und Oekologie.pyt'
+    _toolbox_name = 'TbxBodenKontrolle'
+
+class GrenzlinieAnzeigen(Output):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Flaeche und Oekologie.pyt'
+    _toolbox_name = 'TbxIntegrationsgrad'
+
 

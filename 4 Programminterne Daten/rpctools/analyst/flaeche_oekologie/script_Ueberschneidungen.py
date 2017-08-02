@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import os
 import sys
 
@@ -15,21 +14,33 @@ class Ueberschneidungen(Tool):
     def add_outputs(self):
         params = self.par
 
-        if params.label.value == 1:
+        if params.layer_number.value == 1:
             path = "Waldgebiete"
-        elif params.label.value == 2:
+        elif params.layer_number.value == 2:
             path = "Naturschutzgebiete"
-        elif params.label.value == 3:
+        elif params.layer_number.value == 3:
             path = "Landschaftsschutzgebiete"
-        elif params.label.value == 4:
+        elif params.layer_number.value == 4:
             path = "Wasserflaechen"
+        elif params.layer_number.value == 5:
+            path = "Freiraeume"
+        elif params.layer_number.value == 6:
+            path = "Bodenversiegelung"
+        elif params.layer_number.value == 7:
+            path = "Hochspannung"
 
-        self.output.add_layer(groupname = "oekologie", template_layer = path, template_folder="oekologie", zoom=False)
+        self.output.add_layer(groupname = "oekologie", template_layer = path, template_folder="oekologie", zoom=False, disable_other = False)
+        self.output.add_image("C:\\Temp\\hui.png", "Test")
+
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
+
 
     def run(self):
         params = self.par
         projekt = self.projectname
-        arcpy.AddMessage(self.par.label.value)
+        self.output.enable_layer('projektdefinition')
+
 
 
 

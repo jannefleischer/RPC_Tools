@@ -45,6 +45,7 @@ class TbxGesamtsumme(Tbx):
     def _updateParameters(self, params):
         par = self.par
         anzahl_bestandteile = 0
+        self.spalten = ["Summe_Einnahmenbilanz"]
         grundsteuer = ""
         einkommensteuer = ""
         fla = ""
@@ -73,6 +74,7 @@ class TbxGesamtsumme(Tbx):
 
         for row in cursor:
             if row[0] == "Grundsteuer" and row[1] is not None:
+                self.spalten.append("GrSt")
                 if anzahl_bestandteile == 0:
                     grundsteuer = "Grundsteuer"
                 else:
@@ -80,13 +82,15 @@ class TbxGesamtsumme(Tbx):
                 anzahl_bestandteile += 1
 
             if wohnen_vorhanden and row[0] == "Einkommensteuer" and not c.compare_chronicle("Wanderung Einwohner", "Einkommensteuer", table):
+                self.spalten.append("ESt")
                 if anzahl_bestandteile == 0:
                     einkommensteuer = "Einkommensteuer"
                 else:
                     einkommensteuer = " + Einkommensteuer"
                 anzahl_bestandteile += 1
 
-            if wohnen_vorhanden and row[0] == "Familienleistungsausgleich"  and not c.compare_chronicle("Einkommensteuer", "Familienleistungsausgleich", table):
+            if wohnen_vorhanden and row[0] == "Familienleistungsausgleich"  and not c.compare_chronicle("Familienleistungsausgleich", "Einkommensteuer", table):
+                self.spalten.append("FamLeistAusgl")
                 if anzahl_bestandteile == 0:
                     fla = "Familienleistungsausgleich"
                 else:
@@ -94,12 +98,15 @@ class TbxGesamtsumme(Tbx):
                 anzahl_bestandteile += 1
 
             if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Gewerbesteuer" and not c.compare_chronicle("Wanderung Beschaeftigte", "Gewerbesteuer", table):
+                self.spalten.append("GewSt")
                 if anzahl_bestandteile == 0:
                     gewerbesteuer = "Gewerbesteuer"
                 else:
                     gewerbesteuer = " + Gewerbesteuer"
                 anzahl_bestandteile += 1
+
             if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Umsatzsteuer" and not c.compare_chronicle("Gewerbesteuer", "Umsatzsteuer", table):
+                self.spalten.append("USt")
                 if anzahl_bestandteile == 0:
                     umsatzsteuer = "Umsatzsteuer"
                 else:

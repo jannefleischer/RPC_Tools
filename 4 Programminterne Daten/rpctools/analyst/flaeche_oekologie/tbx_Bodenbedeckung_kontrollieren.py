@@ -5,13 +5,17 @@ import arcpy
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 from rpctools.analyst.flaeche_oekologie.script_Bodenbedeckung_kontrollieren import BodenbedeckungKontrolle
+from rpctools.analyst.flaeche_oekologie.script_Bodenbedeckung_kontrollieren import BodenbedeckungAnzeigen
+from rpctools.analyst.flaeche_oekologie.script_Bodenbedeckung_kontrollieren import BodenbedeckungEntfernen
 from rpctools.utils.constants import Nutzungsart
 import rpctools.utils.lib_oekologie as lib_oeko
+from rpctools.utils.output import Output
+from rpctools.utils.config import Config
 import os
 
 class TbxBodenKontrolle(Tbx):
     """Toolbox Boden kontrollieren"""
-
+    anzeige_an = False
 
     @property
     def label(self):
@@ -419,3 +423,54 @@ class TbxBodenKontrolle(Tbx):
             self.insert_rows_in_table('Bodenbedeckung_Planfall', column_values, "FGDB_Flaeche_und_Oekologie.gdb")
         else:
             self.insert_rows_in_table('Bodenbedeckung_Nullfall', column_values, "FGDB_Flaeche_und_Oekologie.gdb")
+
+class TbxBodenEntfernen(Tbx):
+    """Toolbox Boden entfernen"""
+    anzeige_an = False
+
+    @property
+    def label(self):
+        return u'BodenbedeckungEntfernen'
+
+    @property
+    def Tool(self):
+        return BodenbedeckungEntfernen
+
+    def _getParameterInfo(self):
+
+        params = self.par
+
+        # Projekt_auswählen
+        param = params.name = arcpy.Parameter()
+        param.name = u'Projektname'
+        param.displayName = u'Projektname'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPString'
+
+        return params
+
+class TbxBodenAnzeigen(Tbx):
+    """Toolbox Boden anzeigen"""
+
+    @property
+    def label(self):
+        return u'BodenbedeckungAnzeigen'
+
+    @property
+    def Tool(self):
+        return BodenbedeckungAnzeigen
+
+    def _getParameterInfo(self):
+
+        params = self.par
+
+        # Projekt_auswählen
+        param = params.name = arcpy.Parameter()
+        param.name = u'Projektname'
+        param.displayName = u'Projektname'
+        param.parameterType = 'Required'
+        param.direction = 'Input'
+        param.datatype = u'GPString'
+
+        return params

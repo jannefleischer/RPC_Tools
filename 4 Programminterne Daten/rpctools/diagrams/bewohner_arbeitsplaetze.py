@@ -11,7 +11,7 @@ class BewohnerEntwicklung(MatplotDiagram):
         flaechen_name = kwargs['flaechen_name']
         self.title = (u"{} - {}: Geschätzte Einwohnerentwicklung".format(
             self.tbx.par.get_projectname(), flaechen_name))
-        
+
         table = 'Bewohner_nach_Altersgruppe_und_Jahr'
         workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
         table_df = self.tbx.table_to_dataframe(
@@ -20,7 +20,7 @@ class BewohnerEntwicklung(MatplotDiagram):
         groups = table_df['Altersklasse'].unique()
         colors = self.plt.cm.viridis_r(np.linspace(0, 1, len(groups)))
         transformed = pd.DataFrame(columns=groups)
-        
+
         grouped = table_df.groupby(by='Altersklasse')
         for name, group_data in grouped:
             group_data.sort('Jahr', inplace=True)
@@ -42,14 +42,14 @@ class ArbeitsplatzEntwicklung(MatplotDiagram):
         self.title = (u"{} - {}: Geschätzte Anzahl Arbeitsplätze "
                       u"(Orientierungswerte)".format(
                           self.tbx.par.get_projectname(), flaechen_name))
-        
+
         flaechen_id = kwargs['flaechen_id']
-        
+
         table = 'AP_nach_Jahr'
         workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
         table_df = self.tbx.table_to_dataframe(
             table, workspace=workspace,
-            columns=['Jahr', 'AP'], 
+            columns=['Jahr', 'AP'],
             where='IDTeilflaeche={}'.format(flaechen_id))
         table_df.sort('Jahr', inplace=True)
         ax = table_df.plot(x='Jahr', y='AP', kind='line', title=self.title,
@@ -57,7 +57,7 @@ class ArbeitsplatzEntwicklung(MatplotDiagram):
         ax.set_ylabel(u'Arbeitsplätze (Orientierungswerte)')
         ax.set_ylim(bottom=0)
         ax.yaxis.grid(True, which='major')
-        
+
         return ax
 
 
@@ -68,15 +68,15 @@ class BranchenAnteile(MatplotDiagram):
         self.title = (u"{} - {}: Geschätzte Branchenanteile an den "
                       u"Arbeitsplätzen".format(
                           self.tbx.par.get_projectname(), flaechen_name))
-        
+
         flaechen_id = kwargs['flaechen_id']
-        
+
         table = 'Branchenanteile'
         branche_table = 'Gewerbe_Branchen'
         workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
         table_df = self.tbx.table_to_dataframe(
             table, workspace=workspace,
-            columns=['IDBranche', 'Anteil'], 
+            columns=['IDBranche', 'Anteil'],
             where='IDTeilflaeche={}'.format(flaechen_id))
         branche_table_df = self.tbx.table_to_dataframe(
             branche_table, workspace='FGDB_Definition_Projekt_Tool.gdb',
@@ -87,24 +87,24 @@ class BranchenAnteile(MatplotDiagram):
         idx = table_df['Anteil'] > 0
         table_df = table_df[idx]
         colors = colors[idx]
-        
+
         branche_table_df.rename(
             columns={'ID_Branche_Projektcheck': 'IDBranche'}, inplace=True)
         joined = table_df.merge(branche_table_df, on='IDBranche')
         joined['Anteil'] *= 100
-        
+
         ax = joined['Anteil'].plot(kind='pie', labels=[''] * len(table_df),
                                    autopct='%.0f%%',
-                                   figsize=(8, 8), title=' ', 
+                                   figsize=(8, 8), title=' ',
                                    #shadow=True,
-                                   #explode=[0.1] * len(table_df), 
+                                   #explode=[0.1] * len(table_df),
                                    colors=colors)
         #title = ax.set_title(self.title)
         #title.set_position((.5, 1.0))
         self.plt.figtext(.5, .92, self.title,
                          horizontalalignment='center',
                          fontsize=12)  #, fontweight='bold')
-        
+
         ax.set_ylabel('')
         ax.set_xlabel('')
         ax.legend(joined['Name_Branche_Projektcheck'], loc='upper center',
@@ -115,7 +115,7 @@ class BranchenAnteile(MatplotDiagram):
             handle.set_color(color)
         box = ax.get_position()
         ax.set_position([box.x0, box.y0 + box.y0 * 0.5, box.width, box.height])
-        
+
         return ax
 
 if __name__ == "__main__":

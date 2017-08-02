@@ -67,32 +67,33 @@ class Hebesaetze(ToolboxButton):
     _pyt_file = 'Einnahmen.pyt'
     _toolbox_name = 'TbxKontrolleGewerbesteuer'
 
-    
+
 class Gemeindebilanzen(ToolboxButton):
     """Implementation for rpc_tools.hebesaetze_gewerbesteuer (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Einnahmen.pyt'
     _toolbox_name = 'TbxGewerbesteuer'
 
-    
+
 class BilanzenGesamtsumme(ToolboxButton):
     """Implementation for rpc_tools.hebesaetze_gewerbesteuer (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Einnahmen.pyt'
     _toolbox_name = 'TbxGesamtsumme'
 
-    
+
 class Umsatzsteuer(ToolboxButton):
     """Implementation for rpc_tools.hebesaetze_gewerbesteuer (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Einnahmen.pyt'
     _toolbox_name = 'TbxUmsatzsteuer'
 
-    
+
 class BilanzenHinweise(ToolboxButton):
     """Implementation for rpc_tools.hebesaetze_gewerbesteuer (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Einnahmen.pyt'
+    #_do_show = False
     _toolbox_name = 'TbxErgebnisinterpretation'
 
 

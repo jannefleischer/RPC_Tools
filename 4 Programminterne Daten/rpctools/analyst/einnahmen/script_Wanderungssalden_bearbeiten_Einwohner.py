@@ -29,7 +29,7 @@ class Salden_bearbeiten(Tool):
         workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
         wanderungssalden = os.path.join(workspace_projekt_einnahmen, 'Gemeindebilanzen')
 
-        fields = ["GEN", "Einw_Saldo", "SvB_Saldo"]
+        fields = ["GEN", "Einw_Saldo"]
         cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
         for gemeinde in cursor:
             if gemeinde[0] == target_gemeinde.split(" ||")[0]:
