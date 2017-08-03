@@ -241,8 +241,20 @@
                 <Button caption="Wasserschutzgebiete" category="ProjektCheck" class="Wasserschutzgebiete" id="rpc_tools.wasserschutzgebiete" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
+                <Button caption="Freir&#228;ume" category="ProjektCheck" class="Freiraeume" id="rpc_tools.freiraeume" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Bodenversiegelung" category="ProjektCheck" class="Bodenversiegelung" id="rpc_tools.bodenversiegelung" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Hochspannung" category="ProjektCheck" class="Hochspannung" id="rpc_tools.hochspannung" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
 
-                <Button caption="Bodenbedeckung entfernen" category="ProjektCheck" class="BodenEntfernen" id="rpc_tools.boden_entfernen" image="" message="" tip="">
+                <Button caption="Bodenbedeckungen anzeigen" category="ProjektCheck" class="BodenAnzeigen" id="rpc_tools.boden_anzeigen" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Bodenbedeckungen entfernen" category="ProjektCheck" class="BodenEntfernen" id="rpc_tools.boden_entfernen" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Bodenbedeckung kontrollieren" category="ProjektCheck" class="BodenKontrollieren" id="rpc_tools.boden_kontrollieren" image="" message="" tip="">
@@ -254,12 +266,12 @@
                 <Button caption="Wohnfl&#228;chendichte vergleichen" category="ProjektCheck" class="Wohnflaechendichte" id="rpc_tools.wohnflaechendichte" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Grenzlinie einzeichnen" category="ProjektCheck" class="GrenzlinieEinzeichnen" id="rpc_tools.grenzlinie_einzeichnen" image="" message="" tip="">
+                <Tool caption="Grenze zum Siedlungsk&#246;rper einzeichnen" category="ProjektCheck" class="GrenzlinieEinzeichnen" id="rpc_tools.grenzlinie_einzeichnen" image="" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Grenzlinie l&#246;schen" category="ProjektCheck" class="GrenzlinieLoeschen" id="rpc_tools.grenzlinie_loeschen" image="" message="" tip="">
+                <Button caption="Grenzlinien l&#246;schen" category="ProjektCheck" class="GrenzlinieLoeschen" id="rpc_tools.grenzlinie_loeschen" image="" message="" tip="">
                     <Help heading="" />
-                </Tool>
+                </Button>
                 <Button caption="Integrationsgrad anzeigen" category="ProjektCheck" class="IntegrationsgradAnzeigen" id="rpc_tools.integrationsgrad_anzeigen" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -428,6 +440,9 @@
                         <Button refID="rpc_tools.naturschutzgebiete" />
                         <Button refID="rpc_tools.landschaftsschutzgebiete" />
                         <Button refID="rpc_tools.wasserschutzgebiete" />
+						<Button refID="rpc_tools.freiraeume" />
+						<Button refID="rpc_tools.bodenversiegelung" />
+						<Button refID="rpc_tools.hochspannung" />							
                     </Items>
                 </Menu>
                 <Menu caption="Nullfall" category="ProjektCheck" id="rpc_tools.menu_oeko_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
@@ -462,6 +477,7 @@
                 </Menu>
                 <Menu caption="Bodenbedeckung" category="ProjektCheck" id="rpc_tools.menu_bodenbedeckung" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
+					<Menu refID="rpc_tools.boden_anzeigen" />													 
                         <Menu refID="rpc_tools.menu_oeko_nullfall" />
                         <Menu refID="rpc_tools.menu_oeko_planfall" />
                         <Button refID="rpc_tools.boden_entfernen" />
@@ -470,6 +486,7 @@
                     </Items>
                 </Menu>
                 <Menu caption="Integrationsgrad" category="ProjektCheck" id="rpc_tools.menu_integrationsgrad" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="Integrationsgrad bestimmen" category="ProjektCheck" id="rpc_tools.menu_integrationsgrad" isRootMenu="false" isShortcutMenu="true" separator="true">	 
                     <Items>
                         <Tool refID="rpc_tools.grenzlinie_einzeichnen" />
                         <Tool refID="rpc_tools.grenzlinie_loeschen" />
