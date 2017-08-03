@@ -44,7 +44,16 @@ class Wanderungssalden1(Tool):
         parameters = self.par
         projektname = self.projectname
 
-        lib_einnahmen.create_gemeindebilanzen(self, projektname)
+        cursor = self.parent_tbx.query_table(table_name = 'Chronik_Nutzung',
+                                columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
+                                workspace='FGDB_Einnahmen.gdb')
+        salden_berechnet = True
+        for row in cursor:
+            if row[0] == "Wanderung Einwohner" and row[1] is None:
+                salden_berechnet = False
+
+        if self.par.aktualisieren.value == True or salden_berechnet == False:
+            lib_einnahmen.create_gemeindebilanzen(self, projektname)									
 
         workspace_projekt_definition = self.folders.get_db('FGDB_Definition_Projekt.gdb', projektname)
         workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
