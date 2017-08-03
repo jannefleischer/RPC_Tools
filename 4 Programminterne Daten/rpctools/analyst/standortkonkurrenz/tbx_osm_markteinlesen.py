@@ -145,14 +145,14 @@ class MarktEinlesen(Tool):
 
         for market in markets:
             # no name -> nothing to parse
-            if not getattr(market, field):
+            if not str(getattr(market, field)):
                 arcpy.AddMessage(u'  - Markt mit fehlendem Attribut "{}" wird '
                                  u'übersprungen'.format(field))
                 continue
             match_found = False
             for idx, chain_alloc in df_chains_alloc.iterrows():
                 match_result = re.match(chain_alloc['regex'],
-                                        getattr(market, field))
+                                        str(getattr(market, field)))
                 if not match_result:
                     continue
                 match_found = True
