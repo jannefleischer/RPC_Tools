@@ -504,7 +504,7 @@ if __name__ == "__main__":
     t = TbxProjektwirkungMarkets()
     t.getParameterInfo()
     t.set_active_project()
-    t.par.recalculate.value = False
+    t.par.recalculate.value = True
     #t.show_outputs()
     t.execute()
 

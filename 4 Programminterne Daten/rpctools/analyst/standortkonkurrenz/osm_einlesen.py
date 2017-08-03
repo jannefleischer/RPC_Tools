@@ -14,9 +14,6 @@ import arcpy
 
 class Supermarket(Point):
     """A Supermarket"""
-    __slots__ = ['id', 'x', 'y', 'id_betriebstyp', 'id_kette', 'name',
-                 'kette', 'shop', 'typ', 'geom', 'vkfl', 'id_teilflaeche',
-                 'adresse']
     def __init__(self, id, x, y, name, kette, shop=None, typ=None, vkfl=None, 
                  id_betriebstyp=1, epsg=4326, id_teilflaeche=-1, id_kette=0,
                  adresse='', **kwargs):
