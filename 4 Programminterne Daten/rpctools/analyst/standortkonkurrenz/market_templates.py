@@ -18,6 +18,8 @@ from rpctools.analyst.standortkonkurrenz.osm_einlesen import Point, Supermarket
 
 config = Config()
 
+DEFAULT_NAME = 'maerkte_vorlage'
+
 class MarketTemplate(object):
     '''
     class for managing templates holding markets as inputs for the Tool
@@ -30,7 +32,7 @@ class MarketTemplate(object):
             (for options see keys of class variable 'template_types')
         path : str,
             the path to write to and read the templates from
-        filename : str, optional (defaults to 'maerkte_template.<extension>')
+        filename : str, optional (defaults to 'maerkte_vorlage.<extension>')
             name of the file
         epsg : int, optional (defaults to 4326)
             the projection (required to write shapefiles)
@@ -56,8 +58,6 @@ class MarketTemplate(object):
     
     _option_1 = {u'Vkfl_m²': int}
     _option_2 = {u'BTyp': int}
-
-    _default_name = 'maerkte_template'
     
     _delimiter = ';'
     
@@ -73,7 +73,7 @@ class MarketTemplate(object):
         
         if not filename:
             filename = '{name}{ext}'.format(
-                name=self._default_name,
+                name=DEFAULT_NAME,
                 ext=self.template_types[template_type]
             )
         self.file_path = os.path.join(self.path, filename)

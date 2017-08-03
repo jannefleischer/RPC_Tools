@@ -7,7 +7,7 @@ import re
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.analyst.standortkonkurrenz.market_templates import MarketTemplate
+from rpctools.analyst.standortkonkurrenz.market_templates import MarketTemplate, DEFAULT_NAME
 from rpctools.analyst.standortkonkurrenz.tbx_osm_markteinlesen import MarktEinlesen
 
 
@@ -89,7 +89,7 @@ class TbxMaerkteImportierenFeatureClass(TbxMaerkteImportieren):
     
     @property
     def label(self):
-        return encode(u'Marktstandorte aus Shape/Layer importieren')
+        return encode(u'Marktstandorte aus Shape/Layer-Vorlage importieren')
     
     def _getParameterInfo(self):
         params = super(TbxMaerkteImportierenFeatureClass, self)._getParameterInfo()
@@ -101,13 +101,19 @@ class TbxMaerkteImportierenFeatureClass(TbxMaerkteImportieren):
         param.datatype = u'GPFeatureLayer'
         
         return params
-
+    
+    def _open(self, params):
+        param = self.par.template
+        subfolder = 'input_templates'
+        fn = os.path.join(self.folders.get_projectpath(),
+                                   subfolder, DEFAULT_NAME + '.shp')
+        param.value = fn if os.path.exists(fn) else ''
 
 class TbxMaerkteImportierenDatei(TbxMaerkteImportieren):
 
     @property
     def label(self):
-        return encode(u'Marktstandorte aus CSV/Excel importieren')
+        return encode(u'Marktstandorte aus CSV/Excel-Vorlage importieren')
     
     def _getParameterInfo(self):
         params = super(TbxMaerkteImportierenDatei, self)._getParameterInfo()
@@ -124,13 +130,24 @@ class TbxMaerkteImportierenDatei(TbxMaerkteImportieren):
         param.filter.list = ['csv', 'xlsx']
         
         return params
+    
+    def _open(self, params):
+        param = self.par.template
+        subfolder = 'input_templates'
+        param.value = ''
+        for suffix in param.filter.list:
+            fn = os.path.join(self.folders.get_projectpath(),
+                              subfolder, DEFAULT_NAME + '.' + suffix)
+            if os.path.exists(fn):
+                param.value = fn
+                break
 
 if __name__ == '__main__':
     t = TbxMaerkteImportierenDatei()
     t._getParameterInfo()
     t.set_active_project()
     t.par.truncate.value = True
-    t.par.template.value = r'C:\Users\ggr\Desktop\templates\maerkte_template_auszug.xlsx'    
+    t.par.template.value = r'C:\Users\ggr\Desktop\templates\maerkte_template_auszug.xlsx'
     #t = TbxMaerkteImportierenFeatureClass()
     #t._getParameterInfo()
     #t.par.template.value = r'C:\Users\ggr\Desktop\templates\maerkte_template.shp'
