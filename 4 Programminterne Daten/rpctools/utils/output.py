@@ -411,7 +411,7 @@ class Output(object):
 
         if not arcpy.mapping.ListLayers(project_layer, group, dataframe):
             group_layer_template = self.folders.get_layer(layername=group,
-                folder='toc', enhance=True)
+                                                          folder='toc', enhance=True)
             addLayer = arcpy.mapping.Layer(group_layer_template)
             arcpy.mapping.AddLayerToGroup(
                 dataframe, project_layer, addLayer, "BOTTOM")
@@ -528,7 +528,7 @@ class Output(object):
         '''show all available outputs (diagrams, layers etc.)'''
         self.show_layers()
         self.show_diagrams()
-		self.show_images()		 
+        self.show_images()
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
 
@@ -677,7 +677,7 @@ class Output(object):
                 lyr.visible = False
         new_layer.visible = True
         for lyr in arcpy.mapping.ListLayers(new_layer):
-                lyr.visible = True											   
+            lyr.visible = True											   
         new_layer.name = layer.name
         if layer.query:
             new_layer.definitionQuery = layer.query
@@ -818,7 +818,7 @@ class Output(object):
                                               enhance=True,
                                               folder=folder)
         self.add_layer(groupname=groupname,
-                        template_layer=template_lyr,
+                       template_layer=template_lyr,
                         featureclass=fc,
                         disable_other=disable_other,
                         subgroup=subgroup,
