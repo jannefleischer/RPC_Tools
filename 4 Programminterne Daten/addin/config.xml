@@ -485,8 +485,7 @@
                         <Button refID="rpc_tools.bodenveraenderung" />
                     </Items>
                 </Menu>
-                <Menu caption="Integrationsgrad" category="ProjektCheck" id="rpc_tools.menu_integrationsgrad" isRootMenu="false" isShortcutMenu="true" separator="true">
-                <Menu caption="Integrationsgrad bestimmen" category="ProjektCheck" id="rpc_tools.menu_integrationsgrad" isRootMenu="false" isShortcutMenu="true" separator="true">	 
+                <Menu caption="Integrationsgrad" category="ProjektCheck" id="rpc_tools.menu_integrationsgrad" isRootMenu="false" isShortcutMenu="true" separator="true"> 
                     <Items>
                         <Tool refID="rpc_tools.grenzlinie_einzeichnen" />
                         <Tool refID="rpc_tools.grenzlinie_loeschen" />
