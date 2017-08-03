@@ -2,8 +2,7 @@
 from collections import OrderedDict
 import arcpy
 import numpy as np
-
-
+import subprocess						
 from rpctools.utils.config import Config, Folders
 
 class ArcpyEnv(object):
@@ -222,6 +221,7 @@ class Output(object):
         self.module = LayerGroup()
         self.layers = []
         self.diagrams = []
+        self.images = []							   
         self.add_layer_groups()
         self.define_outputs()
 
@@ -238,7 +238,7 @@ class Output(object):
         root.add("erreichbarkeit",
                  u"Wirkungsbereich 2 - Erreichbarkeit")
         root.add("verkehr", u"Wirkungsbereich 3 - Verkehr im Umfeld")
-        root.add("oekologie", u"Wirkungsbereich 4 - Fläche und Ökologie")
+        root.add("oekologie", u"Wirkungsbereich 4 - Flaeche und Oekologie")
         root.add("infrastruktur",
                  u"Wirkungsbereich 5 - Infrastrukturfolgekosten")
         root.add("einnahmen",
@@ -378,12 +378,26 @@ class Output(object):
         layername may also be the placeholder group-name (e.g. bevoelkerung)'''
         if not self.layer_exists(layername):
             try:
-                layername = self.module.get_label(layer.groupname)
+                layername = self.module.get_label(layername)
             except:
                 return
-        else:
-            for l in self.get_layers(layername):
-                l.visible = False
+        for l in self.get_layers(layername):
+            l.visible = False
+        arcpy.RefreshActiveView()
+        arcpy.RefreshTOC()
+
+    def enable_layer(self, layername):
+        '''enable layer(s) in TOC matching given name,
+        layername may also be the placeholder group-name (e.g. bevoelkerung)'''
+        if not self.layer_exists(layername):
+            try:
+                layername = self.module.get_label(layername)
+            except:
+                return
+        for l in self.get_layers(layername):
+            l.visible = True
+        arcpy.RefreshActiveView()
+        arcpy.RefreshTOC()			
 
     def set_grouplayer(self, group,
                        project_layer=None,
@@ -514,6 +528,7 @@ class Output(object):
         '''show all available outputs (diagrams, layers etc.)'''
         self.show_layers()
         self.show_diagrams()
+		self.show_images()		 
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
 
@@ -532,6 +547,55 @@ class Output(object):
         for layer in self.layers:
             self._show_layer(layer, redraw=redraw)
 
+    def show_images(self):
+        for image in self.images:
+            script_path = "C:\\Temp\\test.py"
+            image_path = image[0]
+            window_title = image[1]
+            interpolation = image[3]
+            window_size = image[2]
+            show_white_space = image[4]
+            show_toolbar = image[5]
+            command = "python " + script_path + " " + image + " " + window_title + " " + interpolation + " " + str(window_size[0]) + " " + str(window_size[1]) + " " + str(show_white_space) + " " + str(show_toolbar)
+            subprocess.Popen(command, shell=False)
+        self.images = []
+
+    def add_image(self,
+                  image_path,
+                  window_title,
+                  window_size=[15.0, 10.0],
+                  interpolation = "lanczos",
+                  show_white_space = False,
+                  show_toolbar=False):
+
+        if not arcpy.Exists(image_path):
+            return
+        image = [image_path, window_title, window_size, interpolation, show_white_space, show_toolbar]
+        self.images.append(image)
+
+        """
+        Displays a specified image via matplotlib
+
+        Parameters
+        ----------
+        image : str
+            full path to image file
+
+        window_title : str
+            title of the new window
+
+        window_size: int list, optional
+            size of the new window in inches [width, height]
+
+        interpolation : str, optional
+            type of interpolation
+
+        show_white_space: boolean, optional
+            if true, the image is displayed with white margins
+
+        show_toolbar : boolean, optional
+            if true, the toolbar within the new window is enabled
+        """								   
     def clear(self):
         '''remove all outputs (diagrams, layers etc.)'''
         self.diagrams = []
@@ -612,6 +676,8 @@ class Output(object):
             for lyr in arcpy.mapping.ListLayers(project_layer):
                 lyr.visible = False
         new_layer.visible = True
+        for lyr in arcpy.mapping.ListLayers(new_layer):
+                lyr.visible = True											   
         new_layer.name = layer.name
         if layer.query:
             new_layer.definitionQuery = layer.query
