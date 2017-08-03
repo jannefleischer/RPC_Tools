@@ -12,8 +12,10 @@ class Einrichtungen(Tool):
     _workspace = 'FGDB_Erreichbarkeit.gdb'
     cutoff = None
 
-    categories = [u'Kita', u'ÖPNV_Haltestelle', u'Autobahnanschlussstelle']
-    
+    categories = [u'Kita', u'Autobahnanschlussstelle', u'Dienstleistungen',
+                  u'Ärzte', 'Freizeit', u'Läden',
+                  u'Supermarkt/Einkaufszentrum', 'Schule']
+        
     def add_outputs(self):
         group_layer = ("erreichbarkeit")
         fc = 'Einrichtungen'
@@ -42,7 +44,6 @@ class Einrichtungen(Tool):
             column_values['projektcheck_category'].append(feat.category)
         
         self.parent_tbx.insert_rows_in_table('Einrichtungen', column_values)
-        
 
 
 class TbxEinrichtungen(Tbx):
