@@ -9,6 +9,7 @@ import arcpy
 from collections import OrderedDict
 import pandas as pd
 import numpy as np
+import string
 
 from rpctools.utils.spatial_lib import google_geocode
 from rpctools.utils.config import Config
@@ -43,13 +44,13 @@ class MarketTemplate(object):
 
     _required_fields = OrderedDict([
         (u'Name', str),
-        (u'Kette', int)
+        (u'Kette', str)
     ])
     
     _address_fields = OrderedDict([
         (u'Ort', str),
-        (u'PLZ', int),
-        (u'Straße', int),
+        (u'PLZ', str),
+        (u'Straße', str),
         (u'Hausnummer', int)
     ])
     
@@ -93,7 +94,7 @@ class MarketTemplate(object):
                                       self._delimiter)
         
         elif self.template_type == 'Exceldatei':
-            self._create_excel_template(self.file_path, self.fields.keys())
+            self._create_excel_template(self.file_path, self.fields)
 
         elif self.template_type == 'Shapefile':
             self._create_shape_template(self.file_path, self.fields,
@@ -101,13 +102,16 @@ class MarketTemplate(object):
             
     def open(self):
         '''open the file (externally with default app if not a shape file)'''
-        if self.template_type in ['CSV-Datei', 'Exceldatei']:
+        if self.template_type == 'Exceldatei':
             if sys.platform.startswith('darwin'):
                 subprocess.call(('open', self.file_path))
             elif os.name == 'nt':
                 os.startfile(self.file_path)
             elif os.name == 'posix':
                 subprocess.call(('xdg-open', self.file_path))
+        elif self.template_type == 'CSV-Datei':
+            subprocess.Popen(r'explorer /select,"{}"'
+                             .format(self.file_path))
         elif self.template_type == 'Shapefile':
             layer = arcpy.mapping.Layer(self.file_path)
             mxd = arcpy.mapping.MapDocument("CURRENT")
@@ -133,7 +137,12 @@ class MarketTemplate(object):
             os.remove(file_path)            
         book = xlsxwriter.Workbook(file_path)
         sheet = book.add_worksheet()
-        for i, field in enumerate(fields):
+        alphabet = string.ascii_uppercase
+        for i, (field, dtype) in enumerate(fields.iteritems()):
+            form = book.add_format()
+            if dtype == str:
+                form.set_num_format('@')
+            sheet.set_column('{l}:{l}'.format(l=alphabet[i]), 50, form)
             sheet.write(0, i, field)
         book.close()
     
@@ -148,6 +157,7 @@ class MarketTemplate(object):
         for field, dtype in fields.iteritems():
             field_type = 'LONG' if dtype == int else 'TEXT'
             arcpy.AddField_management(file_path, field, field_type)
+        arcpy.DeleteField_management(file_path, 'Id')
             
     def get_markets(self):
         '''read and return the markets from file'''
