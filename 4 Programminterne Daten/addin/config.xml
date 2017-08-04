@@ -465,7 +465,7 @@
                     <Items>
                         <Button refID="rpc_tools.hilfe_erreichbarkeit" />
                         <Menu refID="rpc_tools.menu_oepnv" />
-                        
+                        <Menu refID="rpc_tools.menu_fahrrad_auto" />
                     </Items>
                 </Menu>
                 
