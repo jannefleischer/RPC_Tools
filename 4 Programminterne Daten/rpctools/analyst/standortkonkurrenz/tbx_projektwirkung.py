@@ -5,6 +5,7 @@ import pandas as pd
 import json
 import numpy as np
 import pandas as pd
+import gc
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
@@ -81,14 +82,34 @@ class ProjektwirkungMarkets(Tool):
 
         arcpy.AddMessage(u'Berechne Erreichbarkeiten der Märkte...')
         self.calculate_distances(df_markets, bbox)
+        del(df_markets)
 
+        arcpy.AddMessage(u'Lade Eingangsdaten für die nachfolgenden '
+                         u'Berechnungen...')
         # reload markets
-        df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
-        df_zensus = self.parent_tbx.table_to_dataframe('Siedlungszellen')
-        df_distances = self.parent_tbx.table_to_dataframe(
-            'Beziehungen_Maerkte_Zellen',
-            columns=['id_markt', 'id_siedlungszelle', 'distanz'])
+        df_markets = self.parent_tbx.table_to_dataframe(
+            'Maerkte', columns=['id', 'id_betriebstyp_nullfall',
+                                'id_betriebstyp_planfall', 'AGS', 'id_kette'])
+        df_zensus = self.parent_tbx.table_to_dataframe(
+            'Siedlungszellen', columns=['id', 'kk', 'id_teilflaeche'])
+        
+        # workaround for loading distances avoiding 'out of memory' errors
+        df_distances = pd.DataFrame()
+        values = self.parent_tbx.query_table(
+            'Beziehungen_Maerkte_Zellen', columns=['id_markt'])
+        df_distances['id_markt'] = np.array(values).reshape(len(values)).astype('int16')
+        del(values)
+        values = self.parent_tbx.query_table(
+            'Beziehungen_Maerkte_Zellen', columns=['id_siedlungszelle'])
+        df_distances['id_siedlungszelle'] = np.array(values).reshape(len(values)).astype('int32')
+        del(values)
+        values = self.parent_tbx.query_table(
+            'Beziehungen_Maerkte_Zellen', columns=['distanz'])
+        df_distances['distanz'] = np.array(values).reshape(len(values)).astype('int8')
+        del(values)
+        
         sales = Sales(df_distances, df_markets, df_zensus)
+        gc.collect()
         arcpy.AddMessage('Berechne Nullfall...')
         kk_nullfall = sales.calculate_nullfall()
         arcpy.AddMessage('Berechne Planfall...')
@@ -245,6 +266,7 @@ class ProjektwirkungMarkets(Tool):
                 self.distances_to_db(market_id, destinations, distances)
             else:
                 arcpy.AddMessage(u'   bereits berechnet, wird übersprungen')
+            gc.collect()
 
     def sales_to_db(self, kk_nullfall, kk_planfall):
         '''store the sales matrices in database'''
@@ -369,6 +391,8 @@ class ProjektwirkungMarkets(Tool):
         column_values['id_markt'] = [market_id] * len(destinations)
         self.parent_tbx.insert_rows_in_table('Beziehungen_Maerkte_Zellen',
                                              column_values)
+        for p in shapes:
+            del(p)
 
     def get_cells(self):
         cells = []
