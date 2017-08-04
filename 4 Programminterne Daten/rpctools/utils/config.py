@@ -135,6 +135,7 @@ class Folders(object):
         self._MXDS = 'mxds'
         self._DEFINITION_PYT_PATH = '1 Planungsprojekte definieren'
         self._ANALYST_PYT_PATH = '2 Planungsprojekte analysieren'
+        self._MANUALS_PATH = '0 Anleitung'
         # the params
         self._params = params
         self._projectname = projectname
@@ -259,6 +260,10 @@ class Folders(object):
     @property
     def DEFINITION_PYT_PATH(self):
         return self.join_and_check(self.BASE_PATH, self._DEFINITION_PYT_PATH)
+    
+    @property
+    def MANUALS_PATH(self):
+        return self.join_and_check(self.BASE_PATH, self._MANUALS_PATH)
 
     def get_projects(self):
         '''
@@ -277,6 +282,24 @@ class Folders(object):
         subfolders = [f for f in listdir(self.TEMPORARY_GDB_PATH)
                       if isdir(self.get_temporary_projectpath(f))]
         return sorted(subfolders)
+
+    def get_projectpath(self, project=None, check=True):
+        """
+        The Path to the Project Folder
+
+        Parameters
+        ----------
+        project : str
+            the project name
+        Returns
+        -------
+        projectpath : str
+            the full path of the Project folder
+        """
+        projectname = project or self.projectname
+        return self.join_and_check(self.PROJECT_BASE_PATH,
+                                   projectname,
+                                   check=check)
 
     def get_projectpath(self, project=None, check=True):
         """

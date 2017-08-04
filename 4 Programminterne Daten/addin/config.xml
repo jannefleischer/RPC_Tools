@@ -13,6 +13,14 @@
     <AddIn language="PYTHON" library="rpc_tools_addin.py" namespace="rpc_tools">
         <ArcMap>
             <Commands>
+            
+            
+                <Button caption="Hilfe" category="ProjektCheck" class="HilfeGesamt" id="rpc_tools.hilfe_gesamt" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Anleitung mit einer Gesamt&#252;bersicht zur Nutzung des ProjektCheck-Tools">
+                    <Help heading="" />
+                </Button>
+                <Tool caption="Skizze beenden" category="ProjektCheck" class="SkizzeBeenden" id="rpc_tools.skizze_beenden" image="Images\Analyze16.png" message="" tip="Mit Klicken dieses Buttons beenden Sie die Eingabe von Punkten, Netzelemente oder Fl&#228;chen.">
+                    <Help heading="" />
+                </Tool>
 
                 <!-- PROJEKTVERWALTUNG -->
 
@@ -178,9 +186,6 @@
                 <Button caption="Verkehrsbelastung mit Gewichten versehen" category="ProjektCheck" class="WeightedRouting" id="rpc_tools.weighted_routing" image="Images\Route16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Skizze beenden" category="ProjektCheck" class="SkizzeBeenden" id="rpc_tools.skizze_beenden" image="Images\Analyze16.png" message="" tip="Mit Klicken dieses Buttons beenden Sie die Eingabe von Punkten, Netzelemente oder Fl&#228;chen.">
-                    <Help heading="" />
-                </Tool>
                 <Tool caption="Anbindungspunkt setzen" category="ProjektCheck" class="Anbindungspunkt" id="rpc_tools.anbindungspunkt" image="Images\CadastralFeatureSelect16.png" message="" tip="Setzen Sie auf der Karte einen Punkt zur Anbindung der Teilfl&#228;che an das Stra&#223;ennetz">
                     <Help heading="" />
                 </Tool>
@@ -392,6 +397,7 @@
             <Toolbars>
                 <Toolbar caption="ProjektCheck" category="ProjektCheck" id="rpc_tools.toolbar" showInitially="true">
                     <Items>
+                        <Button refID="rpc_tools.hilfe_gesamt" />
                         <ComboBox refID="rpc_tools.projekt_auswahl" />
                         <Button refID="rpc_tools.refresh_layers" />
                         <Menu refID="rpc_tools.menu_verwalten" />

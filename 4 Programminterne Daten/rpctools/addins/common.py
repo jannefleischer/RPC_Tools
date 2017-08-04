@@ -2,6 +2,8 @@
 import os
 import pythonaddins
 from imp import load_source
+import functools
+import threading
 
 from rpctools.utils.singleton import Singleton
 from rpctools.utils.config import Folders, Config
@@ -83,3 +85,26 @@ class Output(ToolboxWrapper):
         
     def onClick(self):
         self.show()
+        
+def threaded(function):
+    @functools.wraps(function)
+    def _threaded(*args, **kwargs):
+        thread = threading.Thread(target=function, args=args, kwargs=kwargs)
+        thread.start()
+        thread.join()
+    return _threaded
+
+
+class FileButton(object):
+    '''class showing pdf-files'''
+    _path = folders.MANUALS_PATH
+    _file = None
+    
+    def __init__(self):
+        self.open = threaded(os.startfile)
+        
+    def onClick(self):
+        #subprocess.Popen(["start", "/WAIT", "{}".format(os.path.join(self._path, self._file))], shell=True)
+        #os.system('start "{}"'.format(os.path.join(self._path, self._file)))
+        self.open(os.path.join(self._path, self._file))
+
