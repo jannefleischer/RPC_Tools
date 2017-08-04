@@ -22,6 +22,11 @@ class CreateTemplate(Tool):
         
         arcpy.AddMessage('Template wird geöffnet, bitte warten...')
         template.open()
+        
+        if self.par.show_help:
+            fn = MarketTemplate.template_types[typ][1]
+            fp = os.path.join(self.folders.MANUALS_PATH, fn)
+            os.startfile(fp)
 
 
 class TbxCreateTemplate(Tbx):
@@ -60,6 +65,13 @@ class TbxCreateTemplate(Tbx):
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'DEFolder'
+
+        param = self.add_parameter('show_help')
+        param.name = encode(u'Hilfe')
+        param.displayName = encode(u'Kurzanleitung zum Ausfüllen anzeigen')
+        param.parameterType = 'Optional'
+        param.direction = 'Input'
+        param.datatype = u'GPBoolean'
         
         return self.par
     
@@ -83,6 +95,6 @@ if __name__ == '__main__':
     t._getParameterInfo()
     t.set_active_project()
     t._open(t.par)
-    t.par.template_type.value = 'Exceldatei'
+    t.par.template_type.value = 'CSV-Datei'
     t.set_active_project()
     t.execute()

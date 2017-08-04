@@ -33,7 +33,8 @@ class MaerkteImportieren(MarktEinlesen):
         name, ext = os.path.splitext(filename)
         
         # get type of template by reverse looking up file extension
-        idx = MarketTemplate.template_types.values().index(ext)
+        extensions = [v[0] for v in MarketTemplate.template_types.values()]
+        idx = extensions.index(ext)
         template_type = MarketTemplate.template_types.keys()[idx]
         template = MarketTemplate(template_type, path, filename=filename,
                                   epsg=self.parent_tbx.config.epsg)
@@ -148,7 +149,8 @@ if __name__ == '__main__':
     t._getParameterInfo()
     t.set_active_project()
     t.par.truncate.value = True
-    t.par.template.value = r'C:\Users\ggr\Desktop\templates\maerkte_template_auszug.xlsx'
+    t.par.template.value = r'C:\ggr Projekte\RPC_Tools\3 Benutzerdefinierte Projekte\sdfsdffds\input_templates\maerkte_vorlage.csv'
+    #t.par.template.value = r'C:\Users\ggr\Desktop\templates\maerkte_template_auszug.xlsx'
     #t = TbxMaerkteImportierenFeatureClass()
     #t._getParameterInfo()
     #t.par.template.value = r'C:\Users\ggr\Desktop\templates\maerkte_template.shp'

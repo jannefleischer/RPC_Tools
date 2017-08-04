@@ -39,9 +39,9 @@ class MarketTemplate(object):
     '''
     
     template_types = {
-        'CSV-Datei': '.csv',
-        'Exceldatei': '.xlsx',
-        'Shapefile': '.shp'
+        'CSV-Datei': ('.csv', 'ProjektCheck_Anleitung_Erfassungsvorlage_Maerkte_CSVDatei_befuellen.pdf'),
+        'Exceldatei': ('.xlsx', 'ProjektCheck_Anleitung_Erfassungsvorlage_Maerkte_Exceldatei_befuellen.pdf'), 
+        'Shapefile': ('.shp', 'ProjektCheck_Anleitung_Erfassungsvorlage_Maerkte_ShapeFile_befuellen.pdf')
      }
 
     _required_fields = OrderedDict([
@@ -74,7 +74,7 @@ class MarketTemplate(object):
         if not filename:
             filename = '{name}{ext}'.format(
                 name=DEFAULT_NAME,
-                ext=self.template_types[template_type]
+                ext=self.template_types[template_type][0]
             )
         self.file_path = os.path.join(self.path, filename)
         
@@ -163,8 +163,8 @@ class MarketTemplate(object):
         '''read and return the markets from file'''
         if self.template_type == 'CSV-Datei':
             df = pd.DataFrame.from_csv(self.file_path, sep=self._delimiter,
-                                       encoding='latin1')
-            df[df.index.name] = df.index
+                                       encoding='utf-8-sig')
+            df = df.reset_index()
         elif self.template_type == 'Exceldatei':
             df = pd.read_excel(self.file_path)
         elif self.template_type == 'Shapefile':

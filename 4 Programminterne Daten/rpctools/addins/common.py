@@ -8,7 +8,7 @@ import threading
 from rpctools.utils.singleton import Singleton
 from rpctools.utils.config import Folders, Config
 
-__all__ = ['ToolboxWrapper', 'ToolboxButton', 'Output']
+__all__ = ['ToolboxWrapper', 'ToolboxButton', 'Output', 'FileButton']
 
 folders = Folders()
 config = Config()
