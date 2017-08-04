@@ -13,8 +13,6 @@
     <AddIn language="PYTHON" library="rpc_tools_addin.py" namespace="rpc_tools">
         <ArcMap>
             <Commands>
-            
-            
                 <Button caption="Hilfe" category="ProjektCheck" class="HilfeGesamt" id="rpc_tools.hilfe_gesamt" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Anleitung mit einer Gesamt&#252;bersicht zur Nutzung des ProjektCheck-Tools">
                     <Help heading="" />
                 </Button>
@@ -30,6 +28,9 @@
                 <Button caption="Layer anzeigen" category="ProjektCheck" class="RefreshLayers" id="rpc_tools.refresh_layers" image="Images\eye-2-16.png" message="" tip="F&#252;gt die von den ProjektCheck-Tools verwendeten Layer des derzeit gew&#228;hlten Projekts dem Inhaltsverzeichnis hinzu bzw. aktualisiert sie.">
                     <Help heading="" />
                 </Button>
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeVerwaltung" id="rpc_tools.hilfe_verwaltung" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                    <Help heading="" />
+                </Button>
                 <Button caption="Neues Projekt" category="ProjektCheck" class="ProjektAnlegen" id="rpc_tools.neues_projekt" image="Images\1002-add2_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -42,6 +43,9 @@
 
                 <!-- NUTZUNGEN -->
 
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeNutzungen" id="rpc_tools.hilfe_nutzungen" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                    <Help heading="" />
+                </Button>
                 <Button caption="Nutzungen auf Teilfl&#228;chen definieren" category="ProjektCheck" class="NutzungenDefinieren" id="rpc_tools.nutzungen_definieren" image="Images\013500-filter_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -57,6 +61,9 @@
 
                 <!-- BEWOHNER/ARBEITSPLAETZE -->
 
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeBewohnerArbeitsplaetze" id="rpc_tools.hilfe_bewohner_arbeitsplaetze" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                    <Help heading="" />
+                </Button>
                 <Button caption="Bewohnerzahl sch&#228;tzen" category="ProjektCheck" class="BewohnerSchaetzen" id="rpc_tools.bewohner_schaetzen" image="Images\4502-users_3.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -66,6 +73,9 @@
 
                 <!-- INFRASTRUKTUR -->
 
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeInfrastruktur" id="rpc_tools.hilfe_infrastruktur" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                    <Help heading="" />
+                </Button>
                 <Button caption="Erschlie&#223;ungsnetze anzeigen" category="ProjektCheck" class="ErschliessungsnetzeAnzeigen" id="rpc_tools.erschliessungsnetze_anzeigen" image="Images\eye-2-16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -138,6 +148,12 @@
 
                 <!-- EINNAHMEN -->
 
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeEinnahmen" id="rpc_tools.hilfe_einnahmen" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Hinweise zur Ergebnisinterpretation" category="ProjektCheck" class="HinweiseBilanzen" id="rpc_tools.bilanzen_hinweise" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                    <Help heading="" />
+                </Button>
                 <Button caption="Sch&#228;tzen" category="ProjektCheck" class="EinwohnersaldenSchaetzen" id="rpc_tools.einwohnersalden_schaetzen" image="Images\4502-users_3.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -171,12 +187,12 @@
                 <Button caption="Gesamtsumme" category="ProjektCheck" class="BilanzenGesamtsumme" id="rpc_tools.bilanzen_gesamtsumme" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Hinweise zur Ergebnisinterpretation" category="ProjektCheck" class="BilanzenHinweise" id="rpc_tools.bilanzen_hinweise" image="" message="" tip="">
-                    <Help heading="" />
-                </Button>
 
                 <!-- VERKEHR -->
 
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeVerkehr" id="rpc_tools.hilfe_verkehr" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                    <Help heading="" />
+                </Button>
                 <Button caption="Straßenverkehrsbelastung schätzen" category="ProjektCheck" class="InitialRouting" id="rpc_tools.initial_routing" image="Images\RouteFastest16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -192,6 +208,9 @@
 
                 <!-- STANDORTKONKURRENZ  -->
 
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeStandortkonkurrenz" id="rpc_tools.hilfe_standortkonkurrenz" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                    <Help heading="" />
+                </Button>
                 <Button caption="M&#228;rkte anzeigen" category="ProjektCheck" class="MaerkteAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -234,10 +253,10 @@
 
                 <!-- FLAECHE UND OEKOLOGIE  -->
 
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.anleitung_flaeche" image="" message="" tip="">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeFlaeche" id="rpc_tools.anleitung_flaeche" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
                     <Help heading="" />
                 </Button>
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.anleitung_oekologie" image="" message="" tip="">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeOekologie" id="rpc_tools.anleitung_oekologie" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
                     <Help heading="" />
                 </Button>
                 <Button caption="Natur- und Artenschutz" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.naturschutzgebiete" image="" message="" tip="">
@@ -372,6 +391,9 @@
 
                 <!-- ERREICHBARKEIT  -->
 
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeErreichbarkeit" id="rpc_tools.hilfe_erreichbarkeit" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                    <Help heading="" />
+                </Button>
                 <Button caption="Haltestellen ermitteln" category="ProjektCheck" class="HaltestellenZentraleOrte" id="rpc_tools.haltestellen_ermitteln" image="Images\TmStopHidingSelected16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -410,6 +432,7 @@
             <Menus>
                 <Menu caption="Verwalten" category="ProjektCheck" id="rpc_tools.menu_verwalten" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
+                        <Button refID="rpc_tools.hilfe_verwaltung" />
                         <Button refID="rpc_tools.neues_projekt" />
                         <Button refID="rpc_tools.projekt_kopieren" />
                         <Button refID="rpc_tools.projekt_loeschen" />
@@ -424,12 +447,14 @@
                 </Menu>
                 <Menu caption="Definieren" category="ProjektCheck" id="rpc_tools.menu_definieren" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
+                        <Button refID="rpc_tools.hilfe_nutzungen" />
                         <Button refID="rpc_tools.nutzungen_definieren" />
                         <Menu refID="rpc_tools.nutzungen_menu_detailangaben_nutzungen" />
                     </Items>
                 </Menu>
                 <Menu caption="Bewohner und Arbeitspl&#228;tze" category="ProjektCheck" id="rpc_tools.menu_bewohner_und_arbeitsplaetze" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
+                        <Button refID="rpc_tools.hilfe_bewohner_arbeitsplaetze" />
                         <Button refID="rpc_tools.bewohner_schaetzen" />
                         <Button refID="rpc_tools.arbeitsplaetze_schaetzen" />
                     </Items>
@@ -450,12 +475,14 @@
                 </Menu>
                 <Menu caption="Erreichbarkeit" category="ProjektCheck" id="rpc_tools.menu_erreichbarkeit" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
+                        <Button refID="rpc_tools.hilfe_erreichbarkeit" />
                         <Menu refID="rpc_tools.menu_oepnv" />
                         <Menu refID="rpc_tools.menu_fahrrad_auto" />
                     </Items>
                 </Menu>
                 <Menu caption="Verkehr im Umfeld" category="ProjektCheck" id="rpc_tools.menu_verkehr_im_umfeld" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
+                        <Button refID="rpc_tools.hilfe_verkehr" />
                         <Button refID="rpc_tools.routing_settings" />
                         <Tool refID="rpc_tools.anbindungspunkt" />
                         <Button refID="rpc_tools.initial_routing" />
@@ -598,6 +625,7 @@
                 </Menu>
                 <Menu caption="Infrastrukturfolgekosten" category="ProjektCheck" id="rpc_tools.menu_infrastrukturkosten" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
+                        <Button refID="rpc_tools.hilfe_infrastruktur" />
                         <Button refID="rpc_tools.erschliessungsnetze_anzeigen"/>
                         <Menu refID="rpc_tools.menu_erschliessungsnetze_skizzieren" />
                         <Menu refID="rpc_tools.menu_punktuelle_massnahmen" />
@@ -646,6 +674,7 @@
                 </Menu>
                 <Menu caption="Kommunale Steuereinnahmen" category="ProjektCheck" id="rpc_tools.menu_einnahmen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
+                        <Button refID="rpc_tools.hilfe_einnahmen" />
                         <Menu refID="rpc_tools.menu_wanderungssalden" />
                         <Menu refID="rpc_tools.menu_fiskalische_bilanzen" />
                     </Items>
@@ -680,6 +709,7 @@
                 </Menu>
                 <Menu caption="Standortkonkurrenz Superm&#228;rkte" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
+                        <Button refID="rpc_tools.hilfe_standortkonkurrenz" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_nullfall" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_planfall" />
                         <Menu refID="rpc_tools.menu_zentren" />
