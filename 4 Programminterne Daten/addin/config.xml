@@ -259,8 +259,6 @@
                     <Help heading="" />
                 </Button>						
                 </Button>
-                <Button caption="Bodenbedeckungsanteile ermitteln" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.bodenanteile_ermitteln" image="" message="" tip="">
-                    <Help heading="" />
                 </Button>					
                 <Button caption="Leistungskennwerte berechnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.kennwerte_berechnen" image="" message="" tip="">
                     <Help heading="" />
@@ -286,7 +284,7 @@
                 <Button caption="Layer anzeigen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_anzeigen" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Bodenbdedeckung l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_loeschen" image="" message="" tip="">
+                <Button caption="Bodenbedeckung l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_loeschen" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Zeichnung auswerten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_auswerten" image="" message="" tip="">
@@ -295,7 +293,7 @@
                 <Button caption="Layer anzeigen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_anzeigen" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Bodenbdedeckung l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_loeschen" image="" message="" tip="">
+                <Button caption="Bodenbedeckung l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_loeschen" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Zeichnung auswerten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_auswerten" image="" message="" tip="">
@@ -570,7 +568,6 @@
                 <Menu caption="Leistungsf&#228;higkeit des Bodens" category="ProjektCheck" id="rpc_tools.menu_bodenbedeckung" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Menu refID="rpc_tools.menu_boden_zeichnen" />
-                        <Button refID="rpc_tools.bodenanteile_ermitteln" />
                         <Button refID="rpc_tools.kennwerte_berechnen" />
                         					
                     </Items>
