@@ -237,13 +237,13 @@
                 </Button>
                 <Button caption="Natur- und Artenschutz" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.naturschutzgebiete" image="" message="" tip="">
                     <Help heading="" />
-                </Button>				
+                </Button>
                 <Button caption="Landschaftsschutz" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.landschaftsschutzgebiete" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Detailangaben zu Schutzgebieten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.detail_schutzgebiete" image="" message="" tip="">
                     <Help heading="" />
-                </Button>				
+                </Button>
                 <Button caption="Unzerschnittene Freir&#228;ume > 100 qkm" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.freiraeume_100" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -252,12 +252,13 @@
                 </Button>
                 <Button caption="Freir&#228;ume" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.freiraeume" image="" message="" tip="">
                     <Help heading="" />
-                </Button>				
+                </Button>
                 <Button caption="Unzerschnittene W&#228;lder > 50 qkm" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder_50" image="" message="" tip="">
                     <Help heading="" />
+                </Button>
                 <Button caption="W&#228;lder" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder" image="" message="" tip="">
                     <Help heading="" />
-                </Button>											
+                </Button>
                 <Button caption="Leistungskennwerte berechnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.kennwerte_berechnen" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -266,16 +267,16 @@
                 </Button>
                 <Button caption="Wohnfl&#228;chendichte bestimmen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.wohnflaechendichte" image="" message="" tip="">
                     <Help heading="" />
-                </Button>				
+                </Button>
                 <Button caption="Hochspannungsleitungen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.hochspannung" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Tool caption="Gemeinsame Grenze mit Siedlungsk&#246;rper einzeichnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.grenzlinie_einzeichnen" image="" message="" tip="">
                     <Help heading="" />
-                </Tool>	
+                </Tool>
                 <Button caption="Grenzlinien l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.grenzlinie_loeschen" image="" message="" tip="">
                     <Help heading="" />
-                </Button>				
+                </Button>
                 <Button caption="Integrationsgrad berechnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.integrationsgrad_berechnen" image="" message="" tip="">
                     <Help heading="" />
                 </Button>
@@ -295,9 +296,8 @@
                     <Help heading="" />
                 </Button>
                 <Button caption="Zeichnung auswerten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_auswerten" image="" message="" tip="">
-                    <Help heading="" />				
+                    <Help heading="" />
                 </Button>
-
                 <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="NullfallUeberbauteFlaechen" id="rpc_tools.nullfall_ueberbaute_flaechen" image="" message="" tip="">
                     <Help heading="" />
                 </Tool>
@@ -331,7 +331,6 @@
                 <Tool caption="Kleinpflaster" category="ProjektCheck" class="NullfallKleinpflaster" id="rpc_tools.nullfall_kleinpflaster" image="" message="" tip="">
                     <Help heading="" />
                 </Tool>
-
                 <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="PlanfallUeberbauteFlaechen" id="rpc_tools.planfall_ueberbaute_flaechen" image="" message="" tip="">
                     <Help heading="" />
                 </Tool>
@@ -366,11 +365,6 @@
                     <Help heading="" />
                 </Tool>
 
-				
-				
-				
-				
-				
                 <!-- ERREICHBARKEIT  -->
 
                 <Button caption="Haltestellen ermitteln" category="ProjektCheck" class="HaltestellenZentraleOrte" id="rpc_tools.haltestellen_ermitteln" image="Images\TmStopHidingSelected16.png" message="" tip="">
@@ -462,13 +456,10 @@
                         <Button refID="rpc_tools.weighted_routing" />
                     </Items>
                 </Menu>
-				
-				
-				
-				
+
                 <Menu caption="Nullfall" category="ProjektCheck" id="rpc_tools.menu_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
-						<Button refID="rpc_tools.nullfall_anzeigen" />							
+                        <Button refID="rpc_tools.nullfall_anzeigen" />
                         <Tool refID="rpc_tools.nullfall_ueberbaute_flaechen" />
                         <Tool refID="rpc_tools.nullfall_natuerliche_wasserflaeche" />
                         <Tool refID="rpc_tools.nullfall_platten" />
@@ -480,13 +471,13 @@
                         <Tool refID="rpc_tools.nullfall_beton" />
                         <Tool refID="rpc_tools.nullfall_acker" />
                         <Tool refID="rpc_tools.nullfall_kleinpflaster" />
-						<Button refID="rpc_tools.nullfall_loeschen" />
-						<Button refID="rpc_tools.nullfall_auswerten" />							
+                        <Button refID="rpc_tools.nullfall_loeschen" />
+                        <Button refID="rpc_tools.nullfall_auswerten" />
                     </Items>
                 </Menu>
                 <Menu caption="Planfall" category="ProjektCheck" id="rpc_tools.menu_planfall" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
-						<Button refID="rpc_tools.planfall_anzeigen" />					
+                        <Button refID="rpc_tools.planfall_anzeigen" />
                         <Tool refID="rpc_tools.planfall_ueberbaute_flaechen" />
                         <Tool refID="rpc_tools.planfall_natuerliche_wasserflaeche" />
                         <Tool refID="rpc_tools.planfall_platten" />
@@ -498,14 +489,10 @@
                         <Tool refID="rpc_tools.planfall_beton" />
                         <Tool refID="rpc_tools.planfall_acker" />
                         <Tool refID="rpc_tools.planfall_kleinpflaster" />
-						<Button refID="rpc_tools.planfall_loeschen" />
-						<Button refID="rpc_tools.planfall_auswerten" />							
+                        <Button refID="rpc_tools.planfall_loeschen" />
+                        <Button refID="rpc_tools.planfall_auswerten" />
                     </Items>
                 </Menu>
-
-				
-		
-				
                 <Menu caption="Integrationsgrad" category="ProjektCheck" id="rpc_tools.menu_integrationsgrad" isRootMenu="false" isShortcutMenu="true" separator="true"> 
                     <Items>
                         <Tool refID="rpc_tools.grenzlinie_einzeichnen" />
@@ -513,89 +500,67 @@
                         <Button refID="rpc_tools.integrationsgrad_berechnen" />
                     </Items>
                 </Menu>
-				
-
                 <Menu caption="Integrierte Lage" category="ProjektCheck" id="rpc_tools.menu_integrierte_lage" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Menu refID="rpc_tools.menu_integrationsgrad" />
-						<Button refID="rpc_tools.hochspannung" />
-                        					
+                        <Button refID="rpc_tools.hochspannung" />
                     </Items>
-                </Menu>	
-	
-
+                </Menu>
                 <Menu caption="Effiziente Fl&#228;chennutzung" category="ProjektCheck" id="rpc_tools.menu_effiziente_nutzung" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.wohndichte" />
-						<Button refID="rpc_tools.wohnflaechendichte" />
-                        					
+                        <Button refID="rpc_tools.wohnflaechendichte" />
                     </Items>
-                </Menu>			
-				
+                </Menu>
                 <Menu caption="Schutzgebiete" category="ProjektCheck" id="rpc_tools.menu_ueberschneidungen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.naturschutzgebiete" />
                         <Button refID="rpc_tools.landschaftsschutzgebiete" />
                         <Button refID="rpc_tools.detail_schutzgebiete" />
-				
                     </Items>
                 </Menu>
-				
                 <Menu caption="Unzerschnittene R&#228;ume" category="ProjektCheck" id="rpc_tools.menu_uzvr" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.freiraeume_100" />
                         <Button refID="rpc_tools.freiraeume_50" />
-                        <Button refID="rpc_tools.freiraeume" />						
+                        <Button refID="rpc_tools.freiraeume" />
                         <Button refID="rpc_tools.waelder_50" />
                         <Button refID="rpc_tools.waelder" /> 
-                        					
                     </Items>
                 </Menu>
-				
                 <Menu caption="Bodenbedeckung zeichnen (optional)" category="ProjektCheck" id="rpc_tools.menu_boden_zeichnen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Menu refID="rpc_tools.menu_nullfall" />
                         <Menu refID="rpc_tools.menu_planfall" />
-                        					
                     </Items>
                 </Menu>
-				
                 <Menu caption="Leistungsf&#228;higkeit des Bodens" category="ProjektCheck" id="rpc_tools.menu_bodenbedeckung" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Menu refID="rpc_tools.menu_boden_zeichnen" />
                         <Button refID="rpc_tools.kennwerte_berechnen" />
-                        					
                     </Items>
                 </Menu>
-				
-				
                 <Menu caption="&#214;kologie" category="ProjektCheck" id="rpc_tools.menu_oekologie" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.anleitung_oekologie" />
-                        <Menu refID="rpc_tools.menu_ueberschneidungen" />						
-						<Menu refID="rpc_tools.menu_uzvr" />					
+                        <Menu refID="rpc_tools.menu_ueberschneidungen" />
+                        <Menu refID="rpc_tools.menu_uzvr" />
                         <Menu refID="rpc_tools.menu_bodenbedeckung" />
-                        					
                     </Items>
                 </Menu>
-				
                 <Menu caption="Fl&#228;cheninanspruchnahme" category="ProjektCheck" id="rpc_tools.menu_flaeche" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.anleitung_flaeche" />
-                        <Menu refID="rpc_tools.menu_effiziente_nutzung" />						
+                        <Menu refID="rpc_tools.menu_effiziente_nutzung" />
                         <Menu refID="rpc_tools.menu_integrierte_lage" />
                     </Items>
                 </Menu>
-
-				
                 <Menu caption="Fl&#228;che und &#214;kologie" category="ProjektCheck" id="rpc_tools.menu_flaeche_und_oekologie" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Menu refID="rpc_tools.menu_oekologie" />
-                        <Menu refID="rpc_tools.menu_flaeche" />						
+                        <Menu refID="rpc_tools.menu_flaeche" />
                     </Items>
                 </Menu>
-				
-				
                 <Menu caption="Erschlie&#223;ungsnetze skizzieren" category="ProjektCheck" id="rpc_tools.menu_erschliessungsnetze_skizzieren" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Tool refID="rpc_tools.anliegerstrasse_innere" />
