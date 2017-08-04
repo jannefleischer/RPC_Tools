@@ -109,6 +109,7 @@ class TbxMaerkteImportierenFeatureClass(TbxMaerkteImportieren):
                                    subfolder, DEFAULT_NAME + '.shp')
         param.value = fn if os.path.exists(fn) else ''
 
+
 class TbxMaerkteImportierenDatei(TbxMaerkteImportieren):
 
     @property
