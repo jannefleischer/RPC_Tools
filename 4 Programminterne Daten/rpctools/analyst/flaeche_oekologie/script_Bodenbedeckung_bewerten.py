@@ -1,5 +1,39 @@
 # -*- coding: utf-8 -*-
 
+Leistungsfähigkeit des Bodens
+	Bodenbedeckung angeben
+		Bodenanteile numerisch angeben
+		Bodenanteile einzeichnen
+			Nullfall
+				[Bodenbedeckung anzeigen]
+				[Bodenbedeckung löschen]
+				...
+			Planfall
+				[Bodenbedeckung anzeigen]
+				[Bodenbedeckung löschen]
+				...
+			Bodenanteile ermitteln
+				
+Leistungsfähigkeit des Bodens
+	Bodenanteile 
+		Bodenanteile numerisch angeben
+		Bodenanteile einzeichnen
+			Nullfall
+				[Bodenbedeckung anzeigen]
+				[Bodenbedeckung löschen]
+				...
+			Planfall
+				[Bodenbedeckung anzeigen]
+				[Bodenbedeckung löschen]
+				...
+			Bodenanteile ermitteln
+			
+			durchschn. wohnfläche -> fgdb definition projekt tool 
+			wohndichte = we pro hektar -> anzahl der we nach kreisen 
+			
+			
+				
+				
 import os
 import sys
 
@@ -20,6 +54,58 @@ class BodenbedeckungBewertung(Tool):
         projekt = self.projectname
 
         path_bodenbedeckung = self.folders.get_table('Bodenbedeckung_Anteile', "FGDB_Flaeche_und_Oekologie.gdb", projekt)
+        path_bodenbedeckung = self.folders.get_table('Bodenbedeckung_Anteile', "FGDB_Flaeche_und_Oekologie.gdb", projekt)
+
+        fields = ["IDBodenbedeckung", "Planfall", "Bodenbedeckung_Anteil"]
+        cursor = arcpy.da.UpdateCursor(path_bodenbedeckung, fields)
+        for row in cursor:
+            if row[1] == 0 and row[0] == 1:
+                 row[2] = params.ueberbauteflaechen_alt.value
+            elif row[1] == 0 and row[0] == 2:
+                 row[2] = params.wasser_alt.value
+            elif row[1] == 0 and row[0] == 3:
+                 row[2] = params.platten_alt.value
+            elif row[1] == 0 and row[0] == 4:
+                 row[2] = params.baeume_alt.value
+            elif row[1] == 0 and row[0] == 5:
+                 row[2] = params.rasengittersteine_alt.value
+            elif row[1] == 0 and row[0] == 6:
+                 row[2] = params.stauden_alt.value
+            elif row[1] == 0 and row[0] == 7:
+                 row[2] = params.wiese_alt.value
+            elif row[1] == 0 and row[0] == 8:
+                 row[2] = params.beton_alt.value
+            elif row[1] == 0 and row[0] == 9:
+                 row[2] =params.acker_alt.value
+            elif row[1] == 0 and row[0] == 10:
+                 row[2] = params.kleinpflaster_alt.value
+            elif row[1] == 0 and row[0] == 11:
+                 row[2] = params.rasen_alt.value
+            elif row[1] == 1 and row[0] == 1:
+                 row[2] = params.ueberbauteflaechen_neu.value
+            elif row[1] == 1 and row[0] == 2:
+                 row[2] = params.wasser_neu.value
+            elif row[1] == 1 and row[0] == 3:
+                 row[2] = params.platten_neu.value
+            elif row[1] == 1 and row[0] == 4:
+                 row[2] =params.baeume_neu.value
+            elif row[1] == 1 and row[0] == 5:
+                 row[2] = params.rasengittersteine_neu.value
+            elif row[1] == 1 and row[0] == 6:
+                 row[2] = params.stauden_neu.value
+            elif row[1] == 1 and row[0] == 7:
+                 row[2] = params.wiese_neu.value
+            elif row[1] == 1 and row[0] == 8:
+                 row[2] = params.beton_neu.value
+            elif row[1] == 1 and row[0] == 9:
+                 row[2] = params.acker_neu.value
+            elif row[1] == 1 and row[0] == 10:
+                 row[2] = params.kleinpflaster_neu.value
+            elif row[1] == 1 and row[0] == 11:
+                 row[2] = params.rasen_neu.value
+            cursor.updateRow(row)
+		
+		
 
         boden_anteile_alt = [0,0,0,0,0,0,0,0,0,0,0]
         boden_anteile_neu = [0,0,0,0,0,0,0,0,0,0,0]

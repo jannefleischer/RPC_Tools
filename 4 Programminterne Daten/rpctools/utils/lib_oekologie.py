@@ -10,8 +10,6 @@ def create_bodenbedeckung(projekt):
     path_bodenbedeckung = folders.get_table('Bodenbedeckung_Anteile', "FGDB_Flaeche_und_Oekologie.gdb", projekt)
     path_bodenbedeckung_tool = folders.get_base_table("FGDB_Flaeche_und_Oekologie_Tool.gdb", 'Bodenbedeckung_Anteile',  projekt)
 
-    arcpy.Copy_management(path_bodenbedeckung_tool, os.path.join(workspace_projekt_oekologie, "Bodenbedeckung_Anteile"))
-
     anteile_alt = create_bodenanteile(0, projekt)
     anteile_neu = create_bodenanteile(1, projekt)
 
@@ -65,29 +63,24 @@ def create_bodenbedeckung(projekt):
              row[2] = anteile_neu[10]
         cursor.updateRow(row)
 
-def create_bodenanteile(layer, projekt):
+def import_zeichenanteile(projekt):
 
     folders = config.Folders()
     workspace_projekt_definition = folders.get_db('FGDB_Definition_Projekt.gdb', projekt)
     path_teilflaechen = folders.get_table('Teilflaechen_Plangebiet', "FGDB_Definition_Projekt.gdb", projekt)
     workspace_projekt_oekologie = folders.get_db('FGDB_Flaeche_und_Oekologie.gdb', projekt)
-    path_bodenbedeckung = folders.get_table('Bodenbedeckung_Anteile', "FGDB_Flaeche_und_Oekologie.gdb", projekt)
     path_nullfall = folders.get_table('Bodenbedeckung_Nullfall', "FGDB_Flaeche_und_Oekologie.gdb", projekt)
     path_planfall = folders.get_table('Bodenbedeckung_Planfall', "FGDB_Flaeche_und_Oekologie.gdb", projekt)
-    path_bodenbedeckung_tool = folders.get_base_table("FGDB_Flaeche_und_Oekologie_Tool.gdb", 'Bodenbedeckung_Anteile',  projekt)
 
-    if layer == 0:
-        working_layer = path_nullfall
-    else:
-        working_layer = path_planfall
 
-    boden_absolut = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    boden_anteil = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+    boden_absolut = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0]
+    boden_anteil = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0]
     gesamtflaeche = 0
     pointer = 0
 
     fields = ["SHAPE_Area", "IDBodenbedeckung"]
-    cursor = arcpy.da.SearchCursor(working_layer, fields)
+    cursor = arcpy.da.SearchCursor(path_nullfall, fields)
     for row in cursor:
         gesamtflaeche += row[0]
         pointer = row[1] - 1
