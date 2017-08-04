@@ -193,16 +193,16 @@
                 <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeVerkehr" id="rpc_tools.hilfe_verkehr" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
                     <Help heading="" />
                 </Button>
-                <Button caption="Straßenverkehrsbelastung schätzen" category="ProjektCheck" class="InitialRouting" id="rpc_tools.initial_routing" image="Images\RouteFastest16.png" message="" tip="">
+                <Button caption="Stra&#223;enverkehrsbelastung sch&#228;tzen" category="ProjektCheck" class="InitialRouting" id="rpc_tools.initial_routing" image="Images\RouteFastest16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Kennwerte zum Verkehrsaufkommen" category="ProjektCheck" class="RoutingSettings" id="rpc_tools.routing_settings" image="Images\settings-4-16.png" message="" tip="">
+                <Button caption="Verkehrsaufkommen und Verkehrsmittelwahl" category="ProjektCheck" class="RoutingSettings" id="rpc_tools.routing_settings" image="Images\settings-4-16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Verkehrsbelastung mit Gewichten versehen" category="ProjektCheck" class="WeightedRouting" id="rpc_tools.weighted_routing" image="Images\Route16.png" message="" tip="">
+                <Button caption="Gewichtung der Herkunfts-/Zielpunkte" category="ProjektCheck" class="WeightedRouting" id="rpc_tools.weighted_routing" image="Images\Route16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Anbindungspunkt setzen" category="ProjektCheck" class="Anbindungspunkt" id="rpc_tools.anbindungspunkt" image="Images\CadastralFeatureSelect16.png" message="" tip="Setzen Sie auf der Karte einen Punkt zur Anbindung der Teilfl&#228;che an das Stra&#223;ennetz">
+                <Tool caption="Anbindung der Teilfl&#228;chen an das Stra&#223;ennetz" category="ProjektCheck" class="Anbindungspunkt" id="rpc_tools.anbindungspunkt" image="Images\CadastralFeatureSelect16.png" message="" tip="Setzen Sie auf der Karte einen Punkt zur Anbindung der Teilfl&#228;che an das Stra&#223;ennetz">
                     <Help heading="" />
                 </Tool>
 
@@ -211,7 +211,7 @@
                 <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeStandortkonkurrenz" id="rpc_tools.hilfe_standortkonkurrenz" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
                     <Help heading="" />
                 </Button>
-                <Button caption="M&#228;rkte anzeigen" category="ProjektCheck" class="MaerkteAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="">
+                <Button caption="M&#228;rkte und Versorgungsbereiche anzeigen" category="ProjektCheck" class="MaerkteAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="OpenStreetMap anfragen" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="">
@@ -409,7 +409,7 @@
                 <Button caption="Isochronen erzeugen" category="ProjektCheck" class="Isochrone" id="rpc_tools.isochrone" image="Images\ShapefilePolygon16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Einrichtungen einlesen" category="ProjektCheck" class="EinrichtungenEinlesen" id="rpc_tools.einrichtungen_einlesen" image="Images\ShapefilePoint16.png" message="" tip="">
+                <Button caption="Einrichtungen im Umfeld ermitteln" category="ProjektCheck" class="EinrichtungenEinlesen" id="rpc_tools.einrichtungen_einlesen" image="Images\ShapefilePoint16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
 
@@ -477,16 +477,22 @@
                     <Items>
                         <Button refID="rpc_tools.hilfe_erreichbarkeit" />
                         <Menu refID="rpc_tools.menu_oepnv" />
-                        <Menu refID="rpc_tools.menu_fahrrad_auto" />
+                        
+                    </Items>
+                </Menu>
+                
+                <Menu caption="Annahmen ver&#228;ndern" category="ProjektCheck" id="rpc_tools.menu_verkehr_annahmen" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                        <Button refID="rpc_tools.routing_settings" />
+                        <Tool refID="rpc_tools.anbindungspunkt" />
+                        <Button refID="rpc_tools.weighted_routing" />
                     </Items>
                 </Menu>
                 <Menu caption="Verkehr im Umfeld" category="ProjektCheck" id="rpc_tools.menu_verkehr_im_umfeld" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_verkehr" />
-                        <Button refID="rpc_tools.routing_settings" />
-                        <Tool refID="rpc_tools.anbindungspunkt" />
                         <Button refID="rpc_tools.initial_routing" />
-                        <Button refID="rpc_tools.weighted_routing" />
+                        <Menu refID="rpc_tools.menu_verkehr_annahmen" />
                     </Items>
                 </Menu>
 
