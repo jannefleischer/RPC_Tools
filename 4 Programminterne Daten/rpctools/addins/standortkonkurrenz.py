@@ -9,7 +9,8 @@ __all__ = [
     "MarktBearbeiten", "MarktHinzu", "BestandMarktBearbeiten",
     "PlanfallMarktBearbeiten", "BestandMarktHinzu",
     "PlanfallMarktHinzu", "PlanfallMarktErweiterung",
-    "ZentrumBearbeiten", "ZentrumHinzu", "StandortkonkurrenzProjektwirkung"
+    "ZentrumBearbeiten", "ZentrumHinzu", "StandortkonkurrenzProjektwirkung",
+    "MaerkteZentrenAnzeigen"
 ]
 
 
@@ -37,6 +38,15 @@ class TemplateEinlesenFeatureClass(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxMaerkteImportierenFeatureClass'
+
+
+class MaerkteZentrenAnzeigen(object):
+    def __init__(self):
+        self.outputs = [MaerkteAnzeigen(), ZentrenAnzeigen()]
+        
+    def onClick(self, coord=None):
+        for o in self.outputs:
+            o.show()
 
 
 class MarktBearbeiten(ToolboxButton):
@@ -92,8 +102,6 @@ class BestandMarktHinzu(MarktHinzu):
 class PlanfallMarktHinzu(MarktHinzu):
     _toolbox_name = 'TbxEditMarketsPlanfall'
     _new_market_name = 'unbenannter geplanter Markt'
-
-
 
 
 class ZentrumBearbeiten(ToolboxButton):

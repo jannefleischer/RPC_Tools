@@ -211,7 +211,7 @@
                 <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeStandortkonkurrenz" id="rpc_tools.hilfe_standortkonkurrenz" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
                     <Help heading="" />
                 </Button>
-                <Button caption="M&#228;rkte und Versorgungsbereiche anzeigen" category="ProjektCheck" class="MaerkteAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="">
+                <Button caption="M&#228;rkte und Versorgungsbereiche anzeigen" category="ProjektCheck" class="MaerkteZentrenAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="OpenStreetMap anfragen" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="">
