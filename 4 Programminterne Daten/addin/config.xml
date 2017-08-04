@@ -118,19 +118,7 @@
                 <Button caption="Gesamtkosten ermitteln" category="ProjektCheck" class="GesamtkostenErmitteln" id="rpc_tools.gesamtkosten_ermitteln" image="Images\450000-chart.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Stra&#223;e (innere Erschlie&#223;ung)" category="ProjektCheck" class="StrasseInnereKostenaufteilung" id="rpc_tools.strasse_innere_kostenaufteilung" image="Images\Driving.png" message="" tip="">
-                    <Help heading="" />
-                </Button>
-                <Button caption="Stra&#223;e (&#228;u&#223;ere Erschlie&#223;ung)" category="ProjektCheck" class="StrasseAeussereKostenaufteilung" id="rpc_tools.strasse_aeussere_kostenaufteilung" image="Images\Driving.png" message="" tip="">
-                    <Help heading="" />
-                </Button>
-                <Button caption="Kanalisation" category="ProjektCheck" class="KanalisationKostenaufteilung" id="rpc_tools.kanalisation_kostenaufteilung" image="Images\Kanal Mischsystem.png" message="" tip="">
-                    <Help heading="" />
-                </Button>
-                <Button caption="Trinkwasser" category="ProjektCheck" class="TrinkwasserKostenaufteilung" id="rpc_tools.trinkwasser_kostenaufteilung" image="Images\Trinkwasserleitung.png" message="" tip="">
-                    <Help heading="" />
-                </Button>
-                <Button caption="Elektrizit&#228;t" category="ProjektCheck" class="ElektrizitaetKostenaufteilung" id="rpc_tools.elektrizitaet_kostenaufteilung" image="Images\Stromleitung.png" message="" tip="">
+                <Button caption="Kostenaufteilung festlegen" category="ProjektCheck" class="Kostenaufteilung" id="rpc_tools.kostenaufteilung" image="Images\017000-breafcase_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Kosten nach Kostentr&#228;gern auswerten" category="ProjektCheck" class="KostenNachKostentraegernAuswerten" id="rpc_tools.kosten_nach_kostentraegern_auswerten" image="Images\450500-pie-chart.png" message="" tip="">
@@ -620,15 +608,6 @@
                         <Tool refID="rpc_tools.massnahme_bearbeiten" />
                     </Items>
                 </Menu>
-                <Menu caption="Kostenaufteilung festlegen" category="ProjektCheck" id="rpc_tools.menu_kostenaufteilung" isRootMenu="false" isShortcutMenu="true" separator="true">
-                    <Items>
-                        <Button refID="rpc_tools.strasse_innere_kostenaufteilung" />
-                        <Button refID="rpc_tools.strasse_aeussere_kostenaufteilung" />
-                        <Button refID="rpc_tools.kanalisation_kostenaufteilung" />
-                        <Button refID="rpc_tools.trinkwasser_kostenaufteilung" />
-                        <Button refID="rpc_tools.elektrizitaet_kostenaufteilung" />
-                    </Items>
-                </Menu>
                 <Menu caption="Infrastrukturfolgekosten" category="ProjektCheck" id="rpc_tools.menu_infrastrukturkosten" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_infrastruktur" />
@@ -638,7 +617,7 @@
                         <Button refID="rpc_tools.infrastrukturmengen_bilanzieren" />
                         <Button refID="rpc_tools.kostenkennwerte_kontrollieren" />
                         <Button refID="rpc_tools.gesamtkosten_ermitteln" />
-                        <Menu refID="rpc_tools.menu_kostenaufteilung" />
+                        <Button refID="rpc_tools.kostenaufteilung" />
                         <Button refID="rpc_tools.kosten_nach_kostentraegern_auswerten" />
                         <Button refID="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" />
                     </Items>

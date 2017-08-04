@@ -13,11 +13,9 @@ __all__ = [
     "KanalMischsystem", "KanalNurSchmutzwasser", "KanalTrennsystem",
     "Trinkwasserleitung", "Stromleitung",
     "NetzabschnittLoeschen",
-    "InfrastrukturmengenBilanzieren", "ElektrizitaetKostenaufteilung",
-    "GesamtkostenErmitteln", "KanalisationKostenaufteilung",
+    "InfrastrukturmengenBilanzieren", "GesamtkostenErmitteln", 
     "KostenNachKostentraegernAuswerten", "KostenProWEBzwAPVergleichen",
-    "KostenkennwerteKontrollieren", "StrasseAeussereKostenaufteilung",
-    "StrasseInnereKostenaufteilung", "TrinkwasserKostenaufteilung",
+    "KostenkennwerteKontrollieren", "Kostenaufteilung",
     "PunktMassnahmeHinzu", "PunktMassnahmeBearbeiten"
 ]
 
@@ -301,33 +299,8 @@ class KostenProWEBzwAPVergleichen(ToolboxButton):
     _toolbox_name = 'TbxKostenVergleichen'
 
 
-class StrasseAeussereKostenaufteilung(ToolboxButton):
-    """Implementation for rpc_tools.strasse_aeussere_kostenaufteilung (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = 'Infrastrukturkosten.pyt'
-    _toolbox_name = 'TbxNetzKostenaufteilungAuessere'
-
-
-class StrasseInnereKostenaufteilung(ToolboxButton):
-    """Implementation for rpc_tools.strasse_innere_kostenaufteilung (Button)"""
+class Kostenaufteilung(ToolboxButton):
+    """Implementation for rpc_tools.kostenaufteilung (Button)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Infrastrukturkosten.pyt'
     _toolbox_name = 'TbxNetzKostenaufteilungInnere'
-
-class TrinkwasserKostenaufteilung(ToolboxButton):
-    """Implementation for rpc_tools.trinkwasser_kostenaufteilung (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = 'Infrastrukturkosten.pyt'
-    _toolbox_name = 'TbxNetzKostenaufteilungTrinkwasser'
-
-class ElektrizitaetKostenaufteilung(ToolboxButton):
-    """Implementation for rpc_tools.elektrizitaet_kostenaufteilung (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = 'Infrastrukturkosten.pyt'
-    _toolbox_name = 'TbxNetzKostenaufteilungElektrizitaet'
-
-class KanalisationKostenaufteilung(ToolboxButton):
-    """Implementation for rpc_tools.kanalisation_kostenaufteilung (Button)"""
-    _path = folders.ANALYST_PYT_PATH
-    _pyt_file = 'Infrastrukturkosten.pyt'
-    _toolbox_name = 'TbxNetzKostenaufteilungKanalisation'
