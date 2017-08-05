@@ -59,6 +59,11 @@ class TbxSettings(Tbx):
     def Tool(self):
         return Settings
 
+    def round_param(self, value):
+        if value >= 10000:
+            return round(value, -3)
+        return round(value, -2)
+
     def _open(self, params):
         # get values from fgdb
         wege_w, pkw_w= self.query_table('Wege_je_Nutzung',
@@ -76,6 +81,9 @@ class TbxSettings(Tbx):
                                                  'PKW_Anteil'],
                                         where='Nutzungsart = {}'.format(
                                             nart.EINZELHANDEL))[0]
+        wege_w = self.round_param(wege_w)
+        wege_g = self.round_param(wege_g)
+        wege_e = self.round_param(wege_e)
         # set params and check if wege_x is set. if not: disable
         params.wohnen_wege.value = wege_w
         params.wohnen_pkw.value = pkw_w
