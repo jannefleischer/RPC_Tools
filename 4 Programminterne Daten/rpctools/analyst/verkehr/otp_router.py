@@ -642,7 +642,7 @@ class OTPRouter(object):
         counter = 1
         with arcpy.da.InsertCursor(fc, fields) as rows:
             for node in self.transfer_nodes.itervalues():
-                name = 'Zielpunkt ' + str(counter)
+                name = 'Herkunfts-/Zielpunkt ' + str(counter)
                 counter += 1
                 geom = node.get_geom()
                 if geom:

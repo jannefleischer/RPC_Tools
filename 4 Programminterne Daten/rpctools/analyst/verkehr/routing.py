@@ -26,7 +26,9 @@ class Routing(Tool):
         # self.output.update_layersymbology(u'Zusätzliche PKW-Fahrten')
         self.output.add_layer('verkehr', 'Zielpunkte',
                               featureclass='Zielpunkte',
-                              template_folder='Verkehr', zoom=False)
+                              template_folder='Verkehr',
+                              name='Herkunfts-/Zielpunkte',
+                              zoom=False)
 
     def run(self):
         toolbox = self.parent_tbx
