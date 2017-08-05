@@ -118,7 +118,8 @@ class TbxSettings(Tbx):
         # Wohnen
         param = params.wohnen_wege = arcpy.Parameter()
         param.name = u'wohnen_wege'
-        param.displayName = u'Gesamtzahl der Wege'
+        param.displayName = u'Gesamtzahl der Wege pro Werktag ' + \
+            u'(Hin- und Rückwege)'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -126,7 +127,8 @@ class TbxSettings(Tbx):
 
         param = params.wohnen_pkw = arcpy.Parameter()
         param.name = u'wohnen_pkw'
-        param.displayName = u'Anteil PKW-Fahrten'
+        param.displayName = u'Anteil der Wege als Pkw-Fahrer/in an dieser ' + \
+            u'Gesamtzahl (in Prozent)'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -138,7 +140,8 @@ class TbxSettings(Tbx):
         # Gewerbe
         param = params.gewerbe_wege = arcpy.Parameter()
         param.name = u'gewerbe_wege'
-        param.displayName = encode(u'Gesamtzahl der Wege')
+        param.displayName = u'Gesamtzahl der Wege pro Werktag ' + \
+            u'(Hin- und Rückwege)'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -146,7 +149,8 @@ class TbxSettings(Tbx):
 
         param = params.gewerbe_pkw = arcpy.Parameter()
         param.name = u'gewerbe_pkw'
-        param.displayName = u'Anteil PKW-Fahrten'
+        param.displayName = u'Anteil der Wege als Pkw-Fahrer/in an dieser ' + \
+            u'Gesamtzahl (in Prozent)'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -159,7 +163,8 @@ class TbxSettings(Tbx):
         # Einzelhandel
         param = params.einzelhandel_wege = arcpy.Parameter()
         param.name = u'einzelhandel_wege'
-        param.displayName = u'Gesamtzahl der Wege'
+        param.displayName = u'Gesamtzahl der Wege pro Werktag ' + \
+            u'(Hin- und Rückwege)'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -167,7 +172,8 @@ class TbxSettings(Tbx):
 
         param = params.einzelhandel_pkw = arcpy.Parameter()
         param.name = u'einzelhandel_pkw'
-        param.displayName = u'Anteil PKW-Fahrten'
+        param.displayName = u'Anteil der Wege als Pkw-Fahrer/in an dieser ' + \
+            u'Gesamtzahl (in Prozent)'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
