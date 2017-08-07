@@ -119,8 +119,8 @@ class ProjektwirkungMarkets(Tool):
         arcpy.AddMessage(u'Berechne Umsatzänderungen der Versorgungsbereiche...')
         self.update_centers()
 
-        #arcpy.AddMessage(u"Erstelle Distanzmatrix...")
-        #self.create_distance_matrix()
+        arcpy.AddMessage(u"Erstelle Distanzmatrix...")
+        self.create_distance_matrix()
 
 
     def calculate_zensus(self, markets):
