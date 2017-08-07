@@ -16,8 +16,9 @@ class RoutingQuery(object):
         'fromPlace': '0, 0',
         'mode': 'WALK',
         'cutoffSec': 600,
-        'walkSpeed': 3,
+        'walkSpeed': 1.33,
         'offRoadDistanceMeters': 500,
+        'bikeSpeed': 5.0,
     }
 
     def __init__(self):

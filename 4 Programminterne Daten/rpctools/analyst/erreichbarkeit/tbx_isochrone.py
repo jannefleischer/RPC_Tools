@@ -13,9 +13,9 @@ class Isochrone(Tool):
     cutoff = None
 
     modes = {
-        'CAR': ('Auto', 15),
-        'BICYCLE': ('Fahrrad', 10),
-        'WALK': (u'zu Fuß', 3)
+        'CAR': ('Auto', 5),
+        'BICYCLE': ('Fahrrad', 5),
+        'WALK': (u'zu Fuß', 1.33)
     }
 
     def add_outputs(self):
@@ -44,11 +44,11 @@ class Isochrone(Tool):
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
         query = RoutingQuery()
         target_epsg = self.parent_tbx.config.epsg
-        for mode, (name, speed) in self.modes.iteritems():
+        for mode, (name, walk_speed) in self.modes.iteritems():
             arcpy.AddMessage(u'Ermittle die Isochronen für den Modus "{}"'
                              .format(name))
             iso_poly = query.get_isochrone(centroid, target_epsg,
-                                           mode, cutoff_sec, speed)
+                                           mode, cutoff_sec, walk_speed)
             column_values['modus'].append(name)
             column_values['SHAPE@'].append(iso_poly)
         arcpy.AddMessage('Schreibe die Isochronen in die Datenbank...')
