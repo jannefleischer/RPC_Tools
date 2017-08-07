@@ -16,7 +16,8 @@ class Sales(object):
     #          nearest market = 4 min drive -> 'Umfeld'
     #          second market = 7 min drive -> 'Umfeld'
     #          third market = 12 min drive -> 'Abstand'
-    cut_off_time = 5
+    # Note: switched from times to km -> cutoff is > 1 km
+    relation_dist = 1  # km
 
     def __init__(self, df_distances, df_markets, df_zensus):
 
@@ -100,7 +101,7 @@ class Sales(object):
         """
         account competition through other markets of the same brand
         """
-        cut_off_time = self.cut_off_time
+        cut_off_time = self.relation_dist
         dist_matrix = dist_matrix.T
         results = pd.DataFrame(data=1., index=dist_matrix.index,
                                columns=dist_matrix.columns)

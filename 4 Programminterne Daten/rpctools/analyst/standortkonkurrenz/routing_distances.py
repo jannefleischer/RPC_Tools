@@ -122,10 +122,10 @@ class DistanceRouting(object):
         return ret
 
     def get_distances(self, origin, destinations, bbox=None):
-        kph = 30
+        kmh = 20
         distances = np.ones(len(destinations), dtype=int)
         distances *= np.iinfo(distances.dtype).max
-        dist_raster = self._request_dist_raster(origin, kph=kph)
+        dist_raster = self._request_dist_raster(origin, kmh=kmh)
         if dist_raster is None:
             return distances
         if bbox is not None:
@@ -142,13 +142,13 @@ class DistanceRouting(object):
         start = time.time()
         raster.register_points(destinations)
         for i, dest in enumerate(destinations):
-            distances[i] = (raster.get_value(dest) / 60.) * kph * 1000
+            distances[i] = (raster.get_value(dest) / 60.) * kmh * 1000
         print('mapping {}s'.format(time.time() - start))
     
         arcpy.Delete_management(dist_raster)
         return distances
 
-    def _request_dist_raster(self, origin, kph=30):        
+    def _request_dist_raster(self, origin, kmh=50):        
         if origin.epsg != self.epsg:
             origin.transform(self.epsg)
 #https://projektcheck.ggr-planung.de/otp/surfaces?batch=true&layers=traveltime&styles=color30&time=17:46&date=07-26-2017&mode=WALK&maxWalkDistance=750&fromPlace=53.47333527412444,9.715690612792967&toPlace=53.47333527412444,9.715690612792967
@@ -161,7 +161,8 @@ class DistanceRouting(object):
             'maxPreTransitTime': 1200,
             'cutoffMinutes': 20,
             #'searchRadiusM': 1000,
-            'walkSpeed': kph / 1.609344,
+            'walkSpeed': kmh / 3.6,
+            'intersectCosts': False,
         }
         start = time.time()
         err_msg = (u'Der Server meldet einen Fehler bei der Berechnung. '

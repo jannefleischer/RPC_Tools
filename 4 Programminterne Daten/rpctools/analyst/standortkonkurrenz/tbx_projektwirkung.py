@@ -42,7 +42,7 @@ class ProjektwirkungMarkets(Tool):
         planfall_idx = (id_nullfall != id_planfall) & (id_planfall > 0)
 
         for index, plan_market in df_markets[planfall_idx].iterrows():
-            for layer in ['Kaufkraftbindung', 'Erreichbarkeit']:
+            for layer in ['Kaufkraftbindung']:#, 'Erreichbarkeit']:
                 layer_name = u'{n} {m} ({i})'.format(n=layer,
                                                      m=plan_market['name'],
                                                      i=plan_market['id'])
@@ -97,10 +97,6 @@ class ProjektwirkungMarkets(Tool):
         self.sales_to_db(kk_nullfall, kk_planfall)
         arcpy.AddMessage(u'Berechne Umsatzänderungen der Versorgungsbereiche...')
         self.update_centers()
-
-        arcpy.AddMessage(u"Erstelle Distanzmatrix...")
-        self.create_distance_matrix()
-
 
     def calculate_zensus(self, markets):
         '''extract zensus points (incl. points for planned areas)
@@ -504,7 +500,7 @@ if __name__ == "__main__":
     t = TbxProjektwirkungMarkets()
     t.getParameterInfo()
     t.set_active_project()
-    t.par.recalculate.value = True
+    t.par.recalculate.value = False
     #t.show_outputs()
     t.execute()
 
