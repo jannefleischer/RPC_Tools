@@ -122,9 +122,10 @@ class DistanceRouting(object):
         return ret
 
     def get_distances(self, origin, destinations, bbox=None):
+        kmh = 20
         distances = np.ones(len(destinations), dtype=int)
         distances *= np.iinfo(distances.dtype).max
-        dist_raster = self._request_dist_raster(origin)
+        dist_raster = self._request_dist_raster(origin, kmh=kmh)
         if dist_raster is None:
             return distances
         if bbox is not None:
@@ -141,31 +142,34 @@ class DistanceRouting(object):
         start = time.time()
         raster.register_points(destinations)
         for i, dest in enumerate(destinations):
-            distances[i] = raster.get_value(dest)
+            distances[i] = (raster.get_value(dest) / 60.) * kmh * 1000
         print('mapping {}s'.format(time.time() - start))
     
         arcpy.Delete_management(dist_raster)
         return distances
 
-    def _request_dist_raster(self, origin):        
+    def _request_dist_raster(self, origin, kmh=50):        
         if origin.epsg != self.epsg:
-            origin.transform(self.epsg) 
+            origin.transform(self.epsg)
+#https://projektcheck.ggr-planung.de/otp/surfaces?batch=true&layers=traveltime&styles=color30&time=17:46&date=07-26-2017&mode=WALK&maxWalkDistance=750&fromPlace=53.47333527412444,9.715690612792967&toPlace=53.47333527412444,9.715690612792967
         params = {
             'batch': True,
             'routerId': self.ROUTER,
             'fromPlace': "{},{}".format(origin.y, origin.x),
-            'mode': 'WALK, CAR',
-            'maxWalkDistance': 5000,
+            'mode': 'WALK',
+            'maxWalkDistance': 50000,
             'maxPreTransitTime': 1200,
             'cutoffMinutes': 20,
-            'searchRadiusM': 1000
+            #'searchRadiusM': 1000,
+            'walkSpeed': kmh / 3.6,
+            'intersectCosts': False,
         }
         start = time.time()
         err_msg = (u'Der Server meldet einen Fehler bei der Berechnung. '
                    u'Bitte überprüfen Sie die Lage des Punktes '
                    u'(innerhalb Deutschlands und max. {}m '
                    u'vom bestehenden Straßennetz entfernt)'
-                   .format(params['searchRadiusM']))
+                   .format(1000))  #params['searchRadiusM']
         try:
             r = requests.post(self.URL, params=params)
             r.raise_for_status()
