@@ -69,7 +69,8 @@ class TbxNutzungen(TbxFlaechendefinition):
 
     def set_selected_area(self):
         area, i = self.get_selected_area()
-        self.par.bezugsbeginn.value = int(area['Beginn_Nutzung'])
+        if 'bezugsbeginn' in self.par:
+            self.par.bezugsbeginn.value = int(area['Beginn_Nutzung'])
         if 'dauer_aufsiedlung' in self.par:
             self.par.dauer_aufsiedlung.value = int(area['Aufsiedlungsdauer'])
 
@@ -81,7 +82,7 @@ class TbxNutzungen(TbxFlaechendefinition):
         if self.par.changed('area'):
             self.set_selected_area()
         
-        elif self.par.changed('bezugsbeginn'):
+        elif 'bezugsbeginn' in self.par and self.par.changed('bezugsbeginn'):
             self.df_areas.loc[idx, 'Beginn_Nutzung'] = self.par.bezugsbeginn.value
         elif ('dauer_aufsiedlung' in self.par and
             self.par.changed('dauer_aufsiedlung')):
@@ -510,8 +511,7 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
         params = super(TbxNutzungenEinzelhandel, self)._getParameterInfo()
         # no duration needed as the shops are assumed to be finished instantly
         self.remove_parameter('dauer_aufsiedlung')
-        
-        heading = u'2) Verkaufsflächen'
+        self.remove_parameter('bezugsbeginn')
         
         for srt in self.sortimente.itervalues():
             assert isinstance(srt, Sortiment)
@@ -525,7 +525,6 @@ class TbxNutzungenEinzelhandel(TbxNutzungen):
             param.value = u'0'
             param.filter.type = 'Range'
             param.filter.list = [0, 20000]
-            param.category = heading
 
         return params
 
