@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from rpctools.addins.common import ToolboxButton, folders, config
 from rpctools.addins.outputs import AnbindungspunkteAnzeigen
 
@@ -27,6 +28,13 @@ class Anbindungspunkt(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Verkehrserzeugung.pyt'
     _toolbox_name = 'TbxSetSource'
+    _message = (
+        u'Klicken Sie nach dem Schließen dieser Meldung in die Karte um einen '
+        u'Anbindungspunkt für eine der Teilflächen Ihres Plangebiets zu setzen.'
+        u'\n\nWarten Sie anschließend bis sich ein Dialogfenster öffnet, mit '
+        u'dem Sie festlegen können, welche Ihrer Teilflächen mit diesem '
+        u'Anbindungspunkt an das bestehende Straßennetz angeschlossen werden '
+        u'soll.')
 
     def __init__(self):
         super(Anbindungspunkt, self).__init__()
@@ -37,7 +45,8 @@ class Anbindungspunkt(ToolboxButton):
         
     def onClick(self, coord=None):
         self.output.show()
+        self.show_message()
 
     def onMouseDownMap(self, x, y, button, shift):
         config.active_coord = (x, y)
-        super(Anbindungspunkt, self).onClick()
+        super(Anbindungspunkt, self).open()

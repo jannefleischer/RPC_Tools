@@ -24,6 +24,7 @@ class InfrastructureDrawingTool(object):
     # has to match the column 'IDNetzelement' of base-table
     # Netze_und_Netzelemente (defined in subclasses)
     _id_netzelement = None
+    _message = ""
 
     def __init__(self):
         self.enabled = True
@@ -37,6 +38,11 @@ class InfrastructureDrawingTool(object):
 
     def onClick(self):
         self.output.show()
+        self.show_message()
+    
+    def show_message(self): 
+        if self._message:
+            pythonaddins.MessageBox(self._message, 'Hinweis', 0)
 
     def commit_geometry(self, tablename, shape, element_id, additional_columns={}):
         """insert geometry with spec. id into given table """
@@ -177,6 +183,13 @@ class PunktMassnahmeBearbeiten(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Infrastrukturkosten.pyt'
     _toolbox_name = 'TbxMassnahmenEditieren'
+    _message = (u'Klicken Sie nach dem Schließen dieser Meldung in der Karte '
+                u'in die Nähe der punktuellen Maßnahme, die Sie (als erstes) '
+                u'bearbeiten oder die sie löschen möchten. \n\n'
+                u'Warten Sie anschließend bis sich ein Dialogfenster öffnet, '
+                u'mit dem Sie die Bearbeitung vornehmen können. An dessen Ende '
+                u'finden Sie auch eine Löschoption für die ausgewählte oder '
+                u'alle punktuellen Maßnahmen.')
 
     def __init__(self):
         super(PunktMassnahmeBearbeiten, self).__init__()
@@ -187,10 +200,11 @@ class PunktMassnahmeBearbeiten(ToolboxButton):
 
     def onClick(self, coord=None):
         self.output.show()
+        self.show_message()
 
     def onMouseDownMap(self, x, y, button, shift):
         config.active_coord = (x, y)
-        super(PunktMassnahmeBearbeiten, self).onClick()
+        super(PunktMassnahmeBearbeiten, self).open()
 
 
 class PunktMassnahmeHinzu(PunktMassnahmeBearbeiten):
@@ -226,6 +240,13 @@ def delete_selected_elements(layer_name):
 
 
 class NetzabschnittLoeschen(InfrastructureDrawingTool):
+    _message = (u'Klicken Sie nach dem Schließen dieser Meldung in die Karte '
+                u'und ziehen Sie mit gedrückter Maustaste ein Rechteck auf.\n\n'
+                u'Alle Abschnitte aller Erschließungsnetze, die ganz oder '
+                u'teilweise innerhalb dieses Rechtecks liegen werden gelöscht. '
+                u'Punktuelle Maßnahmen innerhalb des Rechtecks werden nicht '
+                u'gelöscht.')
+    
     def __init__(self):
         super(NetzabschnittLoeschen, self).__init__()
         self.shape = "Rectangle"
@@ -233,7 +254,7 @@ class NetzabschnittLoeschen(InfrastructureDrawingTool):
     def onRectangle(self, rectangle):
         xmin, ymin = rectangle.XMin, rectangle.YMin
         xmax, ymax = rectangle.XMax, rectangle.YMax
-        project=config.active_project
+        project = config.active_project
         lines = folders.get_table('Erschliessungsnetze_Linienelemente',
                                   workspace='FGDB_Kosten.gdb',
                                   project=project)

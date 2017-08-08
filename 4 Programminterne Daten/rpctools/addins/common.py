@@ -41,14 +41,23 @@ class ToolboxButton(ToolboxWrapper):
     """super class for buttons calling toolboxes on click"""
     # show the toolbox on click (if False, just execute the Tool)
     _do_show = True
+    _message = None
 
     def __init__(self):
         super(ToolboxButton, self).__init__()
         self.enabled = True
         self.checked = False
+    
+    def show_message(self): 
+        if self._message:
+            pythonaddins.MessageBox(self._message, 'Hinweis', 0)
 
     def onClick(self):
         """call toolbox on click"""
+        self.show_message()
+        self.open()
+        
+    def open(self): 
         # validate active project
         self.tbx.set_active_project()
         valid, msg = self.tbx.validate_active_project()

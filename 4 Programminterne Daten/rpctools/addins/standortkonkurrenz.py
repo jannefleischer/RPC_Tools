@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import arcpy
 
 from rpctools.addins.common import ToolboxButton, folders, config
@@ -63,10 +64,11 @@ class MarktBearbeiten(ToolboxButton):
         
     def onClick(self, coord=None):
         self.output.show()
+        self.show_message()
 
     def onMouseDownMap(self, x, y, button, shift):
         config.active_coord = (x, y)
-        super(MarktBearbeiten, self).onClick()
+        super(MarktBearbeiten, self).open()
 
 
 class MarktHinzu(MarktBearbeiten):
@@ -84,30 +86,63 @@ class MarktHinzu(MarktBearbeiten):
 
 class BestandMarktBearbeiten(MarktBearbeiten):
     _toolbox_name = 'TbxEditMarketsNullfall'
+    _message = (u'Klicken Sie nach dem Schließen dieser Meldung in die Nähe '
+                u'des Marktes, den Sie bearbeiten oder löschen möchten.\n\n'
+                u'Warten Sie anschließend bis sich ein Dialogfenster öffnet, '
+                u'mit dem Sie den Markt bearbeiten oder löschen können.')
 
 
 class PlanfallMarktBearbeiten(MarktBearbeiten):
     _toolbox_name = 'TbxEditMarketsPlanfall'
+    _message = (u'Klicken Sie nach dem Schließen dieser Meldung in die Nähe '
+                u'des neuen Marktes im Planfall, den Sie bearbeiten oder '
+                u'löschen möchten.\n\n'
+                u'Warten Sie anschließend bis sich ein Dialogfenster öffnet, '
+                u'mit dem Sie den neuen Markt im Planfall bearbeiten oder '
+                u'löschen können.')
 
 
 class PlanfallMarktErweiterung(MarktBearbeiten):
     _toolbox_name = 'TbxExtendMarkets'
+    _message = (u'Klicken Sie nach dem Schließen dieser Meldung in die Nähe '
+                u'des Marktes, der im Zuge Ihrer Planung erweitert oder '
+                u'geschlossen werden soll ("Planfall").\n\n'
+                u'Warten Sie anschließend bis sich ein Dialogfenster öffnet, '
+                u'mit dem Sie die Details dieser Erweiterung bzw. Schließung '
+                u'festlegen.')
 
 
 class BestandMarktHinzu(MarktHinzu):
     _toolbox_name = 'TbxEditMarketsNullfall'
     _new_market_name = 'unbenannter Markt im Bestand'
+    _message = (u'Klicken Sie nach dem Schließen dieser Meldung an die Stelle '
+                u'in der Karte, an der Sie einen bestehenden Lebensmittelmarkt '
+                u'hinzufügen möchten.\n\n'
+                u'Warten Sie anschließend bis sich ein Dialogfenster öffnet, '
+                u'in das Sie den Namen und den Typ des Marktes eintragen '
+                u'können.')
 
 
 class PlanfallMarktHinzu(MarktHinzu):
     _toolbox_name = 'TbxEditMarketsPlanfall'
     _new_market_name = 'unbenannter geplanter Markt'
+    _message = (u'Klicken Sie nach dem Schließen dieser Meldung an die Stelle '
+                u'in der Karte, an der Sie im Planfall einen neuen '
+                u'Lebensmittelmarkt hinzufügen möchten.\n\n'
+                u'Warten Sie anschließend bis sich ein Dialogfenster öffnet, '
+                u'in das Sie den Namen und den Typ des Marktes eintragen '
+                u'können.')
 
 
 class ZentrumBearbeiten(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxEditCenters'
+    _message = (u'Klicken Sie nach dem Schließen dieser Meldung auf den '
+                u'Versorgungsbereich in der Karte, den Sie (um)benennen oder '
+                u'löschen möchten. \n\n'
+                u'Warten Sie anschließend bis sich ein entsprechendes '
+                u'Dialogfenster öffnet.')
 
     def __init__(self):
         super(ZentrumBearbeiten, self).__init__()
@@ -118,14 +153,30 @@ class ZentrumBearbeiten(ToolboxButton):
         
     def onClick(self, coord=None):
         self.output.show()
+        self.show_message()
 
     def onMouseDownMap(self, x, y, button, shift):
         config.active_coord = (x, y)
-        super(ZentrumBearbeiten, self).onClick()
+        super(ZentrumBearbeiten, self).open()
 
 
 class ZentrumHinzu(ZentrumBearbeiten):
     _new_center_name = 'unbenannter Versorgungsbereich'
+    _message = (u'Zeichnen Sie nach dem Schließen dieser Meldung in der Karte '
+                u'Versorgungsbereiche ein.\n\n'
+                u'Klicken Sie dazu mehrfach in die Karte, um Stützpunkte für '
+                u'die Form eines Versorgungsbereichs zu setzen. Schließen Sie '
+                u'das Einzeichnen jedes Versorgungsbereichs mit einem '
+                u'Doppelklick ab.\n\n'
+                u'Sie können unmittelbar danach einen weiteren weiteren '
+                u'Versorgungsbereich einzeichnen. Wenn Sie mit dem Einzeichnen '
+                u'der Versorgungsbereiche fertig sind, klicken Sie auf das '
+                u'grüne Häkchen ganz rechts in der Projekt-Check-Toolbox.\n\n'
+                u'Über die Funktion "Analysieren > Standortkonkurrenz '
+                u'Supermärkte > Versorgungsbereiche > Versorgungsbereiche '
+                u'bearbeiten / entfernen" können Sie bereits gezeichnete '
+                u'Versorgungsbereiche (um)benennen oder löschen.')
+    
     def __init__(self):
         super(ZentrumHinzu, self).__init__()
         self.shape = 'Line'
