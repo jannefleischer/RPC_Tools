@@ -27,7 +27,7 @@ class Routing(Tool):
                               featureclass='Zielpunkte',
                               template_folder='Verkehr',
                               name='Herkunfts-/Zielpunkte',
-                              zoom=False)#, symbology_classes=(15, 'Gewicht'))
+                              zoom=False)
 
     def run(self):
         toolbox = self.parent_tbx
