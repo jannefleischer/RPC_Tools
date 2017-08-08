@@ -21,14 +21,13 @@ class Routing(Tool):
         self.output.add_layer('verkehr', 'links',
                               featureclass='links',
                               template_folder='Verkehr',
-                              name='Zusätzliche PKW-Fahrten', zoom=True)
-        # layer ist noch nicht da...
-        # self.output.update_layersymbology(u'Zusätzliche PKW-Fahrten')
+                              name='Zusätzliche PKW-Fahrten', zoom=True,
+                              symbology_classes=(15, 'weight'))
         self.output.add_layer('verkehr', 'Zielpunkte',
                               featureclass='Zielpunkte',
                               template_folder='Verkehr',
                               name='Herkunfts-/Zielpunkte',
-                              zoom=False)
+                              zoom=False)#, symbology_classes=(15, 'Gewicht'))
 
     def run(self):
         toolbox = self.parent_tbx

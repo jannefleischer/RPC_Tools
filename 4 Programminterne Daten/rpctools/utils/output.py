@@ -2,7 +2,7 @@
 from collections import OrderedDict
 import arcpy
 import numpy as np
-import subprocess						
+import subprocess
 from rpctools.utils.config import Config, Folders
 
 class ArcpyEnv(object):
@@ -188,7 +188,8 @@ class Layer(object):
                  query="",
                  symbology={},
                  label_replace={},
-                 zoom=True):
+                 zoom=True,
+                 symbology_classes=None):
         self.groupname = groupname
         self.template_layer = template_layer
         self.featureclass = featureclass
@@ -202,6 +203,7 @@ class Layer(object):
         self.symbology = symbology
         self.label_replace = label_replace
         self.workspace = workspace
+        self.symbology_classes = symbology_classes
 
 
 class Output(object):
@@ -221,7 +223,7 @@ class Output(object):
         self.module = LayerGroup()
         self.layers = []
         self.diagrams = []
-        self.images = []							   
+        self.images = []
         self.add_layer_groups()
         self.define_outputs()
 
@@ -397,7 +399,7 @@ class Output(object):
         for l in self.get_layers(layername):
             l.visible = True
         arcpy.RefreshActiveView()
-        arcpy.RefreshTOC()			
+        arcpy.RefreshTOC()
 
     def set_grouplayer(self, group,
                        project_layer=None,
@@ -460,7 +462,7 @@ class Output(object):
                   query="",
                   symbology={},
                   label_replace={},
-                  zoom=True):
+                  zoom=True, symbology_classes=None):
         """
         Add output layer
 
@@ -507,6 +509,9 @@ class Output(object):
         label_replace : dictionary, optional
             replaces columns in label expressions, keys are the old values and
             the values the new ones to replace them with
+        symbology_classes : tuple of int and string, optional
+            Set a number of symbology classes for the layer between min and
+            max value.
         """
         if not name:
             name = template_layer
@@ -515,7 +520,8 @@ class Output(object):
                       disable_other=disable_other, subgroup=subgroup,
                       in_project=in_project, zoom=zoom, query=query,
                       template_folder=template_folder, symbology=symbology,
-                      label_replace=label_replace)
+                      label_replace=label_replace,
+                      symbology_classes=symbology_classes)
         self.layers.append(layer)
 
     def add_diagram(self, *args):
@@ -595,7 +601,7 @@ class Output(object):
 
         show_toolbar : boolean, optional
             if true, the toolbar within the new window is enabled
-        """								   
+        """
     def clear(self):
         '''remove all outputs (diagrams, layers etc.)'''
         self.diagrams = []
@@ -675,9 +681,13 @@ class Output(object):
         if layer.disable_other == True:
             for lyr in arcpy.mapping.ListLayers(project_layer):
                 lyr.visible = False
+        if layer.symbology_classes is not None:
+            num_symclasses, column = layer.symbology_classes
+            self.update_layersymbology(layer.name, num_symclasses, column)
+
         new_layer.visible = True
         for lyr in arcpy.mapping.ListLayers(new_layer):
-            lyr.visible = True											   
+            lyr.visible = True
         new_layer.name = layer.name
         if layer.query:
             new_layer.definitionQuery = layer.query
@@ -894,9 +904,11 @@ class Output(object):
         min_val = int(min(data)[0])
         max_val = int(max(data)[0]) + 1
         new_classes = np.linspace(min_val, max_val, num=num_classes + 1)
-        new_classes = np.round(new_classes)
+        new_classes = np.round(new_classes).astype(int)
+        labels = ['bis zu {}'.format(c) for c in new_classes[1:]]
         # update layer
         lyr.symbology.classBreakValues = new_classes
+        lyr.symbology.classBreakLabels = labels
         lyr.symbology.reclassify()
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
