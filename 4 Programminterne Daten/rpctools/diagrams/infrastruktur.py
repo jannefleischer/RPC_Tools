@@ -150,7 +150,7 @@ class KostentraegerDiagramm(MatplotDiagram):
     def _create(self, **kwargs):
         workspace = 'FGDB_Kosten.gdb'
         table = 'Gesamtkosten_nach_Traeger'
-        self.title = (u"{}: Aufteilung der Gesamtkosten"
+        self.title = (u"{}: Aufteilung der Gesamtkosten "
                       u"auf die Kostenträger".format(
                           self.tbx.par.get_projectname()))
         x_label = u"Kosten für Netzerweiterungen und punktuelle Maßnahmen"

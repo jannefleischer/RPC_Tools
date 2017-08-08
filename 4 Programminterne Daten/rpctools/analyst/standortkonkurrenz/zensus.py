@@ -1,10 +1,11 @@
 from rpctools.utils.config import Folders, Config
-from rpctools.utils.spatial_lib import clip_raster, Point
+from rpctools.utils.spatial_lib import clip_raster, Point, points_within
 
 import os
 import shutil
 import sys
 import arcpy
+import numpy as np
 
 
 class ZensusCell(Point):
@@ -31,19 +32,19 @@ class Zensus(object):
         except:
             pass
 
-    def cutout_area(self, centroid, size):
+    def cutout_area(self, centroid, radius, bbox, epsg=None):
         """return the centroids of the zensus cells as points in a square area
         with the dimensions of distance x distance with the given centroid in
         the middle
         """
-
+        size = 2 * radius
         zensus_points = []
         zensus_raster = self.folders.ZENSUS_RASTER_FILE
 
         out_raster = os.path.join(self.tmp_folder, 'zensus_cutout.tif')
-        
-        bbox = self.get_bbox(centroid, size)
 
+        # clipping circles is pro-version only
+        # clip square instead and filter by distances
         srid = clip_raster(zensus_raster, out_raster, bbox)
 
         out_shp = os.path.join(self.tmp_folder,
@@ -51,29 +52,21 @@ class Zensus(object):
         #cellsize = float(arcpy.GetRasterProperties_management(
             #zensus_file, 'CELLSIZEX').getOutput(0).replace(',', '.'))
 
-
         arcpy.RasterToPoint_conversion(out_raster, out_shp)
-
+        
         desc = arcpy.Describe(out_shp)
         rows = arcpy.da.SearchCursor(out_shp, ['SHAPE@XY', 'GRID_CODE'])
+        coords = []
         for i, ((x, y), value) in enumerate(rows):
             p = ZensusCell(x, y, id=i, epsg=srid, ew=value)
+            p.transform(epsg)
             zensus_points.append(p)
-
-        return zensus_points, bbox, i
-    
-    def get_bbox(self, centroid, size):
-        # p1 and p2 build square around centroid
-        p1 = Point(centroid.x - size / 2,
-                   centroid.y - size / 2,
-                   epsg=centroid.epsg)
-        p2 = Point(centroid.x + size / 2,
-                   centroid.y + size / 2,
-                   epsg=centroid.epsg)
-
-        bbox = (p1, p2)
+            coords.append((p.x, p.y))
         
-        return bbox
+        coords_within, within_idx = points_within(
+            (centroid.x, centroid.y), coords, radius)
+
+        return np.array(zensus_points)[within_idx].tolist(), i
 
     def add_kk(self, zensus_points, project):
         folders = Folders()

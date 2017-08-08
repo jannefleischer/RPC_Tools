@@ -39,6 +39,21 @@ class Point(object):
         self.x = x
         self.y = y
 
+def bounding_box(self, centroid, size):
+    '''return a square bounding box with given centroid in center and dimension
+    of size x size, tuple of lower left and upper right Point'''
+    p1 = Point(centroid.x - size / 2,
+               centroid.y - size / 2,
+               epsg=centroid.epsg)
+    p2 = Point(centroid.x + size / 2,
+               centroid.y + size / 2,
+               epsg=centroid.epsg)
+
+    bbox = (p1, p2)
+    
+    return bbox
+
+
 def google_geocode(address, api_key=''):
     url = 'https://maps.googleapis.com/maps/api/geocode/json'
     params = {'sensor': 'false', 'address': address}
@@ -83,9 +98,9 @@ def points_within(center_point, points, radius):
     
     Parameters
     ----------
-    center_point : tuple
+    center_point : tuple or Point
         x, y (, z) coordinates of center-point of circle
-    points : list of tuples
+    points : list of tuples or list of Points
         x, y (, z) coordinates of points
     radius : int
         radius of circle,
@@ -100,7 +115,7 @@ def points_within(center_point, points, radius):
     """
     distances = _get_distances(center_point, points)
     is_within = distances <= radius
-    return points[is_within], is_within
+    return np.array(points)[is_within], is_within
 
 def _get_distances(point, points):    
     points = [np.array(p) for p in points]

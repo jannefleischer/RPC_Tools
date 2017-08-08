@@ -12,7 +12,7 @@ from rpctools.utils.encoding import encode
 from rpctools.utils.spatial_lib import get_project_centroid
 from rpctools.analyst.standortkonkurrenz.zensus import Zensus, ZensusCell
 from rpctools.analyst.standortkonkurrenz.routing_distances import DistanceRouting
-from rpctools.utils.spatial_lib import Point
+from rpctools.utils.spatial_lib import Point, bounding_box
 from rpctools.utils.config import Folders
 from rpctools.analyst.standortkonkurrenz.sales import Sales
 
@@ -66,12 +66,17 @@ class ProjektwirkungMarkets(Tool):
         if self.recalculate:
             self.parent_tbx.delete_rows_in_table('Beziehungen_Maerkte_Zellen')
             self.parent_tbx.delete_rows_in_table('Siedlungszellen')
-
+        
+        x, y = get_project_centroid(self.projectname)
+        centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
+        radius = self.par.radius.value * 1000
+        
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
-        bbox = self.calculate_zensus(df_markets)
+        bbox = bounding_box(self, centroid, radius * 2)
+        self.calculate_zensus(df_markets, centroid, radius, bbox)
 
         arcpy.AddMessage(u'Ermittle angrenzende Gemeinden...')
-        self.communities_to_centers(bbox)
+        self.communities_to_centers(centroid, radius)
 
         # when cells were not recalculated (including Kaufkraft)
         # do it again (number of inhabitants may have changed by the user
@@ -123,18 +128,15 @@ class ProjektwirkungMarkets(Tool):
         self.create_distance_matrix()
 
 
-    def calculate_zensus(self, markets):
+    def calculate_zensus(self, markets, centroid, radius, bbox):
         '''extract zensus points (incl. points for planned areas)
         and write them to the database'''
         zensus = Zensus()
-        x, y = get_project_centroid(self.projectname)
-        centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
-        square_size = self.par.square_size.value * 1000
 
         if (len(self.parent_tbx.query_table('Siedlungszellen')) == 0):
             arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
-            zensus_points, bbox, max_id = zensus.cutout_area(
-                centroid, square_size)
+            zensus_points, max_id = zensus.cutout_area(
+                centroid, radius, bbox, epsg=self.parent_tbx.config.epsg)
             tfl_points = self.get_tfl_points(max_id + 1)
             # settlements = zensus centroids + teilflaeche centroids
             sz_points = zensus_points + tfl_points
@@ -145,28 +147,18 @@ class ProjektwirkungMarkets(Tool):
             # TODO: Update instead of rewrite
             self.zensus_to_db(sz_points)
         else:
-            bbox = zensus.get_bbox(centroid, square_size)
             arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
                              'Berechnung wird übersprungen')
-        for p in bbox:
-            p.transform(self.parent_tbx.config.epsg)
-        return bbox
 
-    def communities_to_centers(self, bbox):
+    def communities_to_centers(self, centroid, radius):
         '''get communities intersecting with bbox and write them as centers to
         the database'''
         gemeinden = self.parent_tbx.folders.get_base_table(
             table='bkg_gemeinden', workspace='FGDB_Basisdaten_deutschland.gdb')
-        p1, p2 = bbox
-        # bbox as polygon
-        poly_points = arcpy.Array([
-            arcpy.Point(p1.x, p1.y),
-            arcpy.Point(p1.x, p2.y),
-            arcpy.Point(p2.x, p2.y),
-            arcpy.Point(p2.x, p1.y),
-            arcpy.Point(p1.x, p1.y)
-        ])
-        bbox_poly = arcpy.Polygon(poly_points)
+        # circular buffer for clipping
+        centroid.create_geom()
+        pntGeom = arcpy.PointGeometry(centroid.geom)
+        circleGeom = pntGeom.buffer(radius)
         # delete existing community-entries
         self.parent_tbx.delete_rows_in_table('Zentren',
                                              where='nutzerdefiniert=0')
@@ -179,7 +171,7 @@ class ProjektwirkungMarkets(Tool):
             arcpy.Delete_management(fc_bbox)
         if arcpy.Exists(fc_clipped):
             arcpy.Delete_management(fc_clipped)
-        arcpy.CopyFeatures_management([bbox_poly], fc_bbox)
+        arcpy.CopyFeatures_management([circleGeom], fc_bbox)
         arcpy.Clip_analysis(gemeinden, fc_bbox, fc_clipped)
         cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'AGS'])
         # add clipped communities as centers
@@ -406,7 +398,6 @@ class ProjektwirkungMarkets(Tool):
 
     def zensus_to_db(self, zensus_points):
         df = pd.DataFrame()
-        epsg = self.parent_tbx.config.epsg
         shapes = []
         ews = []
         kk_indices = []
@@ -419,7 +410,6 @@ class ProjektwirkungMarkets(Tool):
             # (but keep the planned ones)
             if point.ew <= 0 and point.tfl_id < 0:
                 continue
-            point.transform(epsg)
             point.create_geom()
             shapes.append(point.geom)
             ews.append(point.ew)
@@ -501,15 +491,15 @@ class TbxProjektwirkungMarkets(Tbx):
         p.value = self.config.active_project
 
         # set square size
-        p = self.add_parameter('square_size')
+        p = self.add_parameter('radius')
         p.name = u'sqare_size'
-        p.displayName = encode(u'Größe des betrachteten Siedlungs-Bereichs '
-                               u'wählen (km)')
+        p.displayName = encode(u'Radius des betrachteten Siedlungs-Bereichs '
+                               u'um die Projektfläche wählen (km)')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPLong'
         p.enabled = False
-        p.value = 40
+        p.value = 20
 
         param = self.add_parameter('recalculate')
         param.name = encode(u'Neuberechnung')
@@ -528,7 +518,7 @@ if __name__ == "__main__":
     t = TbxProjektwirkungMarkets()
     t.getParameterInfo()
     t.set_active_project()
-    t.par.recalculate.value = False
+    t.par.recalculate.value = True
     #t.show_outputs()
     t.execute()
 
