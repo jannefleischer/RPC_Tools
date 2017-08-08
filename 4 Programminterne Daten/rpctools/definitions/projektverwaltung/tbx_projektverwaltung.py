@@ -79,16 +79,7 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
         params = self.par
 
         projects = self.folders.get_projects()
-
-        # Name_des_neuen_Projektes
-        p = self.add_parameter('name')
-        p.name = u'Name_des_neuen_Projektes'
-        p.displayName = u'Name des neuen Projektes'
-        p.parameterType = 'Required'
-        p.direction = 'Input'
-        p.datatype = 'GPString'
-        p.value = u''
-
+    
         # Bestehendes_Projekt_auswählen
         p = self.add_parameter('existing_project')
         p.name = encode('Bestehendes_Projekt_auswählen')
@@ -97,6 +88,15 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
         p.direction = 'Input'
         p.datatype = 'GPString'
         p.filter.list = projects
+        
+        # Name_des_neuen_Projektes
+        p = self.add_parameter('name')
+        p.name = u'Name_des_neuen_Projektes'
+        p.displayName = u'Name des neuen Projektes'
+        p.parameterType = 'Required'
+        p.direction = 'Input'
+        p.datatype = 'GPString'
+        p.value = u''
 
         return params
 
@@ -107,6 +107,7 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
 
         projects = self.folders.get_projects()
         params.existing_project.filter.list = projects
+        params.existing_project.value = projects[0]
 
 
 class TbxProjekteLoeschen(TbxProjektVerwaltung):

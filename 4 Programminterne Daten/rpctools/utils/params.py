@@ -389,6 +389,11 @@ class Tbx(object):
             self._update_project_list()
         self._update_dependencies(self.par)
             #self._create_temporary_copies()
+        # check for invalid manual entries in dropdowns
+        for param in self.par:
+            if (param.datatype == 'Zeichenfolge' and param.filter.list and
+                param.altered and param.value not in param.filter.list):
+                return
         self._updateParameters(self.par)
 
     def open(self):
@@ -525,6 +530,16 @@ class Tbx(object):
                 u'nicht korrekt durchgeführt.\n\r '
                 u'Folgende Pfade oder Tabellen wurden nicht gefunden: {}'
                 .format(invalid))
+            
+        # check for invalid manual entries in dropdowns
+        for param in self.par:
+            if (param.datatype == 'Zeichenfolge' and param.filter.list and
+                param.altered and param.value not in param.filter.list):
+                param.setErrorMessage(
+                    u'Bitte ändern Sie nicht manuell Einträge in den '
+                    u'Dropdown-Menüs! Für eventuelle Umbenennungen sind in der '
+                    u'Regel eigene Eingabefelder vorgesehen.')
+                return
         self._updateMessages(self.par)
 
     def validate_inputs(self):

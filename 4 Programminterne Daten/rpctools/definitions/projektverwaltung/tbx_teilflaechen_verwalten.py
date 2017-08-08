@@ -129,8 +129,6 @@ class TbxFlaechendefinition(Tbx):
             self._open(params)
 
         elif params.changed('area'):
-            if params.area.value not in params.area.filter.list:
-                return
             self.set_selected_area()
 
         return params
@@ -158,11 +156,6 @@ class TbxFlaechendefinition(Tbx):
         valid, msg = self.validate_inputs()
         if not valid:
             self.par.projectname.setErrorMessage(msg)
-        if params.area.value not in params.area.filter.list:
-            params.area.setErrorMessage(u'Bitte ändern Sie nicht den Namen der '
-                                        u'Fläche im Dropdown-Menü! Für diesen '
-                                        u'Fall ist in der Nutzungsdefinition ein '
-                                        u'eigenes Feld vorgesehen')
 
 
 class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
