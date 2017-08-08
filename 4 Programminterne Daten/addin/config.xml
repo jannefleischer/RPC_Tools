@@ -241,10 +241,10 @@
 
                 <!-- FLAECHE UND OEKOLOGIE  -->
 
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeFlaeche" id="rpc_tools.anleitung_flaeche" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeFlaeche" id="rpc_tools.hilfe_flaeche" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
                     <Help heading="" />
                 </Button>
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeOekologie" id="rpc_tools.anleitung_oekologie" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeOekologie" id="rpc_tools.hilfe_oekologie" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
                     <Help heading="" />
                 </Button>
                 <Button caption="Natur- und Artenschutz" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.naturschutzgebiete" image="" message="" tip="">
@@ -421,7 +421,7 @@
                 <Menu caption="Verwalten" category="ProjektCheck" id="rpc_tools.menu_verwalten" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_verwaltung" />
-                        <Button refID="rpc_tools.neues_projekt" />
+                        <Button refID="rpc_tools.neues_projekt" separator="true"/>
                         <Button refID="rpc_tools.projekt_kopieren" />
                         <Button refID="rpc_tools.projekt_loeschen" />
                     </Items>
@@ -436,14 +436,14 @@
                 <Menu caption="Definieren" category="ProjektCheck" id="rpc_tools.menu_definieren" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_nutzungen" />
-                        <Button refID="rpc_tools.nutzungen_definieren" />
+                        <Button refID="rpc_tools.nutzungen_definieren" separator="true"/>
                         <Menu refID="rpc_tools.nutzungen_menu_detailangaben_nutzungen" />
                     </Items>
                 </Menu>
                 <Menu caption="Bewohner und Arbeitspl&#228;tze" category="ProjektCheck" id="rpc_tools.menu_bewohner_und_arbeitsplaetze" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_bewohner_arbeitsplaetze" />
-                        <Button refID="rpc_tools.bewohner_schaetzen" />
+                        <Button refID="rpc_tools.bewohner_schaetzen" separator="true"/>
                         <Button refID="rpc_tools.arbeitsplaetze_schaetzen" />
                     </Items>
                 </Menu>
@@ -464,7 +464,7 @@
                 <Menu caption="Erreichbarkeit" category="ProjektCheck" id="rpc_tools.menu_erreichbarkeit" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_erreichbarkeit" />
-                        <Menu refID="rpc_tools.menu_oepnv" />
+                        <Menu refID="rpc_tools.menu_oepnv" separator="true"/>
                         <Menu refID="rpc_tools.menu_fahrrad_auto" />
                     </Items>
                 </Menu>
@@ -479,7 +479,7 @@
                 <Menu caption="Verkehr im Umfeld" category="ProjektCheck" id="rpc_tools.menu_verkehr_im_umfeld" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_verkehr" />
-                        <Button refID="rpc_tools.initial_routing" />
+                        <Button refID="rpc_tools.initial_routing" separator="true"/>
                         <Menu refID="rpc_tools.menu_verkehr_annahmen" />
                     </Items>
                 </Menu>
@@ -569,16 +569,16 @@
                 </Menu>
                 <Menu caption="&#214;kologie" category="ProjektCheck" id="rpc_tools.menu_oekologie" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
-                        <Button refID="rpc_tools.anleitung_oekologie" />
-                        <Menu refID="rpc_tools.menu_ueberschneidungen" />
+                        <Button refID="rpc_tools.hilfe_oekologie" />
+                        <Menu refID="rpc_tools.menu_ueberschneidungen" separator="true"/>
                         <Menu refID="rpc_tools.menu_uzvr" />
                         <Menu refID="rpc_tools.menu_bodenbedeckung" />
                     </Items>
                 </Menu>
                 <Menu caption="Fl&#228;cheninanspruchnahme" category="ProjektCheck" id="rpc_tools.menu_flaeche" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
-                        <Button refID="rpc_tools.anleitung_flaeche" />
-                        <Menu refID="rpc_tools.menu_effiziente_nutzung" />
+                        <Button refID="rpc_tools.hilfe_flaeche" />
+                        <Menu refID="rpc_tools.menu_effiziente_nutzung" separator="true"/>
                         <Menu refID="rpc_tools.menu_integrierte_lage" />
                     </Items>
                 </Menu>
@@ -592,13 +592,13 @@
                     <Items>
                         <Tool refID="rpc_tools.anliegerstrasse_innere" />
                         <Tool refID="rpc_tools.sammelstrasse_innere" />
-                        <Tool refID="rpc_tools.anliegerstrasse_aeussere"  separator="true"/>
+                        <Tool refID="rpc_tools.anliegerstrasse_aeussere" separator="true"/>
                         <Tool refID="rpc_tools.sammelstrasse_aeussere" />
-                        <Tool refID="rpc_tools.kanal_trennsystem"  separator="true"/>
+                        <Tool refID="rpc_tools.kanal_trennsystem" separator="true"/>
                         <Tool refID="rpc_tools.kanal_mischsystem" />
                         <Tool refID="rpc_tools.kanal_nur_schmutzwasser" />
-                        <Tool refID="rpc_tools.trinkwasserleitung"  separator="true"/>
-                        <Tool refID="rpc_tools.stromleitung"  separator="true"/>
+                        <Tool refID="rpc_tools.trinkwasserleitung" separator="true"/>
+                        <Tool refID="rpc_tools.stromleitung" separator="true"/>
                         <Tool refID="rpc_tools.netzabschnitt_loeschen" separator="true"/>
                     </Items>
                 </Menu>
@@ -611,15 +611,15 @@
                 <Menu caption="Infrastrukturfolgekosten" category="ProjektCheck" id="rpc_tools.menu_infrastrukturkosten" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_infrastruktur" />
-                        <Button refID="rpc_tools.erschliessungsnetze_anzeigen"/>
+                        <Button refID="rpc_tools.erschliessungsnetze_anzeigen" separator="true"/>
                         <Menu refID="rpc_tools.menu_erschliessungsnetze_skizzieren" />
                         <Menu refID="rpc_tools.menu_punktuelle_massnahmen" />
-                        <Button refID="rpc_tools.infrastrukturmengen_bilanzieren" />
+                        <Button refID="rpc_tools.infrastrukturmengen_bilanzieren" separator="true"/>
                         <Button refID="rpc_tools.kostenkennwerte_kontrollieren" />
                         <Button refID="rpc_tools.gesamtkosten_ermitteln" />
-                        <Button refID="rpc_tools.kostenaufteilung" />
+                        <Button refID="rpc_tools.kostenaufteilung" separator="true"/>
                         <Button refID="rpc_tools.kosten_nach_kostentraegern_auswerten" />
-                        <Button refID="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" />
+                        <Button refID="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" separator="true"/>
                     </Items>
                 </Menu>
                 <Menu caption="Gewerbesteuer" category="ProjektCheck" id="rpc_tools.menu_gewerbesteuer" isRootMenu="false" isShortcutMenu="true" separator="true">
@@ -660,22 +660,21 @@
                 <Menu caption="Kommunale Steuereinnahmen" category="ProjektCheck" id="rpc_tools.menu_einnahmen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_einnahmen" />
-                        <Menu refID="rpc_tools.menu_wanderungssalden" />
+                        <Menu refID="rpc_tools.menu_wanderungssalden" separator="true"/>
                         <Menu refID="rpc_tools.menu_fiskalische_bilanzen" />
                     </Items>
                 </Menu>
                 <Menu caption="Bestand einlesen" category="ProjektCheck" id="rpc_tools.menu_bestand_einlesen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
-                        <Button refID="rpc_tools.bestand_osm" />
-                        <Button refID="rpc_tools.template_erzeugen" />
-                        <Button refID="rpc_tools.template_einlesen_datei" />
-                        <Button refID="rpc_tools.template_einlesen_featureclass" />
                     </Items>
                 </Menu>
                 <Menu caption="Lebensmitteleinzelhandel im Bestand" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
-                        <Menu refID="rpc_tools.menu_bestand_einlesen" />
-                        <Tool refID="rpc_tools.bestand_hinzu" />
+                        <Button refID="rpc_tools.bestand_osm" />
+                        <Button refID="rpc_tools.template_erzeugen" />
+                        <Button refID="rpc_tools.template_einlesen_datei" />
+                        <Button refID="rpc_tools.template_einlesen_featureclass" />
+                        <Tool refID="rpc_tools.bestand_hinzu" separator="true"/>
                         <Tool refID="rpc_tools.bestand_bearbeiten" />
                     </Items>
                 </Menu>
@@ -695,11 +694,11 @@
                 <Menu caption="Standortkonkurrenz Superm&#228;rkte" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_standortkonkurrenz" />
+                        <Button refID="rpc_tools.maerkte_anzeigen" separator="true"/>
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_nullfall" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_planfall" />
                         <Menu refID="rpc_tools.menu_zentren" />
-                        <Button refID="rpc_tools.maerkte_anzeigen" />
-                        <Button refID="rpc_tools.standortkonkurrenz_projektwirkung" />
+                        <Button refID="rpc_tools.standortkonkurrenz_projektwirkung" separator="true"/>
                     </Items>
                 </Menu>
                 <Menu caption="Analysieren" category="ProjektCheck" id="rpc_tools.menu_analysieren" isRootMenu="false" isShortcutMenu="true" separator="true">
