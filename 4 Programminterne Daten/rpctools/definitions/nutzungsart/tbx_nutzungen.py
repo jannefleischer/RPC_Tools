@@ -340,7 +340,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
     
     def get_shares(self):
         df_shares = self.table_to_dataframe(
-            'Gewerbe_Anteile')
+            'Gewerbe_Anteile') 
         return df_shares    
 
     def set_gewerbe_presets(self, id_gewerbe):
@@ -411,7 +411,6 @@ class TbxNutzungenGewerbe(TbxNutzungen):
         if altered and auto_idx:
             n_jobs = self.estimate_jobs()
             params.arbeitsplaetze_insgesamt.value = n_jobs
-            self._update_shares(area)
         
         if self.par.changed('arbeitsplaetze_insgesamt') or altered:
             idx = self.df_jobs['IDTeilflaeche'] == area['id_teilflaeche']
@@ -419,6 +418,7 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             self.df_jobs.loc[idx, 'Arbeitsplaetze'] = n_jobs
             self.df_jobs.loc[idx, 'ist_geschaetzt'] = auto_idx
             self.df_areas.loc[area_idx, 'AP_gesamt'] = n_jobs
+            self._update_shares(area)
             self.update_pretty_name()
                 
         return params
@@ -490,6 +490,8 @@ class TbxNutzungenGewerbe(TbxNutzungen):
             self.par.arbeitsplaetze_insgesamt.enabled = True
 
         self.par.arbeitsplaetze_insgesamt.value = n_jobs
+        self.df_areas.loc[idx, 'AP_gesamt'] = n_jobs
+        self.update_pretty_name()
         self.par.gebietstyp.value = self.par.gebietstyp.filter.list[0]
 
 
