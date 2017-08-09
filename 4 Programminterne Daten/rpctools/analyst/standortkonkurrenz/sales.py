@@ -108,6 +108,7 @@ class Sales(object):
         
         probabilities = attraction_matrix / attraction_matrix.sum(axis=0)
         kk_flow = probabilities * kk_matrix
+        kk_flow = kk_flow.fillna(0)
         
         if self.debug:
             arcpy.AddMessage('DEBUG: Schreibe weitere Zwischenergebnisse')

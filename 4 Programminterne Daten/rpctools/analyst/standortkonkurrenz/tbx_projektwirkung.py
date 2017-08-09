@@ -127,9 +127,6 @@ class ProjektwirkungMarkets(Tool):
         arcpy.AddMessage(u'Berechne Umsatzänderungen der Versorgungsbereiche...')
         self.update_centers()
 
-        #arcpy.AddMessage(u"Erstelle Distanzmatrix...")
-        #self.create_distance_matrix()
-
 
     def calculate_zensus(self, markets, centroid, radius, bbox):
         '''extract zensus points (incl. points for planned areas)
@@ -434,45 +431,6 @@ class ProjektwirkungMarkets(Tool):
         df['id_teilflaeche'] = tfl_ids
 
         self.parent_tbx.insert_dataframe_in_table('Siedlungszellen', df)
-
-    def create_distance_matrix(self):
-        distance_path = self.folders.get_table("Beziehungen_Maerkte_Zellen", "FGDB_Standortkonkurrenz_Supermaerkte.gdb")
-        modul_path = self.folders.get_db("FGDB_Standortkonkurrenz_Supermaerkte.gdb")
-        markets_path = self.folders.get_table("Maerkte", "FGDB_Standortkonkurrenz_Supermaerkte.gdb")
-        matrix_path = os.path.join(modul_path, "Distanzmatrix")
-        arcpy.AddMessage("...Anzahl Maerkte ermitteln...")
-        cursor = arcpy.da.SearchCursor(markets_path, ["id"])
-        number_markets = 0
-        for row in cursor:
-            number_markets = row[0]
-        arcpy.AddMessage("...Distanzmatrix initialisieren...")
-        if arcpy.Exists(matrix_path):
-            arcpy.Delete_management(matrix_path)
-        arcpy.CreateTable_management(modul_path, "Distanzmatrix")
-        arcpy.AddField_management(matrix_path, "ID_Siedlungszelle", "LONG")
-
-        fields_insert = ["ID_Siedlungszelle"]
-        for number in range(1, number_markets + 1):
-            arcpy.AddField_management(matrix_path, "Markt_" + str(number), "LONG")
-            fields_insert.append("Markt_" + str(number))
-
-
-        cursor_distance = arcpy.da.SearchCursor(distance_path, ["id_markt","id_siedlungszelle","distanz"])
-        arcpy.AddMessage("...Distanzmatrix befuellen...")
-        used_cell = -1
-        new_cell = [-1] * (number_markets +1)
-        for cell in cursor_distance:
-            if cell[1] == used_cell or used_cell == -1:
-                #arcpy.AddMessage("Update: " + str(cell[1]))
-                new_cell[cell[0]] = cell[2]
-            else:
-                new_cell[0] = used_cell
-                cursor_matrix = arcpy.da.InsertCursor(matrix_path, fields_insert)
-                arcpy.AddMessage("Insert: " + str(new_cell[0]))
-                cursor_matrix.insertRow(new_cell)
-                new_cell = [-1] * (number_markets +1)
-                new_cell[cell[0]] = cell[2]
-            used_cell = cell[1]
 
 
 class TbxProjektwirkungMarkets(Tbx):
