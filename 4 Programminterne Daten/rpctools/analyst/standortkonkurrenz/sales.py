@@ -61,7 +61,7 @@ class Sales(object):
             zensus = self.zensus[self.zensus['id_teilflaeche'] < 0]
         else:
             zensus = self.zensus
-
+ 
         df_kk = pd.DataFrame()
         df_kk['id_siedlungszelle'] = zensus['id']
         df_kk['kk'] = zensus['kk']

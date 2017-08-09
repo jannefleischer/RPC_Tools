@@ -110,7 +110,7 @@ class ProjektwirkungMarkets(Tool):
         del(values)
         values = self.parent_tbx.query_table(
             'Beziehungen_Maerkte_Zellen', columns=['distanz'])
-        df_distances['distanz'] = np.array(values).reshape(len(values)).astype('int8')
+        df_distances['distanz'] = np.array(values).reshape(len(values)).astype('int32')
         del(values)
         
         sales = Sales(df_distances, df_markets, df_zensus)
@@ -124,8 +124,8 @@ class ProjektwirkungMarkets(Tool):
         arcpy.AddMessage(u'Berechne Umsatzänderungen der Versorgungsbereiche...')
         self.update_centers()
 
-        arcpy.AddMessage(u"Erstelle Distanzmatrix...")
-        self.create_distance_matrix()
+        #arcpy.AddMessage(u"Erstelle Distanzmatrix...")
+        #self.create_distance_matrix()
 
 
     def calculate_zensus(self, markets, centroid, radius, bbox):
@@ -413,7 +413,8 @@ class ProjektwirkungMarkets(Tool):
             point.create_geom()
             shapes.append(point.geom)
             ews.append(point.ew)
-            kk_indices.append(point.kk_index)
+            #kk_indices.append(point.kk_index)
+            kk_indices.append(100)
             kks.append(point.kk)
             cell_ids.append(point.id)
             tfl_ids.append(point.tfl_id)
@@ -466,6 +467,7 @@ class ProjektwirkungMarkets(Tool):
                 new_cell[cell[0]] = cell[2]
             used_cell = cell[1]
 
+
 class TbxProjektwirkungMarkets(Tbx):
 
     @property
@@ -498,8 +500,10 @@ class TbxProjektwirkungMarkets(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPLong'
-        p.enabled = False
+        p.filter.type = 'Range'
+        p.filter.list = [1, 30]
         p.value = 20
+        p.enabled = False
 
         param = self.add_parameter('recalculate')
         param.name = encode(u'Neuberechnung')
@@ -518,7 +522,7 @@ if __name__ == "__main__":
     t = TbxProjektwirkungMarkets()
     t.getParameterInfo()
     t.set_active_project()
-    t.par.recalculate.value = True
+    t.par.recalculate.value = False
     #t.show_outputs()
     t.execute()
 
