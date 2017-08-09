@@ -80,7 +80,7 @@ class TbxNetzKostenaufteilung(Tbx):
             idx = ((self.df_results.IDNetz == self._netztyp) &
                    (self.df_results.IDKostenphase == id_to_set))
             id_rule = self.df_results.loc[idx, 'IDKostenregel'].values[0]
-            
+
             owner.value = int(self.df_results.loc[idx, 'Anteil_GSB'])
             community.value = int(self.df_results.loc[idx, 'Anteil_GEM'])
             users.value = int(self.df_results.loc[idx, 'Anteil_ALL'])
@@ -178,9 +178,9 @@ class TbxNetzKostenaufteilung(Tbx):
             'Netze_und_Netzelemente', columns=['IDNetz', 'Netz'],
             workspace='FGDB_Kosten_Tool.gdb', is_base_table=True)
         self._df_netzwork_id = self._df_netzwork_id.drop_duplicates()
-        category_EH = "Einmalige Herstellung"
-        category_BU = "Betrieb und Unterhaltung"
-        category_EN = "Erneuerung"
+        category_EH = "1) Einmalige Herstellung"
+        category_BU = "2) Betrieb und Unterhaltung"
+        category_EN = "3) Erneuerung"
         # Projekt_auswählen
         p = self.add_parameter('project')
         p.name = u'Projekt_auswählen'.encode('cp1252')
