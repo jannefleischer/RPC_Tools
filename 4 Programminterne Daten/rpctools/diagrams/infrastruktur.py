@@ -55,9 +55,9 @@ class MassnahmenKostenDiagramm(MatplotDiagram):
 
     def _create(self, **kwargs):
         point_table = 'Erschliessungsnetze_Punktelemente'
-        self.title = u"{}: Kosten der punktuellen Maßnahmen".format(
+        self.title = u"{}: Kosten der punktuellen Maßnahmen (nur erstmalige Herstellung)".format(
             self.tbx.par.get_projectname())
-        x_label = u"Kosten der punktuellen Maßnahmen"
+        x_label = u"Kosten der punktuellen Maßnahmen (nur erstmalige Herstellung)"
 
         point_df = self.tbx.table_to_dataframe(
             point_table, workspace='FGDB_Kosten.gdb')
@@ -294,12 +294,12 @@ if __name__ == "__main__":
     #diagram = KostentraegerDiagramm()
     #diagram.create()
     #diagram.show()
-    #diagram = MassnahmenKostenDiagramm()
-    #diagram.create()
-    #diagram.show()
+    diagram = MassnahmenKostenDiagramm()
+    diagram.create()
+    diagram.show()
     #diagram = NetzlaengenDiagramm()
     #diagram.create()
     #diagram.show()
-    diagram = GesamtkostenDiagramm()
-    diagram.create()
-    diagram.show()
+    #diagram = GesamtkostenDiagramm()
+    #diagram.create()
+    #diagram.show()
