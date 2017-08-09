@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import sys
 
@@ -15,7 +15,7 @@ class Projektauswahl(Projektverwaltung):
     def run(self):
         self.parent_tbx.config.active_project = self.par.active_project.value
         self.output.define_projection()
-        
+
 
 class TbxProjektauswahl(Tbx):
     """Toolbox Projektauswahl"""
@@ -36,8 +36,8 @@ class TbxProjektauswahl(Tbx):
         params = self.par
         # Bestehendes_Projekt_auswählen
         p = self.add_parameter('name')
-        p.name = encode('aktives Projekt')
-        p.displayName = encode('aktives Projekt auswählen')
+        p.name = encode('Projekt')
+        p.displayName = encode('Projekt')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'GPString'
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     t = TbxProjektauswahl()
     params = t.getParameterInfo()
     t.par.name.value = 'NEU'
-    t.show_outputs()    
+    t.show_outputs()
     #t.par.active_project.value = t.config.active_project
     t.execute()
 

@@ -30,7 +30,7 @@ class Isochrone(Tool):
             if self.cutoff:
                 name += ' ({} Minuten)'.format(self.cutoff)
             self.output.add_layer(group_layer, layer, fc,
-                                  name=name, 
+                                  name=name,
                                   template_folder='Erreichbarkeit',
                                   zoom=False)
 
@@ -73,7 +73,7 @@ class TbxIsochrone(Tbx):
         # Projekt_auswählen
         param = self.add_parameter('projectname')
         param.name = encode(u'Projekt_auswählen')
-        param.displayName = encode(u'Projekt auswählen')
+        param.displayName = encode(u'Projekt')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'

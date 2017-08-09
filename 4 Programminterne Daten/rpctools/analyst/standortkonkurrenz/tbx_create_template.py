@@ -15,14 +15,14 @@ class CreateTemplate(Tool):
     def run(self):
         typ = self.par.template_type.value
         arcpy.AddMessage('Template wird erzeugt...')
-    
+
         path = self.par.folder.value.value
         template = MarketTemplate(typ, path, epsg=self.parent_tbx.config.epsg)
         template.create()
-        
+
         arcpy.AddMessage('Template wird geöffnet, bitte warten...')
         template.open()
-        
+
         if self.par.show_help:
             fn = MarketTemplate.template_types[typ][1]
             fp = os.path.join(self.folders.MANUALS_PATH, fn)
@@ -30,7 +30,7 @@ class CreateTemplate(Tool):
 
 
 class TbxCreateTemplate(Tbx):
-    
+
     @property
     def label(self):
         return u'Template für Bestandsmärkte erzeugen'
@@ -40,16 +40,16 @@ class TbxCreateTemplate(Tbx):
         return CreateTemplate
 
     def _getParameterInfo(self):
-        
+
         # Projekt_auswählen
         param = self.add_parameter('projectname')
         param.name = encode(u'Projekt_auswählen')
-        param.displayName = encode(u'Projekt auswählen')
+        param.displayName = encode(u'Projekt')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.filter.list = []
-    
+
         param = self.add_parameter('template_type')
         param.name = encode(u'type')
         param.displayName = encode(u'Dateiformat des zu erzeugenden Templates')
@@ -58,7 +58,7 @@ class TbxCreateTemplate(Tbx):
         param.datatype = u'GPString'
         param.filter.list = MarketTemplate.template_types.keys()
         param.value = param.filter.list[1]
-    
+
         param = self.add_parameter('folder')
         param.name = encode(u'folder')
         param.displayName = encode(u'Zielordner')
@@ -72,18 +72,18 @@ class TbxCreateTemplate(Tbx):
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'
-        
+
         return self.par
-    
+
     def _open(self, params):
         param = self.par.folder
         subfolder = 'input_templates'
         param.value = os.path.join(self.folders.get_projectpath(),
                                    subfolder)
-    
+
     def validate_inputs(self):
         return True, ''
-        
+
     def _updateParameters(self, params):
         return params
 

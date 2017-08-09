@@ -68,11 +68,11 @@ class ProjektwirkungMarkets(Tool):
         if self.recalculate:
             self.parent_tbx.delete_rows_in_table('Beziehungen_Maerkte_Zellen')
             self.parent_tbx.delete_rows_in_table('Siedlungszellen')
-        
+
         x, y = get_project_centroid(self.projectname)
         centroid = Point(x, y, epsg=self.parent_tbx.config.epsg)
         radius = self.par.radius.value * 1000
-        
+
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
         bbox = bounding_box(self, centroid, radius * 2)
         self.calculate_zensus(df_markets, centroid, radius, bbox)
@@ -99,10 +99,10 @@ class ProjektwirkungMarkets(Tool):
                                 'id_betriebstyp_planfall', 'AGS', 'id_kette'])
         df_zensus = self.parent_tbx.table_to_dataframe(
             'Siedlungszellen', columns=['id', 'kk', 'id_teilflaeche'])
-        
+
         # workaround for loading distances avoiding 'out of memory' errors
         df_distances = pd.DataFrame()
-        
+
         values = self.parent_tbx.query_table(
             'Beziehungen_Maerkte_Zellen', columns=['id_markt'])
         df_distances['id_markt'] = np.array(values).reshape(len(values)).astype('int16')
@@ -451,7 +451,7 @@ class TbxProjektwirkungMarkets(Tbx):
         # Projekt_auswählen
         p = self.add_parameter('projectname')
         p.name = u'Projekt_auswählen'.encode('cp1252')
-        p.displayName = u'Projekt auswählen'.encode('cp1252')
+        p.displayName = u'Projekt'.encode('cp1252')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'

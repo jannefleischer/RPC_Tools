@@ -43,7 +43,7 @@ class TbxUpdateNodes(Tbx):
         # Projekt_auswählen
         p = self.add_parameter('project')
         p.name = u'Projekt_auswählen'.encode('cp1252')
-        p.displayName = u'Projekt auswählen'.encode('cp1252')
+        p.displayName = u'Projekt'.encode('cp1252')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'

@@ -15,11 +15,11 @@ class EditCenters(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
 
-    def add_outputs(self):         
+    def add_outputs(self):
         group_layer = ("standortkonkurrenz")
         fc = 'Zentren'
         layer = 'Zentren'
-    
+
         self.output.add_layer(group_layer, layer, fc, zoom=False)
 
     def run(self):
@@ -40,7 +40,7 @@ class EditCenters(Tool):
 
 
 class TbxEditCenters(Tbx):
-    
+
     @property
     def label(self):
         return 'Zentren bearbeiten'
@@ -50,16 +50,16 @@ class TbxEditCenters(Tbx):
         return EditCenters
 
     def _getParameterInfo(self):
-        
+
         # Projekt_auswählen
         param = self.add_parameter('projectname')
         param.name = encode(u'Projekt_auswählen')
-        param.displayName = encode(u'Projekt auswählen')
+        param.displayName = encode(u'Projekt')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.filter.list = []
-    
+
         param = self.add_parameter('centers')
         param.name = encode(u'Versorgungsbereiche')
         param.displayName = encode(u'Versorgungsbereich auswählen')
@@ -67,7 +67,7 @@ class TbxEditCenters(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.filter.list = []
-        
+
         param = self.add_parameter('name')
         param.name = encode(u'Name')
         param.displayName = encode(u'Name des Versorgungsbereichs')
@@ -81,24 +81,24 @@ class TbxEditCenters(Tbx):
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'
-        
+
         self.centers_df = []
         return self.par
-    
+
     def get_centers(self):
         '''return the centers in db as a dataframe, filtered by existance
         in nullfall and planfall (dependent on setting of this toolbox)'''
         df_centers = self.table_to_dataframe('Zentren',
                                              where='nutzerdefiniert=1')
         return df_centers
-    
+
     def add_center_to_db(self, name, polygon):
         '''add a center to the database with given polygon as shape
         '''
         df_centers = self.get_centers()
         if len(df_centers) == 0:
             new_id = 1
-        else: 
+        else:
             new_id = df_centers['id'].max() + 1
         column_values = {
             'id': new_id,
@@ -110,7 +110,7 @@ class TbxEditCenters(Tbx):
             'umsatz_nullfall': 0
         }
         self.insert_rows_in_table('Zentren', column_values)
-    
+
     def _open(self, params):
         self.centers_df = self.get_centers()
         if len(self.centers_df) == 0:
@@ -122,7 +122,7 @@ class TbxEditCenters(Tbx):
         closest_idx = None
         if x and y:
             closest_idx, c = closest_point((x, y), self.centers_df['SHAPE'])
-        
+
         pretty_names = []
         for idx, center in self.centers_df.iterrows():
             pretty = self.get_pretty_center_name(center)
@@ -131,7 +131,7 @@ class TbxEditCenters(Tbx):
         self.update_center_list(closest_idx)
         self.set_selected_center_inputs()
         pass
-    
+
     def set_selected_center_inputs(self):
         center_idx = self.centers_df['pretty'] == self.par.centers.value
         center = self.centers_df.loc[center_idx]
@@ -139,15 +139,15 @@ class TbxEditCenters(Tbx):
         do_delete = center['do_delete'].values[0]
         # strange: can't assign the bool of do_delete directly, arcpy is
         # ignoring it
-        self.par.do_delete.value = True if do_delete else False        
-    
+        self.par.do_delete.value = True if do_delete else False
+
     def validate_inputs(self):
         if len(self.table_to_dataframe('Zentren', columns=['id'])) == 0:
             msg = (u'Es sind keine Zentren definiert. '
                    u'Bitte fügen Sie sie manuell hinzu.')
             return False, msg
         return True, ''
-        
+
     def update_center_list(self, idx=None):
         if idx is None:
             idx = self.par.centers.filter.list.index(
@@ -162,8 +162,8 @@ class TbxEditCenters(Tbx):
             name=center['name'])
         if center['do_delete']:
             pretty += u' - WIRD ENTFERNT'
-        return pretty        
-        
+        return pretty
+
     def _updateParameters(self, params):
         if len(self.centers_df) == 0:
             return
@@ -171,21 +171,21 @@ class TbxEditCenters(Tbx):
 
         if self.par.changed('name'):
             self.centers_df.loc[center_idx, 'name'] = self.par.name.value
-            
+
         elif self.par.changed('do_delete'):
             do_delete = self.par.do_delete.value
             self.centers_df.loc[center_idx, 'do_delete'] = do_delete
-        
+
         # update the pretty names of the center
-            
-        if (self.par.changed('name') or 
+
+        if (self.par.changed('name') or
             self.par.changed('do_delete')):
             i = np.where(center_idx == True)[0][0]
             pretty = self.get_pretty_center_name(
                 self.centers_df.iloc[i])
             self.centers_df.loc[center_idx, 'pretty'] = pretty
             self.update_center_list()
-            
+
         if self.par.changed('centers'):
             self.set_selected_center_inputs()
         return params

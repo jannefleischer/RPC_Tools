@@ -15,7 +15,7 @@ class Einrichtungen(Tool):
     categories = [u'Kita', u'Autobahnanschlussstelle', u'Dienstleistungen',
                   u'Ärzte', 'Freizeit', u'Läden',
                   u'Supermarkt/Einkaufszentrum', 'Schule']
-        
+
     def add_outputs(self):
         group_layer = ("erreichbarkeit")
         fc = 'Einrichtungen'
@@ -42,7 +42,7 @@ class Einrichtungen(Tool):
             feat.create_geom()
             column_values['SHAPE'].append(feat.geom)
             column_values['projektcheck_category'].append(feat.category)
-        
+
         self.parent_tbx.insert_rows_in_table('Einrichtungen', column_values)
 
 
@@ -62,7 +62,7 @@ class TbxEinrichtungen(Tbx):
         # Projekt_auswählen
         param = self.add_parameter('projectname')
         param.name = encode(u'Projekt_auswählen')
-        param.displayName = encode(u'Projekt auswählen')
+        param.displayName = encode(u'Projekt')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'

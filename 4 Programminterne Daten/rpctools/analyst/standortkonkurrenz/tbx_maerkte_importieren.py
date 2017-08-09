@@ -14,24 +14,24 @@ from rpctools.analyst.standortkonkurrenz.tbx_osm_markteinlesen import MarktEinle
 class MaerkteImportieren(MarktEinlesen):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
-    
+
     def run(self):
         template = self.par.template.value
         # in case of DEFile you get the value by calling param.value.value
         # (for whatever reason)
         if hasattr(template, 'value'):
             template = template.value
-        
-        # filepath as input 
+
+        # filepath as input
         if isinstance(template, str):
             path, filename = os.path.split(filepath)
         # layer as input
-        else: 
+        else:
             desc = arcpy.Describe(template)
             path, filename = desc.path, desc.file
 
         name, ext = os.path.splitext(filename)
-        
+
         # get type of template by reverse looking up file extension
         extensions = [v[0] for v in MarketTemplate.template_types.values()]
         idx = extensions.index(ext)
@@ -63,7 +63,7 @@ class TbxMaerkteImportieren(Tbx):
         # Projekt_auswählen
         param = self.add_parameter('projectname')
         param.name = encode(u'Projekt_auswählen')
-        param.displayName = encode(u'Projekt auswählen')
+        param.displayName = encode(u'Projekt')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
@@ -71,7 +71,7 @@ class TbxMaerkteImportieren(Tbx):
 
         param = self.add_parameter('template')
         param.name = encode(u'template')
-        
+
         param = self.add_parameter('truncate')
         param.name = encode(u'truncate')
         param.displayName = encode(u'vorhandene Märkte entfernen')
@@ -87,22 +87,22 @@ class TbxMaerkteImportieren(Tbx):
 
 
 class TbxMaerkteImportierenFeatureClass(TbxMaerkteImportieren):
-    
+
     @property
     def label(self):
         return encode(u'Marktstandorte aus Shape/Layer-Vorlage importieren')
-    
+
     def _getParameterInfo(self):
         params = super(TbxMaerkteImportierenFeatureClass, self)._getParameterInfo()
-        
+
         param = self.par.template
         param.displayName = encode(u'Feature')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPFeatureLayer'
-        
+
         return params
-    
+
     def _open(self, params):
         param = self.par.template
         subfolder = 'input_templates'
@@ -116,23 +116,23 @@ class TbxMaerkteImportierenDatei(TbxMaerkteImportieren):
     @property
     def label(self):
         return encode(u'Marktstandorte aus CSV/Excel-Vorlage importieren')
-    
+
     def _getParameterInfo(self):
         params = super(TbxMaerkteImportierenDatei, self)._getParameterInfo()
-    
-        param = self.par.template        
+
+        param = self.par.template
         param.displayName = encode(u'Datei')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'DEFile'
         #param.filter.type = 'File'
-        
+
         #param.filter.list = [e.replace('.', '')
                                  #for e in MarketTemplate.template_types.values()]
         param.filter.list = ['csv', 'xlsx']
-        
+
         return params
-    
+
     def _open(self, params):
         param = self.par.template
         subfolder = 'input_templates'

@@ -29,7 +29,7 @@ class Tbxwohnflaechendichte(Tbx):
         # Projekt_auswählen
         param_1 = params.projectname = arcpy.Parameter()
         param_1.name = u'Projekt_ausw\xe4hlen'
-        param_1.displayName = u'Projekt ausw\xe4hlen'
+        param_1.displayName = u'Projekt'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = u'GPString'

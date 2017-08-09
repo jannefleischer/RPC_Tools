@@ -15,7 +15,7 @@ from rpctools.analyst.infrastrukturkosten.tbx_gesamtkosten import Gesamtkosten
 class KostenVergleichen(Gesamtkosten):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Kosten.gdb'
-    
+
     def add_outputs(self):
 
         df_areas = self.parent_tbx.table_to_dataframe(
@@ -24,7 +24,7 @@ class KostenVergleichen(Gesamtkosten):
             columns=['Nutzungsart'],
             where='Nutzungsart <> {}'.format(Nutzungsart.UNDEFINIERT)
         )
-        
+
         if len(df_areas) == 0:
             return
 
@@ -36,8 +36,8 @@ class KostenVergleichen(Gesamtkosten):
                 self.output.add_diagram(diagram)
             elif tou == Nutzungsart.WOHNEN:
                 diagram = VergleichWEDiagramm()
-                self.output.add_diagram(diagram)        
-    
+                self.output.add_diagram(diagram)
+
     def run(self):
         super(KostenVergleichen, self).run()
 
@@ -51,7 +51,7 @@ class TbxKostenVergleichen(Tbx):
     @property
     def Tool(self):
         return KostenVergleichen
-    
+
     def _getParameterInfo(self):
 
         params = self.par
@@ -60,14 +60,14 @@ class TbxKostenVergleichen(Tbx):
         # Projekt_auswählen
         p = self.add_parameter('projectname')
         p.name = u'Projekt_auswählen'.encode('cp1252')
-        p.displayName = u'Projekt auswählen'.encode('cp1252')
+        p.displayName = u'Projekt'.encode('cp1252')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
         p.value = self.config.active_project
         return params
-    
-    def get_areas(self): 
+
+    def get_areas(self):
         df_areas = self.table_to_dataframe(
             'Teilflaechen_Plangebiet',
             workspace='FGDB_Definition_Projekt.gdb',
@@ -75,10 +75,10 @@ class TbxKostenVergleichen(Tbx):
             where='Nutzungsart <> {}'.format(Nutzungsart.UNDEFINIERT)
         )
         return df_areas
-    
+
     def validate_inputs(self):
         df_areas = self.get_areas()
-        
+
         if len(df_areas) == 0:
             err_msg = (u'Es wurden keine Flächen mit definierten Nutzungsarten '
                        u'gefunden.')

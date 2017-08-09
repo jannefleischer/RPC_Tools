@@ -16,10 +16,10 @@ from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
 class MarktEinlesen(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
-    
+
     def run(self):
         """"""
-    
+
     def add_outputs(self):
         group_layer = ("standortkonkurrenz")
         fc = 'Maerkte'
@@ -27,46 +27,46 @@ class MarktEinlesen(Tool):
         layer_nullfall = 'Märkte im Bestand'
         layer_changed = 'veränderte Märkte im Bestand'
         layer_planfall = 'geplante Märkte'
-    
+
         self.output.add_layer(group_layer, layer_nullfall, fc,
                               template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_changed, fc,
                               template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_planfall, fc,
                               template_folder=folder, zoom=False)
-        
+
         self.output.hide_layer('projektdefinition')
 
     def markets_to_db(self, supermarkets, truncate=False, planfall=False):
         """Create the point-features for supermarkets"""
         tablename = 'Maerkte'
         sr = arcpy.SpatialReference(self.parent_tbx.config.epsg)
-        
+
         columns = [
             'name',
             'id_betriebstyp_nullfall',
             'id_betriebstyp_planfall',
-            'id_kette', 
+            'id_kette',
             'SHAPE@',
-            'id_teilflaeche', 
+            'id_teilflaeche',
             'id',
             'adresse'
         ]
         table = self.folders.get_table(tablename)
         # remove results as well (distances etc.)
         res_table = self.folders.get_table('Beziehungen_Maerkte_Zellen')
-        
+
         # delete markets of nullfall and ALL results (easiest way)
         if truncate:
             self.parent_tbx.delete_rows_in_table(
                 tablename, where='id_betriebstyp_nullfall > 0')
             arcpy.TruncateTable_management(self.folders.get_table(res_table))
-            
+
         df = self.parent_tbx.table_to_dataframe('Maerkte')
-        max_id = df['id'].max() if len(df) > 0 else 0        
-            
+        max_id = df['id'].max() if len(df) > 0 else 0
+
         with arcpy.da.InsertCursor(table, columns) as rows:
-            for i, markt in enumerate(supermarkets):            
+            for i, markt in enumerate(supermarkets):
                 id_nullfall = 0 if planfall else markt.id_betriebstyp
                 if markt.name is None:
                     continue
@@ -76,9 +76,9 @@ class MarktEinlesen(Tool):
                         markt.name,
                         id_nullfall,
                         markt.id_betriebstyp,
-                        markt.id_kette, 
+                        markt.id_kette,
                         markt.geom,
-                        markt.id_teilflaeche, 
+                        markt.id_teilflaeche,
                         max_id + i + 1,
                         markt.adresse
                     ))
@@ -99,17 +99,17 @@ class MarktEinlesen(Tool):
             cursor.updateRow(row)
         del cursor
 
-    def set_betriebstyp_vkfl(self, markets): 
+    def set_betriebstyp_vkfl(self, markets):
         """
         use the name of the chain of the markets to parse and assign
         chain-ids and betriebstyps
         """
         df_chains = self.parent_tbx.table_to_dataframe(
-            'Ketten', 
+            'Ketten',
             workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
             is_base_table=True)
         df_bt = self.parent_tbx.table_to_dataframe(
-            'Betriebstypen', 
+            'Betriebstypen',
             workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
             is_base_table=True)
         df_bt.fillna(sys.maxint, inplace=True)
@@ -136,11 +136,11 @@ class MarktEinlesen(Tool):
         """
 
         df_chains_alloc = self.parent_tbx.table_to_dataframe(
-            'Ketten_Zuordnung', 
+            'Ketten_Zuordnung',
             workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
             is_base_table=True)
         df_chains_alloc.sort(columns='prioritaet', ascending=False)
-        
+
         ret_markets = []
 
         for market in markets:
@@ -177,7 +177,7 @@ class MarktEinlesen(Tool):
             if not match_found:
                 ret_markets.append(market)
         return ret_markets
-    
+
     def delete_area_market(self, id_area):
         '''delete the market corresponding to a planned area and the already
         calculated results for this market'''
@@ -210,7 +210,7 @@ class OSMMarktEinlesen(MarktEinlesen):
             workspace='FGDB_Definition_Projekt.gdb')
         x = flaechen_df['INSIDE_X'].mean()
         y = flaechen_df['INSIDE_Y'].mean()
-        
+
         epsg = tbx.config.epsg
         centroid = Point(x, y, epsg=epsg)
         arcpy.AddMessage('Sende Standortanfrage an Geoserver...')
@@ -247,7 +247,7 @@ class TbxOSMMarktEinlesen(Tbx):
         # Projekt_auswählen
         param = self.add_parameter('projectname')
         param.name = encode(u'Projekt_auswählen')
-        param.displayName = encode(u'Projekt auswählen')
+        param.displayName = encode(u'Projekt')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
@@ -274,7 +274,7 @@ class TbxOSMMarktEinlesen(Tbx):
         param.filter.type = 'Range'
         param.filter.list = [0, 5000]
         param.value = 1000
-        
+
         param = self.add_parameter('truncate')
         param.name = encode(u'truncate')
         param.displayName = encode(u'vorhandene Märkte entfernen')

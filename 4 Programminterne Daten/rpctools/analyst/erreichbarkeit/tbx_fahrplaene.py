@@ -12,10 +12,10 @@ from rpctools.analyst.erreichbarkeit.bahn_query import BahnQuery
 class Fahrplaene(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Erreichbarkeit.gdb'
-    
+
     def add_outputs(self):
         pass
-    
+
     def run(self):
         query = BahnQuery(next_working_day())
         idx = self.par.selected_index('stops')
@@ -34,7 +34,7 @@ class TbxHaltestellen(Tbx):
         # Projekt_auswählen
         p = self.add_parameter('projectname')
         p.name = u'Projekt_auswählen'.encode('cp1252')
-        p.displayName = u'Projekt auswählen'.encode('cp1252')
+        p.displayName = u'Projekt'.encode('cp1252')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
@@ -47,26 +47,26 @@ class TbxHaltestellen(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.filter.list = []
-        
+
         self.df_stops = []
 
         return params
-    
+
     def validate_inputs(self):
         df_stops = self.get_stops()
         if len(df_stops) == 0:
-            msg = (u'Die Haltestellen wurden noch nicht ermittelt!') 
+            msg = (u'Die Haltestellen wurden noch nicht ermittelt!')
             return False, msg
         return True, ''
-    
+
     def get_stops(self):
         df_stops = self.table_to_dataframe(
             'Haltestellen', where='flaechenzugehoerig=1')
         return df_stops
-        
+
     def _open(self, params):
         self.df_stops = self.get_stops()
-        
+
         names = self.df_stops['name'].values
         distances = self.df_stops['fussweg'].values
         pretty = [u'{} ({} m entfernt)'.format(n, d)
@@ -85,7 +85,7 @@ class TbxFahrplaene(TbxHaltestellen):
     @property
     def Tool(self):
         return Fahrplaene
-    
+
 if __name__ == "__main__":
     t = TbxFahrplaene()
     t.getParameterInfo()
