@@ -392,6 +392,7 @@ class Tbx(object):
         # check for invalid manual entries in dropdowns
         for param in self.par:
             if (param.datatype == 'Zeichenfolge' and param.filter.list and
+                not param.multiValue and 
                 param.altered and param.value not in param.filter.list):
                 return
         self._updateParameters(self.par)
@@ -534,6 +535,7 @@ class Tbx(object):
         # check for invalid manual entries in dropdowns
         for param in self.par:
             if (param.datatype == 'Zeichenfolge' and param.filter.list and
+                not param.multiValue and 
                 param.altered and param.value not in param.filter.list):
                 param.setErrorMessage(
                     u'Bitte ändern Sie nicht manuell Einträge in den '
