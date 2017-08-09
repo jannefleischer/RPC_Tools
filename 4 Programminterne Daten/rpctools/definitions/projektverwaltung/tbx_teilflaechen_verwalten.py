@@ -42,7 +42,7 @@ class TbxFlaechendefinition(Tbx):
         p.direction = 'Input'
         p.datatype = u'GPString'
         p.filter.list = []
-        
+
         self.df_types_of_use = self.table_to_dataframe(
             'Nutzungsarten', workspace='FGDB_Definition_Projekt_Tool.gdb',
             is_base_table=True
@@ -53,10 +53,10 @@ class TbxFlaechendefinition(Tbx):
     def get_areas(self, nutzungsart=None):
         where = 'Nutzungsart = {}'.format(nutzungsart) if nutzungsart else None
         df_areas = self.table_to_dataframe('Teilflaechen_Plangebiet',
-                                           workspace='FGDB_Definition_Projekt.gdb', 
+                                           workspace='FGDB_Definition_Projekt.gdb',
                                            where=where)
         return df_areas
-        
+
     def _open(self, params):
         self.df_areas = self.get_areas(self._nutzungsart)
         pretty_names = [self.get_pretty_area_name(area) for
@@ -64,9 +64,9 @@ class TbxFlaechendefinition(Tbx):
         self.df_areas['pretty'] = pretty_names
         self.update_area_list()
         self.set_selected_area()
-    
+
     def get_selected_area(self):
-        '''return the currently selected area as a Series and 
+        '''return the currently selected area as a Series and
         it's index in the list of areas
         '''
         area_idx = self.df_areas['pretty'] == self.par.area.value
@@ -76,7 +76,7 @@ class TbxFlaechendefinition(Tbx):
         idx = np.where(area_idx==True)[0][0]
         area = self.df_areas.iloc[idx]
         return area, idx
-        
+
     def set_selected_area(self):
         '''set the inputs for the currently selected area '''
         raise NotImplementedError
@@ -89,8 +89,8 @@ class TbxFlaechendefinition(Tbx):
         pretty = u'"{name}" ({id}) | {gemeinde} | {ha} ha | {tou}'.format(
             id=area['id_teilflaeche'],
             name=area['Name'],
-            ha=round(area['Flaeche_ha'], 2), 
-            gemeinde=area['gemeinde_name'], 
+            ha=round(area['Flaeche_ha'], 2),
+            gemeinde=area['gemeinde_name'],
             tou=type_of_use
         )
         suffix = ''
@@ -106,15 +106,15 @@ class TbxFlaechendefinition(Tbx):
             suffix = u' | Verkaufsfläche: {}'.format(n)
         pretty += suffix
         return pretty
-    
+
     def update_pretty_name(self):
         area, idx = self.get_selected_area()
-        # something changed -> update pretty representation of selected area 
+        # something changed -> update pretty representation of selected area
         # and update list as well (to show new pretty repr.)
         pretty = self.get_pretty_area_name(area)
         self.df_areas.loc[idx, 'pretty'] = pretty
-        self.update_area_list()        
-    
+        self.update_area_list()
+
     def update_area_list(self, idx=None):
         """update the list of areas and select the area with index if given"""
         if idx is None:
@@ -132,7 +132,7 @@ class TbxFlaechendefinition(Tbx):
             self.set_selected_area()
 
         return params
-    
+
     def validate_inputs(self):
         df_areas = self.get_areas(self._nutzungsart)
         if len(df_areas) == 0:
@@ -145,12 +145,12 @@ class TbxFlaechendefinition(Tbx):
             msg = (u'Es sind keine Flächen{} definiert!'.format(tou_str))
             return False, msg
         return True, ''
-    
+
     #if not self._get_teilflaechen(nutzungsart=self._nutzungsart):
         #
         #msg = (u'Keine Teilflächen mit der '
                        #u'Nutzungsart "{}" definiert.'.format(nutzung))
-        #return False, msg    
+        #return False, msg
 
     def _updateMessages(self, params):
         valid, msg = self.validate_inputs()
@@ -163,7 +163,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
 
     @property
     def label(self):
-        return u'Schritt 2: Teilflächen verwalten'
+        return u'Nutzungen auf Teilflächen definieren'
 
     @property
     def Tool(self):
@@ -211,7 +211,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
                        self.par.type_of_use.value)
             tou_id = self.df_types_of_use[tou_idx]['id'].values[0]
             self.df_areas.loc[idx, 'Nutzungsart'] = tou_id
-        
+
         if params.changed('name') or params.changed('type_of_use'):
             self.update_pretty_name()
 
@@ -224,7 +224,7 @@ class TbxTeilflaecheVerwalten(TbxFlaechendefinition):
         type_of_use = self.df_types_of_use.loc[tou_idx]['nutzungsart'].values[0]
         self.par.name.value = area['Name']
         self.par.type_of_use.value = type_of_use
-        
+
 
 if __name__ == '__main__':
 

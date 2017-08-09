@@ -214,19 +214,19 @@
                 <Button caption="Shape/Layer-Vorlage einlesen" category="ProjektCheck" class="TemplateEinlesenFeatureClass" id="rpc_tools.template_einlesen_featureclass" image="Images\MetadataGazetteerLoad16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Tool caption="bestehenden Markt hinzuf&#252;gen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
+                <Tool caption="Bestehenden Markt hinzuf&#252;gen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="bestehenden Markt bearbeiten/entfernen" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="">
+                <Tool caption="Bestehenden Markt bearbeiten/entfernen" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="bestehenden Markt erweitern/schlie&#223;en" category="ProjektCheck" class="PlanfallMarktErweiterung" id="rpc_tools.planfall_erweitern" image="Images\GenericPencilTarget16.png" message="" tip="">
+                <Tool caption="Bestehenden Markt erweitern/schlie&#223;en" category="ProjektCheck" class="PlanfallMarktErweiterung" id="rpc_tools.planfall_erweitern" image="Images\GenericPencilTarget16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="geplanten Markt hinzuf&#252;gen" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_hinzu" image="Images\GreenPin16.png" message="" tip="">
+                <Tool caption="Geplanten Markt hinzuf&#252;gen" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_hinzu" image="Images\GreenPin16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="geplanten Markt bearbeiten/entfernen" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="">
+                <Tool caption="Geplanten Markt bearbeiten/entfernen" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
                 <Tool caption="Versorgungsbereich zeichnen" category="ProjektCheck" class="ZentrumHinzu" id="rpc_tools.zentrum_hinzu" image="Images\GenericPencilArea16.png" message="" tip="">
@@ -468,7 +468,7 @@
                         <Menu refID="rpc_tools.menu_fahrrad_auto" />
                     </Items>
                 </Menu>
-                
+
                 <Menu caption="Annahmen ver&#228;ndern" category="ProjektCheck" id="rpc_tools.menu_verkehr_annahmen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.routing_settings" />
@@ -520,7 +520,7 @@
                         <Button refID="rpc_tools.planfall_auswerten" />
                     </Items>
                 </Menu>
-                <Menu caption="Integrationsgrad" category="ProjektCheck" id="rpc_tools.menu_integrationsgrad" isRootMenu="false" isShortcutMenu="true" separator="true"> 
+                <Menu caption="Integrationsgrad" category="ProjektCheck" id="rpc_tools.menu_integrationsgrad" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Tool refID="rpc_tools.grenzlinie_einzeichnen" />
                         <Tool refID="rpc_tools.grenzlinie_loeschen" />
@@ -552,7 +552,7 @@
                         <Button refID="rpc_tools.freiraeume_50" />
                         <Button refID="rpc_tools.freiraeume" />
                         <Button refID="rpc_tools.waelder_50" />
-                        <Button refID="rpc_tools.waelder" /> 
+                        <Button refID="rpc_tools.waelder" />
                     </Items>
                 </Menu>
                 <Menu caption="Bodenbedeckung zeichnen (optional)" category="ProjektCheck" id="rpc_tools.menu_boden_zeichnen" isRootMenu="false" isShortcutMenu="true" separator="true">

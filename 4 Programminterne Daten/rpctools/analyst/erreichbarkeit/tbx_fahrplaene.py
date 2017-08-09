@@ -80,7 +80,7 @@ class TbxFahrplaene(TbxHaltestellen):
 
     @property
     def label(self):
-        return encode(u'Fahrpläne anzeigen')
+        return encode(u'Haltestellenplan aufrufen')
 
     @property
     def Tool(self):

@@ -96,7 +96,7 @@ class TbxErreichbarkeitOEPNV(TbxHaltestellen):
 
     @property
     def label(self):
-        return encode(u'Erreichbarkeit der zentralen Orte im ÖPNV')
+        return encode(u'Fahrtzeit zu zentralen Orten ermitteln')
 
     @property
     def Tool(self):

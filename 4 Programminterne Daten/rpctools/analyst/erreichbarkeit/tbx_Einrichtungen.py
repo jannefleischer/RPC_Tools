@@ -49,7 +49,7 @@ class Einrichtungen(Tool):
 class TbxEinrichtungen(Tbx):
     @property
     def label(self):
-        return encode(u'Einrichtungen anzeigen')
+        return encode(u'Einrichtungen im Umfeld ermitteln')
 
     @property
     def Tool(self):

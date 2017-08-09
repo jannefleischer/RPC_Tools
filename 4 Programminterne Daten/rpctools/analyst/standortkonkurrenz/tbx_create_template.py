@@ -33,7 +33,7 @@ class TbxCreateTemplate(Tbx):
 
     @property
     def label(self):
-        return u'Template für Bestandsmärkte erzeugen'
+        return u'Erfassungsvorlage erzeugen'
 
     @property
     def Tool(self):

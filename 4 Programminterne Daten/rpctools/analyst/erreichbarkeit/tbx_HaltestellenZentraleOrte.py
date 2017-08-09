@@ -184,8 +184,7 @@ class TbxHaltestellenZentraleOrte(Tbx):
 
     @property
     def label(self):
-        return encode(u'Haltestellen und Zentrale Orte '
-                      u'in der Umgebung ermitteln')
+        return encode(u'Haltestellen ermitteln')
 
     @property
     def Tool(self):

@@ -151,7 +151,7 @@ class TbxEditMarkets(Tbx):
 
             param = self.add_parameter('delete_all')
             param.name = encode(u'Alle Löschen')
-            param.displayName = encode(u'alle Märkte entfernen')
+            param.displayName = encode(u'Alle Märkte entfernen')
             param.parameterType = 'Optional'
             param.direction = 'Input'
             param.datatype = u'GPBoolean'
@@ -377,7 +377,7 @@ class TbxEditMarketsNullfall(TbxEditMarkets):
 
 class TbxEditMarketsPlanfall(TbxEditMarkets):
     setting = PLANFALL
-    _label = encode(u'geplante Märkte bearbeiten')
+    _label = encode(u'Geplante Märkte bearbeiten')
 
 
 class TbxExtendMarkets(TbxEditMarkets):

@@ -234,7 +234,7 @@ class TbxOSMMarktEinlesen(Tbx):
 
     @property
     def label(self):
-        return encode(u'Marktstandorte online aus OpenStreetMap abfragen')
+        return encode(u'OpenStreetMap anfragen')
 
     @property
     def Tool(self):
@@ -255,7 +255,7 @@ class TbxOSMMarktEinlesen(Tbx):
 
         param = self.add_parameter('radius')
         param.name = encode(u'Radius')
-        param.displayName = encode(u'maximale Entfernung der '
+        param.displayName = encode(u'Maximale Entfernung der '
                                    u'Märkte vom Plangebiet in Kilometern')
         param.parameterType = 'Required'
         param.direction = 'Input'
@@ -266,7 +266,7 @@ class TbxOSMMarktEinlesen(Tbx):
 
         param = self.add_parameter('count')
         param.name = encode(u'Anzahl')
-        param.displayName = encode(u'maximale Anzahl an '
+        param.displayName = encode(u'Maximale Anzahl an '
                                    u'hinzuzufügenden Märkten')
         param.parameterType = 'Required'
         param.direction = 'Input'
@@ -277,7 +277,7 @@ class TbxOSMMarktEinlesen(Tbx):
 
         param = self.add_parameter('truncate')
         param.name = encode(u'truncate')
-        param.displayName = encode(u'vorhandene Märkte entfernen')
+        param.displayName = encode(u'Vorhandene Märkte entfernen')
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'

@@ -74,7 +74,7 @@ class TbxMaerkteImportieren(Tbx):
 
         param = self.add_parameter('truncate')
         param.name = encode(u'truncate')
-        param.displayName = encode(u'vorhandene Märkte entfernen')
+        param.displayName = encode(u'Vorhandene Märkte entfernen')
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'
@@ -90,7 +90,7 @@ class TbxMaerkteImportierenFeatureClass(TbxMaerkteImportieren):
 
     @property
     def label(self):
-        return encode(u'Marktstandorte aus Shape/Layer-Vorlage importieren')
+        return encode(u'CSV/Excel-Vorlage einlesen')
 
     def _getParameterInfo(self):
         params = super(TbxMaerkteImportierenFeatureClass, self)._getParameterInfo()
@@ -115,7 +115,7 @@ class TbxMaerkteImportierenDatei(TbxMaerkteImportieren):
 
     @property
     def label(self):
-        return encode(u'Marktstandorte aus CSV/Excel-Vorlage importieren')
+        return encode(u'Shape/Layer-Vorlage einlesen')
 
     def _getParameterInfo(self):
         params = super(TbxMaerkteImportierenDatei, self)._getParameterInfo()
