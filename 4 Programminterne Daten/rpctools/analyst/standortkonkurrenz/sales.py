@@ -49,6 +49,7 @@ class Sales(object):
                                          ids_not_in_df)])
         # calc with distances in kilometers
         distances['distanz'] /= 1000
+        distances[distances < 0] = -1
         
         # in case of Nullfall take zensus points without planned areas
         if setting == self.NULLFALL:
@@ -68,6 +69,7 @@ class Sales(object):
         dist_matrix = kk_merged.pivot(index='id_markt',
                                       columns='id_siedlungszelle',
                                       values='distanz')
+        dist_matrix = dist_matrix.fillna(0)
 
         n_cells = len(np.unique(distances['id_siedlungszelle']))
         attraction_matrix = pd.DataFrame(data=np.zeros(dist_matrix.shape),
@@ -80,6 +82,8 @@ class Sales(object):
             exponent = market['exponent']
             attraction_matrix.loc[index] = factor * np.exp(dist * exponent)
         
+        unreachable = dist_matrix < 0
+        attraction_matrix[unreachable] = 0
         competitor_matrix = self.calc_competitors(dist_matrix, df_markets)
         
         if self.debug:
@@ -94,6 +98,7 @@ class Sales(object):
             self.write_intermediate_results(
                 competitor_matrix.transpose(),
                 u'debug_KK_Anteile_{}'.format(setting_str))
+            arcpy.AddMessage('DEBUG: Berechnung')
             
         # include competition between same market types in attraction_matrix
         attraction_matrix = pd.DataFrame(

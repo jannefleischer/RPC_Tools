@@ -258,6 +258,7 @@ class ProjektwirkungMarkets(Tool):
                                epsg=self.parent_tbx.config.epsg)
                 distances = routing.get_distances(origin, destinations, bbox)
                 #distances = routing.get_distances(origin, destinations)
+                arcpy.AddMessage('   wird gespeichert')
                 self.distances_to_db(market_id, destinations, distances)
             else:
                 arcpy.AddMessage(u'   bereits berechnet, wird übersprungen')
@@ -372,8 +373,9 @@ class ProjektwirkungMarkets(Tool):
 
 
     def distances_to_db(self, market_id, destinations, distances):
-        self.parent_tbx.delete_rows_in_table(
-            'Beziehungen_Maerkte_Zellen', where='id_markt={}'.format(market_id))
+        # no need to delete, should be dropped at this point anyway
+        #self.parent_tbx.delete_rows_in_table(
+            #'Beziehungen_Maerkte_Zellen', where='id_markt={}'.format(market_id))
         column_values = {}
         shapes = []
         ids = []

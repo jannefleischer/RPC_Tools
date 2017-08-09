@@ -124,7 +124,7 @@ class DistanceRouting(object):
     def get_distances(self, origin, destinations, bbox=None):
         kmh = 20
         distances = np.ones(len(destinations), dtype=int)
-        distances *= np.iinfo(distances.dtype).max
+        distances.fill(-1)
         dist_raster = self._request_dist_raster(origin, kmh=kmh)
         if dist_raster is None:
             return distances
@@ -142,7 +142,8 @@ class DistanceRouting(object):
         start = time.time()
         raster.register_points(destinations)
         for i, dest in enumerate(destinations):
-            distances[i] = (raster.get_value(dest) / 60.) * kmh * 1000
+            value = raster.get_value(dest)
+            distances[i] = (value / 60.) * kmh * 1000 if value < 120 else -1
         print('mapping {}s'.format(time.time() - start))
     
         arcpy.Delete_management(dist_raster)
