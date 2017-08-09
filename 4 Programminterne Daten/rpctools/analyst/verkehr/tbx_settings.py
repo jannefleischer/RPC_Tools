@@ -113,7 +113,7 @@ class TbxSettings(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPString'
 
-        category = 'Verkehrsaufkommen Wohnen'
+        category = '1) Verkehrsaufkommen Wohnen'
 
         # Wohnen
         param = params.wohnen_wege = arcpy.Parameter()
@@ -135,7 +135,7 @@ class TbxSettings(Tbx):
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = category
-        category = 'Verkehrsaufkommen Gewerbe'
+        category = '2) Verkehrsaufkommen Gewerbe'
 
         # Gewerbe
         param = params.gewerbe_wege = arcpy.Parameter()
@@ -158,7 +158,7 @@ class TbxSettings(Tbx):
         param.filter.list = [0, 100]
         param.category = category
 
-        category = 'Verkehrsaufkommen Einzelhandel'
+        category = '3) Verkehrsaufkommen Einzelhandel'
 
         # Einzelhandel
         param = params.einzelhandel_wege = arcpy.Parameter()
