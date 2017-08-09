@@ -16,6 +16,8 @@ from rpctools.utils.spatial_lib import Point, bounding_box
 from rpctools.utils.config import Folders
 from rpctools.analyst.standortkonkurrenz.sales import Sales
 
+DEBUG = True
+
 
 class ProjektwirkungMarkets(Tool):
     _param_projectname = 'projectname'
@@ -100,6 +102,7 @@ class ProjektwirkungMarkets(Tool):
         
         # workaround for loading distances avoiding 'out of memory' errors
         df_distances = pd.DataFrame()
+        
         values = self.parent_tbx.query_table(
             'Beziehungen_Maerkte_Zellen', columns=['id_markt'])
         df_distances['id_markt'] = np.array(values).reshape(len(values)).astype('int16')
@@ -112,8 +115,8 @@ class ProjektwirkungMarkets(Tool):
             'Beziehungen_Maerkte_Zellen', columns=['distanz'])
         df_distances['distanz'] = np.array(values).reshape(len(values)).astype('int32')
         del(values)
-        
-        sales = Sales(df_distances, df_markets, df_zensus)
+
+        sales = Sales(df_distances, df_markets, df_zensus, debug=DEBUG)
         gc.collect()
         arcpy.AddMessage('Berechne Nullfall...')
         kk_nullfall = sales.calculate_nullfall()
@@ -413,8 +416,10 @@ class ProjektwirkungMarkets(Tool):
             point.create_geom()
             shapes.append(point.geom)
             ews.append(point.ew)
-            #kk_indices.append(point.kk_index)
-            kk_indices.append(100)
+            if DEBUG:
+                kk_indices.append(100)
+            else:
+                kk_indices.append(point.kk_index)
             kks.append(point.kk)
             cell_ids.append(point.id)
             tfl_ids.append(point.tfl_id)

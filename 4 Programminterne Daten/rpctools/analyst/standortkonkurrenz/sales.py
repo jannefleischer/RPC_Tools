@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from rpctools.utils.config import Folders, Config
 from rpctools.utils.spatial_lib import clip_raster
 from rpctools.utils.spatial_lib import Point
@@ -7,6 +8,7 @@ import arcpy
 import os
 import numpy as np
 import pandas as pd
+
 
 class Sales(object):
     NULLFALL = 0
@@ -19,12 +21,13 @@ class Sales(object):
     # Note: switched from times to km -> cutoff is > 1 km
     relation_dist = 1  # km
 
-    def __init__(self, df_distances, df_markets, df_zensus):
+    def __init__(self, df_distances, df_markets, df_zensus, debug=False):
 
         self.distances = df_distances
         self.markets = df_markets
         self.zensus = df_zensus
         self.tbx = DummyTbx()
+        self.debug = debug
 
     def calculate_nullfall(self):
         return self._calculate_sales(self.NULLFALL)
@@ -44,17 +47,8 @@ class Sales(object):
         distances = self.distances.drop(
             self.distances.index[np.in1d(self.distances['id_markt'],
                                          ids_not_in_df)])
-        
-        #df_markets.sort(columns='id', inplace=True)
-        #dist_matrix = self.get_dist_matrix().sort()
-        ## dist_matrix and df_markets should have same market-ids
-        #assert (df_markets['id'] != dist_matrix.index).sum() == 0
-
-        ## Hochzahl * Reisezeit
-        #attraction_matrix = dist_matrix.mul(df_markets['exponent'].values[0],
-                                            #axis=0)
-
-        # no exp. over whole matrix -> row-wise instead
+        # calc with distances in kilometers
+        distances['distanz'] /= 1000
         
         # in case of Nullfall take zensus points without planned areas
         if setting == self.NULLFALL:
@@ -85,17 +79,50 @@ class Sales(object):
             factor = market['exp_faktor']
             exponent = market['exponent']
             attraction_matrix.loc[index] = factor * np.exp(dist * exponent)
-
+        
         competitor_matrix = self.calc_competitors(dist_matrix, df_markets)
+        
+        if self.debug:
+            setting_str = 'Nullfall' if setting == self.NULLFALL else 'Planfall'
+            arcpy.AddMessage('DEBUG: Schreibe Zwischenergebnisse')
+            if setting == self.NULLFALL:
+                self.write_intermediate_results(dist_matrix.transpose(),
+                                                'debug_Distanzmatrix')
+            self.write_intermediate_results(
+                attraction_matrix.transpose(),
+                u'debug_Attraktivität_{}'.format(setting_str))
+            self.write_intermediate_results(
+                competitor_matrix.transpose(),
+                u'debug_KK_Anteile_{}'.format(setting_str))
+            
         # include competition between same market types in attraction_matrix
         attraction_matrix = pd.DataFrame(
             data=attraction_matrix.values * competitor_matrix.values,
             columns=attraction_matrix.columns,
             index=attraction_matrix.index)
+        
         probabilities = attraction_matrix / attraction_matrix.sum(axis=0)
         kk_flow = probabilities * kk_matrix
+        
+        if self.debug:
+            arcpy.AddMessage('DEBUG: Schreibe weitere Zwischenergebnisse')
+            self.write_intermediate_results(
+                attraction_matrix.transpose(),
+                u'debug_Verteilungsmassstab_erster_Schritt_{}'.format(setting_str))
+            self.write_intermediate_results(
+                probabilities.transpose(),
+                u'debug_Verteilungsmassstab_zweiter_Schritt_{}'.format(setting_str))
+            self.write_intermediate_results(
+                kk_flow.transpose(),
+                u'debug_Kaufkraftstroeme_{}'.format(setting_str))
 
         return kk_flow
+    
+    def write_intermediate_results(self, dataframe, table):
+        self.tbx.insert_dataframe_in_table(
+            table, dataframe.reset_index(),
+            workspace='FGDB_Standortkonkurrenz_Supermaerkte.gdb',
+            create=True)
 
     def calc_competitors(self, dist_matrix, df_markets):
         """

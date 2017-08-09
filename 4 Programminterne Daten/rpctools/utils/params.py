@@ -736,8 +736,8 @@ class Tbx(object):
         else:
             table_path = self.folders.get_table(table_name, workspace=workspace)
 
-        if not arcpy.Exists(table_path):
-            table_path = None
+        #if not arcpy.Exists(table_path):
+            #table_path = None
         return table_path
 
     def insert_rows_in_table(self, table_name, column_values, workspace=''):
@@ -911,9 +911,6 @@ class Tbx(object):
         dataframe_to_table('Wohnen_WE_in_Gebaeudetypen',
                            dataframe, ['OBJECTID'], upsert=False)
         """
-        #where = '"{pkey}"='.format(pkey=pkey)
-        #where += (' or ' + where).join(
-            #dataframe[pkey].values.astype(str))
         table_name = os.path.basename(table_name)
         table_path = self._get_table_path(table_name, workspace=workspace)
         columns_incl_pkeys = dataframe.columns.values
@@ -944,7 +941,8 @@ class Tbx(object):
                     list(columns) + pkey_values.keys(),
                     [list(values) + pkey_values.values()])
 
-    def insert_dataframe_in_table(self, table_name, dataframe, workspace=''):
+    def insert_dataframe_in_table(self, table_name, dataframe, workspace='',
+                                  create=False):
         """
         Insert all rows of a pandas dataframe into a table in a Workspace in the
         Project Folder (column names have to match)
@@ -957,21 +955,44 @@ class Tbx(object):
             the columns and the values to update them with as key/value-pairs
         workspace : str, optional
             the database name
+        create : bool, optional, default = False
+            creates the table, drops if already existing
 
         """
         table_name = os.path.basename(table_name)
         table_path = self._get_table_path(table_name, workspace=workspace)
-        desc = arcpy.Describe(table_path)
-        fields = [field.name for field in desc.fields]
-        
-        # intersection of fields between dataframe and available fields
-        # (prevent writing columns of df that don't exist in db)
-        columns = np.intersect1d(dataframe.columns.values, fields)
-        #values = [row[1][columns].values for row in dataframe.iterrows()]
-        # faster way
-        df = dataframe[columns]
-        values = [row.tolist() for index, row in df.iterrows()]
-        self._insert_rows_in_table(table_path, columns, values)
+        df = dataframe
+        if create:
+            arcpy.Delete_management(table_path)
+            arcpy.CreateTable_management(os.path.split(table_path)[0],
+                                         table_name)
+            columns = df.columns.tolist()
+            for i, (column, dtype) in enumerate(zip(columns, df.dtypes)):
+                dtype = str(dtype)
+                if dtype.startswith('int'):
+                    field_type = 'LONG'
+                elif dtype.startswith('float'):
+                    field_type = 'FLOAT'
+                else:
+                    field_type = 'TEXT'
+                # can't use numbers as column names
+                if type(column) != str:
+                    column = columns[i] = '_{}'.format(column)
+                arcpy.AddField_management(table_path, column, field_type)
+        else:
+            desc = arcpy.Describe(table_path)
+            fields = [field.name for field in desc.fields]
+            
+            # intersection of fields between dataframe and available fields
+            # (prevent writing columns of df that don't exist in db)
+            columns = np.intersect1d(dataframe.columns.values, fields)
+            #values = [row[1][columns].values for row in dataframe.iterrows()]
+            # faster way
+            df = dataframe[columns]
+        cursor = arcpy.da.InsertCursor(table_path, columns)
+        for index, row in df.iterrows():
+            cursor.insertRow(row.tolist())
+        del cursor
 
     def query_table(self, table_name, columns=[], workspace='',
                     where=None, pkey=None, project='', is_base_table=False):
