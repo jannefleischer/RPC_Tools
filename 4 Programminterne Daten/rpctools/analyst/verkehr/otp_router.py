@@ -640,6 +640,7 @@ class OTPRouter(object):
         fc = os.path.join(self.ws, 'Zielpunkte')
         self.truncate(fc)
         counter = 1
+        equal_node_weight = round(100 / len(self.transfer_nodes), 1)
         with arcpy.da.InsertCursor(fc, fields) as rows:
             for node in self.transfer_nodes.itervalues():
                 name = 'Herkunfts-/Zielpunkt ' + str(counter)
@@ -647,7 +648,7 @@ class OTPRouter(object):
                 geom = node.get_geom()
                 if geom:
                     rows.insertRow((node.node_id,
-                                    node.weight,
+                                    equal_node_weight,
                                     geom, name))
 
     def truncate(self, fc):

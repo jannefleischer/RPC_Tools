@@ -85,7 +85,7 @@ class TbxUpdateNodes(Tbx):
                 old_weight = self.query_table('Zielpunkte',
                                               ['Gewicht'],
                                               where=where)[0][0]
-                params.new_weight.value = int(round(old_weight * 100, 0))
+                params.new_weight.value = int(round(old_weight, 0))
 
 
         if self.par.changed('new_weight') and not self._opened_for_first_time:

@@ -21,7 +21,8 @@ class UpdateNodes(Routing):
         self.output.add_layer('verkehr', 'links',
                               featureclass='links',
                               template_folder='Verkehr',
-                              name='Zusätzliche PKW-Fahrten gewichtet')
+                              name='Zusätzliche PKW-Fahrten gewichtet',
+                              symbology_classes=(15, 'weight'))
         return
 
     def run(self):
@@ -51,15 +52,15 @@ class UpdateNodes(Routing):
                        if weight != None]
         node_id_not_set = [i for i in node_id if i not in node_id_set]
         #split weight
-        man_weights_set = [weight / 100 for weight in man_weights \
+        man_weights_set = [weight for weight in man_weights \
                            if weight != None]
         man_weights_not_set = [old_weight for i, old_weight in \
                                enumerate(old_weights) \
                                if man_weights[i] == None]
         total_man_weight = sum(man_weights_set)
         total_old_weight_not_set = sum(man_weights_not_set)
-        if total_man_weight <= 1:
-            remaining_weight = 1 - total_man_weight
+        if total_man_weight <= 100:
+            remaining_weight = 100 - total_man_weight
             man_weights_not_set = np.array(man_weights_not_set) * \
                 remaining_weight / total_old_weight_not_set
             man_weights_set = np.array(man_weights_set)
@@ -92,7 +93,7 @@ class UpdateNodes(Routing):
     def remove_output(self):
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = arcpy.mapping.ListDataFrames(mxd, "*")[0]
-        layers1 = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
+        layers1 = arcpy.mapping.ListLayers(mxd, "*Zielpunkte*", df)
         layers2 = arcpy.mapping.ListLayers(mxd, "*Fahrten*", df)
         layers = sum([layers1, layers2], [])
         for layer in layers:

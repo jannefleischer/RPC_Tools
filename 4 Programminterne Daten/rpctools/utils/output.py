@@ -683,7 +683,7 @@ class Output(object):
                 lyr.visible = False
         if layer.symbology_classes is not None:
             num_symclasses, column = layer.symbology_classes
-            self.update_layersymbology(layer.name, num_symclasses, column)
+            self.update_layersymbology(new_layer, num_symclasses, column)
 
         new_layer.visible = True
         for lyr in arcpy.mapping.ListLayers(new_layer):
@@ -878,7 +878,7 @@ class Output(object):
         with ArcpyEnv(addOutputsToMap=True, overwriteOutput=True):
             arcpy.MakeGraph_management(input_template, graph, out_graph_name)
 
-    def update_layersymbology(self, layername, num_classes=13, column='weight'):
+    def update_layersymbology(self, lyr, num_classes=13, column='weight'):
         """
         update the class break values of layersymbology
 
@@ -893,10 +893,10 @@ class Output(object):
         """
         from rpctools.utils.params import DummyTbx
         #get layer
-        mxd = arcpy.mapping.MapDocument('CURRENT')
-        lyr = arcpy.mapping.ListLayers(mxd, layername)
-        arcpy.AddMessage(lyr)
-        lyr = lyr[0]
+        #mxd = arcpy.mapping.MapDocument('CURRENT')
+        #lyr = arcpy.mapping.ListLayers(mxd, layername)
+        #arcpy.AddMessage(lyr)
+        #lyr = lyr[0]
         data_source = lyr.dataSource
         # get new classes
         tbx = DummyTbx()

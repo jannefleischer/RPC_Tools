@@ -21,7 +21,7 @@ class Routing(Tool):
         self.output.add_layer('verkehr', 'links',
                               featureclass='links',
                               template_folder='Verkehr',
-                              name='Zusätzliche PKW-Fahrten', zoom=True,
+                              name='Zusätzliche PKW-Fahrten', zoom=False,
                               symbology_classes=(15, 'weight'))
         self.output.add_layer('verkehr', 'Zielpunkte',
                               featureclass='Zielpunkte',
@@ -159,10 +159,11 @@ class Routing(Tool):
 
 
 if __name__ == '__main__':
-    o = OTPRouter(r'C:\ggr Projekte\RPC_Tools\3 Benutzerdefinierte Projekte\Test Verkehr\FGDB_Verkehr.gdb')
+    o = OTPRouter(r'F:\Projekte SH\RPC Tools\3 Benutzerdefinierte Projekte\0908\FGDB_Verkehr.gdb')
     source = Point(lat=53.5, lon=9.589)
     source_id = 0
     destinations = o.create_circle(source, dist=1000, n_segments=12)
+    o.dist = 1000
     for d, (lon, lat) in enumerate(destinations):
         destination = Point(lat, lon)
         print d,
