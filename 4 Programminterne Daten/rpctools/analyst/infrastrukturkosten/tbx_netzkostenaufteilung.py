@@ -111,6 +111,17 @@ class TbxNetzKostenaufteilung(Tbx):
             self.df_results.loc[(self.df_results.IDNetz == self._netztyp) & (self.df_results.IDKostenphase == id_to_set), ['Anteil_GSB', 'Anteil_GEM', 'Anteil_ALL', 'Kostenregel', 'IDKostenregel']] = \
                 [owner.value, community.value, users.value, default.value, id_default]
 
+    def _update_suggestion_list(self, params):
+        suggestions_EH = self._df_suggestions.loc[(self._df_suggestions.IDNetz == self._netztyp) & (self._df_suggestions.IDPhase==1), 'Kostenregel'].values.tolist()
+        suggestions_EH.append(u"benutzerdefinierte Einstellungen")
+        params.default_EH.filter.list = suggestions_EH
+        suggestions_BU = self._df_suggestions.loc[(self._df_suggestions.IDNetz == self._netztyp) & (self._df_suggestions.IDPhase==2), 'Kostenregel'].values.tolist()
+        suggestions_BU.append(u"benutzerdefinierte Einstellungen")
+        params.default_BU.filter.list = suggestions_BU
+        suggestions_EN = self._df_suggestions.loc[(self._df_suggestions.IDNetz == self._netztyp) & (self._df_suggestions.IDPhase==3), 'Kostenregel'].values.tolist()
+        suggestions_EN.append(u"benutzerdefinierte Einstellungen")
+        params.default_EN.filter.list = suggestions_EN
+
     def _open(self, params):
         # get initial data
         kostenaufteilung_startwerte(self.par.get_projectname())
@@ -131,6 +142,8 @@ class TbxNetzKostenaufteilung(Tbx):
             network_id = int(self._df_netzwork_id.loc[self._df_netzwork_id.Netz == params.network.value, 'IDNetz'])
             self._netztyp = network_id
             self.load_network(params)
+            self._update_suggestion_list(params)
+
         # check if other default settings were choosen
         if self.par.changed('default_EH'):
             if params.default_EH.value != u"benutzerdefinierte Einstellungen":
@@ -171,6 +184,10 @@ class TbxNetzKostenaufteilung(Tbx):
         self._df_defaults.loc[:, ["Anteil_GSB", "Anteil_GEM", "Anteil_ALL"]] = \
             self._df_defaults.loc[:, ["Anteil_GSB", "Anteil_GEM", "Anteil_ALL"]].astype(int)
         # filter list for Kostenregel
+        self._df_suggestions = self.table_to_dataframe(
+            'Aufteilungsregeln_zu_Netzen_und_Phasen', columns=[],
+            workspace='FGDB_Kosten_Tool.gdb', where=None, is_base_table=True)
+        self._df_suggestions = pd.merge(self._df_suggestions, self._df_defaults.loc[:, ['IDKostenregel', 'Kostenregel']], left_on='IDAufteilungsregel', right_on='IDKostenregel')
         default_list = list(self._df_defaults.Kostenregel)
         default_list.append(u"benutzerdefinierte Einstellungen")
         # dataframe for network and networkID
@@ -209,7 +226,7 @@ class TbxNetzKostenaufteilung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = default_list
+        #p.filter.list = default_list
         p.category = category_EH
         # Grundstücksbesitzer
         p = self.add_parameter("owner_EH")
@@ -251,7 +268,7 @@ class TbxNetzKostenaufteilung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = default_list
+        #p.filter.list = default_list
         p.category = category_BU
         # Grundstücksbesitzer
         p = self.add_parameter("owner_BU")
@@ -293,7 +310,7 @@ class TbxNetzKostenaufteilung(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.filter.list = default_list
+        #p.filter.list = default_list
         p.category = category_EN
         # Grundstücksbesitzer
         p = self.add_parameter("owner_EN")
@@ -326,6 +343,8 @@ class TbxNetzKostenaufteilung(Tbx):
         p.filter.list = [0, 100]
         p.category = category_EN
         self.add_dependency(['owner_EN', 'community_EN', 'users_EN'], 100)
+
+        self._update_suggestion_list(params)
 
         return params
 
