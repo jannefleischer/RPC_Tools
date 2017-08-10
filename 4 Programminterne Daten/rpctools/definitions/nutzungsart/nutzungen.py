@@ -346,7 +346,7 @@ class NutzungenGewerbe(Nutzungen):
         
         tbx = self.parent_tbx
         
-        tbx.delete_rows_in_table(perc_res_table,
+        tbx.delete_rows_in_table(perc_res_table, workspace=results_workspace, 
                                  where='IDTeilflaeche={}'.format(flaechen_id))
         
         perc_table_df = tbx.table_to_dataframe(
