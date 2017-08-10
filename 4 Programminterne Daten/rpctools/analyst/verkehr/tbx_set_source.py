@@ -48,11 +48,23 @@ class SetSource(Tool):
         pickle_path = self.folders.get_otp_pickle_filename(check=False)
         if os.path.exists(pickle_path):
             os.remove(pickle_path)
+        # empty gdb tables
+        tn_path = toolbox.folders.get_table('Zielpunkte',
+                                            workspace=self._workspace)
+        links_path = toolbox.folders.get_table('links',
+                                               workspace=self._workspace)
+        nodes_path = toolbox.folders.get_table('nodes',
+                                               workspace=self._workspace)
+        routes_path = toolbox.folders.get_table('Routes',
+                                                workspace=self._workspace)
+        tables_to_clear = [tn_path, links_path, nodes_path, routes_path]
+        for path in tables_to_clear:
+            arcpy.DeleteRows_management(path)
 
     def remove_output(self):
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = arcpy.mapping.ListDataFrames(mxd, "*")[0]
-        layers1 = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
+        layers1 = arcpy.mapping.ListLayers(mxd, "*Zielpunkte*", df)
         layers2 = arcpy.mapping.ListLayers(mxd, "*Fahrten*", df)
         layers = sum([layers1, layers2], [])
         for layer in layers:
