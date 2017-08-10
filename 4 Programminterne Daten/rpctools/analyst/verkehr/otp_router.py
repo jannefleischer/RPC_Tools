@@ -417,6 +417,7 @@ class OTPRouter(object):
         self.areas = Areas()
         self.transfer_nodes = TransferNodes()
         self.transfer_nodes.areas = self.areas
+        self.nodes_have_been_weighted = False
 
     def dump(self, filename):
         """write myself to dumpfile"""

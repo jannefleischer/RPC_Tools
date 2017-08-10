@@ -17,7 +17,8 @@ class UpdateNodes(Routing):
         self.output.add_layer('verkehr', 'Zielpunkte_gewichtet',
                               featureclass='Zielpunkte',
                               template_folder='Verkehr',
-                              name='Zielpunkte gewichtet')
+                              name='Zielpunkte gewichtet',
+                              symbology_classes=(10, 'Neue_Gewichte'))
         self.output.add_layer('verkehr', 'links',
                               featureclass='links',
                               template_folder='Verkehr',
@@ -72,6 +73,7 @@ class UpdateNodes(Routing):
         transfer_nodes = otp_router.transfer_nodes
         self.remove_output()
 
+
         def set_new_weights(weights, node_ids):
             """"""
             # write data to the new table
@@ -81,7 +83,7 @@ class UpdateNodes(Routing):
                 transfer_nodes[id_node].weight = weight
                 where = 'node_id = {}'.format(id_node)
                 toolbox.update_table('Zielpunkte',
-                                  {'Neue_Gewichte': weight}, where=where)
+                                  {'Neue_Gewichte': weight * 100}, where=where)
 
         set_new_weights(man_weights_not_set, node_id_not_set)
         set_new_weights(man_weights_set, node_id_set)
@@ -89,6 +91,7 @@ class UpdateNodes(Routing):
         transfer_nodes.assign_weights_to_routes()
         otp_router.calc_vertex_weights()
         otp_router.create_polyline_features()
+        otp_router.nodes_have_been_weighted = True
         otp_router.dump(pickle_path)
 
     def remove_output(self):

@@ -12,6 +12,8 @@ class Settings(Routing):
     _workspace = 'FGDB_Verkehr.gdb'
     _param_projectname = 'project'
     _initial_routing_exists = False
+    _transfernodes_layer_exsists = False
+    _nodes_have_been_weighted = False
 
     def add_outputs(self):
         if self._initial_routing_exists:
@@ -20,6 +22,20 @@ class Settings(Routing):
                                   template_folder='Verkehr',
                                   name='Zusätzliche PKW-Fahrten', zoom=False,
                                   symbology_classes=(15, 'weight'))
+            if self._transfernodes_layer_exsists:
+                return
+            if self._nodes_have_been_weighted:
+                self.output.add_layer('verkehr', 'Zielpunkte_gewichtet',
+                                      featureclass='Zielpunkte',
+                                      template_folder='Verkehr',
+                                      name='Zielpunkte gewichtet',
+                                      symbology_classes=(10, 'Neue_Gewichte'))
+            else:
+                self.output.add_layer('verkehr', 'Zielpunkte',
+                                      featureclass='Zielpunkte',
+                                      template_folder='Verkehr',
+                                      name='Herkunfts-/Zielpunkte',
+                                      zoom=False)
 
     def run(self):
         toolbox = self.parent_tbx
@@ -60,6 +76,7 @@ class Settings(Routing):
             otp_router.calc_vertex_weights()
             otp_router.create_polyline_features()
             otp_router.create_node_features()
+            self._nodes_have_been_weighted = otp_router.nodes_have_been_weighted
             otp_router.dump(pickle_path)
             self.remove_output()
             #transfer_nodes = otp_router.transfer_nodes
@@ -70,8 +87,10 @@ class Settings(Routing):
     def remove_output(self):
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = arcpy.mapping.ListDataFrames(mxd, "*")[0]
-        #layers1 = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
+        layers1 = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
         layers2 = arcpy.mapping.ListLayers(mxd, "*Fahrten*", df)
+        if layers1:
+            self._transfernodes_layer_exsists = True
         layers = sum([layers2], [])
         for layer in layers:
             arcpy.mapping.RemoveLayer(df, layer)
