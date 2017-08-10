@@ -56,16 +56,6 @@ class Familienleistungsausgleich(Tool):
             for land in cursor2:
                 landesfaktor = land[1]
             FLA_Gemeindebilanz = gemeinde[1] * landesfaktor
-            if abs(FLA_Gemeindebilanz) < 10:
-                FLA_Gemeindebilanz = round(FLA_Gemeindebilanz, 0)
-            else:
-                if abs(FLA_Gemeindebilanz) < 1000:
-                    FLA_Gemeindebilanz = round(FLA_Gemeindebilanz, -1)
-                else:
-                    if abs(FLA_Gemeindebilanz) < 10000:
-                        FLA_Gemeindebilanz = round(FLA_Gemeindebilanz, -2)
-                    else:
-                        FLA_Gemeindebilanz = round(FLA_Gemeindebilanz, -3)
             gemeinde[0] = FLA_Gemeindebilanz
             cursor.updateRow(gemeinde)
 

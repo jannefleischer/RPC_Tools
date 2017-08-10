@@ -60,60 +60,18 @@ class TbxGesamtsumme(Tbx):
                                 workspace='FGDB_Definition_Projekt.gdb')
 
         for row in cursor:
-            if row[0] == Nutzungsart.GEWERBE:
-                gewerbe_oder_einzelhandel_vorhanden = True
-            if row[0] == Nutzungsart.EINZELHANDEL:
+            if row[0] == Nutzungsart.GEWERBE or row[0] == Nutzungsart.EINZELHANDEL:
                 gewerbe_oder_einzelhandel_vorhanden = True
             if row[0] == Nutzungsart.WOHNEN:
                 wohnen_vorhanden = True
 
-        table = self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=par.name.value)
-        cursor = self.query_table(table_name = 'Chronik_Nutzung',
-                                columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
-                                workspace='FGDB_Einnahmen.gdb')
+        if wohnen_vorhanden and gewerbe_oder_einzelhandel_vorhanden:
+            bestandteile = "Grundsteuer + Einkommensteuer + Familienleistungsausgleich + Gewerbesteuer + Umsatzsteuer"
+        elif wohnen_vorhanden and not gewerbe_oder_einzelhandel_vorhanden:
+            bestandteile = "Grundsteuer + Einkommensteuer + Familienleistungsausgleich"
+        elif not wohnen_vorhanden and gewerbe_oder_einzelhandel_vorhanden:
+            bestandteile = "Grundsteuer + Gewerbesteuer + Umsatzsteuer"
 
-        for row in cursor:
-            if row[0] == "Grundsteuer" and row[1] is not None:
-                self.spalten.append("GrSt")
-                if anzahl_bestandteile == 0:
-                    grundsteuer = "Grundsteuer"
-                else:
-                    grundsteuer = " + Grundsteuer"
-                anzahl_bestandteile += 1
-
-            if wohnen_vorhanden and row[0] == "Einkommensteuer" and not c.compare_chronicle("Wanderung Einwohner", "Einkommensteuer", table):
-                self.spalten.append("ESt")
-                if anzahl_bestandteile == 0:
-                    einkommensteuer = "Einkommensteuer"
-                else:
-                    einkommensteuer = " + Einkommensteuer"
-                anzahl_bestandteile += 1
-
-            if wohnen_vorhanden and row[0] == "Familienleistungsausgleich"  and not c.compare_chronicle("Familienleistungsausgleich", "Einkommensteuer", table):
-                self.spalten.append("FamLeistAusgl")
-                if anzahl_bestandteile == 0:
-                    fla = "Familienleistungsausgleich"
-                else:
-                    fla = " + Familienleistungsausgleich"
-                anzahl_bestandteile += 1
-
-            if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Gewerbesteuer" and not c.compare_chronicle("Wanderung Beschaeftigte", "Gewerbesteuer", table):
-                self.spalten.append("GewSt")
-                if anzahl_bestandteile == 0:
-                    gewerbesteuer = "Gewerbesteuer"
-                else:
-                    gewerbesteuer = " + Gewerbesteuer"
-                anzahl_bestandteile += 1
-
-            if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Umsatzsteuer" and not c.compare_chronicle("Gewerbesteuer", "Umsatzsteuer", table):
-                self.spalten.append("USt")
-                if anzahl_bestandteile == 0:
-                    umsatzsteuer = "Umsatzsteuer"
-                else:
-                    umsatzsteuer = " + Umsatzsteuer"
-                anzahl_bestandteile += 1
-
-        bestandteile = grundsteuer + einkommensteuer + fla + gewerbesteuer + umsatzsteuer
         par.summe.value = bestandteile
 
 
@@ -123,15 +81,14 @@ class TbxGesamtsumme(Tbx):
 
         wohnen_vorhanden = False
         gewerbe_oder_einzelhandel_vorhanden = False
+        missing = []
 
         cursor = self.query_table('Teilflaechen_Plangebiet',
                                 ['Nutzungsart'],
                                 workspace='FGDB_Definition_Projekt.gdb')
 
         for row in cursor:
-            if row[0] == Nutzungsart.GEWERBE:
-                gewerbe_oder_einzelhandel_vorhanden = True
-            if row[0] == Nutzungsart.EINZELHANDEL:
+            if row[0] == Nutzungsart.GEWERBE or row[0] == Nutzungsart.EINZELHANDEL:
                 gewerbe_oder_einzelhandel_vorhanden = True
             if row[0] == Nutzungsart.WOHNEN:
                 wohnen_vorhanden = True
@@ -142,9 +99,23 @@ class TbxGesamtsumme(Tbx):
                                 workspace='FGDB_Einnahmen.gdb')
 
         for row in cursor:
+            if row[0] == "Grundsteuer" and row[1] is None:
+                missing.append(u"Grundsteuer")
+            if wohnen_vorhanden and row[0] == "Einkommensteuer" and (row[1] is None or c.compare_chronicle("Einkommensteuer", "Wanderung Einwohner", table) == False):
+                missing.append(u"Einkommensteuer")
+            if wohnen_vorhanden and row[0] == "Familienleistungsausgleich" and (row[1] is None or c.compare_chronicle("Einkommensteuer", "Wanderung Einwohner", table) == False):
+                missing.append(u"Familienleistungsausgleich")
+            if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Gewerbesteuer" and (row[1] is None or c.compare_chronicle("Gewerbesteuer", "Wanderung Beschaeftigte", table) == False):
+                missing.append(u"Gewerbesteuer")
+            if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Umsatzsteuer" and (row[1] is None or c.compare_chronicle("Umsatzsteuer", "Gewerbesteuer", table) == False):
+                missing.append(u"Umsatzsteuer")
 
-            if wohnen_vorhanden and row[0] == "Wanderung Einwohner" and row[1] is None:
-                par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Einwohner berechnet!')
-
-            if gewerbe_oder_einzelhandel_vorhanden and row[0] == "Wanderung Beschaeftigte" and row[1] is None:
-                par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Beschäftigte berechnet!')
+        if missing:
+            missing_nr = 1
+            missing_msg = u"Zur Darstellung der Gesamtsumme müssen zunächst noch folgende Bilanzen (erneut) berechnet werden: "
+            for bilanz in missing:
+                missing_msg += bilanz
+                if missing_nr != len(missing):
+                    missing_msg += ", "
+                missing_nr += 1
+            par.name.setErrorMessage(missing_msg)

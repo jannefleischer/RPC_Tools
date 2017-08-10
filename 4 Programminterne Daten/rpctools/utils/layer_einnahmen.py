@@ -50,7 +50,7 @@ def get_symbology(gemeindewerte, vorzeichen):
         for symbology in cursor:
             if symbology[1] <= ref_value:
                 symbology_layer = symbology[0]
-    arcpy.AddMessage(str(symbology_layer))
+    #arcpy.AddMessage(str(symbology_layer))
     return str(symbology_layer)
 
 def create_gemeindebilanzen(self, projektname):
@@ -96,12 +96,12 @@ def create_gemeindebilanzen(self, projektname):
             arcpy.AddField_management(gemeindebilanzen, "Gewichtete_SvB", "DOUBLE")
             arcpy.AddField_management(gemeindebilanzen, "Wanderungsanteil_Ew", "DOUBLE")
             arcpy.AddField_management(gemeindebilanzen, "Wanderungsanteil_SvB", "DOUBLE")
-            arcpy.AddField_management(gemeindebilanzen, "Einw_Zuzug", "LONG")
-            arcpy.AddField_management(gemeindebilanzen, "Einw_Fortzug", "LONG")
-            arcpy.AddField_management(gemeindebilanzen, "Einw_Saldo", "LONG")
-            arcpy.AddField_management(gemeindebilanzen, "SvB_Zuzug", "LONG")
-            arcpy.AddField_management(gemeindebilanzen, "SvB_Fortzug", "LONG")
-            arcpy.AddField_management(gemeindebilanzen, "SvB_Saldo", "LONG")
+            arcpy.AddField_management(gemeindebilanzen, "Einw_Zuzug", "DOUBLE")
+            arcpy.AddField_management(gemeindebilanzen, "Einw_Fortzug", "DOUBLE")
+            arcpy.AddField_management(gemeindebilanzen, "Einw_Saldo", "DOUBLE")
+            arcpy.AddField_management(gemeindebilanzen, "SvB_Zuzug", "DOUBLE")
+            arcpy.AddField_management(gemeindebilanzen, "SvB_Fortzug", "DOUBLE")
+            arcpy.AddField_management(gemeindebilanzen, "SvB_Saldo", "DOUBLE")
             arcpy.AddField_management(gemeindebilanzen, "GrSt", "DOUBLE")
             arcpy.AddField_management(gemeindebilanzen, "ESt", "DOUBLE")
             arcpy.AddField_management(gemeindebilanzen, "FamLeistAusgl", "DOUBLE")

@@ -218,16 +218,32 @@ class TbxGrundsteuer(Tbx):
                 self.par.slider7.enabled  = False
 
 
-        where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.GEWERBE, Nutzungsart.EINZELHANDEL)
 
         rows = self.query_table('Teilflaechen_Plangebiet',
                                 ['Nutzungsart'],
-                                workspace='FGDB_Definition_Projekt.gdb',
-                                where=where)
+                                workspace='FGDB_Definition_Projekt.gdb')
+        wohnen_exists = False
+        gewerbe_exists = False
+        einzelhandel_exists = False
+        for row in rows:
+            if row[0] == Nutzungsart.WOHNEN:
+                wohnen_exists = True
+            if row[0] == Nutzungsart.GEWERBE:
+                gewerbe_exists = True
+            if row[0] == Nutzungsart.EINZELHANDEL:
+                einzelhandel_exists = True
 
-        if not rows:
-            self.par.slider8.active = False
-            self.par.slider9.active = False
+        if einzelhandel_exists or gewerbe_exists:
+            self.par.slider8.enabled = True
+            self.par.slider9.enabled = True
         else:
-            self.par.slider8.active = True
-            self.par.slider9.active = True
+            self.par.slider8.enabled = False
+            self.par.slider9.enabled = False
+
+        if not wohnen_exists:
+            self.par.slider2.enabled  = False
+            self.par.slider3.enabled  = False
+            self.par.slider4.enabled  = False
+            self.par.slider5.enabled  = False
+            self.par.slider6.enabled  = False
+            self.par.slider7.enabled  = False

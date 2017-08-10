@@ -55,7 +55,7 @@ class Umsatzsteuer(Tool):
 
         cursor_bilanz = arcpy.da.UpdateCursor(tablepath_bilanz, fields)
         for gemeinde in cursor_bilanz:
-            gemeinde[0] = round(GemAnt_GewSt * gemeinde[1] + GemAnt_SvB * gemeinde[2])
+            gemeinde[0] = GemAnt_GewSt * gemeinde[1] + GemAnt_SvB * gemeinde[2]
             cursor_bilanz.updateRow(gemeinde)
 
         c.set_chronicle("Umsatzsteuer", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))

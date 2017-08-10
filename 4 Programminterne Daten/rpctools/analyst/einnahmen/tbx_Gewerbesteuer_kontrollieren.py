@@ -8,7 +8,10 @@ from rpctools.analyst.einnahmen.script_Gewerbesteuer_kontrollieren import Hebesa
 from rpctools.utils.constants import Nutzungsart
 
 class TbxKontrolleGewerbesteuer(Tbx):
-    """Toolbox Wanderungssalden für Einnahmen"""
+    """Toolbox Gewerbesteuerhebesaetze bearbeiten"""
+
+    gemeinden_dict = {}
+    gemeinden_list = []
 
     @property
     def label(self):
@@ -54,6 +57,55 @@ class TbxKontrolleGewerbesteuer(Tbx):
     def _updateParameters(self, params):
         par = self.par
 
+        if par.changed('name'):
+            where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.WOHNEN, Nutzungsart.EINZELHANDEL)
+            rows = self.query_table('Teilflaechen_Plangebiet',
+                                    ['Nutzungsart'],
+                                    workspace='FGDB_Definition_Projekt.gdb',
+                                    where=where)
+            if not rows:
+                par.gemeinde.enabled = False
+                par.gemeinde.filter.list = []
+                par.gemeinde.value = (u'Projekt enthält keine Flächen mit der '
+                                      u'benötigten Nutzungsart')
+            else:
+                par.gemeinde.enabled = True
+                fields = ["GEN"]
+                rows_gemeindebilanz = self.query_table('Gemeindebilanzen', fields,
+                                        workspace='FGDB_Einnahmen.gdb')
+                for gemeinde in rows_gemeindebilanz:
+                    where = '"GEN"' + "='" + gemeinde[0] + "'"
+                    fields2 = ["GEN", "Hebesatz_GewSt"]
+                    rows_bkg_gemeinden = self.query_table(table_name = 'bkg_gemeinden', columns = fields2,
+                                    workspace='FGDB_Basisdaten_deutschland.gdb',
+                                    where = where, is_base_table = True)
+                    for gem_name, hebesteuer in rows_bkg_gemeinden:
+                        self.gemeinden_dict[gem_name] = hebesteuer
+                for key in self.gemeinden_dict:
+                    self.gemeinden_list.append(u"{} || Hebesatz: {}".format(key, self.gemeinden_dict[key]))
+                par.gemeinde.filter.list = sorted(self.gemeinden_list)
+                par.gemeinde.value = sorted(self.gemeinden_list)[0]
+
+        if par.changed('gemeinde'):
+            target_gemeinde = self.par.gemeinde.value
+            target_gemeinde_kurz = target_gemeinde.split(" ||")[0]
+            par.hebesatz.value = self.gemeinden_dict[target_gemeinde_kurz]
+
+        if par.changed('hebesatz'):
+            target_gemeinde = self.par.gemeinde.value
+            target_gemeinde_kurz = target_gemeinde.split(" ||")[0]
+            self.gemeinden_dict[target_gemeinde_kurz] = self.par.hebesatz.value
+
+            self.gemeinden_list = []
+            for key in self.gemeinden_dict:
+                self.gemeinden_list.append(u"{} || Hebesatz: {}".format(key, self.gemeinden_dict[key]))
+            par.gemeinde.filter.list = sorted(self.gemeinden_list)
+            par.gemeinde.value = u"{} || Hebesatz: {}".format(target_gemeinde_kurz, self.gemeinden_dict[target_gemeinde_kurz])
+
+
+    def _updateMessages(self, params):
+        par = self.par
+
         cursor = self.query_table(table_name = 'Chronik_Nutzung',
                                 columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
                                 workspace='FGDB_Einnahmen.gdb')
@@ -62,37 +114,9 @@ class TbxKontrolleGewerbesteuer(Tbx):
                 par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Beschäftigte berechnet!')
 
         where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.WOHNEN, Nutzungsart.EINZELHANDEL)
-        if par.changed('name'):
-            where = 'Nutzungsart = {} or Nutzungsart = {}'.format(Nutzungsart.WOHNEN, Nutzungsart.EINZELHANDEL)
-            rows = self.query_table('Teilflaechen_Plangebiet',
-                                    ['Nutzungsart'],
-                                    workspace='FGDB_Definition_Projekt.gdb',
-                                    where=where)
-            if not rows:
-                par.name.setErrorMessage(u'In diesem Projekt sind keine Gewerbe- oder Einzelhandelsflächen definiert!')
-                par.gemeinde.enabled = False
-                par.gemeinde.filter.list = []
-                par.gemeinde.value = (u'Projekt enthält keine Flächen mit der '
-                                      u'benötigten Nutzungsart')
-            else:
-                par.gemeinde.enabled = True
-                gemeinden = []
-                fields = ["GEN", "Hebesatz_GewSt"]
-                rows = self.query_table('Gemeindebilanzen', fields,
-                                        workspace='FGDB_Einnahmen.gdb')
-                for gem_name, hebesteuer in rows:
-                    gemeinden.append(u"{} || Hebesatz: {}".format(
-                        gem_name, hebesteuer))
-                par.gemeinde.filter.list = sorted(gemeinden)
-
-        if par.changed('gemeinde'):
-
-            target_gemeinde = self.par.gemeinde.value
-            target_gemeinde_kurz = target_gemeinde.split(" ||")[0]
-
-            fields = ["GEN", "Hebesatz_GewSt"]
-            rows = self.query_table('Gemeindebilanzen', fields,
-                                    workspace='FGDB_Einnahmen.gdb')
-            for gemeinde in rows:
-                if gemeinde[0] == target_gemeinde_kurz:
-                    par.hebesatz.value = gemeinde[1]
+        rows = self.query_table('Teilflaechen_Plangebiet',
+                                ['Nutzungsart'],
+                                workspace='FGDB_Definition_Projekt.gdb',
+                                where=where)
+        if not rows:
+            par.name.setErrorMessage(u'In diesem Projekt sind keine Gewerbe- oder Einzelhandelsflächen definiert!')

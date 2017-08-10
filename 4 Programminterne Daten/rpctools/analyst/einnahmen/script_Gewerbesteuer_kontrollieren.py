@@ -25,14 +25,14 @@ class HebesaetzeKontrolle(Tool):
         hebesatz = self.par.hebesatz.value
         target_gemeinde = self.par.gemeinde.value
         target_gemeinde_kurz = target_gemeinde.split(" ||")[0]
-        workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
-        wanderungssalden = os.path.join(workspace_projekt_einnahmen, 'Gemeindebilanzen')
+        basetable_GewSt = self.folders.get_base_table("FGDB_Basisdaten_deutschland.gdb", 'bkg_gemeinden')
         fields = ["GEN", "Hebesatz_GewSt"]
-        where_clause = '"GEN"' + "='" + target_gemeinde_kurz + "'"
-        cursor = arcpy.da.UpdateCursor(wanderungssalden, fields, where_clause)
-        for gemeinde in cursor:
-            gemeinde[1] = hebesatz
-            cursor.updateRow(gemeinde)
+        for key in self.parent_tbx.gemeinden_dict:
+            where_clause = '"GEN"' + "='" + key + "'"
+            cursor = arcpy.da.UpdateCursor(basetable_GewSt, fields, where_clause)
+            for gemeinde in cursor:
+                gemeinde[1] = self.parent_tbx.gemeinden_dict[key]
+                cursor.updateRow(gemeinde)
 
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = mxd.activeDataFrame

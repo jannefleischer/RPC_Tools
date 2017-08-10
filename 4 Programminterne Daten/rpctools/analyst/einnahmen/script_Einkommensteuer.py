@@ -97,16 +97,6 @@ class Einkommensteuer(Tool):
         cursor = arcpy.da.UpdateCursor(tablepath_bilanz, fields)
         for gemeinde in cursor:
             Est_Gemeindebilanz = ESt_pro_Bewohner * gemeinde[1]
-            if abs(Est_Gemeindebilanz) < 10:
-                Est_Gemeindebilanz = round(Est_Gemeindebilanz, 0)
-            else:
-                if abs(Est_Gemeindebilanz) < 1000:
-                    Est_Gemeindebilanz = round(Est_Gemeindebilanz, -1)
-                else:
-                    if abs(Est_Gemeindebilanz) < 10000:
-                        Est_Gemeindebilanz = round(Est_Gemeindebilanz, -2)
-                    else:
-                        Est_Gemeindebilanz = round(Est_Gemeindebilanz, -3)
             gemeinde[0] = Est_Gemeindebilanz
             cursor.updateRow(gemeinde)
 

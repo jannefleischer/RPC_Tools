@@ -61,7 +61,7 @@ class TbxSaldenbearbeiten(Tbx):
 
     def _updateParameters(self, params):
         par = self.par
-        path_gemeindebilanzen = os.path.join(self.folders.get_db('FGDB_Einnahmen.gdb'), "Gemeindebilanzen")
+        path_gemeindebilanzen = self.folders.get_table("Gemeindebilanzen", 'FGDB_Einnahmen.gdb')
 
         if par.changed('name'):
             where = 'Nutzungsart = {}'.format(self._nutzungsart)
@@ -82,11 +82,11 @@ class TbxSaldenbearbeiten(Tbx):
                     rows = self.query_table('Gemeindebilanzen', fields,
                                             workspace='FGDB_Einnahmen.gdb')
                     for gem_name, saldo in rows:
-                        gemeinden.append(u"{} || Saldo: {}".format(
-                            gem_name, saldo))
+                        gemeinden.append(u"{} || Saldo: {}".format(gem_name, saldo))
                     par.gemeinde.filter.list = sorted(gemeinden)
+                    par.gemeinde.value = sorted(gemeinden)[0]
 
-        if (par.changed('saldo') or par.changed('name') or par.changed('gemeinde')) and par.gemeinde.value != None:
+        if par.changed('saldo') or par.changed('name') or par.changed('gemeinde'):
             target_gemeinde = par.gemeinde.value
             target_gemeinde_kurz = target_gemeinde.split(" ||")[0]
             summe = 0

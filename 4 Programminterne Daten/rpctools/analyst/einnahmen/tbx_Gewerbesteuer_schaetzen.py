@@ -32,7 +32,7 @@ class TbxGewerbesteuer(Tbx):
 
         return par
 
-    def _updateParameters(self, params):
+    def _updateMessages(self, params):
 
         par = self.par
 
@@ -54,5 +54,6 @@ class TbxGewerbesteuer(Tbx):
                 par.name.setErrorMessage(u'In diesem Projekt sind keine Gewerbe- oder Einzelhandelsflächen definiert!')
                 par.gemeinde.enabled = False
                 par.gemeinde.filter.list = []
-                par.gemeinde.value = (u'Projekt enthält keine Fl�chen mit der '
-                                      u'ben�tigten Nutzungsart')
+                par.gemeinde.value = (u'Projekt enthält keine Flächen mit der '
+                                      u'benötigten Nutzungsart')
+

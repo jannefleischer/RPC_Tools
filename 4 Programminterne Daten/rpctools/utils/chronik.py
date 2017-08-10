@@ -31,3 +31,4 @@ def compare_chronicle(step1, step2, table):
 
     return date1 > date2
 
+

@@ -32,7 +32,7 @@ class TbxEinkommensteuer(Tbx):
 
         return par
 
-    def _updateParameters(self, params):
+    def _updateMessages(self, params):
 
         par = self.par
 

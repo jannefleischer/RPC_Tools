@@ -59,28 +59,18 @@ class Grundsteuer(Tool):
         fields = ["EFH_Rohmiete", 'DHH_Rohmiete', 'RHW_Rohmiete', 'MFH_Rohmiete', 'Bodenwert_Sachwertverfahren', 'qm_Grundstueck_pro_WE_EFH', 'BGF_Buero', 'BGF_Halle']
         tablepath_basisdaten = self.folders.get_table('GrSt_Basisdaten', "FGDB_Einnahmen.gdb")
         cursor = arcpy.da.UpdateCursor(tablepath_basisdaten, fields)
-        if cursor:
-            for row in cursor:
-                row[0] = params.slider2.value
-                row[1] = params.slider3.value
-                row[2] = params.slider4.value
-                row[3] = params.slider5.value
-                row[4] = params.slider6.value
-                row[5] = params.slider7.value
-                row[6] = params.slider8.value
-                row[7] = params.slider9.value
-                cursor.updateRow(row)
-        else:
-            cursor = arcpy.da.InsertCursor(tablepath_basisdaten, fields)
-            cursor.insertRow(   [params.slider2.value,
-                                params.slider3.value,
-                                params.slider4.value,
-                                params.slider5.value,
-                                params.slider6.value,
-                                params.slider7.value,
-                                params.slider8.value,
-                                params.slider9.value]
-                                )
+        for row in cursor:
+                cursor.deleteRow(row)
+        cursor = arcpy.da.InsertCursor(tablepath_basisdaten, fields)
+        cursor.insertRow(   [params.slider2.value,
+                            params.slider3.value,
+                            params.slider4.value,
+                            params.slider5.value,
+                            params.slider6.value,
+                            params.slider7.value,
+                            params.slider8.value,
+                            params.slider9.value]
+                            )
 
         einheitswert_efh = 0
         einheitswert_dh = 0
@@ -253,22 +243,13 @@ class Grundsteuer(Tool):
             return num - (num % multiple)
 
         GRUNDSTEUERAUFKOMMEN = (messbetrag_efh + messbetrag_dh + messbetrag_rh + messbetrag_mfh + messbetrag_gewerbe) * params.slider1.value / 100.0
-        if GRUNDSTEUERAUFKOMMEN < 10:
-            GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 1)
-        else:
-            if GRUNDSTEUERAUFKOMMEN < 1000:
-                GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 10)
-            else:
-                if GRUNDSTEUERAUFKOMMEN < 10000:
-                    GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 100)
-                else:
-                    GRUNDSTEUERAUFKOMMEN = roundup(GRUNDSTEUERAUFKOMMEN, 1000)
+
         table_bilanzen = self.folders.get_table("Gemeindebilanzen", "FGDB_Einnahmen.gdb")
         fields = ["AGS", "GrSt"]
         cursor = arcpy.da.UpdateCursor(table_bilanzen, fields)
         for row in cursor:
             if row[0] == ags:
-                row[1] = round(GRUNDSTEUERAUFKOMMEN)
+                row[1] = GRUNDSTEUERAUFKOMMEN
             else:
                 row[1] = 0
             cursor.updateRow(row)

@@ -44,8 +44,8 @@ class TbxUmsatzsteuer(Tbx):
         for row in cursor:
             if row[0] == u"Wanderung Beschaeftigte" and row[1] is None:
                 par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Beschäftigte berechnet!')
-            if row[0] == u"Gewerbesteuer" and row[1] is None:
-                par.name.setErrorMessage(u'Es wurde noch keine Gewerbesteuer berechnet!')
+            elif row[0] == u"Gewerbesteuer" and c.compare_chronicle("Gewerbesteuer", "Wanderung Beschaeftigte", table) == False:
+                par.name.setErrorMessage(u'Es muss zunächst die Gewerbesteuer (erneut berechnet) werden!')
 
         table = self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=par.name.value)
         vergleich = c.compare_chronicle(u"Gewerbesteuer", u"Wanderung Beschaeftigte", table)
