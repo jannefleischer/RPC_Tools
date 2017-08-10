@@ -121,7 +121,7 @@ class Routing(Tool):
                     tfl_id_with_tou.append(j)
                     total_trips_for_tou += trips
             for tfl_id in tfl_id_with_tou:
-                source_id, shape, trips, tfl_use = data_tfl[tfl_id]
+                source_id, trips, tfl_use, shape= data_tfl[tfl_id]
                 trips = trips_by_car * trips / total_trips_for_tou \
                     if total_trips_for_tou else 0
                 data_tfl[tfl_id] = (source_id, trips, tfl_use, shape)
