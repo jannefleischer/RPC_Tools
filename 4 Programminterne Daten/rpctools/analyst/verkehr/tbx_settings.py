@@ -2,15 +2,24 @@
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 from rpctools.utils.constants import Nutzungsart as nart
+from rpctools.analyst.verkehr.otp_router import OTPRouter
+from rpctools.analyst.verkehr.routing import Routing
 import arcpy
+import pandas as pd
 import os
 
-class Settings(Tool):
+class Settings(Routing):
     _workspace = 'FGDB_Verkehr.gdb'
     _param_projectname = 'project'
+    _initial_routing_exists = False
 
     def add_outputs(self):
-        pass
+        if self._initial_routing_exists:
+            self.output.add_layer('verkehr', 'links',
+                                  featureclass='links',
+                                  template_folder='Verkehr',
+                                  name='Zusätzliche PKW-Fahrten', zoom=False,
+                                  symbology_classes=(15, 'weight'))
 
     def run(self):
         toolbox = self.parent_tbx
@@ -32,19 +41,38 @@ class Settings(Tool):
                           {'Wege_gesamt': wege_e, 'PKW_Anteil': pkw_e},
                           where='Nutzungsart={}'.format(
                               nart.EINZELHANDEL))
-        arcpy.AddMessage("initialisiertes Verkehrsaufkommen wird gelöscht")
-        self.remove_output()
+        #self.remove_output()
         # delete pickle file
         pickle_path = self.folders.get_otp_pickle_filename(check=False)
+
         if os.path.exists(pickle_path):
-            os.remove(pickle_path)
+            self._initial_routing_exists = True
+            otp_router = OTPRouter.from_dump(pickle_path)
+            data_wjn = [(1, wege_w, pkw_w), (2, wege_g, pkw_g), (3, wege_e, pkw_e)]
+            data_tfl = self.get_areas_data()
+            data_tfl = pd.DataFrame(self.calc_trips(data_tfl, data_wjn))
+
+            for area in otp_router.areas.itervalues():
+                trips = data_tfl.loc[(data_tfl[0] == area.source_id), 1]
+                area.trips = trips.values[0]
+
+            #otp_router.transfer_nodes.calc_initial_weight()
+            otp_router.calc_vertex_weights()
+            otp_router.create_polyline_features()
+            otp_router.create_node_features()
+            otp_router.dump(pickle_path)
+            self.remove_output()
+            #transfer_nodes = otp_router.transfer_nodes
+            #transfer_nodes.assign_weights_to_routes()
+            #otp_router.create_polyline_features()
+            #os.remove(pickle_path)
 
     def remove_output(self):
         mxd = arcpy.mapping.MapDocument("CURRENT")
         df = arcpy.mapping.ListDataFrames(mxd, "*")[0]
-        layers1 = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
+        #layers1 = arcpy.mapping.ListLayers(mxd, "Zielpunkte*", df)
         layers2 = arcpy.mapping.ListLayers(mxd, "*Fahrten*", df)
-        layers = sum([layers1, layers2], [])
+        layers = sum([layers2], [])
         for layer in layers:
             arcpy.mapping.RemoveLayer(df, layer)
         del(mxd)
@@ -189,6 +217,12 @@ class TbxSettings(Tbx):
 if __name__ == "__main__":
     t = TbxSettings()
     t.getParameterInfo()
+    t.par.wohnen_wege.value = 1000
+    t.par.wohnen_pkw.value = 50
+    t.par.gewerbe_wege.value = 2000
+    t.par.gewerbe_pkw.value = 30
+    t.par.einzelhandel_wege.value = 3000
+    t.par.einzelhandel_pkw.value = 60
     t.par.project.value = t.config.active_project
     t.execute()
     print("done")

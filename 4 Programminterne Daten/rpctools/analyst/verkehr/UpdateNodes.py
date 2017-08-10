@@ -89,6 +89,7 @@ class UpdateNodes(Routing):
         transfer_nodes.assign_weights_to_routes()
         otp_router.calc_vertex_weights()
         otp_router.create_polyline_features()
+        otp_router.dump(pickle_path)
 
     def remove_output(self):
         mxd = arcpy.mapping.MapDocument("CURRENT")
