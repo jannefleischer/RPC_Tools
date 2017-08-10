@@ -14,7 +14,7 @@ class TeilflaechenVerwalten(Tool):
 
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Definition_Projekt.gdb'
-    
+
     def add_outputs(self):
         arcpy.RefreshActiveView()
 
@@ -28,18 +28,18 @@ class TeilflaechenVerwalten(Tool):
             area_id = area['id_teilflaeche']
             tou_changed = (df_areas.loc[index]['Nutzungsart'] !=
                            df_areas_old.loc[index]['Nutzungsart'])
-            
+
             if not tou_changed:
                 continue
             arcpy.AddMessage(u'Die Nutzungsart von Fläche "{}" hat sich '
                              u'geändert. Bereinige eventuelle bereits '
                              u'berechnete Ergebnisse und Einstellungen...'
                              .format(area['Name']))
-            
+
             df_areas.loc[index, 'Wege_gesamt'] = 0
             df_areas.loc[index, 'Wege_MIV'] = 0
             df_areas.loc[index, 'ew'] = 0
-            
+
             # remove table entries eventually stored for this area
             # (may exist if it was defined as a different type before)
             if tou_id != Nutzungsart.WOHNEN:
@@ -64,7 +64,15 @@ class TeilflaechenVerwalten(Tool):
                 if not market_tool:
                     market_tool = MarktEinlesen(projectname=self.projectname)
                 market_tool.delete_area_market(area_id)
-        
+
         self.parent_tbx.dataframe_to_table('Teilflaechen_Plangebiet',
                                            df_areas, ['id_teilflaeche'],
                                            upsert=False)
+
+        # reset entries in Einkommenschronik
+        chronik = self.folders.get_table("Chronik_Nutzung", "FGDB_Einnahmen.gdb")
+        cursor = arcpy.da.UpdateCursor(chronik, ["Letzte_Nutzung"])
+        for row in cursor:
+            row[0] = None
+            cursor.updateRow(row)
+        del cursor
