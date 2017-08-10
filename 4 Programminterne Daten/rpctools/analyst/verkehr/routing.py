@@ -116,7 +116,7 @@ class Routing(Tool):
             tfl_id_with_tou = []
             total_trips_for_tou = 0
             for j in range(len(data_tfl)):
-                source_id, shape, trips, tfl_use = data_tfl[j]
+                source_id, trips, tfl_use, shape = data_tfl[j]
                 if tou == tfl_use:
                     tfl_id_with_tou.append(j)
                     total_trips_for_tou += trips
@@ -124,7 +124,7 @@ class Routing(Tool):
                 source_id, shape, trips, tfl_use = data_tfl[tfl_id]
                 trips = trips_by_car * trips / total_trips_for_tou \
                     if total_trips_for_tou else 0
-                data_tfl[tfl_id] = (source_id, shape, trips, tfl_use)
+                data_tfl[tfl_id] = (source_id, trips, tfl_use, shape)
         return data_tfl
 
 
