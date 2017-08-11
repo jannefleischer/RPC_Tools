@@ -76,7 +76,7 @@ class TbxSetSource(TbxFlaechendefinition):
 
     @property
     def label(self):
-        return encode(u'Anbindungspunkte setzen')
+        return encode(u'Anbindung einer Teilfläche an das Straßennetz')
 
     @property
     def Tool(self):
@@ -88,6 +88,10 @@ class TbxSetSource(TbxFlaechendefinition):
 
     def _getParameterInfo(self):
         params = super(TbxSetSource, self)._getParameterInfo()
+        params.area.displayName = encode(u'Teilfläche, die über den eben in '
+                                         u'der Karte gesetzten Anbindungspunkt'
+                                         u' an das Straßennetz angeschlossen'
+                                         u'werden soll')
         return self.par
 
     def set_selected_area(self):

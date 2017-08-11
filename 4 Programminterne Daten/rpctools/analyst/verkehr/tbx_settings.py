@@ -100,7 +100,7 @@ class TbxSettings(Tbx):
 
     @property
     def label(self):
-        return encode(u'Kennwerte zum Verkehrsaufkommen')
+        return encode(u'Verkehrsaufkommen und Verkehrsmittelwahl')
 
     @property
     def Tool(self):

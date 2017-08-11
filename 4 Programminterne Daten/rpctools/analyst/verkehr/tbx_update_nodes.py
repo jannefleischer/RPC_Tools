@@ -13,7 +13,7 @@ class TbxUpdateNodes(Tbx):
     _opened_for_first_time = True
     @property
     def label(self):
-        return encode(u'Verkehrsbelastung mit Gewichten versehen')
+        return encode(u'Gewichtung der Herkunfts-/Zielpunkte')
 
     @property
     def Tool(self):
@@ -54,14 +54,14 @@ class TbxUpdateNodes(Tbx):
         # Select Nodes
         p = self.add_parameter('choose_node')
         p.name = u'choose_node'.encode('cp1252')
-        p.displayName = u'Zielknoten auswählen'.encode('cp1252')
+        p.displayName = u'Herkunfts-/Zielpunkt auswählen'.encode('cp1252')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
         # Set new value
         p = self.add_parameter('new_weight')
         p.name = u'new_weight'
-        p.displayName = u'Neues Gewicht des Zielknotens'
+        p.displayName = u'Neues Gewicht des ausgewählten Herkunfts-/Zielpunkts'
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'GPLong'
