@@ -22,7 +22,7 @@ class TbxProjektauswahl(Tbx):
 
     @property
     def label(self):
-        return u'aktives Projekt wählen'
+        return u'Aktives Projekt wählen'
 
     @property
     def Tool(self):

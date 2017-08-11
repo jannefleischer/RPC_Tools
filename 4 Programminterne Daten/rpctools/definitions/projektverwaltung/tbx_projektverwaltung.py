@@ -37,7 +37,7 @@ class TbxProjektAnlegen(TbxProjektVerwaltung):
         # Name_des_neuen_Projektes
         p = self.add_parameter('name')
         p.name = u'Name_des_neuen_Projektes'
-        p.displayName = u'Name des neuen Projektes'
+        p.displayName = u'Name des neuen Projekts'
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'GPString'
@@ -79,7 +79,7 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
         params = self.par
 
         projects = self.folders.get_projects()
-    
+
         # Bestehendes_Projekt_auswählen
         p = self.add_parameter('existing_project')
         p.name = encode('Bestehendes_Projekt_auswählen')
@@ -88,11 +88,11 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
         p.direction = 'Input'
         p.datatype = 'GPString'
         p.filter.list = projects
-        
+
         # Name_des_neuen_Projektes
         p = self.add_parameter('name')
         p.name = u'Name_des_neuen_Projektes'
-        p.displayName = u'Name des neuen Projektes'
+        p.displayName = u'Name des neuen Projekts'
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'GPString'
@@ -126,7 +126,7 @@ class TbxProjekteLoeschen(TbxProjektVerwaltung):
         # Bestehendes_Projekt_auswählen
         p = self.add_parameter('projekte')
         p.name = encode('1-Projekt_auswählen')
-        p.displayName = encode('Zu löschende Projekt auswählen')
+        p.displayName = encode('Zu löschende Projekte auswählen')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'GPString'
