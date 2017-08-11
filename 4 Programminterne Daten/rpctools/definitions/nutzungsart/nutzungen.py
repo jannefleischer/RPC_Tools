@@ -353,13 +353,7 @@ class NutzungenGewerbe(Nutzungen):
         results_workspace = 'FGDB_Bewohner_Arbeitsplaetze.gdb'
 
         tbx = self.parent_tbx
-<<<<<<< Updated upstream
-        
         tbx.delete_rows_in_table(perc_res_table, workspace=results_workspace, 
-=======
-
-        tbx.delete_rows_in_table(perc_res_table,
->>>>>>> Stashed changes
                                  where='IDTeilflaeche={}'.format(flaechen_id))
 
         perc_table_df = tbx.table_to_dataframe(
