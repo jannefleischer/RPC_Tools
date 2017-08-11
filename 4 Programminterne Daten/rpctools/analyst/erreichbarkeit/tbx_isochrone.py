@@ -60,7 +60,7 @@ class Isochrone(Tool):
 class TbxIsochrone(Tbx):
     @property
     def label(self):
-        return encode(u'Isochronen erzeugen')
+        return encode(u'Isochronen zur Umfelderreichbarkeit erzeugen')
 
     @property
     def Tool(self):

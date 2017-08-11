@@ -137,7 +137,7 @@ class TbxNutzungenWohnen(TbxNutzungen):
             # (kurz nach dem Bezug)
             param = self.add_parameter(gt.param_ew_je_we)
             param.name = encode(u'EW_JE_WE {}'.format(gt.display_name))
-            param.displayName = encode(u'in {}'.format(gt.display_name))
+            param.displayName = encode(u'... in {}'.format(gt.display_name))
             param.parameterType = 'Required'
             param.direction = 'Input'
             param.datatype = u'GPDouble'
