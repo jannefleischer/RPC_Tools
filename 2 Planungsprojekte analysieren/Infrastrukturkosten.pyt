@@ -13,10 +13,7 @@ from rpctools.analyst.infrastrukturkosten.tbx_kostentraeger_auswerten \
 from rpctools.analyst.infrastrukturkosten.tbx_kosten_vergleichen \
      import TbxKostenVergleichen
 from rpctools.analyst.infrastrukturkosten.tbx_netzkostenaufteilung \
-     import TbxNetzKostenaufteilung, TbxNetzKostenaufteilungInnere, \
-     TbxNetzKostenaufteilungAuessere, TbxNetzKostenaufteilungKanalisation, \
-     TbxNetzKostenaufteilungTrinkwasser, TbxNetzKostenaufteilungElektrizitaet
-
+     import TbxNetzKostenaufteilungInnere
 
 class Toolbox(object):
     def __init__(self):
@@ -26,11 +23,6 @@ class Toolbox(object):
                       TbxMassnahmenEditieren,
                       TbxInfrastrukturmengenBilanz,
                       TbxGesamtkosten,
-                      TbxKostenVergleichen, 
-                      TbxNetzKostenaufteilung,
+                      TbxKostenVergleichen,
                       TbxNetzKostenaufteilungInnere,
-                      TbxNetzKostenaufteilungAuessere,
-                      TbxNetzKostenaufteilungKanalisation,
-                      TbxNetzKostenaufteilungTrinkwasser,
-                      TbxNetzKostenaufteilungElektrizitaet,
                       TbxKostentraegerAuswerten]
