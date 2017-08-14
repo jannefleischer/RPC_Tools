@@ -14,7 +14,7 @@ class TbxGrundsteuer(Tbx):
 
     @property
     def label(self):
-        return u'Schritt 4: Grundsteuer'
+        return u'Grundsteuer '
 
     @property
     def Tool(self):
@@ -27,7 +27,7 @@ class TbxGrundsteuer(Tbx):
         # Projektname
         param = params.name = arcpy.Parameter()
         param.name = u'Projektname'
-        param.displayName = u'Projektname'
+        param.displayName = u'Projekt'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
@@ -101,7 +101,7 @@ class TbxGrundsteuer(Tbx):
 
         param = params.slider7 = arcpy.Parameter()
         param.name = u'groesse_efh'
-        param.displayName = u'Mittlere Größe der Einfamilienhausgrundstücke'
+        param.displayName = u'Mittlere Größe der Einfamilienhausgrundstücke (in Quadratmetern)'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPLong'
@@ -123,7 +123,7 @@ class TbxGrundsteuer(Tbx):
 
         param = params.slider9 = arcpy.Parameter()
         param.name = u'lagerflaeche'
-        param.displayName = u'Hallen und Lagerfläche: qm Brutto-Grundfläche (BGF)'
+        param.displayName = u'Produktions- und  Lagerhallen: qm Brutto-Grundfläche (BGF)'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Double'

@@ -12,7 +12,7 @@ class TbxWanderungssalden2(Tbx):
 
     @property
     def label(self):
-        return u'Schritt 2: Wanderungssalden SvB schätzen'
+        return u'Wanderungssalden schätzen (Beschäftigte)'
 
     @property
     def Tool(self):
@@ -25,7 +25,7 @@ class TbxWanderungssalden2(Tbx):
         # Projektname
         par.name = arcpy.Parameter()
         par.name.name = u'Projektname'
-        par.name.displayName = u'Projektname'
+        par.name.displayName = u'Projekt'
         par.name.parameterType = 'Required'
         par.name.direction = 'Input'
         par.name.datatype = u'GPString'

@@ -11,7 +11,7 @@ class TbxEinkommensteuer(Tbx):
 
     @property
     def label(self):
-        return u'Schritt 3: Einkommensteuer schätzen'
+        return u'Einkommensteuer (Kommunalanteil)'
 
     @property
     def Tool(self):
@@ -24,7 +24,7 @@ class TbxEinkommensteuer(Tbx):
         # Projektname
         par.name = arcpy.Parameter()
         par.name.name = u'Projektname'
-        par.name.displayName = u'Projektname'
+        par.name.displayName = u'Projekt'
         par.name.parameterType = 'Required'
         par.name.direction = 'Input'
         par.name.datatype = u'GPString'

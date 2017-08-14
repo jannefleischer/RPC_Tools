@@ -12,7 +12,7 @@ class TbxGesamtsumme(Tbx):
 
     @property
     def label(self):
-        return u'Gesamtsumme'
+        return u'Gesamtsumme der Mehr- und Mindereinnahmen der Gemeinden'
 
     @property
     def Tool(self):
@@ -25,7 +25,7 @@ class TbxGesamtsumme(Tbx):
         # Projektname
         par.name = arcpy.Parameter()
         par.name.name = u'Projektname'
-        par.name.displayName = u'Projektname'
+        par.name.displayName = u'Projekt'
         par.name.parameterType = 'Required'
         par.name.direction = 'Input'
         par.name.datatype = u'GPString'
