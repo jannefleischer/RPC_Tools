@@ -90,13 +90,14 @@ class TbxMaerkteImportierenFeatureClass(TbxMaerkteImportieren):
 
     @property
     def label(self):
-        return encode(u'CSV/Excel-Vorlage einlesen')
+        return encode(u'Befüllte Erfassungsvorlage (Shape-Datei) für '
+                      u'Lebensmittelmärkte im Bestand einlesen')
 
     def _getParameterInfo(self):
         params = super(TbxMaerkteImportierenFeatureClass, self)._getParameterInfo()
 
         param = self.par.template
-        param.displayName = encode(u'Feature')
+        param.displayName = encode(u'Befüllte Erfassungsvorlage (Shape-Datei)')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPFeatureLayer'
@@ -115,13 +116,15 @@ class TbxMaerkteImportierenDatei(TbxMaerkteImportieren):
 
     @property
     def label(self):
-        return encode(u'Shape/Layer-Vorlage einlesen')
+        return encode(u'Befüllte Erfassungsvorlage (csv- oder Excel-Datei) für'
+                      u'Lebensmittelmärkte im Bestand einlesen')
 
     def _getParameterInfo(self):
         params = super(TbxMaerkteImportierenDatei, self)._getParameterInfo()
 
         param = self.par.template
-        param.displayName = encode(u'Datei')
+        param.displayName = encode(u'Befüllte Erfassungsvorlage (csv- oder '
+                                   u'Excel- Datei)')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'DEFile'

@@ -43,7 +43,7 @@ class TbxEditCenters(Tbx):
 
     @property
     def label(self):
-        return 'Zentren bearbeiten'
+        return 'Versorgungsbereiche bearbeiten oder entfernen'
 
     @property
     def Tool(self):

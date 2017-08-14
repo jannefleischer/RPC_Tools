@@ -377,7 +377,7 @@ class TbxEditMarketsNullfall(TbxEditMarkets):
 
 class TbxEditMarketsPlanfall(TbxEditMarkets):
     setting = PLANFALL
-    _label = encode(u'Geplante Märkte bearbeiten')
+    _label = encode(u'Geplante Märkte im Planfall bearbeiten')
 
 
 class TbxExtendMarkets(TbxEditMarkets):
