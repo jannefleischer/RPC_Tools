@@ -83,7 +83,7 @@ class UpdateNodes(Routing):
                 transfer_nodes[id_node].weight = weight
                 where = 'node_id = {}'.format(id_node)
                 toolbox.update_table('Zielpunkte',
-                                  {'Neue_Gewichte': weight * 100}, where=where)
+                                  {'Neue_Gewichte': weight}, where=where)
 
         set_new_weights(man_weights_not_set, node_id_not_set)
         set_new_weights(man_weights_set, node_id_set)
