@@ -28,211 +28,211 @@
                 <Button caption="Layer anzeigen" category="ProjektCheck" class="RefreshLayers" id="rpc_tools.refresh_layers" image="Images\eye-2-16.png" message="" tip="F&#252;gt die von den ProjektCheck-Tools verwendeten Layer des derzeit gew&#228;hlten Projekts dem Inhaltsverzeichnis hinzu bzw. aktualisiert sie.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeVerwaltung" id="rpc_tools.hilfe_verwaltung" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeVerwaltung" id="rpc_tools.hilfe_verwaltung" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Menü “Verwalten” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Neues Projekt" category="ProjektCheck" class="ProjektAnlegen" id="rpc_tools.neues_projekt" image="Images\1002-add2_1.png" message="" tip="">
+                <Button caption="Neues Projekt" category="ProjektCheck" class="ProjektAnlegen" id="rpc_tools.neues_projekt" image="Images\1002-add2_1.png" message="" tip="Ein neues Projekt anlegen. Sie benötigen ein Shape-File o.ä. mit der Fläche (oder den Teilflächen) des Projekts.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Projekt kopieren" category="ProjektCheck" class="ProjektKopieren" id="rpc_tools.projekt_kopieren" image="Images\1002-add_1.png" message="" tip="">
+                <Button caption="Projekt kopieren" category="ProjektCheck" class="ProjektKopieren" id="rpc_tools.projekt_kopieren" image="Images\1002-add_1.png" message="" tip="Ein bestehendes Projekt kopieren und unter einem neuen Namen speichern.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Projekte l&#246;schen" category="ProjektCheck" class="ProjektLoeschen" id="rpc_tools.projekt_loeschen" image="Images\1001-cancel_1.png" message="" tip="">
+                <Button caption="Projekte l&#246;schen" category="ProjektCheck" class="ProjektLoeschen" id="rpc_tools.projekt_loeschen" image="Images\1001-cancel_1.png" message="" tip="Eines oder mehrere bestehende Projekte löschen.">
                     <Help heading="" />
                 </Button>
 
                 <!-- NUTZUNGEN -->
 
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeNutzungen" id="rpc_tools.hilfe_nutzungen" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeNutzungen" id="rpc_tools.hilfe_nutzungen" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Menü “Definieren” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Nutzungen auf Teilfl&#228;chen definieren" category="ProjektCheck" class="NutzungenDefinieren" id="rpc_tools.nutzungen_definieren" image="Images\013500-filter_1.png" message="" tip="">
+                <Button caption="Nutzungen auf Teilfl&#228;chen definieren" category="ProjektCheck" class="NutzungenDefinieren" id="rpc_tools.nutzungen_definieren" image="Images\013500-filter_1.png" message="" tip="Für jede Teilfläche Ihres Projekts festlegen, ob die zukünftige Nutzung Wohnen, Gewerbe oder Einzelhandel sein soll.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Wohnen" category="ProjektCheck" class="Wohnen" id="rpc_tools.wohnen" image="Images\011000-home_1.png" message="" tip="">
+                <Button caption="Wohnen" category="ProjektCheck" class="Wohnen" id="rpc_tools.wohnen" image="Images\011000-home_1.png" message="" tip="Bezugszeitraum, Wohneinheiten, Gebäudetypen und Haushaltsgrößen für Wohnbauflächen festlegen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Gewerbe" category="ProjektCheck" class="Gewerbe" id="rpc_tools.gewerbe" image="Images\506700-factory_1.png" message="" tip="">
+                <Button caption="Gewerbe" category="ProjektCheck" class="Gewerbe" id="rpc_tools.gewerbe" image="Images\506700-factory_1.png" message="" tip="Bezugszeitraum, Branchenstruktur und voraussichtliche Anzahl an Arbeitsplätzen für Gewerbeflächen festlegen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Einzelhandel" category="ProjektCheck" class="Einzelhandel" id="rpc_tools.einzelhandel" image="Images\650000-grocery-shop_1.png" message="" tip="">
+                <Button caption="Einzelhandel" category="ProjektCheck" class="Einzelhandel" id="rpc_tools.einzelhandel" image="Images\650000-grocery-shop_1.png" message="" tip="Eröffnungszeitpunkt, Sortimente und Verkaufsflächen für Einzelhandelsflächen festlegen.">
                     <Help heading="" />
                 </Button>
 
                 <!-- BEWOHNER/ARBEITSPLAETZE -->
 
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeBewohnerArbeitsplaetze" id="rpc_tools.hilfe_bewohner_arbeitsplaetze" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeBewohnerArbeitsplaetze" id="rpc_tools.hilfe_bewohner_arbeitsplaetze" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Bewohner und Arbeitsplätze” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Bewohnerzahl sch&#228;tzen" category="ProjektCheck" class="BewohnerSchaetzen" id="rpc_tools.bewohner_schaetzen" image="Images\4502-users_3.png" message="" tip="">
+                <Button caption="Bewohnerzahl sch&#228;tzen" category="ProjektCheck" class="BewohnerSchaetzen" id="rpc_tools.bewohner_schaetzen" image="Images\4502-users_3.png" message="" tip="Anzahl und Altersstruktur der zukünftigen Bewohner der Teilflächen mit Wohnnutzung schätzen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Arbeitspl&#228;tze sch&#228;tzen" category="ProjektCheck" class="ArbeitsplaetzeSchaetzen" id="rpc_tools.arbeitsplaetze_schaetzen" image="Images\281500-worker_2.png" message="" tip="">
+                <Button caption="Arbeitspl&#228;tze sch&#228;tzen" category="ProjektCheck" class="ArbeitsplaetzeSchaetzen" id="rpc_tools.arbeitsplaetze_schaetzen" image="Images\281500-worker_2.png" message="" tip="Anzahl der zukünftigen Arbeitsplätze nach Branchen auf den Teilflächen mit Gewerbenutzung schätzen.">
                     <Help heading="" />
                 </Button>
 
                 <!-- INFRASTRUKTUR -->
 
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeInfrastruktur" id="rpc_tools.hilfe_infrastruktur" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeInfrastruktur" id="rpc_tools.hilfe_infrastruktur" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Infrastrukturfolgekosten” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Erschlie&#223;ungsnetze anzeigen" category="ProjektCheck" class="ErschliessungsnetzeAnzeigen" id="rpc_tools.erschliessungsnetze_anzeigen" image="Images\eye-2-16.png" message="" tip="">
+                <Button caption="Erschlie&#223;ungsnetze anzeigen" category="ProjektCheck" class="ErschliessungsnetzeAnzeigen" id="rpc_tools.erschliessungsnetze_anzeigen" image="Images\eye-2-16.png" message="" tip="Der aktuellen Kartendarstellung die Layer mit den Erschließungsnetzen hinzufügen und das Plangebiet halbtransparent darstellen.">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen (innere Erschlie&#223;ung)" category="ProjektCheck" class="AnliegerstrasseInnere" id="rpc_tools.anliegerstrasse_innere" image="Images\Driving_Leg16.png" message="" tip="">
+                <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen (innere Erschlie&#223;ung)" category="ProjektCheck" class="AnliegerstrasseInnere" id="rpc_tools.anliegerstrasse_innere" image="Images\Driving_Leg16.png" message="" tip="Zeichnen Sie eine oder mehrere Anliegerstraßen der inneren Erschließung in die Karte ein und beenden Sie Ihre Skizze mit dem Button ganz rechts im Hauptmenü (“grünes Häkchen”).">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Sammelstra&#223;e hinzuf&#252;gen (innere Erschlie&#223;ung)" category="ProjektCheck" class="SammelstrasseInnere" id="rpc_tools.sammelstrasse_innere" image="Images\Driving_Distance16.png" message="" tip="">
+                <Tool caption="Sammelstra&#223;e hinzuf&#252;gen (innere Erschlie&#223;ung)" category="ProjektCheck" class="SammelstrasseInnere" id="rpc_tools.sammelstrasse_innere" image="Images\Driving_Distance16.png" message="" tip="Zeichnen Sie eine oder mehrere Sammelstraßen der inneren Erschließung in die Karte ein und beenden Sie Ihre Skizze mit dem Button ganz rechts im Hauptmenü (“grünes Häkchen”).">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen (&#228;u&#223;ere Erschlie&#223;ung)" separator="true" category="ProjektCheck" class="AnliegerstrasseAeussere" id="rpc_tools.anliegerstrasse_aeussere" image="Images\Driving_Leg16_1.png" message="" tip="">
+                <Tool caption="Anliegerstra&#223;e hinzuf&#252;gen (&#228;u&#223;ere Erschlie&#223;ung)" separator="true" category="ProjektCheck" class="AnliegerstrasseAeussere" id="rpc_tools.anliegerstrasse_aeussere" image="Images\Driving_Leg16_1.png" message="" tip="Zeichnen Sie eine oder mehrere Anliegerstraßen der äußeren Erschließung in die Karte ein und beenden Sie Ihre Skizze mit dem Button ganz rechts im Hauptmenü (“grünes Häkchen”).">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Sammelstra&#223;e hinzuf&#252;gen (&#228;u&#223;ere Erschlie&#223;ung)" category="ProjektCheck" class="SammelstrasseAeussere" id="rpc_tools.sammelstrasse_aeussere" image="Images\Driving_Distance16_1.png" message="" tip="">
+                <Tool caption="Sammelstra&#223;e hinzuf&#252;gen (&#228;u&#223;ere Erschlie&#223;ung)" category="ProjektCheck" class="SammelstrasseAeussere" id="rpc_tools.sammelstrasse_aeussere" image="Images\Driving_Distance16_1.png" message="" tip="Zeichnen Sie eine oder mehrere Sammelstraßen der äußeren Erschließung in die Karte ein und beenden Sie Ihre Skizze mit dem Button ganz rechts im Hauptmenü (“grünes Häkchen”).">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Kanal (Trennsystem) hinzuf&#252;gen" category="ProjektCheck" separator="true" class="KanalTrennsystem" id="rpc_tools.kanal_trennsystem" image="Images\Kanal Trennsystem.png" message="" tip="">
+                <Tool caption="Kanal (Trennsystem) hinzuf&#252;gen" category="ProjektCheck" separator="true" class="KanalTrennsystem" id="rpc_tools.kanal_trennsystem" image="Images\Kanal Trennsystem.png" message="" tip="Zeichnen Sie einen oder mehrere Trennsystem-Kanäle in die Karte ein und beenden Sie Ihre Skizze mit dem Button ganz rechts im Hauptmenü (“grünes Häkchen”).">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Kanal (Mischsystem) hinzuf&#252;gen" category="ProjektCheck" class="KanalMischsystem" id="rpc_tools.kanal_mischsystem" image="Images\Kanal Mischsystem.png" message="" tip="">
+                <Tool caption="Kanal (Mischsystem) hinzuf&#252;gen" category="ProjektCheck" class="KanalMischsystem" id="rpc_tools.kanal_mischsystem" image="Images\Kanal Mischsystem.png" message="" tip="Zeichnen Sie einen oder mehrere Mischsystem-Kanäle in die Karte ein und beenden Sie Ihre Skizze mit dem Button ganz rechts im Hauptmenü (“grünes Häkchen”).">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Kanal (nur Schmutzwasser) hinzuf&#252;gen" category="ProjektCheck" class="KanalNurSchmutzwasser" id="rpc_tools.kanal_nur_schmutzwasser" image="Images\Kanal nur Schmutzwasser.png" message="" tip="">
+                <Tool caption="Kanal (nur Schmutzwasser) hinzuf&#252;gen" category="ProjektCheck" class="KanalNurSchmutzwasser" id="rpc_tools.kanal_nur_schmutzwasser" image="Images\Kanal nur Schmutzwasser.png" message="" tip="Zeichnen Sie einen oder mehrere Schmutzwasserkanäle (z.B. im Falle einer lokalen Regenwasserversickerung) in die Karte ein und beenden Sie Ihre Skizze mit dem Button ganz rechts im Hauptmenü (“grünes Häkchen”).">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Trinkwasserleitung hinzuf&#252;gen" category="ProjektCheck" separator="true" class="Trinkwasserleitung" id="rpc_tools.trinkwasserleitung" image="Images\Trinkwasserleitung.png" message="" tip="">
+                <Tool caption="Trinkwasserleitung hinzuf&#252;gen" category="ProjektCheck" separator="true" class="Trinkwasserleitung" id="rpc_tools.trinkwasserleitung" image="Images\Trinkwasserleitung.png" message="" tip="Zeichnen Sie eine oder mehrere Trinkwasserleitungen in die Karte ein und beenden Sie Ihre Skizze mit dem Button ganz rechts im Hauptmenü (“grünes Häkchen”).">
                     <Help heading="" />
                 </Tool>
                 <Tool caption="Stromleitung hinzuf&#252;gen" category="ProjektCheck" class="Stromleitung" id="rpc_tools.stromleitung" image="Images\Stromleitung.png" message="" tip="">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Netzlinien ausw&#228;hlen und l&#246;schen" category="ProjektCheck" class="NetzabschnittLoeschen" id="rpc_tools.netzabschnitt_loeschen" image="Images\TinEditingTinBreaklineDelete16.png" message="" tip="">
+                <Tool caption="Netzlinien ausw&#228;hlen und l&#246;schen" category="ProjektCheck" class="NetzabschnittLoeschen" id="rpc_tools.netzabschnitt_loeschen" image="Images\TinEditingTinBreaklineDelete16.png" message="" tip="Löschen Sie Linienabschnitte aus allen Erschließungsnetze indem Sie sie einen Löschbereich in der Karte aufziehen.">
                     <Help heading="" />
                 </Tool>
-                <Button caption="Infrastrukturmengen bilanzieren" category="ProjektCheck" class="InfrastrukturmengenBilanzieren" id="rpc_tools.infrastrukturmengen_bilanzieren" image="Images\400000-ruler.png" message="" tip="">
+                <Button caption="Infrastrukturmengen bilanzieren" category="ProjektCheck" class="InfrastrukturmengenBilanzieren" id="rpc_tools.infrastrukturmengen_bilanzieren" image="Images\400000-ruler.png" message="" tip="Länge der bisher in der Karte eingezeichneten Erschließungsnetze sowie Gesamtkosten der punktuellen Maßnahmen aufsummieren und in zwei Diagrammen anzeigen lassen">
                     <Help heading="" />
                 </Button>
-                <Button caption="Kostenkennwerte kontrollieren" category="ProjektCheck" class="KostenkennwerteKontrollieren" id="rpc_tools.kostenkennwerte_kontrollieren" image="Images\3003-coin_1.png" message="" tip="">
+                <Button caption="Kostenkennwerte kontrollieren" category="ProjektCheck" class="KostenkennwerteKontrollieren" id="rpc_tools.kostenkennwerte_kontrollieren" image="Images\3003-coin_1.png" message="" tip="Kostensätze pro laufendem Meter für die einzelnen Erschließungsnetze ansehen und bei Bedarf anpassen (nicht relevant für punktuelle Maßnahmen)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Gesamtkosten ermitteln" category="ProjektCheck" class="GesamtkostenErmitteln" id="rpc_tools.gesamtkosten_ermitteln" image="Images\450000-chart.png" message="" tip="">
+                <Button caption="Gesamtkosten ermitteln" category="ProjektCheck" class="GesamtkostenErmitteln" id="rpc_tools.gesamtkosten_ermitteln" image="Images\450000-chart.png" message="" tip="Aus der Verknüpfung der Infrastrukturmengen (Netzabschnitte und punktuelle Maßnahmen) und der Kostenkennwerte die Gesamtkosten der Erschließung schätzen (noch ohne Aufteilung auf Kostenträger)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Kostenaufteilung festlegen" category="ProjektCheck" class="Kostenaufteilung" id="rpc_tools.kostenaufteilung" image="Images\017000-breafcase_1.png" message="" tip="">
+                <Button caption="Kostenaufteilung festlegen" category="ProjektCheck" class="Kostenaufteilung" id="rpc_tools.kostenaufteilung" image="Images\017000-breafcase_1.png" message="" tip="Festlegen, welcher Kostenträger in welcher Kostenphase welchen Anteil der Kosten welches Erschließungsnetzes zu tragen hat.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Kosten nach Kostentr&#228;gern auswerten" category="ProjektCheck" class="KostenNachKostentraegernAuswerten" id="rpc_tools.kosten_nach_kostentraegern_auswerten" image="Images\450500-pie-chart.png" message="" tip="">
+                <Button caption="Kosten nach Kostentr&#228;gern auswerten" category="ProjektCheck" class="KostenNachKostentraegernAuswerten" id="rpc_tools.kosten_nach_kostentraegern_auswerten" image="Images\450500-pie-chart.png" message="" tip="Auswerten, welcher Kostenträger welchen Anteil der zuvor abgeschätzten Gesamtkosten der zusätzlichen Erschließungselemente zu tragen hat.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Kosten pro WE bzw. AP vergleichen" category="ProjektCheck" class="KostenProWEBzwAPVergleichen" id="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" image="Images\GraphVerticalBar16.png" message="" tip="">
+                <Button caption="Kosten pro WE bzw. AP vergleichen" category="ProjektCheck" class="KostenProWEBzwAPVergleichen" id="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" image="Images\GraphVerticalBar16.png" message="" tip="Die ermittelten Erschließungskosten pro Wohneinheit bzw. Arbeitsplatz bundesweiten Vergleichswerten gegenüberstellen. (Nur verfügbar, wenn alle Teilflächen die Nutzung “Wohnen” oder alle Teilflächen die Nutzung “Gewerbe” haben.)">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" class="PunktMassnahmeHinzu" id="rpc_tools.massnahme_hinzu" image="Images\GreenPin16.png" message="" tip="">
+                <Tool caption="Ma&#223;nahme hinzuf&#252;gen" category="ProjektCheck" class="PunktMassnahmeHinzu" id="rpc_tools.massnahme_hinzu" image="Images\GreenPin16.png" message="" tip="Fügen Sie eine oder mehrere punktuelle Maßnahmen (z.B. einen Kreuzungsumbau) in der Karte hinzu, ordnen Sie sie einem Netz zu und legen Sie die Kosten fest.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Ma&#223;nahme bearbeiten/entfernen" category="ProjektCheck" class="PunktMassnahmeBearbeiten" id="rpc_tools.massnahme_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
+                <Tool caption="Ma&#223;nahme bearbeiten/entfernen" category="ProjektCheck" class="PunktMassnahmeBearbeiten" id="rpc_tools.massnahme_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="Bearbeiten oder löschen Sie hiermit bereits in der Karte eingezeichnete punktuelle Maßnahmen">
                     <Help heading="" />
                 </Tool>
 
                 <!-- EINNAHMEN -->
 
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeEinnahmen" id="rpc_tools.hilfe_einnahmen" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeEinnahmen" id="rpc_tools.hilfe_einnahmen" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Kommunale Steuereinnahmen” an.">
                     <Help heading="" />
                 </Button>
                 <Button caption="Hinweise zur Ergebnisinterpretation" category="ProjektCheck" class="HinweiseBilanzen" id="rpc_tools.bilanzen_hinweise" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
                     <Help heading="" />
                 </Button>
-                <Button caption="Sch&#228;tzen" category="ProjektCheck" class="EinwohnersaldenSchaetzen" id="rpc_tools.einwohnersalden_schaetzen" image="Images\4502-users_3.png" message="" tip="">
+                <Button caption="Sch&#228;tzen" category="ProjektCheck" class="EinwohnersaldenSchaetzen" id="rpc_tools.einwohnersalden_schaetzen" image="Images\4502-users_3.png" message="" tip="Abschätzen, welchen Einfluss das Projekt auf die Einwohnerzahl der Gemeinden in der Region hat. (Nur relevant für Wohnnutzungen.)">
                     <Help heading="" />
                 </Button>
                 <Button caption="Bearbeiten" category="ProjektCheck" class="EinwohnersaldenBearbeiten" id="rpc_tools.einwohnersalden_bearbeiten" image="Images\4502-users_3.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Sch&#228;tzen" category="ProjektCheck" class="BeschaeftigtensaldenSchaetzen" id="rpc_tools.beschaeftigtensalden_schaetzen" image="Images\281500-worker_3.png" message="" tip="">
+                <Button caption="Sch&#228;tzen" category="ProjektCheck" class="BeschaeftigtensaldenSchaetzen" id="rpc_tools.beschaeftigtensalden_schaetzen" image="Images\281500-worker_3.png" message="" tip="Abschätzen, welchen Einfluss das Projekt auf die Zahl der Beschäftigten in den Gemeinden der Region hat. (Nur relevant für Gewerbenutzungen.)">
                     <Help heading="" />
                 </Button>
                 <Button caption="Bearbeiten" category="ProjektCheck" class="BeschaeftigtensaldenBearbeiten" id="rpc_tools.beschaeftigtensalden_bearbeiten" image="Images\281500-worker_3.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Grundsteuer" category="ProjektCheck" class="Grundsteuer" id="rpc_tools.grundsteuer" image="Images\011000-home_1.png" message="" tip="">
+                <Button caption="Grundsteuer" category="ProjektCheck" class="Grundsteuer" id="rpc_tools.grundsteuer" image="Images\011000-home_1.png" message="" tip="Mehreinnahmen der Projektgemeinde aus der Grundsteuer B schätzen">
                     <Help heading="" />
                 </Button>
-                <Button caption="Einkommensteuer" category="ProjektCheck" class="Einkommensteuer" id="rpc_tools.einkommensteuer" image="Images\011000-home_1.png" message="" tip="">
+                <Button caption="Einkommensteuer" category="ProjektCheck" class="Einkommensteuer" id="rpc_tools.einkommensteuer" image="Images\011000-home_1.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Einkommensteuer (Kommunalanteil) schätzen. (Nur relevant für Wohnnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Hebes&#228;tze kontrollieren" category="ProjektCheck" class="Hebesaetze" id="rpc_tools.hebesaetze" image="Images\506700-factory_1.png" message="" tip="">
+                <Button caption="Hebes&#228;tze kontrollieren" category="ProjektCheck" class="Hebesaetze" id="rpc_tools.hebesaetze" image="Images\506700-factory_1.png" message="" tip="Vor der Berechnung der Gewerbesteuer die Hebesätze der Gemeinden in der Region kontrollieren und bei Bedarf anpassen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Gemeindebilanzen sch&#228;tzen" category="ProjektCheck" class="Gemeindebilanzen" id="rpc_tools.gemeindebilanzen" image="Images\506700-factory_1.png" message="" tip="">
+                <Button caption="Gemeindebilanzen sch&#228;tzen" category="ProjektCheck" class="Gemeindebilanzen" id="rpc_tools.gemeindebilanzen" image="Images\506700-factory_1.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Gewerbesteuer (netto) schätzen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Familienleistungsausgleich" category="ProjektCheck" class="Familienleistungsausgleich" id="rpc_tools.familienleistungsausgleich" image="" message="" tip="">
+                <Button caption="Familienleistungsausgleich" category="ProjektCheck" class="Familienleistungsausgleich" id="rpc_tools.familienleistungsausgleich" image="" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus dem Familienleistungsausgleich schätzen.  (Nur relevant für Wohnnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Umsatzsteuer" category="ProjektCheck" class="Umsatzsteuer" id="rpc_tools.umsatzsteuer" image="" message="" tip="">
+                <Button caption="Umsatzsteuer" category="ProjektCheck" class="Umsatzsteuer" id="rpc_tools.umsatzsteuer" image="" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Umsatzsteuer (Kommunalanteil) schätzen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Gesamtsumme" category="ProjektCheck" class="BilanzenGesamtsumme" id="rpc_tools.bilanzen_gesamtsumme" image="" message="" tip="">
+                <Button caption="Gesamtsumme" category="ProjektCheck" class="BilanzenGesamtsumme" id="rpc_tools.bilanzen_gesamtsumme" image="" message="" tip="Zuvor ermittelte Mehr- und Mindereinnahmen der Gemeinden aus der Grund-, Einkommens-, Gewerbe- und Umsatzsteuer sowie dem Familienleistungsausgleich aufsummieren">
                     <Help heading="" />
                 </Button>
 
                 <!-- VERKEHR -->
 
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeVerkehr" id="rpc_tools.hilfe_verkehr" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeVerkehr" id="rpc_tools.hilfe_verkehr" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Verkehr im Umfeld” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Stra&#223;enverkehrsbelastung sch&#228;tzen" category="ProjektCheck" class="InitialRouting" id="rpc_tools.initial_routing" image="Images\RouteFastest16.png" message="" tip="">
+                <Button caption="Stra&#223;enverkehrsbelastung sch&#228;tzen" category="ProjektCheck" class="InitialRouting" id="rpc_tools.initial_routing" image="Images\RouteFastest16.png" message="" tip="Die zusätzliche Straßenverkehrsbelastung aufgrund der neuen Nutzungen schätzen">
                     <Help heading="" />
                 </Button>
-                <Button caption="Verkehrsaufkommen und Verkehrsmittelwahl" category="ProjektCheck" class="RoutingSettings" id="rpc_tools.routing_settings" image="Images\settings-4-16.png" message="" tip="">
+                <Button caption="Verkehrsaufkommen und Verkehrsmittelwahl" category="ProjektCheck" class="RoutingSettings" id="rpc_tools.routing_settings" image="Images\settings-4-16.png" message="" tip="Das Verkehrsaufkommen (Gesamtzahl der Wege) und die Verkehrsmittelwahl (Anteil Pkw) festlegen">
                     <Help heading="" />
                 </Button>
-                <Button caption="Gewichtung der Herkunfts-/Zielpunkte" category="ProjektCheck" class="WeightedRouting" id="rpc_tools.weighted_routing" image="Images\Route16.png" message="" tip="">
+                <Button caption="Gewichtung der Herkunfts-/Zielpunkte" category="ProjektCheck" class="WeightedRouting" id="rpc_tools.weighted_routing" image="Images\Route16.png" message="" tip="Die Herkunfts-/Zielpunkte untereinander so wichten, dass es ihrer realen Verkehrsbedeutung entspricht">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Anbindung der Teilfl&#228;chen an das Stra&#223;ennetz" category="ProjektCheck" class="Anbindungspunkt" id="rpc_tools.anbindungspunkt" image="Images\CadastralFeatureSelect16.png" message="" tip="Setzen Sie auf der Karte einen Punkt zur Anbindung der Teilfl&#228;che an das Stra&#223;ennetz">
+                <Tool caption="Anbindung der Teilfl&#228;chen an das Stra&#223;ennetz" category="ProjektCheck" class="Anbindungspunkt" id="rpc_tools.anbindungspunkt" image="Images\CadastralFeatureSelect16.png" message="" tip="Für die einzelnen Teilflächen festlegen, an welcher Stelle die Verkehre aus bzw. in das Plangebiet in das Bestandsnetz einmünden">
                     <Help heading="" />
                 </Tool>
 
                 <!-- STANDORTKONKURRENZ  -->
 
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeStandortkonkurrenz" id="rpc_tools.hilfe_standortkonkurrenz" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeStandortkonkurrenz" id="rpc_tools.hilfe_standortkonkurrenz" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Standortkonkurrenz Supermärkte” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="M&#228;rkte und Versorgungsbereiche anzeigen" category="ProjektCheck" class="MaerkteZentrenAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="">
+                <Button caption="M&#228;rkte und Versorgungsbereiche anzeigen" category="ProjektCheck" class="MaerkteZentrenAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="Bereits erzeugte, in der Karte aktuell aber nicht enthaltene Layer mit Märkten (Nullfall und Planfall) und Versorgungsbereichen wieder zur Karte hinzufügen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="OpenStreetMap anfragen" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="">
+                <Button caption="OpenStreetMap anfragen" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="Den in OpenStreetMap verfügbaren Bestand an Lebensmittelmärkten online abfragen und einlesen">
                     <Help heading="" />
                 </Button>
-                <Button caption="Erfassungsvorlage erzeugen" category="ProjektCheck" class="TemplateErzeugen" id="rpc_tools.template_erzeugen" image="Images\MetadataDocumentLiveService16.png" message="" tip="">
+                <Button caption="Erfassungsvorlage erzeugen" category="ProjektCheck" class="TemplateErzeugen" id="rpc_tools.template_erzeugen" image="Images\MetadataDocumentLiveService16.png" message="" tip="Eine leere Erfassungsvorlage im csv-, Excel- oder Shapefile-Format erzeugen, in der die Bestandsmärkte händisch eingetragen und später wieder mit Projekt-Check eingelesen werden können.">
                     <Help heading="" />
                 </Button>
-                <Button caption="CSV/Excel-Vorlage einlesen" category="ProjektCheck" class="TemplateEinlesenDatei" id="rpc_tools.template_einlesen_datei" image="Images\MetadataGazetteerLoad16.png" message="" tip="">
+                <Button caption="CSV/Excel-Vorlage einlesen" category="ProjektCheck" class="TemplateEinlesenDatei" id="rpc_tools.template_einlesen_datei" image="Images\MetadataGazetteerLoad16.png" message="" tip="Eine von Ihnen zuvor als csv- oder Excel-Datei erzeugte und anschließend befüllte Erfassungsvorlage für die Lebensmittelmärkte im Bestand wieder einlesen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Shape/Layer-Vorlage einlesen" category="ProjektCheck" class="TemplateEinlesenFeatureClass" id="rpc_tools.template_einlesen_featureclass" image="Images\MetadataGazetteerLoad16.png" message="" tip="">
+                <Button caption="Shape/Layer-Vorlage einlesen" category="ProjektCheck" class="TemplateEinlesenFeatureClass" id="rpc_tools.template_einlesen_featureclass" image="Images\MetadataGazetteerLoad16.png" message="" tip="Eine von Ihnen zuvor als Shape-Datei erzeugte und anschließend befüllte Erfassungsvorlage für die Lebensmittelmärkte im Bestand wieder einlesen.">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Bestehenden Markt hinzuf&#252;gen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="">
+                <Tool caption="Bestehenden Markt hinzuf&#252;gen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="Einen bestehenden Lebensmittelmarkt in die Karte eintragen.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Bestehenden Markt bearbeiten/entfernen" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="">
+                <Tool caption="Bestehenden Markt bearbeiten/entfernen" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="Einen bereits in der Karte enthaltenen Lebensmittelmarkt bearbeiten (Name, Handelskette, Betriebstyp) oder löschen.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Bestehenden Markt erweitern/schlie&#223;en" category="ProjektCheck" class="PlanfallMarktErweiterung" id="rpc_tools.planfall_erweitern" image="Images\GenericPencilTarget16.png" message="" tip="">
+                <Tool caption="Bestehenden Markt erweitern/schlie&#223;en" category="ProjektCheck" class="PlanfallMarktErweiterung" id="rpc_tools.planfall_erweitern" image="Images\GenericPencilTarget16.png" message="" tip="Als Teil Ihrer Planung (“Planfall”) einen bestehenden Markt erweitern oder schließen. Diese Erweiterung oder Schließung wird Gegenstand der nachfolgenden Auswirkungsabschätzungen.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Geplanten Markt hinzuf&#252;gen" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_hinzu" image="Images\GreenPin16.png" message="" tip="">
+                <Tool caption="Geplanten Markt hinzuf&#252;gen" category="ProjektCheck" class="PlanfallMarktHinzu" id="rpc_tools.planfall_hinzu" image="Images\GreenPin16.png" message="" tip="Als Teil Ihrer Planung einen neuen Markt dem “Planfall” hinzufügen. Dieser neue Markt wird Gegenstand der nachfolgenden Auswirkungsabschätzungen.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Geplanten Markt bearbeiten/entfernen" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="">
+                <Tool caption="Geplanten Markt bearbeiten/entfernen" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="Einen bereits in der Karte für den Planfall eingetragenen geplanten neuen Lebensmittelmarkt bearbeiten (Name, Handelskette, Betriebstyp) oder löschen.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Versorgungsbereich zeichnen" category="ProjektCheck" class="ZentrumHinzu" id="rpc_tools.zentrum_hinzu" image="Images\GenericPencilArea16.png" message="" tip="">
+                <Tool caption="Versorgungsbereich zeichnen" category="ProjektCheck" class="ZentrumHinzu" id="rpc_tools.zentrum_hinzu" image="Images\GenericPencilArea16.png" message="" tip="Versorgungsbereiche in der Karte einzeichnen, um die räumliche Basis für die Bilanzierung der Auswirkungen im Planfall festzulegen.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Versorgungsbereich bearbeiten/entfernen" category="ProjektCheck" class="ZentrumBearbeiten" id="rpc_tools.zentrum_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="">
+                <Tool caption="Versorgungsbereich bearbeiten/entfernen" category="ProjektCheck" class="ZentrumBearbeiten" id="rpc_tools.zentrum_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="Bereits in die Karte eingezeichnete Versorgungsbereiche (um)benennen oder löschen">
                     <Help heading="" />
                 </Tool>
                 <Button caption="Projektwirkung sch&#228;tzen" category="ProjektCheck" class="StandortkonkurrenzProjektwirkung" id="rpc_tools.standortkonkurrenz_projektwirkung" image="Images\GenericCalculator16.png" message="" tip="">
@@ -241,163 +241,163 @@
 
                 <!-- FLAECHE UND OEKOLOGIE  -->
 
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeFlaeche" id="rpc_tools.hilfe_flaeche" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeFlaeche" id="rpc_tools.hilfe_flaeche" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Flächeninanspruchnahme” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeOekologie" id="rpc_tools.hilfe_oekologie" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeOekologie" id="rpc_tools.hilfe_oekologie" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Ökologie” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Natur- und Artenschutz" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.naturschutzgebiete" image="" message="" tip="">
+                <Button caption="Natur- und Artenschutz" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.naturschutzgebiete" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem strengen Schutzstatus im Bereich Natur- und Artenschutz ein (Nationalparke, Naturschutzgebiete, Fauna-Flora-Habitat-Gebiete und Vogelschutzgebiete). Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Landschaftsschutz" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.landschaftsschutzgebiete" image="" message="" tip="">
+                <Button caption="Landschaftsschutz" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.landschaftsschutzgebiete" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem allgemeinen Schutzstatus im Bereich Landschaftsschutz ein (Naturparke, Landschaftsschutzgebiete und Biosphärenreservate außerhalb der Gebiete mit strengem Schutzstatus). Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Detailangaben zu Schutzgebieten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.detail_schutzgebiete" image="" message="" tip="">
+                <Button caption="Detailangaben zu Schutzgebieten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.detail_schutzgebiete" image="" message="" tip="Öffnet eine Online-Karte des BfN zu den Schutzgebieten in Deutschland und zoomt auf den Bereich des Plangebiets. Dort finden sich Detailangaben zu den Schutzgebieten.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene Freir&#228;ume > 100 qkm" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.freiraeume_100" image="" message="" tip="">
+                <Button caption="Unzerschnittene Freir&#228;ume > 100 qkm" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.freiraeume_100" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 100 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene Freir&#228;ume > 50 qkm" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.freiraeume_50" image="" message="" tip="">
+                <Button caption="Unzerschnittene Freir&#228;ume > 50 qkm" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.freiraeume_50" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 50 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Freir&#228;ume" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.freiraeume" image="" message="" tip="">
+                <Button caption="Freir&#228;ume" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.freiraeume" image="" message="" tip="Blendet eine Rasterkarte (100x100m) aller landschaftlichen Freiräume (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene W&#228;lder > 50 qkm" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder_50" image="" message="" tip="">
+                <Button caption="Unzerschnittene W&#228;lder > 50 qkm" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder_50" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Waldgebiete über 50 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="W&#228;lder" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder" image="" message="" tip="">
+                <Button caption="W&#228;lder" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder" image="" message="" tip="Blendet eine Rasterkarte (100x100m) aller Waldgebiete (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Leistungskennwerte berechnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.kennwerte_berechnen" image="" message="" tip="">
+                <Button caption="Leistungskennwerte berechnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.kennwerte_berechnen" image="" message="" tip="Ökologische Leistungskennwerte des Boden im Null- und Planfall berechnen. Die dafür benötigten Anteile der Bodenbedeckung können direkt eingetragen oder aus den Zeichnungen übernommen werden.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Wohndichte bestimmen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.wohndichte" image="" message="" tip="">
+                <Button caption="Wohndichte bestimmen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.wohndichte" image="" message="" tip="Die Wohndichte (WE pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Wohnfl&#228;chendichte bestimmen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.wohnflaechendichte" image="" message="" tip="">
+                <Button caption="Wohnfl&#228;chendichte bestimmen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.wohnflaechendichte" image="" message="" tip="Die Wohnflächendichte (qm Wohnfläche pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Hochspannungsleitungen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.hochspannung" image="" message="" tip="">
+                <Button caption="Hochspannungsleitungen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.hochspannung" image="" message="" tip="Blendet eine Rasterkarte (100x100m) mit den Einflussbereichen von Hochspannungsfreileitungen ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Gemeinsame Grenze mit Siedlungsk&#246;rper einzeichnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.grenzlinie_einzeichnen" image="" message="" tip="">
+                <Tool caption="Gemeinsame Grenze mit Siedlungsk&#246;rper einzeichnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.grenzlinie_einzeichnen" image="" message="" tip="Markieren der Abschnitte der Außenkante des Plangebiets, die an eine bestehende Siedlungsfläche angrenzen.">
                     <Help heading="" />
                 </Tool>
-                <Button caption="Grenzlinien l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.grenzlinie_loeschen" image="" message="" tip="">
+                <Button caption="Grenzlinien l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.grenzlinie_loeschen" image="" message="" tip="Löscht die von Ihnen bereits gezeichneten Abschnitte, in denen die Außenkante Ihres Plangebiets an eine bestehende Siedlungsfläche angrenzt.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Integrationsgrad berechnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.integrationsgrad_berechnen" image="" message="" tip="">
+                <Button caption="Integrationsgrad berechnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.integrationsgrad_berechnen" image="" message="" tip="Ermittelt den Integrationsgrad des Plangebiets, d.h. den Anteil der Außenkante des Plangebiets, der an eine bestehende Siedlungsfläche angrenzt.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Layer anzeigen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_anzeigen" image="" message="" tip="">
+                <Button caption="Layer anzeigen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_anzeigen" image="" message="" tip="Fügt den Layer mit den Bodenbedeckungen im Nullfall zur Karte hinzu bzw. macht diesen sichtbar.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Zeichnung l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_loeschen" image="" message="" tip="">
+                <Button caption="Zeichnung l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_loeschen" image="" message="" tip="Löscht alle bisher eingezeichneten Bodenbedeckungen im Nullfall.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Zeichnung auswerten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_auswerten" image="" message="" tip="">
+                <Button caption="Zeichnung auswerten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_auswerten" image="" message="" tip="Aus den eingezeichneten Flächen ableiten, welcher Anteil des Plangebiets im Nullfall welche Bodenbedeckung aufweist.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Layer anzeigen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_anzeigen" image="" message="" tip="">
+                <Button caption="Layer anzeigen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_anzeigen" image="" message="" tip="Fügt den Layer mit den Bodenbedeckungen im Planfall zur Karte hinzu bzw. macht diesen sichtbar.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Zeichnung l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_loeschen" image="" message="" tip="">
+                <Button caption="Zeichnung l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_loeschen" image="" message="" tip="Löscht alle bisher eingezeichneten Bodenbedeckungen im Planfall.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Zeichnung auswerten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_auswerten" image="" message="" tip="">
+                <Button caption="Zeichnung auswerten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_auswerten" image="" message="" tip="Aus den eingezeichneten Flächen ableiten, welcher Anteil des Plangebiets im Nullfall welche Bodenbedeckung aufweist.">
                     <Help heading="" />
                 </Button>
-                <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="NullfallUeberbauteFlaechen" id="rpc_tools.nullfall_ueberbaute_flaechen" image="" message="" tip="">
+                <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="NullfallUeberbauteFlaechen" id="rpc_tools.nullfall_ueberbaute_flaechen" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen überbauter Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Nat&#252;rliche Wasserfl&#228;che" category="ProjektCheck" class="NullfallNatuerlicheWasserflaeche" id="rpc_tools.nullfall_natuerliche_wasserflaeche" image="" message="" tip="">
+                <Tool caption="Nat&#252;rliche Wasserfl&#228;che" category="ProjektCheck" class="NullfallNatuerlicheWasserflaeche" id="rpc_tools.nullfall_natuerliche_wasserflaeche" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen natürlicher Wasserflächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Platten" category="ProjektCheck" class="NullfallPlatten" id="rpc_tools.nullfall_platten" image="" message="" tip="">
+                <Tool caption="Platten" category="ProjektCheck" class="NullfallPlatten" id="rpc_tools.nullfall_platten" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von mit Platten belegten Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="B&#228;ume, Str&#228;ucher" category="ProjektCheck" class="NullfallBaeumeStraeucher" id="rpc_tools.nullfall_baeume_straeucher" image="" message="" tip="">
+                <Tool caption="B&#228;ume oder Str&#228;ucher" category="ProjektCheck" class="NullfallBaeumeStraeucher" id="rpc_tools.nullfall_baeume_straeucher" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Bäumen oder Sträuchern. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Stauden" category="ProjektCheck" class="NullfallStauden" id="rpc_tools.nullfall_stauden" image="" message="" tip="">
+                <Tool caption="Stauden" category="ProjektCheck" class="NullfallStauden" id="rpc_tools.nullfall_stauden" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Stauden. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Wiese" category="ProjektCheck" class="NullfallWiese" id="rpc_tools.nullfall_wiese" image="" message="" tip="">
+                <Tool caption="Wiese" category="ProjektCheck" class="NullfallWiese" id="rpc_tools.nullfall_wiese" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Wiese. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Rasen" category="ProjektCheck" class="NullfallRasen" id="rpc_tools.nullfall_rasen" image="" message="" tip="">
+                <Tool caption="Rasen" category="ProjektCheck" class="NullfallRasen" id="rpc_tools.nullfall_rasen" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Rasen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Wassergebundene Decke, Rasengittersteine" category="ProjektCheck" class="NullfallRasengittersteine" id="rpc_tools.nullfall_rasengittersteine" image="" message="" tip="">
+                <Tool caption="Wassergebundene Decke oder Rasengittersteine" category="ProjektCheck" class="NullfallRasengittersteine" id="rpc_tools.nullfall_rasengittersteine" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit wassergebundener Decke oder Rasengittersteinen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Asphalt, Beton" category="ProjektCheck" class="NullfallBeton" id="rpc_tools.nullfall_beton" image="" message="" tip="">
+                <Tool caption="Asphalt oder Beton" category="ProjektCheck" class="NullfallBeton" id="rpc_tools.nullfall_beton" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Asphalt oder Beton. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Offener Boden, Acker" category="ProjektCheck" class="NullfallAcker" id="rpc_tools.nullfall_acker" image="" message="" tip="">
+                <Tool caption="Offener Boden, Acker" category="ProjektCheck" class="NullfallAcker" id="rpc_tools.nullfall_acker" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit offenem Boden oder Acker. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Kleinpflaster" category="ProjektCheck" class="NullfallKleinpflaster" id="rpc_tools.nullfall_kleinpflaster" image="" message="" tip="">
+                <Tool caption="Kleinpflaster" category="ProjektCheck" class="NullfallKleinpflaster" id="rpc_tools.nullfall_kleinpflaster" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Kleinpflaster. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="PlanfallUeberbauteFlaechen" id="rpc_tools.planfall_ueberbaute_flaechen" image="" message="" tip="">
+                <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="PlanfallUeberbauteFlaechen" id="rpc_tools.planfall_ueberbaute_flaechen" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen überbauter Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Nat&#252;rliche Wasserfl&#228;che" category="ProjektCheck" class="PlanfallNatuerlicheWasserflaeche" id="rpc_tools.planfall_natuerliche_wasserflaeche" image="" message="" tip="">
+                <Tool caption="Nat&#252;rliche Wasserfl&#228;che" category="ProjektCheck" class="PlanfallNatuerlicheWasserflaeche" id="rpc_tools.planfall_natuerliche_wasserflaeche" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen natürlicher Wasserflächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Platten" category="ProjektCheck" class="PlanfallPlatten" id="rpc_tools.planfall_platten" image="" message="" tip="">
+                <Tool caption="Platten" category="ProjektCheck" class="PlanfallPlatten" id="rpc_tools.planfall_platten" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von mit Platten belegten Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="B&#228;ume, Str&#228;ucher" category="ProjektCheck" class="PlanfallBaeumeStraeucher" id="rpc_tools.planfall_baeume_straeucher" image="" message="" tip="">
+                <Tool caption="B&#228;ume oder Str&#228;ucher" category="ProjektCheck" class="PlanfallBaeumeStraeucher" id="rpc_tools.planfall_baeume_straeucher" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Bäumen oder Sträuchern. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Stauden" category="ProjektCheck" class="PlanfallStauden" id="rpc_tools.planfall_stauden" image="" message="" tip="">
+                <Tool caption="Stauden" category="ProjektCheck" class="PlanfallStauden" id="rpc_tools.planfall_stauden" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Stauden. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Wiese" category="ProjektCheck" class="PlanfallWiese" id="rpc_tools.planfall_wiese" image="" message="" tip="">
+                <Tool caption="Wiese" category="ProjektCheck" class="PlanfallWiese" id="rpc_tools.planfall_wiese" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Wiese. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Rasen" category="ProjektCheck" class="PlanfallRasen" id="rpc_tools.planfall_rasen" image="" message="" tip="">
+                <Tool caption="Rasen" category="ProjektCheck" class="PlanfallRasen" id="rpc_tools.planfall_rasen" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Rasen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Wassergebundene Decke, Rasengittersteine" category="ProjektCheck" class="PlanfallRasengittersteine" id="rpc_tools.planfall_rasengittersteine" image="" message="" tip="">
+                <Tool caption="Wassergebundene Decke oder Rasengittersteine" category="ProjektCheck" class="PlanfallRasengittersteine" id="rpc_tools.planfall_rasengittersteine" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit wassergebundener Decke oder Rasengittersteinen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Asphalt, Beton" category="ProjektCheck" class="PlanfallBeton" id="rpc_tools.planfall_beton" image="" message="" tip="">
+                <Tool caption="Asphalt oder Beton" category="ProjektCheck" class="PlanfallBeton" id="rpc_tools.planfall_beton" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Asphalt oder Beton. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Offener Boden, Acker" category="ProjektCheck" class="PlanfallAcker" id="rpc_tools.planfall_acker" image="" message="" tip="">
+                <Tool caption="Offener Boden oder Acker" category="ProjektCheck" class="PlanfallAcker" id="rpc_tools.planfall_acker" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit offenem Boden oder Acker. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Kleinpflaster" category="ProjektCheck" class="PlanfallKleinpflaster" id="rpc_tools.planfall_kleinpflaster" image="" message="" tip="">
+                <Tool caption="Kleinpflaster" category="ProjektCheck" class="PlanfallKleinpflaster" id="rpc_tools.planfall_kleinpflaster" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Kleinpflaster. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
 
                 <!-- ERREICHBARKEIT  -->
 
-                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeErreichbarkeit" id="rpc_tools.hilfe_erreichbarkeit" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Kurzanleitung">
+                <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeErreichbarkeit" id="rpc_tools.hilfe_erreichbarkeit" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Erreichbarkeit” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Haltestellen ermitteln" category="ProjektCheck" class="HaltestellenZentraleOrte" id="rpc_tools.haltestellen_ermitteln" image="Images\TmStopHidingSelected16.png" message="" tip="">
+                <Button caption="Haltestellen ermitteln" category="ProjektCheck" class="HaltestellenZentraleOrte" id="rpc_tools.haltestellen_ermitteln" image="Images\TmStopHidingSelected16.png" message="" tip="ÖPNV-Haltestellen und Anzahl der Abfahrten im Umfeld des Plangebiets ermitteln">
                     <Help heading="" />
                 </Button>
-                <Button caption="Haltestellenplan aufrufen" category="ProjektCheck" class="Haltestellenplan" id="rpc_tools.haltestellenplan" image="Images\ContentsWindowExplorer16.png" message="" tip="">
+                <Button caption="Haltestellenplan aufrufen" category="ProjektCheck" class="Haltestellenplan" id="rpc_tools.haltestellenplan" image="Images\ContentsWindowExplorer16.png" message="" tip="Abfahrtsplan für eine auszuwählende Haltestelle in einem Webbrowser anzeigen">
                     <Help heading="" />
                 </Button>
-                <Button caption="Haltestellen anzeigen" category="ProjektCheck" class="HaltestellenAnzeigen" id="rpc_tools.haltestellen_anzeigen" image="Images\eye-2-16.png" message="" tip="">
+                <Button caption="Haltestellen anzeigen" category="ProjektCheck" class="HaltestellenAnzeigen" id="rpc_tools.haltestellen_anzeigen" image="Images\eye-2-16.png" message="" tip="Sofern die Funktion “Haltestellen ermitteln” schon ausgeführt wurde, lassen sich die Haltestellen hiermit schnell wieder einblenden.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Fahrtzeit zu zentralen Orten ermitteln" category="ProjektCheck" class="FahrtzeitZentraleOrte" id="rpc_tools.fahrtzeit_zentrale_orte" image="Images\RouteFastest16.png" message="" tip="">
+                <Button caption="Fahrtzeit zu zentralen Orten ermitteln" category="ProjektCheck" class="FahrtzeitZentraleOrte" id="rpc_tools.fahrtzeit_zentrale_orte" image="Images\RouteFastest16.png" message="" tip="Werktägliche Fahrzeit mit Bus und Bahn zu den zentralen Orten in der Region ermitteln">
                     <Help heading="" />
                 </Button>
-                <Button caption="Isochronen erzeugen" category="ProjektCheck" class="Isochrone" id="rpc_tools.isochrone" image="Images\ShapefilePolygon16.png" message="" tip="">
+                <Button caption="Isochronen erzeugen" category="ProjektCheck" class="Isochrone" id="rpc_tools.isochrone" image="Images\ShapefilePolygon16.png" message="" tip="Ermitteln, welcher Bereich um das Plangebiet innerhalb einer bestimmten Zeit erreicht werden kann.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Einrichtungen im Umfeld ermitteln" category="ProjektCheck" class="EinrichtungenEinlesen" id="rpc_tools.einrichtungen_einlesen" image="Images\ShapefilePoint16.png" message="" tip="">
+                <Button caption="Einrichtungen einlesen" category="ProjektCheck" class="EinrichtungenEinlesen" id="rpc_tools.einrichtungen_einlesen" image="Images\ShapefilePoint16.png" message="" tip="Kitas, Schulen, Arztpraxen, Läden und Autobahnauffahrten in der Umgebung der Planfläche ermitteln und einblenden.">
                     <Help heading="" />
                 </Button>
 

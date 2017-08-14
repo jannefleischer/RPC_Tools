@@ -31,6 +31,16 @@ class Waldgebiete(ToolboxButton):
     _pyt_file = u'Flaeche und Oekologie.pyt'
     _do_show = False
     _toolbox_name = 'TbxLayerWald'
+    #_message = (
+        #u'Nach dem Schließen dieser Meldung wird in Ihrem Webbrowser eine '
+        #u'Online-Karte des BfN zu den Schutzgebieten in Deutschland aufgerufen'
+        #u'und auf den Bereich des Plangebiets gezoomt. In dieser Online-Karte '
+        #u'finden Sie Detailangaben zu den Schutzgebieten im Umfeld des '
+        #u'Plangebiets.')
+
+    #def onClick(self, coord=None):
+        #self.output.show()
+        #self.show_message()
 
 
 class Naturschutzgebiete(ToolboxButton):
