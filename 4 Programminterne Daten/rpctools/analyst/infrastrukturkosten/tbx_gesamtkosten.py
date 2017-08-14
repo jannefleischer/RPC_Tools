@@ -102,7 +102,7 @@ class TbxGesamtkosten(Tbx):
 
     @property
     def label(self):
-        return encode(u'Gesamtkosten berechnen')
+        return encode(u'Gesamtkosten ermitteln')
 
     @property
     def Tool(self):
