@@ -21,7 +21,13 @@ class TbxUpdateNodes(Tbx):
 
 
     def _open(self, params):
-
+        pickle_path = self.folders.get_otp_pickle_filename(check=False)
+        if not os.path.exists(pickle_path):
+            raise Exception('Es existiert noch keine Berechnung der '
+                            'Straßenverkehrsbelastung!'
+                            'Bitte schätzen Sie zuerst die '
+                            'Straßenverkehrsbelastung, bevor Sie die '
+                            'Verkehrsbelastung neu gewichten.')
         nodes = self.query_table('Zielpunkte', ['Name'])
         nodes = [tup[0] for tup in nodes]
 
@@ -37,7 +43,6 @@ class TbxUpdateNodes(Tbx):
         return
 
     def _getParameterInfo(self):
-
         params = self.par
         projekte = self.folders.get_projects()
         # Projekt_auswählen
