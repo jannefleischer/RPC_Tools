@@ -12,7 +12,7 @@ from rpctools.utils.encoding import encode
 from rpctools.utils.spatial_lib import get_project_centroid
 from rpctools.analyst.standortkonkurrenz.zensus import Zensus, ZensusCell
 from rpctools.analyst.standortkonkurrenz.routing_distances import DistanceRouting
-from rpctools.utils.spatial_lib import Point, bounding_box
+from rpctools.utils.spatial_lib import Point, bounding_box, features_to_raster
 from rpctools.utils.config import Folders
 from rpctools.analyst.standortkonkurrenz.sales import Sales
 
@@ -45,23 +45,30 @@ class ProjektwirkungMarkets(Tool):
         planfall_idx = (id_nullfall != id_planfall) & (id_planfall > 0)
 
         for index, plan_market in df_markets[planfall_idx].iterrows():
-            for layer in ['Kaufkraftbindung']:#, 'Erreichbarkeit']:
-                layer_name = u'{n} {m} ({i})'.format(n=layer,
-                                                     m=plan_market['name'],
-                                                     i=plan_market['id'])
-                self.output.add_layer(group_layer, layer, fc_maerkte,
-                                      query='id_markt={}'.format(
-                                          plan_market['id']),
-                                      name=layer_name,
-                                      template_folder=folder,
-                                      zoom=False)
-
+            layer_name = u'Kaufkraftbindung {m} ({i})'.format(
+                m=plan_market['name'], i=plan_market['id'])
+            fn = u'Kaufkraftbindung_Raster_{i}'.format(i=plan_market['id'])
+                              
+            fp = self.folders.get_table(fn, check=False)
+            arcpy.AddMessage('Erzeuge Raster {}'.format(fn))
+            table = self.folders.get_table('Beziehungen_Maerkte_Zellen')
+            where = 'id_markt={} and distanz>=0'.format(plan_market['id'])
+            arcpy.Delete_management(fp)
+            raster_file = features_to_raster(
+                table, fp, 'kk_bindung_planfall', where=where)
+            self.output.add_layer(group_layer, 'Kaufkraftbindung_Raster',
+                                  fn,
+                                  name=layer_name,
+                                  template_folder=folder,
+                                  zoom=False)
+                
         self.output.add_layer(group_layer, layer_vb, fc_zentren,
                               template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_gem, fc_zentren,
                               template_folder=folder, zoom=False)
 
     def run(self):
+        return
         folders = Folders(self.par)
         self.recalculate = self.par.recalculate.value
 
