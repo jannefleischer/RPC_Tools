@@ -208,7 +208,7 @@ class Wanderungssalden1(Tool):
                 bewohner += flaeche[0]
 
             #Aufteilung Fortzug (und Zuzug [nur Projektgemeinde])
-            cursor_gemeindebilanz = arcpy.da.UpdateCursor(wanderungssalden, ["AGS", "SvB_pro_Ew", "Einw_Fortzug", "SvB_Fortzug", "Einw_Zuzug", "SvB_Zuzug", "SvB_Saldo", "Einw_Saldo"])
+            cursor_gemeindebilanz = arcpy.da.UpdateCursor(wanderungssalden, ["AGS", "SvB_pro_Ew", "Einw_Fortzug", "SvB_Fortzug", "Einw_Zuzug", "SvB_Zuzug", "SvB_Saldo", "Einw_Saldo", "Wanderungsanteil_Ew", "Wanderungsanteil_SvB"])
             for gemeinde in cursor_gemeindebilanz:
                 Summe_Wichtungsfaktoren_Gemeinde_Wohnen = 0
                 Summe_Wichtungsfaktoren_Gemeinde_Gewerbe = 0
@@ -229,6 +229,9 @@ class Wanderungssalden1(Tool):
                 if gemeinde[0] == ags_projekt:
                     gemeinde[4] = bewohner
                     gemeinde[5] = ap
+                else:
+                    gemeinde[8] = Summe_Wichtungsfaktoren_Gemeinde_Wohnen / Summe_Wichtungsfaktoren_Gesamtraum_Wohnen
+                    gemeinde[9] = Summe_Wichtungsfaktoren_Gemeinde_Gewerbe / Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe
                 gemeinde[6] = gemeinde[3] + gemeinde[5]
                 gemeinde[7] = gemeinde[4] + gemeinde[2]
                 cursor_gemeindebilanz.updateRow(gemeinde)
@@ -258,12 +261,12 @@ class Wanderungssalden1(Tool):
             #arcpy.AddMessage("Gewerbe: Neugründungen = {0}".format(Neugruendungen_AP))
 
             self.parent_tbx.delete_rows_in_table("Zuzugsstatistik_Ew")
-            column_values = {"Kategorie": [u"Region", u"Bund/Ausland"],
+            column_values = {"Kategorie": [u"Projektgemeinde/Region", u"Bund/Ausland"],
                                 "Anzahl": [int(round(Summe_Zugeordneter_Fortzug_Ew * -1)), int(round(Differenz_Ew))]}
             self.parent_tbx.insert_rows_in_table("Zuzugsstatistik_Ew", column_values)
 
             self.parent_tbx.delete_rows_in_table("Zuzugsstatistik_SvB")
-            column_values = {"Kategorie": [u"Region", u"Bund/Ausland", u"Neugründungen"],
+            column_values = {"Kategorie": [u"Projektgemeinde/Region", u"Bund/Ausland", u"Neugründungen"],
                              "Anzahl": [int(round(Summe_Zugeordneter_Fortzug_AP * -1)), int(round(-1 * (Differenz_AP - Neugruendungen_AP))), int(round(Neugruendungen_AP))]}
             self.parent_tbx.insert_rows_in_table("Zuzugsstatistik_SvB", column_values)
 

@@ -5,14 +5,17 @@ import os
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 from rpctools.utils.constants import Nutzungsart
-from rpctools.analyst.einnahmen.script_Wanderungssalden_bearbeiten_Einwohner import Salden_bearbeiten
-from rpctools.analyst.einnahmen.script_Wanderungssalden_bearbeiten_Arbeit import Salden_bearbeiten2
+from rpctools.analyst.einnahmen.script_Wanderungssalden_bearbeiten import Salden_bearbeiten
 
 
 class TbxSaldenbearbeiten(Tbx):
     """ superclass for wanderungssalden einwohner/gewerbe"""
     _nutzungsart = None
     _saldo_field = None
+
+    gemeinden_dict = {}
+    gemeinden_dict_initial = {}
+    gemeinden_list = []
 
     def _getParameterInfo(self):
 
@@ -64,7 +67,11 @@ class TbxSaldenbearbeiten(Tbx):
         path_gemeindebilanzen = self.folders.get_table("Gemeindebilanzen", 'FGDB_Einnahmen.gdb')
 
         if par.changed('name'):
-            where = 'Nutzungsart = {}'.format(self._nutzungsart)
+            if self._nutzungsart == Nutzungsart.WOHNEN:
+                where = 'Nutzungsart = {}'.format(Nutzungsart.WOHNEN)
+            elif self._nutzungsart == Nutzungsart.GEWERBE:
+                where = 'Nutzungsart = {} OR Nutzungsart = {}'.format(Nutzungsart.GEWERBE, Nutzungsart.EINZELHANDEL)
+
             rows = self.query_table('Teilflaechen_Plangebiet',
                                     ['Nutzungsart'],
                                     workspace='FGDB_Definition_Projekt.gdb',
@@ -76,31 +83,56 @@ class TbxSaldenbearbeiten(Tbx):
                                       u'benötigten Nutzungsart')
             else:
                 par.gemeinde.enabled = True
-                gemeinden = []
-                fields = ["GEN", self._saldo_field]
-                if arcpy.Exists(path_gemeindebilanzen):
-                    rows = self.query_table('Gemeindebilanzen', fields,
-                                            workspace='FGDB_Einnahmen.gdb')
-                    for gem_name, saldo in rows:
-                        gemeinden.append(u"{} || Saldo: {}".format(gem_name, saldo))
-                    par.gemeinde.filter.list = sorted(gemeinden)
-                    par.gemeinde.value = sorted(gemeinden)[0]
 
-        if par.changed('saldo') or par.changed('name') or par.changed('gemeinde'):
+                self.gemeinden_list = []
+                fields = ["GEN", self._saldo_field]
+                rows = self.query_table('Gemeindebilanzen', fields, workspace='FGDB_Einnahmen.gdb')
+                for gem_name, saldo in rows:
+                    self.gemeinden_dict[gem_name] = saldo
+                for key in self.gemeinden_dict:
+                    self.gemeinden_list.append(u"{} || Saldo: {}".format(key, self.gemeinden_dict[key]))
+                gemeinden_sorted = sorted(self.gemeinden_list)
+
+                fields = ["Kategorie", "Anzahl"]
+                where = ' NOT "Kategorie"' + "='" + 'Projektgemeinde/Region' + "'"
+                rows = self.query_table(self._table, fields, workspace='FGDB_Einnahmen.gdb', where = where)
+                for kategorie, anzahl in rows:
+                    self.gemeinden_dict[kategorie] = -anzahl
+                    gemeinden_sorted.append(u"{} || Saldo: {}".format(kategorie, -anzahl))
+                self.gemeinden_dict_initial = self.gemeinden_dict
+                par.gemeinde.filter.list = gemeinden_sorted
+                par.gemeinde.value = gemeinden_sorted[0]
+
+                summe = 0
+                for key in self.gemeinden_dict:
+                    summe += self.gemeinden_dict[key]
+                par.summe.value = summe
+
+        if par.changed('gemeinde'):
             target_gemeinde = par.gemeinde.value
             target_gemeinde_kurz = target_gemeinde.split(" ||")[0]
-            summe = 0
-            fields = [self._saldo_field, "GEN"]
+            par.saldo.value = self.gemeinden_dict[target_gemeinde_kurz]
 
-            if arcpy.Exists(path_gemeindebilanzen):
-                rows = self.query_table('Gemeindebilanzen', fields,
-                                        workspace='FGDB_Einnahmen.gdb')
-                for saldo in rows:
-                    if saldo[1] == target_gemeinde_kurz and par.saldo.value != None:
-                        summe += par.saldo.value
-                    else:
-                        summe += saldo[0]
-                par.summe.value = summe
+        if par.changed('saldo'):
+            target_gemeinde = par.gemeinde.value
+            target_gemeinde_kurz = target_gemeinde.split(" ||")[0]
+            self.gemeinden_dict[target_gemeinde_kurz] = par.saldo.value
+            summe = 0
+            for key in self.gemeinden_dict:
+                summe += self.gemeinden_dict[key]
+            par.summe.value = summe
+
+            self.gemeinden_list = []
+            for key in self.gemeinden_dict:
+                self.gemeinden_list.append(u"{} || Saldo: {}".format(key, self.gemeinden_dict[key]))
+            gemeinden_sorted = sorted(self.gemeinden_list)
+            fields = ["Kategorie", "Anzahl"]
+            where = 'NOT "Kategorie"' + "='" + 'Projektgemeinde/Region' + "'"
+            rows = self.query_table(self._table, fields, workspace='FGDB_Einnahmen.gdb', where = where)
+            for kategorie, anzahl in rows:
+                gemeinden_sorted.append(u"{} || Saldo: {}".format(kategorie, -anzahl))
+            par.gemeinde.filter.list = gemeinden_sorted
+            par.gemeinde.value = u"{} || Saldo: {}".format(target_gemeinde_kurz, self.gemeinden_dict[target_gemeinde_kurz])
 
     def _updateMessages(self, params):
 
@@ -120,7 +152,10 @@ class TbxSaldenbearbeiten(Tbx):
         if not arcpy.Exists(path_gemeindebilanzen):
             par.name.setErrorMessage(u'Es müssen zuerst Wanderungssalden geschätzt werden, ehe diese bearbeitet werden können.')
 
-        where = 'Nutzungsart = {}'.format(self._nutzungsart)
+        if self._nutzungsart == Nutzungsart.WOHNEN:
+            where = 'Nutzungsart = {}'.format(Nutzungsart.WOHNEN)
+        elif self._nutzungsart == Nutzungsart.GEWERBE:
+            where = 'Nutzungsart = {} OR Nutzungsart = {}'.format(Nutzungsart.GEWERBE, Nutzungsart.EINZELHANDEL)
         rows = self.query_table('Teilflaechen_Plangebiet',
                                 ['Nutzungsart'],
                                 workspace='FGDB_Definition_Projekt.gdb',
@@ -136,6 +171,7 @@ class TbxEWSaldenbearbeiten(TbxSaldenbearbeiten):
     """Toolbox Wanderungssalden für Einnahmen Wohnen"""
     _nutzungsart = Nutzungsart.WOHNEN
     _saldo_field = "Einw_Saldo"
+    _table = 'Zuzugsstatistik_Ew'
 
     @property
     def label(self):
@@ -150,6 +186,7 @@ class TbxGewSaldenbearbeiten(TbxSaldenbearbeiten):
     """Toolbox Wanderungssalden für Einnahmen Gewerbe"""
     _nutzungsart = Nutzungsart.GEWERBE
     _saldo_field = "SvB_Saldo"
+    _table = 'Zuzugsstatistik_SvB'
 
     @property
     def label(self):
@@ -157,4 +194,4 @@ class TbxGewSaldenbearbeiten(TbxSaldenbearbeiten):
 
     @property
     def Tool(self):
-        return Salden_bearbeiten2
+        return Salden_bearbeiten
