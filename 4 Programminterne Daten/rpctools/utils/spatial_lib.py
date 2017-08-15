@@ -4,9 +4,16 @@ from rpctools.utils.params import DummyTbx
 from rpctools.utils.output import ArcpyEnv
 from pyproj import Proj, transform
 
-import requests
+import requests 
 import numpy as np
 from os.path import join
+
+def features_to_raster(feature_class, outfile, field, where=''):
+    layer = arcpy.MakeFeatureLayer_management(feature_class, 'temp_layer',
+                                              where)
+    arcpy.FeatureToRaster_conversion(layer, field, outfile)
+    arcpy.Delete_management(layer)
+    return outfile
 
 
 class Point(object):

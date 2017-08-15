@@ -639,7 +639,9 @@ class Output(object):
                                                   workspace=layer.workspace)
             source_ws = source_layer.workspacePath
             target_ws = arcpy.Describe(featureclass).path
-            source_layer.findAndReplaceWorkspacePath(source_ws, target_ws)
+            #source_layer.findAndReplaceWorkspacePath(source_ws, target_ws)
+            source_layer.replaceDataSource(dataset_name=layer.featureclass,
+                                           workspace_path=target_ws)
 
         # Untergruppen hinzufügen
         if layer.in_project:
