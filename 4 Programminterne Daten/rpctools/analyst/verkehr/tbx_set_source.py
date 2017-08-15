@@ -14,6 +14,12 @@ class SetSource(Tool):
     _workspace = 'FGDB_Verkehr.gdb'
 
     def add_outputs(self):
+        # get extent
+        toolbox = self.parent_tbx
+        points = toolbox.table_to_dataframe('Anbindungspunkte',
+                                            columns=['Shape'],
+                                            workspace='FGDB_Verkehr.gdb').as_matrix()
+        self.set_layer_extent(points)
         # update the names of the areas the points belong to
         df_areas = self.parent_tbx.table_to_dataframe(
             'Teilflaechen_Plangebiet',
@@ -29,7 +35,8 @@ class SetSource(Tool):
 
         self.output.add_layer('verkehr', 'Anbindungspunkte',
                               featureclass='Anbindungspunkte',
-                              template_folder='Verkehr')
+                              template_folder='Verkehr',
+                              zoom=True, zoom_extent=self._extent)
 
     def run(self):
         area, i = self.parent_tbx.get_selected_area()
@@ -48,18 +55,18 @@ class SetSource(Tool):
         pickle_path = self.folders.get_otp_pickle_filename(check=False)
         if os.path.exists(pickle_path):
             os.remove(pickle_path)
-        # empty gdb tables
-        tn_path = toolbox.folders.get_table('Zielpunkte',
-                                            workspace=self._workspace)
-        links_path = toolbox.folders.get_table('links',
-                                               workspace=self._workspace)
-        nodes_path = toolbox.folders.get_table('nodes',
-                                               workspace=self._workspace)
-        routes_path = toolbox.folders.get_table('Routes',
+            # empty gdb tables
+            tn_path = toolbox.folders.get_table('Zielpunkte',
                                                 workspace=self._workspace)
-        tables_to_clear = [tn_path, links_path, nodes_path, routes_path]
-        for path in tables_to_clear:
-            arcpy.DeleteRows_management(path)
+            links_path = toolbox.folders.get_table('links',
+                                                   workspace=self._workspace)
+            nodes_path = toolbox.folders.get_table('nodes',
+                                                   workspace=self._workspace)
+            routes_path = toolbox.folders.get_table('Routes',
+                                                    workspace=self._workspace)
+            tables_to_clear = [tn_path, links_path, nodes_path, routes_path]
+            for path in tables_to_clear:
+                arcpy.DeleteRows_management(path)
 
     def remove_output(self):
         mxd = arcpy.mapping.MapDocument("CURRENT")
@@ -70,6 +77,30 @@ class SetSource(Tool):
         for layer in layers:
             arcpy.mapping.RemoveLayer(df, layer)
         del(mxd)
+
+    def set_layer_extent(self, points, zoom_border=0.2):
+        """
+        get the layer extent from points.
+
+        Parameters
+        ----------
+        points : np.array of points shape = (n, 1)
+        zoom_border : float, optional
+            expands the extend by a factor
+        """
+        x_coords = [point[0][0] for point in points]
+        y_coords = [point[0][1] for point in points]
+        x_max = max(x_coords)
+        x_min = min(x_coords)
+        y_max = max(y_coords)
+        y_min = min(y_coords)
+        x_area = x_max - x_min
+        y_area = y_max - y_min
+
+        self._extent = (x_min - zoom_border * x_area,
+                        y_min - zoom_border * y_area,
+                        x_max + zoom_border * x_area,
+                        y_max + zoom_border * y_area)
 
 
 class TbxSetSource(TbxFlaechendefinition):
@@ -101,7 +132,5 @@ if __name__ == '__main__':
     tbx = TbxSetSource()
     tbx._getParameterInfo()
     tbx.set_active_project()
-    tbx.open()
-    tbx.show_outputs()
     tbx.execute()
     print
