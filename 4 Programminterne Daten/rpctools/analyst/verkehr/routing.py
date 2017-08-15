@@ -13,6 +13,8 @@ class Routing(Tool):
     _param_projectname = 'project'
     _outer_circle = 2000
     _n_segments = 24
+    _extent = (0.0, 0.0, 0.0, 0.0)
+
     def add_outputs(self):
         # Add Layers
         self.output.add_layer('verkehr', 'Anbindungspunkte',
@@ -27,7 +29,7 @@ class Routing(Tool):
                               featureclass='Zielpunkte',
                               template_folder='Verkehr',
                               name='Herkunfts-/Zielpunkte',
-                              zoom=False)
+                              zoom=True, zoom_extent=self._extent)
 
     def run(self):
         toolbox = self.parent_tbx
@@ -79,6 +81,8 @@ class Routing(Tool):
         o.create_node_features()
         print o.transfer_nodes.keys()
         o.create_transfer_node_features()
+        o.set_layer_extent()
+        self._extent = o.extent
         o.dump(self.folders.get_otp_pickle_filename(check=False))
 
     def get_areas_data(self):
@@ -127,37 +131,6 @@ class Routing(Tool):
                 data_tfl[tfl_id] = (source_id, trips, tfl_use, shape)
         return data_tfl
 
-
-
-    """
-    xxx remove later
-    tfl = self.folders.get_table("Teilflaechen_Plangebiet",
-    workspace='FGDB_Definition_Projekt.gdb')
-    tmp_table = os.path.join(arcpy.env.scratchGDB,
-                             "Teilflaechen_Plangebiet")
-    source_table = self.folders.get_table('Anbindungspunkte',
-                                          workspace='FGDB_Verkehr.gdb')
-    if arcpy.Exists(tmp_table):
-        arcpy.Delete_management(tmp_table)
-    arcpy.Copy_management(tfl, tmp_table)   # create tmp table
-    arcpy.AddGeometryAttributes_management(
-        Input_Features=tmp_table, Geometry_Properties="CENTROID_INSIDE",
-        Coordinate_System=4326)
-    arcpy.AddJoin_management(in_layer_or_view=tmp_table,
-                             in_field='id_teilflaeche',
-                             join_table=source_table,
-                             join_field='id_teilflaeche')
-
-    # get data from Teilflaechen_Plangebiet table
-    # xxx
-    columns = ['id_teilflaeche', 'SOURCE_X', 'SOURCE_Y', 'Wege_gesamt',
-               'Nutzungsart']
-    cursor = arcpy.da.SearchCursor(tmp_table, columns)
-    data_tfl = [row for row in cursor]
-    del cursor
-    return data_tfl"""
-
-
 if __name__ == '__main__':
     o = OTPRouter(r'F:\Projekte SH\RPC Tools\3 Benutzerdefinierte Projekte\0908\FGDB_Verkehr.gdb')
     source = Point(lat=53.5, lon=9.589)
@@ -185,3 +158,5 @@ if __name__ == '__main__':
     o.create_polyline_features()
     o.create_node_features()
     o.create_transfer_node_features()
+    o.calc_layer_extent()
+    print(o.extent)

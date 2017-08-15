@@ -20,7 +20,8 @@ class Settings(Routing):
             self.output.add_layer('verkehr', 'links',
                                   featureclass='links',
                                   template_folder='Verkehr',
-                                  name='Zusätzliche PKW-Fahrten', zoom=False,
+                                  name='Zusätzliche PKW-Fahrten', zoom=True,
+                                  zoom_extent=self._extent,
                                   symbology_classes=(15, 'weight'))
             if self._transfernodes_layer_exsists:
                 return
@@ -29,7 +30,8 @@ class Settings(Routing):
                                       featureclass='Zielpunkte',
                                       template_folder='Verkehr',
                                       name='Zielpunkte gewichtet',
-                                      symbology_classes=(10, 'Neue_Gewichte'))
+                                      symbology_classes=(10, 'Neue_Gewichte'),
+                                      zoom=False)
             else:
                 self.output.add_layer('verkehr', 'Zielpunkte',
                                       featureclass='Zielpunkte',
@@ -77,6 +79,7 @@ class Settings(Routing):
             otp_router.create_polyline_features()
             otp_router.create_node_features()
             self._nodes_have_been_weighted = otp_router.nodes_have_been_weighted
+            self._extent = otp_router.extent
             otp_router.dump(pickle_path)
             self.remove_output()
             #transfer_nodes = otp_router.transfer_nodes

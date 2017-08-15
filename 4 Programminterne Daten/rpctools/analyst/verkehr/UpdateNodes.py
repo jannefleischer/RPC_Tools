@@ -14,16 +14,17 @@ class UpdateNodes(Routing):
     def add_outputs(self):
         if not self.pickle_file_exists:
             return
-        self.output.add_layer('verkehr', 'Zielpunkte_gewichtet',
-                              featureclass='Zielpunkte',
-                              template_folder='Verkehr',
-                              name='Zielpunkte gewichtet',
-                              symbology_classes=(10, 'Neue_Gewichte'))
         self.output.add_layer('verkehr', 'links',
                               featureclass='links',
                               template_folder='Verkehr',
                               name='Zusätzliche PKW-Fahrten gewichtet',
                               symbology_classes=(15, 'weight'))
+        self.output.add_layer('verkehr', 'Zielpunkte_gewichtet',
+                              featureclass='Zielpunkte',
+                              template_folder='Verkehr',
+                              name='Zielpunkte gewichtet',
+                              symbology_classes=(10, 'Neue_Gewichte'),
+                              zoom=True, zoom_extent=self._extent)
         return
 
     def run(self):
@@ -92,6 +93,7 @@ class UpdateNodes(Routing):
         otp_router.calc_vertex_weights()
         otp_router.create_polyline_features()
         otp_router.nodes_have_been_weighted = True
+        self._extent = otp_router.extent
         otp_router.dump(pickle_path)
 
     def remove_output(self):

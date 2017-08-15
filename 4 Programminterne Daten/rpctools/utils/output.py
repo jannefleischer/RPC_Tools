@@ -189,6 +189,7 @@ class Layer(object):
                  symbology={},
                  label_replace={},
                  zoom=True,
+                 zoom_extent=None,
                  symbology_classes=None):
         self.groupname = groupname
         self.template_layer = template_layer
@@ -197,6 +198,7 @@ class Layer(object):
         self.subgroup = subgroup
         self.in_project = in_project
         self.zoom = zoom
+        self.zoom_extent = zoom_extent
         self.template_folder = template_folder
         self.query = query
         self.name = name
@@ -462,7 +464,7 @@ class Output(object):
                   query="",
                   symbology={},
                   label_replace={},
-                  zoom=True, symbology_classes=None):
+                  zoom=True, zoom_extent = None, symbology_classes=None):
         """
         Add output layer
 
@@ -518,7 +520,8 @@ class Output(object):
         layer = Layer(groupname, template_layer, name=name,
                       featureclass=featureclass, workspace=workspace,
                       disable_other=disable_other, subgroup=subgroup,
-                      in_project=in_project, zoom=zoom, query=query,
+                      in_project=in_project, zoom=zoom,
+                      zoom_extent=zoom_extent, query=query,
                       template_folder=template_folder, symbology=symbology,
                       label_replace=label_replace,
                       symbology_classes=symbology_classes)
@@ -677,7 +680,11 @@ class Output(object):
                                              current_dataframe)[0]
         # Auf Layer zentrieren
         if layer.zoom:
-            ext = new_layer.getExtent()
+            if layer.zoom_extent is not None:
+                ext = arcpy.Extent(*layer.zoom_extent)
+                print(ext)
+            else:
+                ext = new_layer.getExtent()
             current_dataframe.extent = ext
 
         if layer.disable_other == True:

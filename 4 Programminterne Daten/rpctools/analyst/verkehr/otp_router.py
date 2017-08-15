@@ -418,6 +418,7 @@ class OTPRouter(object):
         self.transfer_nodes = TransferNodes()
         self.transfer_nodes.areas = self.areas
         self.nodes_have_been_weighted = False
+        self.extent = (0.0, 0.0, 0.0, 0.0)
 
     def dump(self, filename):
         """write myself to dumpfile"""
@@ -680,3 +681,14 @@ class OTPRouter(object):
                 if geom:
                     rows.insertRow((node.node_id,
                                     geom))
+
+    def set_layer_extent(self):
+        coords = [tn.get_geom() for tn in self.transfer_nodes.itervalues()]
+        x_coords = [point.X for point in coords]
+        y_coords = [point.Y for point in coords]
+        x_max = max(x_coords)
+        x_min = min(x_coords)
+        y_max = max(y_coords)
+        y_min = min(y_coords)
+        self.extent = (x_min, y_min, x_max, y_max)
+

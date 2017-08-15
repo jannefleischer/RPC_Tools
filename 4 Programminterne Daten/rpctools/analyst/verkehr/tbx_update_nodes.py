@@ -105,6 +105,7 @@ class TbxUpdateNodes(Tbx):
 if __name__ == "__main__":
     t = TbxUpdateNodes()
     t.getParameterInfo()
+    print(t.par.get_projectname())
     t.execute()
 
     print 'done'
