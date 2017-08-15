@@ -21,13 +21,6 @@ class TbxUpdateNodes(Tbx):
 
 
     def _open(self, params):
-        pickle_path = self.folders.get_otp_pickle_filename(check=False)
-        if not os.path.exists(pickle_path):
-            raise Exception('Es existiert noch keine Berechnung der '
-                            'Straßenverkehrsbelastung!'
-                            'Bitte schätzen Sie zuerst die '
-                            'Straßenverkehrsbelastung, bevor Sie die '
-                            'Verkehrsbelastung neu gewichten.')
         nodes = self.query_table('Zielpunkte', ['Name'])
         nodes = [tup[0] for tup in nodes]
 
@@ -100,6 +93,16 @@ class TbxUpdateNodes(Tbx):
 
         self._opened_for_first_time = False
         return
+
+    def validate_inputs(self):
+        pickle_path = self.folders.get_otp_pickle_filename(check=False)
+        if not os.path.exists(pickle_path):
+            msg = (u'Es existiert noch keine Berechnung der '
+                   u'Straßenverkehrsbelastung! \nBitte schätzen Sie zuerst die '
+                   u'Straßenverkehrsbelastung, bevor Sie die Verkehrsbelastung'
+                   u' neu gewichten.')
+            return False, msg
+        return True, ''
 
 
 if __name__ == "__main__":
