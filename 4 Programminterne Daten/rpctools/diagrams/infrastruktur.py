@@ -116,6 +116,7 @@ class GesamtkostenDiagramm(MatplotDiagram):
         pos_idx = np.arange(len(categories))
 
         bar_width = 0.2
+        spacing = 1.05
 
         figure, ax = self.plt.subplots(figsize=(10, 6))
         self.plt.gca().invert_yaxis()
@@ -124,17 +125,17 @@ class GesamtkostenDiagramm(MatplotDiagram):
         text_offset =  max(df_costs['Euro']) * 0.01
         for i, (phase_id, group) in enumerate(grouped):
             costs = group['Euro'].values
-            ax.barh(pos_idx + i * bar_width, costs, height=bar_width,
+            ax.barh(pos_idx + i * bar_width*spacing, costs, height=bar_width,
                     align='center')
             phase_names.append(legend[group['IDKostenphase'].values[0]-1])
             for index, cost in enumerate(costs):
                 ax.text(cost + text_offset,
-                        pos_idx[index] + i * bar_width + 0.1*bar_width,
+                        pos_idx[index] + i * bar_width * spacing + 0.1*bar_width,
                         str(int(round(cost, 0))) + u' €', color='black')
 
 
         ax.tick_params(axis='both', which='major', labelsize=9)
-        ax.set_yticks(pos_idx + bar_width)
+        ax.set_yticks(pos_idx + bar_width*spacing)
         ax.set_yticklabels(categories)
         ax.set_title(self.title)
         ax.set_xlabel(x_label)
