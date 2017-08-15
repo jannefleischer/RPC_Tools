@@ -25,7 +25,7 @@ class _TbxEinnahmen(Tbx):
 
         param_1 = params.name = arcpy.Parameter()
         param_1.name = u'Projektname'
-        param_1.displayName = u'Projektname'
+        param_1.displayName = u'Projekt'
         param_1.parameterType = 'Required'
         param_1.direction = 'Input'
         param_1.datatype = u'GPString'

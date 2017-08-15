@@ -26,7 +26,7 @@ class TbxBodenbedeckungbeschreiben(Tbx):
         # Projekt_auswählen
         param = params.projectname = arcpy.Parameter()
         param.name = u'Projektname'
-        param.displayName = u'Projektname'
+        param.displayName = u'Projekt'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'

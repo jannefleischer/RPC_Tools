@@ -27,7 +27,7 @@ class TbxWohnflaeche(Tbx):
         # Projekt_auswählen
         par.name = arcpy.Parameter()
         par.name.name = u'Projektname'
-        par.name.displayName = u'Projektname'
+        par.name.displayName = u'Projekt'
         par.name.parameterType = 'Required'
         par.name.direction = 'Input'
         par.name.datatype = u'GPString'

@@ -27,12 +27,12 @@ class TbxBodenBewertung(Tbx):
         # Projekt_auswählen
         param = params.name = arcpy.Parameter()
         param.name = u'Projektname'
-        param.displayName = u'Projektname'
+        param.displayName = u'Projekt'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-		
-		
+
+
         param = params.quelle = arcpy.Parameter()
         param.name = u'Quelle'
         param.displayName = u'Quelle der Bodenbedeckungsanteile bestimmen'
@@ -176,7 +176,7 @@ class TbxBodenBewertung(Tbx):
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
-		
+
         heading = encode("Bodenbedeckung Planfall")
 
         param = params.ueberbauteflaechen_neu = arcpy.Parameter()
@@ -299,7 +299,7 @@ class TbxBodenBewertung(Tbx):
         param.filter.type = 'Range'
         param.filter.list = [0, 100]
         param.category = heading
-		
+
         param = params.undefiniert_neu = arcpy.Parameter()
         param.name = u'undefiniert_neu'
         param.displayName = u'Undefinierte Fläche'
@@ -394,18 +394,18 @@ class TbxBodenBewertung(Tbx):
 				lib_oeko.import_zeichenanteile(projektname)
 
         return
-		
+
 
     def _updateParameters(self, params):
 
         if params.name.altered and not params.name.hasBeenValidated:
                 self.eingaben_auslesen("manuell")
 				params.quelle.value == "Bodenbedeckungsanteile manuell festlegen"
-				
+
         if params.quelle.altered and not params.name.hasBeenValidated:
                 if params.quelle.value == "Bodenbedeckungsanteile aus Zeichnungen importieren":
 					self.eingaben_auslesen("zeichnung")
-				
+
         listeSliderID = ['ueberbauteflaechen_alt',
                          'wasser_alt',
                          'platten_alt',
@@ -477,7 +477,7 @@ class TbxBodenEntfernen(Tbx):
         # Projekt_auswählen
         param = params.name = arcpy.Parameter()
         param.name = u'Projektname'
-        param.displayName = u'Projektname'
+        param.displayName = u'Projekt'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
@@ -502,7 +502,7 @@ class TbxBodenAnzeigen(Tbx):
         # Projekt_auswählen
         param = params.name = arcpy.Parameter()
         param.name = u'Projektname'
-        param.displayName = u'Projektname'
+        param.displayName = u'Projekt'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'

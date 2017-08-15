@@ -32,7 +32,7 @@ class TbxBodenKontrolle(Tbx):
         # Projekt_auswählen
         param = params.name = arcpy.Parameter()
         param.name = u'Projektname'
-        param.displayName = u'Projektname'
+        param.displayName = u'Projekt'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
@@ -443,7 +443,7 @@ class TbxBodenEntfernen(Tbx):
         # Projekt_auswählen
         param = params.name = arcpy.Parameter()
         param.name = u'Projektname'
-        param.displayName = u'Projektname'
+        param.displayName = u'Projekt'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
@@ -468,7 +468,7 @@ class TbxBodenAnzeigen(Tbx):
         # Projekt_auswählen
         param = params.name = arcpy.Parameter()
         param.name = u'Projektname'
-        param.displayName = u'Projektname'
+        param.displayName = u'Projekt'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
