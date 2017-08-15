@@ -682,7 +682,6 @@ class Output(object):
         if layer.zoom:
             if layer.zoom_extent is not None:
                 ext = arcpy.Extent(*layer.zoom_extent)
-                print(ext)
             else:
                 ext = new_layer.getExtent()
             current_dataframe.extent = ext
