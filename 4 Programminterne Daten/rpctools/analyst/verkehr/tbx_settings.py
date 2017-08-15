@@ -109,7 +109,9 @@ class TbxSettings(Tbx):
     def round_param(self, value):
         if value >= 10000:
             return round(value, -3)
-        return round(value, -2)
+        elif value >= 1000:
+            return round(value, ndigits=-2)
+        return round(value, -1)
 
     def _open(self, params):
         # get values from fgdb
