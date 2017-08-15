@@ -101,7 +101,7 @@ class Zensus(object):
         for zensus_cell in zensus_points:
             if not kk_indices.has_key(zensus_cell.id):
                 continue
-            kk_index = kk_indices[zensus_cell.id]
+            kk_index = default_kk_index  #kk_indices[zensus_cell.id]
             if kk_index is None:
                 kk_index = default_kk_index
             zensus_cell.kk_index = kk_index

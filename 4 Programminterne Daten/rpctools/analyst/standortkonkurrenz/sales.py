@@ -101,10 +101,7 @@ class Sales(object):
             arcpy.AddMessage('DEBUG: Berechnung')
             
         # include competition between same market types in attraction_matrix
-        attraction_matrix = pd.DataFrame(
-            data=attraction_matrix.values * competitor_matrix.values,
-            columns=attraction_matrix.columns,
-            index=attraction_matrix.index)
+        attraction_matrix *= competitor_matrix.values
         
         probabilities = attraction_matrix / attraction_matrix.sum(axis=0)
         kk_flow = probabilities * kk_matrix
@@ -272,7 +269,7 @@ class Sales(object):
                 return idx
 
             # exp. factors
-            df_exp_gr_klasse = df_exponential_parameters[
+            df_exp_gr_klasse = df_exponential_parameters[ 
                 df_exponential_parameters['gem_groessenklasse'] == gr_klasse]
             idx = get_entry_idx(df_exp_gr_klasse, id_kette, id_betriebstyp)
             entry = df_exp_gr_klasse[idx]
