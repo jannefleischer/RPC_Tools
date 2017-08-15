@@ -6,7 +6,7 @@ from rpctools.addins.outputs import MaerkteAnzeigen, ZentrenAnzeigen
 
 __all__ = [
     "BestandOSMEinlesen", "TemplateErzeugen",
-    "TemplateEinlesenDatei", "TemplateEinlesenFeatureClass", 
+    "TemplateEinlesenDatei", "TemplateEinlesenFeatureClass",
     "MarktBearbeiten", "MarktHinzu", "BestandMarktBearbeiten",
     "PlanfallMarktBearbeiten", "BestandMarktHinzu",
     "PlanfallMarktHinzu", "PlanfallMarktErweiterung",
@@ -44,7 +44,7 @@ class TemplateEinlesenFeatureClass(ToolboxButton):
 class MaerkteZentrenAnzeigen(object):
     def __init__(self):
         self.outputs = [MaerkteAnzeigen(), ZentrenAnzeigen()]
-        
+
     def onClick(self, coord=None):
         for o in self.outputs:
             o.show()
@@ -61,7 +61,7 @@ class MarktBearbeiten(ToolboxButton):
         self.shape = 'NONE'
         self.cursor = 3
         self.output = MaerkteAnzeigen()
-        
+
     def onClick(self, coord=None):
         self.output.show()
         self.show_message()
@@ -75,7 +75,12 @@ class MarktHinzu(MarktBearbeiten):
     '''does the same thing as MarktBearbeiten except adding a market at
     click position before opening toolbox'''
     _new_market_name = ''
-    
+    _message = (u'Klicken Sie nach dem Schließen dieser Meldung an die Stelle '
+                u'in der Karte, an der Sie einen bestehenden Lebensmittelmarkt'
+                u'hinzufügen möchten. Warten Sie anschließend bis sich ein '
+                u'Dialogfenster öffnet, in das Sie den Namen und den Typ des '
+                u'Marktes eintragen können.')
+
     def onMouseDownMap(self, x, y, button, shift):
         tbx = self.tbx
         tbx.set_active_project()
@@ -150,7 +155,7 @@ class ZentrumBearbeiten(ToolboxButton):
         self.shape = 'NONE'
         self.cursor = 3
         self.output = ZentrenAnzeigen()
-        
+
     def onClick(self, coord=None):
         self.output.show()
         self.show_message()
@@ -176,17 +181,17 @@ class ZentrumHinzu(ZentrumBearbeiten):
                 u'Supermärkte > Versorgungsbereiche > Versorgungsbereiche '
                 u'bearbeiten / entfernen" können Sie bereits gezeichnete '
                 u'Versorgungsbereiche (um)benennen oder löschen.')
-    
+
     def __init__(self):
         super(ZentrumHinzu, self).__init__()
         self.shape = 'Line'
-        
+
     def onLine(self, line_geometry):
         tbx = self.tbx
         tbx.set_active_project()
         array = arcpy.Array()
-        points = line_geometry.getPart(0)  
-        for point in points:  
+        points = line_geometry.getPart(0)
+        for point in points:
             array.add(point)
         first = line_geometry.firstPoint
         array.add(first)
@@ -196,7 +201,7 @@ class ZentrumHinzu(ZentrumBearbeiten):
         #config.active_coord = (first.X, first.Y)
         #super(ZentrumBearbeiten, self).onClick()
 
-    def onMouseDownMap(self, x, y, button, shift): 
+    def onMouseDownMap(self, x, y, button, shift):
         pass
 
 

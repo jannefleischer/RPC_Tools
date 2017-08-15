@@ -13,7 +13,7 @@ __all__ = [
     "KanalMischsystem", "KanalNurSchmutzwasser", "KanalTrennsystem",
     "Trinkwasserleitung", "Stromleitung",
     "NetzabschnittLoeschen",
-    "InfrastrukturmengenBilanzieren", "GesamtkostenErmitteln", 
+    "InfrastrukturmengenBilanzieren", "GesamtkostenErmitteln",
     "KostenNachKostentraegernAuswerten", "KostenProWEBzwAPVergleichen",
     "KostenkennwerteKontrollieren", "Kostenaufteilung",
     "PunktMassnahmeHinzu", "PunktMassnahmeBearbeiten"
@@ -39,8 +39,8 @@ class InfrastructureDrawingTool(object):
     def onClick(self):
         self.output.show()
         self.show_message()
-    
-    def show_message(self): 
+
+    def show_message(self):
         if self._message:
             pythonaddins.MessageBox(self._message, 'Hinweis', 0)
 
@@ -208,6 +208,11 @@ class PunktMassnahmeBearbeiten(ToolboxButton):
 
 
 class PunktMassnahmeHinzu(PunktMassnahmeBearbeiten):
+    _message = (u'Klicken Sie nach dem Schließen dieser Meldung in die Karte '
+                u'um die Lage der punktuellen Maßnahme festzulegen.\nWarten '
+                u'Sie anschließend bis sich ein Dialogfenster öffnet, mit dem '
+                u'Sie festlegen können, zu welchem Netz die Maßnahme gehört'
+                u'und welche Kosten mit ihr verbunden sind.')
 
     def onMouseDownMap(self, x, y, button, shift):
         tbx = self.tbx
@@ -246,7 +251,7 @@ class NetzabschnittLoeschen(InfrastructureDrawingTool):
                 u'teilweise innerhalb dieses Rechtecks liegen werden gelöscht. '
                 u'Punktuelle Maßnahmen innerhalb des Rechtecks werden nicht '
                 u'gelöscht.')
-    
+
     def __init__(self):
         super(NetzabschnittLoeschen, self).__init__()
         self.shape = "Rectangle"
