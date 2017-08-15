@@ -121,16 +121,20 @@ class GesamtkostenDiagramm(MatplotDiagram):
         self.plt.gca().invert_yaxis()
         grouped = df_costs.groupby(by='IDKostenphase')
         phase_names = []
+        text_offset =  max(df_costs['Euro']) * 0.01
         for i, (phase_id, group) in enumerate(grouped):
-            costs = group['Euro']
+            costs = group['Euro'].values
             ax.barh(pos_idx + i * bar_width, costs, height=bar_width,
                     align='center')
             phase_names.append(legend[group['IDKostenphase'].values[0]-1])
-            ax.text(costs + 10000, pos_idx + i * bar_width , str(int(round(group['Euro'].values[0], 0))) + u' €', color='black')
+            for index, cost in enumerate(costs):
+                ax.text(cost + text_offset,
+                        pos_idx[index] + i * bar_width + 0.1*bar_width,
+                        str(int(round(cost, 0))) + u' €', color='black')
 
 
         ax.tick_params(axis='both', which='major', labelsize=9)
-        ax.set_yticks(pos_idx + bar_width / 3)
+        ax.set_yticks(pos_idx + bar_width)
         ax.set_yticklabels(categories)
         ax.set_title(self.title)
         ax.set_xlabel(x_label)
@@ -294,12 +298,12 @@ if __name__ == "__main__":
     #diagram = KostentraegerDiagramm()
     #diagram.create()
     #diagram.show()
-    diagram = MassnahmenKostenDiagramm()
-    diagram.create()
-    diagram.show()
+    #diagram = MassnahmenKostenDiagramm()
+    #diagram.create()
+    #diagram.show()
     #diagram = NetzlaengenDiagramm()
     #diagram.create()
     #diagram.show()
-    #diagram = GesamtkostenDiagramm()
-    #diagram.create()
-    #diagram.show()
+    diagram = GesamtkostenDiagramm()
+    diagram.create()
+    diagram.show()
