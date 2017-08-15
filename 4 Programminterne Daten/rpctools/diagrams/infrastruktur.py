@@ -261,8 +261,14 @@ class VegleichsDiagramm(MatplotDiagram):
         figure, ax = self.plt.subplots(figsize=(9, 4))
         y_pos = np.arange(len(categories))
 
-        ax.barh(y_pos, [reference, costs_per_x], height=0.3, align='center',
+        text_offset = max([reference, costs_per_x]) * 0.02
+        bar_width = 0.5
+        ax.barh(y_pos, [reference, costs_per_x], height=bar_width, align='center',
                 color=[ '#99aaff', '#2c64ff'])
+        ax.text(reference + text_offset, y_pos[0] - 0.02,
+                str(int(round(reference, 0))) + u' €', color='black', bbox=dict(facecolor='white', edgecolor='white', boxstyle="round"))
+        ax.text(costs_per_x + text_offset, y_pos[1] - 0.02,
+                str(int(round(costs_per_x, 0))) + u' €', color='black', bbox=dict(facecolor='white', edgecolor='white', boxstyle="round"))
 
         ax.tick_params(axis='both', which='major', labelsize=9)
         ax.set_yticks(y_pos)
@@ -272,6 +278,8 @@ class VegleichsDiagramm(MatplotDiagram):
         ax.xaxis.set_major_formatter(mticker.FormatStrFormatter(u'%d €'))
         ax.xaxis.grid(True, which='major')
         box = ax.get_position()
+        x_min, x_max = ax.get_xlim()
+        ax.set_xlim(0.0, x_max*1.1)
         ax.set_position([box.x0 + box.width * 0.2, box.y0,
                          box.width * 0.8, box.height])
         return ax
@@ -290,9 +298,9 @@ class VergleichAPDiagramm(VegleichsDiagramm):
 
 
 if __name__ == "__main__":
-    #diagram = VergleichAPDiagramm()
-    #diagram.create()
-    #diagram.show()
+    diagram = VergleichAPDiagramm()
+    diagram.create()
+    diagram.show()
     #diagram = VergleichWEDiagramm()
     #diagram.create()
     #diagram.show()
@@ -305,6 +313,6 @@ if __name__ == "__main__":
     #diagram = NetzlaengenDiagramm()
     #diagram.create()
     #diagram.show()
-    diagram = GesamtkostenDiagramm()
-    diagram.create()
-    diagram.show()
+    #diagram = GesamtkostenDiagramm()
+    #diagram.create()
+    #diagram.show()
