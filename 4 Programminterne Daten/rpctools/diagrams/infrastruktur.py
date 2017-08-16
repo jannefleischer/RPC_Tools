@@ -116,23 +116,25 @@ class GesamtkostenDiagramm(MatplotDiagram):
         pos_idx = np.arange(len(categories))
 
         bar_width = 0.2
-        spacing = 1.05
+        spacing = 1.15
 
         figure, ax = self.plt.subplots(figsize=(10, 6))
         self.plt.gca().invert_yaxis()
         grouped = df_costs.groupby(by='IDKostenphase')
         phase_names = []
-        text_offset =  max(df_costs['Euro']) * 0.01
+
+        text_offset =  max(df_costs['Euro']) * 0.07
         for i, (phase_id, group) in enumerate(grouped):
             costs = group['Euro'].values
-            ax.barh(pos_idx + i * bar_width*spacing, costs, height=bar_width,
-                    align='center')
+            patches = ax.barh(pos_idx + i * bar_width * spacing, costs,
+                              height=bar_width, align='center')
             phase_names.append(legend[group['IDKostenphase'].values[0]-1])
-            for index, cost in enumerate(costs):
-                ax.text(cost + text_offset,
-                        pos_idx[index] + i * bar_width * spacing + 0.1*bar_width,
-                        str(int(round(cost, 0))) + u' €', color='black')
 
+            for index, patch in enumerate(patches):
+                width = patch.get_width()
+                ax.text(width + text_offset,
+                        pos_idx[index] + i * bar_width * spacing,
+                        '%d' % int(width) + u' €', ha='center', va='center')
 
         ax.tick_params(axis='both', which='major', labelsize=9)
         ax.set_yticks(pos_idx + bar_width*spacing)
@@ -158,7 +160,6 @@ class GesamtkostenDiagramm(MatplotDiagram):
 
 class KostentraegerDiagramm(MatplotDiagram):
     colors = ['#005CE6', '#002673', '#894444', '#73FFDF', '#FFFF00']
-
     def _create(self, **kwargs):
         workspace = 'FGDB_Kosten.gdb'
         table = 'Gesamtkosten_nach_Traeger'
@@ -188,12 +189,24 @@ class KostentraegerDiagramm(MatplotDiagram):
         colors = self.colors  #self.plt.cm.Paired(np.linspace(0, 1, len(df_shares)))
 
         summed = np.zeros(len(cols))
+
         for j, (index, net_share) in enumerate(df_shares.iterrows()):
             data = []
             for i, col in enumerate(cols):
                 data.append(net_share[col])
-            ax.barh(pos_idx, data, left=summed, height=bar_width, color=colors[j])
+            patches = ax.barh(pos_idx, data, left=summed, height=bar_width, color=colors[j])
             summed += data
+
+        # Anfang: Balken beschriften
+        text_offset = max(summed) * 0.02
+        for i, patch in enumerate(patches.get_children()):
+            width = patch.get_x() + patch.get_width()
+            y_pos = patch.get_y()
+            print y_pos
+            ax.text(width + text_offset, i, str(round(width, 0)) + u' €', color='black',ha='left', va='center')  #, bbox=dict(facecolor='white', edgecolor='white', boxstyle="round"))
+        x_min, x_max = ax.get_xlim()
+        ax.set_xlim(x_min, x_max * 1.2)
+        # Ende: Balken beschriften
 
         ax.tick_params(axis='both', which='major', labelsize=9)
         ax.set_yticks(pos_idx)
@@ -260,16 +273,18 @@ class VegleichsDiagramm(MatplotDiagram):
 
         figure, ax = self.plt.subplots(figsize=(9, 4))
         y_pos = np.arange(len(categories))
-
-        text_offset = max([reference, costs_per_x]) * 0.02
         bar_width = 0.5
-        ax.barh(y_pos, [reference, costs_per_x], height=bar_width, align='center',
-                color=[ '#99aaff', '#2c64ff'])
+        ax.barh(y_pos, [reference, costs_per_x], height=bar_width,
+                align='center')  #, color=[ '#99aaff', '#2c64ff'])
+        # Anfang: Balken beschriften
+        text_offset = max([reference, costs_per_x]) * 0.02
         ax.text(reference + text_offset, y_pos[0] - 0.02,
-                str(int(round(reference, 0))) + u' €', color='black', bbox=dict(facecolor='white', edgecolor='white', boxstyle="round"))
+                str(int(round(reference, 0))) + u' €', color='black')
         ax.text(costs_per_x + text_offset, y_pos[1] - 0.02,
-                str(int(round(costs_per_x, 0))) + u' €', color='black', bbox=dict(facecolor='white', edgecolor='white', boxstyle="round"))
-
+                str(int(round(costs_per_x, 0))) + u' €', color='black')
+        x_min, x_max = ax.get_xlim()
+        ax.set_xlim(x_min, x_max*1.1)
+        # Ende: Balken beschriften
         ax.tick_params(axis='both', which='major', labelsize=9)
         ax.set_yticks(y_pos)
         ax.set_yticklabels(categories)
@@ -278,8 +293,6 @@ class VegleichsDiagramm(MatplotDiagram):
         ax.xaxis.set_major_formatter(mticker.FormatStrFormatter(u'%d €'))
         ax.xaxis.grid(True, which='major')
         box = ax.get_position()
-        x_min, x_max = ax.get_xlim()
-        ax.set_xlim(0.0, x_max*1.1)
         ax.set_position([box.x0 + box.width * 0.2, box.y0,
                          box.width * 0.8, box.height])
         return ax
@@ -298,15 +311,15 @@ class VergleichAPDiagramm(VegleichsDiagramm):
 
 
 if __name__ == "__main__":
-    diagram = VergleichAPDiagramm()
-    diagram.create()
-    diagram.show()
+    #diagram = VergleichAPDiagramm()
+    #diagram.create()
+    #diagram.show()
     #diagram = VergleichWEDiagramm()
     #diagram.create()
     #diagram.show()
-    #diagram = KostentraegerDiagramm()
-    #diagram.create()
-    #diagram.show()
+    diagram = KostentraegerDiagramm()
+    diagram.create()
+    diagram.show()
     #diagram = MassnahmenKostenDiagramm()
     #diagram.create()
     #diagram.show()
