@@ -8,7 +8,6 @@ from textwrap import wrap
 
 
 class NetzlaengenDiagramm(MatplotDiagram):
-
     def _create(self, **kwargs):
         line_table = 'Erschliessungsnetze_Linienelemente'
         self.title = (u"{}: Länge der zusätzlichen Infrastrukturnetze "
@@ -38,7 +37,20 @@ class NetzlaengenDiagramm(MatplotDiagram):
         figure, ax = self.plt.subplots(figsize=(10, 5))
         ax.tick_params(axis='both', which='major', labelsize=9)
         y_pos = np.arange(len(categories))
-        ax.barh(y_pos, lengths, height=0.3, align='center')
+        bar_width = 0.5
+        patches = ax.barh(y_pos, lengths, height=bar_width, align='center')
+        # Anfang Barlabels
+        text_offset = max([patch.get_x() + patch.get_width() for patch in
+                           patches.get_children()]) * 0.02
+        for i, patch in enumerate(patches.get_children()):
+                    width = patch.get_x() + patch.get_width()
+                    y = patch.get_y()
+                    ax.text(width + text_offset, y + bar_width/2,
+                            str(int(round(width, 0))) + u' €',
+                            color='black',ha='left', va='center')
+        x_min, x_max = ax.get_xlim()
+        ax.set_xlim(x_min, x_max * 1.2)
+        # Ende Barlabels
         ax.set_yticks(y_pos)
         ax.set_yticklabels(categories)
         ax.set_title(self.title)
@@ -79,8 +91,19 @@ class MassnahmenKostenDiagramm(MatplotDiagram):
 
         figure, ax = self.plt.subplots(figsize=(10, 5))
         y_pos = np.arange(len(categories))
-        ax.barh(y_pos, costs, height=0.3, align='center')
-        ax.tick_params(axis='both', which='major', labelsize=9)
+        bar_width = 0.5
+        patches = ax.barh(y_pos, costs, height=bar_width, align='center')
+        text_offset = max([patch.get_x() + patch.get_width() for patch in
+                           patches.get_children()]) * 0.02
+        for i, patch in enumerate(patches.get_children()):
+            width = patch.get_x() + patch.get_width()
+            print(width)
+            y = patch.get_y() + bar_width / 2
+            ax.text(width + text_offset, y, str(round(width, 0)) + u' €', color='black',ha='left', va='center')  #, bbox=dict(facecolor='white', edgecolor='white', boxstyle="round"))
+        x_min, x_max = ax.get_xlim()
+        ax.set_xlim(x_min, x_max * 1.2)
+
+
         ax.set_yticks(y_pos)
         ax.set_yticklabels(categories)
         ax.set_title(self.title)
@@ -198,14 +221,14 @@ class KostentraegerDiagramm(MatplotDiagram):
             summed += data
 
         # Anfang: Balken beschriften
-        text_offset = max(summed) * 0.02
+        text_offset = max([patch.get_x() + patch.get_width() for patch in patches]) * 0.02
         for i, patch in enumerate(patches.get_children()):
             width = patch.get_x() + patch.get_width()
             y_pos = patch.get_y()
-            print y_pos
             ax.text(width + text_offset, i, str(round(width, 0)) + u' €', color='black',ha='left', va='center')  #, bbox=dict(facecolor='white', edgecolor='white', boxstyle="round"))
         x_min, x_max = ax.get_xlim()
         ax.set_xlim(x_min, x_max * 1.2)
+
         # Ende: Balken beschriften
 
         ax.tick_params(axis='both', which='major', labelsize=9)
@@ -274,17 +297,20 @@ class VegleichsDiagramm(MatplotDiagram):
         figure, ax = self.plt.subplots(figsize=(9, 4))
         y_pos = np.arange(len(categories))
         bar_width = 0.5
-        ax.barh(y_pos, [reference, costs_per_x], height=bar_width,
+        patches = ax.barh(y_pos, [reference, costs_per_x], height=bar_width,
                 align='center')  #, color=[ '#99aaff', '#2c64ff'])
-        # Anfang: Balken beschriften
-        text_offset = max([reference, costs_per_x]) * 0.02
-        ax.text(reference + text_offset, y_pos[0] - 0.02,
-                str(int(round(reference, 0))) + u' €', color='black')
-        ax.text(costs_per_x + text_offset, y_pos[1] - 0.02,
-                str(int(round(costs_per_x, 0))) + u' €', color='black')
+        # Anfang Barlabels
+        text_offset = max([patch.get_x() + patch.get_width() for patch in
+                           patches.get_children()]) * 0.02
+        for i, patch in enumerate(patches.get_children()):
+                    width = patch.get_x() + patch.get_width()
+                    y = patch.get_y()
+                    ax.text(width + text_offset, y + bar_width/2,
+                            str(int(round(width, 0))) + u' €',
+                            color='black',ha='left', va='center')
         x_min, x_max = ax.get_xlim()
-        ax.set_xlim(x_min, x_max*1.1)
-        # Ende: Balken beschriften
+        ax.set_xlim(x_min, x_max * 1.2)
+        # Ende Barlabels
         ax.tick_params(axis='both', which='major', labelsize=9)
         ax.set_yticks(y_pos)
         ax.set_yticklabels(categories)
@@ -311,15 +337,15 @@ class VergleichAPDiagramm(VegleichsDiagramm):
 
 
 if __name__ == "__main__":
-    #diagram = VergleichAPDiagramm()
-    #diagram.create()
-    #diagram.show()
+    diagram = VergleichAPDiagramm()
+    diagram.create()
+    diagram.show()
     #diagram = VergleichWEDiagramm()
     #diagram.create()
     #diagram.show()
-    diagram = KostentraegerDiagramm()
-    diagram.create()
-    diagram.show()
+    #diagram = KostentraegerDiagramm()
+    #diagram.create()
+    #diagram.show()
     #diagram = MassnahmenKostenDiagramm()
     #diagram.create()
     #diagram.show()
