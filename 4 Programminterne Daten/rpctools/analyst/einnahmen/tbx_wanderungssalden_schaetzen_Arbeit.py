@@ -8,7 +8,7 @@ from rpctools.utils.constants import Nutzungsart
 from rpctools.analyst.einnahmen.script_Wanderungssalden_schaetzen_Arbeit import Wanderungssalden2
 
 class TbxWanderungssalden2(Tbx):
-    """Toolbox Wanderungssalden für Einnahmen"""
+    """Toolbox Wanderungssalden für Beschäftigte"""
 
     @property
     def label(self):

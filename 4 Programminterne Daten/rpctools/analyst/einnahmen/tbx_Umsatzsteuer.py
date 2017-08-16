@@ -36,7 +36,7 @@ class TbxUmsatzsteuer(Tbx):
     def _updateMessages(self, params):
 
         par = self.par
-
+        table = self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=par.name.value)
 
         cursor = self.query_table(table_name = 'Chronik_Nutzung',
                                 columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
@@ -47,7 +47,6 @@ class TbxUmsatzsteuer(Tbx):
             elif row[0] == u"Gewerbesteuer" and c.compare_chronicle("Gewerbesteuer", "Wanderung Beschaeftigte", table) == False:
                 par.name.setErrorMessage(u'Es muss zunächst die Gewerbesteuer (erneut berechnet) werden!')
 
-        table = self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=par.name.value)
         vergleich = c.compare_chronicle(u"Gewerbesteuer", u"Wanderung Beschaeftigte", table)
         if not vergleich:
             par.name.setErrorMessage(u'Die Gewerbesteuer muss zuerst (erneut) berechnet werden!')

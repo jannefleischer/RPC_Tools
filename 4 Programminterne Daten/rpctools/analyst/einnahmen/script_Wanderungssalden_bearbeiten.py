@@ -25,28 +25,28 @@ class Salden_bearbeiten(Tool):
         saldo = self.par.saldo.value
         target_gemeinde = self.par.gemeinde.value
         target_gemeinde_kurz = target_gemeinde.split(" ||")[0]
-
         workspace_projekt_einnahmen = self.folders.get_db('FGDB_Einnahmen.gdb', projektname)
         wanderungssalden = os.path.join(workspace_projekt_einnahmen, 'Gemeindebilanzen')
 
+        fields = ["GEN", self.parent_tbx._saldo_field]
         for key in self.parent_tbx.gemeinden_dict:
-            fields = ["GEN", self.parent_tbx._saldo_field]
             where_clause = '"GEN"' + "='" + key + "'"
             cursor = arcpy.da.UpdateCursor(wanderungssalden, fields, where_clause)
             for gemeinde in cursor:
-                gemeinde[1] = self.parent_tbx.gemeinden_dict[key]
-                cursor.updateRow(gemeinde)
+                    gemeinde[1] = self.parent_tbx.gemeinden_dict[key]
+                    cursor.updateRow(gemeinde)
 
-            if self.parent_tbx._saldo_field == "SvB_Saldo":
-                zuzugsstatistik = "Zuzugsstatistik_SvB"
-            else:
-                zuzugsstatistik = "Zuzugsstatistik_Ew"
-            table_zuzugsstatistik = self.folders.get_table(zuzugsstatistik, 'FGDB_Einnahmen.gdb')
-            where_zuzug = 'NOT "Kategorie"' + "='" + 'Projektgemeinde/Region' + "'"
-            fields_zuzug = ["Kategorie", "Anzahl"]
-            cursor = arcpy.da.UpdateCursor(table_zuzugsstatistik, fields_zuzug, where_zuzug)
-            for row in cursor:
-                row[1] = abs(self.parent_tbx.gemeinden_dict[row[0]])
+        if self.parent_tbx._saldo_field == "SvB_Saldo":
+            zuzugsstatistik = "Zuzugsstatistik_SvB"
+        else:
+            zuzugsstatistik = "Zuzugsstatistik_Ew"
+        table_zuzugsstatistik = self.folders.get_table(zuzugsstatistik, 'FGDB_Einnahmen.gdb')
+        where_zuzug = 'NOT "Kategorie"' + "='" + 'Projektgemeinde/Region' + "'"
+        fields_zuzug = ["Kategorie", "Anzahl"]
+        cursor = arcpy.da.UpdateCursor(table_zuzugsstatistik, fields_zuzug, where_zuzug)
+        for row in cursor:
+            row[1] = abs(self.parent_tbx.gemeinden_dict[row[0]])
+            cursor.updateRow(row)
 
         # Bestimme AGS der Projektgemeinde
         if self.par.kontrolle.value == True:
@@ -69,7 +69,7 @@ class Salden_bearbeiten(Tool):
             fields = ['AGS', self.parent_tbx._saldo_field, wanderungsanteil]
             cursor = arcpy.da.UpdateCursor(wanderungssalden, fields)
 
-            for x in range(0,3):
+            for x in range(0,2):
                 saldo_summe = 0.0
 
                 fields_saldo = [self.parent_tbx._saldo_field]
@@ -80,32 +80,28 @@ class Salden_bearbeiten(Tool):
                 for row in cursor_zuzug:
                     saldo_summe -= row[1]
 
+                arcpy.AddMessage("Saldo_Summe: " + str(saldo_summe))
                 if saldo_summe  == 0:
                     break
-                arcpy.AddMessage("Saldo_Summe: " + str(saldo_summe))
 
                 if saldo_summe < 0:
                     if plangebiet_saldo_changed == True:
-                        #arcpy.AddMessage("Step 1")
                         for gemeinde in cursor:
                             if gemeinde[0] != ags:
                                 gemeinde[1] -= saldo_summe * gemeinde[2]
                             cursor.updateRow(gemeinde)
                     else:
-                        #arcpy.AddMessage("Step 2")
                         for gemeinde in cursor:
                             if gemeinde[0] == ags:
                                 gemeinde[1] -= saldo_summe
                             cursor.updateRow(gemeinde)
                 elif saldo_summe > 0:
                     if plangebiet_saldo_changed == True:
-                        #arcpy.AddMessage("Step 3")
                         for gemeinde in cursor:
                             if gemeinde[0] != ags:
                                 gemeinde[1] -= saldo_summe * gemeinde[2]
                             cursor.updateRow(gemeinde)
                     else:
-                        #arcpy.AddMessage("Step 4")
                         for gemeinde in cursor:
                             if gemeinde[0] == ags:
                                 gemeinde[1] -= saldo_summe

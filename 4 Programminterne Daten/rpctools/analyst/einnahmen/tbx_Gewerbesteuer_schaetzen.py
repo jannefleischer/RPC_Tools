@@ -7,7 +7,7 @@ from rpctools.utils.encoding import encode
 from rpctools.analyst.einnahmen.script_Gewerbesteuer_schaetzen import Gewerbesteuer
 
 class TbxGewerbesteuer(Tbx):
-    """ToolboxGewerbesteuer"""
+    """Toolbox Gewerbesteuer"""
 
     @property
     def label(self):

@@ -8,7 +8,7 @@ from rpctools.analyst.einnahmen.script_Familienleistungsausgleich import Familie
 import rpctools.utils.chronik as c
 
 class TbxFLA(Tbx):
-    """Toolbox Wanderungssalden für Einnahmen"""
+    """Toolbox Familienleistungsausgleich"""
 
     @property
     def label(self):

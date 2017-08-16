@@ -59,5 +59,5 @@ class Familienleistungsausgleich(Tool):
             gemeinde[0] = FLA_Gemeindebilanz
             cursor.updateRow(gemeinde)
 
-        c.set_chronicle("Einkommensteuer", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
+        c.set_chronicle("Familienleistungsausgleich", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
 

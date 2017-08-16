@@ -16,7 +16,7 @@ def get_values(spalte, projekt):
 
 def get_symbology(gemeindewerte, vorzeichen):
 
-    #gemeinde_values = gemeindewerte
+    gemeinde_values = gemeindewerte
     gemeinde_values = [value for value in gemeindewerte if value != 0]
     anzahl_gemeinden = len(gemeinde_values)
     if anzahl_gemeinden > 0:

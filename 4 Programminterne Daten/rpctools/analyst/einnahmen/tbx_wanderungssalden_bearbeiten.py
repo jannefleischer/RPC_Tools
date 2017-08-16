@@ -168,7 +168,7 @@ class TbxSaldenbearbeiten(Tbx):
 
 
 class TbxEWSaldenbearbeiten(TbxSaldenbearbeiten):
-    """Toolbox Wanderungssalden für Einnahmen Wohnen"""
+    """Toolbox Wanderungssalden bearbeiten für Einwohner"""
     _nutzungsart = Nutzungsart.WOHNEN
     _saldo_field = "Einw_Saldo"
     _table = 'Zuzugsstatistik_Ew'
@@ -183,7 +183,7 @@ class TbxEWSaldenbearbeiten(TbxSaldenbearbeiten):
 
 
 class TbxGewSaldenbearbeiten(TbxSaldenbearbeiten):
-    """Toolbox Wanderungssalden für Einnahmen Gewerbe"""
+    """Toolbox Wanderungssalden bearbeiten Beschäftigte"""
     _nutzungsart = Nutzungsart.GEWERBE
     _saldo_field = "SvB_Saldo"
     _table = 'Zuzugsstatistik_SvB'

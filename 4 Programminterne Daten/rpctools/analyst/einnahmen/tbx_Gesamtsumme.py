@@ -8,7 +8,7 @@ from rpctools.analyst.einnahmen.script_Gesamtsumme import Gesamtsumme
 import rpctools.utils.chronik as c
 
 class TbxGesamtsumme(Tbx):
-    """Toolbox TbxGesamtsumme für Einnahmen"""
+    """Toolbox Gesamtsumme der Einnahmen """
 
     @property
     def label(self):
@@ -44,13 +44,6 @@ class TbxGesamtsumme(Tbx):
 
     def _updateParameters(self, params):
         par = self.par
-        anzahl_bestandteile = 0
-        self.spalten = ["Summe_Einnahmenbilanz"]
-        grundsteuer = ""
-        einkommensteuer = ""
-        fla = ""
-        gewerbesteuer = ""
-        umsatzsteuer = ""
 
         wohnen_vorhanden = False
         gewerbe_oder_einzelhandel_vorhanden = False
@@ -67,10 +60,13 @@ class TbxGesamtsumme(Tbx):
 
         if wohnen_vorhanden and gewerbe_oder_einzelhandel_vorhanden:
             bestandteile = "Grundsteuer + Einkommensteuer + Familienleistungsausgleich + Gewerbesteuer + Umsatzsteuer"
+            self.spalten = ["Summe_Einnahmenbilanz", "GrSt", "ESt", "FamLeistAusgl", "GewSt", "USt"]
         elif wohnen_vorhanden and not gewerbe_oder_einzelhandel_vorhanden:
             bestandteile = "Grundsteuer + Einkommensteuer + Familienleistungsausgleich"
+            self.spalten = ["Summe_Einnahmenbilanz", "GrSt", "ESt", "FamLeistAusgl"]
         elif not wohnen_vorhanden and gewerbe_oder_einzelhandel_vorhanden:
             bestandteile = "Grundsteuer + Gewerbesteuer + Umsatzsteuer"
+            self.spalten = ["Summe_Einnahmenbilanz", "GrSt", "GewSt", "USt"]
 
         par.summe.value = bestandteile
 

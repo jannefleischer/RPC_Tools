@@ -10,7 +10,7 @@ from rpctools.analyst.einnahmen.script_Grundsteuer import Grundsteuer
 
 
 class TbxGrundsteuer(Tbx):
-    """Toolbox to name Teilflächen"""
+    """Toolbox Grundsteuer"""
 
     @property
     def label(self):

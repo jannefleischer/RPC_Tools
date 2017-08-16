@@ -9,7 +9,7 @@ from rpctools.analyst.einnahmen.script_Wanderungssalden_schaetzen_Einwohner impo
 
 
 class TbxWanderungssalden1(Tbx):
-    """Toolbox Wanderungssalden für Einnahmen"""
+    """Toolbox Wanderungssalden für Einwohner"""
 
     @property
     def label(self):
