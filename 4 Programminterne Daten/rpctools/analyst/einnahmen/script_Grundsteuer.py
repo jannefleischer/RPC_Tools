@@ -60,7 +60,7 @@ class Grundsteuer(Tool):
         tablepath_basisdaten = self.folders.get_table('GrSt_Basisdaten', "FGDB_Einnahmen.gdb")
         cursor = arcpy.da.UpdateCursor(tablepath_basisdaten, fields)
         for row in cursor:
-                cursor.deleteRow(row)
+                cursor.deleteRow()
         cursor = arcpy.da.InsertCursor(tablepath_basisdaten, fields)
         cursor.insertRow(   [params.slider2.value,
                             params.slider3.value,
