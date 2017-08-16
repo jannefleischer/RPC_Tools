@@ -48,6 +48,8 @@ class NetzlaengenDiagramm(MatplotDiagram):
                     ax.text(width + text_offset, y + bar_width/2,
                             str(int(round(width, 0))) + u' €',
                             color='black',ha='left', va='center')
+                    #bbox=dict(facecolor='white',
+                    # edgecolor='white', boxstyle="round"))
         x_min, x_max = ax.get_xlim()
         ax.set_xlim(x_min, x_max * 1.2)
         # Ende Barlabels
@@ -99,7 +101,9 @@ class MassnahmenKostenDiagramm(MatplotDiagram):
             width = patch.get_x() + patch.get_width()
             print(width)
             y = patch.get_y() + bar_width / 2
-            ax.text(width + text_offset, y, str(round(width, 0)) + u' €', color='black',ha='left', va='center')  #, bbox=dict(facecolor='white', edgecolor='white', boxstyle="round"))
+            ax.text(width + text_offset, y, str(round(width, 0)) + u' €',
+                    color='black',ha='left', va='center')
+            #bbox=dict(facecolor='white', edgecolor='white', boxstyle="round"))
         x_min, x_max = ax.get_xlim()
         ax.set_xlim(x_min, x_max * 1.2)
 
@@ -158,6 +162,8 @@ class GesamtkostenDiagramm(MatplotDiagram):
                 ax.text(width + text_offset,
                         pos_idx[index] + i * bar_width * spacing,
                         '%d' % int(width) + u' €', ha='center', va='center')
+                        # bbox=dict(facecolor='white',
+                        # edgecolor='white', boxstyle="round"))
 
         ax.tick_params(axis='both', which='major', labelsize=9)
         ax.set_yticks(pos_idx + bar_width*spacing)
@@ -225,7 +231,10 @@ class KostentraegerDiagramm(MatplotDiagram):
         for i, patch in enumerate(patches.get_children()):
             width = patch.get_x() + patch.get_width()
             y_pos = patch.get_y()
-            ax.text(width + text_offset, i, str(round(width, 0)) + u' €', color='black',ha='left', va='center')  #, bbox=dict(facecolor='white', edgecolor='white', boxstyle="round"))
+            ax.text(width + text_offset, i, str(round(width, 0)) + u' €',
+                    color='black',ha='left', va='center')
+                    # bbox=dict(facecolor='white',
+                    # edgecolor='white', boxstyle="round"))
         x_min, x_max = ax.get_xlim()
         ax.set_xlim(x_min, x_max * 1.2)
 
@@ -244,7 +253,8 @@ class KostentraegerDiagramm(MatplotDiagram):
                          box.width * 0.8, box.height * 0.75])
 
         # Put the legend to the right of the current axis
-        ax.legend(df_shares['Netz'], loc='center left', bbox_to_anchor=(0, -0.35))
+        ax.legend(df_shares['Netz'], loc='center left',
+                  bbox_to_anchor=(0, -0.35))
         # didn't find a way to pass custom colors directly
         for color, handle in zip(colors, ax.get_legend().legendHandles):
             handle.set_color(color)
@@ -308,6 +318,8 @@ class VegleichsDiagramm(MatplotDiagram):
                     ax.text(width + text_offset, y + bar_width/2,
                             str(int(round(width, 0))) + u' €',
                             color='black',ha='left', va='center')
+                            # bbox=dict(facecolor='white',
+                            # edgecolor='white', boxstyle="round"))
         x_min, x_max = ax.get_xlim()
         ax.set_xlim(x_min, x_max * 1.2)
         # Ende Barlabels
@@ -340,18 +352,18 @@ if __name__ == "__main__":
     diagram = VergleichAPDiagramm()
     diagram.create()
     diagram.show()
-    #diagram = VergleichWEDiagramm()
-    #diagram.create()
-    #diagram.show()
-    #diagram = KostentraegerDiagramm()
-    #diagram.create()
-    #diagram.show()
-    #diagram = MassnahmenKostenDiagramm()
-    #diagram.create()
-    #diagram.show()
-    #diagram = NetzlaengenDiagramm()
-    #diagram.create()
-    #diagram.show()
-    #diagram = GesamtkostenDiagramm()
-    #diagram.create()
-    #diagram.show()
+    diagram = VergleichWEDiagramm()
+    diagram.create()
+    diagram.show()
+    diagram = KostentraegerDiagramm()
+    diagram.create()
+    diagram.show()
+    diagram = MassnahmenKostenDiagramm()
+    diagram.create()
+    diagram.show()
+    diagram = NetzlaengenDiagramm()
+    diagram.create()
+    diagram.show()
+    diagram = GesamtkostenDiagramm()
+    diagram.create()
+    diagram.show()

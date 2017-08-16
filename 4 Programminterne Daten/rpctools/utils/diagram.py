@@ -84,6 +84,7 @@ class MatplotDiagram(Diagram):
     # (matplotlib needs to be set to PS, as tkinter causes errors and
     # crashes within arcmap)
     folders = Folders()
+    # possible stylesheets: 'rpc.mplstyle' and 'rpc2.mplstyle'
     stylesheet = os.path.join(folders.INTERN, 'styles', 'rpc.mplstyle')
     plt = plt
     plt.style.use(stylesheet)
