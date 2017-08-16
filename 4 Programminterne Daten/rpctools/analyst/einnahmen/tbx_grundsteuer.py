@@ -12,6 +12,10 @@ from rpctools.analyst.einnahmen.script_Grundsteuer import Grundsteuer
 class TbxGrundsteuer(Tbx):
     """Toolbox Grundsteuer"""
 
+    wohnen_exists = False
+    gewerbe_exists = False
+    einzelhandel_exists = False
+
     @property
     def label(self):
         return u'Grundsteuer '
@@ -222,28 +226,42 @@ class TbxGrundsteuer(Tbx):
         rows = self.query_table('Teilflaechen_Plangebiet',
                                 ['Nutzungsart'],
                                 workspace='FGDB_Definition_Projekt.gdb')
-        wohnen_exists = False
-        gewerbe_exists = False
-        einzelhandel_exists = False
+
         for row in rows:
             if row[0] == Nutzungsart.WOHNEN:
-                wohnen_exists = True
+                self.wohnen_exists = True
             if row[0] == Nutzungsart.GEWERBE:
-                gewerbe_exists = True
+                self.gewerbe_exists = True
             if row[0] == Nutzungsart.EINZELHANDEL:
-                einzelhandel_exists = True
+                self.einzelhandel_exists = True
 
-        if einzelhandel_exists or gewerbe_exists:
+        if self.einzelhandel_exists or self.gewerbe_exists:
             self.par.slider8.enabled = True
             self.par.slider9.enabled = True
         else:
             self.par.slider8.enabled = False
             self.par.slider9.enabled = False
 
-        if not wohnen_exists:
+        if not self.wohnen_exists:
             self.par.slider2.enabled  = False
             self.par.slider3.enabled  = False
             self.par.slider4.enabled  = False
             self.par.slider5.enabled  = False
             self.par.slider6.enabled  = False
             self.par.slider7.enabled  = False
+
+
+
+    def _updateMessages(self, params):
+
+        par = self.par
+
+        cursor = self.query_table(table_name = 'Chronik_Nutzung',
+                                columns = ['Arbeitsschritt', 'Letzte_Nutzung'],
+                                workspace='FGDB_Einnahmen.gdb')
+
+        for row in cursor:
+            if row[0] == "Wanderung Einwohner" and row[1] is None and self.wohnen_exists:
+                par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Einwohner berechnet!')
+            if row[0] == "Wanderung Beschaeftigte" and row[1] is None and (self.gewerbe_exists or self.einzelhandel_exists):
+                par.name.setErrorMessage(u'Es wurden noch keine Wanderungssalden für Beschäftigte berechnet!')
