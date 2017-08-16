@@ -8,14 +8,14 @@ import sys
 import pickle
 import arcpy
 
-from rpctools.utils.params import DummyTbx
+from rpctools.utils.params import DummyTbx, Folders
 from rpctools.utils import diagram_exec
 from rpctools.utils.encoding import encode
 
 
 class Diagram(object):
     _workspace = None
-    
+
     def __init__(self, **kwargs):
         """
         title : str
@@ -23,13 +23,13 @@ class Diagram(object):
         self.title = ''
         self.kwargs = kwargs
         self.tbx = DummyTbx()
-        
+
     def create(self):
         '''
         create a plot
-        
+
         kwargs: other optional parameters the subclassing diagram needs
-        '''    
+        '''
         self.tbx._getParameterInfo()
         projectname = self.kwargs['projectname'] if 'projectname' in self.kwargs else None
         self.tbx.set_active_project(projectname=projectname)
@@ -37,11 +37,11 @@ class Diagram(object):
             self.tbx.folders._workspace = self._workspace
 
     def show(self):
-        pass    
+        pass
 
 
 class ArcpyDiagram(Diagram):
-    
+
     def __init__(self, **kwargs):
         """
         title : str
@@ -49,17 +49,17 @@ class ArcpyDiagram(Diagram):
         super(ArcpyDiagram, self).__init__(**kwargs)
         self.graph = None
         self.template = None
-        
+
     def create(self):
         '''
         create a plot
-        
+
         Parameters
         ----------
         projectname: str, optional
             the name of the project the data the plot is based on belongs to
             defaults to the active project
-            
+
         kwargs: other optional parameters the subclassing diagram needs
         '''
         super(ArcpyDiagram, self).create()
@@ -68,7 +68,7 @@ class ArcpyDiagram(Diagram):
     def _create(self, **kwargs):
         """to be implemented by subclasses,
         has to return the graph-object and the path to the template"""
-        
+
     def show(self):
         if not self.graph:
             self.create()
@@ -83,20 +83,23 @@ class MatplotDiagram(Diagram):
     # USE THIS PLT, NEVER IMPORT MATPLOTLIB SOMEWHERE ELSE!!!!
     # (matplotlib needs to be set to PS, as tkinter causes errors and
     # crashes within arcmap)
+    folders = Folders()
+    stylesheet = os.path.join(folders.INTERN, 'styles', 'rpc.mplstyle')
     plt = plt
+    plt.style.use(stylesheet)
     def __init__(self, **kwargs):
         """
         title : str
         """
         super(MatplotDiagram, self).__init__(**kwargs)
         self.figure = None
-        
+
     def show(self, external=True):
         '''
         show the created plot in current process or externally in own process
-        
+
         if not shown in external process, ArcMap will crash
-        
+
         Parameters
         ----------
         external: bool, optional
@@ -106,23 +109,23 @@ class MatplotDiagram(Diagram):
         if not self.figure:
             self.create()
         if external:
-            filename = os.path.join(self.tbx.folders.TEMPORARY_GDB_PATH, 
+            filename = os.path.join(self.tbx.folders.TEMPORARY_GDB_PATH,
                                     '{}diagram.pickle'.format(
                                         self.__class__.__name__))
             self.show_external(self.figure, filename)
-        else: 
+        else:
             self.plt.show()
-        
+
     def create(self):
         '''
         create a plot
-        
+
         Parameters
         ----------
         projectname: str, optional
             the name of the project the data the plot is based on belongs to
             defaults to the active project
-            
+
         kwargs: other optional parameters the subclassing diagram needs
         '''
         super(MatplotDiagram, self).create()
@@ -138,7 +141,7 @@ class MatplotDiagram(Diagram):
             [os.path.join(sys.exec_prefix, 'python.exe'),
              '-m' , diagram_exec.__name__, '-f', filename,
              '-t', encode(self.title)], shell=True)
-        
+
     def _create(self, **kwargs):
         """to be implemented by subclasses,
         has to return the axes-object of the plot"""
