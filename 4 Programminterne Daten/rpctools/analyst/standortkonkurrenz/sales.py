@@ -38,9 +38,9 @@ class Sales(object):
     def _calculate_sales(self, setting):
         df_markets = self._prepare_markets(self.markets, setting)
         df_markets.set_index('id', inplace=True)
-        
+
         # drop rows with markets, that are not in the dataframe of markets
-        # used for current settings 
+        # used for current settings
         # (e.g. planfall markets when current setting is nullfall)
         ids_not_in_df = np.setdiff1d(
             np.unique(self.distances['id_markt']), df_markets.index)
@@ -50,13 +50,13 @@ class Sales(object):
         # calc with distances in kilometers
         distances['distanz'] /= 1000
         distances[distances < 0] = -1
-        
+
         # in case of Nullfall take zensus points without planned areas
         if setting == self.NULLFALL:
             zensus = self.zensus[self.zensus['id_teilflaeche'] < 0]
         else:
             zensus = self.zensus
- 
+
         df_kk = pd.DataFrame()
         df_kk['id_siedlungszelle'] = zensus['id']
         df_kk['kk'] = zensus['kk']
@@ -81,11 +81,11 @@ class Sales(object):
             factor = market['exp_faktor']
             exponent = market['exponent']
             attraction_matrix.loc[index] = factor * np.exp(dist * exponent)
-        
+
         unreachable = dist_matrix < 0
         attraction_matrix[unreachable] = 0
         competitor_matrix = self.calc_competitors(dist_matrix, df_markets)
-        
+
         if self.debug:
             setting_str = 'Nullfall' if setting == self.NULLFALL else 'Planfall'
             arcpy.AddMessage('DEBUG: Schreibe Zwischenergebnisse')
@@ -99,14 +99,14 @@ class Sales(object):
                 competitor_matrix.transpose(),
                 u'debug_KK_Anteile_{}'.format(setting_str))
             arcpy.AddMessage('DEBUG: Berechnung')
-            
+
         # include competition between same market types in attraction_matrix
         attraction_matrix *= competitor_matrix.values
-        
+
         probabilities = attraction_matrix / attraction_matrix.sum(axis=0)
         kk_flow = probabilities * kk_matrix
         kk_flow = kk_flow.fillna(0)
-        
+
         if self.debug:
             arcpy.AddMessage('DEBUG: Schreibe weitere Zwischenergebnisse')
             self.write_intermediate_results(
@@ -120,7 +120,7 @@ class Sales(object):
                 u'debug_Kaufkraftstroeme_{}'.format(setting_str))
 
         return kk_flow
-    
+
     def write_intermediate_results(self, dataframe, table):
         self.tbx.insert_dataframe_in_table(
             table, dataframe.reset_index(),
@@ -133,6 +133,8 @@ class Sales(object):
         """
         cut_off_time = self.relation_dist
         dist_matrix = dist_matrix.T
+        dist_matrix = dist_matrix.mask(dist_matrix < 0)
+        # TODO check here
         results = pd.DataFrame(data=1., index=dist_matrix.index,
                                columns=dist_matrix.columns)
         competing_markets = df_markets[['id_kette']]
@@ -269,7 +271,7 @@ class Sales(object):
                 return idx
 
             # exp. factors
-            df_exp_gr_klasse = df_exponential_parameters[ 
+            df_exp_gr_klasse = df_exponential_parameters[
                 df_exponential_parameters['gem_groessenklasse'] == gr_klasse]
             idx = get_entry_idx(df_exp_gr_klasse, id_kette, id_betriebstyp)
             entry = df_exp_gr_klasse[idx]
