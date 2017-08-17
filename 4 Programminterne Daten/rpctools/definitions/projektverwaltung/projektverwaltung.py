@@ -365,7 +365,8 @@ class ProjektAnlegen(Projektverwaltung):
                     'umsatz_differenz': 0,
                     'umsatz_planfall': 0,
                     'umsatz_nullfall': 0,
-                    'id': i + 1
+                    'id': i + 1,
+                    'Auswahl': 0,
                 })
         del cursor
         arcpy.Delete_management(fc_bbox)
