@@ -146,6 +146,7 @@ class Sales(object):
             indices = list(markets_of_same_type.index)
             number_of_competing_markets = len(indices)
             same_type_dist_matrix = dist_matrix[indices]
+            same_type_dist_ranking = same_type_dist_matrix.rank(axis=1)
             same_type_dist_matrix['Minimum'] = \
                 same_type_dist_matrix.loc[:, indices].min(axis=1)
             # time differences between way to nearest market and other markets
@@ -195,7 +196,9 @@ class Sales(object):
                 results.loc[(competition_factors[market_id]==False) & \
                             (competition_factors['Umkreis']>1), \
                             market_id] = factor
-
+            # if more than 3 markets: markets 4 to end set to 0
+            # if market 3 and 4 have same distance: keep both
+            results.loc[:, indices] = results.loc[:, indices].mask((same_type_dist_ranking > 3) | (same_type_dist_ranking.isnull()), 0.)
         # Return results in shape of dist_matrix
         return results.T
 
