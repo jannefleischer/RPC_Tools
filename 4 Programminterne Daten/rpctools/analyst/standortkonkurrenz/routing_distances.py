@@ -122,7 +122,7 @@ class DistanceRouting(object):
         return ret
 
     def get_distances(self, origin, destinations, bbox=None):
-        kmh = 20
+        kmh = 12
         distances = np.ones(len(destinations), dtype=int)
         distances.fill(-1)
         dist_raster = self._request_dist_raster(origin, kmh=kmh)
@@ -149,7 +149,7 @@ class DistanceRouting(object):
         arcpy.Delete_management(dist_raster)
         return distances
 
-    def _request_dist_raster(self, origin, kmh=50):        
+    def _request_dist_raster(self, origin, kmh=30):        
         if origin.epsg != self.epsg:
             origin.transform(self.epsg)
 #https://projektcheck.ggr-planung.de/otp/surfaces?batch=true&layers=traveltime&styles=color30&time=17:46&date=07-26-2017&mode=WALK&maxWalkDistance=750&fromPlace=53.47333527412444,9.715690612792967&toPlace=53.47333527412444,9.715690612792967
@@ -160,7 +160,7 @@ class DistanceRouting(object):
             'mode': 'WALK',
             'maxWalkDistance': 50000,
             'maxPreTransitTime': 1200,
-            'cutoffMinutes': 20,
+            'cutoffMinutes': 70,  # the max traveltime will be (cutoffMinutes + 30 min)
             #'searchRadiusM': 1000,
             'walkSpeed': kmh / 3.6,
             'intersectCosts': False,
