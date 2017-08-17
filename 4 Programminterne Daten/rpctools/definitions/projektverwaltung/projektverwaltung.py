@@ -29,6 +29,7 @@ from rpctools.utils.encoding import encode
 
 from rpctools.utils.params import Tool
 from rpctools.diagrams.diagram_teilflaechen import DiaTeilflaechen
+from rpctools.utils.spatial_lib import Point
 
 
 class Projektverwaltung(Tool):
@@ -50,6 +51,7 @@ class Projektverwaltung(Tool):
 
 class ProjektAnlegen(Projektverwaltung):
     """Projekt neu anlegen"""
+    _sk_radius = 20000
 
     def add_outputs(self):
         if os.path.exists(self.folders.get_projectpath(check=False)):
@@ -100,6 +102,12 @@ class ProjektAnlegen(Projektverwaltung):
 
         arcpy.AddMessage("Neues Projekt angelegt im Ordner {}\n".format(
             project_path))
+
+        # create 'Zentren'-table
+        arcpy.AddMessage('Ermittle gemeinden im Umkreis von {} km...'.format(
+            self._sk_radius/1000))
+        self.communities_to_centers(self._project_centroid,
+                                    radius=self._sk_radius)
 
     def set_projektrahmendaten(self,
                                ags_projekt,
@@ -267,6 +275,7 @@ class ProjektAnlegen(Projektverwaltung):
                                         ['INSIDE_X', 'INSIDE_Y'])
         INSIDE_X = [row[0] for row in XY_INSIDE]
         INSIDE_Y = [row[1] for row in XY_INSIDE]
+        self._project_centroid = (np.mean(INSIDE_X), np.mean(INSIDE_Y))
         distances = []
         if len(XY_INSIDE) > 1:
             for i in range(len(XY_INSIDE)):
@@ -307,6 +316,61 @@ class ProjektAnlegen(Projektverwaltung):
                                'id_teilflaeche': area},
                 pkey={'id_teilflaeche': area},
                 workspace=out_workspace)
+
+    def communities_to_centers(self, centroid, radius):
+        '''get communities intersecting with bbox and write them as centers to
+        the database'''
+        import time
+        start = time.time()
+        gemeinden = self.parent_tbx.folders.get_base_table(
+            table='bkg_gemeinden', workspace='FGDB_Basisdaten_deutschland.gdb')
+        centroid = Point(centroid[0], centroid[1])
+        # circular buffer for clipping
+        centroid.create_geom()
+        pntGeom = arcpy.PointGeometry(centroid.geom)
+        circleGeom = pntGeom.buffer(radius)
+        #cursor = arcpy.da.SearchCursor(gemeinden, ['SHAPE@', 'GEN', 'AGS'])
+        #yes = 0
+        #no = 0
+        #for i, (shape, name, ags) in enumerate(cursor):
+            #if shape.overlaps(circleGeom):
+                #yes += 1
+            #else:
+                #no += 1
+        #print yes, no
+        #delete existing community-entries
+        #clip the communities with the bbox
+        fc_bbox = 'in_memory/bbox'
+        fc_clipped = 'in_memory/clipped'
+        if arcpy.Exists(fc_bbox):
+            arcpy.Delete_management(fc_bbox)
+        if arcpy.Exists(fc_clipped):
+            arcpy.Delete_management(fc_clipped)
+        arcpy.CopyFeatures_management([circleGeom], fc_bbox)
+        arcpy.Clip_analysis(gemeinden, fc_bbox, fc_clipped)
+        cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'AGS'])
+        # add clipped communities as centers
+        for i, (shape, name, ags) in enumerate(cursor):
+            c2 = arcpy.da.SearchCursor(gemeinden, ['SHAPE@'],
+                                       where_clause=''' "AGS"='{}' '''.format(ags))
+            shape = c2.next()[0]
+            del(c2)
+            self.parent_tbx.insert_rows_in_table(
+                'Zentren',
+                workspace='FGDB_Standortkonkurrenz_Supermaerkte.gdb',
+                column_values={
+                    'SHAPE@': shape,
+                    'name': name,
+                    'nutzerdefiniert': 0,
+                    'umsatz_differenz': 0,
+                    'umsatz_planfall': 0,
+                    'umsatz_nullfall': 0,
+                    'id': i + 1
+                })
+        del cursor
+        arcpy.Delete_management(fc_bbox)
+        arcpy.Delete_management(fc_clipped)
+        print('Dauer: {}'.format(time.time() - start))
 
 
 class ProjektKopieren(Projektverwaltung):
