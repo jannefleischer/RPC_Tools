@@ -238,6 +238,9 @@
                 <Button caption="Projektwirkung sch&#228;tzen" category="ProjektCheck" class="StandortkonkurrenzProjektwirkung" id="rpc_tools.standortkonkurrenz_projektwirkung" image="Images\GenericCalculator16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
+                <Tool caption="Betrachtungsraum ausw&#228;hlen" category="ProjektCheck" class="FieldSelection" id="rpc_tools.select_ags" image="Images\Driving_Distance16.png" message="" tip="">
+                    <Help heading="" />
+                </Tool>
 
                 <!-- FLAECHE UND OEKOLOGIE  -->
 
@@ -698,7 +701,8 @@
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_nullfall" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_planfall" />
                         <Menu refID="rpc_tools.menu_zentren" />
-                        <Button refID="rpc_tools.standortkonkurrenz_projektwirkung" separator="true"/>
+                        <Button refID="rpc_tools.select_ags" separator="true"/>
+                        <Button refID="rpc_tools.standortkonkurrenz_projektwirkung" />
                     </Items>
                 </Menu>
                 <Menu caption="Analysieren" category="ProjektCheck" id="rpc_tools.menu_analysieren" isRootMenu="false" isShortcutMenu="true" separator="true">
