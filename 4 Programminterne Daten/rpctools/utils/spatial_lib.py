@@ -4,7 +4,7 @@ from rpctools.utils.params import DummyTbx
 from rpctools.utils.output import ArcpyEnv
 from pyproj import Proj, transform
 
-import requests 
+import requests
 import numpy as np
 from os.path import join
 
@@ -57,7 +57,7 @@ def bounding_box(self, centroid, size):
                epsg=centroid.epsg)
 
     bbox = (p1, p2)
-    
+
     return bbox
 
 
@@ -80,7 +80,7 @@ def google_geocode(address, api_key=''):
 def closest_point(point, points):
     """get the point out of given points that is closest to the given point,
     points have to be passed as tuples of x, y (z optional) coordinates
-    
+
     Parameters
     ----------
     point : tuple
@@ -102,7 +102,7 @@ def closest_point(point, points):
 def points_within(center_point, points, radius):
     """get the points within a radius around a given center_point,
     points have to be passed as tuples of x, y (z optional) coordinates
-    
+
     Parameters
     ----------
     center_point : tuple or Point
@@ -124,7 +124,7 @@ def points_within(center_point, points, radius):
     is_within = distances <= radius
     return np.array(points)[is_within], is_within
 
-def _get_distances(point, points):    
+def _get_distances(point, points):
     points = [np.array(p) for p in points]
     diff = np.array(points) - np.array(point)
     distances = np.apply_along_axis(np.linalg.norm, 1, diff)
@@ -147,7 +147,7 @@ def _get_distances(point, points):
     #cursor = arcpy.da.SearchCursor(fc_center, ['*'])
     #for row in cursor:
         #print(row)
-        
+
     #arcpy.PointDistance_analysis(fc_center, table, search_radius=35)
     #cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'AGS'])
 
@@ -205,15 +205,15 @@ def get_ags(features, id_column):
         tmp_table = join(arcpy.env.scratchGDB, 'tmp_join')
         if arcpy.Exists(tmp_table):
             arcpy.Delete_management(tmp_table)
-    
+
         arcpy.SpatialJoin_analysis(features, gemeinden, tmp_table,
                                    match_option='HAVE_THEIR_CENTER_IN')
-    
+
         cursor = arcpy.da.SearchCursor(tmp_table, [id_column, 'AGS_0', 'GEN'])
         ags_res = {}
         for row in cursor:
             ags_res[row[0]] = row[1], row[2]
-    
+
         arcpy.Delete_management(tmp_table)
     return ags_res
 
@@ -241,7 +241,7 @@ def assign_groessenklassen():
     gr_df.loc[np.isnan(gr_df['bis']), 'bis'] = sys.maxint
     gem_columns = ['Einwohner', 'groessenklasse']
     gem_table = folders.get_base_table(workspace, 'bkg_gemeinden')
-    
+
     cursor = arcpy.da.UpdateCursor(gem_table, gem_columns)
     for ew, gr_klasse in cursor:
         higher = ew >= gr_df['von']
@@ -252,5 +252,29 @@ def assign_groessenklassen():
         gr_klasse = match[0]
         cursor.updateRow((ew, gr_klasse))
 
+def get_extent(tablename, workspace, where=''):
+    """
+    get the extent of a table with optional where clause for the shapes
+    """
+    tbx = DummyTbx()
+    tbx.set_active_project()
+    xmin, xmax, ymin, ymax = [np.inf, -np.inf, np.inf, -np.inf]
+    community_cursor = tbx.query_table(tablename, columns=['SHAPE@'],
+                                       workspace=workspace,
+                                       where=where)
+    for row in community_cursor:
+        shape = row[0]
+        xmin = min(xmin, shape.extent.XMin)
+        xmax = max(xmax, shape.extent.XMax)
+        ymin = min(ymin, shape.extent.YMin)
+        ymax = max(ymax, shape.extent.YMax)
+
+    return xmin, xmax, ymin, ymax
+
 if __name__ == '__main__':
-    assign_groessenklassen()
+    tablename = "Zentren"
+    workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
+    import time
+    start = time.time()
+    print(get_extent(tablename, workspace, where='Auswahl<>{}'.format(0)))
+    print(time.time() - start)
