@@ -35,11 +35,14 @@ class FieldSelectionTool(Tool):
         self.output.add_layer('standortkonkurrenz', 'Zentren_selected',
                              template_folder='Standortkonkurrenz',
                              featureclass=self._table,
-                             workspace=self._workspace)
+                             workspace=self._workspace,
+                             name='Ausgewählte Gemeinden')
         self.output.add_layer('standortkonkurrenz', 'Zentren_background',
                              template_folder='Standortkonkurrenz',
                              featureclass=self._table,
-                             workspace=self._workspace)
+                             workspace=self._workspace,
+                             name='Nicht ausgewählte Gemeinden',
+                             zoom=True)
 
     def run(self):
         pass
