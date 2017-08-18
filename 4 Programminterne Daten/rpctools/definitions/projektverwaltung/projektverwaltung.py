@@ -87,6 +87,7 @@ class ProjektAnlegen(Projektverwaltung):
         max_dist = toolbox.config.max_area_distance
         ags_projekt, gemeindename_projekt = \
             self.get_gemeinde(tfl, 'OBJECTID', max_dist)
+        self._project_ags = ags_projekt
 
         self.calculate_teilflaechen_attributes(tfl,
                                                ags_projekt,
@@ -351,6 +352,9 @@ class ProjektAnlegen(Projektverwaltung):
         cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'AGS'])
         # add clipped communities as centers
         for i, (shape, name, ags) in enumerate(cursor):
+            selection = 0
+            if ags == self._project_ags:
+                selection = -1
             c2 = arcpy.da.SearchCursor(gemeinden, ['SHAPE@'],
                                        where_clause=''' "AGS"='{}' '''.format(ags))
             shape = c2.next()[0]
@@ -366,7 +370,7 @@ class ProjektAnlegen(Projektverwaltung):
                     'umsatz_planfall': 0,
                     'umsatz_nullfall': 0,
                     'id': i + 1,
-                    'Auswahl': 0,
+                    'Auswahl': selection,
                 })
         del cursor
         arcpy.Delete_management(fc_bbox)
