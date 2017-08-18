@@ -220,6 +220,7 @@ class FieldSelection(ToolboxButton):
     _table = 'Zentren'
 
     def __init__(self):
+        super(FieldSelection, self).__init__()
         self.enabled = True
         netz_table = folders.get_base_table('FGDB_Kosten_Tool.gdb',
                                             'Netze_und_Netzelemente')
@@ -235,22 +236,25 @@ class FieldSelection(ToolboxButton):
         tbx.set_active_project()
         cursor = tbx.query_table(self._table, workspace=self._workspace,
                                  columns=['SHAPE@', 'id', "Auswahl"])
+        found = False
         for row in cursor:
             shape, object_id, selection = row
             if shape.contains(coords):
                 print object_id
+                found = True
                 break
+        if not found:
+            return
         if selection == 0:
             new_selection = 1
-            print 1
-        if selection == 1:
+        elif selection == 1:
             new_selection = 0
-            print 0
         else:
             new_selection = selection
+        print new_selection
         del(cursor)
         tbx.update_table(self._table,
-                         column_values={'Auswahl': 1},
+                         column_values={'Auswahl': new_selection},
                          where="id={}".format(object_id),
                          workspace=self._workspace)
         arcpy.RefreshActiveView()

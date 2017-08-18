@@ -14,23 +14,23 @@ from rpctools.analyst.standortkonkurrenz.tbx_edit_markets import (
 from rpctools.analyst.standortkonkurrenz.tbx_create_template import TbxCreateTemplate
 from rpctools.analyst.standortkonkurrenz.tbx_versorgungsbereiche import TbxEditCenters
 from rpctools.analyst.standortkonkurrenz.tbx_maerkte_importieren import (
-    TbxMaerkteImportierenDatei, TbxMaerkteImportierenFeatureClass
-)
-
+    TbxMaerkteImportierenDatei, TbxMaerkteImportierenFeatureClass)
+from rpctools.analyst.standortkonkurrenz.tbx_field_selection import TbxFieldSelection
 
 class Toolbox(object):
     def __init__(self):
         self.label = u'standortkonkurrenz'
         self.alias = ''
         self.tools = [TbxOSMMarktEinlesen,
-                      TbxCreateTemplate, 
+                      TbxCreateTemplate,
                       TbxProjektwirkungMarkets,
-                      TbxEditMarketsNullfall, 
+                      TbxEditMarketsNullfall,
                       TbxEditMarketsPlanfall,
                       TbxEditCenters,
-                      TbxExtendMarkets, 
-                      TbxMaerkteImportierenDatei, 
-                      TbxMaerkteImportierenFeatureClass]
+                      TbxExtendMarkets,
+                      TbxMaerkteImportierenDatei,
+                      TbxMaerkteImportierenFeatureClass,
+                      TbxFieldSelection]
 
 
 
