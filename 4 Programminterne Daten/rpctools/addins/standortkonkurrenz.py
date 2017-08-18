@@ -3,6 +3,7 @@ import arcpy
 
 from rpctools.addins.common import ToolboxButton, folders, config
 from rpctools.addins.outputs import MaerkteAnzeigen, ZentrenAnzeigen
+from rpctools.utils.params import DummyTbx
 
 __all__ = [
     "BestandOSMEinlesen", "TemplateErzeugen",
@@ -11,7 +12,7 @@ __all__ = [
     "PlanfallMarktBearbeiten", "BestandMarktHinzu",
     "PlanfallMarktHinzu", "PlanfallMarktErweiterung",
     "ZentrumBearbeiten", "ZentrumHinzu", "StandortkonkurrenzProjektwirkung",
-    "MaerkteZentrenAnzeigen"
+    "MaerkteZentrenAnzeigen",  "FieldSelection"
 ]
 
 
@@ -209,3 +210,47 @@ class StandortkonkurrenzProjektwirkung(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxProjektwirkungMarkets'
+
+
+class FieldSelection(ToolboxButton):
+    _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
+    _toolbox_name = 'TbxFieldSelection'
+    _table = 'Zentren'
+
+    def __init__(self):
+        self.enabled = True
+        netz_table = folders.get_base_table('FGDB_Kosten_Tool.gdb',
+                                            'Netze_und_Netzelemente')
+        self.cursor = 3
+
+    def onClick(self):
+        self.tbx.show_outputs()
+
+
+    def onMouseDownMap(self, x, y, button, shift):
+        coords = arcpy.Point(x, y)
+        tbx = self.tbx
+        tbx.set_active_project()
+        cursor = tbx.query_table(self._table, workspace=self._workspace,
+                                 columns=['SHAPE@', 'id', "Auswahl"])
+        for row in cursor:
+            shape, object_id, selection = row
+            if shape.contains(coords):
+                print object_id
+                break
+        if selection == 0:
+            new_selection = 1
+            print 1
+        if selection == 1:
+            new_selection = 0
+            print 0
+        else:
+            new_selection = selection
+        del(cursor)
+        tbx.update_table(self._table,
+                         column_values={'Auswahl': 1},
+                         where="id={}".format(object_id),
+                         workspace=self._workspace)
+        arcpy.RefreshActiveView()
