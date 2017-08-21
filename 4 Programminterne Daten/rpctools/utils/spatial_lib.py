@@ -46,15 +46,13 @@ class Point(object):
         self.x = x
         self.y = y
 
-def bounding_box(self, centroid, size):
+def extent_to_bbox(self, extent, epsg):
     '''return a square bounding box with given centroid in center and dimension
     of size x size, tuple of lower left and upper right Point'''
-    p1 = Point(centroid.x - size / 2,
-               centroid.y - size / 2,
-               epsg=centroid.epsg)
-    p2 = Point(centroid.x + size / 2,
-               centroid.y + size / 2,
-               epsg=centroid.epsg)
+    xmin, ymin, xmax, ymax = extent
+    p1 = Point(xmin, ymin, epsg=epsg)
+    p2 = Point(xmax, ymax, epsg=epsg)
+
 
     bbox = (p1, p2)
 
@@ -259,17 +257,17 @@ def get_extent(tablename, workspace, where=''):
     tbx = DummyTbx()
     tbx.set_active_project()
     xmin, xmax, ymin, ymax = [np.inf, -np.inf, np.inf, -np.inf]
-    community_cursor = tbx.query_table(tablename, columns=['SHAPE@'],
+    cursor = tbx.query_table(tablename, columns=['SHAPE@'],
                                        workspace=workspace,
                                        where=where)
-    for row in community_cursor:
+    for row in cursor:
         shape = row[0]
         xmin = min(xmin, shape.extent.XMin)
         xmax = max(xmax, shape.extent.XMax)
         ymin = min(ymin, shape.extent.YMin)
         ymax = max(ymax, shape.extent.YMax)
-
-    return xmin, xmax, ymin, ymax
+    del(cursor)
+    return xmin, ymin, xmax, ymax
 
 if __name__ == '__main__':
     tablename = "Zentren"
