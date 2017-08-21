@@ -22,6 +22,8 @@ DEBUG = True
 
 class ProjektwirkungMarkets(Tool):
     _param_projectname = 'projectname'
+    _settlement_buffer = 3000
+    _markets_buffer = 6000
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     # ToDo: set this in toolbox?
     recalculate = False
@@ -85,8 +87,10 @@ class ProjektwirkungMarkets(Tool):
                                       where='Auswahl<>{}'.format(0))
         bbox =  extent_to_bbox(self, community_extent,
                                epsg=self.parent_tbx.config.epsg,
-                               boundary_size=0.05)
-        self.calculate_zensus(df_markets, centroid, radius, bbox)
+                               boundary_size=self._settlement_buffer)
+        self.calculate_zensus(df_markets, centroid, radius, bbox,
+                              settlement_buffer=self._settlement_buffer,
+                              markets_buffer=self._markets_buffer)
 
         arcpy.AddMessage(u'Ermittle angrenzende Gemeinden...')
         #self.communities_to_centers(centroid, radius)
@@ -139,7 +143,7 @@ class ProjektwirkungMarkets(Tool):
         self.update_centers()
 
 
-    def calculate_zensus(self, markets, centroid, radius, bbox):
+    def calculate_zensus(self, markets, centroid, radius, bbox, settlement_buffer, markets_buffer):
         '''extract zensus points (incl. points for planned areas)
         and write them to the database'''
         zensus = Zensus()
@@ -147,7 +151,9 @@ class ProjektwirkungMarkets(Tool):
         if (len(self.parent_tbx.query_table('Siedlungszellen')) == 0):
             arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
             zensus_points, max_id = zensus.cutout_area(
-                centroid, radius, bbox, epsg=self.parent_tbx.config.epsg)
+                centroid, radius, bbox, epsg=self.parent_tbx.config.epsg,
+                settlement_buffer=settlement_buffer,
+                markets_buffer=markets_buffer)
             tfl_points = self.get_tfl_points(max_id + 1)
             # settlements = zensus centroids + teilflaeche centroids
             sz_points = zensus_points + tfl_points

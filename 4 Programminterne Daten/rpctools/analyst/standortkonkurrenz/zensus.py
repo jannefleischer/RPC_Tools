@@ -8,6 +8,7 @@ import shutil
 import sys
 import arcpy
 import numpy as np
+import time
 
 
 class ZensusCell(Point):
@@ -37,7 +38,7 @@ class Zensus(object):
         except:
             pass
 
-    def cutout_area(self, centroid, radius, bbox, epsg):
+    def cutout_area(self, centroid, radius, bbox, epsg, settlement_buffer=3000, markets_buffer=6000):
         """
         return the centroids of the zensus cells as points inside the
         selected communities
@@ -59,11 +60,21 @@ class Zensus(object):
         out_raster = os.path.join(self.tmp_folder, 'zensus_cutout.tif')
         ws_tmp = tbx.folders.get_db(workspace=self._workspace)
         selected_communities = "tmp_selected_communities"
+        settlement_cells_buffer_feature = "Siedlungszellen_Puffer"
+        markets_buffer_feature = "Maerkte_Puffer"
         selected_communities_path =  os.path.join(ws_tmp, selected_communities)
+        settlement_cells_buffer_path =  os.path.join(ws_tmp, settlement_cells_buffer_feature)
+        markets_buffer_path =  os.path.join(ws_tmp, markets_buffer_feature)
         # clip minimum to rectangle shape that still contains all communities
         srid = clip_raster(zensus_raster, out_raster, bbox)
         # get raster points
         arcpy.RasterToPoint_conversion(out_raster, raster_points)
+        start = time.time()
+        with arcpy.da.UpdateCursor(raster_points, "GRID_CODE") as cursor:
+            for row in cursor:
+                if row[0] <= 0:
+                    cursor.deleteRow()
+        print(time.time() - start)
         # project raster points to gauss krueger
         out_cs = arcpy.SpatialReference(epsg)
         arcpy.Project_management(raster_points, raster_points_projected,
@@ -72,9 +83,18 @@ class Zensus(object):
         arcpy.FeatureClassToFeatureClass_conversion(
             community_path, ws_tmp, selected_communities,
             where_clause='Auswahl<>{}'.format(0))
+        # create buffer area
+        arcpy.Buffer_analysis(in_features=selected_communities_path,
+                              out_feature_class=settlement_cells_buffer_path,
+                              buffer_distance_or_field=settlement_buffer,
+                              dissolve_option='ALL')
+        arcpy.Buffer_analysis(in_features=selected_communities_path,
+                              out_feature_class=markets_buffer_path,
+                              buffer_distance_or_field=markets_buffer,
+                              dissolve_option='ALL')
         # clip raster points to selected communities
         arcpy.Clip_analysis(raster_points_projected,
-                            selected_communities_path,
+                            settlement_cells_buffer_path,
                             raster_points_clipped)
         # create list with zensus points for return
         rows = arcpy.da.SearchCursor(raster_points_clipped,
