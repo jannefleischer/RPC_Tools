@@ -46,12 +46,13 @@ class Point(object):
         self.x = x
         self.y = y
 
-def extent_to_bbox(self, extent, epsg):
+def extent_to_bbox(self, extent, epsg, boundary_size = 0.00):
     '''return a square bounding box with given centroid in center and dimension
     of size x size, tuple of lower left and upper right Point'''
     xmin, ymin, xmax, ymax = extent
-    p1 = Point(xmin, ymin, epsg=epsg)
-    p2 = Point(xmax, ymax, epsg=epsg)
+    boundary = max([xmax - xmin, ymax - ymin]) * boundary_size
+    p1 = Point(xmin - boundary, ymin - boundary, epsg=epsg)
+    p2 = Point(xmax + boundary, ymax + boundary, epsg=epsg)
 
 
     bbox = (p1, p2)

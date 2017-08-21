@@ -84,7 +84,8 @@ class ProjektwirkungMarkets(Tool):
         community_extent = get_extent('Zentren', self._workspace,
                                       where='Auswahl<>{}'.format(0))
         bbox =  extent_to_bbox(self, community_extent,
-                               epsg=self.parent_tbx.config.epsg)
+                               epsg=self.parent_tbx.config.epsg,
+                               boundary_size=0.05)
         self.calculate_zensus(df_markets, centroid, radius, bbox)
 
         arcpy.AddMessage(u'Ermittle angrenzende Gemeinden...')
