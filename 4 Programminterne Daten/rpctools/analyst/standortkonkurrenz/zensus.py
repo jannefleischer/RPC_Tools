@@ -1,5 +1,7 @@
 from rpctools.utils.config import Folders, Config
-from rpctools.utils.spatial_lib import clip_raster, Point, points_within
+from rpctools.utils.params import DummyTbx
+from rpctools.utils.spatial_lib import clip_raster, Point, points_within, \
+     get_extent
 
 import os
 import shutil
@@ -20,6 +22,9 @@ class ZensusCell(Point):
 
 
 class Zensus(object):
+    _workspace = "FGDB_Standortkonkurrenz_Supermaerkte.gdb"
+    _table = "Zentren"
+
     def __init__(self):
         self.folders = Folders()
         self.epsg = 4326
@@ -32,41 +37,63 @@ class Zensus(object):
         except:
             pass
 
-    def cutout_area(self, centroid, radius, bbox, epsg=None):
-        """return the centroids of the zensus cells as points in a square area
-        with the dimensions of distance x distance with the given centroid in
-        the middle
+    def cutout_area(self, centroid, radius, bbox, epsg):
         """
-        size = 2 * radius
+        return the centroids of the zensus cells as points inside the
+        selected communities
+        """
+        tbx = DummyTbx()
+        tbx.set_active_project()
+        community_path =  tbx.folders.get_table(self._table,
+                                                 workspace=self._workspace)
         zensus_points = []
         zensus_raster = self.folders.ZENSUS_RASTER_FILE
-
+        # temporary paths
         out_raster = os.path.join(self.tmp_folder, 'zensus_cutout.tif')
-
-        # clipping circles is pro-version only
-        # clip square instead and filter by distances
-        srid = clip_raster(zensus_raster, out_raster, bbox)
-
-        out_shp = os.path.join(self.tmp_folder,
+        raster_points = os.path.join(self.tmp_folder,
                                'zensus_cutout.shp')
-        #cellsize = float(arcpy.GetRasterProperties_management(
-            #zensus_file, 'CELLSIZEX').getOutput(0).replace(',', '.'))
-
-        arcpy.RasterToPoint_conversion(out_raster, out_shp)
-        
-        desc = arcpy.Describe(out_shp)
-        rows = arcpy.da.SearchCursor(out_shp, ['SHAPE@XY', 'GRID_CODE'])
-        coords = []
-        for i, ((x, y), value) in enumerate(rows):
-            p = ZensusCell(x, y, id=i, epsg=srid, ew=value)
-            p.transform(epsg)
+        raster_points_projected = os.path.join(self.tmp_folder,
+                                         'zensus_cutout_projected.shp')
+        raster_points_clipped = os.path.join(self.tmp_folder,
+                                       'zensus_cutout_clipped.shp')
+        out_raster = os.path.join(self.tmp_folder, 'zensus_cutout.tif')
+        ws_tmp = tbx.folders.get_db(workspace=self._workspace)
+        selected_communities = "tmp_selected_communities"
+        selected_communities_path =  os.path.join(ws_tmp, selected_communities)
+        # clip minimum to rectangle shape that still contains all communities
+        srid = clip_raster(zensus_raster, out_raster, bbox)
+        # get raster points
+        arcpy.RasterToPoint_conversion(out_raster, raster_points)
+        # project raster points to gauss krueger
+        out_cs = arcpy.SpatialReference(epsg)
+        arcpy.Project_management(raster_points, raster_points_projected,
+                                 out_cs)
+        # make feature class for selected communities
+        arcpy.FeatureClassToFeatureClass_conversion(
+            community_path, ws_tmp, selected_communities,
+            where_clause='Auswahl<>{}'.format(0))
+        # clip raster points to selected communities
+        arcpy.Clip_analysis(raster_points_projected,
+                            selected_communities_path,
+                            raster_points_clipped)
+        # create list with zensus points for return
+        rows = arcpy.da.SearchCursor(raster_points_clipped,
+                                     ['SHAPE@XY', 'GRID_CODE'])
+        zensus_points = []
+        index = 0
+        for ((x, y), value) in rows:
+            if value <= 0:
+                continue
+            p = ZensusCell(x, y, id=index, epsg=srid, ew=value)
             zensus_points.append(p)
-            coords.append((p.x, p.y))
-        
-        coords_within, within_idx = points_within(
-            (centroid.x, centroid.y), coords, radius)
-
-        return np.array(zensus_points)[within_idx].tolist(), i
+            index += 1
+        # delete temporary files
+        def del_tmp():
+            for fn in [raster_points, raster_points_projected, out_raster,
+                       raster_points_clipped, selected_communities_path]:
+                arcpy.Delete_management(fn)
+        del_tmp()
+        return zensus_points, len(zensus_points)
 
     def add_kk(self, zensus_points, project):
         folders = Folders()

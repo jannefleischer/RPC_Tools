@@ -12,7 +12,8 @@ from rpctools.utils.encoding import encode
 from rpctools.utils.spatial_lib import get_project_centroid
 from rpctools.analyst.standortkonkurrenz.zensus import Zensus, ZensusCell
 from rpctools.analyst.standortkonkurrenz.routing_distances import DistanceRouting
-from rpctools.utils.spatial_lib import Point, bounding_box, features_to_raster
+from rpctools.utils.spatial_lib import Point, extent_to_bbox, \
+     get_extent, features_to_raster
 from rpctools.utils.config import Folders
 from rpctools.analyst.standortkonkurrenz.sales import Sales
 
@@ -48,7 +49,7 @@ class ProjektwirkungMarkets(Tool):
             layer_name = u'Kaufkraftbindung {m} ({i})'.format(
                 m=plan_market['name'], i=plan_market['id'])
             fn = u'Kaufkraftbindung_Raster_{i}'.format(i=plan_market['id'])
-                              
+
             fp = self.folders.get_table(fn, check=False)
             arcpy.AddMessage('Erzeuge Raster {}'.format(fn))
             table = self.folders.get_table('Beziehungen_Maerkte_Zellen')
@@ -61,7 +62,7 @@ class ProjektwirkungMarkets(Tool):
                                   name=layer_name,
                                   template_folder=folder,
                                   zoom=False)
-                
+
         self.output.add_layer(group_layer, layer_vb, fc_zentren,
                               template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_gem, fc_zentren,
@@ -80,11 +81,14 @@ class ProjektwirkungMarkets(Tool):
         radius = self.par.radius.value * 1000
 
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
-        bbox = bounding_box(self, centroid, radius * 2)
+        community_extent = get_extent('Zentren', self._workspace,
+                                      where='Auswahl<>{}'.format(0))
+        bbox =  extent_to_bbox(self, community_extent,
+                               epsg=self.parent_tbx.config.epsg)
         self.calculate_zensus(df_markets, centroid, radius, bbox)
 
         arcpy.AddMessage(u'Ermittle angrenzende Gemeinden...')
-        self.communities_to_centers(centroid, radius)
+        #self.communities_to_centers(centroid, radius)
 
         # when cells were not recalculated (including Kaufkraft)
         # do it again (number of inhabitants may have changed by the user
@@ -156,46 +160,46 @@ class ProjektwirkungMarkets(Tool):
             arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
                              'Berechnung wird übersprungen')
 
-    def communities_to_centers(self, centroid, radius):
-        '''get communities intersecting with bbox and write them as centers to
-        the database'''
-        gemeinden = self.parent_tbx.folders.get_base_table(
-            table='bkg_gemeinden', workspace='FGDB_Basisdaten_deutschland.gdb')
-        # circular buffer for clipping
-        centroid.create_geom()
-        pntGeom = arcpy.PointGeometry(centroid.geom)
-        circleGeom = pntGeom.buffer(radius)
-        # delete existing community-entries
-        self.parent_tbx.delete_rows_in_table('Zentren',
-                                             where='nutzerdefiniert=0')
-        ids = self.parent_tbx.query_table('Zentren', columns='id')
-        max_id = np.array(ids).max() if len(ids) > 0 else 0
-        # clip the communities with the bbox
-        fc_bbox = 'in_memory/bbox'
-        fc_clipped = 'in_memory/clipped'
-        if arcpy.Exists(fc_bbox):
-            arcpy.Delete_management(fc_bbox)
-        if arcpy.Exists(fc_clipped):
-            arcpy.Delete_management(fc_clipped)
-        arcpy.CopyFeatures_management([circleGeom], fc_bbox)
-        arcpy.Clip_analysis(gemeinden, fc_bbox, fc_clipped)
-        cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'AGS'])
-        # add clipped communities as centers
-        for i, (shape, name, ags) in enumerate(cursor):
-            self.parent_tbx.insert_rows_in_table(
-                'Zentren',
-                column_values={
-                    'SHAPE@': shape,
-                    'name': name,
-                    'nutzerdefiniert': 0,
-                    'umsatz_differenz': 0,
-                    'umsatz_planfall': 0,
-                    'umsatz_nullfall': 0,
-                    'id': max_id + i + 1
-                })
-        del cursor
-        arcpy.Delete_management(fc_bbox)
-        arcpy.Delete_management(fc_clipped)
+    #def communities_to_centers(self, centroid, radius):
+        #'''get communities intersecting with bbox and write them as centers to
+        #the database'''
+        #gemeinden = self.parent_tbx.folders.get_base_table(
+            #table='bkg_gemeinden', workspace='FGDB_Basisdaten_deutschland.gdb')
+        ## circular buffer for clipping
+        #centroid.create_geom()
+        #pntGeom = arcpy.PointGeometry(centroid.geom)
+        #circleGeom = pntGeom.buffer(radius)
+        ## delete existing community-entries
+        #self.parent_tbx.delete_rows_in_table('Zentren',
+                                             #where='nutzerdefiniert=0')
+        #ids = self.parent_tbx.query_table('Zentren', columns='id')
+        #max_id = np.array(ids).max() if len(ids) > 0 else 0
+        ## clip the communities with the bbox
+        #fc_bbox = 'in_memory/bbox'
+        #fc_clipped = 'in_memory/clipped'
+        #if arcpy.Exists(fc_bbox):
+            #arcpy.Delete_management(fc_bbox)
+        #if arcpy.Exists(fc_clipped):
+            #arcpy.Delete_management(fc_clipped)
+        #arcpy.CopyFeatures_management([circleGeom], fc_bbox)
+        #arcpy.Clip_analysis(gemeinden, fc_bbox, fc_clipped)
+        #cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'AGS'])
+        ## add clipped communities as centers
+        #for i, (shape, name, ags) in enumerate(cursor):
+            #self.parent_tbx.insert_rows_in_table(
+                #'Zentren',
+                #column_values={
+                    #'SHAPE@': shape,
+                    #'name': name,
+                    #'nutzerdefiniert': 0,
+                    #'umsatz_differenz': 0,
+                    #'umsatz_planfall': 0,
+                    #'umsatz_nullfall': 0,
+                    #'id': max_id + i + 1
+                #})
+        #del cursor
+        #arcpy.Delete_management(fc_bbox)
+        #arcpy.Delete_management(fc_clipped)
 
     def get_tfl_points(self, start_id):
         '''get the centroids of the planned areas as zensus points, start_id
