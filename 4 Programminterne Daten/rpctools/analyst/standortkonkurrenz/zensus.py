@@ -38,7 +38,7 @@ class Zensus(object):
         except:
             pass
 
-    def cutout_area(self, centroid, radius, bbox, epsg, settlement_buffer=3000, markets_buffer=6000):
+    def cutout_area(self, bbox, epsg, settlement_buffer=3000, markets_buffer=6000):
         """
         return the centroids of the zensus cells as points inside the
         selected communities
@@ -65,6 +65,10 @@ class Zensus(object):
         selected_communities_path =  os.path.join(ws_tmp, selected_communities)
         settlement_cells_buffer_path =  os.path.join(ws_tmp, settlement_cells_buffer_feature)
         markets_buffer_path =  os.path.join(ws_tmp, markets_buffer_feature)
+        # delete old tables
+        arcpy.Delete_management(selected_communities_path)
+        arcpy.Delete_management(settlement_cells_buffer_path)
+        arcpy.Delete_management(markets_buffer_path)
         # clip minimum to rectangle shape that still contains all communities
         srid = clip_raster(zensus_raster, out_raster, bbox)
         # get raster points
