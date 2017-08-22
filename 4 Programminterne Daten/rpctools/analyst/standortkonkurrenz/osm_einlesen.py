@@ -46,7 +46,7 @@ class OSMShopsReader(object):
         self.epsg = epsg
 
 
-    def get_shops(self, point, distance=20000, count=1000):
+    def get_shops(self, count=1000):
         """
         get shops from osm
 
@@ -147,7 +147,7 @@ if __name__ == '__main__':
     o = OSMShopsReader()
     source = Point(54, 10, epsg=4326)
     #source.transform(3035)
-    supermarkets = o.get_shops(source)
+    supermarkets = o.get_shops()
     o.create_supermarket_features(supermarkets)
 
 

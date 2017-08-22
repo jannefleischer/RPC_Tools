@@ -235,9 +235,7 @@ class OSMMarktEinlesen(MarktEinlesen):
         centroid = Point(x, y, epsg=epsg)
         arcpy.AddMessage('Sende Standortanfrage an Geoserver...')
         reader = OSMShopsReader(epsg=epsg)
-        markets = reader.get_shops(centroid,
-                                   distance=self.par.radius.value * 1000,
-                                   count=self.par.count.value)
+        markets = reader.get_shops(count=self.par.count.value)
         arcpy.AddMessage(u'{} Märkte gefunden'.format(len(markets)))
         arcpy.AddMessage(u'Analysiere gefundene Märkte...'
                          .format(len(markets)))
@@ -300,16 +298,16 @@ class TbxOSMMarktEinlesen(Tbx):
         param.datatype = u'GPString'
         param.filter.list = []
 
-        param = self.add_parameter('radius')
-        param.name = encode(u'Radius')
-        param.displayName = encode(u'Maximale Entfernung der '
-                                   u'Märkte vom Plangebiet in Kilometern')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.filter.type = 'Range'
-        param.filter.list = [1, 100]
-        param.value = 5
+        #param = self.add_parameter('radius')
+        #param.name = encode(u'Radius')
+        #param.displayName = encode(u'Maximale Entfernung der '
+                                   #u'Märkte vom Plangebiet in Kilometern')
+        #param.parameterType = 'Required'
+        #param.direction = 'Input'
+        #param.datatype = u'GPLong'
+        #param.filter.type = 'Range'
+        #param.filter.list = [1, 100]
+        #param.value = 5
 
         param = self.add_parameter('count')
         param.name = encode(u'Anzahl')

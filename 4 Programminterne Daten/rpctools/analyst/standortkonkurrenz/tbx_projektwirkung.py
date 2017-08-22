@@ -88,11 +88,11 @@ class ProjektwirkungMarkets(Tool):
         bbox =  extent_to_bbox(self, community_extent,
                                epsg=self.parent_tbx.config.epsg,
                                boundary_size=self._settlement_buffer)
-        self.calculate_zensus(df_markets, centroid, radius, bbox,
-                              settlement_buffer=self._settlement_buffer,
-                              markets_buffer=self._markets_buffer)
+        #self.calculate_zensus(bbox,
+                              #settlement_buffer=self._settlement_buffer,
+                              #markets_buffer=self._markets_buffer)
 
-        arcpy.AddMessage(u'Ermittle angrenzende Gemeinden...')
+        #arcpy.AddMessage(u'Ermittle angrenzende Gemeinden...')
         #self.communities_to_centers(centroid, radius)
 
         # when cells were not recalculated (including Kaufkraft)
@@ -143,29 +143,29 @@ class ProjektwirkungMarkets(Tool):
         self.update_centers()
 
 
-    def calculate_zensus(self, markets, centroid, radius, bbox, settlement_buffer, markets_buffer):
-        '''extract zensus points (incl. points for planned areas)
-        and write them to the database'''
-        zensus = Zensus()
+    #def calculate_zensus(self, markets, centroid, radius, bbox, settlement_buffer, markets_buffer):
+        #'''extract zensus points (incl. points for planned areas)
+        #and write them to the database'''
+        #zensus = Zensus()
 
-        if (len(self.parent_tbx.query_table('Siedlungszellen')) == 0):
-            arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
-            zensus_points, max_id = zensus.cutout_area(bbox,
-                                                       epsg=self.parent_tbx.config.epsg,
-                settlement_buffer=settlement_buffer,
-                markets_buffer=markets_buffer)
-            tfl_points = self.get_tfl_points(max_id + 1)
-            # settlements = zensus centroids + teilflaeche centroids
-            sz_points = zensus_points + tfl_points
-            arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
-            self.zensus_to_db(sz_points)
-            project = self.parent_tbx.folders.projectname
-            zensus.add_kk(sz_points, project)
-            # TODO: Update instead of rewrite
-            self.zensus_to_db(sz_points)
-        else:
-            arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
-                             'Berechnung wird übersprungen')
+        #if (len(self.parent_tbx.query_table('Siedlungszellen')) == 0):
+            #arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
+            #zensus_points, max_id = zensus.cutout_area(bbox,
+                                                       #epsg=self.parent_tbx.config.epsg,
+                #settlement_buffer=settlement_buffer,
+                #markets_buffer=markets_buffer)
+            #tfl_points = self.get_tfl_points(max_id + 1)
+            ## settlements = zensus centroids + teilflaeche centroids
+            #sz_points = zensus_points + tfl_points
+            #arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
+            #self.zensus_to_db(sz_points)
+            #project = self.parent_tbx.folders.projectname
+            #zensus.add_kk(sz_points, project)
+            ## TODO: Update instead of rewrite
+            #self.zensus_to_db(sz_points)
+        #else:
+            #arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
+                             #'Berechnung wird übersprungen')
 
     #def communities_to_centers(self, centroid, radius):
         #'''get communities intersecting with bbox and write them as centers to
@@ -208,21 +208,21 @@ class ProjektwirkungMarkets(Tool):
         #arcpy.Delete_management(fc_bbox)
         #arcpy.Delete_management(fc_clipped)
 
-    def get_tfl_points(self, start_id):
-        '''get the centroids of the planned areas as zensus points, start_id
-        is the id the first point gets (further areas ascending)'''
-        df_tfl = self.parent_tbx.table_to_dataframe(
-            'Teilflaechen_Plangebiet', workspace='FGDB_Definition_Projekt.gdb')
-        points = []
-        i = 0
-        for index, tfl in df_tfl.iterrows():
-            point = ZensusCell(tfl['INSIDE_X'], tfl['INSIDE_Y'],
-                               epsg=self.parent_tbx.config.epsg, ew=tfl['ew'],
-                               id=start_id+i,
-                               tfl_id=tfl['id_teilflaeche'])
-            points.append(point)
-            i += 1
-        return points
+    #def get_tfl_points(self, start_id):
+        #'''get the centroids of the planned areas as zensus points, start_id
+        #is the id the first point gets (further areas ascending)'''
+        #df_tfl = self.parent_tbx.table_to_dataframe(
+            #'Teilflaechen_Plangebiet', workspace='FGDB_Definition_Projekt.gdb')
+        #points = []
+        #i = 0
+        #for index, tfl in df_tfl.iterrows():
+            #point = ZensusCell(tfl['INSIDE_X'], tfl['INSIDE_Y'],
+                               #epsg=self.parent_tbx.config.epsg, ew=tfl['ew'],
+                               #id=start_id+i,
+                               #tfl_id=tfl['id_teilflaeche'])
+            #points.append(point)
+            #i += 1
+        #return points
 
     def update_tfl_points(self):
         '''update the number of inhabitants for points representing the
@@ -415,39 +415,39 @@ class ProjektwirkungMarkets(Tool):
             cells.append(dest)
         return cells
 
-    def zensus_to_db(self, zensus_points):
-        df = pd.DataFrame()
-        shapes = []
-        ews = []
-        kk_indices = []
-        kks = []
-        cell_ids = []
-        tfl_ids = []
-        self.parent_tbx.delete_rows_in_table('Siedlungszellen')
-        for point in zensus_points:
-            # ignore zensus points with no inhabitants
-            # (but keep the planned ones)
-            if point.ew <= 0 and point.tfl_id < 0:
-                continue
-            point.create_geom()
-            shapes.append(point.geom)
-            ews.append(point.ew)
-            if DEBUG:
-                kk_indices.append(100)
-            else:
-                kk_indices.append(point.kk_index)
-            kks.append(point.kk)
-            cell_ids.append(point.id)
-            tfl_ids.append(point.tfl_id)
+    #def zensus_to_db(self, zensus_points):
+        #df = pd.DataFrame()
+        #shapes = []
+        #ews = []
+        #kk_indices = []
+        #kks = []
+        #cell_ids = []
+        #tfl_ids = []
+        #self.parent_tbx.delete_rows_in_table('Siedlungszellen')
+        #for point in zensus_points:
+            ## ignore zensus points with no inhabitants
+            ## (but keep the planned ones)
+            #if point.ew <= 0 and point.tfl_id < 0:
+                #continue
+            #point.create_geom()
+            #shapes.append(point.geom)
+            #ews.append(point.ew)
+            #if DEBUG:
+                #kk_indices.append(100)
+            #else:
+                #kk_indices.append(point.kk_index)
+            #kks.append(point.kk)
+            #cell_ids.append(point.id)
+            #tfl_ids.append(point.tfl_id)
 
-        df['id'] = cell_ids
-        df['SHAPE'] = shapes
-        df['ew'] = ews
-        df['kk_index'] = kk_indices
-        df['kk'] = kks
-        df['id_teilflaeche'] = tfl_ids
+        #df['id'] = cell_ids
+        #df['SHAPE'] = shapes
+        #df['ew'] = ews
+        #df['kk_index'] = kk_indices
+        #df['kk'] = kks
+        #df['id_teilflaeche'] = tfl_ids
 
-        self.parent_tbx.insert_dataframe_in_table('Siedlungszellen', df)
+        #self.parent_tbx.insert_dataframe_in_table('Siedlungszellen', df)
 
 
 class TbxProjektwirkungMarkets(Tbx):

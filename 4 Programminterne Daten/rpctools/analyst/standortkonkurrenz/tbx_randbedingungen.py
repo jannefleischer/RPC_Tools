@@ -8,6 +8,7 @@ from rpctools.analyst.standortkonkurrenz.zensus import Zensus, ZensusCell
 from rpctools.utils.spatial_lib import Point, extent_to_bbox, \
      get_extent, features_to_raster
 from rpctools.utils.encoding import encode
+from rpctools.analyst.standortkonkurrenz.tbx_osm_markteinlesen import OSMMarktEinlesen
 
 
 
@@ -25,10 +26,12 @@ class SetBoundaryConditions(Tool):
                               'Siedlungszellen_Puffer',
                               featureclass="Siedlungszellen_Puffer",
                               template_folder="Standortkonkurrenz")
+        self.output.delete_output("Nicht ausgewählte Gemeinden")
         pass
 
     def run(self):
         zensus = Zensus()
+        #o = OSMMarktEinlesen()
         settlement_radius = self.par.radius_settlement.value
         markets_radius = self.par.radius_markets.value
 
@@ -40,6 +43,7 @@ class SetBoundaryConditions(Tool):
         self.calculate_zensus(bbox,
                               settlement_buffer=settlement_radius,
                               markets_buffer=markets_radius)
+        #o.run()
         pass
 
     def calculate_zensus(self, bbox, settlement_buffer, markets_buffer):
@@ -146,7 +150,7 @@ class TbxSetBoundaryConditions(Tbx):
         p.filter.type = 'Range'
         p.filter.list = [0, 5000]
         p.value = 3000
-        p.enabled = False
+        p.enabled = True
 
         # markets radius
         p = self.add_parameter('radius_markets')
@@ -159,7 +163,7 @@ class TbxSetBoundaryConditions(Tbx):
         p.filter.type = 'Range'
         p.filter.list = [0, 10000]
         p.value = 6000
-        p.enabled = False
+        p.enabled = True
 
         return params
 
