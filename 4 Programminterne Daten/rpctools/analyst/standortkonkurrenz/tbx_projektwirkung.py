@@ -150,8 +150,8 @@ class ProjektwirkungMarkets(Tool):
 
         if (len(self.parent_tbx.query_table('Siedlungszellen')) == 0):
             arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
-            zensus_points, max_id = zensus.cutout_area(
-                centroid, radius, bbox, epsg=self.parent_tbx.config.epsg,
+            zensus_points, max_id = zensus.cutout_area(bbox,
+                                                       epsg=self.parent_tbx.config.epsg,
                 settlement_buffer=settlement_buffer,
                 markets_buffer=markets_buffer)
             tfl_points = self.get_tfl_points(max_id + 1)
