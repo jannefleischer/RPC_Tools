@@ -5,10 +5,11 @@ import arcpy
 import shutil
 import re
 import pandas as pd
+import numpy as np
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.utils.spatial_lib import get_ags
+from rpctools.utils.spatial_lib import get_ags, extent_to_bbox
 from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
                                                               Point)
 
@@ -16,7 +17,6 @@ from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
 class MarktEinlesen(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
-
     def run(self):
         """"""
 
@@ -37,9 +37,8 @@ class MarktEinlesen(Tool):
 
         self.output.hide_layer('projektdefinition')
 
-    def markets_to_db(self, supermarkets, truncate=False, planfall=False):
+    def markets_to_db(self, supermarkets, tablename='Maerkte', truncate=False, planfall=False, is_buffer=False):
         """Create the point-features for supermarkets"""
-        tablename = 'Maerkte'
         sr = arcpy.SpatialReference(self.parent_tbx.config.epsg)
 
         columns = [
@@ -50,7 +49,8 @@ class MarktEinlesen(Tool):
             'SHAPE@',
             'id_teilflaeche',
             'id',
-            'adresse'
+            'adresse',
+            'is_buffer'
         ]
         table = self.folders.get_table(tablename)
         # remove results as well (distances etc.)
@@ -80,7 +80,8 @@ class MarktEinlesen(Tool):
                         markt.geom,
                         markt.id_teilflaeche,
                         max_id + i + 1,
-                        markt.adresse
+                        markt.adresse,
+                        int(is_buffer)
                     ))
 
     def set_ags(self):
@@ -200,9 +201,28 @@ class MarktEinlesen(Tool):
 
 
 class OSMMarktEinlesen(MarktEinlesen):
-
+    _markets_table = 'Maerkte'
+    _markets_table_tmp = 'Maerkte_tmp'
+    _markets_in_communities = 'Maerkte_in_Gemeinden'
+    _markets_buffer = 'Maerkte_Puffer'
+    _markets_boundary = 'Maerkte_Randbedingung'
+    _selected_communities = "Ausgewaehlte_Gemeinden"
     def run(self):
+
         tbx = self.parent_tbx
+        # paths
+        markets_path = tbx.folders.get_table(self._markets_table,
+                                             workspace=self._workspace)
+        markets_boundary_path = tbx.folders.get_table(self._markets_boundary,
+                                             workspace=self._workspace)
+        tmp_markets_path = tbx.folders.get_table(self._markets_table_tmp,
+                                             workspace=self._workspace)
+        buffer_path = tbx.folders.get_table(self._markets_buffer,
+                                             workspace=self._workspace)
+        markets_in_communities_path = tbx.folders.get_table(self._markets_in_communities,
+                                             workspace=self._workspace)
+        selected_communities_path = tbx.folders.get_table(
+            self._selected_communities, workspace=self._workspace)
         # calc. center of areas
         flaechen_df = tbx.table_to_dataframe(
             'Teilflaechen_Plangebiet',
@@ -225,9 +245,36 @@ class OSMMarktEinlesen(MarktEinlesen):
         markets = self.parse_meta(markets)
         arcpy.AddMessage(u'Schreibe {} Märkte in die Datenbank...'
                          .format(len(markets)))
-        self.markets_to_db(markets, truncate=truncate)
+        tbx.delete_rows_in_table(self._markets_table, where='is_buffer=1')
+        arcpy.Copy_management(markets_path, markets_boundary_path)
+        tbx.delete_rows_in_table(markets_boundary_path)
+        self.markets_to_db(markets,
+                           tablename=self._markets_boundary,
+                           truncate=truncate,
+                           is_buffer=True)
+
         arcpy.AddMessage(u'Aktualisiere die AGS der Märkte...')
         self.set_ags()
+        # only markets in buffer zone
+
+
+        arcpy.Clip_analysis(markets_boundary_path, buffer_path,
+                            tmp_markets_path)
+        #arcpy.Delete_management(markets_path)
+        arcpy.Clip_analysis(tmp_markets_path, selected_communities_path, markets_in_communities_path)
+        cursor = arcpy.da.SearchCursor(markets_in_communities_path, ['id'],
+                                       where_clause='is_buffer=1')
+        in_com_ids = [str(id) for id, in cursor]
+        del(cursor)
+        where = 'id IN ({})'.format(','.join(in_com_ids))
+        tbx.delete_rows_in_table(tmp_markets_path, where)
+        tbx.delete_rows_in_table(self._markets_table, where='is_buffer=1')
+        arcpy.Delete_management(markets_path)
+        arcpy.Rename_management(in_data=tmp_markets_path,
+                                out_data=markets_path)
+        arcpy.Delete_management(markets_boundary_path)
+        arcpy.Delete_management(markets_in_communities_path)
+
 
 
 class TbxOSMMarktEinlesen(Tbx):

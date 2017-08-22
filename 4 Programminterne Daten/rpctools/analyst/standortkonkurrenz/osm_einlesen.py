@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from rpctools.utils.spatial_lib import Point
+from rpctools.utils.config import Folders, Config
 import requests
 
 #import arcpy
@@ -14,7 +15,7 @@ import arcpy
 
 class Supermarket(Point):
     """A Supermarket"""
-    def __init__(self, id, x, y, name, kette, shop=None, typ=None, vkfl=None, 
+    def __init__(self, id, x, y, name, kette, shop=None, typ=None, vkfl=None,
                  id_betriebstyp=1, epsg=4326, id_teilflaeche=-1, id_kette=0,
                  adresse='', **kwargs):
         super(Supermarket, self).__init__(x, y, id=id, epsg=epsg)
@@ -44,6 +45,7 @@ class OSMShopsReader(object):
                                outputFormat='application/json')
         self.epsg = epsg
 
+
     def get_shops(self, point, distance=20000, count=1000):
         """
         get shops from osm
@@ -58,12 +60,29 @@ class OSMShopsReader(object):
         -------
         json
         """
-        query = 'DWithin(geom,POINT({y} {x}),{m},meters)'
-        point.transform(self.geoserver_epsg)
+        buffer_path = Folders().get_table(
+            'Maerkte_Puffer',
+            workspace='FGDB_Standortkonkurrenz_Supermaerkte.gdb',
+            project=Config().active_project)
+        for row in arcpy.SearchCursor(buffer_path):
+            polygon = row.getValue("SHAPE")
+        poly_extent = polygon.extent
+        query = 'INTERSECTS(geom,POLYGON(({})))'
+        try:
+            poly_trans = [Point(p.X, p.Y, epsg=self.epsg).\
+                          transform(self.geoserver_epsg)
+                          for p in [poly_extent.lowerLeft,
+                                    poly_extent.upperLeft,
+                                    poly_extent.upperRight,
+                                    poly_extent.lowerRight,
+                                    poly_extent.lowerLeft]]
+            str_poly = ', '.join(('{} {}'.format(pnt[1], pnt[0])
+                              for pnt in poly_trans))
+        except AttributeError as e:
+            if p is not None:
+                raise e
         srsname = 'EPSG:{}'.format(self.epsg)
-        params = dict(CQL_FILTER=query.format(x=point.x,
-                                              y=point.y,
-                                              m=distance),
+        params = dict(CQL_FILTER=query.format(str_poly),
                       srsname=srsname,
                       count=str(count))
         params.update(self.wfs_params)
@@ -135,3 +154,4 @@ if __name__ == '__main__':
 
 
 
+    u'<ows:ExceptionReport xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0.0" xsi:schemaLocation="Could not parse CQL filter list.\nPoints of LinearRing do not form a closed linestring Parsing : DISJOINT(geom,POLYGON((4279232.71478 3319275.58031, 4280073.39017 3379519.62277, 4334285.73117 3378761.16243, 4333441.76038 3318521.71001))).</ows:ExceptionText>\n  </ows:Exception>\n</ows:ExceptionReport>\n'

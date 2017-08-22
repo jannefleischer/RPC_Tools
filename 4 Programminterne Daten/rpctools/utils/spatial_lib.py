@@ -45,6 +45,7 @@ class Point(object):
         self.proj = Proj(init='epsg:{}'.format(self.epsg))
         self.x = x
         self.y = y
+        return (x, y)
 
 def extent_to_bbox(self, extent, epsg, boundary_size = 0.00):
     '''return a square bounding box with given centroid in center and dimension

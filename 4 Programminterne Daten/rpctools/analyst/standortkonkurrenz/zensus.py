@@ -59,7 +59,7 @@ class Zensus(object):
                                        'zensus_cutout_clipped.shp')
         out_raster = os.path.join(self.tmp_folder, 'zensus_cutout.tif')
         ws_tmp = tbx.folders.get_db(workspace=self._workspace)
-        selected_communities = "tmp_selected_communities"
+        selected_communities = "Ausgewaehlte_Gemeinden"
         settlement_cells_buffer_feature = "Siedlungszellen_Puffer"
         markets_buffer_feature = "Maerkte_Puffer"
         selected_communities_path =  os.path.join(ws_tmp, selected_communities)
@@ -110,7 +110,7 @@ class Zensus(object):
         # delete temporary files
         def del_tmp():
             for fn in [raster_points, raster_points_projected, out_raster,
-                       raster_points_clipped, selected_communities_path]:
+                       raster_points_clipped]:
                 arcpy.Delete_management(fn)
         del_tmp()
         return zensus_points, len(zensus_points)
