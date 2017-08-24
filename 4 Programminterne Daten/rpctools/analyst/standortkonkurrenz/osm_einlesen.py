@@ -46,7 +46,7 @@ class OSMShopsReader(object):
         self.epsg = epsg
 
 
-    def get_shops(self, count=1000):
+    def get_shops(self, polygon, count=1000):
         """
         get shops from osm
 
@@ -60,27 +60,10 @@ class OSMShopsReader(object):
         -------
         json
         """
-        buffer_path = Folders().get_table(
-            'Maerkte_Puffer',
-            workspace='FGDB_Standortkonkurrenz_Supermaerkte.gdb',
-            project=Config().active_project)
-        for row in arcpy.SearchCursor(buffer_path):
-            polygon = row.getValue("SHAPE")
-        poly_extent = polygon.extent
         query = 'INTERSECTS(geom,POLYGON(({})))'
-        try:
-            poly_trans = [Point(p.X, p.Y, epsg=self.epsg).\
-                          transform(self.geoserver_epsg)
-                          for p in [poly_extent.lowerLeft,
-                                    poly_extent.upperLeft,
-                                    poly_extent.upperRight,
-                                    poly_extent.lowerRight,
-                                    poly_extent.lowerLeft]]
-            str_poly = ', '.join(('{} {}'.format(pnt[1], pnt[0])
+        poly_trans = [p.transform(self.geoserver_epsg) for p in polygon]
+        str_poly = ', '.join(('{} {}'.format(pnt[1], pnt[0])
                               for pnt in poly_trans))
-        except AttributeError as e:
-            if p is not None:
-                raise e
         srsname = 'EPSG:{}'.format(self.epsg)
         params = dict(CQL_FILTER=query.format(str_poly),
                       srsname=srsname,

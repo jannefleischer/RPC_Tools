@@ -9,7 +9,8 @@ import numpy as np
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.utils.spatial_lib import get_ags, extent_to_bbox
+from rpctools.utils.spatial_lib import (get_ags, extent_to_bbox,
+                                        minimal_bounding_poly)
 from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
                                                               Point)
 
@@ -204,23 +205,21 @@ class OSMMarktEinlesen(MarktEinlesen):
     _markets_table = 'Maerkte'
     _markets_table_tmp = 'Maerkte_tmp'
     _markets_in_communities = 'Maerkte_in_Gemeinden'
-    _markets_buffer = 'Maerkte_Puffer'
     _markets_boundary = 'Maerkte_Randbedingung'
     _selected_communities = "Ausgewaehlte_Gemeinden"
+
     def run(self):
 
         tbx = self.parent_tbx
         # paths
-        markets_path = tbx.folders.get_table(self._markets_table,
-                                             workspace=self._workspace)
-        markets_boundary_path = tbx.folders.get_table(self._markets_boundary,
-                                             workspace=self._workspace)
-        tmp_markets_path = tbx.folders.get_table(self._markets_table_tmp,
-                                             workspace=self._workspace)
-        buffer_path = tbx.folders.get_table(self._markets_buffer,
-                                             workspace=self._workspace)
-        markets_in_communities_path = tbx.folders.get_table(self._markets_in_communities,
-                                             workspace=self._workspace)
+        markets_path = tbx.folders.get_table(
+            self._markets_table, workspace=self._workspace)
+        markets_boundary_path = tbx.folders.get_table(
+            self._markets_boundary, workspace=self._workspace)
+        tmp_markets_path = tbx.folders.get_table(
+            self._markets_table_tmp, workspace=self._workspace)
+        markets_in_communities_path = tbx.folders.get_table(
+            self._markets_in_communities, workspace=self._workspace)
         selected_communities_path = tbx.folders.get_table(
             self._selected_communities, workspace=self._workspace)
         # calc. center of areas
@@ -230,12 +229,21 @@ class OSMMarktEinlesen(MarktEinlesen):
             workspace='FGDB_Definition_Projekt.gdb')
         x = flaechen_df['INSIDE_X'].mean()
         y = flaechen_df['INSIDE_Y'].mean()
-
+        
+        communities = self.folders.get_table('Zentren')
+        multi_poly = minimal_bounding_poly(communities, where='"Auswahl"<>0')
+        
+        epsg = self.parent_tbx.config.epsg
+        multi_poly = [[Point(p.X, p.Y, epsg=epsg) for p in poly]
+                      for poly in multi_poly]
+        
         epsg = tbx.config.epsg
-        centroid = Point(x, y, epsg=epsg)
         arcpy.AddMessage('Sende Standortanfrage an Geoserver...')
         reader = OSMShopsReader(epsg=epsg)
-        markets = reader.get_shops(count=self.par.count.value)
+        markets = []
+        for poly in multi_poly:
+            m = reader.get_shops(poly, count=self.par.count.value-len(markets))
+            markets += m
         arcpy.AddMessage(u'{} Märkte gefunden'.format(len(markets)))
         arcpy.AddMessage(u'Analysiere gefundene Märkte...'
                          .format(len(markets)))
@@ -243,43 +251,20 @@ class OSMMarktEinlesen(MarktEinlesen):
         markets = self.parse_meta(markets)
         arcpy.AddMessage(u'Schreibe {} Märkte in die Datenbank...'
                          .format(len(markets)))
-        tbx.delete_rows_in_table(self._markets_table, where='is_buffer=1')
-        arcpy.Copy_management(markets_path, markets_boundary_path)
-        tbx.delete_rows_in_table(markets_boundary_path)
         self.markets_to_db(markets,
-                           tablename=self._markets_boundary,
+                           tablename=self._markets_table,
                            truncate=truncate,
-                           is_buffer=True)
+                           is_buffer=False)
 
         arcpy.AddMessage(u'Aktualisiere die AGS der Märkte...')
         self.set_ags()
-        # only markets in buffer zone
-
-
-        arcpy.Clip_analysis(markets_boundary_path, buffer_path,
-                            tmp_markets_path)
-        #arcpy.Delete_management(markets_path)
-        arcpy.Clip_analysis(tmp_markets_path, selected_communities_path, markets_in_communities_path)
-        cursor = arcpy.da.SearchCursor(markets_in_communities_path, ['id'],
-                                       where_clause='is_buffer=1')
-        in_com_ids = [str(id) for id, in cursor]
-        del(cursor)
-        where = 'id IN ({})'.format(','.join(in_com_ids))
-        tbx.delete_rows_in_table(tmp_markets_path, where)
-        tbx.delete_rows_in_table(self._markets_table, where='is_buffer=1')
-        arcpy.Delete_management(markets_path)
-        arcpy.Rename_management(in_data=tmp_markets_path,
-                                out_data=markets_path)
-        arcpy.Delete_management(markets_boundary_path)
-        arcpy.Delete_management(markets_in_communities_path)
-
 
 
 class TbxOSMMarktEinlesen(Tbx):
 
     @property
     def label(self):
-        return encode(u'OpenStreetMap anfragen')
+        return encode(u'Märkte aus OpenStreetMap im Betrachtungsraum einlesen')
 
     @property
     def Tool(self):
@@ -297,17 +282,6 @@ class TbxOSMMarktEinlesen(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.filter.list = []
-
-        #param = self.add_parameter('radius')
-        #param.name = encode(u'Radius')
-        #param.displayName = encode(u'Maximale Entfernung der '
-                                   #u'Märkte vom Plangebiet in Kilometern')
-        #param.parameterType = 'Required'
-        #param.direction = 'Input'
-        #param.datatype = u'GPLong'
-        #param.filter.type = 'Range'
-        #param.filter.list = [1, 100]
-        #param.value = 5
 
         param = self.add_parameter('count')
         param.name = encode(u'Anzahl')
