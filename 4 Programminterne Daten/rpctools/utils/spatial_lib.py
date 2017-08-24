@@ -6,7 +6,7 @@ from pyproj import Proj, transform
 
 import requests
 import numpy as np
-from os.path import join
+from os.path import join, split
 
 def features_to_raster(feature_class, outfile, field, where=''):
     layer = arcpy.MakeFeatureLayer_management(feature_class, 'temp_layer',
@@ -54,12 +54,48 @@ def extent_to_bbox(self, extent, epsg, boundary_size = 0.00):
     boundary = boundary_size
     p1 = Point(xmin - boundary, ymin - boundary, epsg=epsg)
     p2 = Point(xmax + boundary, ymax + boundary, epsg=epsg)
-
-
     bbox = (p1, p2)
 
     return bbox
 
+def minimal_bounding_poly(in_features, where=''):
+    """get a bounding multipart geometry around the given features
+
+    Parameters
+    ----------
+    in_features : str
+        full path to input features
+    iout_features : str
+        full path to output features
+    where : str, optional
+        where clause
+
+    Returns
+    -------
+    polygon : arcpy.Polygon
+    """
+    ws_tmp = arcpy.env.scratchGDB
+    feat_tmp = join(ws_tmp, 'feat_tmp')
+    feat_single = join(ws_tmp, 'feat_single')
+    feat_minimal = join(ws_tmp, 'feat_minimal')
+    out_features = join(ws_tmp, 'out')
+    
+    arcpy.FeatureClassToFeatureClass_conversion(
+        in_features, ws_tmp, split(feat_tmp)[1],
+        where_clause=where)
+    arcpy.MultipartToSinglepart_management(feat_tmp, feat_single)
+    arcpy.MinimumBoundingGeometry_management(feat_single, feat_minimal, 
+                                             "RECTANGLE_BY_AREA", "NONE")
+    arcpy.Dissolve_management(feat_minimal, out_features, "", "", 
+                              "MULTI_PART", "DISSOLVE_LINES")
+    
+    cursor = arcpy.da.SearchCursor(out_features, ['SHAPE@'])
+    polygon = cursor.next()[0]
+    del(cursor)
+    
+    for f in [feat_tmp, feat_single, feat_minimal, out_features]:
+        arcpy.Delete_management(f)
+    return polygon
 
 def google_geocode(address, api_key=''):
     url = 'https://maps.googleapis.com/maps/api/geocode/json'
