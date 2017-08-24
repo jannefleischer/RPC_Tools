@@ -211,24 +211,6 @@ class OSMMarktEinlesen(MarktEinlesen):
     def run(self):
 
         tbx = self.parent_tbx
-        # paths
-        markets_path = tbx.folders.get_table(
-            self._markets_table, workspace=self._workspace)
-        markets_boundary_path = tbx.folders.get_table(
-            self._markets_boundary, workspace=self._workspace)
-        tmp_markets_path = tbx.folders.get_table(
-            self._markets_table_tmp, workspace=self._workspace)
-        markets_in_communities_path = tbx.folders.get_table(
-            self._markets_in_communities, workspace=self._workspace)
-        selected_communities_path = tbx.folders.get_table(
-            self._selected_communities, workspace=self._workspace)
-        # calc. center of areas
-        flaechen_df = tbx.table_to_dataframe(
-            'Teilflaechen_Plangebiet',
-            columns=['INSIDE_X', 'INSIDE_Y'],
-            workspace='FGDB_Definition_Projekt.gdb')
-        x = flaechen_df['INSIDE_X'].mean()
-        y = flaechen_df['INSIDE_Y'].mean()
         
         communities = self.folders.get_table('Zentren')
         multi_poly = minimal_bounding_poly(communities, where='"Auswahl"<>0')
