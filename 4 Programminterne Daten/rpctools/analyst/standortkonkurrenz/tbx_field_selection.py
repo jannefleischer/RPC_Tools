@@ -36,7 +36,7 @@ class FieldSelectionTool(Tool):
                              template_folder='Standortkonkurrenz',
                              featureclass=self._table,
                              workspace=self._workspace,
-                             name='Ausgewählte Gemeinden')
+                             name='Ausgewählte Gemeinden im Betrachtungsraum')
         self.output.add_layer('standortkonkurrenz', 'Zentren_background',
                              template_folder='Standortkonkurrenz',
                              featureclass=self._table,

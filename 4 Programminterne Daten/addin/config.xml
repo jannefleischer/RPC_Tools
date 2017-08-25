@@ -202,22 +202,22 @@
                 <Button caption="M&#228;rkte und Versorgungsbereiche anzeigen" category="ProjektCheck" class="MaerkteZentrenAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="Bereits erzeugte, in der Karte aktuell aber nicht enthaltene Layer mit Märkten (Nullfall und Planfall) und Versorgungsbereichen wieder zur Karte hinzufügen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="M&#228;rkte im Betrachtungsraum (OpenStreetMap)" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="Den in OpenStreetMap verfügbaren Bestand an Lebensmittelmärkten online abfragen und einlesen">
+                <Button caption="Betrachtungsraum mit M&#228;rkten aus OSM erg&#228;nzen" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="Den in OpenStreetMap verfügbaren Bestand an Lebensmittelmärkten online abfragen und einlesen">
                     <Help heading="" />
                 </Button>
-                <Button caption="M&#228;rkte im Umkreis erg&#228;nzen (OpenStreetMap)" category="ProjektCheck" class="BestandOSMBuffer" id="rpc_tools.bestand_osm_buffer" image="Images\Openstreetmap_logo.svg.png" message="" tip="Das Randgebiet des Betrachtungsraums durch Märkte aus OpenStreetMap ergänzen">
+                <Button caption="Umkreis mit M&#228;rkten aus OSM erg&#228;nzen" category="ProjektCheck" class="BestandOSMBuffer" id="rpc_tools.bestand_osm_buffer" image="Images\Openstreetmap_logo.svg.png" message="" tip="Das Randgebiet des Betrachtungsraums durch Märkte aus OpenStreetMap ergänzen">
                     <Help heading="" />
                 </Button>
                 <Button caption="Erfassungsvorlage erzeugen" category="ProjektCheck" class="TemplateErzeugen" id="rpc_tools.template_erzeugen" image="Images\MetadataDocumentLiveService16.png" message="" tip="Eine leere Erfassungsvorlage im csv-, Excel- oder Shapefile-Format erzeugen, in der die Bestandsmärkte händisch eingetragen und später wieder mit Projekt-Check eingelesen werden können.">
                     <Help heading="" />
                 </Button>
-                <Button caption="CSV/Excel-Vorlage einlesen" category="ProjektCheck" class="TemplateEinlesenDatei" id="rpc_tools.template_einlesen_datei" image="Images\MetadataGazetteerLoad16.png" message="" tip="Eine von Ihnen zuvor als csv- oder Excel-Datei erzeugte und anschließend befüllte Erfassungsvorlage für die Lebensmittelmärkte im Bestand wieder einlesen.">
+                <Button caption="bef&#252;llte CSV/Excel-Vorlage einlesen" category="ProjektCheck" class="TemplateEinlesenDatei" id="rpc_tools.template_einlesen_datei" image="Images\MetadataGazetteerLoad16.png" message="" tip="Eine von Ihnen zuvor als csv- oder Excel-Datei erzeugte und anschließend befüllte Erfassungsvorlage für die Lebensmittelmärkte im Bestand wieder einlesen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Shape/Layer-Vorlage einlesen" category="ProjektCheck" class="TemplateEinlesenFeatureClass" id="rpc_tools.template_einlesen_featureclass" image="Images\MetadataGazetteerLoad16.png" message="" tip="Eine von Ihnen zuvor als Shape-Datei erzeugte und anschließend befüllte Erfassungsvorlage für die Lebensmittelmärkte im Bestand wieder einlesen.">
+                <Button caption="bef&#252;llte Shape/Layer-Vorlage einlesen" category="ProjektCheck" class="TemplateEinlesenFeatureClass" id="rpc_tools.template_einlesen_featureclass" image="Images\MetadataGazetteerLoad16.png" message="" tip="Eine von Ihnen zuvor als Shape-Datei erzeugte und anschließend befüllte Erfassungsvorlage für die Lebensmittelmärkte im Bestand wieder einlesen.">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Bestehenden Markt hinzuf&#252;gen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="Einen bestehenden Lebensmittelmarkt in die Karte eintragen.">
+                <Tool caption="Bestehenden Markt manuell hinzuf&#252;gen" category="ProjektCheck" class="BestandMarktHinzu" id="rpc_tools.bestand_hinzu" image="Images\GreenPin16.png" message="" tip="Einen bestehenden Lebensmittelmarkt in die Karte eintragen.">
                     <Help heading="" />
                 </Tool>
                 <Tool caption="Bestehenden Markt bearbeiten/entfernen" category="ProjektCheck" class="BestandMarktBearbeiten" id="rpc_tools.bestand_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="Einen bereits in der Karte enthaltenen Lebensmittelmarkt bearbeiten (Name, Handelskette, Betriebstyp) oder löschen.">
@@ -676,13 +676,13 @@
                 </Menu>
                 <Menu caption="Lebensmitteleinzelhandel im Bestand" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_nullfall" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
-                        <Button refID="rpc_tools.bestand_osm" />
                         <Button refID="rpc_tools.template_erzeugen" />
                         <Button refID="rpc_tools.template_einlesen_datei" />
                         <Button refID="rpc_tools.template_einlesen_featureclass" />
+                        <Button refID="rpc_tools.bestand_osm" separator="true"/>
+                        <Button refID="rpc_tools.bestand_osm_buffer"/>
                         <Tool refID="rpc_tools.bestand_hinzu" separator="true"/>
                         <Tool refID="rpc_tools.bestand_bearbeiten" />
-                        <Button refID="rpc_tools.bestand_osm_buffer" separator="true"/>
                     </Items>
                 </Menu>
                 <Menu caption="Ver&#228;nderungen durch Planung" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_planfall" isRootMenu="false" isShortcutMenu="true" separator="true">

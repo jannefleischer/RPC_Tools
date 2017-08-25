@@ -9,7 +9,7 @@ import numpy as np
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.utils.spatial_lib import get_ags, minimal_bounding_poly
+from rpctools.utils.spatial_lib import get_ags, minimal_bounding_poly, remove_duplicates
 from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
                                                               Point)
 
@@ -51,7 +51,8 @@ class MarktEinlesen(Tool):
             'id_teilflaeche',
             'id',
             'adresse',
-            'is_buffer'
+            'is_buffer',
+            'is_osm'
         ]
         table = self.folders.get_table(tablename)
         # remove results as well (distances etc.)
@@ -83,7 +84,8 @@ class MarktEinlesen(Tool):
                         markt.id_teilflaeche,
                         start_id + i,
                         markt.adresse,
-                        int(is_buffer)
+                        int(is_buffer),
+                        1
                     ))
 
     def set_ags(self):
@@ -132,10 +134,13 @@ class MarktEinlesen(Tool):
                     market.id_betriebstyp = df_bt[fit_idx]['id_betriebstyp'].values[0]
         return markets
 
-    def parse_meta(self, markets, field='name'):
+    def parse_meta(self, markets, field='name', known_only=False):
         """
         use the name of the markets to parse and assign chain-ids and
         betriebstyps
+        
+        known_only: str, optional
+            only return markets that belong to known chains if True
         """
 
         df_chains_alloc = self.parent_tbx.table_to_dataframe(
@@ -176,9 +181,14 @@ class MarktEinlesen(Tool):
                         u'  - Markt "{}" ist kein Lebensmitteleinzelhandel, '
                         u'wird übersprungen'.format(market.name))
                 break
-            # add markets that didn't match (keep defaults)
+            # markets that didn't match (keep defaults)
             if not match_found:
-                ret_markets.append(market)
+                if known_only:
+                    arcpy.AddMessage(
+                        u'  - Markt "{}" gehört zu keiner bekannten Kette. '
+                        u'wird übersprungen'.format(market.name))
+                else:
+                    ret_markets.append(market)
         return ret_markets
 
     def delete_area_market(self, id_area):
@@ -204,10 +214,6 @@ class MarktEinlesen(Tool):
 
 class OSMMarktEinlesen(MarktEinlesen):
     _markets_table = 'Maerkte'
-    _markets_table_tmp = 'Maerkte_tmp'
-    _markets_in_communities = 'Maerkte_in_Gemeinden'
-    _markets_boundary = 'Maerkte_Randbedingung'
-    _selected_communities = "Ausgewaehlte_Gemeinden"
 
     def run(self):
 
@@ -217,12 +223,19 @@ class OSMMarktEinlesen(MarktEinlesen):
         multi_poly = minimal_bounding_poly(communities, where='"Auswahl"<>0')
         
         epsg = self.parent_tbx.config.epsg
-        multi_poly = [[Point(p.X, p.Y, epsg=epsg) for p in poly]
+        multi_poly = [[Point(p.X, p.Y, epsg=epsg) for p in poly if p]
                       for poly in multi_poly]
         
         epsg = tbx.config.epsg
         arcpy.AddMessage('Sende Standortanfrage an Geoserver...')
         reader = OSMShopsReader(epsg=epsg)
+        truncate = self.par.truncate.value
+        if truncate:
+            n = tbx.delete_rows_in_table(self._markets_table, where='is_osm=1')
+            arcpy.AddMessage(u'{} vorhandene OSM-Märkte gelöscht'.format(n))
+        if self.par.count.value == 0:
+            return
+        
         markets = []
         for poly in multi_poly:
             m = reader.get_shops(poly, count=self.par.count.value-len(markets))
@@ -230,15 +243,20 @@ class OSMMarktEinlesen(MarktEinlesen):
         arcpy.AddMessage(u'{} Märkte gefunden'.format(len(markets)))
         arcpy.AddMessage(u'Analysiere gefundene Märkte...'
                          .format(len(markets)))
-        truncate = self.par.truncate.value
-        markets = self.parse_meta(markets)
+        
+        markets = self.parse_meta(markets, known_only=self.par.known_only.value)
         arcpy.AddMessage(u'Schreibe {} Märkte in die Datenbank...'
                          .format(len(markets)))
         self.markets_to_db(markets,
                            tablename=self._markets_table,
-                           truncate=truncate,
+                           truncate=False,  # already truncated osm markets
                            is_buffer=False)
 
+        arcpy.AddMessage('Entferne Duplikate...')
+        n = remove_duplicates(self.folders.get_table(self._markets_table),
+                              'id', match_field='id_kette', 
+                              where='is_osm=1', distance=50)
+        arcpy.AddMessage('{} Duplikate entfernt...'.format(n))
         arcpy.AddMessage(u'Aktualisiere die AGS der Märkte...')
         self.set_ags()
 
@@ -279,7 +297,14 @@ class TbxOSMMarktEinlesen(Tbx):
 
         param = self.add_parameter('truncate')
         param.name = encode(u'truncate')
-        param.displayName = encode(u'Vorhandene Märkte entfernen')
+        param.displayName = encode(u'Vorhandene OSM-Märkte entfernen')
+        param.parameterType = 'Optional'
+        param.direction = 'Input'
+        param.datatype = u'GPBoolean'
+    
+        param = self.add_parameter('known_only')
+        param.name = encode(u'known_only')
+        param.displayName = encode(u'Nur Märkte großer Ketten hinzufügen')
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'

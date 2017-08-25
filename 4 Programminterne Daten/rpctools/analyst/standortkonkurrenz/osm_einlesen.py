@@ -78,6 +78,7 @@ class OSMShopsReader(object):
         try:
             json = r.json()
         except ValueError:
+            arcpy.AddMessage('Fehler bei der Anfrage des Geoservers.')
             return []
         return self._decode_json(json)
 

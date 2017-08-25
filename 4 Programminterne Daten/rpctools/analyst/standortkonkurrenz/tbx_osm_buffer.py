@@ -92,6 +92,7 @@ class OSMMarktBuffer(OSMMarktEinlesen):
             )
             ids = [id for id, in self.parent_tbx.query_table(markets_table, ['id'])]
             start_id = max(ids) + 1 if ids else 0
+            markets = self.parse_meta(markets, known_only=True)
             self.markets_to_db(markets,
                                tablename=os.path.split(markets_tmp)[1],
                                is_buffer=True, start_id=start_id)
@@ -121,8 +122,8 @@ class TbxOSMBuffer(Tbx):
 
     @property
     def label(self):
-        return encode(u'Randgebiet des Betrachtungsgebietes M&#228;rkte '
-                      u'aus OpenStreetMap erg&#228;nzen')
+        return encode(u'Erweiterten Betrachtungsraum mit Märkten '
+                      u'aus OpenStreetMap ergänzen')
 
     @property
     def Tool(self):
@@ -144,7 +145,7 @@ class TbxOSMBuffer(Tbx):
         # markets radius
         p = self.add_parameter('radius_markets')
         p.name = u'radius_markets'
-        p.displayName = encode(u'Pufferzone für Märkte um gewählte'
+        p.displayName = encode(u'Pufferzone für Märkte um gewählte '
                                u'Gemeinden festlegen')
         p.parameterType = 'Required'
         p.direction = 'Input'
