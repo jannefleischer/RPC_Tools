@@ -18,6 +18,8 @@ def remove_duplicates(features, id_field, match_field='', where='', distance=100
     fields =  [id_field, 'SHAPE', add]
     cursor = arcpy.da.SearchCursor(features, fields)
     all_r = [(id, point, mf) for id, point, mf in cursor]
+    if len(all_r) == 0:
+        return 0
     ids, points, mfs = zip(*all_r)
     del(cursor)
     ids = np.array(ids)
@@ -113,9 +115,10 @@ def minimal_bounding_poly(in_features, where=''):
     feat_tmp = join(ws_tmp, 'feat_tmp')
     feat_single = join(ws_tmp, 'feat_single')
     feat_minimal = join(ws_tmp, 'feat_minimal')
+    out_union = join(ws_tmp, 'out_union')
     out_features = join(ws_tmp, 'out')
     def del_tmp():
-        for f in [feat_tmp, feat_single, feat_minimal, out_features]:
+        for f in [feat_tmp, feat_single, feat_minimal, out_features, out_union]:
             arcpy.Delete_management(f)
     
     del_tmp()
@@ -125,9 +128,10 @@ def minimal_bounding_poly(in_features, where=''):
     arcpy.MultipartToSinglepart_management(feat_tmp, feat_single)
     arcpy.MinimumBoundingGeometry_management(feat_single, feat_minimal, 
                                              "RECTANGLE_BY_AREA", "NONE")
-    arcpy.Dissolve_management(feat_minimal, out_features, "", "", 
+    arcpy.Union_analysis(feat_minimal, out_union, gaps="NO_GAPS")
+    arcpy.Dissolve_management(out_union, out_features, "", "", 
                               "MULTI_PART", "DISSOLVE_LINES")
-    
+    #arcpy.FillGaps_production(out_features)
     cursor = arcpy.da.SearchCursor(out_features, ['SHAPE@'])
     polygon = cursor.next()[0]
     del(cursor)
