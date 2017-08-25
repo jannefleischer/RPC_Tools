@@ -202,7 +202,10 @@
                 <Button caption="M&#228;rkte und Versorgungsbereiche anzeigen" category="ProjektCheck" class="MaerkteZentrenAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="Bereits erzeugte, in der Karte aktuell aber nicht enthaltene Layer mit Märkten (Nullfall und Planfall) und Versorgungsbereichen wieder zur Karte hinzufügen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="OpenStreetMap anfragen" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="Den in OpenStreetMap verfügbaren Bestand an Lebensmittelmärkten online abfragen und einlesen">
+                <Button caption="M&#228;rkte im Betrachtungsraum (OpenStreetMap)" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="Den in OpenStreetMap verfügbaren Bestand an Lebensmittelmärkten online abfragen und einlesen">
+                    <Help heading="" />
+                </Button>
+                <Button caption="M&#228;rkte im Umkreis erg&#228;nzen (OpenStreetMap)" category="ProjektCheck" class="BestandOSMBuffer" id="rpc_tools.bestand_osm_buffer" image="Images\Openstreetmap_logo.svg.png" message="" tip="Das Randgebiet des Betrachtungsraums durch Märkte aus OpenStreetMap ergänzen">
                     <Help heading="" />
                 </Button>
                 <Button caption="Erfassungsvorlage erzeugen" category="ProjektCheck" class="TemplateErzeugen" id="rpc_tools.template_erzeugen" image="Images\MetadataDocumentLiveService16.png" message="" tip="Eine leere Erfassungsvorlage im csv-, Excel- oder Shapefile-Format erzeugen, in der die Bestandsmärkte händisch eingetragen und später wieder mit Projekt-Check eingelesen werden können.">
@@ -679,6 +682,7 @@
                         <Button refID="rpc_tools.template_einlesen_featureclass" />
                         <Tool refID="rpc_tools.bestand_hinzu" separator="true"/>
                         <Tool refID="rpc_tools.bestand_bearbeiten" />
+                        <Button refID="rpc_tools.bestand_osm_buffer" separator="true"/>
                     </Items>
                 </Menu>
                 <Menu caption="Ver&#228;nderungen durch Planung" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz_planfall" isRootMenu="false" isShortcutMenu="true" separator="true">
@@ -697,12 +701,12 @@
                 <Menu caption="Standortkonkurrenz Superm&#228;rkte" category="ProjektCheck" id="rpc_tools.menu_standortkonkurrenz" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_standortkonkurrenz" />
-                        <Button refID="rpc_tools.maerkte_anzeigen" separator="true"/>
+                        <Button refID="rpc_tools.select_ags" separator="true"/>
+                        <Button refID="rpc_tools.maerkte_anzeigen"/>
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_nullfall" />
                         <Menu refID="rpc_tools.menu_standortkonkurrenz_planfall" />
                         <Menu refID="rpc_tools.menu_zentren" />
-                        <Button refID="rpc_tools.select_ags" separator="true"/>
-                        <Button refID="rpc_tools.standortkonkurrenz_projektwirkung" />
+                        <Button refID="rpc_tools.standortkonkurrenz_projektwirkung" separator="true"/>
                     </Items>
                 </Menu>
                 <Menu caption="Analysieren" category="ProjektCheck" id="rpc_tools.menu_analysieren" isRootMenu="false" isShortcutMenu="true" separator="true">

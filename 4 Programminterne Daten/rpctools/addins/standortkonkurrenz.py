@@ -12,7 +12,7 @@ __all__ = [
     "PlanfallMarktBearbeiten", "BestandMarktHinzu",
     "PlanfallMarktHinzu", "PlanfallMarktErweiterung",
     "ZentrumBearbeiten", "ZentrumHinzu", "StandortkonkurrenzProjektwirkung",
-    "MaerkteZentrenAnzeigen",  "FieldSelection"
+    "MaerkteZentrenAnzeigen",  "FieldSelection", "BestandOSMBuffer"
 ]
 
 
@@ -21,6 +21,14 @@ class BestandOSMEinlesen(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxOSMMarktEinlesen'
+    _do_show = True
+
+
+class BestandOSMBuffer(ToolboxButton):
+    """Implementation for rpc_tools.bestand_osm (Button)"""
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
+    _toolbox_name = 'TbxOSMBuffer'
     _do_show = True
 
 

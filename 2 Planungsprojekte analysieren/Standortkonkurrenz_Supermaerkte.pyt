@@ -8,6 +8,7 @@
 #reload(tbx_edit_markets)
 
 from rpctools.analyst.standortkonkurrenz.tbx_osm_markteinlesen import TbxOSMMarktEinlesen
+from rpctools.analyst.standortkonkurrenz.tbx_osm_buffer import TbxOSMBuffer
 from rpctools.analyst.standortkonkurrenz.tbx_projektwirkung import TbxProjektwirkungMarkets
 from rpctools.analyst.standortkonkurrenz.tbx_edit_markets import (
     TbxEditMarketsPlanfall, TbxEditMarketsNullfall, TbxExtendMarkets)
@@ -23,6 +24,7 @@ class Toolbox(object):
         self.label = u'standortkonkurrenz'
         self.alias = ''
         self.tools = [TbxOSMMarktEinlesen,
+                      TbxOSMBuffer, 
                       TbxCreateTemplate,
                       TbxProjektwirkungMarkets,
                       TbxEditMarketsNullfall,

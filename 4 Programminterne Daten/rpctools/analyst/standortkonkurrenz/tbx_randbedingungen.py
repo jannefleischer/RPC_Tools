@@ -161,7 +161,7 @@ class TbxSetBoundaryConditions(Tbx):
         p.direction = 'Input'
         p.datatype = u'GPLong'
         p.filter.type = 'Range'
-        p.filter.list = [0, 10000]
+        p.filter.list = [3000, 10000]
         p.value = 6000
         p.enabled = True
 

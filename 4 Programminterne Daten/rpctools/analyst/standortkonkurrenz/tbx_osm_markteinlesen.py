@@ -9,8 +9,7 @@ import numpy as np
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.utils.spatial_lib import (get_ags, extent_to_bbox,
-                                        minimal_bounding_poly)
+from rpctools.utils.spatial_lib import get_ags, minimal_bounding_poly
 from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
                                                               Point)
 
@@ -38,7 +37,8 @@ class MarktEinlesen(Tool):
 
         self.output.hide_layer('projektdefinition')
 
-    def markets_to_db(self, supermarkets, tablename='Maerkte', truncate=False, planfall=False, is_buffer=False):
+    def markets_to_db(self, supermarkets, tablename='Maerkte', truncate=False,
+                      planfall=False, is_buffer=False, start_id=None):
         """Create the point-features for supermarkets"""
         sr = arcpy.SpatialReference(self.parent_tbx.config.epsg)
 
@@ -63,8 +63,9 @@ class MarktEinlesen(Tool):
                 tablename, where='id_betriebstyp_nullfall > 0')
             arcpy.TruncateTable_management(self.folders.get_table(res_table))
 
-        df = self.parent_tbx.table_to_dataframe('Maerkte')
-        max_id = df['id'].max() if len(df) > 0 else 0
+        if start_id is None:
+            ids = [id for id, in self.parent_tbx.query_table('Maerkte', ['id'])]
+            start_id = max(ids) + 1 if ids else 0
 
         with arcpy.da.InsertCursor(table, columns) as rows:
             for i, markt in enumerate(supermarkets):
@@ -80,7 +81,7 @@ class MarktEinlesen(Tool):
                         markt.id_kette,
                         markt.geom,
                         markt.id_teilflaeche,
-                        max_id + i + 1,
+                        start_id + i,
                         markt.adresse,
                         int(is_buffer)
                     ))
