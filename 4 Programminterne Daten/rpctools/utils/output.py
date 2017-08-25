@@ -307,6 +307,15 @@ class Output(object):
         del(current_dataframe)
         del(current_mxd)
         return projectlayer
+    
+    def remove_layer(self, layername):
+        '''remove layers with given name from project
+        (removes all appearances)'''
+        layers = self.get_layers(layername)
+        current_mxd = arcpy.mapping.MapDocument("CURRENT")
+        current_dataframe = current_mxd.activeDataFrame
+        for layer in layers:
+            arcpy.mapping.RemoveLayer(current_dataframe, layer)
 
     @staticmethod
     def change_layers_workspace(source_ws, target_ws):

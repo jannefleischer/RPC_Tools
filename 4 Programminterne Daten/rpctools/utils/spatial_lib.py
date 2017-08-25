@@ -7,8 +7,43 @@ from pyproj import Proj, transform
 import requests
 import numpy as np
 from os.path import join, split
+    
+def remove_duplicates(features, id_field, match_field='', where='', distance=100):
+    '''remove point features matched by where clause from the given feature-class
+    if other features are within given distance
+    match_field - optional, only delete feature, if points within distance have
+                  same value in this field
+    '''
+    add = match_field or id_field
+    fields =  [id_field, 'SHAPE', add]
+    cursor = arcpy.da.SearchCursor(features, fields)
+    all_r = [(id, point, mf) for id, point, mf in cursor]
+    ids, points, mfs = zip(*all_r)
+    del(cursor)
+    ids = np.array(ids)
+    points = np.array(points)
+    mfs = np.array(mfs)
+    cursor = arcpy.da.UpdateCursor(features, fields, where)
+    n_duplicates = 0
+    for id, point, mf in cursor:
+        p_within, indices = points_within(point, points, distance)
+        sub_ids = ids[indices]
+        sub_mfs = mfs[indices]
+        for p, pid, pmf in zip(p_within, sub_ids, sub_mfs):
+            if id == pid:
+                continue
+            if match_field and mf != pmf:
+                continue
+            cursor.deleteRow()
+            n_duplicates += 1
+            break
+    return n_duplicates
+        
+    #other_features = 
+
 
 def features_to_raster(feature_class, outfile, field, where=''):
+    '''convert a feature-class to a raster-file'''
     layer = arcpy.MakeFeatureLayer_management(feature_class, 'temp_layer',
                                               where)
     arcpy.FeatureToRaster_conversion(layer, field, outfile)
@@ -79,7 +114,11 @@ def minimal_bounding_poly(in_features, where=''):
     feat_single = join(ws_tmp, 'feat_single')
     feat_minimal = join(ws_tmp, 'feat_minimal')
     out_features = join(ws_tmp, 'out')
+    def del_tmp():
+        for f in [feat_tmp, feat_single, feat_minimal, out_features]:
+            arcpy.Delete_management(f)
     
+    del_tmp()
     arcpy.FeatureClassToFeatureClass_conversion(
         in_features, ws_tmp, split(feat_tmp)[1],
         where_clause=where)
@@ -93,8 +132,7 @@ def minimal_bounding_poly(in_features, where=''):
     polygon = cursor.next()[0]
     del(cursor)
     
-    for f in [feat_tmp, feat_single, feat_minimal, out_features]:
-        arcpy.Delete_management(f)
+    del_tmp()
     return polygon
 
 def google_geocode(address, api_key=''):

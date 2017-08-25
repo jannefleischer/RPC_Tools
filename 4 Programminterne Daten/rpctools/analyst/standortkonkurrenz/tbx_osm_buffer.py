@@ -9,7 +9,7 @@ import numpy as np
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.utils.spatial_lib import get_ags, minimal_bounding_poly
+from rpctools.utils.spatial_lib import get_ags, minimal_bounding_poly, remove_duplicates
 from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
                                                               Point)
 from rpctools.analyst.standortkonkurrenz.tbx_osm_markteinlesen import (
@@ -19,13 +19,14 @@ from rpctools.analyst.standortkonkurrenz.tbx_osm_markteinlesen import (
 class OSMMarktBuffer(OSMMarktEinlesen):
     _markets_table = 'Maerkte'
     _markets_buffer = 'Maerkte_Puffer'
+    _out_layer_name = 'erweiterter Betrachtungsraum'
     
     def add_outputs(self):
         super(OSMMarktEinlesen, self).add_outputs()
         self.output.add_layer('standortkonkurrenz',
                               self._markets_buffer,
                               featureclass=self._markets_buffer,
-                              name='erweiterter Betrachtungsraum', 
+                              name=self._out_layer_name, 
                               template_folder="Standortkonkurrenz")
 
     def run(self):
@@ -49,7 +50,7 @@ class OSMMarktBuffer(OSMMarktEinlesen):
         
         arcpy.FeatureClassToFeatureClass_conversion(
             communities, ws_tmp, os.path.split(sel_comm)[1],
-            where_clause='Auswahl<>{}'.format(0))
+            where_clause='Auswahl<>0')
         
         # ToDo: buffer -> multi_poly -> markets -> markets in selected communities -> remove those from markets in multi_poly -> to db
         
@@ -58,6 +59,11 @@ class OSMMarktBuffer(OSMMarktEinlesen):
         arcpy.Buffer_analysis(sel_comm, feat_buffered,
                               self.par.radius_markets.value,
                               dissolve_option='NONE')
+        try:
+            self.output.remove_layer(self._out_layer_name)
+        except:
+            pass
+        
         arcpy.Delete_management(markets_buffer_output)
         arcpy.Dissolve_management(feat_buffered, markets_buffer_output, "", "", 
                                   "SINGLE_PART", "DISSOLVE_LINES")
@@ -97,63 +103,18 @@ class OSMMarktBuffer(OSMMarktEinlesen):
             where = 'id IN ({})'.format(','.join(in_com_ids))
             self.parent_tbx.delete_rows_in_table(markets_buffer, where)
             arcpy.Append_management(markets_buffer, markets_table)
+            
+            arcpy.AddMessage('Entferne Duplikate...')
+            n = remove_duplicates(markets_table, 'id', match_field='id_kette', 
+                                  where='is_buffer=1', distance=50)
+            arcpy.AddMessage('{} Duplikate entfernt...'.format(n))
+            
             self.set_ags()
+            
 
         del_tmp()
-        #tbx = self.parent_tbx
-        ## paths
-        #markets_path = tbx.folders.get_table(self._markets_table,
-                                             #workspace=self._workspace)
-        #markets_boundary_path = tbx.folders.get_table(self._markets_boundary,
-                                             #workspace=self._workspace)
-        #tmp_markets_path = tbx.folders.get_table(self._markets_table_tmp,
-                                             #workspace=self._workspace)
-        #buffer_path = tbx.folders.get_table(self._markets_buffer,
-                                             #workspace=self._workspace)
-        #markets_in_communities_path = tbx.folders.get_table(self._markets_in_communities,
-                                             #workspace=self._workspace)
-        #selected_communities_path = tbx.folders.get_table(
-            #self._selected_communities, workspace=self._workspace)
         
-        #arcpy.AddMessage('Sende Standortanfrage an Geoserver...')
-        #reader = OSMShopsReader(epsg=epsg)
-        #markets = reader.get_shops(count=self.par.count.value)
-        #arcpy.AddMessage(u'{} Märkte gefunden'.format(len(markets)))
-        #arcpy.AddMessage(u'Analysiere gefundene Märkte...'
-                         #.format(len(markets)))
-        #truncate = self.par.truncate.value
-        #markets = self.parse_meta(markets)
-        #arcpy.AddMessage(u'Schreibe {} Märkte in die Datenbank...'
-                         #.format(len(markets)))
-        #tbx.delete_rows_in_table(self._markets_table, where='is_buffer=1')
-        #arcpy.Copy_management(markets_path, markets_boundary_path)
-        #tbx.delete_rows_in_table(markets_boundary_path)
-        #self.markets_to_db(markets,
-                           #tablename=self._markets_boundary,
-                           #truncate=truncate,
-                           #is_buffer=True)
-
-        #arcpy.AddMessage(u'Aktualisiere die AGS der Märkte...')
-        #self.set_ags()
-        ## only markets in buffer zone
-
-
-        #arcpy.Clip_analysis(markets_boundary_path, buffer_path,
-                            #tmp_markets_path)
-        ##arcpy.Delete_management(markets_path)
-        #arcpy.Clip_analysis(tmp_markets_path, selected_communities_path, markets_in_communities_path)
-        #cursor = arcpy.da.SearchCursor(markets_in_communities_path, ['id'],
-                                       #where_clause='is_buffer=1')
-        #in_com_ids = [str(id) for id, in cursor]
-        #del(cursor)
-        #where = 'id IN ({})'.format(','.join(in_com_ids))
-        #tbx.delete_rows_in_table(tmp_markets_path, where)
-        #tbx.delete_rows_in_table(self._markets_table, where='is_buffer=1')
-        #arcpy.Delete_management(markets_path)
-        #arcpy.Rename_management(in_data=tmp_markets_path,
-                                #out_data=markets_path)
-        #arcpy.Delete_management(markets_boundary_path)
-        #arcpy.Delete_management(markets_in_communities_path)
+        
 
 
 class TbxOSMBuffer(Tbx):
