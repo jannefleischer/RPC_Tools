@@ -10,11 +10,11 @@ from collections import Counter
 
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
-from rpctools.utils.spatial_lib import get_project_centroid
 from rpctools.analyst.standortkonkurrenz.zensus import Zensus, ZensusCell
 from rpctools.analyst.standortkonkurrenz.routing_distances import DistanceRouting
-from rpctools.utils.spatial_lib import Point, extent_to_bbox, \
-     get_extent, features_to_raster
+from rpctools.utils.spatial_lib import (get_project_centroid, Point,
+                                        extent_to_bbox, get_extent,
+                                        features_to_raster)
 from rpctools.utils.config import Folders
 from rpctools.analyst.standortkonkurrenz.sales import Sales
 
@@ -58,8 +58,11 @@ class ProjektwirkungMarkets(Tool):
             table = self.folders.get_table('Beziehungen_Maerkte_Zellen')
             where = 'id_markt={} and distanz>=0'.format(plan_market['id'])
             arcpy.Delete_management(fp)
+            template = self.folders.ZENSUS_RASTER_FILE
             raster_file = features_to_raster(
-                table, fp, 'kk_bindung_planfall', where=where)
+                table, fp, 'kk_bindung_planfall', template=template,
+                transform_method=self.parent_tbx.config.transformation, 
+                where=where)
             self.output.add_layer(group_layer, 'Kaufkraftbindung_Raster',
                                   fn,
                                   name=layer_name,
@@ -72,6 +75,7 @@ class ProjektwirkungMarkets(Tool):
                               template_folder=folder, zoom=False)
 
     def run(self):
+        return
         folders = Folders(self.par)
         self.recalculate = self.par.recalculate.value
         

@@ -40,16 +40,29 @@ def remove_duplicates(features, id_field, match_field='', where='', distance=100
             n_duplicates += 1
             break
     return n_duplicates
-        
-    #other_features = 
 
-
-def features_to_raster(feature_class, outfile, field, where=''):
-    '''convert a feature-class to a raster-file'''
-    layer = arcpy.MakeFeatureLayer_management(feature_class, 'temp_layer',
-                                              where)
-    arcpy.FeatureToRaster_conversion(layer, field, outfile)
-    arcpy.Delete_management(layer)
+def features_to_raster(feature_class, outfile, field, template=None,
+                       transform_method=None, 
+                       where=''):
+    '''convert a feature-class to a raster-file
+    
+    template : str, optional
+        full path to template raster, outfput file will get same projection and
+        raster size
+    '''
+    proj_tmp = join(arcpy.env.scratchGDB, 'proj_tmp')
+    where_tmp = join(arcpy.env.scratchGDB, 'where_tmp')
+    in_features = arcpy.FeatureClassToFeatureClass_conversion(
+        feature_class, *split(where_tmp), where_clause=where)
+    if template:
+        desc = arcpy.Describe(template)
+        sr = desc.spatialReference
+        in_features = arcpy.Project_management(
+            in_features, proj_tmp, sr, transform_method=transform_method)
+    arcpy.FeatureToRaster_conversion(in_features, field, outfile,
+                                     cell_size=template)
+    arcpy.Delete_management(where_tmp)
+    arcpy.Delete_management(proj_tmp)
     return outfile
 
 
