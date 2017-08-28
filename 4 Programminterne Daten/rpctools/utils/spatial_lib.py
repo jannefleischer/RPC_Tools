@@ -117,10 +117,10 @@ def minimal_bounding_poly(in_features, where=''):
     feat_minimal = join(ws_tmp, 'feat_minimal')
     out_union = join(ws_tmp, 'out_union')
     out_features = join(ws_tmp, 'out')
+    #arcpy.Delete_management(ws_tmp)
     def del_tmp():
         for f in [feat_tmp, feat_single, feat_minimal, out_features, out_union]:
             arcpy.Delete_management(f)
-    
     del_tmp()
     arcpy.FeatureClassToFeatureClass_conversion(
         in_features, ws_tmp, split(feat_tmp)[1],
@@ -338,8 +338,8 @@ def get_extent(tablename, workspace, where=''):
     tbx.set_active_project()
     xmin, xmax, ymin, ymax = [np.inf, -np.inf, np.inf, -np.inf]
     cursor = tbx.query_table(tablename, columns=['SHAPE@'],
-                                       workspace=workspace,
-                                       where=where)
+                             workspace=workspace,
+                             where=where)
     for row in cursor:
         shape = row[0]
         xmin = min(xmin, shape.extent.XMin)

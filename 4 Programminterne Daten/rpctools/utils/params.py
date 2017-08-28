@@ -1266,7 +1266,8 @@ class DummyTbx(Tbx):
     a 'real' toolbox, not for the purpose to be shown in ArcGIS 
     """
     
-    def __init__(self):
+    def __init__(self, projectname=''):
+        self.projectname = projectname
         super(DummyTbx, self).__init__()
         self._getParameterInfo()
 
@@ -1278,6 +1279,7 @@ class DummyTbx(Tbx):
         p.direction = 'Input'
         p.datatype = 'GPString'
         p.filter.list = []
+        p.value = self.projectname
         return self.par
     
     @property

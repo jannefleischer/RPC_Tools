@@ -29,16 +29,14 @@ class Zensus(object):
     def __init__(self):
         self.folders = Folders()
         self.epsg = 4326
-        self.tmp_folder = os.path.join(self.folders.TEMPORARY_GDB_PATH,
-                                       'Zensus')
-        if os.path.exists(self.tmp_folder):
-            arcpy.Delete_management(self.tmp_folder)
+        self.tmp_folder = arcpy.env.scratchGDB
         try:
-            os.mkdir(self.tmp_folder)
+            arcpy.Delete_management(self.tmp_folder)
+            arcpy.CreateFileGDB_management(*os.path.split(self.tmp_folder))
         except:
             pass
 
-    def cutout_area(self, bbox, epsg, settlement_buffer=3000, markets_buffer=6000):
+    def cutout_area(self, bbox, epsg, cutout_shape=None):
         """
         return the centroids of the zensus cells as points inside the
         selected communities
@@ -50,25 +48,19 @@ class Zensus(object):
         zensus_points = []
         zensus_raster = self.folders.ZENSUS_RASTER_FILE
         # temporary paths
-        out_raster = os.path.join(self.tmp_folder, 'zensus_cutout.tif')
+        out_raster = os.path.join(self.tmp_folder, 'zensus_cutout')
         raster_points = os.path.join(self.tmp_folder,
-                               'zensus_cutout.shp')
+                                     'raster_points')
         raster_points_projected = os.path.join(self.tmp_folder,
-                                         'zensus_cutout_projected.shp')
+                                         'raster_points_projected')
         raster_points_clipped = os.path.join(self.tmp_folder,
-                                       'zensus_cutout_clipped.shp')
-        out_raster = os.path.join(self.tmp_folder, 'zensus_cutout.tif')
-        ws_tmp = tbx.folders.get_db(workspace=self._workspace)
-        selected_communities = "Ausgewaehlte_Gemeinden"
-        settlement_cells_buffer_feature = "Siedlungszellen_Puffer"
-        markets_buffer_feature = "Maerkte_Puffer"
-        selected_communities_path =  os.path.join(ws_tmp, selected_communities)
-        settlement_cells_buffer_path =  os.path.join(ws_tmp, settlement_cells_buffer_feature)
-        markets_buffer_path =  os.path.join(ws_tmp, markets_buffer_feature)
-        # delete old tables
-        arcpy.Delete_management(selected_communities_path)
-        arcpy.Delete_management(settlement_cells_buffer_path)
-        arcpy.Delete_management(markets_buffer_path)
+                                             'raster_points_clipped')
+        def del_tmp():
+            for fn in [raster_points, raster_points_projected, out_raster,
+                       raster_points_clipped]:
+                arcpy.Delete_management(fn)
+        del_tmp()
+        out_raster = os.path.join(self.tmp_folder, 'zensus_cutout')
         # clip minimum to rectangle shape that still contains all communities
         srid = clip_raster(zensus_raster, out_raster, bbox)
         # get raster points
@@ -83,23 +75,14 @@ class Zensus(object):
         out_cs = arcpy.SpatialReference(epsg)
         arcpy.Project_management(raster_points, raster_points_projected,
                                  out_cs)
-        # make feature class for selected communities
-        arcpy.FeatureClassToFeatureClass_conversion(
-            community_path, ws_tmp, selected_communities,
-            where_clause='Auswahl<>{}'.format(0))
-        # create buffer area
-        arcpy.Buffer_analysis(in_features=selected_communities_path,
-                              out_feature_class=settlement_cells_buffer_path,
-                              buffer_distance_or_field=settlement_buffer,
-                              dissolve_option='ALL')
-        arcpy.Buffer_analysis(in_features=selected_communities_path,
-                              out_feature_class=markets_buffer_path,
-                              buffer_distance_or_field=markets_buffer,
-                              dissolve_option='ALL')
-        # clip raster points to selected communities
-        arcpy.Clip_analysis(raster_points_projected,
-                            settlement_cells_buffer_path,
-                            raster_points_clipped)
+        
+        if cutout_shape:
+            # clip raster points to selected communities
+            arcpy.Clip_analysis(raster_points_projected,
+                                cutout_shape,
+                                raster_points_clipped)
+        else:
+            raster_points_clipped = raster_points
         # create list with zensus points for return
         rows = arcpy.da.SearchCursor(raster_points_clipped,
                                      ['SHAPE@XY', 'GRID_CODE'])
@@ -112,10 +95,6 @@ class Zensus(object):
             zensus_points.append(p)
             index += 1
         # delete temporary files
-        def del_tmp():
-            for fn in [raster_points, raster_points_projected, out_raster,
-                       raster_points_clipped]:
-                arcpy.Delete_management(fn)
         del_tmp()
         return zensus_points, len(zensus_points)
 

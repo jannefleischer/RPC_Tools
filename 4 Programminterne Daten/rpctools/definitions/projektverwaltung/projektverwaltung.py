@@ -105,7 +105,7 @@ class ProjektAnlegen(Projektverwaltung):
             project_path))
 
         # create 'Zentren'-table
-        arcpy.AddMessage('Ermittle gemeinden im Umkreis von {} km...'.format(
+        arcpy.AddMessage('Ermittle Gemeinden im Umkreis von {} km...'.format(
             self._sk_radius/1000))
         self.communities_to_centers(self._project_centroid,
                                     radius=self._sk_radius)
@@ -330,17 +330,6 @@ class ProjektAnlegen(Projektverwaltung):
         centroid.create_geom()
         pntGeom = arcpy.PointGeometry(centroid.geom)
         circleGeom = pntGeom.buffer(radius)
-        #cursor = arcpy.da.SearchCursor(gemeinden, ['SHAPE@', 'GEN', 'AGS'])
-        #yes = 0
-        #no = 0
-        #for i, (shape, name, ags) in enumerate(cursor):
-            #if shape.overlaps(circleGeom):
-                #yes += 1
-            #else:
-                #no += 1
-        #print yes, no
-        #delete existing community-entries
-        #clip the communities with the bbox
         fc_bbox = 'in_memory/bbox'
         fc_clipped = 'in_memory/clipped'
         if arcpy.Exists(fc_bbox):
@@ -371,6 +360,7 @@ class ProjektAnlegen(Projektverwaltung):
                     'umsatz_nullfall': 0,
                     'id': i + 1,
                     'Auswahl': selection,
+                    'AGS': ags
                 })
         del cursor
         arcpy.Delete_management(fc_bbox)

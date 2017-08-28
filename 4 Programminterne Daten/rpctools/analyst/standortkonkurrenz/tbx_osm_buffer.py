@@ -42,11 +42,14 @@ class OSMMarktBuffer(OSMMarktEinlesen):
         markets_com = os.path.join(ws_tmp, 'markets_com')
         
         def del_tmp():
-            for f in [sel_comm, feat_buffered, markets_buffer, markets_tmp,
-                      markets_com]:
-                arcpy.Delete_management(f)
+            try:
+                arcpy.Delete_management(ws_tmp)
+                arcpy.CreateFileGDB_management(*os.path.split(ws_tmp))
+            except:
+                for f in [sel_comm, feat_buffered, markets_buffer, markets_tmp,
+                          markets_com]:
+                    arcpy.Delete_management(f)
         
-        del_tmp()
         
         arcpy.FeatureClassToFeatureClass_conversion(
             communities, ws_tmp, os.path.split(sel_comm)[1],
@@ -111,11 +114,7 @@ class OSMMarktBuffer(OSMMarktEinlesen):
             arcpy.AddMessage('{} Duplikate entfernt...'.format(n))
             
             self.set_ags()
-            
-
         del_tmp()
-        
-        
 
 
 class TbxOSMBuffer(Tbx):

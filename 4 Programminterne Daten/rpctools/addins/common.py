@@ -31,7 +31,7 @@ class ToolboxWrapper(object):
         """the instanciated toolbox (load on demand only)"""
         if not self._tbx:
             tbx_module = load_source(self._toolbox_name,
-                                     self.path.encode('utf-8'))
+                                     self.path.encode('utf-8'))  # probieren: self.path.encode(sys.getfilesystemencoding())
             self._tbx = getattr(tbx_module, self._toolbox_name)()
             self._tbx.getParameterInfo()
         return self._tbx

@@ -21,12 +21,13 @@ class Sales(object):
     # Note: switched from times to km -> cutoff is > 1 km
     relation_dist = 1  # km
 
-    def __init__(self, df_distances, df_markets, df_zensus, debug=False):
+    def __init__(self, df_distances, df_markets, df_zensus, debug=False,
+                 projectname=''):
 
         self.distances = df_distances
         self.markets = df_markets
         self.zensus = df_zensus
-        self.tbx = DummyTbx()
+        self.tbx = DummyTbx(projectname=projectname)
         self.debug = debug
 
     def calculate_nullfall(self):

@@ -28,6 +28,7 @@ class TbxFieldSelection(Tbx):
 
         return params
 
+
 class FieldSelectionTool(Tool):
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     _table = "Zentren"
