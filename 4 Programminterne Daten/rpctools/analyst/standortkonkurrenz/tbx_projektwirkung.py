@@ -75,7 +75,6 @@ class ProjektwirkungMarkets(Tool):
                               template_folder=folder, zoom=False)
 
     def run(self):
-        return
         folders = Folders(self.par)
         self.recalculate = self.par.recalculate.value
         
