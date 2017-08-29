@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from rpctools.addins.common import ToolboxButton, folders, config
-from rpctools.addins.outputs import BodenbedeckungAnzeigen
+from rpctools.addins.outputs import BodenbedeckungAnzeigen_Nullfall
+from rpctools.addins.outputs import BodenbedeckungAnzeigen_Planfall
 from rpctools.addins.outputs import GrenzlinieAnzeigen
 import arcpy
 
@@ -243,9 +244,12 @@ class Draw_Bodenbedeckung(ToolboxButton):
         self.bodenbedeckung = 0
         self.planfall = False
         self.shape = 'Line'
-        self.output = BodenbedeckungAnzeigen()
 
     def onClick(self, coord=None):
+        if self.planfall == False:
+            self.output = BodenbedeckungAnzeigen_Nullfall()
+        else:
+            self.output = BodenbedeckungAnzeigen_Planfall()
         self.output.show()
 
     def onLine(self, line_geometry):

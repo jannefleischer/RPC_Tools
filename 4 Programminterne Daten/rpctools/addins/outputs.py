@@ -38,11 +38,15 @@ class AnbindungspunkteAnzeigen(Output):
     _toolbox_name = 'TbxSetSource'
 
 
-class BodenbedeckungAnzeigen(Output):
+class BodenbedeckungAnzeigen_Nullfall(Output):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Flaeche und Oekologie.pyt'
-    _toolbox_name = 'TbxBodenKontrolle'
+    _toolbox_name = 'TbxBodenAnzeigen_Nullfall'
 
+class BodenbedeckungAnzeigen_Planfall(Output):
+    _path = folders.ANALYST_PYT_PATH
+    _pyt_file = 'Flaeche und Oekologie.pyt'
+    _toolbox_name = 'TbxBodenAnzeigen_Planfall'
 
 class GrenzlinieAnzeigen(Output):
     _path = folders.ANALYST_PYT_PATH

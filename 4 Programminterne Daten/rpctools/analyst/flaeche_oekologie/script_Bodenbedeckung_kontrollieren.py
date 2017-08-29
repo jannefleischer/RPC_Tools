@@ -115,11 +115,11 @@ class BodenbedeckungAnzeigen(Tool):
         if self.parent_tbx.nullfall == 1:
             self.output.add_layer(groupname = "oekologie", featureclass = "Bodenbedeckung_Nullfall", template_layer = "Bodenbedeckung_Nullfall", template_folder="oekologie",  zoom=False, disable_other = True)
         else:
-            self.output.add_layer(groupname = "oekologie", featureclass = "Bodenbedeckung_Planfall", template_layer = "Bodenbedeckung_Planfall", template_folder="oekologie",  zoom=False, disable_other = False)
+            self.output.add_layer(groupname = "oekologie", featureclass = "Bodenbedeckung_Planfall", template_layer = "Bodenbedeckung_Planfall", template_folder="oekologie",  zoom=False, disable_other = True)
         self.output.show_layers()
 
     def run(self):
-        pass
+        arcpy.AddMessage("Nullfall: " + str(self.parent_tbx.nullfall))
 
 class BodenbedeckungZeichnen(Tool):
     """BodenbedeckungZeichnen"""
