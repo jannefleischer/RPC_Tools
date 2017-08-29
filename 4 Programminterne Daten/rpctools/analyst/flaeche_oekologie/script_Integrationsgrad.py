@@ -91,6 +91,7 @@ class Integrationsgrad_zeichnen(Tool):
 
     def add_outputs(self):
         self.output.add_layer(groupname = "oekologie", featureclass = "Grenze_Siedlungskoerper", template_layer = "Grenze_Siedlungskoerper", template_folder="oekologie",  zoom=False, disable_other = True)
+        self.output.show_layers()
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
 
