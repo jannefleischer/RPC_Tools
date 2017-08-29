@@ -26,7 +26,6 @@ class ProjektwirkungMarkets(Tool):
     _settlement_buffer = 3000
     _markets_buffer = 6000
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
-    # ToDo: set this in toolbox?
     recalculate = False
 
     def add_outputs(self):

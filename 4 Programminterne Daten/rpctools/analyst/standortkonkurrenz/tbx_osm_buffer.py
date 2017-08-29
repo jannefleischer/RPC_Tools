@@ -95,7 +95,7 @@ class OSMMarktBuffer(OSMMarktEinlesen):
             markets = self.parse_meta(markets, known_only=True)
             self.markets_to_db(markets,
                                tablename=os.path.split(markets_tmp)[1],
-                               is_buffer=True, start_id=start_id)
+                               is_buffer=True, start_id=start_id, is_osm=True)
             arcpy.Clip_analysis(markets_tmp, feat_buffered, markets_buffer)
             arcpy.Clip_analysis(markets_buffer, sel_comm, markets_com)
             cursor = arcpy.da.SearchCursor(markets_com, ['id'])

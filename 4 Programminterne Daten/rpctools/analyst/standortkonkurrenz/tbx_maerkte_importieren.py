@@ -42,7 +42,7 @@ class MaerkteImportieren(MarktEinlesen):
         markets = template.get_markets()
         truncate = self.par.truncate.value
         markets = self.parse_meta(markets, field='kette')
-        markets = self.set_betriebstyp_vkfl(markets)
+        markets = self.vkfl_to_betriebstyp(markets)
         arcpy.AddMessage(u'Schreibe {} Märkte in die Datenbank...'
                          .format(len(markets)))
         self.markets_to_db(markets, truncate=truncate)

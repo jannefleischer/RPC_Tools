@@ -17,6 +17,26 @@ from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
 class MarktEinlesen(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
+    
+    def __init__(self, *args):
+        super(MarktEinlesen, self).__init__(*args)
+
+        self.df_chains = self.parent_tbx.table_to_dataframe(
+            'Ketten',
+            workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
+            is_base_table=True)
+        self.df_bt = self.parent_tbx.table_to_dataframe(
+            'Betriebstypen',
+            workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
+            is_base_table=True)
+        self.df_bt.fillna(sys.maxint, inplace=True)
+
+        self.df_chains_alloc = self.parent_tbx.table_to_dataframe(
+            'Ketten_Zuordnung',
+            workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
+            is_base_table=True)
+        self.df_chains_alloc.sort(columns='prioritaet', ascending=False)
+
     def run(self):
         """"""
 
@@ -38,7 +58,8 @@ class MarktEinlesen(Tool):
         self.output.hide_layer('projektdefinition')
 
     def markets_to_db(self, supermarkets, tablename='Maerkte', truncate=False,
-                      planfall=False, is_buffer=False, start_id=None):
+                      planfall=False, is_buffer=False, start_id=None,
+                      is_osm=False):
         """Create the point-features for supermarkets"""
         sr = arcpy.SpatialReference(self.parent_tbx.config.epsg)
 
@@ -52,7 +73,9 @@ class MarktEinlesen(Tool):
             'id',
             'adresse',
             'is_buffer',
-            'is_osm'
+            'is_osm',
+            'vkfl',
+            'adresse'
         ]
         table = self.folders.get_table(tablename)
         # remove results as well (distances etc.)
@@ -69,23 +92,27 @@ class MarktEinlesen(Tool):
             start_id = max(ids) + 1 if ids else 0
 
         with arcpy.da.InsertCursor(table, columns) as rows:
-            for i, markt in enumerate(supermarkets):
-                id_nullfall = 0 if planfall else markt.id_betriebstyp
-                if markt.name is None:
+            for i, market in enumerate(supermarkets):
+                id_nullfall = 0 if planfall else market.id_betriebstyp
+                if market.name is None:
                     continue
-                markt.create_geom()
-                if markt.geom:
+                market.create_geom()
+                # set sales area, if not set yet (esp. osm markets)
+                vkfl = market.vkfl or self.betriebstyp_to_vkfl(market)
+                if market.geom:
                     rows.insertRow((
-                        markt.name,
+                        market.name,
                         id_nullfall,
-                        markt.id_betriebstyp,
-                        markt.id_kette,
-                        markt.geom,
-                        markt.id_teilflaeche,
+                        market.id_betriebstyp,
+                        market.id_kette,
+                        market.geom,
+                        market.id_teilflaeche,
                         start_id + i,
-                        markt.adresse,
+                        market.adresse,
                         int(is_buffer),
-                        1
+                        int(is_osm),
+                        vkfl, 
+                        market.adresse
                     ))
 
     def set_ags(self):
@@ -104,35 +131,45 @@ class MarktEinlesen(Tool):
             cursor.updateRow(row)
         del cursor
 
-    def set_betriebstyp_vkfl(self, markets):
+    def vkfl_to_betriebstyp(self, markets):
         """
-        use the name of the chain of the markets to parse and assign
-        chain-ids and betriebstyps
+        set types of use (betriebstyp) matching the sales area (vkfl)
+        of all given markets
+        returns the markets with set types of use
         """
-        df_chains = self.parent_tbx.table_to_dataframe(
-            'Ketten',
-            workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
-            is_base_table=True)
-        df_bt = self.parent_tbx.table_to_dataframe(
-            'Betriebstypen',
-            workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
-            is_base_table=True)
-        df_bt.fillna(sys.maxint, inplace=True)
         for market in markets:
             if market.id_kette > 0:
-                idx = df_chains['id_kette'] == market.id_kette
-                is_discounter = df_chains[idx]['discounter'].values[0]
+                idx = self.df_chains['id_kette'] == market.id_kette
+                is_discounter = self.df_chains[idx]['discounter'].values[0]
             else:
                 market.id_kette = 0
                 is_discounter = 0
             if is_discounter:
                 market.id_betriebstyp = 7
             elif market.vkfl is not None:
-                fit_idx = ((df_bt['von_m2'] <= market.vkfl) &
-                           (df_bt['bis_m2'] > market.vkfl))
+                fit_idx = ((self.df_bt['von_m2'] <= market.vkfl) &
+                           (self.df_bt['bis_m2'] > market.vkfl))
                 if fit_idx.sum() > 0:
-                    market.id_betriebstyp = df_bt[fit_idx]['id_betriebstyp'].values[0]
+                    market.id_betriebstyp = self.df_bt[fit_idx]['id_betriebstyp'].values[0]
         return markets
+    
+    def betriebstyp_to_vkfl(self, market):
+        """
+        return the sales area (vkfl) matching the type of use (betriebstyp)
+        of a single market
+        """
+        # some discounters have (since there is no specific betriebstyp and 
+        # therefore no hint on possible vkfl for them)
+        if market.id_betriebstyp == 7:
+            default_vkfl = self.df_chains[
+                self.df_chains['id_kette']==market.id_kette]
+            if len(default_vkfl) != 0:
+                vkfl = default_vkfl['default_vkfl'].values[0]
+                return vkfl
+        # all other vkfl are assigned via betriebstyp (+ unmatched discounters)
+        idx = self.df_bt['id_betriebstyp'] == market.id_betriebstyp
+        vkfl = self.df_bt[idx]['default_vkfl'].values[0]
+        return vkfl
 
     def parse_meta(self, markets, field='name', known_only=False):
         """
@@ -142,12 +179,6 @@ class MarktEinlesen(Tool):
         known_only: str, optional
             only return markets that belong to known chains if True
         """
-
-        df_chains_alloc = self.parent_tbx.table_to_dataframe(
-            'Ketten_Zuordnung',
-            workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
-            is_base_table=True)
-        df_chains_alloc.sort(columns='prioritaet', ascending=False)
 
         ret_markets = []
 
@@ -163,7 +194,7 @@ class MarktEinlesen(Tool):
                                  u'übersprungen'.format(field))
                 continue
             match_found = False
-            for idx, chain_alloc in df_chains_alloc.iterrows():
+            for idx, chain_alloc in self.df_chains_alloc.iterrows():
                 match_result = re.match(chain_alloc['regex'],
                                         name)
                 if not match_result:
@@ -250,7 +281,8 @@ class OSMMarktEinlesen(MarktEinlesen):
         self.markets_to_db(markets,
                            tablename=self._markets_table,
                            truncate=False,  # already truncated osm markets
-                           is_buffer=False)
+                           is_buffer=False,
+                           is_osm=True)
 
         arcpy.AddMessage('Entferne Duplikate...')
         n = remove_duplicates(self.folders.get_table(self._markets_table),

@@ -462,7 +462,7 @@ class NutzungenEinzelhandel(Nutzungen):
                                      vkfl=vkfl_lebensmittel,
                                      id_teilflaeche=id,
                                      epsg=self.parent_tbx.config.epsg)
-                market = market_tool.set_betriebstyp_vkfl([market])[0]
+                market = market_tool.vkfl_to_betriebstyp([market])[0]
                 market_tool.markets_to_db([market], planfall=True)
                 # market added -> update ags for all markets (no function for
                 # single update implemented yet)
