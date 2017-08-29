@@ -3,6 +3,7 @@ from collections import OrderedDict
 import arcpy
 import numpy as np
 import subprocess
+import os
 from rpctools.utils.config import Config, Folders
 
 class ArcpyEnv(object):
@@ -642,6 +643,8 @@ class Output(object):
         # Template Layer laden
         template_layer = self.folders.get_layer(layer.template_layer,
                                                 layer.template_folder)
+        if not os.path.exists(template_layer):
+            raise Exception('Layer-file {} does not exist!'.format(template_layer))
         #arcpy.AddMessage(template_layer)
         source_layer = arcpy.mapping.Layer(template_layer)
 
