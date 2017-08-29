@@ -482,14 +482,14 @@
                 <Menu caption="Annahmen ver&#228;ndern" category="ProjektCheck" id="rpc_tools.menu_verkehr_annahmen" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.routing_settings" />
-                        <Tool refID="rpc_tools.anbindungspunkt" />
                         <Button refID="rpc_tools.weighted_routing" />
                     </Items>
                 </Menu>
                 <Menu caption="Verkehr im Umfeld" category="ProjektCheck" id="rpc_tools.menu_verkehr_im_umfeld" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_verkehr" />
-                        <Button refID="rpc_tools.initial_routing" separator="true"/>
+                        <Tool refID="rpc_tools.anbindungspunkt" separator="true"/>
+                        <Button refID="rpc_tools.initial_routing"/>
                         <Menu refID="rpc_tools.menu_verkehr_annahmen" />
                     </Items>
                 </Menu>
