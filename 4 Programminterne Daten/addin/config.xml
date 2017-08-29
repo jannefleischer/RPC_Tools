@@ -253,67 +253,71 @@
                 <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeOekologie" id="rpc_tools.hilfe_oekologie" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Ökologie” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Natur- und Artenschutz" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.naturschutzgebiete" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem strengen Schutzstatus im Bereich Natur- und Artenschutz ein (Nationalparke, Naturschutzgebiete, Fauna-Flora-Habitat-Gebiete und Vogelschutzgebiete). Quelle: IÖR-Monitor">
+                <Button caption="Natur- und Artenschutz" category="ProjektCheck" class="Naturschutz" id="rpc_tools.naturschutzgebiete" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem strengen Schutzstatus im Bereich Natur- und Artenschutz ein (Nationalparke, Naturschutzgebiete, Fauna-Flora-Habitat-Gebiete und Vogelschutzgebiete). Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Landschaftsschutz" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.landschaftsschutzgebiete" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem allgemeinen Schutzstatus im Bereich Landschaftsschutz ein (Naturparke, Landschaftsschutzgebiete und Biosphärenreservate außerhalb der Gebiete mit strengem Schutzstatus). Quelle: IÖR-Monitor">
+                <Button caption="Landschaftsschutz" category="ProjektCheck" class="Landschaftsschutz" id="rpc_tools.landschaftsschutzgebiete" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem allgemeinen Schutzstatus im Bereich Landschaftsschutz ein (Naturparke, Landschaftsschutzgebiete und Biosphärenreservate außerhalb der Gebiete mit strengem Schutzstatus). Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Detailangaben zu Schutzgebieten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.detail_schutzgebiete" image="" message="" tip="Öffnet eine Online-Karte des BfN zu den Schutzgebieten in Deutschland und zoomt auf den Bereich des Plangebiets. Dort finden sich Detailangaben zu den Schutzgebieten.">
+                <Button caption="Detailangaben zu Schutzgebieten" category="ProjektCheck" class="Schutzgebiete" id="rpc_tools.detail_schutzgebiete" image="" message="" tip="Öffnet eine Online-Karte des BfN zu den Schutzgebieten in Deutschland und zoomt auf den Bereich des Plangebiets. Dort finden sich Detailangaben zu den Schutzgebieten.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene Freir&#228;ume > 100 qkm" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.freiraeume_100" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 100 km² Größe ein. Quelle: IÖR-Monitor">
+                <Button caption="Unzerschnittene Freir&#228;ume > 100 qkm" category="ProjektCheck" class="Freiraeume_100qkm" id="rpc_tools.freiraeume_100" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 100 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene Freir&#228;ume > 50 qkm" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.freiraeume_50" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 50 km² Größe ein. Quelle: IÖR-Monitor">
+                <Button caption="Unzerschnittene Freir&#228;ume > 50 qkm" category="ProjektCheck" class="Freiraeume_50qkm" id="rpc_tools.freiraeume_50" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 50 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Freir&#228;ume" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.freiraeume" image="" message="" tip="Blendet eine Rasterkarte (100x100m) aller landschaftlichen Freiräume (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
+                <Button caption="Freir&#228;ume" category="ProjektCheck" class="Freiraeume" id="rpc_tools.freiraeume" image="" message="" tip="Blendet eine Rasterkarte (100x100m) aller landschaftlichen Freiräume (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene W&#228;lder > 50 qkm" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder_50" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Waldgebiete über 50 km² Größe ein. Quelle: IÖR-Monitor">
+                <Button caption="Unzerschnittene W&#228;lder > 50 qkm" category="ProjektCheck" class="Waelder_50qkm" id="rpc_tools.waelder_50" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Waldgebiete über 50 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
                 <Button caption="W&#228;lder" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder" image="" message="" tip="Blendet eine Rasterkarte (100x100m) aller Waldgebiete (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Leistungskennwerte berechnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.kennwerte_berechnen" image="" message="" tip="Ökologische Leistungskennwerte des Boden im Null- und Planfall berechnen. Die dafür benötigten Anteile der Bodenbedeckung können direkt eingetragen oder aus den Zeichnungen übernommen werden.">
+                <Button caption="Leistungskennwerte berechnen" category="ProjektCheck" class="Kennwerte_berechnen" id="rpc_tools.kennwerte_berechnen" image="" message="" tip="Ökologische Leistungskennwerte des Boden im Null- und Planfall berechnen. Die dafür benötigten Anteile der Bodenbedeckung können direkt eingetragen oder aus den Zeichnungen übernommen werden.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Wohndichte bestimmen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.wohndichte" image="" message="" tip="Die Wohndichte (WE pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
+                <Button caption="Wohndichte bestimmen" category="ProjektCheck" class="Wohndichte" id="rpc_tools.wohndichte" image="" message="" tip="Die Wohndichte (WE pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Wohnfl&#228;chendichte bestimmen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.wohnflaechendichte" image="" message="" tip="Die Wohnflächendichte (qm Wohnfläche pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
+                <Button caption="Wohnfl&#228;chendichte bestimmen" category="ProjektCheck" class="Wohnflaechendichte" id="rpc_tools.wohnflaechendichte" image="" message="" tip="Die Wohnflächendichte (qm Wohnfläche pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Hochspannungsleitungen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.hochspannung" image="" message="" tip="Blendet eine Rasterkarte (100x100m) mit den Einflussbereichen von Hochspannungsfreileitungen ein. Quelle: IÖR-Monitor">
+                <Button caption="Hochspannungsleitungen" category="ProjektCheck" class="Hochspannungsleitungen" id="rpc_tools.hochspannung" image="" message="" tip="Blendet eine Rasterkarte (100x100m) mit den Einflussbereichen von Hochspannungsfreileitungen ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Gemeinsame Grenze mit Siedlungsk&#246;rper einzeichnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.grenzlinie_einzeichnen" image="" message="" tip="Markieren der Abschnitte der Außenkante des Plangebiets, die an eine bestehende Siedlungsfläche angrenzen.">
+                <Tool caption="Gemeinsame Grenze mit Siedlungsk&#246;rper einzeichnen" category="ProjektCheck" class="Grenze_zeichnen" id="rpc_tools.grenzlinie_einzeichnen" image="" message="" tip="Markieren der Abschnitte der Außenkante des Plangebiets, die an eine bestehende Siedlungsfläche angrenzen.">
                     <Help heading="" />
                 </Tool>
-                <Button caption="Grenzlinien l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.grenzlinie_loeschen" image="" message="" tip="Löscht die von Ihnen bereits gezeichneten Abschnitte, in denen die Außenkante Ihres Plangebiets an eine bestehende Siedlungsfläche angrenzt.">
+                <Button caption="Grenzlinien l&#246;schen" category="ProjektCheck" class="Grenze_loeschen" id="rpc_tools.grenzlinie_loeschen" image="" message="" tip="Löscht die von Ihnen bereits gezeichneten Abschnitte, in denen die Außenkante Ihres Plangebiets an eine bestehende Siedlungsfläche angrenzt.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Integrationsgrad berechnen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.integrationsgrad_berechnen" image="" message="" tip="Ermittelt den Integrationsgrad des Plangebiets, d.h. den Anteil der Außenkante des Plangebiets, der an eine bestehende Siedlungsfläche angrenzt.">
+                <Button caption="Integrationsgrad berechnen" category="ProjektCheck" class="Integrationsgrad_berechnen" id="rpc_tools.integrationsgrad_berechnen" image="" message="" tip="Ermittelt den Integrationsgrad des Plangebiets, d.h. den Anteil der Außenkante des Plangebiets, der an eine bestehende Siedlungsfläche angrenzt.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Layer anzeigen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_anzeigen" image="" message="" tip="Fügt den Layer mit den Bodenbedeckungen im Nullfall zur Karte hinzu bzw. macht diesen sichtbar.">
+
+
+
+
+                <Button caption="[Layer anzeigen]" category="ProjektCheck" class="BodenAnzeigen_Nullfall" id="rpc_tools.nullfall_anzeigen" image="" message="" tip="Fügt den Layer mit den Bodenbedeckungen im Nullfall zur Karte hinzu bzw. macht diesen sichtbar.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Zeichnung l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_loeschen" image="" message="" tip="Löscht alle bisher eingezeichneten Bodenbedeckungen im Nullfall.">
+                <Button caption="[Zeichnung l&#246;schen]" category="ProjektCheck" class="BodenEntfernen_Nullfall" id="rpc_tools.nullfall_loeschen" image="" message="" tip="Löscht alle bisher eingezeichneten Bodenbedeckungen im Nullfall.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Zeichnung auswerten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.nullfall_auswerten" image="" message="" tip="Aus den eingezeichneten Flächen ableiten, welcher Anteil des Plangebiets im Nullfall welche Bodenbedeckung aufweist.">
+                <Button caption="[Zeichnung auswerten]" category="ProjektCheck" class="Zeichnung_Nullfall" id="rpc_tools.nullfall_auswerten" image="" message="" tip="Aus den eingezeichneten Flächen ableiten, welcher Anteil des Plangebiets im Nullfall welche Bodenbedeckung aufweist.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Layer anzeigen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_anzeigen" image="" message="" tip="Fügt den Layer mit den Bodenbedeckungen im Planfall zur Karte hinzu bzw. macht diesen sichtbar.">
+                <Button caption="[Layer anzeigen]" category="ProjektCheck" class="BodenAnzeigen_Planfall" id="rpc_tools.planfall_anzeigen" image="" message="" tip="Fügt den Layer mit den Bodenbedeckungen im Planfall zur Karte hinzu bzw. macht diesen sichtbar.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Zeichnung l&#246;schen" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_loeschen" image="" message="" tip="Löscht alle bisher eingezeichneten Bodenbedeckungen im Planfall.">
+                <Button caption="[Zeichnung l&#246;schen]" category="ProjektCheck" class="BodenEntfernen_Planfall" id="rpc_tools.planfall_loeschen" image="" message="" tip="Löscht alle bisher eingezeichneten Bodenbedeckungen im Planfall.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Zeichnung auswerten" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.planfall_auswerten" image="" message="" tip="Aus den eingezeichneten Flächen ableiten, welcher Anteil des Plangebiets im Nullfall welche Bodenbedeckung aufweist.">
+                <Button caption="[Zeichnung auswerten]" category="ProjektCheck" class="Zeichnung_Planfall" id="rpc_tools.planfall_auswerten" image="" message="" tip="Aus den eingezeichneten Flächen ableiten, welcher Anteil des Plangebiets im Nullfall welche Bodenbedeckung aufweist.">
                     <Help heading="" />
                 </Button>
                 <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="NullfallUeberbauteFlaechen" id="rpc_tools.nullfall_ueberbaute_flaechen" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen überbauter Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
