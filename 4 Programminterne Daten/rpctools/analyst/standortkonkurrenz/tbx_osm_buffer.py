@@ -42,14 +42,11 @@ class OSMMarktBuffer(OSMMarktEinlesen):
         markets_com = os.path.join(ws_tmp, 'markets_com')
         
         def del_tmp():
-            try:
-                arcpy.Delete_management(ws_tmp)
-                arcpy.CreateFileGDB_management(*os.path.split(ws_tmp))
-            except:
-                for f in [sel_comm, feat_buffered, markets_buffer, markets_tmp,
-                          markets_com]:
-                    arcpy.Delete_management(f)
+            for f in [sel_comm, feat_buffered, markets_buffer, markets_tmp,
+                      markets_com]:
+                arcpy.Delete_management(f)
         
+        del_tmp()
         
         arcpy.FeatureClassToFeatureClass_conversion(
             communities, ws_tmp, os.path.split(sel_comm)[1],
@@ -87,8 +84,8 @@ class OSMMarktBuffer(OSMMarktEinlesen):
             # pro license only
             #arcpy.SymDiff_analysis(feat_buffered, sel_comm, buffer_diff)
             
-            self.parent_tbx.delete_rows_in_table(self._markets_table,
-                                                 where='is_buffer=1')
+            #self.parent_tbx.delete_rows_in_table(self._markets_table,
+                                                 #where='is_buffer=1')
             arcpy.CreateFeatureclass_management(
                 os.path.split(markets_tmp)[0], os.path.split(markets_tmp)[1],
                 template=markets_table
