@@ -261,12 +261,12 @@ class Wanderungssalden2(Tool):
             #arcpy.AddMessage("Gewerbe: Neugründungen = {0}".format(Neugruendungen_AP))
 
             self.parent_tbx.delete_rows_in_table("Zuzugsstatistik_Ew")
-            column_values = {"Kategorie": [u"Projektgemeinde/Region", u"Bund/Ausland"],
+            column_values = {"Kategorie": [u"Projektgemeinde/Region", u"Restliches Bundesgebiet/Ausland"],
                                 "Anzahl": [int(round(Summe_Zugeordneter_Fortzug_Ew * -1)), int(round(Differenz_Ew))]}
             self.parent_tbx.insert_rows_in_table("Zuzugsstatistik_Ew", column_values)
 
             self.parent_tbx.delete_rows_in_table("Zuzugsstatistik_SvB")
-            column_values = {"Kategorie": [u"Projektgemeinde/Region", u"Bund/Ausland", u"Neugründungen"],
+            column_values = {"Kategorie": [u"Projektgemeinde/Region", u"Restliches Bundesgebiet/Ausland", u"Neugründungen"],
                              "Anzahl": [int(round(Summe_Zugeordneter_Fortzug_AP * -1)), int(round(-1 * (Differenz_AP - Neugruendungen_AP))), int(round(Neugruendungen_AP))]}
             self.parent_tbx.insert_rows_in_table("Zuzugsstatistik_SvB", column_values)
 

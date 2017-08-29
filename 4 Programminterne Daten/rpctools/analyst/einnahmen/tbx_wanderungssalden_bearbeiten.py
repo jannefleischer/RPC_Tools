@@ -43,7 +43,7 @@ class TbxSaldenbearbeiten(Tbx):
         par.saldo.displayName = u'Neuer Saldo'
         par.saldo.parameterType = 'Required'
         par.saldo.direction = 'Input'
-        par.saldo.datatype = u'GPLong'
+        par.saldo.datatype = u'GPDouble'
 
         par.summe = arcpy.Parameter()
         par.summe.name = u'Summe'
