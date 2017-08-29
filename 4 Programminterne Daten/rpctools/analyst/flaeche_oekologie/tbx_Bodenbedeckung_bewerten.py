@@ -7,7 +7,7 @@ from rpctools.utils.encoding import encode
 from rpctools.analyst.flaeche_oekologie.script_Bodenbedeckung_bewerten import BodenbedeckungBewertung
 from rpctools.utils.constants import Nutzungsart
 import rpctools.utils.lib_oekologie as lib_oeko
-
+import os
 
 class TbxBodenBewertung(Tbx):
     """'Bodenbedeckung bewerte"""
@@ -39,8 +39,9 @@ class TbxBodenBewertung(Tbx):
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-		values = ["Bodenbedeckungsanteile aus Zeichnungen importieren", "Bodenbedeckungsanteile manuell festlegen"]
-		param.filter.list = values
+        values = ["Bodenbedeckungsanteile manuell festlegen", "Bodenbedeckungsanteile aus Zeichnungen importieren"]
+        param.filter.list = values
+        param.value == values[0]
 
 
         heading = encode("Bodenbedeckung Nullfall")
@@ -340,55 +341,55 @@ class TbxBodenBewertung(Tbx):
         workspace_projekt_oekologie = self.folders.get_db('FGDB_Flaeche_und_Oekologie.gdb', projektname)
         tabelle_boden_anteile = os.path.join(workspace_projekt_oekologie, "Bodenbedeckung_Anteile")
 
-		if type == "manuell":
+        if type == "manuell":
 
-			fields = ["IDBodenbedeckung", "Planfall", "Bodenbedeckung_Anteil"]
-			cursor = arcpy.da.SearchCursor(tabelle_boden_anteile, fields)
-			for row in cursor:
-				if row[1] == 0 and row[0] == 1:
-					 params['ueberbauteflaechen_alt'].value = row[2]
-				elif row[1] == 0 and row[0] == 2:
-					 params['wasser_alt'].value = row[2]
-				elif row[1] == 0 and row[0] == 3:
-					 params['platten_alt'].value = row[2]
-				elif row[1] == 0 and row[0] == 4:
-					 params['baeume_alt'].value = row[2]
-				elif row[1] == 0 and row[0] == 5:
-					 params['rasengittersteine_alt'].value = row[2]
-				elif row[1] == 0 and row[0] == 6:
-					 params['stauden_alt'].value = row[2]
-				elif row[1] == 0 and row[0] == 7:
-					 params['wiese_alt'].value = row[2]
-				elif row[1] == 0 and row[0] == 8:
-					 params['beton_alt'].value = row[2]
-				elif row[1] == 0 and row[0] == 9:
-					 params['acker_alt'].value = row[2]
-				elif row[1] == 0 and row[0] == 10:
-					 params['kleinpflaster_alt'].value = row[2]
-				elif row[1] == 0 and row[0] == 11:
-					 params['rasen_alt'].value = row[2]
-				elif row[1] == 1 and row[0] == 1:
-					 params['ueberbauteflaechen_neu'].value = row[2]
-				elif row[1] == 1 and row[0] == 2:
-					 params['wasser_neu'].value = row[2]
-				elif row[1] == 1 and row[0] == 3:
-					 params['platten_neu'].value = row[2]
-				elif row[1] == 1 and row[0] == 4:
-					 params['baeume_neu'].value = row[2]
-				elif row[1] == 1 and row[0] == 5:
-					 params['rasengittersteine_neu'].value = row[2]
-				elif row[1] == 1 and row[0] == 6:
-					 params['stauden_neu'].value = row[2]
-				elif row[1] == 1 and row[0] == 7:
-					 params['wiese_neu'].value = row[2]
-				elif row[1] == 1 and row[0] == 8:
-					 params['beton_neu'].value = row[2]
-				elif row[1] == 1 and row[0] == 9:
-					 params['acker_neu'].value = row[2]
-				elif row[1] == 1 and row[0] == 10:
-					 params['kleinpflaster_neu'].value = row[2]
-				elif row[1] == 1 and row[0] == 11:
-					 params['rasen_neu'].value = row[2]
+            fields = ["IDBodenbedeckung", "Planfall", "Bodenbedeckung_Anteil"]
+            cursor = arcpy.da.SearchCursor(tabelle_boden_anteile, fields)
+            for row in cursor:
+                if row[1] == 0 and row[0] == 1:
+                	 params['ueberbauteflaechen_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 2:
+                	 params['wasser_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 3:
+                	 params['platten_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 4:
+                	 params['baeume_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 5:
+                	 params['rasengittersteine_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 6:
+                	 params['stauden_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 7:
+                	 params['wiese_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 8:
+                	 params['beton_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 9:
+                	 params['acker_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 10:
+                	 params['kleinpflaster_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 11:
+                	 params['rasen_alt'].value = row[2]
+                elif row[1] == 1 and row[0] == 1:
+                	 params['ueberbauteflaechen_neu'].value = row[2]
+                elif row[1] == 1 and row[0] == 2:
+                	 params['wasser_neu'].value = row[2]
+                elif row[1] == 1 and row[0] == 3:
+                	 params['platten_neu'].value = row[2]
+                elif row[1] == 1 and row[0] == 4:
+                	 params['baeume_neu'].value = row[2]
+                elif row[1] == 1 and row[0] == 5:
+                	 params['rasengittersteine_neu'].value = row[2]
+                elif row[1] == 1 and row[0] == 6:
+                	 params['stauden_neu'].value = row[2]
+                elif row[1] == 1 and row[0] == 7:
+                	 params['wiese_neu'].value = row[2]
+                elif row[1] == 1 and row[0] == 8:
+                	 params['beton_neu'].value = row[2]
+                elif row[1] == 1 and row[0] == 9:
+                	 params['acker_neu'].value = row[2]
+                elif row[1] == 1 and row[0] == 10:
+                	 params['kleinpflaster_neu'].value = row[2]
+                elif row[1] == 1 and row[0] == 11:
+                	 params['rasen_neu'].value = row[2]
 
 		elif type == "zeichnen":
 				lib_oeko.import_zeichenanteile(projektname)
@@ -397,15 +398,12 @@ class TbxBodenBewertung(Tbx):
 
 
     def _updateParameters(self, params):
+        params = self.par
 
         if params.name.altered and not params.name.hasBeenValidated:
-                self.eingaben_auslesen("manuell")
-				params.quelle.value == "Bodenbedeckungsanteile manuell festlegen"
-
-        if params.quelle.altered and not params.name.hasBeenValidated:
-                if params.quelle.value == "Bodenbedeckungsanteile aus Zeichnungen importieren":
-					self.eingaben_auslesen("zeichnung")
-
+            self.eingaben_auslesen("manuell")
+            self.par.quelle.value == "Bodenbedeckungsanteile manuell festlegen"
+        changed = False
         listeSliderID = ['ueberbauteflaechen_alt',
                          'wasser_alt',
                          'platten_alt',
@@ -419,11 +417,17 @@ class TbxBodenBewertung(Tbx):
                          'rasen_alt',
 						 'undefiniert_alt'
 						 ]
+        if params.quelle.altered and not params.name.hasBeenValidated:
+            changed = True
+            if self.par.quelle.value == "Bodenbedeckungsanteile aus Zeichnungen importieren":
+                self.eingaben_auslesen("zeichnung")
 
         zielwertSlidersumme = 100
 
         for r in listeSliderID:
             if params[r].altered:
+                if changed == True:
+                    self.par.quelle.value == "Bodenbedeckungsanteile manuell festlegen"
                 self.sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
 
 
@@ -442,6 +446,8 @@ class TbxBodenBewertung(Tbx):
 
         for r in listeSliderID:
             if params[r].altered:
+                if changed == True:
+                    self.par.quelle.value == "Bodenbedeckungsanteile manuell festlegen"
                 self.sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
 
 		return

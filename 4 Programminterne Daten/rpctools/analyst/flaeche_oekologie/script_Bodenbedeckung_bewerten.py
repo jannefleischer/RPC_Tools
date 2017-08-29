@@ -1,44 +1,18 @@
 # -*- coding: utf-8 -*-
-
-Leistungsfähigkeit des Bodens
-	Bodenbedeckung angeben
-		Bodenanteile numerisch angeben
-		Bodenanteile einzeichnen
-			Nullfall
-				[Bodenbedeckung anzeigen]
-				[Bodenbedeckung löschen]
-				...
-			Planfall
-				[Bodenbedeckung anzeigen]
-				[Bodenbedeckung löschen]
-				...
-			Bodenanteile ermitteln
-				
-Leistungsfähigkeit des Bodens
-	Bodenanteile 
-		Bodenanteile numerisch angeben
-		Bodenanteile einzeichnen
-			Nullfall
-				[Bodenbedeckung anzeigen]
-				[Bodenbedeckung löschen]
-				...
-			Planfall
-				[Bodenbedeckung anzeigen]
-				[Bodenbedeckung löschen]
-				...
-			Bodenanteile ermitteln
-			
-			durchschn. wohnfläche -> fgdb definition projekt tool 
-			wohndichte = we pro hektar -> anzahl der we nach kreisen 
-			
-			
-				
-				
 import os
 import sys
 
 import arcpy
 from rpctools.utils.params import Tool
+from rpctools.diagrams.diagram_oekologie import Dia_Waerme
+from rpctools.diagrams.diagram_oekologie import Dia_Schadstoff
+from rpctools.diagrams.diagram_oekologie import Dia_Durchlaessigkeit
+from rpctools.diagrams.diagram_oekologie import Dia_Ueberformung
+from rpctools.diagrams.diagram_oekologie import Dia_Abfluss
+from rpctools.diagrams.diagram_oekologie import Dia_Grundwasser
+from rpctools.diagrams.diagram_oekologie import Dia_Regenwasser
+from rpctools.diagrams.diagram_oekologie import Dia_Biotop
+from rpctools.diagrams.diagram_oekologie import Dia_Staub
 
 class BodenbedeckungBewertung(Tool):
     """BodenbedeckungBewertung"""
@@ -47,7 +21,24 @@ class BodenbedeckungBewertung(Tool):
     _workspace = 'FGDB_Flaeche_und_Oekologie.gdb'
 
     def add_outputs(self):
-        pass
+        diagram = Dia_Waerme(projectname=self.par.name.value)
+        self.output.add_diagram(diagram)
+        diagram = Dia_Schadstoff(projectname=self.par.name.value)
+        self.output.add_diagram(diagram)
+        diagram = Dia_Durchlaessigkeit(projectname=self.par.name.value)
+        self.output.add_diagram(diagram)
+        diagram = Dia_Ueberformung(projectname=self.par.name.value)
+        self.output.add_diagram(diagram)
+        diagram = Dia_Abfluss(projectname=self.par.name.value)
+        self.output.add_diagram(diagram)
+        diagram = Dia_Grundwasser(projectname=self.par.name.value)
+        self.output.add_diagram(diagram)
+        diagram = Dia_Regenwasser(projectname=self.par.name.value)
+        self.output.add_diagram(diagram)
+        diagram = Dia_Biotop(projectname=self.par.name.value)
+        self.output.add_diagram(diagram)
+        diagram = Dia_Staub(projectname=self.par.name.value)
+        self.output.add_diagram(diagram)
 
     def run(self):
         params = self.par
@@ -104,8 +95,8 @@ class BodenbedeckungBewertung(Tool):
             elif row[1] == 1 and row[0] == 11:
                  row[2] = params.rasen_neu.value
             cursor.updateRow(row)
-		
-		
+
+
 
         boden_anteile_alt = [0,0,0,0,0,0,0,0,0,0,0]
         boden_anteile_neu = [0,0,0,0,0,0,0,0,0,0,0]
@@ -169,8 +160,8 @@ class BodenbedeckungBewertung(Tool):
         boden_ha_absolut_planfall = [0,0,0,0,0,0,0,0,0,0,0]
 
         for x in xrange(11):
-            boden_absolut_alt[x] = boden_anteile_alt[x] * plangebiet_ha
-            boden_absolut_neu[x] = boden_anteile_neu[x] * plangebiet_ha
+            boden_ha_absolut_nullfall[x] = boden_anteile_alt[x] * plangebiet_ha
+            boden_ha_absolut_planfall[x] = boden_anteile_neu[x] * plangebiet_ha
 
         #Klima
         waermespeicherung_multiplikator = [0,0,0.1,0.2,0.3,0.3,1,0.8,0.9,1,1]
@@ -254,32 +245,81 @@ class BodenbedeckungBewertung(Tool):
             faktor_biotopausbildungsvermoegen_planfall.append(boden_anteile_neu[x] * biotopausbildungsvermoegen_multiplikator[x])
 
 
+        table_kennwerte = self.folders.get_table("Leistungskennwerte")
+        cursor = arcpy.da.UpdateCursor(table_kennwerte, ["*"])
+        for row in cursor:
+            cursor.deleteRow()
 
-        quotient_waermespeicherung_nullfall = sum(faktor_waermespeicherung_nullfall) / 11
-        quotient_waermespeicherung_planfall = sum(faktor_waermespeicherung_planfall) / 11
+        def get_kennwert(quotient):
+            if(quotient<0.2):
+                return 1
+            elif(quotient>=0.2 and quotient<0.4):
+                return 2
+            elif(quotient>=0.4 and quotient<0.6):
+                return 3
+            elif(quotient >= 0.6 and quotient<0.8):
+                return 4
+            elif(quotient>=0.8):
+                return 5
+            else:
+                return 0
 
-        quotient_staubbindevermoegen_nullfall = sum(faktor_staubbindevermoegen_nullfall) / 11
-        quotient_staubbindevermoegen_planfall = sum(faktor_staubbindevermoegen_planfall) / 11
 
-        quotient_waermespeicherung_nullfall = sum(faktor_waermespeicherung_nullfall) / 11
-        quotient_waermespeicherung_planfall = sum(faktor_waermespeicherung_planfall) / 11
 
-        quotient_waermespeicherung_nullfall = sum(faktor_waermespeicherung_nullfall) / 11
-        quotient_waermespeicherung_planfall = sum(faktor_waermespeicherung_planfall) / 11
+        quotient_waermespeicherung_nullfall = sum(faktor_waermespeicherung_nullfall) / 11.0
+        waermespeicherung_nullfall = get_kennwert(quotient_waermespeicherung_nullfall)
+        quotient_waermespeicherung_planfall = sum(faktor_waermespeicherung_planfall) / 11.0
+        waermespeicherung_planfall = get_kennwert(quotient_waermespeicherung_planfall)
 
-        quotient_waermespeicherung_nullfall = sum(faktor_waermespeicherung_nullfall) / 11
-        quotient_waermespeicherung_planfall = sum(faktor_waermespeicherung_planfall) / 11
+        quotient_staubbindevermoegen_nullfall = sum(faktor_staubbindevermoegen_nullfall) / 11.0
+        staubbindevermoegen_nullfall = get_kennwert(quotient_staubbindevermoegen_nullfall)
+        quotient_staubbindevermoegen_planfall = sum(faktor_staubbindevermoegen_planfall) / 11.0
+        staubbindevermoegen_planfall = get_kennwert(quotient_staubbindevermoegen_planfall)
 
-        quotient_waermespeicherung_nullfall = sum(faktor_waermespeicherung_nullfall) / 11
-        quotient_waermespeicherung_planfall = sum(faktor_waermespeicherung_planfall) / 11
+        quotient_schadstoffrueckhaltung_nullfall = sum(faktor_schadstoffrueckhaltung_nullfall) / 11.0
+        schadstoffrueckhaltung_nullfall = get_kennwert(quotient_schadstoffrueckhaltung_nullfall)
+        quotient_schadstoffrueckhaltung_planfall = sum(faktor_schadstoffrueckhaltung_planfall) / 11.0
+        schadstoffrueckhaltung_planfall = get_kennwert(quotient_schadstoffrueckhaltung_planfall)
 
-        quotient_waermespeicherung_nullfall = sum(faktor_waermespeicherung_nullfall) / 11
-        quotient_waermespeicherung_planfall = sum(faktor_waermespeicherung_planfall) / 11
+        quotient_durchlaessigkeit_nullfall = sum(faktor_durchlaessigkeit_nullfall) / 11.0
+        durchlaessigkeit_nullfall  = get_kennwert(quotient_durchlaessigkeit_nullfall)
+        quotient_durchlaessigkeit_planfall = sum(faktor_durchlaessigkeit_planfall) / 11.0
+        durchlaessigkeit_planfall = get_kennwert(quotient_durchlaessigkeit_planfall)
 
-        quotient_waermespeicherung_nullfall = sum(faktor_waermespeicherung_nullfall) / 11
-        quotient_waermespeicherung_planfall = sum(faktor_waermespeicherung_planfall) / 11
+        quotient_bodenueberformung_nullfall = sum(faktor_bodenueberformung_nullfall) / 11.0
+        bodenueberformung_nullfall = get_kennwert(quotient_bodenueberformung_nullfall)
+        quotient_bodenueberformung_planfall = sum(faktor_bodenueberformung_planfall) / 11.0
+        bodenueberformung_planfall = get_kennwert(quotient_bodenueberformung_planfall)
 
-        quotient_waermespeicherung_nullfall = sum(faktor_waermespeicherung_nullfall) / 11
-        quotient_waermespeicherung_planfall = sum(faktor_waermespeicherung_planfall) / 11
+        quotient_oberflaechenabfluss_nullfall = sum(faktor_oberflaechenabfluss_nullfall) / 11.0
+        oberflaechenabfluss_nullfall = get_kennwert(quotient_oberflaechenabfluss_nullfall)
+        quotient_oberflaechenabfluss_planfall = sum(faktor_oberflaechenabfluss_planfall) / 11.0
+        oberflaechenabfluss_planfall = get_kennwert(quotient_oberflaechenabfluss_planfall)
 
-        arcpy.AddMessage()
+        quotient_grundwasserneubildung_nullfall = sum(faktor_grundwasserneubildung_nullfall) / 11.0
+        grundwasserneubildung_nullfall = get_kennwert(quotient_grundwasserneubildung_nullfall)
+        quotient_grundwasserneubildung_planfall = sum(faktor_grundwasserneubildung_planfall) / 11.0
+        grundwasserneubildung_planfall = get_kennwert(quotient_grundwasserneubildung_planfall)
+
+        quotient_regenwasserversickerung_nullfall = sum(faktor_regenwasserversickerung_nullfall) / 11.0
+        regenwasserversickerung_nullfall = get_kennwert(quotient_regenwasserversickerung_nullfall)
+        quotient_regenwasserversickerung_planfall = sum(faktor_regenwasserversickerung_planfall) / 11.0
+        regenwasserversickerung_planfall = get_kennwert(quotient_regenwasserversickerung_planfall)
+
+        quotient_biotopausbildungsvermoegen_nullfall = sum(faktor_biotopausbildungsvermoegen_nullfall) / 11.0
+        biotopausbildungsvermoegen_nullfall = get_kennwert(quotient_biotopausbildungsvermoegen_nullfall)
+        quotient_biotopausbildungsvermoegen_planfall = sum(faktor_biotopausbildungsvermoegen_planfall) / 11.0
+        biotopausbildungsvermoegen_planfall = get_kennwert(quotient_biotopausbildungsvermoegen_planfall)
+
+        column_values = {"Kategorie": [u"Nullfall", u"Planfall", u"Veränderung"],
+                                "Schadstoffrueckhaltung": [schadstoffrueckhaltung_nullfall,schadstoffrueckhaltung_planfall, abs(schadstoffrueckhaltung_nullfall - schadstoffrueckhaltung_planfall)],
+                                "Waermespeicherung": [waermespeicherung_nullfall,waermespeicherung_planfall, abs(waermespeicherung_nullfall - waermespeicherung_planfall)],
+                                "Durchlaessigkeit": [durchlaessigkeit_nullfall,durchlaessigkeit_planfall,abs(durchlaessigkeit_nullfall - durchlaessigkeit_planfall)],
+                                "Bodenueberformung": [bodenueberformung_nullfall,bodenueberformung_planfall, abs(bodenueberformung_nullfall - bodenueberformung_planfall)],
+                                "Oberflaechenabfluss": [oberflaechenabfluss_nullfall,oberflaechenabfluss_planfall, abs(oberflaechenabfluss_nullfall - oberflaechenabfluss_planfall)],
+                                "Grundwasserneubildung": [grundwasserneubildung_nullfall,grundwasserneubildung_planfall, abs(grundwasserneubildung_nullfall - grundwasserneubildung_planfall)],
+                                "Regenwasserversickerung": [regenwasserversickerung_nullfall,regenwasserversickerung_planfall, abs(regenwasserversickerung_nullfall - regenwasserversickerung_planfall)],
+                                "Biotopausbildungsvermoegen": [biotopausbildungsvermoegen_nullfall,biotopausbildungsvermoegen_planfall,abs(biotopausbildungsvermoegen_nullfall - biotopausbildungsvermoegen_planfall)],
+                                "Staubbindevermoegen": [staubbindevermoegen_nullfall,staubbindevermoegen_planfall, abs(staubbindevermoegen_nullfall - staubbindevermoegen_planfall)]
+                                }
+        self.parent_tbx.insert_rows_in_table("Leistungskennwerte", column_values)

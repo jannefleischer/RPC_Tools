@@ -12,7 +12,6 @@ class Dia_Wanderung_Ew(ArcpyDiagram):
         """
         Diagramm für die Zuzugsstatistik (Einwohner)
         """
-        # Erstelle Diagramm Teilflaechen nach Hektar
         project_name = self.tbx.par.get_projectname()
         title = encode(
             "{}: Herkunftsorte der Einwohner im Plangebiet"
@@ -20,11 +19,8 @@ class Dia_Wanderung_Ew(ArcpyDiagram):
         input_template = self.tbx.folders.get_diagram_template(
             'Zuzugsstatistik')
 
-        # Create the graph
         graph = arcpy.Graph()
         input_data = self.tbx.folders.get_table("Zuzugsstatistik_Ew", "FGDB_Einnahmen.gdb")
-
-        # Add a vertical bar series to the graph
         graph.addSeriesBarVertical(dataSrc=input_data,
                                    fieldY= "Anzahl",
                                    fieldLabel="Kategorie")
@@ -38,7 +34,6 @@ class Dia_Wanderung_SvB(ArcpyDiagram):
         """
         Diagramm für die Zuzugsstatistik (SvB)
         """
-        # Erstelle Diagramm Teilflaechen nach Hektar
         project_name = self.tbx.par.get_projectname()
         title = encode(
             "{}: Herkunftsorte der Arbeitsplätze im Plangebiet"
@@ -46,11 +41,8 @@ class Dia_Wanderung_SvB(ArcpyDiagram):
         input_template = self.tbx.folders.get_diagram_template(
             'Zuzugsstatistik')
 
-        # Create the graph
         graph = arcpy.Graph()
         input_data = self.tbx.folders.get_table("Zuzugsstatistik_SvB", "FGDB_Einnahmen.gdb")
-
-        # Add a vertical bar series to the graph
         graph.addSeriesBarVertical(dataSrc=input_data,
                                    fieldY= "Anzahl",
                                    fieldLabel="Kategorie")

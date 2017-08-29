@@ -5,6 +5,8 @@ import sys
 
 import arcpy
 from rpctools.utils.params import Tool
+from rpctools.diagrams.diagram_oekologie import Dia_Nullfall
+from rpctools.diagrams.diagram_oekologie import Dia_Planfall
 
 class BodenbedeckungKontrolle(Tool):
     """BodenbedeckungKontrolle"""
@@ -90,13 +92,17 @@ class BodenbedeckungEntfernen(Tool):
         table_nullfall = self.folders.get_table("Bodenbedeckung_Nullfall", "FGDB_Flaeche_und_Oekologie.gdb")
         table_planfall = self.folders.get_table("Bodenbedeckung_Planfall", "FGDB_Flaeche_und_Oekologie.gdb")
 
-        cursor = arcpy.da.UpdateCursor(table_nullfall, ["*"])
-        for row in cursor:
-            cursor.deleteRow()
+        if self.parent_tbx.nullfall == 1:
+            cursor = arcpy.da.UpdateCursor(table_nullfall, ["*"])
+            for row in cursor:
+                cursor.deleteRow()
+        else:
+            cursor = arcpy.da.UpdateCursor(table_planfall, ["*"])
+            for row in cursor:
+                cursor.deleteRow()
 
-        cursor = arcpy.da.UpdateCursor(table_planfall, ["*"])
-        for row in cursor:
-            cursor.deleteRow()
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
 
 class BodenbedeckungAnzeigen(Tool):
     """BodenbedeckungAnzeigen"""
@@ -105,9 +111,33 @@ class BodenbedeckungAnzeigen(Tool):
     _workspace = 'FGDB_Flaeche_und_Oekologie.gdb'
 
     def add_outputs(self):
-        self.output.add_layer(groupname = "oekologie", featureclass = "Bodenbedeckung_Nullfall", template_layer = "Bodenbedeckung_Nullfall", template_folder="oekologie",  zoom=False, disable_other = True)
-        self.output.add_layer(groupname = "oekologie", featureclass = "Bodenbedeckung_Planfall", template_layer = "Bodenbedeckung_Planfall", template_folder="oekologie",  zoom=False, disable_other = False)
+
+        if self.parent_tbx.nullfall == 1:
+            self.output.add_layer(groupname = "oekologie", featureclass = "Bodenbedeckung_Nullfall", template_layer = "Bodenbedeckung_Nullfall", template_folder="oekologie",  zoom=False, disable_other = True)
+        else:
+            self.output.add_layer(groupname = "oekologie", featureclass = "Bodenbedeckung_Planfall", template_layer = "Bodenbedeckung_Planfall", template_folder="oekologie",  zoom=False, disable_other = False)
         self.output.show_layers()
+
+    def run(self):
+        pass
+
+class BodenbedeckungZeichnen(Tool):
+    """BodenbedeckungZeichnen"""
+
+    _param_projectname = 'name'
+    _workspace = 'FGDB_Flaeche_und_Oekologie.gdb'
+
+    def add_outputs(self):
+
+        if self.parent_tbx.nullfall == 1:
+            diagram = Dia_Nullfall(projectname=self.par.name.value)
+        else:
+            diagram = Dia_Planfall(projectname=self.par.name.value)
+
+        self.output.add_diagram(diagram)
+
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
 
     def run(self):
         pass

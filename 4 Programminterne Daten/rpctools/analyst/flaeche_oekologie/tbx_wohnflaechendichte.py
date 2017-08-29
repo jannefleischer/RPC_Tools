@@ -4,17 +4,17 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.analyst.flaeche_oekologie.script_Wohnflaechendichte import Wohnflaechendichte
+from rpctools.analyst.flaeche_oekologie.script_Wohnflaeche import Wohnflaechendichte
 from rpctools.utils.constants import Nutzungsart
 
-class TbxWohnflaeche(Tbx):
+class TbxWohnflaechendichte(Tbx):
     """Toolbox Wohnflaechendichte"""
 
     id_teilflaeche = 1
 
     @property
     def label(self):
-        return u'Wohnflächendichte vergleichen'
+        return u'Wohnflächendichte anzeigen'
 
     @property
     def Tool(self):
@@ -41,6 +41,16 @@ class TbxWohnflaeche(Tbx):
         par.teilflaeche.direction = 'Input'
         par.teilflaeche.datatype = u'GPString'
         par.teilflaeche.filter.list = []
+
+        # Nicht-Nettofläche
+        par.nettoflaeche = arcpy.Parameter()
+        par.nettoflaeche.name = u'nettoflaeche'
+        par.nettoflaeche.displayName = u'Anteil der Fläche der ausgewählten Teilfläche, welcher kein Nettowohnbauland (= Wohnbaugrundstücke) ist (in Prozent)'
+        par.nettoflaeche.parameterType = 'Required'
+        par.nettoflaeche.direction = 'Input'
+        par.nettoflaeche.datatype = u'Long'
+        par.nettoflaeche.filter.type = 'Range'
+        par.nettoflaeche.filter.list = [0, 100]
 
         heading = encode("Durchschnittliche überbaute Fläche nach Gebäudetyp")
 
@@ -112,6 +122,18 @@ class TbxWohnflaeche(Tbx):
                 self.id_teilflaeche = id_teilflaechen[0]
             else:
                 par.name.setErrorMessage(u'Es wurden keine Wohngebiete definiert.')
+
+            path_vorgabewerte = self.folders.get_base_table("FGDB_Definition_Projekt_Tool.gdb", "Wohnen_Gebaeudetypen")
+            cursor = arcpy.da.SearchCursor(path_vorgabewerte, ["IDGebaeudetyp", "Wohnfl_m2_pro_WE"])
+            for row in cursor:
+                if row[0] == 1:
+                    par.flaeche_efh.value = row[1]
+                elif row[0] == 2:
+                    par.flaeche_dh.value = row[1]
+                elif row[0] == 3:
+                    par.flaeche_rh.value = row[1]
+                elif row[0] == 4:
+                    par.flaeche_mfh.value = row[1]
 
         if par.teilflaeche.altered and not par.teilflaeche.hasBeenValidated:
             split1 = par.teilflaeche.value.split("ID: ")[1]

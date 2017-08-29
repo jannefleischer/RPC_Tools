@@ -23,7 +23,7 @@ class TbxUeberschneidungen(Tbx):
 
         par = self.par
 
-        # Projektname
+        # Projekt_auswählen
         par.name = arcpy.Parameter()
         par.name.name = u'Projektname'
         par.name.displayName = u'Projekt'
@@ -32,13 +32,6 @@ class TbxUeberschneidungen(Tbx):
         par.name.datatype = u'GPString'
         par.name.filter.list = []
 
-        # Projektname
-        par.layer_number = arcpy.Parameter()
-        par.layer_number.name = u'layer_number'
-        par.layer_number.displayName = u'layer_number'
-        par.layer_number.parameterType = 'Required'
-        par.layer_number.datatype = u'GPLong'
-        par.layer_number.value = 0
 
         return par
 
@@ -48,7 +41,7 @@ class TbxLayerWald(TbxUeberschneidungen):
     def _getParameterInfo(self):
         super(TbxLayerWald, self)._getParameterInfo()
         par = self.par
-        par.layer_number.value = 1
+        self.layer_number = 1
         return par
 
 class TbxLayerNatur(TbxUeberschneidungen):
@@ -56,7 +49,7 @@ class TbxLayerNatur(TbxUeberschneidungen):
     def _getParameterInfo(self):
         super(TbxLayerNatur, self)._getParameterInfo()
         par = self.par
-        par.layer_number.value = 2
+        self.layer_number = 2
         return par
 
 class TbxLayerLandschaft(TbxUeberschneidungen):
@@ -64,15 +57,23 @@ class TbxLayerLandschaft(TbxUeberschneidungen):
     def _getParameterInfo(self):
         super(TbxLayerLandschaft, self)._getParameterInfo()
         par = self.par
-        par.layer_number.value = 3
+        self.layer_number = 3
         return par
 
-class TbxLayerWasser(TbxUeberschneidungen):
+class TbxLayerFreiraum_100(TbxUeberschneidungen):
 
     def _getParameterInfo(self):
-        super(TbxLayerWasser, self)._getParameterInfo()
+        super(TbxLayerFreiraum_100, self)._getParameterInfo()
         par = self.par
-        par.layer_number.value = 4
+        self.layer_number = 4
+        return par
+
+class TbxLayerFreiraum_50(TbxUeberschneidungen):
+
+    def _getParameterInfo(self):
+        super(TbxLayerFreiraum_50, self)._getParameterInfo()
+        par = self.par
+        self.layer_number = 5
         return par
 
 class TbxLayerFreiraum(TbxUeberschneidungen):
@@ -80,21 +81,31 @@ class TbxLayerFreiraum(TbxUeberschneidungen):
     def _getParameterInfo(self):
         super(TbxLayerFreiraum, self)._getParameterInfo()
         par = self.par
-        par.layer_number.value = 5
+        self.layer_number = 6
         return par
 
-class TbxLayerBodenversiegelung(TbxUeberschneidungen):
+
+class TbxLayerWald_50(TbxUeberschneidungen):
 
     def _getParameterInfo(self):
-        super(TbxLayerBodenversiegelung, self)._getParameterInfo()
+        super(TbxLayerWald_50, self)._getParameterInfo()
         par = self.par
-        par.layer_number.value = 6
+        self.layer_number = 7
         return par
+
 
 class TbxLayerHochspannung(TbxUeberschneidungen):
 
     def _getParameterInfo(self):
         super(TbxLayerHochspannung, self)._getParameterInfo()
         par = self.par
-        par.layer_number.value = 7
+        self.layer_number = 8
+        return par
+
+class TbxSchutzgebiete(TbxUeberschneidungen):
+
+    def _getParameterInfo(self):
+        super(TbxSchutzgebiete, self)._getParameterInfo()
+        par = self.par
+        self.layer_number = 9
         return par
