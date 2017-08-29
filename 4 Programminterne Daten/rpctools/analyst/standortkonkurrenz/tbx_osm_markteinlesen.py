@@ -308,6 +308,7 @@ class TbxOSMMarktEinlesen(Tbx):
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'
+        param.value = True
 
         return params
 

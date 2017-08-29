@@ -17,10 +17,11 @@ class EditCenters(Tool):
 
     def add_outputs(self):
         group_layer = ("standortkonkurrenz")
+        folder = 'Standortkonkurrenz'
         fc = 'Zentren'
         layer = 'Zentren'
-
-        self.output.add_layer(group_layer, layer, fc, zoom=False)
+        self.output.add_layer(group_layer, layer, fc, zoom=False,
+                              template_folder=folder)
 
     def run(self):
         centers_df = self.parent_tbx.centers_df

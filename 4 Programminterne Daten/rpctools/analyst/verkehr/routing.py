@@ -52,7 +52,7 @@ class Routing(Tool):
         for single_tfl in data_tfl:
             source_id, trips, tfl_use, shape = single_tfl
             arcpy.AddMessage(
-                "suche Routen von Teilfläche {} aus...".format(source_id))
+                u"Suche Routen ausgehend von Teilfläche {}...".format(source_id))
             x_coord, y_coord = shape
             if not trips:
                 continue
