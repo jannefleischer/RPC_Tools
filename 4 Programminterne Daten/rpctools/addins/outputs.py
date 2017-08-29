@@ -47,6 +47,6 @@ class BodenbedeckungAnzeigen(Output):
 class GrenzlinieAnzeigen(Output):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Flaeche und Oekologie.pyt'
-    _toolbox_name = 'TbxIntegrationsgrad'
+    _toolbox_name = 'TbxIntegrationsgrad_zeichnen'
 
 

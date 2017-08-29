@@ -28,8 +28,9 @@ from rpctools.analyst.flaeche_oekologie.tbx_Bodenbedeckung_kontrollieren import 
 from rpctools.analyst.flaeche_oekologie.tbx_Bodenbedeckung_kontrollieren import TbxZeichnung_Nullfall
 from rpctools.analyst.flaeche_oekologie.tbx_Bodenbedeckung_kontrollieren import TbxZeichnung_Planfall
 
-from rpctools.analyst.flaeche_oekologie.tbx_Integrationsgrad import TbxIntegrationsgrad
+from rpctools.analyst.flaeche_oekologie.tbx_Integrationsgrad import TbxIntegrationsgrad_berechnen
 from rpctools.analyst.flaeche_oekologie.tbx_Integrationsgrad import TbxIntegrationsgrad_loeschen
+from rpctools.analyst.flaeche_oekologie.tbx_Integrationsgrad import TbxIntegrationsgrad_zeichnen
 
 from rpctools.analyst.flaeche_oekologie.tbx_wohnflaechendichte import TbxWohnflaechendichte
 from rpctools.analyst.flaeche_oekologie.tbx_wohndichte import TbxWohndichte
@@ -58,7 +59,8 @@ class Toolbox(object):
                       TbxZeichnung_Nullfall,
                       TbxZeichnung_Planfall,
 
-					  TbxIntegrationsgrad,
+					  TbxIntegrationsgrad_berechnen,
+                      TbxIntegrationsgrad_zeichnen,
                       TbxIntegrationsgrad_loeschen,
 
 					  TbxWohnflaechendichte,

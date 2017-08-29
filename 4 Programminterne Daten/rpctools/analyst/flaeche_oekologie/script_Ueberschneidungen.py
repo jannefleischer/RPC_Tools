@@ -34,7 +34,7 @@ class Ueberschneidungen(Tool):
             path = "Hochspannungsleitungen"
 
         if self.parent_tbx.layer_number != 9:
-            self.output.add_layer(groupname = "oekologie", template_layer = path, template_folder="oekologie", zoom=False, disable_other = False)
+            self.output.add_layer(groupname = "oekologie", template_layer = path, template_folder="oekologie", zoom=False, disable_other = True)
         #self.output.add_image("C:\\Temp\\hui.png", "Test")
 
             arcpy.RefreshTOC()

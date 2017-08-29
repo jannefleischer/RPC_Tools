@@ -117,14 +117,14 @@ class Integrationsgrad_berechnen(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = u'Flaeche und Oekologie.pyt'
     _do_show = False
-    _toolbox_name = 'TbxIntegrationsgrad'
+    _toolbox_name = 'TbxIntegrationsgrad_berechnen'
 
 
 class Grenze_zeichnen(ToolboxButton):
     """Implementation for rpc_tools.grenzlinie_einzeichnen (Tool)"""
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Flaeche und Oekologie.pyt'
-    _toolbox_name = 'TbxIntegrationsgrad'
+    _toolbox_name = 'TbxIntegrationsgrad_zeichnen'
 
     def __init__(self):
         super(Grenze_zeichnen, self).__init__()

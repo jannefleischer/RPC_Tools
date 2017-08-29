@@ -4,13 +4,14 @@ import arcpy
 
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
-from rpctools.analyst.flaeche_oekologie.script_Integrationsgrad import Integrationsgrad
+from rpctools.analyst.flaeche_oekologie.script_Integrationsgrad import Integrationsgrad_berechnen
 from rpctools.analyst.flaeche_oekologie.script_Integrationsgrad import Integrationsgrad_loeschen
+from rpctools.analyst.flaeche_oekologie.script_Integrationsgrad import Integrationsgrad_zeichnen
 from rpctools.utils.constants import Nutzungsart
 from rpctools.utils.output import Output
 
-class TbxIntegrationsgrad(Tbx):
-    """Toolbox Integrationsgrad"""
+class TbxIntegrationsgrad_berechnen(Tbx):
+    """Toolbox Integrationsgrad_berechnen"""
 
     @property
     def label(self):
@@ -18,7 +19,7 @@ class TbxIntegrationsgrad(Tbx):
 
     @property
     def Tool(self):
-        return Integrationsgrad
+        return Integrationsgrad_berechnen
 
     def _getParameterInfo(self):
 
@@ -33,6 +34,35 @@ class TbxIntegrationsgrad(Tbx):
         par.name.datatype = u'GPString'
         par.name.filter.list = []
 
+
+        return par
+
+    def _updateParameters(self, params):
+        par = self.par
+
+class TbxIntegrationsgrad_zeichnen(Tbx):
+    """Toolbox TbxIntegrationsgrad_zeichnen"""
+
+    @property
+    def label(self):
+        return u' Integrationsgrad zeichnen'
+
+    @property
+    def Tool(self):
+        return Integrationsgrad_zeichnen
+
+    def _getParameterInfo(self):
+
+        par = self.par
+
+        # Projektname
+        par.name = arcpy.Parameter()
+        par.name.name = u'Projektname'
+        par.name.displayName = u'Projektname'
+        par.name.parameterType = 'Required'
+        par.name.direction = 'Input'
+        par.name.datatype = u'GPString'
+        par.name.filter.list = []
 
         return par
 

@@ -7,8 +7,8 @@ import arcpy
 from rpctools.utils.params import Tool
 from rpctools.diagrams.diagram_oekologie import Dia_Integrationsgrad
 
-class Integrationsgrad(Tool):
-    """Integrationsgrad"""
+class Integrationsgrad_berechnen(Tool):
+    """Integrationsgrad_berechnen"""
 
     _param_projectname = 'name'
     _workspace = 'FGDB_Flaeche_und_Oekologie.gdb'
@@ -42,6 +42,13 @@ class Integrationsgrad(Tool):
         for row in cursor:
             self.aussengrenze += row[0]
         arcpy.Delete_management(path_aussengrenze)
+        current_mxd = arcpy.mapping.MapDocument("CURRENT")
+        current_dataframe = current_mxd.activeDataFrame
+        aussengrenze_layer = arcpy.mapping.ListLayers(
+            current_mxd,
+            "Aussengrenze_Plangebiet",
+            current_dataframe)[0]
+        arcpy.mapping.RemoveLayer(current_dataframe, aussengrenze_layer)
 
         table_integrationsgrad = self.folders.get_table("Integrationsgrad", "FGDB_Flaeche_und_Oekologie.gdb")
         cursor = arcpy.da.UpdateCursor(table_integrationsgrad, ["*"])
@@ -75,3 +82,19 @@ class Integrationsgrad_loeschen(Tool):
 
         arcpy.RefreshActiveView()
         arcpy.RefreshTOC()
+
+class Integrationsgrad_zeichnen(Tool):
+    """Integrationsgradzeichnen"""
+
+    _param_projectname = 'name'
+    _workspace = 'FGDB_Flaeche_und_Oekologie.gdb'
+
+    def add_outputs(self):
+        self.output.add_layer(groupname = "oekologie", featureclass = "Grenze_Siedlungskoerper", template_layer = "Grenze_Siedlungskoerper", template_folder="oekologie",  zoom=False, disable_other = True)
+        arcpy.RefreshTOC()
+        arcpy.RefreshActiveView()
+
+    def run(self):
+        params = self.par
+
+
