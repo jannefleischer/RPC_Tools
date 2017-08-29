@@ -17,7 +17,6 @@ from rpctools.analyst.standortkonkurrenz.tbx_versorgungsbereiche import TbxEditC
 from rpctools.analyst.standortkonkurrenz.tbx_maerkte_importieren import (
     TbxMaerkteImportierenDatei, TbxMaerkteImportierenFeatureClass)
 from rpctools.analyst.standortkonkurrenz.tbx_field_selection import TbxFieldSelection
-from rpctools.analyst.standortkonkurrenz.tbx_randbedingungen import TbxSetBoundaryConditions
 
 class Toolbox(object):
     def __init__(self):
@@ -33,8 +32,7 @@ class Toolbox(object):
                       TbxExtendMarkets,
                       TbxMaerkteImportierenDatei,
                       TbxMaerkteImportierenFeatureClass,
-                      TbxFieldSelection,
-                      TbxSetBoundaryConditions]
+                      TbxFieldSelection]
 
 
 
