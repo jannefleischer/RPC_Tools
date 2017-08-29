@@ -51,6 +51,7 @@ class ProjektwirkungMarkets(Tool):
         for index, plan_market in df_markets[planfall_idx].iterrows():
             layer_name = u'Kaufkraftbindung {m} ({i})'.format(
                 m=plan_market['name'], i=plan_market['id'])
+            self.output.remove_layer(layer_name)
             fn = u'Kaufkraftbindung_Raster_{i}'.format(i=plan_market['id'])
 
             fp = self.folders.get_table(fn, check=False)
@@ -59,9 +60,9 @@ class ProjektwirkungMarkets(Tool):
             where = 'id_markt={} and distanz>=0'.format(plan_market['id'])
             arcpy.Delete_management(fp)
             template = self.folders.ZENSUS_RASTER_FILE
+            arcpy.Delete_management(fp)
             raster_file = features_to_raster(
                 table, fp, 'kk_bindung_planfall', template=template,
-                transform_method=self.parent_tbx.config.transformation, 
                 where=where)
             self.output.add_layer(group_layer, 'Kaufkraftbindung_Raster',
                                   fn,
@@ -88,7 +89,7 @@ class ProjektwirkungMarkets(Tool):
             'betrachtungsraum': ','.join(cur_ags),
         }
         prev_settings = self.parent_tbx.query_table(set_table,
-                                               columns=cur_settings.keys())
+                                                    columns=cur_settings.keys())
         if len(prev_settings) == 0:
             self.parent_tbx.insert_rows_in_table(set_table, cur_settings)
             self.recalculate = True  # will be done anyway, cause all result tables are empty
@@ -338,6 +339,7 @@ class ProjektwirkungMarkets(Tool):
         df_sales['id'] = df_sales.index
         df_sales['umsatz_differenz'] = ((df_sales['umsatz_planfall'] /
                                          df_sales['umsatz_nullfall']) * 100 - 100)
+        df_sales.fillna(0, inplace=True)
 
         self.parent_tbx.dataframe_to_table('Maerkte', df_sales, pkeys=['id'])
 
@@ -508,6 +510,13 @@ class TbxProjektwirkungMarkets(Tbx):
         param.datatype = u'GPBoolean'
 
         return params
+    
+    def open(self):
+        set_table = 'Settings'
+        prev_settings = self.query_table(set_table,
+                                         columns='sz_puffer')
+        self.par.radius_sz.value = (2000 if len(prev_settings) == 0
+                                    else prev_settings[0][0])
 
     def _updateParameters(self, params):
         pass

@@ -52,6 +52,8 @@ def features_to_raster(feature_class, outfile, field, template=None,
     '''
     proj_tmp = join(arcpy.env.scratchGDB, 'proj_tmp')
     where_tmp = join(arcpy.env.scratchGDB, 'where_tmp')
+    arcpy.Delete_management(where_tmp)
+    arcpy.Delete_management(proj_tmp)
     in_features = arcpy.FeatureClassToFeatureClass_conversion(
         feature_class, *split(where_tmp), where_clause=where)
     if template:
