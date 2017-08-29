@@ -37,6 +37,7 @@ class SetSource(Tool):
                               featureclass='Anbindungspunkte',
                               template_folder='Verkehr',
                               zoom=True, zoom_extent=self._extent)
+        self.output.hide_layer('projektdefinition')
 
     def run(self):
         area, i = self.parent_tbx.get_selected_area()
