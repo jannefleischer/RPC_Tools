@@ -37,9 +37,11 @@ class ProjektwirkungMarkets(Tool):
         fc_zentren = 'Zentren'
         layer_vb = u'Umsatzveränderung Bestand Versorgungsbereiche'
         layer_gem = u'Umsatzveränderung Bestand Gemeinden'
+        layer_zen = u'Zentralität Planfall'
+        layer_vkfl = u'Verkaufsflächendichte Planfall'
 
-        self.output.add_layer(group_layer, layer_maerkte, fc_maerkte,
-                              template_folder=folder, zoom=False)
+        #self.output.add_layer(group_layer, layer_maerkte, fc_maerkte,
+                              #template_folder=folder, zoom=False)
 
         betriebstyp_col = 'id_betriebstyp_nullfall'
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
@@ -73,6 +75,10 @@ class ProjektwirkungMarkets(Tool):
         self.output.add_layer(group_layer, layer_vb, fc_zentren,
                               template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_gem, fc_zentren,
+                              template_folder=folder, zoom=False)
+        self.output.add_layer(group_layer, layer_zen, fc_zentren,
+                              template_folder=folder, zoom=False)
+        self.output.add_layer(group_layer, layer_vkfl, fc_zentren,
                               template_folder=folder, zoom=False)
 
     def run(self):
@@ -410,7 +416,7 @@ class ProjektwirkungMarkets(Tool):
         if arcpy.Exists(tmp_markets):
             arcpy.Delete_management(tmp_markets)
 
-        umsatz_fields = ['umsatz_nullfall', 'umsatz_planfall']
+        umsatz_fields = ['umsatz_nullfall', 'umsatz_planfall', 'vkfl']
 
         markets_table = self.parent_tbx.folders.get_table('Maerkte')
         centers_table = self.parent_tbx.folders.get_table('Zentren')
@@ -434,7 +440,7 @@ class ProjektwirkungMarkets(Tool):
         fm_c.addInputField(centers_table, 'id')
         fieldmappings.addFieldMap(fm_c)
 
-        arcpy.SpatialJoin_analysis(tmp_markets,centers_table, tmp_join,
+        arcpy.SpatialJoin_analysis(tmp_markets, centers_table, tmp_join,
                                    join_type='KEEP_COMMON',
                                    join_operation='JOIN_ONE_TO_MANY',
                                    field_mapping=fieldmappings,
@@ -447,6 +453,12 @@ class ProjektwirkungMarkets(Tool):
         summed['umsatz_differenz'] = 100 * (summed['umsatz_planfall'] /
                                             summed['umsatz_nullfall']) - 100
         summed['id'] = summed.index
+        df_centers = self.parent_tbx.table_to_dataframe(
+            'Zentren', columns=['id', 'ew', 'kk'])
+        summed = summed.merge(df_centers, how='inner', on='id')
+        summed['vkfl_dichte'] = summed['vkfl'] / summed['ew']
+        summed['zentralitaet'] = 100 * summed['umsatz_planfall'] / summed['kk']
+        summed.fillna(0, inplace=True)
         self.parent_tbx.dataframe_to_table('Zentren', summed, pkeys=['id'])
 
     def distances_to_db(self, market_id, destinations, distances):
@@ -543,7 +555,7 @@ if __name__ == "__main__":
     t = TbxProjektwirkungMarkets()
     t.getParameterInfo()
     t.set_active_project()
-    t.par.recalculate.value = True
+    t.par.recalculate.value = False
     #t.show_outputs()
     t.execute()
 
