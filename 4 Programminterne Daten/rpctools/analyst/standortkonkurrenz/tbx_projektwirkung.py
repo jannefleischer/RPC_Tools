@@ -200,7 +200,6 @@ class ProjektwirkungMarkets(Tool):
             self.parent_tbx.update_table('Zentren',
                                          column_values={'ew': ew, 'kk': kk},
                                          where="ags='{}'".format(ags))
-        print
 
     def get_tfl_points(self, start_id):
         '''get the centroids of the planned areas as zensus points, start_id
