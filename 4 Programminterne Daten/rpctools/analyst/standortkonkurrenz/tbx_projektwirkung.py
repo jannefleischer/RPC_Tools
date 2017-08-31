@@ -56,7 +56,8 @@ class ProjektwirkungMarkets(Tool):
             fp = self.folders.get_table(fn, check=False)
             arcpy.AddMessage('Erzeuge Raster {}'.format(fn))
             table = self.folders.get_table('Beziehungen_Maerkte_Zellen')
-            where = 'id_markt={} and distanz>=0'.format(plan_market['id'])
+            where = ('id_markt={} and distanz>=0 and in_auswahl=1'
+                     .format(plan_market['id']))
             arcpy.Delete_management(fp)
             template = self.folders.ZENSUS_RASTER_FILE
             arcpy.Delete_management(fp)
@@ -80,8 +81,9 @@ class ProjektwirkungMarkets(Tool):
         
         # check the settings of last calculation
         set_table = 'Settings'
-        cur_ags = self.parent_tbx.query_table('Zentren', columns=['AGS'],
-                                              where='"Auswahl" <> 0')
+        cur_ags = self.parent_tbx.query_table(
+            'Zentren', columns=['AGS'],
+            where='"Auswahl" <> 0 and nutzerdefiniert = 0')
         cur_ags = zip(*cur_ags)[0]
         cur_settings = {
             'sz_puffer': self.par.radius_sz.value,
@@ -117,11 +119,14 @@ class ProjektwirkungMarkets(Tool):
             self.parent_tbx.delete_rows_in_table('Beziehungen_Maerkte_Zellen')
             self.parent_tbx.delete_rows_in_table('Siedlungszellen')
 
-        sz_count = int(arcpy.GetCount_management(
-            self.folders.get_table('Siedlungszellen')).getOutput(0))
+        # buggy? counts rows that are not there
+        #sz_count = int(arcpy.GetCount_management(
+            #self.folders.get_table('Siedlungszellen')).getOutput(0))
+        sz_count = len(self.parent_tbx.query_table('Siedlungszellen',
+                                                   columns=['id']))
         if sz_count == 0:
             # calculate cells with inhabitants (incl. 'teilflaechen')
-            self.calculate_zensus()
+            self.calculate_zensus(cur_ags)
         else:
             arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
                              'Berechnung wird übersprungen')
@@ -170,7 +175,7 @@ class ProjektwirkungMarkets(Tool):
         arcpy.AddMessage(u'Berechne Umsatzänderungen der Versorgungsbereiche...')
         self.update_centers()
 
-    def calculate_zensus(self):
+    def calculate_zensus(self, ags_auswahl):
         '''extract zensus points (incl. points for planned areas)
         and write them to the database'''
         buffered = self.folders.get_table('Siedlungszellen_Puffer', check=False)
@@ -187,9 +192,15 @@ class ProjektwirkungMarkets(Tool):
         arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
         self.zensus_to_db(sz_points)
         project = self.parent_tbx.folders.projectname
-        zensus.add_kk(sz_points, project)
+        ags_res = zensus.add_kk_ags(sz_points, project, ags_auswahl)
         # TODO: Update instead of rewrite
         self.zensus_to_db(sz_points)
+        
+        for ags, (ew, kk) in ags_res.iteritems():
+            self.parent_tbx.update_table('Zentren',
+                                         column_values={'ew': ew, 'kk': kk},
+                                         where="ags='{}'".format(ags))
+        print
 
     def get_tfl_points(self, start_id):
         '''get the centroids of the planned areas as zensus points, start_id
@@ -215,6 +226,8 @@ class ProjektwirkungMarkets(Tool):
         kks = []
         cell_ids = []
         tfl_ids = []
+        in_auswahl = []
+        ags = []
         self.parent_tbx.delete_rows_in_table('Siedlungszellen')
         for point in zensus_points:
             # ignore zensus points with no inhabitants
@@ -228,6 +241,8 @@ class ProjektwirkungMarkets(Tool):
             kks.append(point.kk)
             cell_ids.append(point.id)
             tfl_ids.append(point.tfl_id)
+            in_auswahl.append(int(point.in_auswahl))
+            ags.append(point.ags)
 
         df['id'] = cell_ids
         df['SHAPE'] = shapes
@@ -235,6 +250,8 @@ class ProjektwirkungMarkets(Tool):
         df['kk_index'] = kk_indices
         df['kk'] = kks
         df['id_teilflaeche'] = tfl_ids
+        df['in_auswahl'] = in_auswahl
+        df['ags'] = ags
 
         self.parent_tbx.insert_dataframe_in_table('Siedlungszellen', df)
 
@@ -287,7 +304,7 @@ class ProjektwirkungMarkets(Tool):
                                     joined['ew'].values)]
         zensus = Zensus()
         project = self.parent_tbx.folders.projectname
-        zensus.add_kk(points, project)
+        zensus.add_kk_ags(points, project)
         kk = [point.kk for point in points]
         joined['kk'] = kk
         self.parent_tbx.dataframe_to_table(
@@ -433,7 +450,6 @@ class ProjektwirkungMarkets(Tool):
         summed['id'] = summed.index
         self.parent_tbx.dataframe_to_table('Zentren', summed, pkeys=['id'])
 
-
     def distances_to_db(self, market_id, destinations, distances):
         # no need to delete, should be dropped at this point anyway
         #self.parent_tbx.delete_rows_in_table(
@@ -441,11 +457,14 @@ class ProjektwirkungMarkets(Tool):
         column_values = {}
         shapes = []
         ids = []
+        in_auswahl = []
         for dest in destinations:
             ids.append(dest.id)
             shapes.append(arcpy.Point(dest.x, dest.y))
+            in_auswahl.append(dest.in_auswahl)
         column_values['distanz'] = distances
         column_values['id_siedlungszelle'] = ids
+        column_values['in_auswahl'] = in_auswahl
         column_values['SHAPE'] = shapes
         column_values['id_markt'] = [market_id] * len(destinations)
         self.parent_tbx.insert_rows_in_table('Beziehungen_Maerkte_Zellen',
@@ -459,7 +478,8 @@ class ProjektwirkungMarkets(Tool):
         df = self.parent_tbx.table_to_dataframe('Siedlungszellen')
         for id, cell in df.iterrows():
             x, y = cell['SHAPE']
-            dest = Point(x, y, id=cell['id'], epsg=epsg)
+            dest = ZensusCell(x, y, id=cell['id'], in_auswahl=cell['in_auswahl'],
+                              epsg=epsg)
             cells.append(dest)
         return cells
 
@@ -524,7 +544,7 @@ if __name__ == "__main__":
     t = TbxProjektwirkungMarkets()
     t.getParameterInfo()
     t.set_active_project()
-    t.par.recalculate.value = False
+    t.par.recalculate.value = True
     #t.show_outputs()
     t.execute()
 

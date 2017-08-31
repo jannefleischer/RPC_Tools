@@ -9,17 +9,20 @@ import sys
 import arcpy
 import numpy as np
 import time
+from collections import defaultdict
 
 
 class ZensusCell(Point):
     def __init__(self, x, y, epsg=4326, ew=0, id=None, kk_index=None,
-                 kk=None, tfl_id=-1):
+                 kk=None, tfl_id=-1, ags='', in_auswahl=False):
         super(ZensusCell, self).__init__(x, y, id=id, epsg=epsg)
         self.ew = ew
         self.kk_index = kk_index
         self.kk = kk
         # -1 if point is not correlated to a planned area
         self.tfl_id = tfl_id
+        self.ags = ags
+        self.in_auswahl = in_auswahl
 
 
 class Zensus(object):
@@ -41,10 +44,6 @@ class Zensus(object):
         return the centroids of the zensus cells as points inside the
         selected communities
         """
-        tbx = DummyTbx()
-        tbx.set_active_project()
-        community_path =  tbx.folders.get_table(self._table,
-                                                 workspace=self._workspace)
         zensus_points = []
         zensus_raster = self.folders.ZENSUS_RASTER_FILE
         # temporary paths
@@ -98,7 +97,12 @@ class Zensus(object):
         del_tmp()
         return zensus_points, len(zensus_points)
 
-    def add_kk(self, zensus_points, project):
+    def add_kk_ags(self, zensus_points, project, ags_auswahl):
+        """
+        add kaufkraft and ags by joining to base tables
+        return dictionary with ags_auswahl as keys values and
+        [inhabitants, kk] as values
+        """
         folders = Folders()
         default_table = folders.get_base_table(
             table='Grundeinstellungen',
@@ -110,31 +114,58 @@ class Zensus(object):
         default_kk_index = cursor.next()[0]
         del(cursor)
         base_kk = 2280
-        tmp_table = os.path.join(arcpy.env.scratchGDB, 'tmp_kk_join')
+        tmp_table = os.path.join(arcpy.env.scratchGDB, 'tmp_table')
+        tmp_ags_join = os.path.join(arcpy.env.scratchGDB, 'tmp_ags_join')
         kk_table = folders.get_base_table(
             workspace='FGDB_Basisdaten_deutschland.gdb',
             table='KK2015')
-        zensus_table = folders.get_table(
+        ags_table = folders.get_base_table(
+            workspace='FGDB_Basisdaten_deutschland.gdb',
+            table='bkg_gemeinden')
+        sz_table = folders.get_table(
             'Siedlungszellen',
             workspace='FGDB_Standortkonkurrenz_Supermaerkte.gdb',
             project=project)
 
-        if arcpy.Exists(tmp_table):
-            arcpy.Delete_management(tmp_table)
-        arcpy.SpatialJoin_analysis(zensus_table, kk_table, tmp_table,
+        arcpy.Delete_management(tmp_table)
+        arcpy.Delete_management(tmp_ags_join)
+        arcpy.SpatialJoin_analysis(sz_table, ags_table, tmp_ags_join,
+                                   match_option='WITHIN')
+        arcpy.SpatialJoin_analysis(sz_table, kk_table, tmp_table,
                                    match_option='WITHIN')
 
-        cursor = arcpy.da.SearchCursor(tmp_table, ['id', 'kk_ew_index'])
         kk_indices = {}
+        ags_indices = {}
+        cursor = arcpy.da.SearchCursor(tmp_table, ['id', 'kk_ew_index'])
         for id_cell, kk_index in cursor:
             kk_indices[id_cell] = kk_index
+        del(cursor)
+        ags_indices = {}
+        results = defaultdict(list)
+        cursor = arcpy.da.SearchCursor(tmp_ags_join, ['id', 'AGS_1'])
+        for id_cell, ags in cursor:
+            ags_indices[id_cell] = ags
+        del(cursor)
+        
+        results = dict([(a, [0, 0]) for a in ags_auswahl])
         for zensus_cell in zensus_points:
-            if not kk_indices.has_key(zensus_cell.id):
-                continue
-            kk_index = default_kk_index  #kk_indices[zensus_cell.id]
-            if kk_index is None:
-                kk_index = default_kk_index
+            kk_index = default_kk_index
+            # take default kk_index only atm
+            #if kk_indices.has_key(zensus_cell.id):
+                #kk_index = kk_indices[zensus_cell.id]
+                #if kk_index is None:
+                    #kk_index = default_kk_index
             zensus_cell.kk_index = kk_index
             zensus_cell.kk = zensus_cell.ew * base_kk * kk_index / 100
+            if ags_indices.has_key(zensus_cell.id):
+                zensus_cell.ags = ags_indices[zensus_cell.id] or ''
+                zensus_cell.in_auswahl = False
+                if zensus_cell.ags in ags_auswahl:
+                    zensus_cell.in_auswahl = True
+                    res = results[zensus_cell.ags]
+                    res[0] += zensus_cell.ew
+                    res[1] += zensus_cell.kk
 
         arcpy.Delete_management(tmp_table)
+        arcpy.Delete_management(tmp_ags_join)
+        return results
