@@ -178,7 +178,7 @@ class ProjektwirkungMarkets(Tool):
         kk_planfall = sales.calculate_planfall()
         arcpy.AddMessage(u'Berechne Kenngrößen...')
         self.sales_to_db(kk_nullfall, kk_planfall)
-        arcpy.AddMessage(u'Berechne Umsatzänderungen der Versorgungsbereiche...')
+        arcpy.AddMessage(u'Werte Ergebnisse auf Gemeindeebene aus...')
         self.update_centers()
 
     def calculate_zensus(self, ags_auswahl):
@@ -409,57 +409,24 @@ class ProjektwirkungMarkets(Tool):
 
     def update_centers(self):
         '''calculate the sales of the defined centers'''
-        tmp_join = os.path.join(arcpy.env.scratchGDB, 'tmp_join')
-        tmp_markets = os.path.join(arcpy.env.scratchGDB, 'tmp_markets')
-        if arcpy.Exists(tmp_join):
-            arcpy.Delete_management(tmp_join)
-        if arcpy.Exists(tmp_markets):
-            arcpy.Delete_management(tmp_markets)
-
-        umsatz_fields = ['umsatz_nullfall', 'umsatz_planfall', 'vkfl']
-
-        markets_table = self.parent_tbx.folders.get_table('Maerkte')
-        centers_table = self.parent_tbx.folders.get_table('Zentren')
-
-        arcpy.CopyFeatures_management(markets_table, tmp_markets)
-        # you have to remove the id column to join because both tables have
-        # column of same name
-        arcpy.DeleteField_management(tmp_markets, 'id')
-        # remove the planned markets, that did not exist in nullfall
-        self.parent_tbx._delete_rows_in_table(tmp_markets,
-                                              where='id_betriebstyp_nullfall=0')
-
-        fieldmappings = arcpy.FieldMappings()
-        for field in umsatz_fields:
-            fm = arcpy.FieldMap()
-            fm.addInputField(tmp_markets, field)
-            fieldmappings.addFieldMap(fm)
-        fm_c = arcpy.FieldMap()
-        # the table assigned to the fieldmapping is ignored by dumbass arcpy,
-        # arcpy always takes markets_table anyway (so the need to delete before)
-        fm_c.addInputField(centers_table, 'id')
-        fieldmappings.addFieldMap(fm_c)
-
-        arcpy.SpatialJoin_analysis(tmp_markets, centers_table, tmp_join,
-                                   join_type='KEEP_COMMON',
-                                   join_operation='JOIN_ONE_TO_MANY',
-                                   field_mapping=fieldmappings,
-                                   match_option='WITHIN')
-        columns = ['id'] + umsatz_fields
-        rows = self.parent_tbx._query_table(tmp_join,
-                                            columns=columns)
-        df_join = pd.DataFrame.from_records(rows, columns=columns)
-        summed = df_join.groupby('id').sum()
-        summed['umsatz_differenz'] = 100 * (summed['umsatz_planfall'] /
-                                            summed['umsatz_nullfall']) - 100
-        summed['id'] = summed.index
+        df_markets = self.parent_tbx.table_to_dataframe(
+            'Maerkte',
+            columns=['AGS', 'umsatz_planfall', 'umsatz_nullfall', 'vkfl'])
         df_centers = self.parent_tbx.table_to_dataframe(
-            'Zentren', columns=['id', 'ew', 'kk'])
-        summed = summed.merge(df_centers, how='inner', on='id')
-        summed['vkfl_dichte'] = summed['vkfl'] / summed['ew']
-        summed['zentralitaet'] = 100 * summed['umsatz_planfall'] / summed['kk']
-        summed.fillna(0, inplace=True)
-        self.parent_tbx.dataframe_to_table('Zentren', summed, pkeys=['id'])
+            'Zentren', columns=['id', 'AGS', 'ew', 'kk'])
+        summed = df_markets.groupby('AGS').sum().reset_index()
+        df_centers_res = df_centers.merge(summed, how='left', on='AGS')
+        df_centers_res['umsatz_differenz'] = (
+            100 * (df_centers_res['umsatz_planfall'] /
+                   df_centers_res['umsatz_nullfall']) - 100)
+        df_centers_res['vkfl_dichte'] = (
+            df_centers_res['vkfl'] / df_centers_res['ew'])
+        df_centers_res['zentralitaet'] = (
+            100 * df_centers_res['umsatz_planfall'] / df_centers_res['kk'])
+        df_centers_res.replace([np.inf, -np.inf], np.nan, inplace=True)
+        df_centers_res.fillna(0, inplace=True)
+        self.parent_tbx.dataframe_to_table('Zentren', df_centers_res,
+                                           pkeys=['id'])
 
     def distances_to_db(self, market_id, destinations, distances):
         # no need to delete, should be dropped at this point anyway
