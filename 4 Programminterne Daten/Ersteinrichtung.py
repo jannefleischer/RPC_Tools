@@ -12,11 +12,15 @@
 # LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
 # ---------------------------------------------------------------------------
 
+try:
+    from nsis import log, messagebox
+except:
+    def log(x): print(x)
+    messagebox = log
+    
 import os, sys
-from os.path import join
 import subprocess
 from collections import OrderedDict
-import arcpy
 import _winreg
 
 min_requirement = 10.4
@@ -50,22 +54,31 @@ def get_python_path():
         is_64b = os.path.exists(os.path.join(desktop_dir, "bin64"))
         bitstr = 'x64' if is_64b else ''
 
-        python_path = os.path.join(python_dir, 'ArcGIS{b}{v}'
-                                   .format(b=bitstr, v=version))
-        return python_path
+        possible_pathes = []
+        possible_pathes.append(os.path.join(python_dir, 'ArcGIS{v}'.format(v=version)))
+        possible_pathes.append(os.path.join(python_dir, 'ArcGISx64{v}'.format(v=version)))
+
+        python_pathes = []
+        for path in possible_pathes:
+            if os.path.exists(path):
+		        python_pathes.append(path)
+
+        return python_pathes
+
     except WindowsError:
-        print 'Keine ArcGIS-Pythoninstallation gefunden.'
+        log('Keine ArcGIS-Pythoninstallation gefunden.')
         return None
+    except Exception as e:
+        log(e)
 
 def install_packages(python_path):
 
-    arcpy.AddMessage("\n"+ "Verwendeter Python-Pfad: " + python_path + "\n")
-    arcpy.AddMessage(sys.version)
-    arcpy.AddMessage(sys.platform)
+    log("\n"+ "Verwendeter Python-Pfad: " + python_path + "\n")
+    log(sys.version)
+    log(sys.platform)
     platform = 'win32'
-    if sys.maxsize > 2**32:
+    if "ArcGISx64" in python_path:
         platform = 'win_amd64'
-    platform = 'win32'
 
 
     #Creating list with missing packages
@@ -127,7 +140,7 @@ def install_packages(python_path):
     #Installing pip
     base_path = os.path.dirname(__file__)
     wheel_path = os.path.join(base_path, 'wheels')
-    arcpy.AddMessage('Install or upgrade pip')
+    log('Install or upgrade pip')
     process = subprocess.Popen([os.path.join(python_path, 'python'),
                      os.path.join(wheel_path, "pip-9.0.1-py2.py3-none-any.whl", "pip"),
                      'install',
@@ -136,16 +149,15 @@ def install_packages(python_path):
                            shell=True)
     ret = process.wait()
     if ret:
-        arcpy.AddWarning('pip nicht richtig installiert')
+        log('pip nicht richtig installiert')
     else:
-        arcpy.AddMessage('pip installiert')
+        log('pip installiert')
 
     ##Installing packages
-    import pip
-    arcpy.AddMessage('wheel_path; {}'.format(wheel_path))
+    log('wheel_path; {}'.format(wheel_path))
 
     for package, filename in used_packages.iteritems():
-        arcpy.AddMessage('{p}: {f}'.format(p=package, f=filename))
+        log('{p}: {f}'.format(p=package, f=filename))
         process = subprocess.Popen([os.path.join(python_path, 'Scripts', 'pip.exe'),
                                     'install',
                                     '-f', wheel_path,
@@ -153,16 +165,11 @@ def install_packages(python_path):
                                    shell=True)
         ret = process.wait()
         if ret:
-            arcpy.AddWarning("Paket " + package + " konnte ggf. nicht installiert werden." + "\n")
-        try:
-            new_package = __import__(package)
-            arcpy.AddMessage("Paket " + package + " wurde installiert." + "\n")
-        except:
-            arcpy.AddWarning("Paket " + package + " konnte nicht installiert werden." + "\n")
+            log("Paket " + package + " konnte ggf. nicht installiert werden." + "\n")
 
     # install rpctools package
     # ToDo: Finally change from --editable to wheel
-    arcpy.AddMessage("installiere RPCTools")
+    log("installiere RPCTools")
 
     process = subprocess.Popen([os.path.join(python_path, 'Scripts', 'pip.exe'),
                                 'install',
@@ -173,16 +180,15 @@ def install_packages(python_path):
     ret = process.wait()
 
     if ret:
-        arcpy.AddWarning('rpctools konnte nicht installiert werden')
+        log('rpctools konnte nicht installiert werden')
     else:
-        arcpy.AddMessage("RPCTools installiert")
+        log("RPCTools installiert")
 
-    arcpy.AddMessage('Installation abgeschlossen.')
-
+    log('Installation abgeschlossen.')
 
 if __name__ == '__main__':
-    python_path = get_python_path()
-    if python_path:
-        print(python_path)
-    install_packages('C:\\Python27\\ArcGISx6410.5')
-    install_packages('C:\\Python27\\ArcGIS10.5')
+    python_pathes = get_python_path()
+    if python_pathes:
+		for path in python_pathes:
+			install_packages(path)
+    #install_packages('C:\\Python27-ArcGIS\\ArcGISx6410.4')

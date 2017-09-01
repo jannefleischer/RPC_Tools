@@ -1,16 +1,4 @@
 # -*- coding: utf-8 -*-
-# ---------------------------------------------------------------------------
-# REGIOPROJEKTCHECK
-# install_packages.py
-#
-# Description:
-# PROJECT URL: http://www.regioprojektcheck.de
-#
-# Author:
-# ILS gGmbH
-#
-# LICENSE: The MIT License (MIT) Copyright (c) 2014 RPC Consortium
-# ---------------------------------------------------------------------------
 
 try:
     from nsis import log, messagebox
@@ -138,7 +126,7 @@ def install_packages(python_path):
     missing = OrderedDict()
 
     #Installing pip
-    base_path, installer = os.path.split(os.path.dirname("__file__"))
+    base_path = os.path.dirname(__file__)
     wheel_path = os.path.join(base_path, 'wheels')
     log('Install or upgrade pip')
     process = subprocess.Popen([os.path.join(python_path, 'python'),
