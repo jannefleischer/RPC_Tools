@@ -11,7 +11,7 @@ class Dia_Integrationsgrad(ArcpyDiagram):
     def _create(self, **kwargs):
         project_name = self.tbx.par.get_projectname()
         title = encode(
-            "{}: Integrationsgrad des Plangebiets"
+            "{}: Anteil der Plangebietsgrenze (in Prozent), der ..."
             .format(project_name))
         input_template = self.tbx.folders.get_diagram_template(
             'Integrationsgrad')

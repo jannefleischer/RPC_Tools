@@ -22,6 +22,27 @@ class Wohnflaechendichte(Tool):
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
 
+    def rename_kreistyp(kreistyp):
+        if kreistyp == 1:
+            return u"Kernstädte (Agglomerationsraum)"
+        elif kreistyp == 2:
+            return u"Hochverdichtete Kreise (Agglomerationsraum)"
+        elif kreistyp == 3:
+            return u"Verdichtete Kreise (Agglomerationsraum)"
+        elif kreistyp == 4:
+            return u"Kernsrationsraum)"
+        elif kreistyp == 5:
+            return u"Kernsionsraum)"
+        elif kreistyp == 6:
+            return u"Kernsttionsraum)"
+        elif kreistyp == 7:
+            return u"Ländliche K"
+        elif kreistyp == 8:
+            return u"Kreise höherer Dichte (Ländlicher Raum)"
+        elif kreistyp == 9:
+            return u"Kreise geringerer Dichte (Ländlicher Raum)"
+
+
     def run(self):
         """run Wohnflaechendichte Tool"""
 
@@ -82,24 +103,27 @@ class Wohnflaechendichte(Tool):
 
         wohnflaechendichte_kreis = 0
         kreistyp = 0
-        fields = ["AGS5", "Siedlungsstruktureller_Kreistyp", "Wohnflaechendichte_qm_Wohnfl_pro_ha_Nettowohnbauland"]
+        fields = ["AGS5", "Siedlungsstruktureller_Kreistyp", "Wohnflaechendichte_qm_Wohnfl_pro_ha_Nettowohnbauland", "Kreis_kreisfreie_Stadt"]
         where = '"AGS5"' + "='" + ags_kreis  + "'"
         table_kreis = self.folders.get_base_table("FGDB_Flaeche_und_Oekologie_Tool.gdb", "Wohndichte_Wohnflaechendichte_Kreise")
         cursor = arcpy.da.SearchCursor(table_kreis, fields, where)
         for kreis in cursor:
             kreistyp = kreis[1]
             wohnflaechendichte_kreis = round(kreis[2])
+            kreis_name = u"Kreis: " + kreis[3].split(u", ")[0]
         self.wohnflaechendichte_kreis = int(wohnflaechendichte_kreis)
 
         where = '"Siedlungsstruktureller_Kreistyp"' + "=" + str(kreistyp)
         table_kreistyp = self.folders.get_base_table("FGDB_Flaeche_und_Oekologie_Tool.gdb", "Wohndichte_Wohnflaechendichte_RaumTypen")
-        fields = ["Siedlungsstruktureller_Kreistyp", "Wohnflaechendichte_qm_Wohnfl_pro_ha_Nettowohnbauland"]
+        fields = ["Siedlungsstruktureller_Kreistyp", "Wohnflaechendichte_qm_Wohnfl_pro_ha_Nettowohnbauland", "Bezeichnung"]
         cursor = arcpy.da.SearchCursor(table_kreistyp, fields, where)
         for kreistyp in cursor:
             wohnflaechendichte_kreistyp = round(kreistyp[1])
+            kreistyp_name = u"Typ: " + kreistyp[2]
+            kreistyp_name = rename_kreistyp(kreistyp)
         self.wohnflaechendichte_kreistyp = int(wohnflaechendichte_kreistyp)
 
-        column_values = {"Typ": [u"Teilfläche im Plangebiet", u"Kreis", u"Kreistyp"],
+        column_values = {"Typ": [u"Teilfläche im Plangebiet", kreis_name, kreistyp_name],
                                 "Wohnflaechendichte": [self.wohnflaechendichte_projekt, self.wohnflaechendichte_kreis, self.wohnflaechendichte_kreistyp]}
         self.parent_tbx.insert_rows_in_table("Wohnflaechendichte", column_values)
 
@@ -118,6 +142,9 @@ class Wohndichte(Tool):
 
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
+
+    def rename_kreistyp(kreistyp):
+        pass
 
     def run(self):
         """run Wohndichte Tool"""
@@ -156,24 +183,28 @@ class Wohndichte(Tool):
 
         wohndichte_kreis = 0
         kreistyp = 0
-        fields = ["AGS5", "Siedlungsstruktureller_Kreistyp", "Wohndichte_WE_pro_ha_Nettowohnbauland"]
+        fields = ["AGS5", "Siedlungsstruktureller_Kreistyp", "Wohndichte_WE_pro_ha_Nettowohnbauland", "Kreis_kreisfreie_Stadt"]
         where = '"AGS5"' + "='" + ags_kreis  + "'"
         table_kreis = self.folders.get_base_table("FGDB_Flaeche_und_Oekologie_Tool.gdb", "Wohndichte_Wohnflaechendichte_Kreise")
         cursor = arcpy.da.SearchCursor(table_kreis, fields, where)
         for kreis in cursor:
             kreistyp = kreis[1]
             wohndichte_kreis = round(kreis[2])
+            kreis_name = u"Kreis: " + kreis[3].split(u", ")[0]
         self.wohndichte_kreis = int(wohndichte_kreis)
 
         where = '"Siedlungsstruktureller_Kreistyp"' + "=" + str(kreistyp)
         table_kreistyp = self.folders.get_base_table("FGDB_Flaeche_und_Oekologie_Tool.gdb", "Wohndichte_Wohnflaechendichte_RaumTypen")
-        fields = ["Siedlungsstruktureller_Kreistyp", "Wohndichte_WE_pro_ha_Nettowohnbauland"]
+        fields = ["Siedlungsstruktureller_Kreistyp", "Wohndichte_WE_pro_ha_Nettowohnbauland", "Bezeichnung"]
         cursor = arcpy.da.SearchCursor(table_kreistyp, fields, where)
         for kreistyp in cursor:
             wohndichte_kreistyp = round(kreistyp[1])
+            kreistyp_name = rename_kreistyp(kreistyp)
         self.wohndichte_kreistyp = int(wohndichte_kreistyp)
 
-        column_values = {"Typ": [u"Teilfläche im Plangebiet", u"Kreis", u"Kreistyp"],
+
+
+        column_values = {"Typ": [u"Teilfläche im Plangebiet", kreis_name, kreistyp_name],
                                 "Wohndichte": [self.wohndichte_projekt, self.wohndichte_kreis, self.wohndichte_kreistyp]}
         self.parent_tbx.insert_rows_in_table("Wohndichte", column_values)
 

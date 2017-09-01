@@ -21,6 +21,7 @@ class Integrationsgrad_berechnen(Tool):
 
         diagram = Dia_Integrationsgrad(projectname=self.par.name.value)
         self.output.add_diagram(diagram)
+        self.output.show_layers()
 
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
@@ -57,7 +58,7 @@ class Integrationsgrad_berechnen(Tool):
 
         gemeinsame_grenze = round(self.gemeinsame_grenze / self.aussengrenze, 3) * 100
         neue_grenze = 100 - gemeinsame_grenze
-        column_values = {"Grenze": [u"Überschneidung mit bestehender Siedlungsfläche", u"Grenze ohne Überschneidung mit Siedlungsfläche"],
+        column_values = {"Grenze": [u"... an bestehende Siedlungen angrenzt", u"... nicht an bestehende Siedlungen angrenzt"],
                                 "Umfang": [neue_grenze, gemeinsame_grenze]}
         self.parent_tbx.insert_rows_in_table("Integrationsgrad", column_values)
 

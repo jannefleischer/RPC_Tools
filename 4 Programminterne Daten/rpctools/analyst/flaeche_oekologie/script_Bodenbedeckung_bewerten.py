@@ -312,14 +312,14 @@ class BodenbedeckungBewertung(Tool):
         biotopausbildungsvermoegen_planfall = get_kennwert(quotient_biotopausbildungsvermoegen_planfall)
 
         column_values = {"Kategorie": [u"Nullfall", u"Planfall", u"Veränderung"],
-                                "Schadstoffrueckhaltung": [schadstoffrueckhaltung_nullfall,schadstoffrueckhaltung_planfall, abs(schadstoffrueckhaltung_nullfall - schadstoffrueckhaltung_planfall)],
-                                "Waermespeicherung": [waermespeicherung_nullfall,waermespeicherung_planfall, abs(waermespeicherung_nullfall - waermespeicherung_planfall)],
-                                "Durchlaessigkeit": [durchlaessigkeit_nullfall,durchlaessigkeit_planfall,abs(durchlaessigkeit_nullfall - durchlaessigkeit_planfall)],
-                                "Bodenueberformung": [bodenueberformung_nullfall,bodenueberformung_planfall, abs(bodenueberformung_nullfall - bodenueberformung_planfall)],
-                                "Oberflaechenabfluss": [oberflaechenabfluss_nullfall,oberflaechenabfluss_planfall, abs(oberflaechenabfluss_nullfall - oberflaechenabfluss_planfall)],
-                                "Grundwasserneubildung": [grundwasserneubildung_nullfall,grundwasserneubildung_planfall, abs(grundwasserneubildung_nullfall - grundwasserneubildung_planfall)],
-                                "Regenwasserversickerung": [regenwasserversickerung_nullfall,regenwasserversickerung_planfall, abs(regenwasserversickerung_nullfall - regenwasserversickerung_planfall)],
-                                "Biotopausbildungsvermoegen": [biotopausbildungsvermoegen_nullfall,biotopausbildungsvermoegen_planfall,abs(biotopausbildungsvermoegen_nullfall - biotopausbildungsvermoegen_planfall)],
-                                "Staubbindevermoegen": [staubbindevermoegen_nullfall,staubbindevermoegen_planfall, abs(staubbindevermoegen_nullfall - staubbindevermoegen_planfall)]
+                                "Schadstoffrueckhaltung": [schadstoffrueckhaltung_nullfall,schadstoffrueckhaltung_planfall,  schadstoffrueckhaltung_planfall - schadstoffrueckhaltung_nullfall],
+                                "Waermespeicherung": [waermespeicherung_nullfall,waermespeicherung_planfall,  waermespeicherung_planfall - waermespeicherung_nullfall],
+                                "Durchlaessigkeit": [durchlaessigkeit_nullfall,durchlaessigkeit_planfall, durchlaessigkeit_planfall - durchlaessigkeit_nullfall],
+                                "Bodenueberformung": [bodenueberformung_nullfall,bodenueberformung_planfall,  bodenueberformung_planfall - bodenueberformung_nullfall],
+                                "Oberflaechenabfluss": [oberflaechenabfluss_nullfall,oberflaechenabfluss_planfall,  oberflaechenabfluss_planfall - oberflaechenabfluss_nullfall],
+                                "Grundwasserneubildung": [grundwasserneubildung_nullfall,grundwasserneubildung_planfall,  grundwasserneubildung_planfall - grundwasserneubildung_nullfall],
+                                "Regenwasserversickerung": [regenwasserversickerung_nullfall,regenwasserversickerung_planfall,  regenwasserversickerung_planfall - regenwasserversickerung_nullfall],
+                                "Biotopausbildungsvermoegen": [biotopausbildungsvermoegen_nullfall,biotopausbildungsvermoegen_planfall, biotopausbildungsvermoegen_planfall - biotopausbildungsvermoegen_nullfall],
+                                "Staubbindevermoegen": [staubbindevermoegen_nullfall,staubbindevermoegen_planfall,  staubbindevermoegen_planfall - staubbindevermoegen_nullfall]
                                 }
         self.parent_tbx.insert_rows_in_table("Leistungskennwerte", column_values)

@@ -51,6 +51,7 @@ class TbxWohnflaechendichte(Tbx):
         par.nettoflaeche.datatype = u'Long'
         par.nettoflaeche.filter.type = 'Range'
         par.nettoflaeche.filter.list = [0, 100]
+        par.nettoflaeche.value = 15
 
         heading = encode("Durchschnittliche überbaute Fläche nach Gebäudetyp")
 

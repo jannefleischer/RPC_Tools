@@ -43,7 +43,7 @@ class TbxBodenKontrolle(Tbx):
 
         param = params.ueberbauteflaechen_alt = arcpy.Parameter()
         param.name = u'Anteil_an_ueberbauten_Flaechen_alt'
-        param.displayName = u'Anteil an ueberbauten Flaechen'
+        param.displayName = u'Anteil an überbauten Flaechen'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -54,7 +54,7 @@ class TbxBodenKontrolle(Tbx):
 
         param = params.wasser_alt = arcpy.Parameter()
         param.name = u'Anteil_an_natuerlichen_Wasserflaechen_alt'
-        param.displayName = u'Anteil an natuerlichen Wasserflaechen'
+        param.displayName = u'Anteil an natürlichen Wasserflächen'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -76,7 +76,7 @@ class TbxBodenKontrolle(Tbx):
 
         param = params.baeume_alt = arcpy.Parameter()
         param.name = u'Anteil_an_Baumen_und_Straeuchern_alt'
-        param.displayName = u'Anteil an Baumen und Straeuchern'
+        param.displayName = u'Anteil an Bäumen und Sträuchern'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -167,7 +167,7 @@ class TbxBodenKontrolle(Tbx):
 
         param = params.ueberbauteflaechen_neu = arcpy.Parameter()
         param.name = u'Anteil_an_ueberbauten_Flaechen_neu'
-        param.displayName = u'Anteil an ueberbauten Flaechen'
+        param.displayName = u'Anteil an überbauten Flächen'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -178,7 +178,7 @@ class TbxBodenKontrolle(Tbx):
 
         param = params.wasser_neu = arcpy.Parameter()
         param.name = u'Anteil_an_natuerlichen_Wasserflaechen_neu'
-        param.displayName = u'Anteil an natuerlichen Wasserflaechen'
+        param.displayName = u'Anteil an natürlichen Wasserflächen'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -200,7 +200,7 @@ class TbxBodenKontrolle(Tbx):
 
         param = params.baeume_neu = arcpy.Parameter()
         param.name = u'Anteil_an_Baumen_und_Straeuchern_neu'
-        param.displayName = u'Anteil an Baumen und Straeuchern'
+        param.displayName = u'Anteil an Baumen und Sträuchern'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'

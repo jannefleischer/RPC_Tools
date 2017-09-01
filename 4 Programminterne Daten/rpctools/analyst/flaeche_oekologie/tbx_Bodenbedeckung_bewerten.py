@@ -41,14 +41,14 @@ class TbxBodenBewertung(Tbx):
         param.datatype = u'GPString'
         values = ["Bodenbedeckungsanteile manuell festlegen", "Bodenbedeckungsanteile aus Zeichnungen importieren"]
         param.filter.list = values
-        param.value == values[0]
+        param.value = values[0]
 
 
         heading = encode("Bodenbedeckung Nullfall")
 
         param = params.ueberbauteflaechen_alt = arcpy.Parameter()
         param.name = u'Anteil_an_ueberbauten_Flaechen_alt'
-        param.displayName = u'Anteil an ueberbauten Flaechen'
+        param.displayName = u'Anteil an überbauten Flächen'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -59,7 +59,7 @@ class TbxBodenBewertung(Tbx):
 
         param = params.wasser_alt = arcpy.Parameter()
         param.name = u'Anteil_an_natuerlichen_Wasserflaechen_alt'
-        param.displayName = u'Anteil an natuerlichen Wasserflaechen'
+        param.displayName = u'Anteil an natürlichen Wasserflächen'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -81,7 +81,7 @@ class TbxBodenBewertung(Tbx):
 
         param = params.baeume_alt = arcpy.Parameter()
         param.name = u'Anteil_an_Baumen_und_Straeuchern_alt'
-        param.displayName = u'Anteil an Baumen und Straeuchern'
+        param.displayName = u'Anteil an Bäumen und Sträuchern'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -182,7 +182,7 @@ class TbxBodenBewertung(Tbx):
 
         param = params.ueberbauteflaechen_neu = arcpy.Parameter()
         param.name = u'Anteil_an_ueberbauten_Flaechen_neu'
-        param.displayName = u'Anteil an ueberbauten Flaechen'
+        param.displayName = u'Anteil an überbauten Flächen'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -193,7 +193,7 @@ class TbxBodenBewertung(Tbx):
 
         param = params.wasser_neu = arcpy.Parameter()
         param.name = u'Anteil_an_natuerlichen_Wasserflaechen_neu'
-        param.displayName = u'Anteil an natuerlichen Wasserflaechen'
+        param.displayName = u'Anteil an natürlichen Wasserflächen'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -215,7 +215,7 @@ class TbxBodenBewertung(Tbx):
 
         param = params.baeume_neu = arcpy.Parameter()
         param.name = u'Anteil_an_Baumen_und_Straeuchern_neu'
-        param.displayName = u'Anteil an Baumen und Straeuchern'
+        param.displayName = u'Anteil an Bäumen und Sträuchern'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Long'
@@ -402,7 +402,7 @@ class TbxBodenBewertung(Tbx):
 
         if params.name.altered and not params.name.hasBeenValidated:
             self.eingaben_auslesen("manuell")
-            self.par.quelle.value == "Bodenbedeckungsanteile manuell festlegen"
+            self.par.quelle.value = "Bodenbedeckungsanteile manuell festlegen"
         changed = False
         listeSliderID = ['ueberbauteflaechen_alt',
                          'wasser_alt',
@@ -417,7 +417,7 @@ class TbxBodenBewertung(Tbx):
                          'rasen_alt',
 						 'undefiniert_alt'
 						 ]
-        if params.quelle.altered and not params.name.hasBeenValidated:
+        if params.quelle.altered and not params.quelle.hasBeenValidated:
             changed = True
             if self.par.quelle.value == "Bodenbedeckungsanteile aus Zeichnungen importieren":
                 self.eingaben_auslesen("zeichnung")
@@ -427,7 +427,7 @@ class TbxBodenBewertung(Tbx):
         for r in listeSliderID:
             if params[r].altered:
                 if changed == True:
-                    self.par.quelle.value == "Bodenbedeckungsanteile manuell festlegen"
+                    self.par.quelle.value = "Bodenbedeckungsanteile manuell festlegen"
                 self.sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
 
 
@@ -447,7 +447,7 @@ class TbxBodenBewertung(Tbx):
         for r in listeSliderID:
             if params[r].altered:
                 if changed == True:
-                    self.par.quelle.value == "Bodenbedeckungsanteile manuell festlegen"
+                    self.par.quelle.value = "Bodenbedeckungsanteile manuell festlegen"
                 self.sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
 
 		return
