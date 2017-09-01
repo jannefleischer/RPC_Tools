@@ -375,7 +375,6 @@ class ProjektKopieren(Projektverwaltung):
         """"""
         self.output.define_projection()
         self.projekt_kopieren()
-        self.output.show()
         #self.add_diagramm()
         self.parent_tbx.config.active_project = self.projectname
 

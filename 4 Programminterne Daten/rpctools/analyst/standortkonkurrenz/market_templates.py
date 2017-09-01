@@ -162,8 +162,17 @@ class MarketTemplate(object):
     def get_markets(self):
         '''read and return the markets from file'''
         if self.template_type == 'CSV-Datei':
-            df = pd.DataFrame.from_csv(self.file_path, sep=self._delimiter,
-                                       encoding='utf-8-sig')
+            df = None
+            for encoding in ['utf-8-sig', 'ISO-8859-1']:
+                try:
+                    df = pd.DataFrame.from_csv(self.file_path, sep=self._delimiter,
+                                               encoding=encoding)
+                    break
+                except:
+                    continue
+            if df is None:
+                raise Exception(u'Es gibt ein Problem mit der '
+                                u'Zeichenkodierung der CSV-Datei!')
             df = df.reset_index()
         elif self.template_type == 'Exceldatei':
             df = pd.read_excel(self.file_path)
