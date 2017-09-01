@@ -1,9 +1,9 @@
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 import sys
 import arcpy
 
 if __name__ == '__main__':
+    import matplotlib.pyplot as plt
+    import matplotlib.image as mpimg
     #if not sys.argv[7] == True:
         #plt.rcParams['toolbar'] = 'None'
     plt.rcParams['figure.figsize'] = (float(sys.argv[3]), float(sys.argv[4]))

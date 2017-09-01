@@ -7,6 +7,8 @@ import os
 import sys
 from rpctools.utils.config import Config, Folders
 from rpctools.utils import image as image_exec
+import requests
+import shutil
 
 
 class ArcpyEnv(object):
@@ -178,6 +180,24 @@ class LayerGroup(OrderedDict):
         return lg
 
 
+class Image(object):
+    def __init__(self,
+                 image_path,
+                 window_title,
+                 width=15.0,
+                 height=10.0,
+                 interpolation = "lanczos",
+                 show_white_space = False,
+                 show_toolbar=False):
+        self.image_path = image_path
+        self.window_title = window_title
+        self.width = width
+        self.height = height
+        self.interpolation = interpolation
+        self.show_white_space = show_white_space
+        self.show_toolbar = show_toolbar
+
+
 class Layer(object):
     def __init__(self,
                  groupname,
@@ -194,7 +214,8 @@ class Layer(object):
                  label_replace={},
                  zoom=True,
                  zoom_extent=None,
-                 symbology_classes=None):
+                 symbology_classes=None,
+                 show_wms_legends=False):
         self.groupname = groupname
         self.template_layer = template_layer
         self.featureclass = featureclass
@@ -210,6 +231,7 @@ class Layer(object):
         self.label_replace = label_replace
         self.workspace = workspace
         self.symbology_classes = symbology_classes
+        self.show_wms_legends = show_wms_legends
 
 
 class Output(object):
@@ -477,7 +499,10 @@ class Output(object):
                   query="",
                   symbology={},
                   label_replace={},
-                  zoom=True, zoom_extent = None, symbology_classes=None):
+                  zoom=True,
+                  zoom_extent = None,
+                  symbology_classes=None,
+                  show_wms_legends=False):
         """
         Add output layer
 
@@ -537,7 +562,8 @@ class Output(object):
                       zoom_extent=zoom_extent, query=query,
                       template_folder=template_folder, symbology=symbology,
                       label_replace=label_replace,
-                      symbology_classes=symbology_classes)
+                      symbology_classes=symbology_classes,
+                      show_wms_legends=show_wms_legends)
         self.layers.append(layer)
 
     def add_diagram(self, *args):
@@ -571,12 +597,23 @@ class Output(object):
 
     def show_images(self):
         for image in self.images:
-            script_path = self.folders.get_projectpath()
-            params = [str(p) for p in image]
-            subprocess.Popen(
-                [os.path.join(sys.exec_prefix, 'python.exe'),
-                 '-m' , image_exec.__name__] + params, shell=True)
+            self._show_image(image)
         self.images = []
+    
+    def _show_image(self, image):
+        attrs = ['image_path', 'window_title', 'width', 'height', 'interpolation',
+                 'show_white_space', 'show_toolbar']
+        #params = []
+        #for a in attrs:
+            #p = getattr(image, a)
+            #if not isinstance(p, str):
+                #p = str(p)
+            #params.append(p)
+        params = [str(getattr(image, a)) for a in attrs]
+        print params
+        subprocess.Popen(
+            [os.path.join(sys.exec_prefix, 'python.exe'),
+             '-m' , image_exec.__name__] + params, shell=True)
 
     def add_image(self,
                   image_path,
@@ -589,8 +626,8 @@ class Output(object):
 
         if not arcpy.Exists(image_path):
             return
-        image = [image_path, window_title, width, height, interpolation,
-                 show_white_space, show_toolbar]
+        image = Image(image_path, window_title, width, height, interpolation,
+                      show_white_space, show_toolbar)
         self.images.append(image)
 
         """
@@ -738,6 +775,27 @@ class Output(object):
         target_grouplayer.visible = True
         if layer.in_project:
             project_layer.visible = True
+
+        if layer.show_wms_legends:
+            url = new_layer.serviceProperties['URL']
+            for l in new_layer:
+                name = l.serviceProperties['Name']
+                legend_url = url + '&layer={}'.format(name)
+                legend_url += '&sld_version=1.1.0&request=GetLegendGraphic&service=WMS&version=1.3.0&format=image/png'
+                fn = name + '.png'
+                fp = os.path.join(os.path.split(template_layer)[0], fn)
+                arcpy.Delete_management(fp)
+                print(fp)
+                title = l.serviceProperties['WMSTitle'].encode('utf-8')
+                r = requests.get(legend_url, stream=True)
+                print(legend_url)
+                print(r)
+                if r.status_code == 200:
+                    with open(fp, 'wb') as f:
+                        r.raw.decode_content = True
+                        shutil.copyfileobj(r.raw, f)
+                    legend = Image(fp, title)
+                    self._show_image(legend)
 
         self.sort_layers()
         del(current_dataframe)
