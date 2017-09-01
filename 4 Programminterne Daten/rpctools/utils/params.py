@@ -304,6 +304,7 @@ class Tbx(object):
             self.output.show_layers(redraw=redraw)
         if show_diagrams:
             self.output.show_diagrams()
+        self.output.show_images()
 
     def __init__(self):
 

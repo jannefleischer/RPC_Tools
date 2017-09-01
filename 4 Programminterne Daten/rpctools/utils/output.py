@@ -4,7 +4,10 @@ import arcpy
 import numpy as np
 import subprocess
 import os
+import sys
 from rpctools.utils.config import Config, Folders
+from rpctools.utils import image as image_exec
+
 
 class ArcpyEnv(object):
     """
@@ -568,28 +571,26 @@ class Output(object):
 
     def show_images(self):
         for image in self.images:
-            script_path = "C:\\Temp\\test.py"
-            image_path = image[0]
-            window_title = image[1]
-            interpolation = image[3]
-            window_size = image[2]
-            show_white_space = image[4]
-            show_toolbar = image[5]
-            command = "python " + script_path + " " + image + " " + window_title + " " + interpolation + " " + str(window_size[0]) + " " + str(window_size[1]) + " " + str(show_white_space) + " " + str(show_toolbar)
-            subprocess.Popen(command, shell=False)
+            script_path = self.folders.get_projectpath()
+            params = [str(p) for p in image]
+            subprocess.Popen(
+                [os.path.join(sys.exec_prefix, 'python.exe'),
+                 '-m' , image_exec.__name__] + params, shell=True)
         self.images = []
 
     def add_image(self,
                   image_path,
                   window_title,
-                  window_size=[15.0, 10.0],
+                  width=15.0,
+                  height=10.0,
                   interpolation = "lanczos",
                   show_white_space = False,
                   show_toolbar=False):
 
         if not arcpy.Exists(image_path):
             return
-        image = [image_path, window_title, window_size, interpolation, show_white_space, show_toolbar]
+        image = [image_path, window_title, width, height, interpolation,
+                 show_white_space, show_toolbar]
         self.images.append(image)
 
         """
