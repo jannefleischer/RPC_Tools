@@ -57,8 +57,8 @@
   Section "Projektcheck-Tools installieren"
     SetOutPath "$INSTDIR" 
 	;relative path 
-	File /r "..\*"
-	
+	File /r  /x *.exe /x .git /x .gitignore /x "3 Benutzerdefinierte Projekte" /x rpctools.egg-info /x *.pyc "..\..\*"
+	CreateDirectory "$INSTDIR\3 Benutzerdefinierte Projekte"
 	;Store installation folder
 	WriteRegStr HKCU "Software\RPC Profi" "" $INSTDIR
 	
@@ -74,7 +74,7 @@
   SectionEnd
 
   Section "AddIn installieren"
-	ExecShell "" "$INSTDIR\addin\addin.esriaddin"
+	ExecShell "" "$INSTDIR\4 Programminterne Daten\addin\addin.esriaddin"
   SectionEnd
   
 Section "Uninstall"
