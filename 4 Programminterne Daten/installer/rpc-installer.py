@@ -77,9 +77,8 @@ def install_packages(python_path):
     log(sys.version)
     log(sys.platform)
     platform = 'win32'
-    if sys.maxsize > 2**32:
+    if "ArcGISx64" in python_path:
         platform = 'win_amd64'
-    platform = 'win32'
 
 
     #Creating list with missing packages
