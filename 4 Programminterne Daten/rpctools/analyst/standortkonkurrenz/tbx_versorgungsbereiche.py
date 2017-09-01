@@ -28,7 +28,7 @@ class EditCenters(Tool):
         delete_df = centers_df.loc[centers_df['do_delete'] == True]
         update_df = centers_df.loc[centers_df['do_delete'] == False]
         if len(delete_df) > 0:
-            arcpy.AddMessage(u'Lösche Märkte')
+            arcpy.AddMessage(u'Lösche Versorgungsbereiche')
         for idx, center in delete_df.iterrows():
             arcpy.AddMessage(u' - {}'.format(center['pretty']))
             self.parent_tbx.delete_rows_in_table(

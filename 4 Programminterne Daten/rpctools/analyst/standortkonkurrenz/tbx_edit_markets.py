@@ -75,7 +75,7 @@ class TbxEditMarkets(Tbx):
         param.datatype = u'GPString'
         param.filter.list = []
 
-        self.chains_df = self.table_to_dataframe(
+        self.df_chains = self.table_to_dataframe(
             'Ketten',
             workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
             is_base_table=True
@@ -97,11 +97,11 @@ class TbxEditMarkets(Tbx):
             param.parameterType = 'Required'
             param.direction = 'Input'
             param.datatype = u'GPString'
-            param.filter.list = sorted(self.chains_df['name'].values.tolist())
+            param.filter.list = sorted(self.df_chains['name'].values.tolist())
 
         # Betriebstypen
 
-        self.types_df = self.table_to_dataframe(
+        self.df_types = self.table_to_dataframe(
             'Betriebstypen',
             workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
             is_base_table=True
@@ -109,7 +109,7 @@ class TbxEditMarkets(Tbx):
 
         # list pretty names for Betriebstypen
         pretty_names = []
-        for idx, typ in self.types_df.iterrows():
+        for idx, typ in self.df_types.iterrows():
             details = ''
             lower = typ['von_m2']
             upper = typ['bis_m2']
@@ -122,15 +122,15 @@ class TbxEditMarkets(Tbx):
             pretty = u'{name} {details}'.format(name=typ['name'],
                                                 details=details)
             pretty_names.append(pretty)
-        self.types_df['pretty'] = pretty_names
+        self.df_types['pretty'] = pretty_names
 
         # add a row for closing markets
         if self.setting == CHANGE:
             # extend the commercial types
-            custom_row = pd.DataFrame(columns=self.types_df.columns)
+            custom_row = pd.DataFrame(columns=self.df_types.columns)
             custom_row['id_betriebstyp'] = [0]
             custom_row['pretty'] = custom_row['name'] = [u'Schließung']
-            self.types_df = self.types_df.append(
+            self.df_types = self.df_types.append(
                 custom_row, ignore_index=True).sort('id_betriebstyp')
 
         param = self.add_parameter('type_name')
@@ -139,7 +139,7 @@ class TbxEditMarkets(Tbx):
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-        param.filter.list = self.types_df['pretty'].values.tolist()
+        param.filter.list = self.df_types['pretty'].values.tolist()
 
         if self.setting != CHANGE:
             param = self.add_parameter('do_delete')
@@ -209,6 +209,24 @@ class TbxEditMarkets(Tbx):
         self.update_table('Maerkte', column_values={'AGS': new_ags},
                           where='id={}'.format(new_id))
 
+    def betriebstyp_to_vkfl(self, id_betriebstyp, id_kette):
+        """
+        return the sales area (vkfl) matching the type of use (betriebstyp)
+        of a single market
+        """
+        # some discounters have (since there is no specific betriebstyp and 
+        # therefore no hint on possible vkfl for them)
+        if id_betriebstyp == 7:
+            default_vkfl = self.df_chains[
+                self.df_chains['id_kette']==id_kette]
+            if len(default_vkfl) != 0:
+                vkfl = default_vkfl['default_vkfl'].values[0]
+                return vkfl
+        # all other vkfl are assigned via betriebstyp (+ unmatched discounters)
+        idx = self.df_types['id_betriebstyp'] == id_betriebstyp
+        vkfl = self.df_types[idx]['default_vkfl'].values[0]
+        return vkfl
+
     def _open(self, params):
         # reset markets dataframe on opening of toolbox
         self.markets_df = self.get_markets()
@@ -238,22 +256,22 @@ class TbxEditMarkets(Tbx):
         informations'''
         # type before doesn't matter in planfall (it's zero and not in list)
         if self.setting in [NULLFALL, CHANGE]:
-            type_before = self.types_df['name'][
-                self.types_df['id_betriebstyp'] ==
+            type_before = self.df_types['name'][
+                self.df_types['id_betriebstyp'] ==
                 market['id_betriebstyp_nullfall']].values[0]
-        a_idx = (self.types_df['id_betriebstyp'] ==
+        a_idx = (self.df_types['id_betriebstyp'] ==
                  market['id_betriebstyp_planfall'])
         # closing is not listed in Nullfall
         if a_idx.sum() == 0:
             type_after = u'Schließung'
         else:
-            type_after = self.types_df['name'][a_idx].values[0]
+            type_after = self.df_types['name'][a_idx].values[0]
 
         type_name = type_before if self.setting in [NULLFALL, CHANGE] \
             else type_after
 
-        chain_name = self.chains_df['name'][
-            self.chains_df['id_kette'] == market['id_kette']].values[0]
+        chain_name = self.df_chains['name'][
+            self.df_chains['id_kette'] == market['id_kette']].values[0]
         pretty = u'"{name}" ({id}) - {typ} ({chain})'.format(
             id=market['id'], name=market['name'], typ=type_name,
             chain=chain_name)
@@ -269,16 +287,16 @@ class TbxEditMarkets(Tbx):
         market = self.markets_df.loc[market_idx]
         betriebstyp_col = 'id_betriebstyp_nullfall' \
             if self.setting == NULLFALL else 'id_betriebstyp_planfall'
-        pretty_idx = (self.types_df['id_betriebstyp'] ==
+        pretty_idx = (self.df_types['id_betriebstyp'] ==
                       market[betriebstyp_col].values[0])
-        typ_pretty = self.types_df['pretty'][pretty_idx]
+        typ_pretty = self.df_types['pretty'][pretty_idx]
         self.par.type_name.value = typ_pretty.values[0]
 
         if self.setting != CHANGE:
             self.par.delete_all.value = False
             self.par.name.value = market['name'].values[0]
-            chain_name = self.chains_df['name'][
-                self.chains_df['id_kette'] == market['id_kette'].values[0]]
+            chain_name = self.df_chains['name'][
+                self.df_chains['id_kette'] == market['id_kette'].values[0]]
             self.par.chain.value = chain_name.values[0]
             do_delete = market['do_delete'].values[0]
             # strange: can't assign the bool of do_delete directly, arcpy is
@@ -319,19 +337,22 @@ class TbxEditMarkets(Tbx):
             self.markets_df.loc[market_idx, 'name'] = self.par.name.value
 
         elif self.par.changed('chain'):
-            id_chain = self.chains_df['id_kette'][
-                self.chains_df['name'] == self.par.chain.value].values[0]
+            id_chain = self.df_chains['id_kette'][
+                self.df_chains['name'] == self.par.chain.value].values[0]
             self.markets_df.loc[market_idx, 'id_kette'] = id_chain
 
         elif self.par.changed('type_name'):
-            id_typ = self.types_df['id_betriebstyp'][
-                self.types_df['pretty'] == self.par.type_name.value].values[0]
+            id_typ = self.df_types['id_betriebstyp'][
+                self.df_types['pretty'] == self.par.type_name.value].values[0]
             # only change nullfall type when toolbox is set to nullfall
             # in case of planfall it stays 0
             if self.setting == NULLFALL:
                 self.markets_df.loc[market_idx, 'id_betriebstyp_nullfall'] = id_typ
             # ToDo: set different type for planfall if nullfall is edited?
             self.markets_df.loc[market_idx, 'id_betriebstyp_planfall'] = id_typ
+            id_kette = self.markets_df.loc[market_idx, 'id_kette'].values[0]
+            vkfl = self.betriebstyp_to_vkfl(id_typ, id_kette)
+            self.markets_df.loc[market_idx, 'vkfl'] = vkfl
 
         elif self.par.changed('do_delete'):
             do_delete = self.par.do_delete.value
@@ -390,8 +411,8 @@ class TbxExtendMarkets(TbxEditMarkets):
         market_idx = self.markets_df['pretty'] == self.par.markets.value
         altered = False
         if self.par.changed('type_name'):
-            id_typ = self.types_df['id_betriebstyp'][
-                self.types_df['pretty'] == self.par.type_name.value].values[0]
+            id_typ = self.df_types['id_betriebstyp'][
+                self.df_types['pretty'] == self.par.type_name.value].values[0]
 
             self.markets_df.loc[market_idx, 'id_betriebstyp_planfall'] = id_typ
             altered = True
