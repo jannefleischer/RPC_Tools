@@ -184,8 +184,8 @@ class Image(object):
     def __init__(self,
                  image_path,
                  window_title,
-                 width=15.0,
-                 height=10.0,
+                 width=7.0,
+                 height=5.0,
                  interpolation = "lanczos",
                  show_white_space = False,
                  show_toolbar=False):
@@ -333,7 +333,7 @@ class Output(object):
         del(current_dataframe)
         del(current_mxd)
         return projectlayer
-    
+
     def remove_layer(self, layername):
         '''remove layers with given name from project
         (removes all appearances)'''
@@ -599,7 +599,7 @@ class Output(object):
         for image in self.images:
             self._show_image(image)
         self.images = []
-    
+
     def _show_image(self, image):
         attrs = ['image_path', 'window_title', 'width', 'height', 'interpolation',
                  'show_white_space', 'show_toolbar']
