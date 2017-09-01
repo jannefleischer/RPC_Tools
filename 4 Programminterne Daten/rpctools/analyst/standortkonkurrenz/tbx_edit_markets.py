@@ -413,7 +413,6 @@ class TbxExtendMarkets(TbxEditMarkets):
         if self.par.changed('type_name'):
             id_typ = self.df_types['id_betriebstyp'][
                 self.df_types['pretty'] == self.par.type_name.value].values[0]
-
             self.markets_df.loc[market_idx, 'id_betriebstyp_planfall'] = id_typ
             altered = True
         elif self.par.changed('do_close'):
@@ -424,6 +423,13 @@ class TbxExtendMarkets(TbxEditMarkets):
                     self.markets_df.loc[market_idx, 'id_betriebstyp_nullfall']
             altered = True
         if altered:
+            id_typ = self.markets_df.loc[market_idx, 'id_betriebstyp_planfall'].values[0]
+            id_kette = self.markets_df.loc[market_idx, 'id_kette'].values[0]
+            if id_typ == 0:
+                vkfl = 0
+            else:
+                vkfl = self.betriebstyp_to_vkfl(id_typ, id_kette)
+            self.markets_df.loc[market_idx, 'vkfl'] = vkfl
             i = np.where(market_idx == True)[0][0]
             pretty = self.get_pretty_market_name(
                 self.markets_df.iloc[i])
