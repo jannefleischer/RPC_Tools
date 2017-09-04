@@ -149,7 +149,7 @@ class ProjektAnlegen(Projektverwaltung):
                                         "PYTHON_9.3", "")
 
 
-        # Berechne Umfang der Fl�chen
+        # Berechne Umfang der Flächen
         arcpy.CalculateField_management(tfl, "umfang_meter",
                                         "!shape.length@METER!", "PYTHON_9.3")
 
@@ -172,7 +172,7 @@ class ProjektAnlegen(Projektverwaltung):
             cursor.updateRow(row)
 
     def copy_teilflaechen_to_gdb(self, project_name, flaeche):
-        """add layer teilfl�chen to gdb"""
+        """add layer teilflächen to gdb"""
         arcpy.SetProgressorLabel('Teilflächen laden')
         arcpy.SetProgressorPosition(30)
 
@@ -259,12 +259,12 @@ class ProjektAnlegen(Projektverwaltung):
             sys.exit()
 
     def get_gemeinde(self, tfl, id_column, max_dist):
-        """Verschneide Teilfl�chen mit Gemeinde"""
+        """Verschneide Teilflächen mit Gemeinde"""
         # to do (Stefaan)
-        arcpy.SetProgressorLabel('Verschneide Teilfl�chen mit Gemeinde')
+        arcpy.SetProgressorLabel('Verschneide Teilflächen mit Gemeinde')
         arcpy.SetProgressorPosition(10)
 
-        # calculate Gau�-Kr�ger-Coordinates and append them to tfl
+        # calculate Gauß-Krüger-Coordinates and append them to tfl
         arcpy.AddGeometryAttributes_management(
             Input_Features=tfl, Geometry_Properties="CENTROID_INSIDE")
 
@@ -293,7 +293,7 @@ class ProjektAnlegen(Projektverwaltung):
         ags_project = [ID[0] for ID in ags_gen.values()]
         gen_project =  [ID[1] for ID in ags_gen.values()]
         if len(np.unique(ags_project)) != 1:
-            raise Exception("Die Teilfl�chen m�ssen in der selben Gemeinde"
+            raise Exception("Die Teilflächen müssen in der selben Gemeinde"
                             "liegen")
 
         return ags_project[0], gen_project[0]
@@ -420,7 +420,7 @@ class ProjektLoeschen(Tool):
         # prevent eventual locks
         gc.collect()
         self.fragments_left = []
-        arcpy.AddMessage(encode('L�sche Projekte'))
+        arcpy.AddMessage(encode('Lösche Projekte'))
 
         projects_to_delete = self.par.projekte.values
         step = 100 / len(projects_to_delete)
@@ -429,7 +429,7 @@ class ProjektLoeschen(Tool):
             pos += step
             arcpy.SetProgressorPosition(pos)
             arcpy.SetProgressorLabel(
-                encode('L�sche Projekt {}'.format(project)))
+                encode(u'Lösche Projekt {}'.format(project)))
             self.compact_gdbs(project)
             self.remove_project_from_output(project)
             self.projekt_loeschen(project)
@@ -487,7 +487,7 @@ class ProjektLoeschen(Tool):
         projektPfad = self.folders.get_projectpath(project_name)
         arcpy.AddMessage(u"Suche Ordner: " + projektPfad)
 
-        # �berpr�fen, ob der Projektordner existiert
+        # Überprüfen, ob der Projektordner existiert
         if isdir(projektPfad):
             arcpy.AddMessage("Projektordner gefunden \n")
             shutil.rmtree(projektPfad, ignore_errors=True)
