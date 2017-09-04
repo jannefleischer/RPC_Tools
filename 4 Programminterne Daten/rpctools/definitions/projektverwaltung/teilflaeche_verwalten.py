@@ -62,7 +62,7 @@ class TeilflaechenVerwalten(Tool):
                 df_areas.loc[index, 'VF_gesamt'] = 0
                 # delete markets eventually belonging to the area
                 if not market_tool:
-                    market_tool = MarktEinlesen(self.projectname)
+                    market_tool = MarktEinlesen(projectname=self.projectname)
                 market_tool.delete_area_market(area_id)
 
         self.parent_tbx.dataframe_to_table('Teilflaechen_Plangebiet',
