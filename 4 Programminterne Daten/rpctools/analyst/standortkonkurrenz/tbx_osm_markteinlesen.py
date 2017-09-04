@@ -18,8 +18,10 @@ class MarktEinlesen(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     
-    def __init__(self, *args):
-        super(MarktEinlesen, self).__init__(*args)
+    def __init__(self, params=None, parent_tbx=None, projectname=None):
+        super(MarktEinlesen, self).__init__(params=params,
+                                            parent_tbx=parent_tbx,
+                                            projectname=projectname)
 
         self.df_chains = self.parent_tbx.table_to_dataframe(
             'Ketten',
