@@ -266,8 +266,17 @@ class OSMMarktEinlesen(MarktEinlesen):
         reader = OSMShopsReader(epsg=epsg)
         truncate = self.par.truncate.value
         if truncate:
-            n = tbx.delete_rows_in_table(self._markets_table, where='is_osm=1')
-            arcpy.AddMessage(u'{} vorhandene OSM-Märkte gelöscht'.format(n))
+            ids = [str(i) for i, in tbx.query_table(
+                self._markets_table, columns=['id'], where='is_osm=1')]
+            if len(ids) > 0:
+                arcpy.AddMessage(u'Lösche vorhandene OSM-Märkte...')
+                n = tbx.delete_rows_in_table(self._markets_table, where='is_osm=1')
+                tbx.delete_rows_in_table('Beziehungen_Maerkte_Zellen',
+                                         where='id_markt in ({})'
+                                         .format(','.join(ids)))
+                arcpy.AddMessage(u'{} OSM-Märkte gelöscht'.format(n))
+            else:
+                arcpy.AddMessage(u'Keine OSM-Märkte vorhanden.')
         if self.par.count.value == 0:
             return
         
