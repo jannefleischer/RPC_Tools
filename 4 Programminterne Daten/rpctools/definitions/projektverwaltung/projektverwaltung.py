@@ -39,7 +39,7 @@ class Projektverwaltung(Tool):
 
 
     def add_outputs(self):
-        # add Teilfl�chen
+        # add Teilflächen
         fc = "Teilflaechen_Plangebiet"
         layer = "Teilflaechen des Plangebiets"
         self.output.add_layer("projektdefinition", layer, fc,
