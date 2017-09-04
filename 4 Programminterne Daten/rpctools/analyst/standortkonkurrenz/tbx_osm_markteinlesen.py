@@ -252,6 +252,8 @@ class OSMMarktEinlesen(MarktEinlesen):
 
         tbx = self.parent_tbx
         
+        # get amrkets in minimal bounding polygon (in fact multiple rectangles,
+        # as always there is no basic function for minimal bounding polygon)
         communities = self.folders.get_table('Zentren')
         multi_poly = minimal_bounding_poly(communities, where='"Auswahl"<>0')
         
@@ -280,12 +282,37 @@ class OSMMarktEinlesen(MarktEinlesen):
         markets = self.parse_meta(markets, known_only=self.par.known_only.value)
         arcpy.AddMessage(u'Schreibe {} Märkte in die Datenbank...'
                          .format(len(markets)))
+    
+        markets_tmp = self.folders.get_table('markets_tmp', check=False)
+        auswahl_tmp = self.folders.get_table('auswahl_tmp', check=False)
+        clipped_tmp = self.folders.get_table('clipped_tmp', check=False)
+        def del_tmp():
+            for table in [markets_tmp, clipped_tmp, auswahl_tmp]:
+                arcpy.Delete_management(table)
+        del_tmp()
+    
+        markets_table = self.folders.get_table('Maerkte', check=False)
+        ids = [id for id, in self.parent_tbx.query_table(markets_table, ['id'])]
+        start_id = max(ids) + 1 if ids else 0
+        # write markets to temporary table and clip it with selected communities
+        arcpy.CreateFeatureclass_management(
+            os.path.split(markets_tmp)[0], os.path.split(markets_tmp)[1],
+            template=markets_table
+        )
         self.markets_to_db(markets,
-                           tablename=self._markets_table,
+                           tablename=os.path.split(markets_tmp)[1],
                            truncate=False,  # already truncated osm markets
                            is_buffer=False,
-                           is_osm=True)
-
+                           is_osm=True,
+                           start_id=start_id)
+        
+        arcpy.FeatureClassToFeatureClass_conversion(
+            communities, *os.path.split(auswahl_tmp),
+            where_clause='Auswahl<>0')
+        arcpy.Clip_analysis(markets_tmp, auswahl_tmp, clipped_tmp)
+        
+        arcpy.Append_management(clipped_tmp, markets_table)
+        del_tmp()
         arcpy.AddMessage('Entferne Duplikate...')
         n = remove_duplicates(self.folders.get_table(self._markets_table),
                               'id', match_field='id_kette', 
