@@ -31,8 +31,8 @@ class TeilflaechenVerwalten(Tool):
 
             if not tou_changed:
                 continue
-            arcpy.AddMessage(u'Die Nutzungsart von Fl√§che "{}" hat sich '
-                             u'ge√§ndert. Bereinige eventuelle bereits '
+            arcpy.AddMessage(u'Die Nutzungsart von Fl‰che "{}" hat sich '
+                             u'ge‰ndert. Bereinige eventuelle bereits '
                              u'berechnete Ergebnisse und Einstellungen...'
                              .format(area['Name']))
 
@@ -62,7 +62,7 @@ class TeilflaechenVerwalten(Tool):
                 df_areas.loc[index, 'VF_gesamt'] = 0
                 # delete markets eventually belonging to the area
                 if not market_tool:
-                    market_tool = MarktEinlesen(projectname=self.projectname)
+                    market_tool = MarktEinlesen(self.projectname)
                 market_tool.delete_area_market(area_id)
 
         self.parent_tbx.dataframe_to_table('Teilflaechen_Plangebiet',
