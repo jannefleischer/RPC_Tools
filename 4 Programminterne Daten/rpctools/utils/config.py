@@ -26,7 +26,7 @@ class Config(object):
     __metaclass__ = Singleton
 
     _default = {
-        'active_project': '',
+        'active_project': u'',
         'epsg': 31467,
         'transformation': "DHDN_To_WGS_1984_5x",
         'max_area_distance': 1000,
@@ -270,7 +270,7 @@ class Folders(object):
         returns all available projects inside the project folder
         (except the temp. projects which are not meant to be edited)
         '''
-        subfolders = [f for f in listdir(self.PROJECT_BASE_PATH)
+        subfolders = [f for f in listdir(u'{}'.format(self.PROJECT_BASE_PATH))
                       if isdir(self.get_projectpath(f))
                       and f != self._TEST_TMP_PROJECT]
         return sorted(subfolders)
