@@ -195,7 +195,7 @@ class KostentraegerDiagramm(MatplotDiagram):
         self.title = (u"{}: Aufteilung der Gesamtkosten "
                       u"auf die Kostenträger".format(
                           self.tbx.par.get_projectname()))
-        x_label = u"Kosten für Netzerweiterungen und punktuelle Maßnahmen"
+        y_label = u"Kosten für Netzerweiterungen \nund punktuelle Maßnahmen"
 
         df_shares = self.tbx.table_to_dataframe(
             table, workspace=workspace
@@ -210,11 +210,9 @@ class KostentraegerDiagramm(MatplotDiagram):
 
         pos_idx = np.arange(len(categories))
 
-        bar_width = 0.5
+        #bar_width = 0.5
 
         figure, ax = self.plt.subplots(figsize=(12, 5))
-        self.plt.gca().invert_yaxis()
-
         colors = self.colors  #self.plt.cm.Paired(np.linspace(0, 1, len(df_shares)))
 
         summed = np.zeros(len(cols))
@@ -223,30 +221,42 @@ class KostentraegerDiagramm(MatplotDiagram):
             data = []
             for i, col in enumerate(cols):
                 data.append(net_share[col])
-            patches = ax.barh(pos_idx, data, left=summed, height=bar_width, color=colors[j])
+            patches = ax.bar(pos_idx, data, bottom=summed, color=colors[j])
+            for i, rect in enumerate(patches.get_children()):
+                value = data[i]
+                bottom = summed[i]
+                if value != 0:
+                    color = 'black'
+                    if j in [1, 2]:
+                        color = 'white'
+                    ax.text(i, bottom + value/2., int(value),
+                            ha='center', va='center', color=color)
+                    #,
+                            #bbox=dict(facecolor='white',
+                                      #edgecolor='white', boxstyle="round"))
+
             summed += data
 
         # Anfang: Balken beschriften
-        text_offset = max([patch.get_x() + patch.get_width() for patch in patches]) * 0.02
-        for i, patch in enumerate(patches.get_children()):
-            width = patch.get_x() + patch.get_width()
-            y_pos = patch.get_y()
-            ax.text(width + text_offset, i, str(round(width, 0)) + u' €',
-                    color='black',ha='left', va='center')
+        #text_offset = max([patch.get_x() + patch.get_width() for patch in patches]) * 0.02
+        #for i, patch in enumerate(patches.get_children()):
+            #width = patch.get_x() + patch.get_width()
+            #y_pos = patch.get_y()
+            #ax.text(width + text_offset, i, str(round(width, 0)) + u' €',
+                    #color='black',ha='left', va='center')
                     # bbox=dict(facecolor='white',
                     # edgecolor='white', boxstyle="round"))
-        x_min, x_max = ax.get_xlim()
-        ax.set_xlim(x_min, x_max * 1.2)
+        #x_min, x_max = ax.get_xlim()
 
         # Ende: Balken beschriften
 
-        ax.tick_params(axis='both', which='major', labelsize=9)
-        ax.set_yticks(pos_idx)
-        ax.set_yticklabels(categories)
+        #ax.tick_params(axis='both', which='major', labelsize=9)
+        ax.set_xticks(pos_idx)
+        ax.set_xticklabels(categories)
         ax.set_title(self.title)
-        ax.set_xlabel(x_label)
-        ax.xaxis.set_major_formatter(mticker.FormatStrFormatter(u'%d €'))
-        ax.xaxis.grid(True, which='major')
+        ax.set_ylabel(y_label, rotation=90, labelpad=15)
+        ax.yaxis.set_major_formatter(mticker.FormatStrFormatter(u'%d €'))
+        ax.yaxis.grid(True, which='major')
 
         box = ax.get_position()
         ax.set_position([box.x0 + box.width * 0.2, box.y0 + box.height * 0.25,
@@ -349,21 +359,21 @@ class VergleichAPDiagramm(VegleichsDiagramm):
 
 
 if __name__ == "__main__":
-    diagram = VergleichAPDiagramm()
-    diagram.create()
-    diagram.show()
-    diagram = VergleichWEDiagramm()
-    diagram.create()
-    diagram.show()
+    #diagram = VergleichAPDiagramm()
+    #diagram.create()
+    #diagram.show()
+    #diagram = VergleichWEDiagramm()
+    #diagram.create()
+    #diagram.show()
     diagram = KostentraegerDiagramm()
     diagram.create()
     diagram.show()
-    diagram = MassnahmenKostenDiagramm()
-    diagram.create()
-    diagram.show()
-    diagram = NetzlaengenDiagramm()
-    diagram.create()
-    diagram.show()
-    diagram = GesamtkostenDiagramm()
-    diagram.create()
-    diagram.show()
+    #diagram = MassnahmenKostenDiagramm()
+    #diagram.create()
+    #diagram.show()
+    #diagram = NetzlaengenDiagramm()
+    #diagram.create()
+    #diagram.show()
+    #diagram = GesamtkostenDiagramm()
+    #diagram.create()
+    #diagram.show()
