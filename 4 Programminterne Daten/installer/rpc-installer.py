@@ -126,7 +126,7 @@ def install_packages(python_path):
     missing = OrderedDict()
 
     #Installing pip
-    base_path = os.path.dirname(__file__)
+    base_path = os.path.dirname("__file__")
     wheel_path = os.path.join(base_path, 'wheels')
     log('Install or upgrade pip')
     process = subprocess.Popen([os.path.join(python_path, 'python'),
@@ -158,7 +158,7 @@ def install_packages(python_path):
     # install rpctools package
     # ToDo: Finally change from --editable to wheel
     log("installiere RPCTools")
-
+	base_path = os.path.dirname(__file__)
     process = subprocess.Popen([os.path.join(python_path, 'Scripts', 'pip.exe'),
                                 'install',
                                 '--editable',
