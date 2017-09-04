@@ -218,7 +218,7 @@ class ProjektwirkungMarkets(Tool):
             point = ZensusCell(tfl['INSIDE_X'], tfl['INSIDE_Y'],
                                epsg=self.parent_tbx.config.epsg, ew=tfl['ew'],
                                id=start_id+i,
-                               tfl_id=tfl['id_teilflaeche'])
+                               tfl_id=tfl['id_teilflaeche'], in_auswahl=True)
             points.append(point)
             i += 1
         return points
