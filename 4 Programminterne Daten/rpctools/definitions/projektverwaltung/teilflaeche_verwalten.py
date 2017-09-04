@@ -31,8 +31,8 @@ class TeilflaechenVerwalten(Tool):
 
             if not tou_changed:
                 continue
-            arcpy.AddMessage(u'Die Nutzungsart von Fl‰che "{}" hat sich '
-                             u'ge‰ndert. Bereinige eventuelle bereits '
+            arcpy.AddMessage(u'Die Nutzungsart von Fl√§che "{}" hat sich '
+                             u'ge√§ndert. Bereinige eventuelle bereits '
                              u'berechnete Ergebnisse und Einstellungen...'
                              .format(area['Name']))
 

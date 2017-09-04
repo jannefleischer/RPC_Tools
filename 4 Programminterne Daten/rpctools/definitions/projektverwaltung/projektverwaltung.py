@@ -39,7 +39,7 @@ class Projektverwaltung(Tool):
 
 
     def add_outputs(self):
-        # add Teilflächen
+        # add Teilflï¿½chen
         fc = "Teilflaechen_Plangebiet"
         layer = "Teilflaechen des Plangebiets"
         self.output.add_layer("projektdefinition", layer, fc,
@@ -139,7 +139,7 @@ class ProjektAnlegen(Projektverwaltung):
                                           ags_projekt,
                                           gemeindename_projekt):
         """Attribute berechnen"""
-        arcpy.SetProgressorLabel('Teilflächen-Attribute berechnen')
+        arcpy.SetProgressorLabel('Teilflï¿½chen-Attribute berechnen')
         arcpy.SetProgressorPosition(40)
 
         # Berechne ha der Teilflaechen
@@ -149,7 +149,7 @@ class ProjektAnlegen(Projektverwaltung):
                                         "PYTHON_9.3", "")
 
 
-        # Berechne Umfang der Flächen
+        # Berechne Umfang der Flï¿½chen
         arcpy.CalculateField_management(tfl, "umfang_meter",
                                         "!shape.length@METER!", "PYTHON_9.3")
 
@@ -172,8 +172,8 @@ class ProjektAnlegen(Projektverwaltung):
             cursor.updateRow(row)
 
     def copy_teilflaechen_to_gdb(self, project_name, flaeche):
-        """add layer teilflächen to gdb"""
-        arcpy.SetProgressorLabel('Teilflächen laden')
+        """add layer teilflï¿½chen to gdb"""
+        arcpy.SetProgressorLabel('Teilflï¿½chen laden')
         arcpy.SetProgressorPosition(30)
 
         tfl = self.folders.get_table('Teilflaechen_Plangebiet',
@@ -185,7 +185,7 @@ class ProjektAnlegen(Projektverwaltung):
         config = self.parent_tbx.config
         sr1 = arcpy.Describe(flaeche).spatialReference
         if not sr1.factoryCode:
-            raise Exception(u'Den Teilflächen fehlen Angaben zur Projektion. '
+            raise Exception(u'Den TeilflÃ¤chen fehlen Angaben zur Projektion. '
                             u'Bitte definieren Sie die Projektion in der Quelle!')
         sr2 = arcpy.SpatialReference(config.epsg)
         possible_transformations = arcpy.ListTransformations(sr1, sr2)
@@ -254,17 +254,17 @@ class ProjektAnlegen(Projektverwaltung):
             arcpy.AddMessage("Es scheint bereits ein Projekt mit diesem " +
                              "Namen zu existieren")
             arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein oder " +
-                             "nutzen Sie die 'Projekt löschen' Funktion in " +
+                             "nutzen Sie die 'Projekt lÃ¶schen' Funktion in " +
                              "der Toolbox")
             sys.exit()
 
     def get_gemeinde(self, tfl, id_column, max_dist):
-        """Verschneide Teilflächen mit Gemeinde"""
+        """Verschneide Teilflï¿½chen mit Gemeinde"""
         # to do (Stefaan)
-        arcpy.SetProgressorLabel('Verschneide Teilflächen mit Gemeinde')
+        arcpy.SetProgressorLabel('Verschneide Teilflï¿½chen mit Gemeinde')
         arcpy.SetProgressorPosition(10)
 
-        # calculate Gauß-Krüger-Coordinates and append them to tfl
+        # calculate Gauï¿½-Krï¿½ger-Coordinates and append them to tfl
         arcpy.AddGeometryAttributes_management(
             Input_Features=tfl, Geometry_Properties="CENTROID_INSIDE")
 
@@ -285,7 +285,7 @@ class ProjektAnlegen(Projektverwaltung):
                     distances.append(dist)
             if distances and max(distances) > max_dist:
                 raise Exception("Der Abstand zwischen den Schwerpunkten der "
-                                "Teilflächen darf nicht größer "
+                                "TeilflÃ¤chen darf nicht grÃ¶ÃŸer "
                                 "als {} m sein!".format(max_dist))
 
         # get AGS and Gemeindename and check if AGS is unique
@@ -293,7 +293,7 @@ class ProjektAnlegen(Projektverwaltung):
         ags_project = [ID[0] for ID in ags_gen.values()]
         gen_project =  [ID[1] for ID in ags_gen.values()]
         if len(np.unique(ags_project)) != 1:
-            raise Exception("Die Teilflächen müssen in der selben Gemeinde"
+            raise Exception("Die Teilflï¿½chen mï¿½ssen in der selben Gemeinde"
                             "liegen")
 
         return ags_project[0], gen_project[0]
@@ -400,7 +400,7 @@ class ProjektKopieren(Projektverwaltung):
             arcpy.AddMessage("Es scheint bereits ein Projekt "
                              "mit diesem Namen zu existieren")
             arcpy.AddMessage("Bitte geben Sie einen anderen Namen ein "
-                             "oder nutzen Sie die 'Projekt löschen' Funktion "
+                             "oder nutzen Sie die 'Projekt lÃ¶schen' Funktion "
                              "in der Toolbox")
             sys.exit()
 
@@ -420,7 +420,7 @@ class ProjektLoeschen(Tool):
         # prevent eventual locks
         gc.collect()
         self.fragments_left = []
-        arcpy.AddMessage(encode('Lösche Projekte'))
+        arcpy.AddMessage(encode('Lï¿½sche Projekte'))
 
         projects_to_delete = self.par.projekte.values
         step = 100 / len(projects_to_delete)
@@ -429,7 +429,7 @@ class ProjektLoeschen(Tool):
             pos += step
             arcpy.SetProgressorPosition(pos)
             arcpy.SetProgressorLabel(
-                encode('Lösche Projekt {}'.format(project)))
+                encode('Lï¿½sche Projekt {}'.format(project)))
             self.compact_gdbs(project)
             self.remove_project_from_output(project)
             self.projekt_loeschen(project)
@@ -487,7 +487,7 @@ class ProjektLoeschen(Tool):
         projektPfad = self.folders.get_projectpath(project_name)
         arcpy.AddMessage(u"Suche Ordner: " + projektPfad)
 
-        # Überprüfen, ob der Projektordner existiert
+        # ï¿½berprï¿½fen, ob der Projektordner existiert
         if isdir(projektPfad):
             arcpy.AddMessage("Projektordner gefunden \n")
             shutil.rmtree(projektPfad, ignore_errors=True)
@@ -495,14 +495,14 @@ class ProjektLoeschen(Tool):
                 arcpy.Delete_management(projektPfad)
             except:
                 pass
-            arcpy.AddMessage("Projektordner gelöscht \n")
+            arcpy.AddMessage(u"Projektordner gelÃ¶scht \n")
         else:
             arcpy.AddMessage(u"Projektordner " + project_name + u" nicht gefunden \n")
 
         arcpy.AddMessage("*" * 45)
         if arcpy.Exists(projektPfad):
             self.fragments_left.append(project_name)
-            arcpy.AddError(encode('Projekt {p} konnte nicht vollständig gelöscht '
+            arcpy.AddError(encode('Projekt {p} konnte nicht vollstÃ¤ndig gelÃ¶scht '
                            'werden.'.format(p=project_name)))
         else:
             arcpy.AddMessage("Das Projekt " + project_name + " wurde erfolgreich entfernt \n")
