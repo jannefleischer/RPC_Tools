@@ -139,7 +139,7 @@ class ProjektAnlegen(Projektverwaltung):
                                           ags_projekt,
                                           gemeindename_projekt):
         """Attribute berechnen"""
-        arcpy.SetProgressorLabel('Teilfl�chen-Attribute berechnen')
+        arcpy.SetProgressorLabel('Teilflächen-Attribute berechnen')
         arcpy.SetProgressorPosition(40)
 
         # Berechne ha der Teilflaechen
@@ -173,7 +173,7 @@ class ProjektAnlegen(Projektverwaltung):
 
     def copy_teilflaechen_to_gdb(self, project_name, flaeche):
         """add layer teilfl�chen to gdb"""
-        arcpy.SetProgressorLabel('Teilfl�chen laden')
+        arcpy.SetProgressorLabel('Teilflächen laden')
         arcpy.SetProgressorPosition(30)
 
         tfl = self.folders.get_table('Teilflaechen_Plangebiet',
