@@ -5,6 +5,8 @@ from rpctools.utils.diagram import MatplotDiagram
 import matplotlib.ticker as mticker
 from rpctools.utils.constants import Nutzungsart
 from textwrap import wrap
+#import locale
+#locale.setlocale(locale.LC_ALL, 'German')
 
 
 class NetzlaengenDiagramm(MatplotDiagram):
@@ -186,6 +188,9 @@ class GesamtkostenDiagramm(MatplotDiagram):
         ax.legend(phase_names, loc='center left', bbox_to_anchor=(0, -0.3))
         return ax
 
+def format_func(x, pos):
+    s = '{:0,d}'.format(int(x))
+    return s
 
 class KostentraegerDiagramm(MatplotDiagram):
     colors = ['#005CE6', '#002673', '#894444', '#73FFDF', '#FFFF00']
@@ -195,7 +200,7 @@ class KostentraegerDiagramm(MatplotDiagram):
         self.title = (u"{}: Aufteilung der Gesamtkosten "
                       u"auf die Kostenträger".format(
                           self.tbx.par.get_projectname()))
-        y_label = u"Kosten für Netzerweiterungen \nund punktuelle Maßnahmen"
+        y_label = u"Kosten der erstmaligen Herstellung, \nBetriebs- und Unterhaltungskosten in den \nersten 20 Jahren sowie Erneuerungskosten \n(anteilig für die ersten 20 Jahre)"
 
         df_shares = self.tbx.table_to_dataframe(
             table, workspace=workspace
@@ -229,7 +234,7 @@ class KostentraegerDiagramm(MatplotDiagram):
                     color = 'black'
                     if j in [1, 2]:
                         color = 'white'
-                    ax.text(i, bottom + value/2., int(value),
+                    ax.text(i, bottom + value/2., u"{0:,} €".format(int(value)),
                             ha='center', va='center', color=color)
                     #,
                             #bbox=dict(facecolor='white',
@@ -237,25 +242,14 @@ class KostentraegerDiagramm(MatplotDiagram):
 
             summed += data
 
-        # Anfang: Balken beschriften
-        #text_offset = max([patch.get_x() + patch.get_width() for patch in patches]) * 0.02
-        #for i, patch in enumerate(patches.get_children()):
-            #width = patch.get_x() + patch.get_width()
-            #y_pos = patch.get_y()
-            #ax.text(width + text_offset, i, str(round(width, 0)) + u' €',
-                    #color='black',ha='left', va='center')
-                    # bbox=dict(facecolor='white',
-                    # edgecolor='white', boxstyle="round"))
-        #x_min, x_max = ax.get_xlim()
-
-        # Ende: Balken beschriften
-
-        #ax.tick_params(axis='both', which='major', labelsize=9)
         ax.set_xticks(pos_idx)
         ax.set_xticklabels(categories)
         ax.set_title(self.title)
         ax.set_ylabel(y_label, rotation=90, labelpad=15)
-        ax.yaxis.set_major_formatter(mticker.FormatStrFormatter(u'%d €'))
+        fmt = u'{x:,.0f} €'
+        tick = mticker.StrMethodFormatter(fmt)
+        #tick = mticker.FuncFormatter(format_func)
+        ax.yaxis.set_major_formatter(tick)
         ax.yaxis.grid(True, which='major')
 
         box = ax.get_position()
