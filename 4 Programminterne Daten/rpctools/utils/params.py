@@ -391,11 +391,12 @@ class Tbx(object):
         self._update_dependencies(self.par)
             #self._create_temporary_copies()
         # check for invalid manual entries in dropdowns
-        #for param in self.par:
-            #if (param.datatype == 'Zeichenfolge' and param.filter.list and
-                #not param.multiValue and
-                #param.altered and param.value not in param.filter.list):
-                #return
+        # ***Christoph
+        for param in self.par:
+            if (param.datatype == 'Zeichenfolge' and param.filter.list and
+                not param.multiValue and
+                param.altered and param.value not in param.filter.list):
+                return
         self._updateParameters(self.par)
 
     def open(self):
@@ -534,15 +535,16 @@ class Tbx(object):
                 .format(invalid))
 
         # check for invalid manual entries in dropdowns
-        #for param in self.par:
-            #if (param.datatype == 'Zeichenfolge' and param.filter.list and
-                #not param.multiValue and
-                #param.altered and param.value not in param.filter.list):
-                #param.setErrorMessage(
-                    #u'Bitte ändern Sie nicht manuell Einträge in den '
-                    #u'Dropdown-Menüs! Für eventuelle Umbenennungen sind in der '
-                    #u'Regel eigene Eingabefelder vorgesehen.')
-                #return
+        # ***Christoph
+        for param in self.par:
+            if (param.datatype == 'Zeichenfolge' and param.filter.list and
+                not param.multiValue and
+                param.altered and param.value not in param.filter.list):
+                param.setErrorMessage(
+                    u'Bitte ändern Sie nicht manuell Einträge in den '
+                    u'Dropdown-Menüs! Für eventuelle Umbenennungen sind in der '
+                    u'Regel eigene Eingabefelder vorgesehen.')
+                return
         self._updateMessages(self.par)
 
     def validate_inputs(self):
