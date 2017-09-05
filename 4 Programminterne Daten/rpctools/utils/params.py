@@ -76,21 +76,21 @@ class Tool(object):
         self.par = params if params is not None else Params()
         self.mes = Message()
         self.folders = ToolFolders(params=self.par)
-            
+
         if projectname:
             self.folders._projectname = projectname
         self.folders._workspace = self._workspace
         self.output = Output(params)
-        
-        # create a dummy toolbox, so that a tool may be able to function 
+
+        # create a dummy toolbox, so that a tool may be able to function
         # without a 'real' one
         if not parent_tbx:
             parent_tbx = DummyTbx()
             parent_tbx.tool = self
             parent_tbx.folders = Folders(projectname=self.folders._projectname,
                                          workspace=self._workspace)
-        
-        self.parent_tbx = parent_tbx         
+
+        self.parent_tbx = parent_tbx
 
     def main(self, par, parameters=None, messages=None):
         """
@@ -126,7 +126,7 @@ class Tool(object):
     def projectname(self):
         """Return the current projectname"""
         return self.par.get_projectname()
-    
+
     @abstractmethod
     def add_outputs(self):
         """method defining layers, diagrams, etc. as a result of the
@@ -204,7 +204,7 @@ class Dependency(object):
         """
         actual_sum = 0
         altered_param = None
-        
+
         values = []
         for name in self.param_names:
             param = params[name]
@@ -212,11 +212,11 @@ class Dependency(object):
             value = np.nan if params.changed(name) else param.value
             values.append(value)
             actual_sum += param.value
-        
+
         # continue only if ONE parameter is changed
         if np.isnan(values).sum() != 1:
             return
-        
+
         # anteil an differenz
         difference = self.target_value - actual_sum
         if not difference:
@@ -236,7 +236,7 @@ class Dependency(object):
         for i, name in enumerate(self.param_names):
             new_val = res[i]
             if np.isnan(new_val):
-                continue        
+                continue
             param = params[name]
             param.value = int(new_val)
 
@@ -276,11 +276,11 @@ class Tbx(object):
         """projects that were changed (only works if toolbox works with
         temporary databases)"""
         return self.folders.get_temporary_projects()
-    
+
     @property
     def output(self):
         return self.tool.output
-    
+
     def show_outputs(self, show_layers=True, show_diagrams=True, redraw=True):
         '''
         show the outputs of the tool (as defined in add_outputs() of Tool)
@@ -296,7 +296,7 @@ class Tbx(object):
         Returns
         -------
         parameter : arcpy.Parameter-instance
-        
+
         '''
         self.output.clear()
         self.tool.add_outputs()
@@ -391,11 +391,11 @@ class Tbx(object):
         self._update_dependencies(self.par)
             #self._create_temporary_copies()
         # check for invalid manual entries in dropdowns
-        for param in self.par:
-            if (param.datatype == 'Zeichenfolge' and param.filter.list and
-                not param.multiValue and 
-                param.altered and param.value not in param.filter.list):
-                return
+        #for param in self.par:
+            #if (param.datatype == 'Zeichenfolge' and param.filter.list and
+                #not param.multiValue and
+                #param.altered and param.value not in param.filter.list):
+                #return
         self._updateParameters(self.par)
 
     def open(self):
@@ -532,17 +532,17 @@ class Tbx(object):
                 u'nicht korrekt durchgeführt.\n\r '
                 u'Folgende Pfade oder Tabellen wurden nicht gefunden: {}'
                 .format(invalid))
-            
+
         # check for invalid manual entries in dropdowns
-        for param in self.par:
-            if (param.datatype == 'Zeichenfolge' and param.filter.list and
-                not param.multiValue and 
-                param.altered and param.value not in param.filter.list):
-                param.setErrorMessage(
-                    u'Bitte ändern Sie nicht manuell Einträge in den '
-                    u'Dropdown-Menüs! Für eventuelle Umbenennungen sind in der '
-                    u'Regel eigene Eingabefelder vorgesehen.')
-                return
+        #for param in self.par:
+            #if (param.datatype == 'Zeichenfolge' and param.filter.list and
+                #not param.multiValue and
+                #param.altered and param.value not in param.filter.list):
+                #param.setErrorMessage(
+                    #u'Bitte ändern Sie nicht manuell Einträge in den '
+                    #u'Dropdown-Menüs! Für eventuelle Umbenennungen sind in der '
+                    #u'Regel eigene Eingabefelder vorgesehen.')
+                #return
         self._updateMessages(self.par)
 
     def validate_inputs(self):
@@ -684,8 +684,8 @@ class Tbx(object):
         if not table_path:
             return 0
         return self._delete_rows_in_table(table_path, where=where, pkey=pkey)
-    
-    def _delete_rows_in_table(self, table_path, where=None, pkey=None): 
+
+    def _delete_rows_in_table(self, table_path, where=None, pkey=None):
         """
         Delete rows in a FileGeodatabase which match the where-clause or the
         primary key (if no pkey or where clause are given, all rows will be
@@ -705,8 +705,8 @@ class Tbx(object):
         r : int
             the number of deleted rows
         """
-    
-        where = where or self.get_where_clause(pkey)        
+
+        where = where or self.get_where_clause(pkey)
         columns = pkey.keys() if pkey else '*'
         cursor = arcpy.da.UpdateCursor(table_path, columns, where_clause=where)
         r = 0
@@ -766,7 +766,7 @@ class Tbx(object):
             rows = zip(*values)
         except:
             rows = [values]
-            
+
         self._insert_rows_in_table(table_path, columns, rows)
 
     def _insert_rows_in_table(self, table_path, columns, rows):
@@ -919,14 +919,14 @@ class Tbx(object):
         columns_incl_pkeys = dataframe.columns.values
         desc = arcpy.Describe(table_path)
         fields = [field.name for field in desc.fields]
-    
+
         # intersection of fields between dataframe and available fields
-        # (prevent writing columns of df that don't exist in db)        
+        # (prevent writing columns of df that don't exist in db)
         columns_incl_pkeys = np.intersect1d(columns_incl_pkeys, fields)
-        
+
         # columns without the pkeys
         columns = np.setdiff1d(columns_incl_pkeys, pkeys)
-        
+
         for row in dataframe.iterrows():
             # row is a tuple with index at 0 and the columns at 1
             pkey_values = dict(zip(pkeys, row[1][pkeys].values))
@@ -985,7 +985,7 @@ class Tbx(object):
         else:
             desc = arcpy.Describe(table_path)
             fields = [field.name for field in desc.fields]
-            
+
             # intersection of fields between dataframe and available fields
             # (prevent writing columns of df that don't exist in db)
             columns = np.intersect1d(dataframe.columns.values, fields)
@@ -1251,22 +1251,22 @@ class Tbx(object):
 
         with open(new_fn, 'w') as new_file:
             new_file.write(src)
-            
+
 
 class DummyTool(Tool):
-    
+
     def add_outputs(self):
         pass
-    
+
     def run(self):
         pass
 
 
 class DummyTbx(Tbx):
     """dummy toolbox to be able to access functions of toolboxes outside of
-    a 'real' toolbox, not for the purpose to be shown in ArcGIS 
+    a 'real' toolbox, not for the purpose to be shown in ArcGIS
     """
-    
+
     def __init__(self, projectname=''):
         self.projectname = projectname
         super(DummyTbx, self).__init__()
@@ -1282,11 +1282,11 @@ class DummyTbx(Tbx):
         p.filter.list = []
         p.value = self.projectname
         return self.par
-    
+
     @property
     def Tool(self):
         return DummyTool
-    
+
     @property
     def label(self):
         return ''
