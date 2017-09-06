@@ -247,6 +247,7 @@ class MarktEinlesen(Tool):
 
 class OSMMarktEinlesen(MarktEinlesen):
     _markets_table = 'Maerkte'
+    _max_count = 3000  # max number of markets
 
     def run(self):
 
@@ -277,12 +278,12 @@ class OSMMarktEinlesen(MarktEinlesen):
                 arcpy.AddMessage(u'{} OSM-Märkte gelöscht'.format(n))
             else:
                 arcpy.AddMessage(u'Keine OSM-Märkte vorhanden.')
-        if self.par.count.value == 0:
-            return
+        #if self.par.count.value == 0:
+            #return
         
         markets = []
         for poly in multi_poly:
-            m = reader.get_shops(poly, count=self.par.count.value-len(markets))
+            m = reader.get_shops(poly, count=self._max_count-len(markets))
             markets += m
         arcpy.AddMessage(u'{} Märkte gefunden'.format(len(markets)))
         arcpy.AddMessage(u'Analysiere gefundene Märkte...'
@@ -354,16 +355,16 @@ class TbxOSMMarktEinlesen(Tbx):
         param.datatype = u'GPString'
         param.filter.list = []
 
-        param = self.add_parameter('count')
-        param.name = encode(u'Anzahl')
-        param.displayName = encode(u'Maximale Anzahl an '
-                                   u'hinzuzufügenden Märkten')
-        param.parameterType = 'Required'
-        param.direction = 'Input'
-        param.datatype = u'GPLong'
-        param.filter.type = 'Range'
-        param.filter.list = [0, 5000]
-        param.value = 1000
+        #param = self.add_parameter('count')
+        #param.name = encode(u'Anzahl')
+        #param.displayName = encode(u'Maximale Anzahl an '
+                                   #u'hinzuzufügenden Märkten')
+        #param.parameterType = 'Required'
+        #param.direction = 'Input'
+        #param.datatype = u'GPLong'
+        #param.filter.type = 'Range'
+        #param.filter.list = [0, 5000]
+        #param.value = 1000
 
         param = self.add_parameter('truncate')
         param.name = encode(u'truncate')
