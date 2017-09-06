@@ -230,6 +230,7 @@ if __name__ == '__main__':
 
     t = TbxTeilflaecheVerwalten()
     t.getParameterInfo()
+    t.set_active_project(projectname=u'Häüß')
     t.open()
     t._updateParameters(t.par)
     t.execute()

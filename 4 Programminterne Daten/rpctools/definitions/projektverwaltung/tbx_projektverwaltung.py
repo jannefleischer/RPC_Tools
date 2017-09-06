@@ -149,8 +149,9 @@ if __name__ == '__main__':
     import numpy as np
     t = TbxProjektAnlegen()
     params = t.getParameterInfo()
-    t.par.name.value = 'Test91' + str(np.random.randint(0, 10000))
-    #t.show_outputs()
+    #t.par.name.value = 'Test91' + str(np.random.randint(0, 10000))
+    t.set_active_project()
+    t.show_outputs()
     t.execute()
     t.print_tool_parameters()
 
