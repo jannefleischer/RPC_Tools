@@ -122,6 +122,7 @@ def install_packages(python_path):
     used_packages['pypiwin32-219'] = 'pypiwin32-219-cp27-none-{}.whl'.format(platform)
     used_packages['pyproj'] = 'pyproj-1.9.5.1-cp27-cp27m-{}.whl'.format(platform)
 
+    used_packages['rpctools'] = 'rpctools-any.whl'
 
     missing = OrderedDict()
 
@@ -154,23 +155,6 @@ def install_packages(python_path):
         ret = process.wait()
         if ret:
             log("Paket " + package + " konnte ggf. nicht installiert werden." + "\n")
-
-    # install rpctools package
-    # ToDo: Finally change from --editable to wheel
-    log("installiere RPCTools")
-	base_path = os.path.dirname(__file__)
-    process = subprocess.Popen([os.path.join(python_path, 'Scripts', 'pip.exe'),
-                                'install',
-                                '--editable',
-                                base_path],
-                               shell=True)
-
-    ret = process.wait()
-
-    if ret:
-        log('rpctools konnte nicht installiert werden')
-    else:
-        log("RPCTools installiert")
 
     log('Installation abgeschlossen.')
 

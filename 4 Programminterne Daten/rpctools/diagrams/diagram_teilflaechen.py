@@ -10,7 +10,7 @@ class DiaTeilflaechen(ArcpyDiagram):
 
     def _create(self, **kwargs):
         """
-        Diagramm f�r Teilflächen
+        Diagramm für Teilflächen
         """
         # Erstelle Diagramm Teilflaechen nach Hektar
         project_name = kwargs['project_name'] if 'project_name' in kwargs \
@@ -30,10 +30,7 @@ class DiaTeilflaechen(ArcpyDiagram):
                                    fieldY="Flaeche_ha",
                                    fieldLabel="Name")
 
-        #title = encode("{}: Teilflächen des Plangebiets (Bruttofläche)".format(project_name))
         title = encode("{}: Teilflächen des Plangebiets (Bruttofläche)".format(project_name.encode("utf-8")))
-        arcpy.AddMessage("title: " + title)
-        arcpy.AddMessage("title_type: " + str(type(title)))
         graph.graphPropsGeneral.title = title
         return graph, input_template
 
