@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
 from rpctools.addins.common import FileButton
 
-__all__ = ['HilfeGesamt', 'HilfeVerwaltung', 'HilfeNutzungen',
-           'HilfeBewohnerArbeitsplaetze', 'HilfeInfrastruktur',
-           'HilfeEinnahmen', 'HilfeVerkehr', 'HilfeStandortkonkurrenz',
-           'HilfeFlaeche', 'HilfeOekologie', 'HilfeErreichbarkeit',
-           'HinweiseBilanzen']
+__all__ = ['HilfeGesamt', 'UeberRPC', 'Haftung', 'HilfeVerwaltung',
+           'HilfeNutzungen', 'HilfeBewohnerArbeitsplaetze',
+           'HilfeInfrastruktur', 'HilfeEinnahmen', 'HilfeVerkehr',
+           'HilfeStandortkonkurrenz', 'HilfeFlaeche', 'HilfeOekologie',
+           'HilfeErreichbarkeit', 'HinweiseBilanzen']
 
 
 class HilfeGesamt(FileButton):
     _file = 'ProjektCheck_Anleitung_Gesamtueberblick.pdf'
 
+class UeberRPC(FileButton):
+    _file = 'ProjektCheck_About.pdf'
+
+class Haftung(FileButton):
+    _file = 'ProjektCheck_Haftungsausschluss.pdf'
 
 class HilfeVerwaltung(FileButton):
     _file = 'ProjektCheck_Anleitung_Projekte_verwalten.pdf'
@@ -37,7 +42,7 @@ class HilfeVerkehr(FileButton):
 
 
 class HilfeStandortkonkurrenz(FileButton):
-    _file = 'ProjektCheck_Anleitung_Standortkonkurrenz_Supermaerkte.pdf'    
+    _file = 'ProjektCheck_Anleitung_Standortkonkurrenz_Supermaerkte.pdf'
 
 
 class HilfeFlaeche(FileButton):

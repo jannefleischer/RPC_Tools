@@ -13,7 +13,13 @@
     <AddIn language="PYTHON" library="rpc_tools_addin.py" namespace="rpc_tools">
         <ArcMap>
             <Commands>
-                <Button caption="Hilfe" category="ProjektCheck" class="HilfeGesamt" id="rpc_tools.hilfe_gesamt" image="Images\HelpSystem_C_16.png" message="" tip="PDF-Anleitung mit einer Gesamt&#252;bersicht zur Nutzung des ProjektCheck-Tools">
+                <Button caption="Schnelle Orientierung" category="ProjektCheck" class="HilfeGesamt" id="rpc_tools.hilfe_gesamt" image="Images\0102-help.png" message="" tip="PDF-Anleitung mit einer Gesamt&#252;bersicht zur Nutzung des ProjektCheck-Tools">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Über Projekt-Check" category="ProjektCheck" class="UeberRPC" id="rpc_tools.ueber_rpc" image="Images\4502-users.png" message="" tip="">
+                    <Help heading="" />
+                </Button>
+                <Button caption="Haftungsausschluss" category="ProjektCheck" class="Haftung" id="rpc_tools.haft" image="Images\800500-script.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Tool caption="Skizze beenden" category="ProjektCheck" class="SkizzeBeenden" id="rpc_tools.skizze_beenden" image="Images\Analyze16.png" message="" tip="Mit Klicken dieses Buttons beenden Sie die Eingabe von Punkten, Netzelemente oder Fl&#228;chen.">
@@ -417,7 +423,7 @@
             <Toolbars>
                 <Toolbar caption="ProjektCheck" category="ProjektCheck" id="rpc_tools.toolbar" showInitially="true">
                     <Items>
-                        <Button refID="rpc_tools.hilfe_gesamt" />
+                        <Menu refID="rpc_tools.hilfe_menu" />
                         <ComboBox refID="rpc_tools.projekt_auswahl" />
                         <Button refID="rpc_tools.refresh_layers" />
                         <Menu refID="rpc_tools.menu_verwalten" />
@@ -428,7 +434,13 @@
                 </Toolbar>
             </Toolbars>
             <Menus>
-                <Menu caption="Verwalten" category="ProjektCheck" id="rpc_tools.menu_verwalten" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="Info" category="ProjektCheck" id="rpc_tools.hilfe_menu" isRootMenu="false" isShortcutMenu="true" separator="true">
+                    <Items>
+                    <Button refID="rpc_tools.hilfe_gesamt" />
+                    <Button refID="rpc_tools.ueber_rpc" />
+                    <Button refID="rpc_tools.haft" />
+                    </Items>
+                </Menu>                <Menu caption="Verwalten" category="ProjektCheck" id="rpc_tools.menu_verwalten" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_verwaltung" />
                         <Button refID="rpc_tools.neues_projekt" separator="true"/>
