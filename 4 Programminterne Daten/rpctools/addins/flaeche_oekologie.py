@@ -3,10 +3,11 @@ from rpctools.addins.common import ToolboxButton, folders, config
 from rpctools.addins.outputs import BodenbedeckungAnzeigen_Nullfall
 from rpctools.addins.outputs import BodenbedeckungAnzeigen_Planfall
 from rpctools.addins.outputs import GrenzlinieAnzeigen
+from rpctools.addins.common import FileButton
 import arcpy
 
 __all__ = [
-    "Waldgebiete", "Naturschutz",
+    "Erlaeuterung", "Waldgebiete", "Naturschutz",
     "Landschaftsschutz", "Schutzgebiete",
     "Freiraeume_100qkm", "Freiraeume_50qkm", "Freiraeume",
     "Waelder_50qkm", "Hochspannungsleitungen",
@@ -31,6 +32,8 @@ __all__ = [
 
 
 
+class Erlaeuterung(FileButton):
+    _file = 'ProjektCheck_Erlaeuterung_Kennwerte_Leistungsfaehigkeit_Boden.pdf'
 
 class Naturschutz(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""

@@ -304,6 +304,9 @@
                 <Button caption="Integrationsgrad berechnen" category="ProjektCheck" class="Integrationsgrad_berechnen" id="rpc_tools.integrationsgrad_berechnen" image="" message="" tip="Ermittelt den Integrationsgrad des Plangebiets, d.h. den Anteil der Außenkante des Plangebiets, der an eine bestehende Siedlungsfläche angrenzt.">
                     <Help heading="" />
                 </Button>
+                <Button caption="Erläuterung der Leistungskennwerte" category="ProjektCheck" class="Erlaeuterung" id="rpc_tools.erlaeuterung" image="" message="" tip="">
+                    <Help heading="" />
+                </Button>
 
 
 
@@ -592,6 +595,7 @@
                 <Menu caption="&#214;kologie" category="ProjektCheck" id="rpc_tools.menu_oekologie" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_oekologie" />
+                        <Button refID="rpc_tools.erlaeuterung" />
                         <Menu refID="rpc_tools.menu_ueberschneidungen" separator="true"/>
                         <Menu refID="rpc_tools.menu_uzvr" />
                         <Menu refID="rpc_tools.menu_bodenbedeckung" />
