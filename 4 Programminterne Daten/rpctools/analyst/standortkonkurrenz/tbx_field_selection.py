@@ -33,25 +33,18 @@ class FieldSelectionTool(Tool):
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
     _table = "Zentren"
     def add_outputs(self):
-        mxd = arcpy.mapping.MapDocument("Current")
-        lyrname_selected = 'Ausgewählte Gemeinden im Betrachtungsraum'
-        lyrname_not_selected = 'Nicht ausgewählte Gemeinden'
-        lyr_selected = arcpy.mapping.ListLayers(mxd, lyrname_selected)
-        lyr_not_selected = arcpy.mapping.ListLayers(mxd, lyrname_not_selected)
-        if not lyr_selected:
-            self.output.add_layer('standortkonkurrenz', 'Zentren_selected',
-                                 template_folder='Standortkonkurrenz',
-                                 featureclass=self._table,
-                                 workspace=self._workspace,
-                                 name='Ausgewählte Gemeinden im '+\
-                                 'Betrachtungsraum')
-        if not lyr_not_selected:
-            self.output.add_layer('standortkonkurrenz', 'Zentren_background',
-                                 template_folder='Standortkonkurrenz',
-                                 featureclass=self._table,
-                                 workspace=self._workspace,
-                                 name='Nicht ausgewählte Gemeinden',
-                                 zoom=True)
+        self.output.add_layer('standortkonkurrenz', 'Zentren_selected',
+                             template_folder='Standortkonkurrenz',
+                             featureclass=self._table,
+                             workspace=self._workspace,
+                             name='Ausgewählte Gemeinden im '+\
+                             'Betrachtungsraum')
+        self.output.add_layer('standortkonkurrenz', 'Zentren_background',
+                             template_folder='Standortkonkurrenz',
+                             featureclass=self._table,
+                             workspace=self._workspace,
+                             name='Nicht ausgewählte Gemeinden',
+                             zoom=True)
 
     def run(self):
         pass
