@@ -667,7 +667,7 @@ class Output(object):
         if not redraw and self.layer_exists(layer.name):
             arcpy.RefreshActiveView()
             return
-
+        self.remove_layer(layer.name)
         projektname = self.projectname
 
         group = self.module.get_label(layer.groupname)
