@@ -24,9 +24,9 @@ class TbxFieldSelection(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPString'
-        p.value = self.config.active_project
 
         return params
+
 
 
 class FieldSelectionTool(Tool):

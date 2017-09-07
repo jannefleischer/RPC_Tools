@@ -235,13 +235,13 @@ class FieldSelection(ToolboxButton):
         self.cursor = 3
 
     def onClick(self):
+        self.tbx.set_active_project()
         self.tbx.show_outputs()
 
 
     def onMouseDownMap(self, x, y, button, shift):
         coords = arcpy.Point(x, y)
         tbx = self.tbx
-        tbx.set_active_project()
         cursor = tbx.query_table(self._table, workspace=self._workspace,
                                  columns=['SHAPE@', 'id', "Auswahl"])
         found = False
