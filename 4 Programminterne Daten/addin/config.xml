@@ -16,7 +16,7 @@
                 <Button caption="Schnelle Orientierung" category="ProjektCheck" class="HilfeGesamt" id="rpc_tools.hilfe_gesamt" image="Images\0102-help.png" message="" tip="PDF-Anleitung mit einer Gesamt&#252;bersicht zur Nutzung des ProjektCheck-Tools">
                     <Help heading="" />
                 </Button>
-                <Button caption="Über Projekt-Check" category="ProjektCheck" class="UeberRPC" id="rpc_tools.ueber_rpc" image="Images\4502-users.png" message="" tip="">
+                <Button caption="Über Projekt-Check" category="ProjektCheck" class="UeberRPC" id="rpc_tools.ueber_rpc" image="Images\RPC.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Haftungsausschluss" category="ProjektCheck" class="Haftung" id="rpc_tools.haft" image="Images\800500-script.png" message="" tip="">
@@ -304,7 +304,7 @@
                 <Button caption="Integrationsgrad berechnen" category="ProjektCheck" class="Integrationsgrad_berechnen" id="rpc_tools.integrationsgrad_berechnen" image="" message="" tip="Ermittelt den Integrationsgrad des Plangebiets, d.h. den Anteil der Außenkante des Plangebiets, der an eine bestehende Siedlungsfläche angrenzt.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Erläuterung der Leistungskennwerte" category="ProjektCheck" class="Erlaeuterung" id="rpc_tools.erlaeuterung" image="" message="" tip="">
+                <Button caption="Erläuterung der Leistungskennwerte" category="ProjektCheck" class="Erlaeuterung" id="rpc_tools.erlaeuterung" image="Images\HelpSystem_C_16.png" message="" tip="">
                     <Help heading="" />
                 </Button>
 
