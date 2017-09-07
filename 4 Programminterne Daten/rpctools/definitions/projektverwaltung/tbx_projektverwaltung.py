@@ -101,15 +101,6 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
 
         return params
 
-    #def _open(self, params):
-        #"""Modify the values and properties of parameters before internal
-        #validation is performed.  This method is called whenever a parameter
-        #has been changed."""
-
-        #projects = self.folders.get_projects()
-        #params.existing_project.filter.list = projects
-        #params.existing_project.value = projects[0]
-
     def _updateParameters(self, params):
         projects = self.folders.get_projects()
         params.existing_project.filter.list = projects
@@ -152,11 +143,11 @@ class TbxProjekteLoeschen(TbxProjektVerwaltung):
 
 if __name__ == '__main__':
     import numpy as np
-    t = TbxProjektAnlegen()
+    t = TbxProjektKopieren()
     params = t.getParameterInfo()
-    #t.par.name.value = 'Test91' + str(np.random.randint(0, 10000))
-    t.set_active_project()
-    t.show_outputs()
+    t.par.name.value = 'Test' + str(np.random.randint(0, 10000))
+    #t.set_active_project()
+    t.updateParameters(params)
     t.execute()
     t.print_tool_parameters()
 
