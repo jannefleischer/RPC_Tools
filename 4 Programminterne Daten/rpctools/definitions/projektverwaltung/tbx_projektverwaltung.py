@@ -88,6 +88,7 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
         p.direction = 'Input'
         p.datatype = 'GPString'
         p.filter.list = projects
+        p.value = projects[0]
 
         # Name_des_neuen_Projektes
         p = self.add_parameter('name')
@@ -100,14 +101,18 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
 
         return params
 
-    def _open(self, params):
-        """Modify the values and properties of parameters before internal
-        validation is performed.  This method is called whenever a parameter
-        has been changed."""
+    #def _open(self, params):
+        #"""Modify the values and properties of parameters before internal
+        #validation is performed.  This method is called whenever a parameter
+        #has been changed."""
 
+        #projects = self.folders.get_projects()
+        #params.existing_project.filter.list = projects
+        #params.existing_project.value = projects[0]
+
+    def _updateParameters(self, params):
         projects = self.folders.get_projects()
         params.existing_project.filter.list = projects
-        params.existing_project.value = projects[0]
 
 
 class TbxProjekteLoeschen(TbxProjektVerwaltung):
