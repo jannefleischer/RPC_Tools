@@ -590,12 +590,12 @@
                     <Items>
                         <Menu refID="rpc_tools.menu_boden_zeichnen" />
                         <Button refID="rpc_tools.kennwerte_berechnen" />
+                        <Button refID="rpc_tools.erlaeuterung" />
                     </Items>
                 </Menu>
                 <Menu caption="&#214;kologie" category="ProjektCheck" id="rpc_tools.menu_oekologie" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hilfe_oekologie" />
-                        <Button refID="rpc_tools.erlaeuterung" />
                         <Menu refID="rpc_tools.menu_ueberschneidungen" separator="true"/>
                         <Menu refID="rpc_tools.menu_uzvr" />
                         <Menu refID="rpc_tools.menu_bodenbedeckung" />
