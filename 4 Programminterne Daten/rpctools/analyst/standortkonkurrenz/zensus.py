@@ -113,7 +113,11 @@ class Zensus(object):
             where_clause="Info = 'KK je Einwohner default'")
         default_kk_index = cursor.next()[0]
         del(cursor)
-        base_kk = 2280
+        cursor = arcpy.da.SearchCursor(
+            default_table, ['Wert'],
+            where_clause="Info = 'Kaufkraft pro Person'")
+        base_kk = cursor.next()[0]
+        del(cursor)
         tmp_table = os.path.join(arcpy.env.scratchGDB, 'tmp_table')
         tmp_ags_join = os.path.join(arcpy.env.scratchGDB, 'tmp_ags_join')
         kk_table = folders.get_base_table(

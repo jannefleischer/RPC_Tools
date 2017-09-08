@@ -37,7 +37,6 @@ class MassnahmenEditieren(Tool):
             self.parent_tbx.delete_rows_in_table(
                 'Erschliessungsnetze_Punktelemente',
                 where='id={}'.format(measure['id']))
-
         # updates
         arcpy.AddMessage(u'Schreibe Änderungen in Datenbank...')
         self.parent_tbx.dataframe_to_table('Erschliessungsnetze_Punktelemente',
@@ -321,15 +320,7 @@ if __name__ == '__main__':
     from time import time
     start = time()
     t = TbxMassnahmenEditieren()
-    print('init: {}s'.format(time() - start))
-    start = time()
     t.getParameterInfo()
-    print('_getParameterInfo: {}s'.format(time() - start))
     t.set_active_project()
-    #t.add_measure_to_db('Test add', (3544252, 5925427))
-    start = time()
     t.open()
-    print('open: {}s'.format(time() - start))
-    t.update_measures_list(idx=5)
-    t._updateParameters(None)
     t.execute()
