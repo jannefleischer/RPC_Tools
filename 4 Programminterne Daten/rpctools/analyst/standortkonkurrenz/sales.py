@@ -98,7 +98,7 @@ class Sales(object):
                 u'debug_Attraktivität_{}'.format(setting_str))
             self.write_intermediate_results(
                 competitor_matrix.transpose(),
-                u'debug_KK_Anteile_{}'.format(setting_str))
+                u'debug_Aenderung_gleiche_Anbieter_{}'.format(setting_str))
             arcpy.AddMessage('DEBUG: Berechnung')
 
         # include competition between same market types in attraction_matrix
