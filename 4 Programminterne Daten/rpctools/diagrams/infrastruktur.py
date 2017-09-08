@@ -103,7 +103,7 @@ class MassnahmenKostenDiagramm(MatplotDiagram):
             width = patch.get_x() + patch.get_width()
             print(width)
             y = patch.get_y() + bar_width / 2
-            ax.text(width + text_offset, y, str(round(width, 0)) + u' €',
+            ax.text(width + text_offset, y, str(int(round(width, 0))) + u' €',
                     color='black',ha='left', va='center')
             #bbox=dict(facecolor='white', edgecolor='white', boxstyle="round"))
         x_min, x_max = ax.get_xlim()
@@ -362,12 +362,12 @@ if __name__ == "__main__":
     #diagram = KostentraegerDiagramm()
     #diagram.create()
     #diagram.show()
-    #diagram = MassnahmenKostenDiagramm()
-    #diagram.create()
-    #diagram.show()
-    diagram = NetzlaengenDiagramm()
+    diagram = MassnahmenKostenDiagramm()
     diagram.create()
     diagram.show()
+    #diagram = NetzlaengenDiagramm()
+    #diagram.create()
+    #diagram.show()
     #diagram = GesamtkostenDiagramm()
     #diagram.create()
     #diagram.show()
