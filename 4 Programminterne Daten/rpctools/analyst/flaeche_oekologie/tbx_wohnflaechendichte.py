@@ -53,12 +53,12 @@ class TbxWohnflaechendichte(Tbx):
         par.nettoflaeche.filter.list = [0, 100]
         par.nettoflaeche.value = 15
 
-        heading = encode("Durchschnittliche überbaute Fläche nach Gebäudetyp")
+        heading = encode("Durchschnittliche Wohnfläche nach Gebäudetyp")
 
         # Durchschnittliche_�berbaute_Fl�che_je_Wohneinheit_in_Ein-_und_Zweifamilienh�usern__qm_
         par.flaeche_efh = arcpy.Parameter()
         par.flaeche_efh.name = u'Durchschnittliche_\xfcberbaute_Fl\xe4che_je_Wohneinheit_in_Ein-_und_Zweifamilienh\xe4usern__qm_'
-        par.flaeche_efh.displayName = u'Durchschnittliche \xfcberbaute Fl\xe4che je Wohneinheit in Ein- und Zweifamilienh\xe4usern (qm)'
+        par.flaeche_efh.displayName = u'Durchschnittliche Wohnfläche je Wohneinheit in Ein- und Zweifamilienh\xe4usern (qm)'
         par.flaeche_efh.parameterType = 'Required'
         par.flaeche_efh.direction = 'Input'
         par.flaeche_efh.datatype = u'Long'
@@ -70,7 +70,7 @@ class TbxWohnflaechendichte(Tbx):
         # Durchschnittliche_�berbaute_Fl�che_je_Wohneinheit_in_Doppelh�usern__qm_
         par.flaeche_dh = arcpy.Parameter()
         par.flaeche_dh.name = u'Durchschnittliche_\xfcberbaute_Fl\xe4che_je_Wohneinheit_in_Doppelh\xe4usern__qm_'
-        par.flaeche_dh.displayName = u'Durchschnittliche \xfcberbaute Fl\xe4che je Wohneinheit in Doppelh\xe4usern (qm)'
+        par.flaeche_dh.displayName = u'Durchschnittliche Wohnfläche je Wohneinheit in Doppelh\xe4usern (qm)'
         par.flaeche_dh.parameterType = 'Required'
         par.flaeche_dh.direction = 'Input'
         par.flaeche_dh.datatype = u'Long'
@@ -82,7 +82,7 @@ class TbxWohnflaechendichte(Tbx):
         # Durchschnittliche_�berbaute_Fl�che_je_Wohneinheit_in_Reihenh�usern__qm_
         par.flaeche_rh = arcpy.Parameter()
         par.flaeche_rh.name = u'Durchschnittliche_\xfcberbaute_Fl\xe4che_je_Wohneinheit_in_Reihenh\xe4usern__qm_'
-        par.flaeche_rh.displayName = u'Durchschnittliche \xfcberbaute Fl\xe4che je Wohneinheit in Reihenh\xe4usern (qm)'
+        par.flaeche_rh.displayName = u'Durchschnittliche Wohnfläche je Wohneinheit in Reihenh\xe4usern (qm)'
         par.flaeche_rh.parameterType = 'Required'
         par.flaeche_rh.direction = 'Input'
         par.flaeche_rh.datatype = u'Long'
@@ -94,7 +94,7 @@ class TbxWohnflaechendichte(Tbx):
         # Durchschnittliche_�berbaute_Fl�che_je_Wohneinheit_in_Mehrfamilienh�usern__qm_
         par.flaeche_mfh = arcpy.Parameter()
         par.flaeche_mfh.name = u'Durchschnittliche_\xfcberbaute_Fl\xe4che_je_Wohneinheit_in_Mehrfamilienh\xe4usern__qm_'
-        par.flaeche_mfh.displayName = u'Durchschnittliche \xfcberbaute Fl\xe4che je Wohneinheit in Mehrfamilienh\xe4usern (qm)'
+        par.flaeche_mfh.displayName = u'Durchschnittliche Wohnfläche je Wohneinheit in Mehrfamilienh\xe4usern (qm)'
         par.flaeche_mfh.parameterType = 'Required'
         par.flaeche_mfh.direction = 'Input'
         par.flaeche_mfh.datatype = u'Long'
