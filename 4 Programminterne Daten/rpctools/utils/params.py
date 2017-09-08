@@ -396,7 +396,7 @@ class Tbx(object):
                 #not param.multiValue and
                 #param.altered and param.value not in param.filter.list):
                 #return
-        #self._updateParameters(self.par)
+        self._updateParameters(self.par)
 
     def open(self):
         """
