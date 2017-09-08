@@ -122,7 +122,7 @@ def install_packages(python_path):
     used_packages['pypiwin32-219'] = 'pypiwin32-219-cp27-none-{}.whl'.format(platform)
     used_packages['pyproj'] = 'pyproj-1.9.5.1-cp27-cp27m-{}.whl'.format(platform)
 
-    used_packages['rpctools'] = 'rpctools-any.whl'
+    used_packages['rpctools'] = 'rpctools-0.9.5b0-py2-none-any.whl'
 
     missing = OrderedDict()
 

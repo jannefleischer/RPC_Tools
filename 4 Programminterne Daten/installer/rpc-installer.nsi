@@ -5,14 +5,14 @@
 ;General
 
   ;Name and file
-  Name "RPC Profi"
-  OutFile "rpc-profi-installer.exe"
+  Name "Projekt-Check Profi"
+  OutFile "projekt-check-profi-installer.exe"
 
   ;Default installation folder
-  InstallDir "$PROGRAMFILES\RPC Profi"
+  InstallDir "$PROGRAMFILES\Projekt-Check Profi"
 
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\RPC PROFI" ""
+  InstallDirRegKey HKCU "Software\ProjektCheck PROFI" ""
 
   ;Request application privileges for Windows Vista
   ;RequestExecutionLevel user
@@ -60,7 +60,7 @@
 	File /r  /x *.exe /x .git /x .gitignore /x "3 Benutzerdefinierte Projekte" /x rpctools.egg-info /x *.pyc "..\..\*"
 	CreateDirectory "$INSTDIR\3 Benutzerdefinierte Projekte"
 	;Store installation folder
-	WriteRegStr HKCU "Software\RPC Profi" "" $INSTDIR
+	WriteRegStr HKCU "Software\ProjektCheck Profi" "" $INSTDIR
 	
     ;Create uninstaller
     WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -83,7 +83,7 @@ Section "Uninstall"
 
   RMDir /r "$INSTDIR"
 
-  DeleteRegKey /ifempty HKCU "Software\RPC Profi"
+  DeleteRegKey /ifempty HKCU "Software\ProjektCheck Profi"
 
 SectionEnd
 
