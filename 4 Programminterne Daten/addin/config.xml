@@ -13,7 +13,7 @@
     <AddIn language="PYTHON" library="rpc_tools_addin.py" namespace="rpc_tools">
         <ArcMap>
             <Commands>
-                <Button caption="Schnelle Orientierung" category="ProjektCheck" class="HilfeGesamt" id="rpc_tools.hilfe_gesamt" image="Images\0102-help.png" message="" tip="PDF-Anleitung mit einer Gesamt&#252;bersicht zur Nutzung des ProjektCheck-Tools">
+                <Button caption="Schnelleinstieg" category="ProjektCheck" class="HilfeGesamt" id="rpc_tools.hilfe_gesamt" image="Images\0102-help.png" message="" tip="PDF-Anleitung mit einer Gesamt&#252;bersicht zur Nutzung des ProjektCheck-Tools">
                     <Help heading="" />
                 </Button>
                 <Button caption="Über Projekt-Check" category="ProjektCheck" class="UeberRPC" id="rpc_tools.ueber_rpc" image="Images\RPC.png" message="" tip="">
@@ -426,12 +426,12 @@
             <Toolbars>
                 <Toolbar caption="ProjektCheck" category="ProjektCheck" id="rpc_tools.toolbar" showInitially="true">
                     <Items>
-                        <Menu refID="rpc_tools.hilfe_menu" />
                         <ComboBox refID="rpc_tools.projekt_auswahl" />
                         <Button refID="rpc_tools.refresh_layers" />
                         <Menu refID="rpc_tools.menu_verwalten" />
                         <Menu refID="rpc_tools.menu_definieren" />
                         <Menu refID="rpc_tools.menu_analysieren" />
+                        <Menu refID="rpc_tools.hilfe_menu" />
                         <Tool refID="rpc_tools.skizze_beenden" />
                     </Items>
                 </Toolbar>
