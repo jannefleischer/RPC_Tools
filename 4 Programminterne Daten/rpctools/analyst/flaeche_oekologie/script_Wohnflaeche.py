@@ -8,6 +8,27 @@ from rpctools.utils.params import Tool
 from rpctools.diagrams.diagram_oekologie import Dia_Wohndichte
 from rpctools.diagrams.diagram_oekologie import Dia_Wohnflaechendichte
 
+
+def rename_kreistyp(kreistyp):
+    if kreistyp == 1:
+        return u"Kernstädte (Agglomerationsraum)"
+    elif kreistyp == 2:
+        return u"Hochverdichtete Kreise (Agglomerationsraum)"
+    elif kreistyp == 3:
+        return u"Verdichtete Kreise (Agglomerationsraum)"
+    elif kreistyp == 4:
+        return u"Kernsrationsraum)"
+    elif kreistyp == 5:
+        return u"Kernsionsraum)"
+    elif kreistyp == 6:
+        return u"Kernsttionsraum)"
+    elif kreistyp == 7:
+        return u"Ländliche K"
+    elif kreistyp == 8:
+        return u"Kreise höherer Dichte (Ländlicher Raum)"
+    elif kreistyp == 9:
+        return u"Kreise geringerer Dichte (Ländlicher Raum)"
+
 class Wohnflaechendichte(Tool):
     """Wohnflaechendichte-Tool"""
 
@@ -21,27 +42,6 @@ class Wohnflaechendichte(Tool):
 
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
-
-    def rename_kreistyp(self, kreistyp):
-        if kreistyp == 1:
-            return u"Kernstädte (Agglomerationsraum)"
-        elif kreistyp == 2:
-            return u"Hochverdichtete Kreise (Agglomerationsraum)"
-        elif kreistyp == 3:
-            return u"Verdichtete Kreise (Agglomerationsraum)"
-        elif kreistyp == 4:
-            return u"Kernsrationsraum)"
-        elif kreistyp == 5:
-            return u"Kernsionsraum)"
-        elif kreistyp == 6:
-            return u"Kernsttionsraum)"
-        elif kreistyp == 7:
-            return u"Ländliche K"
-        elif kreistyp == 8:
-            return u"Kreise höherer Dichte (Ländlicher Raum)"
-        elif kreistyp == 9:
-            return u"Kreise geringerer Dichte (Ländlicher Raum)"
-
 
     def run(self):
         """run Wohnflaechendichte Tool"""
@@ -120,7 +120,7 @@ class Wohnflaechendichte(Tool):
         for kreistyp in cursor:
             wohnflaechendichte_kreistyp = round(kreistyp[1])
             kreistyp_name = u"Typ: " + kreistyp[2]
-            kreistyp_name = self.rename_kreistyp(kreistyp[0])
+            kreistyp_name = rename_kreistyp(kreistyp[0])
         self.wohnflaechendichte_kreistyp = int(wohnflaechendichte_kreistyp)
 
         column_values = {"Typ": [u"Teilfläche im Plangebiet", kreis_name, kreistyp_name],
@@ -143,8 +143,8 @@ class Wohndichte(Tool):
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
 
-    def rename_kreistyp(kreistyp):
-        pass
+    #def rename_kreistyp(kreistyp):
+        #pass
 
     def run(self):
         """run Wohndichte Tool"""
@@ -199,7 +199,7 @@ class Wohndichte(Tool):
         cursor = arcpy.da.SearchCursor(table_kreistyp, fields, where)
         for kreistyp in cursor:
             wohndichte_kreistyp = round(kreistyp[1])
-            kreistyp_name = rename_kreistyp(kreistyp)
+            kreistyp_name = rename_kreistyp(kreistyp[0])
         self.wohndichte_kreistyp = int(wohndichte_kreistyp)
 
 
