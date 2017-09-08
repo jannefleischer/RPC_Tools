@@ -144,3 +144,10 @@ class TbxWohnflaechendichte(Tbx):
 
 
 
+if __name__ == "__main__":
+    t = TbxWohnflaechendichte()
+    t.getParameterInfo()
+    t.set_active_project()
+    t.open()
+    t.show_outputs()
+    t.execute()

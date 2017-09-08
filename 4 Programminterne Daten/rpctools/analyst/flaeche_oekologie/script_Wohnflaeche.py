@@ -22,7 +22,7 @@ class Wohnflaechendichte(Tool):
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
 
-    def rename_kreistyp(kreistyp):
+    def rename_kreistyp(self, kreistyp):
         if kreistyp == 1:
             return u"Kernstädte (Agglomerationsraum)"
         elif kreistyp == 2:
@@ -120,7 +120,7 @@ class Wohnflaechendichte(Tool):
         for kreistyp in cursor:
             wohnflaechendichte_kreistyp = round(kreistyp[1])
             kreistyp_name = u"Typ: " + kreistyp[2]
-            kreistyp_name = rename_kreistyp(kreistyp)
+            kreistyp_name = self.rename_kreistyp(kreistyp[0])
         self.wohnflaechendichte_kreistyp = int(wohnflaechendichte_kreistyp)
 
         column_values = {"Typ": [u"Teilfläche im Plangebiet", kreis_name, kreistyp_name],
