@@ -48,7 +48,7 @@ class NetzlaengenDiagramm(MatplotDiagram):
                     width = patch.get_x() + patch.get_width()
                     y = patch.get_y()
                     ax.text(width + text_offset, y + bar_width/2,
-                            str(int(round(width, 0))) + u' €',
+                            str(int(round(width, 0))) + u' m',
                             color='black',ha='left', va='center')
                     #bbox=dict(facecolor='white',
                     # edgecolor='white', boxstyle="round"))
@@ -359,15 +359,15 @@ if __name__ == "__main__":
     #diagram = VergleichWEDiagramm()
     #diagram.create()
     #diagram.show()
-    diagram = KostentraegerDiagramm()
-    diagram.create()
-    diagram.show()
+    #diagram = KostentraegerDiagramm()
+    #diagram.create()
+    #diagram.show()
     #diagram = MassnahmenKostenDiagramm()
     #diagram.create()
     #diagram.show()
-    #diagram = NetzlaengenDiagramm()
-    #diagram.create()
-    #diagram.show()
+    diagram = NetzlaengenDiagramm()
+    diagram.create()
+    diagram.show()
     #diagram = GesamtkostenDiagramm()
     #diagram.create()
     #diagram.show()
