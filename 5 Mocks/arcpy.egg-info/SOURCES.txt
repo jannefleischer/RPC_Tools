@@ -1,9 +1,0 @@
-./arcpy/__init__.py
-./arcpy/parameter.py
-arcpy/__init__.py
-arcpy/parameter.py
-arcpy.egg-info/PKG-INFO
-arcpy.egg-info/SOURCES.txt
-arcpy.egg-info/dependency_links.txt
-arcpy.egg-info/not-zip-safe
-arcpy.egg-info/top_level.txt
