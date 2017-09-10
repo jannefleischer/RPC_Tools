@@ -45,7 +45,7 @@ class TbxGrundsteuer(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPLong'
         param.filter.type = 'Range'
-        param.filter.list = [50, 500]
+        param.filter.list = [50, 750]
         param.category = heading
 
         heading = u"2 Wohnen: Jahresrohmieten nach Ertragswertverfahren (alte Bundesländer)"
