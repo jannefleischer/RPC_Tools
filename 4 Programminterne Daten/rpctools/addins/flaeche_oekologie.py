@@ -4,6 +4,7 @@ from rpctools.addins.outputs import BodenbedeckungAnzeigen_Nullfall
 from rpctools.addins.outputs import BodenbedeckungAnzeigen_Planfall
 from rpctools.addins.outputs import GrenzlinieAnzeigen
 from rpctools.addins.common import FileButton
+import pythonaddins
 import arcpy
 
 __all__ = [
@@ -55,6 +56,14 @@ class Schutzgebiete(ToolboxButton):
     _pyt_file = u'Flaeche und Oekologie.pyt'
     _do_show = False
     _toolbox_name = 'TbxSchutzgebiete'
+    _message = u"Nach dem Schließen dieser Meldung wird in Ihrem Webbrowser eine Online-Karte des BfN zu den Schutzgebieten in Deutschland aufgerufen und auf den Bereich des Plangebiets gezoomt. \n\n In dieser Online-Karte finden Sie Detailangaben zu den Schutzgebieten im Umfeld des Plangebiets."
+
+    def onClick(self, coord=None):
+        self.show_message()
+        
+    def show_message(self):
+        if self._message:
+            pythonaddins.MessageBox(self._message, 'Hinweis', 0)
 
 class Freiraeume_100qkm(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
@@ -129,6 +138,7 @@ class Grenze_zeichnen(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Flaeche und Oekologie.pyt'
     _toolbox_name = 'TbxIntegrationsgrad_zeichnen'
+    _message = u"Zeichnen Sie nach dem Schließen dieser Meldung mit dem dann verfügbaren Zeichenwerkzeug die Außenkante Ihres Plangebiets in den Abschnitten nach, in denen Ihr Plangebiet an eine bestehende Siedlungsfläche angrenzt. \n\n Schließen Sie jede (Teil-)Linie durch einen Doppelklick ab. \n\n Klicken Sie am Ende bitte auf das grüne Häkchen am rechten Rand der Projekt-Check-Toolbox, um das Zeichentool zu verlassen."
 
     def __init__(self):
         super(Grenze_zeichnen, self).__init__()
@@ -139,6 +149,11 @@ class Grenze_zeichnen(ToolboxButton):
 
     def onClick(self, coord=None):
         self.output.show()
+        self.show_message()
+        
+    def show_message(self):
+        if self._message:
+            pythonaddins.MessageBox(self._message, 'Hinweis', 0)
 
     def onLine(self, line_geometry):
         tbx = self.tbx
@@ -205,14 +220,14 @@ class BodenEntfernen_Planfall(ToolboxButton):
 class Zeichnung_Nullfall(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
-    _do_show = False
+    _do_show = True
     _pyt_file = u'Flaeche und Oekologie.pyt'
     _toolbox_name = 'TbxZeichnung_Nullfall'
 
 class Zeichnung_Planfall(ToolboxButton):
     """Implementation for rpc_tools.bewohner_schaetzen (Button)"""
     _path = folders.ANALYST_PYT_PATH
-    _do_show = False
+    _do_show = True
     _pyt_file = u'Flaeche und Oekologie.pyt'
     _toolbox_name = 'TbxZeichnung_Planfall'
 

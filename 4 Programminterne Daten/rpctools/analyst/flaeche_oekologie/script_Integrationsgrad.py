@@ -31,6 +31,7 @@ class Integrationsgrad_berechnen(Tool):
         projekt = self.projectname
         table_grenzlinie = self.folders.get_table("Grenze_Siedlungskoerper", "FGDB_Flaeche_und_Oekologie.gdb")
         cursor = arcpy.da.SearchCursor(table_grenzlinie, ["SHAPE_Length"])
+        self.gemeinsame_grenze = 0.0
         for row in cursor:
             self.gemeinsame_grenze += row[0]
 
@@ -40,6 +41,7 @@ class Integrationsgrad_berechnen(Tool):
             arcpy.Delete_management(path_aussengrenze)
         arcpy.Dissolve_management(teilflaechen, path_aussengrenze)
         cursor = arcpy.da.SearchCursor(path_aussengrenze, ["SHAPE_Length"])
+        self.aussengrenze = 0.0
         for row in cursor:
             self.aussengrenze += row[0]
         arcpy.Delete_management(path_aussengrenze)
@@ -56,10 +58,12 @@ class Integrationsgrad_berechnen(Tool):
         for row in cursor:
             cursor.deleteRow()
 
-        gemeinsame_grenze = round(self.gemeinsame_grenze / self.aussengrenze, 3) * 100
-        neue_grenze = 100 - gemeinsame_grenze
+        geteilte_grenze = round(self.gemeinsame_grenze / self.aussengrenze, 3) * 100
+        if geteilte_grenze > 100.0:
+            geteilte_grenze = 100.0
+        neue_grenze = 100.0 - geteilte_grenze
         column_values = {"Grenze": [u"... an bestehende Siedlungen angrenzt", u"... nicht an bestehende Siedlungen angrenzt"],
-                                "Umfang": [neue_grenze, gemeinsame_grenze]}
+                                "Umfang": [geteilte_grenze, neue_grenze]}
         self.parent_tbx.insert_rows_in_table("Integrationsgrad", column_values)
 
 class Integrationsgrad_loeschen(Tool):

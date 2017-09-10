@@ -12,6 +12,10 @@ import os
 class TbxBodenBewertung(Tbx):
     """'Bodenbedeckung bewerte"""
 
+    values = [u"Bodenbedeckungsanteile manuell festlegen", u"Bodenbedeckungsanteile aus Zeichnungen importieren"] 
+    mode = "manuell"
+    changed_mode = False
+    
     @property
     def label(self):
         return u'Bodenbedeckung bewerten'
@@ -39,9 +43,8 @@ class TbxBodenBewertung(Tbx):
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
-        values = ["Bodenbedeckungsanteile manuell festlegen", "Bodenbedeckungsanteile aus Zeichnungen importieren"]
-        param.filter.list = values
-        param.value = values[0]
+        param.filter.list = self.values
+        param.value = self.values[0]
 
 
         heading = encode("Bodenbedeckung Nullfall")
@@ -342,7 +345,7 @@ class TbxBodenBewertung(Tbx):
         tabelle_boden_anteile = os.path.join(workspace_projekt_oekologie, "Bodenbedeckung_Anteile")
 
         if type == "manuell":
-
+            self.mode = "manuell"
             fields = ["IDBodenbedeckung", "Planfall", "Bodenbedeckung_Anteil"]
             cursor = arcpy.da.SearchCursor(tabelle_boden_anteile, fields)
             for row in cursor:
@@ -368,6 +371,8 @@ class TbxBodenBewertung(Tbx):
                 	 params['kleinpflaster_alt'].value = row[2]
                 elif row[1] == 0 and row[0] == 11:
                 	 params['rasen_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 12:
+                	 params['undefiniert_alt'].value = row[2]
                 elif row[1] == 1 and row[0] == 1:
                 	 params['ueberbauteflaechen_neu'].value = row[2]
                 elif row[1] == 1 and row[0] == 2:
@@ -390,11 +395,68 @@ class TbxBodenBewertung(Tbx):
                 	 params['kleinpflaster_neu'].value = row[2]
                 elif row[1] == 1 and row[0] == 11:
                 	 params['rasen_neu'].value = row[2]
+                elif row[1] == 1 and row[0] == 12:
+                	 params['undefiniert_neu'].value = row[2]
+                	 
+        elif type == "zeichnung":
+            
+            anteile_nullfall, anteile_planfall = lib_oeko.import_zeichenanteile(projektname)
+            listeSliderID = ['ueberbauteflaechen_alt',
+                     'wasser_alt',
+                     'platten_alt',
+                     'baeume_alt',
+                     'rasengittersteine_alt',
+                     'stauden_alt',
+                     'wiese_alt',
+                     'beton_alt',
+                     'acker_alt',
+                     'kleinpflaster_alt',
+                     'rasen_alt',
+                      'undefiniert_alt']
+            pointer = 0
+            for slider in listeSliderID:
+                params[slider].value = anteile_nullfall[pointer]
+                pointer += 1
 
-		elif type == "zeichnen":
-				lib_oeko.import_zeichenanteile(projektname)
+            listeSliderID = ['ueberbauteflaechen_neu',
+                         'wasser_neu',
+                         'platten_neu',
+                         'baeume_neu',
+                         'rasengittersteine_neu',
+                         'stauden_neu',
+                         'wiese_neu',
+                         'beton_neu',
+                         'acker_neu',
+                         'kleinpflaster_neu',
+                         'rasen_neu',
+			'undefiniert_neu']                
+            pointer = 0
+            for slider in listeSliderID:
+                params[slider].value = anteile_planfall[pointer]
+                pointer += 1
 
-        return
+            bodenarten = [u'Überbaut',
+                         u'Wasser',
+                         u'Platten',
+                         u'Bäume',
+                         u'Gittersteine',
+                         u'Stauden',
+                         u'Wiese',
+                         u'Beton',
+                         u'Acker',
+                         u'Kleinpflaster',
+                         u'Rasen',
+			u'Undefiniert']  
+
+            self.delete_rows_in_table("Bodenbedeckung_Zeichnung")
+            column_values = {"Nullfall": anteile_nullfall,
+                             "Planfall": anteile_planfall,
+                             "Bodenbedeckung": bodenarten}
+            self.insert_rows_in_table("Bodenbedeckung_Zeichnung", column_values)
+            self.mode = "zeichnung_initial"
+            self.par.quelle.value = self.values[1]
+
+
 
 
     def _updateParameters(self, params):
@@ -402,9 +464,9 @@ class TbxBodenBewertung(Tbx):
 
         if params.name.altered and not params.name.hasBeenValidated:
             self.eingaben_auslesen("manuell")
-            self.par.quelle.value = "Bodenbedeckungsanteile manuell festlegen"
-        changed = False
-        listeSliderID = ['ueberbauteflaechen_alt',
+            self.par.quelle.value = self.values[0]
+            
+        listeSliderID_alt = ['ueberbauteflaechen_alt',
                          'wasser_alt',
                          'platten_alt',
                          'baeume_alt',
@@ -417,21 +479,8 @@ class TbxBodenBewertung(Tbx):
                          'rasen_alt',
 						 'undefiniert_alt'
 						 ]
-        if params.quelle.altered and not params.quelle.hasBeenValidated:
-            changed = True
-            if self.par.quelle.value == "Bodenbedeckungsanteile aus Zeichnungen importieren":
-                self.eingaben_auslesen("zeichnung")
 
-        zielwertSlidersumme = 100
-
-        for r in listeSliderID:
-            if params[r].altered:
-                if changed == True:
-                    self.par.quelle.value = "Bodenbedeckungsanteile manuell festlegen"
-                self.sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
-
-
-        listeSliderID = ['ueberbauteflaechen_neu',
+        listeSliderID_neu = ['ueberbauteflaechen_neu',
                          'wasser_neu',
                          'platten_neu',
                          'baeume_neu',
@@ -443,14 +492,48 @@ class TbxBodenBewertung(Tbx):
                          'kleinpflaster_neu',
                          'rasen_neu',
 						 'undefiniert_neu']
+        
+        if params.quelle.altered and not params.quelle.hasBeenValidated:
+            if self.par.quelle.value == self.values[1]:
+                self.eingaben_auslesen("zeichnung")
+##                for r in listeSliderID_alt:
+##                    params[r].enabled = False
+##                for r in listeSliderID_neu:
+##                    params[r].enabled = False
+##          else:
+##                for r in listeSliderID_alt:
+##                    params[r].enabled = True
+##                for r in listeSliderID_neu:
+##                    params[r].enabled = True
 
-        for r in listeSliderID:
+        zielwertSlidersumme = 100
+
+        for r in listeSliderID_alt:
             if params[r].altered:
-                if changed == True:
-                    self.par.quelle.value = "Bodenbedeckungsanteile manuell festlegen"
-                self.sliderSummenKontrolle(listeSliderID, zielwertSlidersumme)
+                if self.changed_mode == False:
+                    if self.mode == "zeichnung":
+                        self.mode = "manuell"
+                        self.par.quelle.value = self.values[0]
+                    elif self.mode == "zeichnung_initial":
+                        self.changed_mode = True
+                        self.mode = "zeichnung"
+                        self.par.quelle.value = self.values[1]
+                self.sliderSummenKontrolle(listeSliderID_alt, zielwertSlidersumme)
+            
+        for r in listeSliderID_neu:
+            if params[r].altered:
+                if self.changed_mode == False:
+                    if self.mode == "zeichnung":
+                        self.mode = "manuell"
+                        self.par.quelle.value = self.values[0]
+                    elif self.mode == "zeichnung_initial":
+                        self.changed_mode = True
+                        self.mode = "zeichnung"
+                        self.par.quelle.value = self.values[1]
+                self.sliderSummenKontrolle(listeSliderID_neu, zielwertSlidersumme)
 
-		return
+        self.changed_mode = False
+
 
 
     def bodenbedeckung_eintragen(self, polygon, bodenbedeckung, planfall):
@@ -463,6 +546,16 @@ class TbxBodenBewertung(Tbx):
             self.insert_rows_in_table('Bodenbedeckung_Planfall', column_values, "FGDB_Flaeche_und_Oekologie.gdb")
         else:
             self.insert_rows_in_table('Bodenbedeckung_Nullfall', column_values, "FGDB_Flaeche_und_Oekologie.gdb")
+
+    def _updateMessages(self, params):
+
+        par = self.par
+        if par.undefiniert_alt.value != 0:
+            par.undefiniert_alt.setErrorMessage(u'Bitte weisen Sie der kompletten Fläche eine Bodenbedeckung zu!')
+        if par.undefiniert_neu.value != 0:
+            par.undefiniert_neu.setErrorMessage(u'Bitte weisen Sie der kompletten Fläche eine Bodenbedeckung zu!')
+
+
 
 class TbxBodenEntfernen(Tbx):
     """Toolbox Boden entfernen"""

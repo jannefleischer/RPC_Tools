@@ -432,7 +432,7 @@ class TbxBodenEntfernen_Nullfall(Tbx):
 
     @property
     def label(self):
-        return u'BodenbedeckungEntfernen'
+        return u'BodenEntfernen_Nullfall'
 
     @property
     def Tool(self):
@@ -459,7 +459,7 @@ class TbxBodenAnzeigen_Nullfall(Tbx):
 
     @property
     def label(self):
-        return u'BodenbedeckungAnzeigen'
+        return u'BodenAnzeigen_Nullfall'
 
     @property
     def Tool(self):
@@ -486,7 +486,7 @@ class TbxZeichnung_Nullfall(Tbx):
 
     @property
     def label(self):
-        return u'BodenbedeckungAnzeigen'
+        return u'Zeichnung_Nullfall'
 
     @property
     def Tool(self):
@@ -513,7 +513,7 @@ class TbxBodenEntfernen_Planfall(Tbx):
 
     @property
     def label(self):
-        return u'BodenbedeckungEntfernen'
+        return u'odenEntfernen_Planfall'
 
     @property
     def Tool(self):
@@ -540,7 +540,7 @@ class TbxBodenAnzeigen_Planfall(Tbx):
 
     @property
     def label(self):
-        return u'BodenbedeckungAnzeigen'
+        return u'BodenAnzeigenPlanfall'
 
     @property
     def Tool(self):
@@ -567,7 +567,7 @@ class TbxZeichnung_Planfall(Tbx):
 
     @property
     def label(self):
-        return u'BodenbedeckungAnzeigen'
+        return u'ZeichnungPlanfall'
 
     @property
     def Tool(self):

@@ -105,49 +105,49 @@ class BodenbedeckungBewertung(Tool):
         cursor = arcpy.da.SearchCursor(path_bodenbedeckung, fields)
         for row in cursor:
             if row[1] == 0 and row[0] == 1:
-                 boden_anteile_alt[0] = row[2]
+                 boden_anteile_alt[0] = row[2] / 10.0
             elif row[1] == 0 and row[0] == 2:
-                 boden_anteile_alt[1] = row[2]
+                 boden_anteile_alt[1] = row[2] / 10.0
             elif row[1] == 0 and row[0] == 3:
-                 boden_anteile_alt[2] = row[2]
+                 boden_anteile_alt[2] = row[2] / 10.0
             elif row[1] == 0 and row[0] == 4:
-                 boden_anteile_alt[3] = row[2]
+                 boden_anteile_alt[3] = row[2] / 10.0
             elif row[1] == 0 and row[0] == 5:
-                 boden_anteile_alt[4] = row[2]
+                 boden_anteile_alt[4] = row[2] / 10.0
             elif row[1] == 0 and row[0] == 6:
-                 boden_anteile_alt[5] = row[2]
+                 boden_anteile_alt[5] = row[2] / 10.0
             elif row[1] == 0 and row[0] == 7:
-                 boden_anteile_alt[6] = row[2]
+                 boden_anteile_alt[6] = row[2] / 10.0
             elif row[1] == 0 and row[0] == 8:
-                 boden_anteile_alt[7] = row[2]
+                 boden_anteile_alt[7] = row[2] / 10.0
             elif row[1] == 0 and row[0] == 9:
-                 boden_anteile_alt[8] = row[2]
+                 boden_anteile_alt[8] = row[2] / 10.0
             elif row[1] == 0 and row[0] == 10:
-                 boden_anteile_alt[9] = row[2]
+                 boden_anteile_alt[9] = row[2] / 10.0
             elif row[1] == 0 and row[0] == 11:
-                 boden_anteile_alt[10] = row[2]
+                 boden_anteile_alt[10] = row[2] / 10.0
             elif row[1] == 1 and row[0] == 1:
-                 boden_anteile_neu[0] = row[2]
+                 boden_anteile_neu[0] = row[2] / 10.0
             elif row[1] == 1 and row[0] == 2:
-                 boden_anteile_neu[1] = row[2]
+                 boden_anteile_neu[1] = row[2] / 10.0
             elif row[1] == 1 and row[0] == 3:
-                 boden_anteile_neu[2] = row[2]
+                 boden_anteile_neu[2] = row[2] / 10.0
             elif row[1] == 1 and row[0] == 4:
-                 boden_anteile_neu[3] = row[2]
+                 boden_anteile_neu[3] = row[2] / 10.0
             elif row[1] == 1 and row[0] == 5:
-                 boden_anteile_neu[4] = row[2]
+                 boden_anteile_neu[4] = row[2] / 10.0
             elif row[1] == 1 and row[0] == 6:
-                 boden_anteile_neu[5] = row[2]
+                 boden_anteile_neu[5] = row[2] / 10.0
             elif row[1] == 1 and row[0] == 7:
-                 boden_anteile_neu[6] = row[2]
+                 boden_anteile_neu[6] = row[2] / 10.0
             elif row[1] == 1 and row[0] == 8:
-                 boden_anteile_neu[7] = row[2]
+                 boden_anteile_neu[7] = row[2] / 10.0
             elif row[1] == 1 and row[0] == 9:
-                 boden_anteile_neu[8] = row[2]
+                 boden_anteile_neu[8] = row[2] / 10.0
             elif row[1] == 1 and row[0] == 10:
-                 boden_anteile_neu[9] = row[2]
+                 boden_anteile_neu[9] = row[2] / 10.0
             elif row[1] == 1 and row[0] == 11:
-                 boden_anteile_neu[10] = row[2]
+                 boden_anteile_neu[10] = row[2] / 10.0
 
         plangebiet_ha = 0
         path_teilflaechen = self.folders.get_table('Teilflaechen_Plangebiet', "FGDB_Definition_Projekt.gdb", projekt)
@@ -174,6 +174,7 @@ class BodenbedeckungBewertung(Tool):
         oberflaechenabfluss_multiplikator = [0,0.1,0.4,0.7,0.6,1,0.8,1,1,1,0]
         grundwasserneubildung_multiplikator = [0,0,0.3,0.5,0.8,1,0.5,0.4,0.5,0.5,1]
         regenwasserversickerung_multiplikator = [0,0.1,0.4,0.5,0.5,1,0.8,0.9,0.9,1,1]
+        #Biotop
         biotopausbildungsvermoegen_multiplikator = [0.1,0.1,0.2,0.3,0.4,0.5,0.6,0.9,0.9,1,1]
 
         # 0 = Überbaute Fläche
@@ -185,8 +186,8 @@ class BodenbedeckungBewertung(Tool):
         # 6 = Rasen
         # 7 = Bäume / Sträucher
         # 9 = Stauden
-        # 10 = Wiese
-        # 11 = natürliche Wasserflächen
+        # 9 = Wiese
+        # 10 = natürliche Wasserflächen
 
         faktor_waermespeicherung_nullfall = []
         faktor_waermespeicherung_planfall = []
@@ -244,7 +245,8 @@ class BodenbedeckungBewertung(Tool):
             faktor_biotopausbildungsvermoegen_nullfall.append(boden_anteile_alt[x] * biotopausbildungsvermoegen_multiplikator[x])
             faktor_biotopausbildungsvermoegen_planfall.append(boden_anteile_neu[x] * biotopausbildungsvermoegen_multiplikator[x])
 
-
+        arcpy.AddMessage("Faktoren Nullfall: " + str(faktor_biotopausbildungsvermoegen_nullfall))
+        arcpy.AddMessage("Faktoren Planfall: " + str(faktor_biotopausbildungsvermoegen_planfall))
         table_kennwerte = self.folders.get_table("Leistungskennwerte")
         cursor = arcpy.da.UpdateCursor(table_kennwerte, ["*"])
         for row in cursor:
@@ -307,8 +309,10 @@ class BodenbedeckungBewertung(Tool):
         regenwasserversickerung_planfall = get_kennwert(quotient_regenwasserversickerung_planfall)
 
         quotient_biotopausbildungsvermoegen_nullfall = sum(faktor_biotopausbildungsvermoegen_nullfall) / 11.0
+        arcpy.AddMessage("Quotient Nullfall: " + str(quotient_biotopausbildungsvermoegen_nullfall))
         biotopausbildungsvermoegen_nullfall = get_kennwert(quotient_biotopausbildungsvermoegen_nullfall)
         quotient_biotopausbildungsvermoegen_planfall = sum(faktor_biotopausbildungsvermoegen_planfall) / 11.0
+        arcpy.AddMessage("Quotient Planfall: " + str(quotient_biotopausbildungsvermoegen_planfall))
         biotopausbildungsvermoegen_planfall = get_kennwert(quotient_biotopausbildungsvermoegen_planfall)
 
         column_values = {"Kategorie": [u"Nullfall", u"Planfall", u"Veränderung"],

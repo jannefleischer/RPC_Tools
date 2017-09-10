@@ -72,13 +72,13 @@ class Dia_Nullfall(ArcpyDiagram):
             u"{}: Bodenbedeckung im Nullfall"
             .format(project_name))
         input_template = self.tbx.folders.get_diagram_template(
-            'Wohnflaechendichte')
+            'Bodenbedeckung')
 
         graph = arcpy.Graph()
-        input_data = self.tbx.folders.get_table("Wohnflaechendichte", "FGDB_Flaeche_und_Oekologie.gdb")
+        input_data = self.tbx.folders.get_table("Bodenbedeckung_Zeichnung", "FGDB_Flaeche_und_Oekologie.gdb")
         graph.addSeriesBarVertical(dataSrc=input_data,
-                                   fieldY= "Wohnflaechendichte",
-                                   fieldLabel="Typ")
+                                   fieldY= "Nullfall",
+                                   fieldLabel="Bodenbedeckung")
         graph.graphPropsGeneral.title = title
         return graph, input_template
 
@@ -91,13 +91,13 @@ class Dia_Planfall(ArcpyDiagram):
             u"{}: Bodenbedeckung im Planfall"
             .format(project_name))
         input_template = self.tbx.folders.get_diagram_template(
-            'Wohnflaechendichte')
+            'Bodenbedeckung')
 
         graph = arcpy.Graph()
-        input_data = self.tbx.folders.get_table("Wohnflaechendichte", "FGDB_Flaeche_und_Oekologie.gdb")
+        input_data = self.tbx.folders.get_table("Bodenbedeckung_Zeichnung", "FGDB_Flaeche_und_Oekologie.gdb")
         graph.addSeriesBarVertical(dataSrc=input_data,
-                                   fieldY= "Wohnflaechendichte",
-                                   fieldLabel="Typ")
+                                   fieldY= "Planfall",
+                                   fieldLabel="Bodenbedeckung")
         graph.graphPropsGeneral.title = title
         return graph, input_template
 
@@ -126,7 +126,7 @@ class Dia_Staub(ArcpyDiagram):
     def _create(self, **kwargs):
         project_name = self.tbx.par.get_projectname()
         title = encode(
-            u"{}: Bodenkennwert Staubbindevermoegen"
+            u"{}: Bodenkennwert Staubbindevermögen"
             .format(project_name))
         input_template = self.tbx.folders.get_diagram_template(
             'Bodenkennwerte')

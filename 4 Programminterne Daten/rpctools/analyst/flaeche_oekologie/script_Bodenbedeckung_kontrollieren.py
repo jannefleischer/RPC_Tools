@@ -7,6 +7,7 @@ import arcpy
 from rpctools.utils.params import Tool
 from rpctools.diagrams.diagram_oekologie import Dia_Nullfall
 from rpctools.diagrams.diagram_oekologie import Dia_Planfall
+import rpctools.utils.lib_oekologie as lib_oeko
 
 class BodenbedeckungKontrolle(Tool):
     """BodenbedeckungKontrolle"""
@@ -140,4 +141,22 @@ class BodenbedeckungZeichnen(Tool):
         arcpy.RefreshActiveView()
 
     def run(self):
-        pass
+        anteile_nullfall, anteile_planfall = lib_oeko.import_zeichenanteile(self.par.name.value)
+        self.parent_tbx.delete_rows_in_table("Bodenbedeckung_Zeichnung")
+        bodenarten = [u'Überbaut',
+             u'Wasser',
+             u'Platten',
+             u'Bäume',
+             u'Gittersteine',
+             u'Stauden',
+             u'Wiese',
+             u'Beton',
+             u'Acker',
+             u'Kleinpflaster',
+             u'Rasen',
+            u'Undefiniert']  
+        column_values = {"Nullfall": anteile_nullfall,
+                         "Planfall": anteile_planfall,
+                         "Bodenbedeckung": bodenarten}
+        self.parent_tbx.insert_rows_in_table("Bodenbedeckung_Zeichnung", column_values)
+

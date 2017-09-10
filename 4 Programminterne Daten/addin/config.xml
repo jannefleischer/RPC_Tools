@@ -259,49 +259,49 @@
                 <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeOekologie" id="rpc_tools.hilfe_oekologie" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Ökologie” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Natur- und Artenschutz" category="ProjektCheck" class="Naturschutz" id="rpc_tools.naturschutzgebiete" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem strengen Schutzstatus im Bereich Natur- und Artenschutz ein (Nationalparke, Naturschutzgebiete, Fauna-Flora-Habitat-Gebiete und Vogelschutzgebiete). Quelle: IÖR-Monitor">
+                <Button caption="Natur- und Artenschutz" category="ProjektCheck" class="Naturschutz" id="rpc_tools.naturschutzgebiete" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem strengen Schutzstatus im Bereich Natur- und Artenschutz ein (Nationalparke, Naturschutzgebiete, Fauna-Flora-Habitat-Gebiete und Vogelschutzgebiete). Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Landschaftsschutz" category="ProjektCheck" class="Landschaftsschutz" id="rpc_tools.landschaftsschutzgebiete" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem allgemeinen Schutzstatus im Bereich Landschaftsschutz ein (Naturparke, Landschaftsschutzgebiete und Biosphärenreservate außerhalb der Gebiete mit strengem Schutzstatus). Quelle: IÖR-Monitor">
+                <Button caption="Landschaftsschutz" category="ProjektCheck" class="Landschaftsschutz" id="rpc_tools.landschaftsschutzgebiete" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem allgemeinen Schutzstatus im Bereich Landschaftsschutz ein (Naturparke, Landschaftsschutzgebiete und Biosphärenreservate außerhalb der Gebiete mit strengem Schutzstatus). Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Detailangaben zu Schutzgebieten" category="ProjektCheck" class="Schutzgebiete" id="rpc_tools.detail_schutzgebiete" image="" message="" tip="Öffnet eine Online-Karte des BfN zu den Schutzgebieten in Deutschland und zoomt auf den Bereich des Plangebiets. Dort finden sich Detailangaben zu den Schutzgebieten.">
+                <Button caption="Detailangaben zu Schutzgebieten" category="ProjektCheck" class="Schutzgebiete" id="rpc_tools.detail_schutzgebiete" image="Images\5000-web.png" message="" tip="Öffnet eine Online-Karte des BfN zu den Schutzgebieten in Deutschland und zoomt auf den Bereich des Plangebiets. Dort finden sich Detailangaben zu den Schutzgebieten.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene Freir&#228;ume > 100 qkm" category="ProjektCheck" class="Freiraeume_100qkm" id="rpc_tools.freiraeume_100" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 100 km² Größe ein. Quelle: IÖR-Monitor">
+                <Button caption="Unzerschnittene Freir&#228;ume > 100 qkm" category="ProjektCheck" class="Freiraeume_100qkm" id="rpc_tools.freiraeume_100" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 100 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene Freir&#228;ume > 50 qkm" category="ProjektCheck" class="Freiraeume_50qkm" id="rpc_tools.freiraeume_50" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 50 km² Größe ein. Quelle: IÖR-Monitor">
+                <Button caption="Unzerschnittene Freir&#228;ume > 50 qkm" category="ProjektCheck" class="Freiraeume_50qkm" id="rpc_tools.freiraeume_50" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 50 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Freir&#228;ume" category="ProjektCheck" class="Freiraeume" id="rpc_tools.freiraeume" image="" message="" tip="Blendet eine Rasterkarte (100x100m) aller landschaftlichen Freiräume (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
+                <Button caption="Freir&#228;ume" category="ProjektCheck" class="Freiraeume" id="rpc_tools.freiraeume" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) aller landschaftlichen Freiräume (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene W&#228;lder > 50 qkm" category="ProjektCheck" class="Waelder_50qkm" id="rpc_tools.waelder_50" image="" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Waldgebiete über 50 km² Größe ein. Quelle: IÖR-Monitor">
+                <Button caption="Unzerschnittene W&#228;lder > 50 qkm" category="ProjektCheck" class="Waelder_50qkm" id="rpc_tools.waelder_50" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Waldgebiete über 50 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="W&#228;lder" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder" image="" message="" tip="Blendet eine Rasterkarte (100x100m) aller Waldgebiete (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
+                <Button caption="W&#228;lder" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) aller Waldgebiete (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Leistungskennwerte berechnen" category="ProjektCheck" class="Kennwerte_berechnen" id="rpc_tools.kennwerte_berechnen" image="" message="" tip="Ökologische Leistungskennwerte des Boden im Null- und Planfall berechnen. Die dafür benötigten Anteile der Bodenbedeckung können direkt eingetragen oder aus den Zeichnungen übernommen werden.">
+                <Button caption="Leistungskennwerte berechnen" category="ProjektCheck" class="Kennwerte_berechnen" id="rpc_tools.kennwerte_berechnen" image="Images\450000-chart.png" message="" tip="Ökologische Leistungskennwerte des Boden im Null- und Planfall berechnen. Die dafür benötigten Anteile der Bodenbedeckung können direkt eingetragen oder aus den Zeichnungen übernommen werden.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Wohndichte bestimmen" category="ProjektCheck" class="Wohndichte" id="rpc_tools.wohndichte" image="" message="" tip="Die Wohndichte (WE pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
+                <Button caption="Wohndichte bestimmen" category="ProjektCheck" class="Wohndichte" id="rpc_tools.wohndichte" image="Images\450000-chart.png" message="" tip="Die Wohndichte (WE pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Wohnfl&#228;chendichte bestimmen" category="ProjektCheck" class="Wohnflaechendichte" id="rpc_tools.wohnflaechendichte" image="" message="" tip="Die Wohnflächendichte (qm Wohnfläche pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
+                <Button caption="Wohnfl&#228;chendichte bestimmen" category="ProjektCheck" class="Wohnflaechendichte" id="rpc_tools.wohnflaechendichte" image="Images\450000-chart.png" message="" tip="Die Wohnflächendichte (qm Wohnfläche pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Hochspannungsleitungen" category="ProjektCheck" class="Hochspannungsleitungen" id="rpc_tools.hochspannung" image="" message="" tip="Blendet eine Rasterkarte (100x100m) mit den Einflussbereichen von Hochspannungsfreileitungen ein. Quelle: IÖR-Monitor">
+                <Button caption="Hochspannungsleitungen" category="ProjektCheck" class="Hochspannungsleitungen" id="rpc_tools.hochspannung" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) mit den Einflussbereichen von Hochspannungsfreileitungen ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Tool caption="Gemeinsame Grenze mit Siedlungsk&#246;rper einzeichnen" category="ProjektCheck" class="Grenze_zeichnen" id="rpc_tools.grenzlinie_einzeichnen" image="" message="" tip="Markieren der Abschnitte der Außenkante des Plangebiets, die an eine bestehende Siedlungsfläche angrenzen.">
+                <Tool caption="Gemeinsame Grenze mit Siedlungsk&#246;rper einzeichnen" category="ProjektCheck" class="Grenze_zeichnen" id="rpc_tools.grenzlinie_einzeichnen" image="Images\EditingSketchTool12.png" message="" tip="Markieren der Abschnitte der Außenkante des Plangebiets, die an eine bestehende Siedlungsfläche angrenzen.">
                     <Help heading="" />
                 </Tool>
-                <Button caption="Grenzlinien l&#246;schen" category="ProjektCheck" class="Grenze_loeschen" id="rpc_tools.grenzlinie_loeschen" image="" message="" tip="Löscht die von Ihnen bereits gezeichneten Abschnitte, in denen die Außenkante Ihres Plangebiets an eine bestehende Siedlungsfläche angrenzt.">
+                <Button caption="Grenzlinien l&#246;schen" category="ProjektCheck" class="Grenze_loeschen" id="rpc_tools.grenzlinie_loeschen" image="Images\1001-cancel_1.png" message="" tip="Löscht die von Ihnen bereits gezeichneten Abschnitte, in denen die Außenkante Ihres Plangebiets an eine bestehende Siedlungsfläche angrenzt.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Integrationsgrad berechnen" category="ProjektCheck" class="Integrationsgrad_berechnen" id="rpc_tools.integrationsgrad_berechnen" image="" message="" tip="Ermittelt den Integrationsgrad des Plangebiets, d.h. den Anteil der Außenkante des Plangebiets, der an eine bestehende Siedlungsfläche angrenzt.">
+                <Button caption="Integrationsgrad berechnen" category="ProjektCheck" class="Integrationsgrad_berechnen" id="rpc_tools.integrationsgrad_berechnen" image="Images\450500-pie-chart.png" message="" tip="Ermittelt den Integrationsgrad des Plangebiets, d.h. den Anteil der Außenkante des Plangebiets, der an eine bestehende Siedlungsfläche angrenzt.">
                     <Help heading="" />
                 </Button>
                 <Button caption="Erläuterung der Leistungskennwerte" category="ProjektCheck" class="Erlaeuterung" id="rpc_tools.erlaeuterung" image="Images\HelpSystem_C_16.png" message="" tip="">
@@ -311,88 +311,88 @@
 
 
 
-                <Button caption="[Layer anzeigen]" category="ProjektCheck" class="BodenAnzeigen_Nullfall" id="rpc_tools.nullfall_anzeigen" image="" message="" tip="Fügt den Layer mit den Bodenbedeckungen im Nullfall zur Karte hinzu bzw. macht diesen sichtbar.">
+                <Button caption="[Layer anzeigen]" category="ProjektCheck" class="BodenAnzeigen_Nullfall" id="rpc_tools.nullfall_anzeigen" image="Images\eye-2-16.png" message="" tip="Fügt den Layer mit den Bodenbedeckungen im Nullfall zur Karte hinzu bzw. macht diesen sichtbar.">
                     <Help heading="" />
                 </Button>
-                <Button caption="[Zeichnung l&#246;schen]" category="ProjektCheck" class="BodenEntfernen_Nullfall" id="rpc_tools.nullfall_loeschen" image="" message="" tip="Löscht alle bisher eingezeichneten Bodenbedeckungen im Nullfall.">
+                <Button caption="[Zeichnung l&#246;schen]" category="ProjektCheck" class="BodenEntfernen_Nullfall" id="rpc_tools.nullfall_loeschen" image="Images\1001-cancel_1.png" message="" tip="Löscht alle bisher eingezeichneten Bodenbedeckungen im Nullfall.">
                     <Help heading="" />
                 </Button>
-                <Button caption="[Zeichnung auswerten]" category="ProjektCheck" class="Zeichnung_Nullfall" id="rpc_tools.nullfall_auswerten" image="" message="" tip="Aus den eingezeichneten Flächen ableiten, welcher Anteil des Plangebiets im Nullfall welche Bodenbedeckung aufweist.">
+                <Button caption="[Zeichnung auswerten]" category="ProjektCheck" class="Zeichnung_Nullfall" id="rpc_tools.nullfall_auswerten" image="Images\450000-chart.png" message="" tip="Aus den eingezeichneten Flächen ableiten, welcher Anteil des Plangebiets im Nullfall welche Bodenbedeckung aufweist.">
                     <Help heading="" />
                 </Button>
-                <Button caption="[Layer anzeigen]" category="ProjektCheck" class="BodenAnzeigen_Planfall" id="rpc_tools.planfall_anzeigen" image="" message="" tip="Fügt den Layer mit den Bodenbedeckungen im Planfall zur Karte hinzu bzw. macht diesen sichtbar.">
+                <Button caption="[Layer anzeigen]" category="ProjektCheck" class="BodenAnzeigen_Planfall" id="rpc_tools.planfall_anzeigen" image="Images\eye-2-16.png" message="" tip="Fügt den Layer mit den Bodenbedeckungen im Planfall zur Karte hinzu bzw. macht diesen sichtbar.">
                     <Help heading="" />
                 </Button>
-                <Button caption="[Zeichnung l&#246;schen]" category="ProjektCheck" class="BodenEntfernen_Planfall" id="rpc_tools.planfall_loeschen" image="" message="" tip="Löscht alle bisher eingezeichneten Bodenbedeckungen im Planfall.">
+                <Button caption="[Zeichnung l&#246;schen]" category="ProjektCheck" class="BodenEntfernen_Planfall" id="rpc_tools.planfall_loeschen" image="Images\1001-cancel_1.png" message="" tip="Löscht alle bisher eingezeichneten Bodenbedeckungen im Planfall.">
                     <Help heading="" />
                 </Button>
-                <Button caption="[Zeichnung auswerten]" category="ProjektCheck" class="Zeichnung_Planfall" id="rpc_tools.planfall_auswerten" image="" message="" tip="Aus den eingezeichneten Flächen ableiten, welcher Anteil des Plangebiets im Nullfall welche Bodenbedeckung aufweist.">
+                <Button caption="[Zeichnung auswerten]" category="ProjektCheck" class="Zeichnung_Planfall" id="rpc_tools.planfall_auswerten" image="Images\450000-chart.png" message="" tip="Aus den eingezeichneten Flächen ableiten, welcher Anteil des Plangebiets im Nullfall welche Bodenbedeckung aufweist.">
                     <Help heading="" />
                 </Button>
-                <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="NullfallUeberbauteFlaechen" id="rpc_tools.nullfall_ueberbaute_flaechen" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen überbauter Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="NullfallUeberbauteFlaechen" id="rpc_tools.nullfall_ueberbaute_flaechen" image="Images\boden_ueberbaut.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen überbauter Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Nat&#252;rliche Wasserfl&#228;che" category="ProjektCheck" class="NullfallNatuerlicheWasserflaeche" id="rpc_tools.nullfall_natuerliche_wasserflaeche" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen natürlicher Wasserflächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Nat&#252;rliche Wasserfl&#228;che" category="ProjektCheck" class="NullfallNatuerlicheWasserflaeche" id="rpc_tools.nullfall_natuerliche_wasserflaeche" image="Images\boden_wasser.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen natürlicher Wasserflächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Platten" category="ProjektCheck" class="NullfallPlatten" id="rpc_tools.nullfall_platten" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von mit Platten belegten Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Platten" category="ProjektCheck" class="NullfallPlatten" id="rpc_tools.nullfall_platten" image="Images\boden_platten.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von mit Platten belegten Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="B&#228;ume oder Str&#228;ucher" category="ProjektCheck" class="NullfallBaeumeStraeucher" id="rpc_tools.nullfall_baeume_straeucher" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Bäumen oder Sträuchern. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="B&#228;ume oder Str&#228;ucher" category="ProjektCheck" class="NullfallBaeumeStraeucher" id="rpc_tools.nullfall_baeume_straeucher" image="Images\boden_baeume.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Bäumen oder Sträuchern. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Stauden" category="ProjektCheck" class="NullfallStauden" id="rpc_tools.nullfall_stauden" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Stauden. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Stauden" category="ProjektCheck" class="NullfallStauden" id="rpc_tools.nullfall_stauden" image="Images\boden_stauden.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Stauden. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Wiese" category="ProjektCheck" class="NullfallWiese" id="rpc_tools.nullfall_wiese" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Wiese. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Wiese" category="ProjektCheck" class="NullfallWiese" id="rpc_tools.nullfall_wiese" image="Images\boden_wiese.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Wiese. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Rasen" category="ProjektCheck" class="NullfallRasen" id="rpc_tools.nullfall_rasen" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Rasen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Rasen" category="ProjektCheck" class="NullfallRasen" id="rpc_tools.nullfall_rasen" image="Images\boden_rasen.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Rasen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Wassergebundene Decke oder Rasengittersteine" category="ProjektCheck" class="NullfallRasengittersteine" id="rpc_tools.nullfall_rasengittersteine" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit wassergebundener Decke oder Rasengittersteinen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Wassergebundene Decke oder Rasengittersteine" category="ProjektCheck" class="NullfallRasengittersteine" id="rpc_tools.nullfall_rasengittersteine" image="Images\boden_gittersteine.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit wassergebundener Decke oder Rasengittersteinen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Asphalt oder Beton" category="ProjektCheck" class="NullfallBeton" id="rpc_tools.nullfall_beton" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Asphalt oder Beton. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Asphalt oder Beton" category="ProjektCheck" class="NullfallBeton" id="rpc_tools.nullfall_beton" image="Images\boden_beton.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Asphalt oder Beton. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Offener Boden, Acker" category="ProjektCheck" class="NullfallAcker" id="rpc_tools.nullfall_acker" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit offenem Boden oder Acker. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Offener Boden, Acker" category="ProjektCheck" class="NullfallAcker" id="rpc_tools.nullfall_acker" image="Images\boden_acker.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit offenem Boden oder Acker. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Kleinpflaster" category="ProjektCheck" class="NullfallKleinpflaster" id="rpc_tools.nullfall_kleinpflaster" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Kleinpflaster. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Kleinpflaster" category="ProjektCheck" class="NullfallKleinpflaster" id="rpc_tools.nullfall_kleinpflaster" image="Images\boden_kleinpflaster.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Kleinpflaster. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="PlanfallUeberbauteFlaechen" id="rpc_tools.planfall_ueberbaute_flaechen" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen überbauter Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="&#220;berbaute Fl&#228;chen" category="ProjektCheck" class="PlanfallUeberbauteFlaechen" id="rpc_tools.planfall_ueberbaute_flaechen" image="Images\boden_ueberbaut.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen überbauter Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Nat&#252;rliche Wasserfl&#228;che" category="ProjektCheck" class="PlanfallNatuerlicheWasserflaeche" id="rpc_tools.planfall_natuerliche_wasserflaeche" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen natürlicher Wasserflächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Nat&#252;rliche Wasserfl&#228;che" category="ProjektCheck" class="PlanfallNatuerlicheWasserflaeche" id="rpc_tools.planfall_natuerliche_wasserflaeche" image="Images\boden_wasser.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen natürlicher Wasserflächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Platten" category="ProjektCheck" class="PlanfallPlatten" id="rpc_tools.planfall_platten" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von mit Platten belegten Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Platten" category="ProjektCheck" class="PlanfallPlatten" id="rpc_tools.planfall_platten" image="Images\boden_platten.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von mit Platten belegten Flächen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="B&#228;ume oder Str&#228;ucher" category="ProjektCheck" class="PlanfallBaeumeStraeucher" id="rpc_tools.planfall_baeume_straeucher" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Bäumen oder Sträuchern. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="B&#228;ume oder Str&#228;ucher" category="ProjektCheck" class="PlanfallBaeumeStraeucher" id="rpc_tools.planfall_baeume_straeucher" image="Images\boden_baeume.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Bäumen oder Sträuchern. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Stauden" category="ProjektCheck" class="PlanfallStauden" id="rpc_tools.planfall_stauden" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Stauden. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Stauden" category="ProjektCheck" class="PlanfallStauden" id="rpc_tools.planfall_stauden" image="Images\boden_stauden.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Stauden. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Wiese" category="ProjektCheck" class="PlanfallWiese" id="rpc_tools.planfall_wiese" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Wiese. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Wiese" category="ProjektCheck" class="PlanfallWiese" id="rpc_tools.planfall_wiese" image="Images\boden_wiese.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Wiese. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Rasen" category="ProjektCheck" class="PlanfallRasen" id="rpc_tools.planfall_rasen" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Rasen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Rasen" category="ProjektCheck" class="PlanfallRasen" id="rpc_tools.planfall_rasen" image="Images\boden_rasen.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Rasen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Wassergebundene Decke oder Rasengittersteine" category="ProjektCheck" class="PlanfallRasengittersteine" id="rpc_tools.planfall_rasengittersteine" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit wassergebundener Decke oder Rasengittersteinen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Wassergebundene Decke oder Rasengittersteine" category="ProjektCheck" class="PlanfallRasengittersteine" id="rpc_tools.planfall_rasengittersteine" image="Images\boden_gittersteine.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit wassergebundener Decke oder Rasengittersteinen. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Asphalt oder Beton" category="ProjektCheck" class="PlanfallBeton" id="rpc_tools.planfall_beton" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Asphalt oder Beton. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Asphalt oder Beton" category="ProjektCheck" class="PlanfallBeton" id="rpc_tools.planfall_beton" image="Images\boden_beton.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Asphalt oder Beton. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Offener Boden oder Acker" category="ProjektCheck" class="PlanfallAcker" id="rpc_tools.planfall_acker" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit offenem Boden oder Acker. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Offener Boden oder Acker" category="ProjektCheck" class="PlanfallAcker" id="rpc_tools.planfall_acker" image="Images\boden_acker.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit offenem Boden oder Acker. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Kleinpflaster" category="ProjektCheck" class="PlanfallKleinpflaster" id="rpc_tools.planfall_kleinpflaster" image="" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Kleinpflaster. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
+                <Tool caption="Kleinpflaster" category="ProjektCheck" class="PlanfallKleinpflaster" id="rpc_tools.planfall_kleinpflaster" image="Images\boden_kleinpflaster.png" message="" tip="Startet das Zeichenwerkzeug zum Einzeichnen von Flächen mit Kleinpflaster. Umriss abschließen mit Doppelklick. Zum Verlassen das grüne Häkchen ganz rechts in der Projekt-Check-Toolbox klicken.">
                     <Help heading="" />
                 </Tool>
 

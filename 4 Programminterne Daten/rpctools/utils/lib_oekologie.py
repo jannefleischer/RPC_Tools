@@ -71,31 +71,84 @@ def import_zeichenanteile(projekt):
     workspace_projekt_oekologie = folders.get_db('FGDB_Flaeche_und_Oekologie.gdb', projekt)
     path_nullfall = folders.get_table('Bodenbedeckung_Nullfall', "FGDB_Flaeche_und_Oekologie.gdb", projekt)
     path_planfall = folders.get_table('Bodenbedeckung_Planfall', "FGDB_Flaeche_und_Oekologie.gdb", projekt)
+    temp = folders.get_table('bodentemp', "FGDB_Flaeche_und_Oekologie.gdb", projekt)
 
+    gesamtflaeche = 0.0
+    fields = ["SHAPE_Area"]
+    cursor_teilflaechen = arcpy.da.SearchCursor(path_teilflaechen, fields)
+    for row in cursor_teilflaechen:
+        gesamtflaeche += row[0]
 
-
-    boden_absolut = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0]
-    boden_anteil = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0]
-    gesamtflaeche = 0
+    #Nullfall
+    boden_absolut = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0]
+    boden_anteil = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0]
     pointer = 0
+    skizze_exists = True
 
     fields = ["SHAPE_Area", "IDBodenbedeckung"]
     cursor = arcpy.da.SearchCursor(path_nullfall, fields)
     for row in cursor:
-        gesamtflaeche += row[0]
         pointer = row[1] - 1
         boden_absolut[pointer] += row[0]
-    else:
-        boden_anteil[0] = 100
-        return boden_anteil
+
+    if skizze_exists:
+        for x in xrange(11):
+            boden_anteil[x] = (boden_absolut[x] / gesamtflaeche) * 100.0
+            boden_anteil[x] = math.floor(boden_anteil[x])
+        #fields = [ "alt"]
+        #cursor = arcpy.da.InsertCursor(temp, fields)
+        #for anteil in boden_anteil:
+        #    cursor.insertRow([anteil])      
+
+        summe = sum(boden_anteil)
+        differenz = 100 - summe
+        if differenz > 0:
+            boden_anteil[11] += differenz
+        elif differenz < 0:
+            neue_differenz = abs(differenz)
+            pointer = 0
+            for anteil in bodenanteil:
+                if anteil > 0 and neue_differenz > 0:
+                    if anteil > neue_differenz:
+                        bodenanteil[pointer] = anteil - neue_differenz
+                        neue_differenz = 0
+                    else:
+                        bodenanteil[pointer] = 0
+                        neue_differenz = neue_differenz - anteil
+                pointer += 1
+        anteile_nullfall = boden_anteil
+
+    #Planfall
+    boden_absolut = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0]
+    boden_anteil = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0]
+    pointer = 0
+
+    fields = ["SHAPE_Area", "IDBodenbedeckung"]
+    cursor = arcpy.da.SearchCursor(path_planfall, fields)
+    for row in cursor:
+        pointer = row[1] - 1
+        boden_absolut[pointer] += row[0]
 
     for x in xrange(11):
-        boden_anteil[x] = boden_absolut[x] / gesamtflaeche
+        boden_anteil[x] = (boden_absolut[x] / gesamtflaeche) * 100.0
         boden_anteil[x] = math.floor(boden_anteil[x])
 
     summe = sum(boden_anteil)
     differenz = 100 - summe
     if differenz > 0:
-        boden_anteil[0] += differenz
+        boden_anteil[11] += differenz
+    elif differenz < 0:
+        neue_differenz = abs(differenz)
+        pointer = 0
+        for anteil in bodenanteil:
+            if anteil > 0 and neue_differenz > 0:
+                if anteil > neue_differenz:
+                    bodenanteil[pointer] = anteil - neue_differenz
+                    neue_differenz = 0
+                else:
+                    bodenanteil[pointer] = 0
+                    neue_differenz = neue_differenz - anteil
+            pointer += 1
+    anteile_planfall = boden_anteil
 
-    return boden_anteil
+    return anteile_nullfall, anteile_planfall

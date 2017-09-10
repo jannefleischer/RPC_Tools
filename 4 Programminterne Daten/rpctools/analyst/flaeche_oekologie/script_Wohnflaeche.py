@@ -11,23 +11,23 @@ from rpctools.diagrams.diagram_oekologie import Dia_Wohnflaechendichte
 
 def rename_kreistyp(kreistyp):
     if kreistyp == 1:
-        return u"Kernstädte (Agglomerationsraum)"
+        return u"Kernstädte (Agglomerationsräume)"
     elif kreistyp == 2:
-        return u"Hochverdichtete Kreise (Agglomerationsraum)"
+        return u"Hochverdichtete Kreise (Agglomerationsräume)"
     elif kreistyp == 3:
-        return u"Verdichtete Kreise (Agglomerationsraum)"
+        return u"Verdichtete Kreise (Agglomerationsräume)"
     elif kreistyp == 4:
-        return u"Kernsrationsraum)"
+        return u"Ländliche Kreise (Agglomerationsräume)"
     elif kreistyp == 5:
-        return u"Kernsionsraum)"
+        return u"Kernstädte (Verstädtete Räume)"
     elif kreistyp == 6:
-        return u"Kernsttionsraum)"
+        return u"Verdichtete Kreise (Verstädtete Räume)"
     elif kreistyp == 7:
-        return u"Ländliche K"
+        return u"Ländliche Kreise (Verstädtete Räume)"
     elif kreistyp == 8:
-        return u"Kreise höherer Dichte (Ländlicher Raum)"
+        return u"Kreise höherer Dichte (Ländliche Räume)"
     elif kreistyp == 9:
-        return u"Kreise geringerer Dichte (Ländlicher Raum)"
+        return u"Kreise geringerer Dichte (Ländliche Räume)"
 
 class Wohnflaechendichte(Tool):
     """Wohnflaechendichte-Tool"""
@@ -143,8 +143,6 @@ class Wohndichte(Tool):
         arcpy.RefreshTOC()
         arcpy.RefreshActiveView()
 
-    #def rename_kreistyp(kreistyp):
-        #pass
 
     def run(self):
         """run Wohndichte Tool"""
