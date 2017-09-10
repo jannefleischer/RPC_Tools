@@ -237,10 +237,10 @@ class Wanderungssalden2(Tool):
                 cursor_gemeindebilanz.updateRow(gemeinde)
 
             #Summe der zugeordneten Fortzüge (innerhalb 25 km) und Zuzüge [jeweils inkl. Rundungseffekte]
-            Summe_Zugeordneter_Fortzug_Ew = 0
-            Summe_Zugeordneter_Zuzug_Ew = 0
-            Summe_Zugeordneter_Fortzug_AP = 0
-            Summe_Zugeordneter_Zuzug_AP = 0
+            Summe_Zugeordneter_Fortzug_Ew = 0.0
+            Summe_Zugeordneter_Zuzug_Ew = 0.0
+            Summe_Zugeordneter_Fortzug_AP = 0.0
+            Summe_Zugeordneter_Zuzug_AP = 0.0
             cursor_summe = arcpy.da.SearchCursor(wanderungssalden, ["AGS", "SvB_pro_Ew", "Einw_Fortzug", "SvB_Fortzug", "Einw_Zuzug", "SvB_Zuzug", "SvB_Saldo", "Einw_Saldo"])
             for gemeinde in cursor_summe:
                 Summe_Zugeordneter_Fortzug_Ew += gemeinde[2]
@@ -262,7 +262,7 @@ class Wanderungssalden2(Tool):
 
             self.parent_tbx.delete_rows_in_table("Zuzugsstatistik_Ew")
             column_values = {"Kategorie": [u"Projektgemeinde/Region", u"Restliches Bundesgebiet/Ausland"],
-                                "Anzahl": [int(round(Summe_Zugeordneter_Fortzug_Ew * -1)), int(round(Differenz_Ew))]}
+                                "Anzahl": [int(round(Summe_Zugeordneter_Fortzug_Ew * -1)), int(round(-1 * Differenz_Ew))]}
             self.parent_tbx.insert_rows_in_table("Zuzugsstatistik_Ew", column_values)
 
             self.parent_tbx.delete_rows_in_table("Zuzugsstatistik_SvB")
