@@ -886,7 +886,7 @@ class Tbx(object):
 
 
     def dataframe_to_table(self, table_name, dataframe, pkeys, workspace='',
-                           upsert=False):
+                           upsert=False, is_base_table=False):
         """
         Update a table in a Workspace in the Project Folder with values inside a
         pandas dataframe, all columns inside the dataframe will be written to
@@ -915,7 +915,11 @@ class Tbx(object):
                            dataframe, ['OBJECTID'], upsert=False)
         """
         table_name = os.path.basename(table_name)
-        table_path = self._get_table_path(table_name, workspace=workspace)
+        if is_base_table:
+            table_path = self.folders.get_base_table(workspace, table_name)
+        else:
+            table_path = self.folders.get_table(table_name, workspace=workspace,
+                                                project=project)
         columns_incl_pkeys = dataframe.columns.values
         desc = arcpy.Describe(table_path)
         fields = [field.name for field in desc.fields]

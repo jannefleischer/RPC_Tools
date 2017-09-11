@@ -519,6 +519,8 @@ class TbxProjektwirkungMarkets(Tbx):
         pass
 
 if __name__ == "__main__":
+    from rpctools.utils.spatial_lib import assign_groessenklassen
+    assign_groessenklassen()
     t = TbxProjektwirkungMarkets()
     t.getParameterInfo()
     t.set_active_project()

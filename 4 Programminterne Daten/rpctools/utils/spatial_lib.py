@@ -7,6 +7,7 @@ from pyproj import Proj, transform
 import requests
 import numpy as np
 from os.path import join, split
+import sys
     
 def remove_duplicates(features, id_field, match_field='', where='', distance=100):
     '''remove point features matched by where clause from the given feature-class
@@ -323,27 +324,36 @@ def get_gemeindetyp(ags):
 def assign_groessenklassen():
     '''assign the groessenklassen to the gemeinde table based on their
     number of inhabitants'''
-    folders = Folders()
     tbx = DummyTbx()
     workspace = 'FGDB_Basisdaten_deutschland.gdb'
-    gr_table = folders.get_base_table(workspace, 'Gemeindegroessenklassen')
     gr_df = tbx.table_to_dataframe('Gemeindegroessenklassen',
                                    workspace=workspace,
                                    is_base_table=True)
     # set nan values to max integer (for highest groessenklasse)
     gr_df.loc[np.isnan(gr_df['bis']), 'bis'] = sys.maxint
-    gem_columns = ['Einwohner', 'groessenklasse']
-    gem_table = folders.get_base_table(workspace, 'bkg_gemeinden')
+    gem_columns = ['RS', 'Einwohner', 'groessenklasse',
+                   'vwg_rs', 'vwg_groessenklasse']
+    gem_table = tbx.table_to_dataframe('bkg_gemeinden', columns=gem_columns,
+                                       workspace=workspace,
+                                       is_base_table=True)
+    summed = gem_table.groupby('vwg_rs').sum()['Einwohner'].reset_index()
+    summed.rename(columns={'Einwohner': 'vwg_Einwohner'}, inplace=True)
+    gem_table = gem_table.merge(summed, on='vwg_rs')
 
-    cursor = arcpy.da.UpdateCursor(gem_table, gem_columns)
-    for ew, gr_klasse in cursor:
-        higher = ew >= gr_df['von']
-        lower = ew < gr_df['bis']
-        # take the id where both borders match
-        match = gr_df['groessenklasse'][np.logical_and(higher, lower)].values
-        assert len(match) == 1
-        gr_klasse = match[0]
-        cursor.updateRow((ew, gr_klasse))
+    for index, gem in gem_table.iterrows():
+        for gr_col, ew_col in [('groessenklasse', 'Einwohner'),
+                               ('vwg_groessenklasse', 'vwg_Einwohner')]:
+            ew = gem[ew_col]
+            higher = ew >= gr_df['von']
+            lower = ew < gr_df['bis']
+            # take the id where both borders match
+            match = gr_df['groessenklasse'][np.logical_and(higher, lower)].values
+            assert len(match) == 1
+            gr_klasse = match[0]
+            gem_table.loc[index, gr_col] = gr_klasse
+    tbx.dataframe_to_table('bkg_gemeinden', gem_table, ['RS'],
+                           workspace=workspace, is_base_table=True, 
+                           upsert=False)
 
 def get_extent(tablename, workspace, where=''):
     """
