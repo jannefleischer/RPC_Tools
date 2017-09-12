@@ -127,7 +127,8 @@ class TbxGrundsteuer(Tbx):
 
         param = params.slider9 = arcpy.Parameter()
         param.name = u'lagerflaeche'
-        param.displayName = u'Produktions- und  Lagerhallen: qm Brutto-Grundfläche (BGF)'
+        param.displayName = u'Verkaufsräume bzw. Produktions- und ' + \
+            u'Lagerhallen: qm Brutto-Grundfläche (BGF)'
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'Double'
