@@ -17,6 +17,7 @@ from os.path import join, isdir, abspath, dirname, basename, exists
 from os import mkdir
 import arcpy
 import json
+import _winreg
 
 from rpctools.utils.singleton import Singleton
 from rpctools.utils.encoding import encode
@@ -117,7 +118,12 @@ class Folders(object):
     """"""
     def __init__(self, params=None, projectname=None, workspace=None): 
         """class that returns path"""
-        self.BASE_PATH = abspath(join(dirname(__file__), '..', '..', '..'))
+        try:
+            self.BASE_PATH = _winreg.QueryValue( _winreg.HKEY_CURRENT_USER,
+                                                 "Software\ProjektCheck PROFI")
+        except WindowsError:
+            
+            self.BASE_PATH = abspath(join(dirname(__file__), '..', '..', '..'))
         self._PROJECT_BASE_PATH = '3 Benutzerdefinierte Projekte'
         self._INTERN = '4 Programminterne Daten'
         self._BASE_DBS = 'workspaces'
