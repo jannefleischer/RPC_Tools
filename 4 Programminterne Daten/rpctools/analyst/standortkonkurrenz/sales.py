@@ -260,7 +260,7 @@ class Sales(object):
 
         # add the parameters to markets
         for index, market in df_markets.iterrows():
-            gr_klasse = market['vwg_groessenklasse']
+            gr_klasse = int(market['vwg_groessenklasse'])
             id_kette = market['id_kette']
             id_betriebstyp = market[betriebstyp_col]
 
