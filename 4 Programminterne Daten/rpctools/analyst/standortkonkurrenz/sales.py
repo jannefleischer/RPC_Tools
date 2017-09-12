@@ -228,7 +228,7 @@ class Sales(object):
 
         df_communities = self.tbx.table_to_dataframe(
             table_name='bkg_gemeinden',
-            columns=['AGS', 'groessenklasse'],
+            columns=['AGS', 'vwg_groessenklasse'],
             workspace='FGDB_Basisdaten_deutschland.gdb',
             is_base_table=True)
 
@@ -260,7 +260,7 @@ class Sales(object):
 
         # add the parameters to markets
         for index, market in df_markets.iterrows():
-            gr_klasse = market['groessenklasse']
+            gr_klasse = market['vwg_groessenklasse']
             id_kette = market['id_kette']
             id_betriebstyp = market[betriebstyp_col]
 
