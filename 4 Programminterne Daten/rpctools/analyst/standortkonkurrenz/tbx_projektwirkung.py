@@ -84,7 +84,7 @@ class ProjektwirkungMarkets(Tool):
     def run(self):
         folders = Folders(self.par)
         self.recalculate = self.par.recalculate.value
-        
+
         # check the settings of last calculation
         set_table = 'Settings'
         cur_ags = self.parent_tbx.query_table(
@@ -187,7 +187,7 @@ class ProjektwirkungMarkets(Tool):
         buffered = self.folders.get_table('Siedlungszellen_Puffer', check=False)
         arcpy.Delete_management(buffered)
         bbox = self.buffer_area(self.par.radius_sz.value, buffered)
-        
+
         zensus = Zensus()
         arcpy.AddMessage('Extrahiere Siedlungszellen aus Zensusdaten...')
         zensus_points, max_id = zensus.cutout_area(
@@ -201,7 +201,7 @@ class ProjektwirkungMarkets(Tool):
         ags_res = zensus.add_kk_ags(sz_points, project, ags_auswahl)
         # TODO: Update instead of rewrite
         self.zensus_to_db(sz_points)
-        
+
         for ags, (ew, kk) in ags_res.iteritems():
             self.parent_tbx.update_table('Zentren',
                                          column_values={'ew': ew, 'kk': kk},
@@ -264,28 +264,28 @@ class ProjektwirkungMarkets(Tool):
         communities = self.folders.get_table('Zentren')
         ws_tmp = arcpy.env.scratchGDB
         sel_comm = os.path.join(ws_tmp, 'sel_comm')
-        
+
         arcpy.Delete_management(sel_comm)
-        
+
         arcpy.FeatureClassToFeatureClass_conversion(
             communities, ws_tmp, os.path.split(sel_comm)[1],
             where_clause='Auswahl<>0')
-        
+
         arcpy.AddMessage('Analysiere Pufferbereich...')
         # create buffer area
         arcpy.Buffer_analysis(sel_comm, output,
                               radius,
                               dissolve_option='ALL')
-        
+
         bbox = self.get_bbox(output)
         arcpy.Delete_management(sel_comm)
         return bbox
-    
+
     def get_bbox(self, table_path):
         desc = arcpy.Describe(table_path)
         epsg = self.parent_tbx.config.epsg
         ex = desc.extent
-        bbox = (Point(ex.XMin, ex.YMin, epsg=epsg), 
+        bbox = (Point(ex.XMin, ex.YMin, epsg=epsg),
                 Point(ex.XMax, ex.YMax, epsg=epsg))
         return bbox
 
@@ -318,7 +318,7 @@ class ProjektwirkungMarkets(Tool):
     def calculate_distances(self):
         '''calculate distances between settlement points and markets and
         write them to the database'''
-    
+
         # calculate bounding box
         bbox = self.get_bbox(self.folders.get_table('Siedlungszellen'))
         markets = self.parent_tbx.table_to_dataframe('Maerkte')
@@ -485,7 +485,7 @@ class TbxProjektwirkungMarkets(Tbx):
         p.direction = 'Input'
         p.datatype = u'GPString'
         p.value = self.config.active_project
-    
+
         # markets radius
         p = self.add_parameter('radius_sz')
         p.name = u'radius_sz'
@@ -507,7 +507,7 @@ class TbxProjektwirkungMarkets(Tbx):
         param.datatype = u'GPBoolean'
 
         return params
-    
+
     def open(self):
         set_table = 'Settings'
         prev_settings = self.query_table(set_table,
@@ -519,8 +519,8 @@ class TbxProjektwirkungMarkets(Tbx):
         pass
 
 if __name__ == "__main__":
-    from rpctools.utils.spatial_lib import assign_groessenklassen
-    assign_groessenklassen()
+    #from rpctools.utils.spatial_lib import assign_groessenklassen
+    #assign_groessenklassen()
     t = TbxProjektwirkungMarkets()
     t.getParameterInfo()
     t.set_active_project()
