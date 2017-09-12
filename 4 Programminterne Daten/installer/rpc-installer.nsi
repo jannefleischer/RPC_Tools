@@ -38,7 +38,7 @@
  
 ;Files reserved
   ReserveFile "python27.dll"
-  ReserveFile "rpc-installer.py"
+  ;ReserveFile "rpc-installer.py"
 
 
   Function .onInit
@@ -47,7 +47,7 @@
 	InitPluginsDir
 	
 	File "/oname=$PLUGINSDIR\python27.dll" "python27.dll"
-	File "/oname=$PLUGINSDIR\rpc-installer.py" "rpc-installer.py"
+	;File "/oname=$PLUGINSDIR\rpc-installer.py" "rpc-installer.py"
   FunctionEnd
 
   Function .onGUIEnd
@@ -68,7 +68,7 @@
 
   Section "Bibliotheken installieren"
     
-    nsPython::execFile "$PLUGINSDIR\rpc-installer.py"
+    nsPython::execFile "$INSTDIR\4 Programminterne Daten\installer\rpc-installer.py"
     Pop $0
     DetailPrint "Result: $0"
   SectionEnd

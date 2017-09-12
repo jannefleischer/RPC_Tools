@@ -10,6 +10,7 @@ import os, sys
 import subprocess
 from collections import OrderedDict
 import _winreg
+from argparse import ArgumentParser
 
 min_requirement = 10.4
 
@@ -59,7 +60,7 @@ def get_python_path():
     except Exception as e:
         log(e)
 
-def install_packages(python_path):
+def install_packages(python_path, install_dir=''):
 
     log("\n"+ "Verwendeter Python-Pfad: " + python_path + "\n")
     log(sys.version)
@@ -122,12 +123,16 @@ def install_packages(python_path):
     used_packages['pypiwin32-219'] = 'pypiwin32-219-cp27-none-{}.whl'.format(platform)
     used_packages['pyproj'] = 'pyproj-1.9.5.1-cp27-cp27m-{}.whl'.format(platform)
 
-    used_packages['rpctools'] = 'rpctools-0.9.5b0-py2-none-any.whl'
-
     missing = OrderedDict()
+    
+    try:
+        base_path = os.path.dirname(__file__)
+    # executed from nsis
+    except:
+        install_dir = os.getcwd()
+        base_path = os.path.join(install_dir,
+                                     '4 Programminterne Daten', 'installer')
 
-    #Installing pip
-    base_path = os.path.dirname("__file__")
     wheel_path = os.path.join(base_path, 'wheels')
     log('Install or upgrade pip')
     process = subprocess.Popen([os.path.join(python_path, 'python'),
@@ -144,23 +149,40 @@ def install_packages(python_path):
 
     ##Installing packages
     log('wheel_path; {}'.format(wheel_path))
-
-    for package, filename in used_packages.iteritems():
+    
+    def install_package(package, filename, upgrade=False): 
         log('{p}: {f}'.format(p=package, f=filename))
-        process = subprocess.Popen([os.path.join(python_path, 'Scripts', 'pip.exe'),
-                                    'install',
-                                    '-f', wheel_path,
-                                    os.path.join(wheel_path, filename)],
-                                   shell=True)
-        ret = process.wait()
-        if ret:
+        args = [os.path.join(python_path, 'Scripts', 'pip.exe'),
+                'install', 
+                '-f', wheel_path,
+                os.path.join(wheel_path, filename)]
+        if upgrade:
+            args.append('--upgrade')
+        process = subprocess.Popen(args,
+                                   shell=True,
+                                   stdout=subprocess.PIPE, 
+                                   stderr=subprocess.PIPE)
+        out, err = process.communicate()
+        log(out)
+        log(err)
+        
+        if process.returncode:
             log("Paket " + package + " konnte ggf. nicht installiert werden." + "\n")
+        
+    for package, filename in used_packages.iteritems():
+        install_package(package, filename)
+    
+    install_package('rpctools', 'rpctools-0.9.5b0-py2-none-any.whl',
+                    upgrade=True)
 
     log('Installation abgeschlossen.')
 
 if __name__ == '__main__':
-    python_pathes = get_python_path()
-    if python_pathes:
-        for path in python_pathes:
-            install_packages(path)
+    #parser = ArgumentParser()
+    #parser.add_argument('-i', dest='installdir')
+    #install_dir = parser.parse_args().installdir
+    python_paths = get_python_path()
+    if python_paths:
+        for python_path in python_paths:
+            install_packages(python_path)  #, install_dir=install_dir)
     #install_packages('C:\\Python27-ArcGIS\\ArcGISx6410.4')
