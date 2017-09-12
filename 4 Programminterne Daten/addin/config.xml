@@ -151,34 +151,34 @@
                 <Button caption="Sch&#228;tzen" category="ProjektCheck" class="EinwohnersaldenSchaetzen" id="rpc_tools.einwohnersalden_schaetzen" image="Images\4502-users_3.png" message="" tip="Abschätzen, welchen Einfluss das Projekt auf die Einwohnerzahl der Gemeinden in der Region hat. (Nur relevant für Wohnnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Bearbeiten" category="ProjektCheck" class="EinwohnersaldenBearbeiten" id="rpc_tools.einwohnersalden_bearbeiten" image="Images\4502-users_3.png" message="" tip="">
+                <Button caption="Bearbeiten" category="ProjektCheck" class="EinwohnersaldenBearbeiten" id="rpc_tools.einwohnersalden_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Sch&#228;tzen" category="ProjektCheck" class="BeschaeftigtensaldenSchaetzen" id="rpc_tools.beschaeftigtensalden_schaetzen" image="Images\281500-worker_3.png" message="" tip="Abschätzen, welchen Einfluss das Projekt auf die Zahl der Beschäftigten in den Gemeinden der Region hat. (Nur relevant für Gewerbenutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Bearbeiten" category="ProjektCheck" class="BeschaeftigtensaldenBearbeiten" id="rpc_tools.beschaeftigtensalden_bearbeiten" image="Images\281500-worker_3.png" message="" tip="">
+                <Button caption="Bearbeiten" category="ProjektCheck" class="BeschaeftigtensaldenBearbeiten" id="rpc_tools.beschaeftigtensalden_bearbeiten" image="Images\EditingSketchTool12.png" message="" tip="">
                     <Help heading="" />
                 </Button>
-                <Button caption="Grundsteuer" category="ProjektCheck" class="Grundsteuer" id="rpc_tools.grundsteuer" image="Images\011000-home_1.png" message="" tip="Mehreinnahmen der Projektgemeinde aus der Grundsteuer B schätzen">
+                <Button caption="Grundsteuer" category="ProjektCheck" class="Grundsteuer" id="rpc_tools.grundsteuer" image="Images\506500-office-building.png" message="" tip="Mehreinnahmen der Projektgemeinde aus der Grundsteuer B schätzen">
                     <Help heading="" />
                 </Button>
-                <Button caption="Einkommensteuer" category="ProjektCheck" class="Einkommensteuer" id="rpc_tools.einkommensteuer" image="Images\011000-home_1.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Einkommensteuer (Kommunalanteil) schätzen. (Nur relevant für Wohnnutzungen.)">
+                <Button caption="Einkommensteuer" category="ProjektCheck" class="Einkommensteuer" id="rpc_tools.einkommensteuer" image="Images\281500-worker.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Einkommensteuer (Kommunalanteil) schätzen. (Nur relevant für Wohnnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Hebes&#228;tze kontrollieren" category="ProjektCheck" class="Hebesaetze" id="rpc_tools.hebesaetze" image="Images\506700-factory_1.png" message="" tip="Vor der Berechnung der Gewerbesteuer die Hebesätze der Gemeinden in der Region kontrollieren und bei Bedarf anpassen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
+                <Button caption="Hebes&#228;tze kontrollieren" category="ProjektCheck" class="Hebesaetze" id="rpc_tools.hebesaetze" image="Images\vH.png" message="" tip="Vor der Berechnung der Gewerbesteuer die Hebesätze der Gemeinden in der Region kontrollieren und bei Bedarf anpassen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
                     <Help heading="" />
                 </Button>
                 <Button caption="Gemeindebilanzen sch&#228;tzen" category="ProjektCheck" class="Gemeindebilanzen" id="rpc_tools.gemeindebilanzen" image="Images\506700-factory_1.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Gewerbesteuer (netto) schätzen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Familienleistungsausgleich" category="ProjektCheck" class="Familienleistungsausgleich" id="rpc_tools.familienleistungsausgleich" image="" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus dem Familienleistungsausgleich schätzen.  (Nur relevant für Wohnnutzungen.)">
+                <Button caption="Familienleistungsausgleich" category="ProjektCheck" class="Familienleistungsausgleich" id="rpc_tools.familienleistungsausgleich" image="Images\4502-users_2.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus dem Familienleistungsausgleich schätzen.  (Nur relevant für Wohnnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Umsatzsteuer" category="ProjektCheck" class="Umsatzsteuer" id="rpc_tools.umsatzsteuer" image="" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Umsatzsteuer (Kommunalanteil) schätzen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
+                <Button caption="Umsatzsteuer" category="ProjektCheck" class="Umsatzsteuer" id="rpc_tools.umsatzsteuer" image="Images\022000-basket.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Umsatzsteuer (Kommunalanteil) schätzen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Gesamtsumme" category="ProjektCheck" class="BilanzenGesamtsumme" id="rpc_tools.bilanzen_gesamtsumme" image="" message="" tip="Zuvor ermittelte Mehr- und Mindereinnahmen der Gemeinden aus der Grund-, Einkommens-, Gewerbe- und Umsatzsteuer sowie dem Familienleistungsausgleich aufsummieren">
+                <Button caption="Gesamtsumme" category="ProjektCheck" class="BilanzenGesamtsumme" id="rpc_tools.bilanzen_gesamtsumme" image="Images\Summe.png" message="" tip="Zuvor ermittelte Mehr- und Mindereinnahmen der Gemeinden aus der Grund-, Einkommens-, Gewerbe- und Umsatzsteuer sowie dem Familienleistungsausgleich aufsummieren">
                     <Help heading="" />
                 </Button>
 
@@ -259,40 +259,40 @@
                 <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeOekologie" id="rpc_tools.hilfe_oekologie" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Ökologie” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Natur- und Artenschutz" category="ProjektCheck" class="Naturschutz" id="rpc_tools.naturschutzgebiete" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem strengen Schutzstatus im Bereich Natur- und Artenschutz ein (Nationalparke, Naturschutzgebiete, Fauna-Flora-Habitat-Gebiete und Vogelschutzgebiete). Quelle: IÖR-Monitor">
+                <Button caption="Natur- und Artenschutz" category="ProjektCheck" class="Naturschutz" id="rpc_tools.naturschutzgebiete" image="Images\700200-butterfly.png" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem strengen Schutzstatus im Bereich Natur- und Artenschutz ein (Nationalparke, Naturschutzgebiete, Fauna-Flora-Habitat-Gebiete und Vogelschutzgebiete). Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Landschaftsschutz" category="ProjektCheck" class="Landschaftsschutz" id="rpc_tools.landschaftsschutzgebiete" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem allgemeinen Schutzstatus im Bereich Landschaftsschutz ein (Naturparke, Landschaftsschutzgebiete und Biosphärenreservate außerhalb der Gebiete mit strengem Schutzstatus). Quelle: IÖR-Monitor">
+                <Button caption="Landschaftsschutz" category="ProjektCheck" class="Landschaftsschutz" id="rpc_tools.landschaftsschutzgebiete" image="Images\662000-sprouts.png" message="" tip="Blendet eine Rasterkarte (100x100m) der Gebiete mit einem allgemeinen Schutzstatus im Bereich Landschaftsschutz ein (Naturparke, Landschaftsschutzgebiete und Biosphärenreservate außerhalb der Gebiete mit strengem Schutzstatus). Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Detailangaben zu Schutzgebieten" category="ProjektCheck" class="Schutzgebiete" id="rpc_tools.detail_schutzgebiete" image="Images\5000-web.png" message="" tip="Öffnet eine Online-Karte des BfN zu den Schutzgebieten in Deutschland und zoomt auf den Bereich des Plangebiets. Dort finden sich Detailangaben zu den Schutzgebieten.">
+                <Button caption="Detailangaben zu Schutzgebieten" category="ProjektCheck" class="Schutzgebiete" id="rpc_tools.detail_schutzgebiete" image="Images\001500-search.png" message="" tip="Öffnet eine Online-Karte des BfN zu den Schutzgebieten in Deutschland und zoomt auf den Bereich des Plangebiets. Dort finden sich Detailangaben zu den Schutzgebieten.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene Freir&#228;ume > 100 qkm" category="ProjektCheck" class="Freiraeume_100qkm" id="rpc_tools.freiraeume_100" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 100 km² Größe ein. Quelle: IÖR-Monitor">
+                <Button caption="Unzerschnittene Freir&#228;ume > 100 qkm" category="ProjektCheck" class="Freiraeume_100qkm" id="rpc_tools.freiraeume_100" image="Images\UnzerschnittenerFreiraum100.png" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 100 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene Freir&#228;ume > 50 qkm" category="ProjektCheck" class="Freiraeume_50qkm" id="rpc_tools.freiraeume_50" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 50 km² Größe ein. Quelle: IÖR-Monitor">
+                <Button caption="Unzerschnittene Freir&#228;ume > 50 qkm" category="ProjektCheck" class="Freiraeume_50qkm" id="rpc_tools.freiraeume_50" image="Images\UnzerschnittenerFreiraum50.png" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Freiräume über 50 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Freir&#228;ume" category="ProjektCheck" class="Freiraeume" id="rpc_tools.freiraeume" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) aller landschaftlichen Freiräume (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
+                <Button caption="Freir&#228;ume" category="ProjektCheck" class="Freiraeume" id="rpc_tools.freiraeume" image="Images\Freiraum.png" message="" tip="Blendet eine Rasterkarte (100x100m) aller landschaftlichen Freiräume (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="Unzerschnittene W&#228;lder > 50 qkm" category="ProjektCheck" class="Waelder_50qkm" id="rpc_tools.waelder_50" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Waldgebiete über 50 km² Größe ein. Quelle: IÖR-Monitor">
+                <Button caption="Unzerschnittene W&#228;lder > 50 qkm" category="ProjektCheck" class="Waelder_50qkm" id="rpc_tools.waelder_50" image="Images\UnzerschnitteneWaelder50.png" message="" tip="Blendet eine Rasterkarte (100x100m) der unzerschnittenen Waldgebiete über 50 km² Größe ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
-                <Button caption="W&#228;lder" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) aller Waldgebiete (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
+                <Button caption="W&#228;lder" category="ProjektCheck" class="Waldgebiete" id="rpc_tools.waelder" image="Images\Waelder.png" message="" tip="Blendet eine Rasterkarte (100x100m) aller Waldgebiete (unabhängig von ihrer Größe) ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
                 <Button caption="Leistungskennwerte berechnen" category="ProjektCheck" class="Kennwerte_berechnen" id="rpc_tools.kennwerte_berechnen" image="Images\450000-chart.png" message="" tip="Ökologische Leistungskennwerte des Boden im Null- und Planfall berechnen. Die dafür benötigten Anteile der Bodenbedeckung können direkt eingetragen oder aus den Zeichnungen übernommen werden.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Wohndichte bestimmen" category="ProjektCheck" class="Wohndichte" id="rpc_tools.wohndichte" image="Images\450000-chart.png" message="" tip="Die Wohndichte (WE pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
+                <Button caption="Wohndichte bestimmen" category="ProjektCheck" class="Wohndichte" id="rpc_tools.wohndichte" image="Images\011000-home_1.png" message="" tip="Die Wohndichte (WE pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Wohnfl&#228;chendichte bestimmen" category="ProjektCheck" class="Wohnflaechendichte" id="rpc_tools.wohnflaechendichte" image="Images\450000-chart.png" message="" tip="Die Wohnflächendichte (qm Wohnfläche pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
+                <Button caption="Wohnfl&#228;chendichte bestimmen" category="ProjektCheck" class="Wohnflaechendichte" id="rpc_tools.wohnflaechendichte" image="Images\0188-door.png" message="" tip="Die Wohnflächendichte (qm Wohnfläche pro Hektar Nettowohnbauland) für Teilflächen mit der Nutzung “Wohnen” ermitteln und mit regionalen Durchschnittswerten vergleichen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Hochspannungsleitungen" category="ProjektCheck" class="Hochspannungsleitungen" id="rpc_tools.hochspannung" image="Images\800500-script.png" message="" tip="Blendet eine Rasterkarte (100x100m) mit den Einflussbereichen von Hochspannungsfreileitungen ein. Quelle: IÖR-Monitor">
+                <Button caption="Hochspannungsleitungen" category="ProjektCheck" class="Hochspannungsleitungen" id="rpc_tools.hochspannung" image="Images\Freileitung.png" message="" tip="Blendet eine Rasterkarte (100x100m) mit den Einflussbereichen von Hochspannungsfreileitungen ein. Quelle: IÖR-Monitor">
                     <Help heading="" />
                 </Button>
                 <Tool caption="Gemeinsame Grenze mit Siedlungsk&#246;rper einzeichnen" category="ProjektCheck" class="Grenze_zeichnen" id="rpc_tools.grenzlinie_einzeichnen" image="Images\EditingSketchTool12.png" message="" tip="Markieren der Abschnitte der Außenkante des Plangebiets, die an eine bestehende Siedlungsfläche angrenzen.">
