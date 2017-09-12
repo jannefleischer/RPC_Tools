@@ -163,19 +163,19 @@
                 <Button caption="Grundsteuer" category="ProjektCheck" class="Grundsteuer" id="rpc_tools.grundsteuer" image="Images\506500-office-building.png" message="" tip="Mehreinnahmen der Projektgemeinde aus der Grundsteuer B schätzen">
                     <Help heading="" />
                 </Button>
-                <Button caption="Einkommensteuer" category="ProjektCheck" class="Einkommensteuer" id="rpc_tools.einkommensteuer" image="Images\281500-worker.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Einkommensteuer (Kommunalanteil) schätzen. (Nur relevant für Wohnnutzungen.)">
+                <Button caption="Einkommensteuer (Kommunalanteil)" category="ProjektCheck" class="Einkommensteuer" id="rpc_tools.einkommensteuer" image="Images\281500-worker.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Einkommensteuer (Kommunalanteil) schätzen. (Nur relevant für Wohnnutzungen.)">
                     <Help heading="" />
                 </Button>
                 <Button caption="Hebes&#228;tze kontrollieren" category="ProjektCheck" class="Hebesaetze" id="rpc_tools.hebesaetze" image="Images\vH.png" message="" tip="Vor der Berechnung der Gewerbesteuer die Hebesätze der Gemeinden in der Region kontrollieren und bei Bedarf anpassen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Gemeindebilanzen sch&#228;tzen" category="ProjektCheck" class="Gemeindebilanzen" id="rpc_tools.gemeindebilanzen" image="Images\506700-factory_1.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Gewerbesteuer (netto) schätzen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
+                <Button caption="Gewerbesteuer (netto)" category="ProjektCheck" class="Gemeindebilanzen" id="rpc_tools.gemeindebilanzen" image="Images\506700-factory_1.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Gewerbesteuer (netto) schätzen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
                     <Help heading="" />
                 </Button>
                 <Button caption="Familienleistungsausgleich" category="ProjektCheck" class="Familienleistungsausgleich" id="rpc_tools.familienleistungsausgleich" image="Images\4502-users_2.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus dem Familienleistungsausgleich schätzen.  (Nur relevant für Wohnnutzungen.)">
                     <Help heading="" />
                 </Button>
-                <Button caption="Umsatzsteuer" category="ProjektCheck" class="Umsatzsteuer" id="rpc_tools.umsatzsteuer" image="Images\022000-basket.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Umsatzsteuer (Kommunalanteil) schätzen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
+                <Button caption="Umsatzsteuer (Kommunalanteil)" category="ProjektCheck" class="Umsatzsteuer" id="rpc_tools.umsatzsteuer" image="Images\022000-basket.png" message="" tip="Mehreinnahmen der Projektgemeinde sowie Mindereinnahmen der Nachbargemeinden aus der Umsatzsteuer (Kommunalanteil) schätzen. (Nur relevant für Gewerbe- und Einzelhandelsnutzungen.)">
                     <Help heading="" />
                 </Button>
                 <Button caption="Gesamtsumme" category="ProjektCheck" class="BilanzenGesamtsumme" id="rpc_tools.bilanzen_gesamtsumme" image="Images\Summe.png" message="" tip="Zuvor ermittelte Mehr- und Mindereinnahmen der Gemeinden aus der Grund-, Einkommens-, Gewerbe- und Umsatzsteuer sowie dem Familienleistungsausgleich aufsummieren">
@@ -648,7 +648,7 @@
                         <Button refID="rpc_tools.kosten_pro_we_bzw_ap_vergleichen" separator="true"/>
                     </Items>
                 </Menu>
-                <Menu caption="Gewerbesteuer" category="ProjektCheck" id="rpc_tools.menu_gewerbesteuer" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="Gewerbesteuer (netto)" category="ProjektCheck" id="rpc_tools.menu_gewerbesteuer" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.hebesaetze" />
                         <Button refID="rpc_tools.gemeindebilanzen" />

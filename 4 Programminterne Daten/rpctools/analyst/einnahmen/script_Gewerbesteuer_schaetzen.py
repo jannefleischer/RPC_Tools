@@ -137,16 +137,28 @@ class Gewerbesteuer(Tool):
 
         Gewerbesteuermessbetrag_pro_SvB_Projekt = Gewerbesteuermessbetrag_Projekt / (SvB_Branchen + SvB_Verkaufsflaechen)
         #arcpy.AddMessage("Gewerbesteuermessbetrag_pro_SvB_Projekt: " + str(Gewerbesteuermessbetrag_pro_SvB_Projekt))
-
+        
         table_bilanzen = self.folders.get_table("Gemeindebilanzen", "FGDB_Einnahmen.gdb")
         fields = ["AGS", "GewSt", "Hebesatz_GewSt", "SvB_Saldo"]
         cursor = arcpy.da.UpdateCursor(table_bilanzen, fields)
+        table_umlage = self.folders.get_base_table("FGDB_Einnahmen_Tool.gdb", "GewSt_Umlage_Vervielfaeltiger")
+        fields8 = ['Summe_BVV_LVV_EHZ']
 
         for row in cursor:
+            agsGem = row[0]
+            agsLand = agsGem[0:2]
+            where8 = '"AGS_Land"' + "='" + agsLand + "'"
+            cursor8 = arcpy.da.SearchCursor(table_umlage, fields8, where8)
+            for row8 in cursor8:
+                bvv_plus_lvv_plus_ehz = row8[0]
+            #arcpy.AddMessage("Summe Bundes- und Landesvervielfältiger plus Erhöhungszahl: " + str(bvv_plus_lvv_plus_ehz))
+            umlagesatz = bvv_plus_lvv_plus_ehz / row[2]
+            #arcpy.AddMessage("Umlagesatz Gewerbesteuerumlage: " + str(umlagesatz))
+            
             if row[0] == ags:
-                row[1] = Gewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100.0) * (row[3] + SvB_Verkaufsflaechen)
+                row[1] = (Gewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100.0) * (row[3] + SvB_Verkaufsflaechen)) * (1 - umlagesatz)
             else:
-                row[1] = Gewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100.0) * row[3]
+                row[1] = (Gewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100.0) * row[3]) * (1 - umlagesatz)
             cursor.updateRow(row)
 
         c.set_chronicle("Gewerbesteuer", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
