@@ -33,18 +33,23 @@ class TbxProjectFolder(Tbx):
     def Tool(self):
         return ProjectFolder
 
-    def _getParameterInfo(self):
-        params = self.par
+    def validate_active_project(self):
+        return True, ''
+
+    def _open(self, params):
+        p = params.folderpath
         config = Config()
         project_folder = config.project_folder
+        p.value = project_folder
 
+    def _getParameterInfo(self):
+        params = self.par
         p = self.add_parameter('folderpath')
         p.name = u'folderpath'
         p.displayName = u'Pfad zu den benutzerdefinierten Projekten'
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'DEFolder'
-        p.value = project_folder
 
         return params
 
