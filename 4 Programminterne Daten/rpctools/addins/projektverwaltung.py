@@ -6,7 +6,13 @@ import pythonaddins
 
 __all__ = ['ProjektAnlegen', 'ProjektAuswahl',
            'ProjektKopieren', 'ProjektLoeschen',
-           'RefreshLayers']
+           'RefreshLayers', 'ProjektOrdner']
+
+class ProjektOrdner(ToolboxButton):
+    """Implementation for rpc_tools.neues_projekt (Button)"""
+    _path = folders.DEFINITION_PYT_PATH
+    _pyt_file = 'Projektverwaltung.pyt'
+    _toolbox_name = 'TbxProjectFolder'
 
 
 class ProjektAnlegen(ToolboxButton):

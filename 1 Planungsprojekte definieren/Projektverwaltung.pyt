@@ -14,6 +14,8 @@ from rpctools.definitions.projektverwaltung.tbx_projektverwaltung import \
 
 from rpctools.definitions.projektverwaltung.tbx_projektauswahl import \
      TbxProjektauswahl
+from rpctools.definitions.projektpfad.tbx_projektpfad import TbxProjectFolder
+
 
 
 class Toolbox(object):
@@ -24,4 +26,5 @@ class Toolbox(object):
                       TbxProjektKopieren,
                       TbxProjekteLoeschen,
                       TbxProjektauswahl,
+                      TbxProjectFolder,
                       ]
