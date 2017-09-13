@@ -11,6 +11,11 @@ class ProjectFolder(Tool):
     def run(self):
         config = Config()
         tbx = self.parent_tbx
+        if not tbx._writeable:
+            arcpy.AddError("Für den von Ihnen angegebenen Dateipfad besitzen "
+                           "Sie keine Schreibrechte. Bitte geben Sie einen "
+                           "anderen Pfad an!")
+            return
         config.project_folder = str(tbx.par.folderpath.value)
 
 
@@ -19,7 +24,7 @@ class ProjectFolder(Tool):
 
 
 class TbxProjectFolder(Tbx):
-
+    _writeable = True
     @property
     def label(self):
         return encode(u'Projektpfad setzen')
@@ -30,6 +35,8 @@ class TbxProjectFolder(Tbx):
 
     def _getParameterInfo(self):
         params = self.par
+        config = Config()
+        project_folder = config.project_folder
 
         p = self.add_parameter('folderpath')
         p.name = u'folderpath'
@@ -37,5 +44,26 @@ class TbxProjectFolder(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'DEFolder'
+        p.value = project_folder
 
         return params
+
+    #def _updateParameters(self, params):
+        #if self.par.changed('folderpath'):
+            #if
+
+    def _updateMessages(self, params):
+
+        par = self.par
+        if par.changed('folderpath'):
+            try:
+                test_path = str(par.folderpath.value) + \
+                    r'\writability_test.txt'
+                testfile = open(test_path, 'w+')
+                testfile.close()
+                os.remove(test_path)
+            except:
+                self._writeable = False
+                par.folderpath.setErrorMessage(u'Sie besitzen keine '
+                                               u'Schreibrechte für diesen '
+                                               u'Pfad!')
