@@ -9,6 +9,12 @@ from rpctools.utils.params import Tbx, Tool
 class ProjectFolder(Tool):
 
     def run(self):
+        config = Config()
+        tbx = self.parent_tbx
+        config.project_folder = str(tbx.par.folderpath.value)
+
+
+    def add_outputs(self):
         pass
 
 
@@ -20,7 +26,7 @@ class TbxProjectFolder(Tbx):
 
     @property
     def Tool(self):
-        return ProjektwirkungMarkets
+        return ProjectFolder
 
     def _getParameterInfo(self):
         params = self.par
@@ -30,6 +36,6 @@ class TbxProjectFolder(Tbx):
         p.displayName = u'Pfad zu den benutzerdefinierten Projekten'
         p.parameterType = 'Required'
         p.direction = 'Input'
-        p.datatype = 'GPFeatureLayer'
+        p.datatype = 'DEFolder'
 
         return params
