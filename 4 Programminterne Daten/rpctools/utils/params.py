@@ -321,6 +321,7 @@ class Tbx(object):
         self.canRunInBackground = False
         # update projects on call of updateParameters
         self.requires_existing_project = True
+        self.requires_existing_project_path = True
         self._dependencies = []
         # updates to these tables are written to temp. tables and written to
         # project db only on execution of tool
@@ -443,6 +444,16 @@ class Tbx(object):
             return False, (u'Aktives Projekt kann nicht gefunden werden!')
         return True, ''
 
+    def validate_project_folder(self):
+        if not self.requires_existing_project:
+            return True, ''
+        project_folder = self.config.project_folder
+        if not project_folder:
+            return False, (u'Kein Projektpfad definiert!')
+        elif not os.path.exists(project_folder):
+            return False, (u'Angegebener Projektpfad existiert nicht mehr!')
+        return True, ''
+
     def _update_project_list(self):
         """
         Update the parameter list of existing projects
@@ -520,6 +531,11 @@ class Tbx(object):
         params = self.par._od.values()
         if self.requires_existing_project:
             valid, message = self.validate_active_project()
+            if not valid:
+                params[0].setErrorMessage(message)
+                return
+        if self.requires_existing_project_path:
+            valid, message = self.validate_project_folder()
             if not valid:
                 params[0].setErrorMessage(message)
                 return

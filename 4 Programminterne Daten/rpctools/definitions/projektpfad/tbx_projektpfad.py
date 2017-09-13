@@ -43,6 +43,7 @@ class TbxProjectFolder(Tbx):
         p.value = project_folder
 
     def _getParameterInfo(self):
+        self.requires_existing_project_path = False
         params = self.par
         p = self.add_parameter('folderpath')
         p.name = u'folderpath'
@@ -67,8 +68,10 @@ class TbxProjectFolder(Tbx):
                 testfile = open(test_path, 'w+')
                 testfile.close()
                 os.remove(test_path)
+                self._writeable = True
             except:
                 self._writeable = False
+                arcpy.AddMessage(str(par.folderpath.value))
                 par.folderpath.setErrorMessage(u'Sie besitzen keine '
                                                u'Schreibrechte für diesen '
                                                u'Pfad!')
