@@ -14,7 +14,7 @@
 from os import listdir
 import sys
 from os.path import join, isdir, abspath, dirname, basename, exists
-from os import mkdir
+from os import mkdir, getenv
 import arcpy
 import json
 import _winreg
@@ -31,7 +31,8 @@ class Config(object):
         'epsg': 31467,
         'transformation': "DHDN_To_WGS_1984_5x",
         'max_area_distance': 1000,
-        'google_api_key': ' AIzaSyDL32xzaNsQmB_fZGU9SF_FtnvJ4ZrwP8g'
+        'google_api_key': ' AIzaSyDL32xzaNsQmB_fZGU9SF_FtnvJ4ZrwP8g',
+        'project_folder': ''
     }
 
     _config = {}
@@ -147,7 +148,7 @@ class Folders(object):
         self._projectname = projectname
         self._workspace = workspace
         self._invalid_paths = []
-        self._CONFIG_FILE = 'config.txt'
+        self._CONFIG_FILE = 'projektcheck-config.txt'
         self._OTP_PICKLE_FILE = 'otpgraph.pickle'
         self._ZENUS_FILE = r'ZensusGrid\Zensus2011GridWGS84_int.tif'
 
@@ -257,7 +258,7 @@ class Folders(object):
 
     @property
     def CONFIG_FILE(self):
-        return join(self.INTERN, self._CONFIG_FILE)
+        return join(self.APPDATA_PATH, self._CONFIG_FILE)
 
     @property
     def ANALYST_PYT_PATH(self):
@@ -270,6 +271,13 @@ class Folders(object):
     @property
     def MANUALS_PATH(self):
         return self.join_and_check(self.BASE_PATH, self._MANUALS_PATH)
+    
+    @property
+    def APPDATA_PATH(self):
+        path = join(getenv('LOCALAPPDATA'), 'Projekt-Check')
+        if not exists(path):
+            mkdir(path)
+        return path
 
     def get_projects(self):
         '''
