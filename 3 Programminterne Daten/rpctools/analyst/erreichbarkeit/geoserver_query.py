@@ -56,7 +56,7 @@ class GeoserverQuery(object):
             else:
                 x, y = coords[0]
             category = feat['properties']['projektcheck_category']
-            name = feat['properties']['name'][:99] or ''
-            feature = Feature(x, y, name, category, epsg=target_epsg)
+            name = feat['properties']['name'] or ''
+            feature = Feature(x, y, name[:99], category, epsg=target_epsg)
             features.append(feature)
         return features
