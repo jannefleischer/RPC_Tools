@@ -131,7 +131,7 @@ def install_packages(python_path, install_dir=''):
     except:
         install_dir = os.getcwd()
         base_path = os.path.join(install_dir,
-                                     '4 Programminterne Daten', 'installer')
+                                     '3 Programminterne Daten', 'installer')
 
     wheel_path = os.path.join(base_path, 'wheels')
     log('Install or upgrade pip')
