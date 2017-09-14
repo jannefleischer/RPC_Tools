@@ -16,6 +16,7 @@ class ProjectFolder(Tool):
                            "Sie keine Schreibrechte. Bitte geben Sie einen "
                            "anderen Pfad an!")
             return
+        config.active_project = ""
         config.project_folder = str(tbx.par.folderpath.value)
 
 
@@ -44,7 +45,9 @@ class TbxProjectFolder(Tbx):
 
     def _getParameterInfo(self):
         self.requires_existing_project_path = False
+        self.requires_existing_project = False
         params = self.par
+        config = Config()
         p = self.add_parameter('folderpath')
         p.name = u'folderpath'
         p.displayName = u'Pfad zu den benutzerdefinierten Projekten'
@@ -52,11 +55,12 @@ class TbxProjectFolder(Tbx):
         p.direction = 'Input'
         p.datatype = 'DEFolder'
 
-        return params
+        p = self.add_parameter('dummy')
+        p.direction = 'Input'
+        p.parameterType = 'Optional'
+        p.enabled = False
 
-    #def _updateParameters(self, params):
-        #if self.par.changed('folderpath'):
-            #if
+        return params
 
     def _updateMessages(self, params):
 

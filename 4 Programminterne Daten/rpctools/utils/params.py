@@ -410,8 +410,9 @@ class Tbx(object):
         # set the active project on open (do not do this in project management
         # toolboxes, updating projects messes them up, that's what the boolean
         # self.update_projects is for)
-        if (self.requires_existing_project and
-            self.par._get_param_project() is not None):
+        if  (  #not self.requires_existing_project_path or
+            (self.requires_existing_project and
+            self.par._get_param_project() is not None)):
             self.set_active_project()
             # don't call _open of subclass if there is only one parameter
             if len(self.par) > 1:
@@ -445,7 +446,7 @@ class Tbx(object):
         return True, ''
 
     def validate_project_folder(self):
-        if not self.requires_existing_project:
+        if not self.requires_existing_project_path:
             return True, ''
         project_folder = self.config.project_folder
         if not project_folder:
@@ -529,13 +530,13 @@ class Tbx(object):
         """
         self.par._update_parameters(parameters)
         params = self.par._od.values()
-        if self.requires_existing_project:
-            valid, message = self.validate_active_project()
+        if self.requires_existing_project_path:
+            valid, message = self.validate_project_folder()
             if not valid:
                 params[0].setErrorMessage(message)
                 return
-        if self.requires_existing_project_path:
-            valid, message = self.validate_project_folder()
+        if self.requires_existing_project:
+            valid, message = self.validate_active_project()
             if not valid:
                 params[0].setErrorMessage(message)
                 return
@@ -562,6 +563,9 @@ class Tbx(object):
         self._updateMessages(self.par)
 
     def validate_inputs(self):
+        """
+        to be implemented in derived toolbox
+        """
         return True, ''
 
     def _updateMessages(self, parameters):
