@@ -280,12 +280,21 @@ class Folders(object):
         returns all available projects inside the project folder
         (except the temp. projects which are not meant to be edited)
         '''
+        base_path = self.PROJECT_BASE_PATH
         if not exists(self.PROJECT_BASE_PATH):
             return []
-        subfolders = [f for f in listdir(u'{}'.format(self.PROJECT_BASE_PATH))
-                      if isdir(self.get_projectpath(f))
-                      and f != self._TEST_TMP_PROJECT]
-        return sorted(subfolders)
+        project_folders = []
+        for f in listdir(base_path):
+            path = join(base_path, f)
+            if isdir(path) and f != self._TEST_TMP_PROJECT:
+                subfolders = listdir(path)
+                # folder has to contain at least one template file-geodatabase 
+                # (starting with FGDB_)
+                for s in subfolders:
+                    if (s.startswith('FGDB_')):
+                        project_folders.append(f)
+                        break
+        return sorted(project_folders)
 
     def get_temporary_projects(self):
         '''
@@ -534,7 +543,9 @@ class Folders(object):
                                            subfolder,
                                            filename)
         return diagram_path
-
+    
 if __name__ == '__main__':
     c = Config()
-    print(c)
+    f = Folders(projectname=c.active_project)
+    projects = f.get_projects()
+    print(projects)
