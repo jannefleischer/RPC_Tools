@@ -50,7 +50,7 @@ class TbxProjectFolder(Tbx):
         params = self.par
         p = self.add_parameter('folderpath')
         p.name = u'folderpath'
-        p.displayName = u'Speicherort für alle Ihre benutzerdefinierter ' + \
+        p.displayName = u'Speicherort für alle Ihre benutzerdefinierten ' + \
             'Projekte (Pfad zu einem Ordner)'
         p.parameterType = 'Required'
         p.direction = 'Input'
