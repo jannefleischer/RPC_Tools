@@ -17,6 +17,8 @@ class ProjectFolder(Tool):
                            "anderen Pfad an!")
             return
         config.project_folder = str(tbx.par.folderpath.value)
+        projects = self.folders.get_projects()
+        config.active_project = projects[0] if projects else ''
 
 
     def add_outputs(self):
@@ -25,6 +27,12 @@ class ProjectFolder(Tool):
 
 class TbxProjectFolder(Tbx):
     _writeable = True
+
+    def __init__(self):
+        super(TbxProjectFolder, self).__init__()
+        self.requires_existing_project = False
+        self.requires_existing_project_path = False
+
     @property
     def label(self):
         return encode(u'Projektpfad setzen')
@@ -33,17 +41,12 @@ class TbxProjectFolder(Tbx):
     def Tool(self):
         return ProjectFolder
 
-    def validate_active_project(self):
-        return True, ''
-
     def _open(self, params):
         p = params.folderpath
-        config = Config()
-        project_folder = config.project_folder
+        project_folder = self.config.project_folder
         p.value = project_folder
 
     def _getParameterInfo(self):
-        self.requires_existing_project_path = False
         params = self.par
         p = self.add_parameter('folderpath')
         p.name = u'folderpath'
@@ -51,15 +54,22 @@ class TbxProjectFolder(Tbx):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'DEFolder'
+        p.value = ''
+
+        p = self.add_parameter('dummy')
+        p.name = u'dummy'
+        p.direction = 'Input'
+        p.parameterType = 'Required'
+        p.datatype = 'GPBoolean'
+        p.enabled = False
+        p.value = False
 
         return params
 
-    #def _updateParameters(self, params):
-        #if self.par.changed('folderpath'):
-            #if
+    def _updateParameters(self, params):
+        pass
 
     def _updateMessages(self, params):
-
         par = self.par
         if par.changed('folderpath'):
             try:
@@ -75,3 +85,8 @@ class TbxProjectFolder(Tbx):
                 par.folderpath.setErrorMessage(u'Sie besitzen keine '
                                                u'Schreibrechte für diesen '
                                                u'Pfad!')
+
+if __name__ == "__main__":
+    t = TbxProjectFolder()
+    parameters = t._getParameterInfo()
+    t.updateParameters(parameters)
