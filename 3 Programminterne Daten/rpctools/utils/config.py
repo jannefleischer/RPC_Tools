@@ -224,7 +224,7 @@ class Folders(object):
 
     @property
     def TEMPORARY_GDB_PATH(self):
-        path = join(self.INTERN, self._TEMPORARY_GDB_PATH)
+        path = join(self.PROJECT_BASE_PATH, self._TEMPORARY_GDB_PATH)
         if not exists(path):
             mkdir(path)
         return path
