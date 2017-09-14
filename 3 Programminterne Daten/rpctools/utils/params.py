@@ -440,19 +440,22 @@ class Tbx(object):
         active_project = self.config.active_project
         projects = self.folders.get_projects()
         if not active_project:
-            return False, (u'Kein aktives Projekt ausgewählt!')
+            return False, (u'Es ist kein aktives Projekt ausgewählt!')
         elif active_project not in projects:
-            return False, (u'Aktives Projekt kann nicht gefunden werden!')
+            return False, (u'Das aktive Projekt kann nicht gefunden werden!')
         return True, ''
 
     def validate_project_folder(self):
         if not self.requires_existing_project_path:
             return True, ''
         project_folder = self.config.project_folder
+        msg = (u'\nBitte geben Sie im Menü Verwalten einen '
+               u'validen Speicherort an.')
         if not project_folder:
-            return False, (u'Kein Projektpfad definiert!')
+            return False, (u'Es ist kein Speicherort für Ihre Projekte definiert!')
         elif not os.path.exists(project_folder):
-            return False, (u'Angegebener Projektpfad existiert nicht mehr!')
+            return False, (u'Der angegebene Speicherort für Ihre Projekte '
+                           u'existiert nicht (mehr)!')
         return True, ''
 
     def _update_project_list(self):

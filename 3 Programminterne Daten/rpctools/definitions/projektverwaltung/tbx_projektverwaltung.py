@@ -13,6 +13,7 @@ class TbxProjektVerwaltung(Tbx):
 
     def __init__(self):
         super(TbxProjektVerwaltung, self).__init__()
+        self.requires_existing_project_path = True
         self.requires_existing_project = False
 
 
@@ -74,11 +75,16 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
     @property
     def Tool(self):
         return ProjektKopieren
+    
+    def _open(self, params):
+        projects = self.folders.get_projects()
+        p = self.par.existing_project
+        p.filter.list = projects
+        p.value = projects[0] if projects else ''
 
     def _getParameterInfo(self):
         params = self.par
 
-        projects = self.folders.get_projects()
 
         # Bestehendes_Projekt_auswählen
         p = self.add_parameter('existing_project')
@@ -87,8 +93,6 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'GPString'
-        p.filter.list = projects
-        p.value = projects[0]
 
         # Name_des_neuen_Projektes
         p = self.add_parameter('name')
@@ -147,7 +151,7 @@ if __name__ == '__main__':
     params = t.getParameterInfo()
     t.par.name.value = 'Test' + str(np.random.randint(0, 10000))
     #t.set_active_project()
-    t.updateParameters(params)
+    t._updateParameters(params)
     t.execute()
     t.print_tool_parameters()
 

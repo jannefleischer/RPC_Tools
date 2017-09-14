@@ -3,6 +3,7 @@
 from rpctools.addins.common import ToolboxButton, folders, config
 from rpctools.addins.outputs import ProjektAnzeigen
 import pythonaddins
+from os.path import exists
 
 __all__ = ['ProjektAnlegen', 'ProjektAuswahl',
            'ProjektKopieren', 'ProjektLoeschen',
@@ -54,9 +55,23 @@ class ProjektAuswahl(ProjektAnzeigen):
                    u'Bitte löschen Sie es bei Gelegenheit!')
             pythonaddins.MessageBox(msg, 'Fehler', 0)
             config.active_project = self.value = ''
-
+    
     def onFocus(self, focused):
         if focused:
+            # doesn't work, arcpy get's stuck in focus when showing messagebox
+            #folder = config.project_folder
+            #err = ''
+            #if not folder:
+                #err = (u'Es wurde noch kein Speicherort für die Projekte definiert.')
+            #elif not exists(folder):
+                #err = (u'Der angegebene Speicherort für die Projekte existiert nicht.')
+            #print folder
+            #print(err)
+            #if err:
+                #err += (u'\nBitte geben Sie im Menü Verwalten '
+                        #u'einen validen Speicherort an')
+                #pythonaddins.MessageBox(err, 'Fehler', 0)
+            #else:
             self.refresh()
 
     def refresh(self):

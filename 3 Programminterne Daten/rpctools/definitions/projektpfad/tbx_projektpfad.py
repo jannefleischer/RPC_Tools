@@ -73,19 +73,23 @@ class TbxProjectFolder(Tbx):
     def _updateMessages(self, params):
         par = self.par
         if par.changed('folderpath'):
-            try:
-                test_path = str(par.folderpath.value) + \
-                    r'\writability_test.txt'
-                testfile = open(test_path, 'w+')
-                testfile.close()
-                os.remove(test_path)
-                self._writeable = True
-            except:
-                self._writeable = False
-                arcpy.AddMessage(str(par.folderpath.value))
-                par.folderpath.setErrorMessage(u'Sie besitzen keine '
-                                               u'Schreibrechte für diesen '
-                                               u'Pfad!')
+            err = ''
+            if not os.path.exists(str(par.folderpath.value)):
+                err = 'Der Pfad existiert nicht.'
+            else:
+                try:
+                    test_path = str(par.folderpath.value) + \
+                        r'\writability_test.txt'
+                    testfile = open(test_path, 'w+')
+                    testfile.close()
+                    os.remove(test_path)
+                    self._writeable = True
+                except:
+                    self._writeable = False
+                    arcpy.AddMessage(str(par.folderpath.value))
+                    err = u'Sie besitzen keine Schreibrechte für diesen Pfad!'
+            if err:
+                par.folderpath.setErrorMessage(err)
 
 if __name__ == "__main__":
     t = TbxProjectFolder()
