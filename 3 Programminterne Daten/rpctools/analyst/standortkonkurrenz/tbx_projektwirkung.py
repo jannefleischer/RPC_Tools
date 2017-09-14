@@ -490,7 +490,7 @@ class TbxProjektwirkungMarkets(Tbx):
         p = self.add_parameter('radius_sz')
         p.name = u'radius_sz'
         p.displayName = encode(u'Pufferzone für Siedlungszellen um gewählte '
-                               u'Gemeinden festlegen')
+                               u'Gemeinden festlegen (in m)')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPLong'

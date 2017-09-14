@@ -20,13 +20,13 @@ class OSMMarktBuffer(OSMMarktEinlesen):
     _markets_table = 'Maerkte'
     _markets_buffer = 'Maerkte_Puffer'
     _out_layer_name = 'erweiterter Betrachtungsraum'
-    
+
     def add_outputs(self):
         super(OSMMarktEinlesen, self).add_outputs()
         self.output.add_layer('standortkonkurrenz',
                               self._markets_buffer,
                               featureclass=self._markets_buffer,
-                              name=self._out_layer_name, 
+                              name=self._out_layer_name,
                               template_folder="Standortkonkurrenz")
 
     def run(self):
@@ -40,20 +40,20 @@ class OSMMarktBuffer(OSMMarktEinlesen):
         markets_buffer_output = self.folders.get_table(self._markets_buffer,
                                                        check=False)
         markets_com = os.path.join(ws_tmp, 'markets_com')
-        
+
         def del_tmp():
             for f in [sel_comm, feat_buffered, markets_buffer, markets_tmp,
                       markets_com]:
                 arcpy.Delete_management(f)
-        
+
         del_tmp()
-        
+
         arcpy.FeatureClassToFeatureClass_conversion(
             communities, ws_tmp, os.path.split(sel_comm)[1],
             where_clause='Auswahl<>0')
-        
+
         # ToDo: buffer -> multi_poly -> markets -> markets in selected communities -> remove those from markets in multi_poly -> to db
-        
+
         arcpy.AddMessage('Analysiere Pufferbereich...')
         # create buffer area
         arcpy.Buffer_analysis(sel_comm, feat_buffered,
@@ -63,11 +63,11 @@ class OSMMarktBuffer(OSMMarktEinlesen):
             self.output.remove_layer(self._out_layer_name)
         except:
             pass
-        
+
         arcpy.Delete_management(markets_buffer_output)
-        arcpy.Dissolve_management(feat_buffered, markets_buffer_output, "", "", 
+        arcpy.Dissolve_management(feat_buffered, markets_buffer_output, "", "",
                                   "SINGLE_PART", "DISSOLVE_LINES")
-    
+
         multi_poly = minimal_bounding_poly(feat_buffered)
         epsg = self.parent_tbx.config.epsg
         multi_poly = [[Point(p.X, p.Y, epsg=epsg) for p in poly]
@@ -79,11 +79,11 @@ class OSMMarktBuffer(OSMMarktEinlesen):
         for poly in multi_poly:
             m = reader.get_shops(poly, count=count-len(markets))
             markets += m
-        
+
         if len(markets) > 0:
             # pro license only
             #arcpy.SymDiff_analysis(feat_buffered, sel_comm, buffer_diff)
-            
+
             #self.parent_tbx.delete_rows_in_table(self._markets_table,
                                                  #where='is_buffer=1')
             arcpy.CreateFeatureclass_management(
@@ -104,12 +104,12 @@ class OSMMarktBuffer(OSMMarktEinlesen):
             where = 'id IN ({})'.format(','.join(in_com_ids))
             self.parent_tbx.delete_rows_in_table(markets_buffer, where)
             arcpy.Append_management(markets_buffer, markets_table)
-            
+
             arcpy.AddMessage('Entferne Duplikate...')
-            n = remove_duplicates(markets_table, 'id', match_field='id_kette', 
+            n = remove_duplicates(markets_table, 'id', match_field='id_kette',
                                   where='is_buffer=1', distance=50)
             arcpy.AddMessage('{} Duplikate entfernt...'.format(n))
-            
+
             self.set_ags()
         del_tmp()
 
@@ -137,12 +137,12 @@ class TbxOSMBuffer(Tbx):
         param.direction = 'Input'
         param.datatype = u'GPString'
         param.filter.list = []
-        
+
         # markets radius
         p = self.add_parameter('radius_markets')
         p.name = u'radius_markets'
         p.displayName = encode(u'Pufferzone für Märkte um gewählte '
-                               u'Gemeinden festlegen')
+                               u'Gemeinden festlegen (in m)')
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = u'GPLong'
