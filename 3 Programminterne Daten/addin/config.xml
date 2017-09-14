@@ -31,7 +31,7 @@
                 <ComboBox caption="Projekt" category="ProjektCheck" class="ProjektAuswahl" id="rpc_tools.projekt_auswahl" itemSizeString="WWWWWW" message="" rows="4" sizeString="WWWWWW" tip="Nur dieses Projekt k&#246;nnen Sie editieren und analysieren. Weitere Projekte k&#246;nnen angezeigt bleiben.">
                     <Help heading="" />
                 </ComboBox>
-                <Button caption="Projektordner w&#228;hlen" category="ProjektCheck" class="ProjektOrdner" id="rpc_tools.projektordner" image="" message="" tip="">
+                <Button caption="Speicherort f&#252;r Ihre Projekte" category="ProjektCheck" class="ProjektOrdner" id="rpc_tools.projektordner" image="Images\011000-home_1.png" message="" tip="">
                     <Help heading="" />
                 </Button>
                 <Button caption="Layer anzeigen" category="ProjektCheck" class="RefreshLayers" id="rpc_tools.refresh_layers" image="Images\eye-2-16.png" message="" tip="F&#252;gt die von den ProjektCheck-Tools verwendeten Layer des derzeit gew&#228;hlten Projekts dem Inhaltsverzeichnis hinzu bzw. aktualisiert sie.">
