@@ -1,1 +1,0 @@
-mylanguage = 'de_DE'
