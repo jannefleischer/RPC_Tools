@@ -148,7 +148,7 @@ class Params(object):
         # setze die Werte
         for i, key in enumerate(self._od):
             self[key]._arc_object = parameters[i]
-            
+
     def _get_param_project(self):
         """return the parameter holding the project name,
         return None if project parameter is not used"""
@@ -189,6 +189,7 @@ class Params(object):
     def toolbox_opened(self):
         """return True if toolbox was opened just before last update"""
         opened = not any([p.hasBeenValidated for p in self])
+        #raise Exception(opened)
         return opened
 
     def selected_index(self, name):

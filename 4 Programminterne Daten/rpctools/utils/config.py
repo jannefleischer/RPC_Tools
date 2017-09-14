@@ -42,7 +42,7 @@ class Config(object):
 
     def __init__(self):
 
-        self.config_file = Folders().CONFIG_FILE
+        self.config_file = join(self.APPDATA_PATH, 'projektcheck-config.txt')
         self._callbacks = {}
         self.active_coord = (0, 0)
         if exists(self.config_file):
@@ -60,6 +60,13 @@ class Config(object):
         else:
             self._config = self._default.copy()
             self.write()
+
+    @property
+    def APPDATA_PATH(self):
+        path = join(getenv('LOCALAPPDATA'), 'Projekt-Check')
+        if not exists(path):
+            mkdir(path)
+        return path
 
     def read(self, config_file=None):
         if config_file is None:
@@ -257,9 +264,9 @@ class Folders(object):
         return self.join_and_check(self.PROJECT_BASE_PATH,
                                    self._TEST_TMP_PROJECT)
 
-    @property
-    def CONFIG_FILE(self):
-        return join(self.APPDATA_PATH, self._CONFIG_FILE)
+    #@property
+    #def CONFIG_FILE(self):
+        #return join(self.APPDATA_PATH, self._CONFIG_FILE)
 
     @property
     def ANALYST_PYT_PATH(self):
@@ -273,12 +280,12 @@ class Folders(object):
     def MANUALS_PATH(self):
         return self.join_and_check(self.BASE_PATH, self._MANUALS_PATH)
 
-    @property
-    def APPDATA_PATH(self):
-        path = join(getenv('LOCALAPPDATA'), 'Projekt-Check')
-        if not exists(path):
-            mkdir(path)
-        return path
+    #@property
+    #def APPDATA_PATH(self):
+        #path = join(getenv('LOCALAPPDATA'), 'Projekt-Check')
+        #if not exists(path):
+            #mkdir(path)
+        #return path
 
     def get_projects(self):
         '''

@@ -410,7 +410,7 @@ class Tbx(object):
         # set the active project on open (do not do this in project management
         # toolboxes, updating projects messes them up, that's what the boolean
         # self.update_projects is for)
-        if  (  #not self.requires_existing_project_path or
+        if  (not self.requires_existing_project_path or
             (self.requires_existing_project and
             self.par._get_param_project() is not None)):
             self.set_active_project()
