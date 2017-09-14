@@ -211,7 +211,7 @@
                 <Button caption="M&#228;rkte und Versorgungsbereiche anzeigen" category="ProjektCheck" class="MaerkteZentrenAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="Bereits erzeugte, in der Karte aktuell aber nicht enthaltene Layer mit Märkten (Nullfall und Planfall) und Versorgungsbereichen wieder zur Karte hinzufügen.">
                     <Help heading="" />
                 </Button>
-                <Button caption="Betrachtungsraum mit M&#228;rkten aus OSM erg&#228;nzen" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="Den in OpenStreetMap verfügbaren Bestand an Lebensmittelmärkten online abfragen und einlesen">
+                <Button caption="Betrachtungsraum mit M&#228;rkten aus OSM erg&#228;nzen" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="Den in OpenStreetMap verfügbaren Bestand an Lebensmittelmärkten innerhalb des Plangebiets online abfragen und einlesen">
                     <Help heading="" />
                 </Button>
                 <Button caption="Umkreis mit M&#228;rkten aus OSM erg&#228;nzen" category="ProjektCheck" class="BestandOSMBuffer" id="rpc_tools.bestand_osm_buffer" image="Images\Openstreetmap_logo.svg.png" message="" tip="Das Randgebiet des Betrachtungsraums durch Märkte aus OpenStreetMap ergänzen">
@@ -247,7 +247,7 @@
                 <Tool caption="Versorgungsbereich bearbeiten/entfernen" category="ProjektCheck" class="ZentrumBearbeiten" id="rpc_tools.zentrum_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="Bereits in die Karte eingezeichnete Versorgungsbereiche (um)benennen oder löschen">
                     <Help heading="" />
                 </Tool>
-                <Button caption="Projektwirkung sch&#228;tzen" category="ProjektCheck" class="StandortkonkurrenzProjektwirkung" id="rpc_tools.standortkonkurrenz_projektwirkung" image="Images\GenericCalculator16.png" message="" tip="">
+                <Button caption="Projektwirkung sch&#228;tzen" category="ProjektCheck" class="StandortkonkurrenzProjektwirkung" id="rpc_tools.standortkonkurrenz_projektwirkung" image="Images\GenericCalculator16.png" message="" tip="Umsatzumverteilung zwischen Planfall und Nullfall bezogen auf die Gemeinden und die Versorgungsbereiche sowie weitere Kennwerte der Einzelhandelsplanung schätzen">
                     <Help heading="" />
                 </Button>
                 <Tool caption="Betrachtungsraum ausw&#228;hlen" category="ProjektCheck" class="FieldSelection" id="rpc_tools.select_ags" image="Images\CadastralFeatureSelect16.png" message="" tip="">
