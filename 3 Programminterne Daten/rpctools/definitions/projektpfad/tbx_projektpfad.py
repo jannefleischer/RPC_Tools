@@ -35,7 +35,7 @@ class TbxProjectFolder(Tbx):
 
     @property
     def label(self):
-        return 'Speicherort der Projekte'
+        return u'Speicherort für Ihre Projekte'
 
     @property
     def Tool(self):
@@ -50,7 +50,8 @@ class TbxProjectFolder(Tbx):
         params = self.par
         p = self.add_parameter('folderpath')
         p.name = u'folderpath'
-        p.displayName = u'Pfad zu den benutzerdefinierten Projekten'
+        p.displayName = u'Speicherort für alle Ihre benutzerdefinierter ' + \
+            'Projekte (Pfad zu einem Ordner)'
         p.parameterType = 'Required'
         p.direction = 'Input'
         p.datatype = 'DEFolder'
