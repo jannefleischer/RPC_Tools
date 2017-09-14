@@ -57,8 +57,7 @@
   Section "Projektcheck-Tools installieren"
     SetOutPath "$INSTDIR" 
 	;relative path 
-	File /r  /x *.exe /x .git /x .gitignore /x "3 Benutzerdefinierte Projekte" /x rpctools.egg-info /x *.pyc "..\..\*"
-	CreateDirectory "$INSTDIR\3 Benutzerdefinierte Projekte"
+	File /r  /x *.exe /x .git /x .gitignore /x rpctools.egg-info /x *.pyc "..\..\*"
 	;Store installation folder
 	WriteRegStr HKCU "Software\ProjektCheck Profi" "" $INSTDIR
 	
@@ -68,13 +67,13 @@
 
   Section "Bibliotheken installieren"
     
-    nsPython::execFile "$INSTDIR\4 Programminterne Daten\installer\rpc-installer.py"
+    nsPython::execFile "$INSTDIR\3 Programminterne Daten\installer\rpc-installer.py"
     Pop $0
     DetailPrint "Result: $0"
   SectionEnd
 
   Section "AddIn installieren"
-	ExecShell "" "$INSTDIR\4 Programminterne Daten\addin\addin.esriaddin"
+	ExecShell "" "$INSTDIR\3 Programminterne Daten\addin\addin.esriaddin"
   SectionEnd
   
 Section "Uninstall"
