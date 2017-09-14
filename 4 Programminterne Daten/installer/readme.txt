@@ -1,1 +1,0 @@
-Erstellt mit NSIS (https://sourceforge.net/projects/nsis/) und dem NsPython plug-in (http://nsis.sourceforge.net/NsPython_plug-in)
