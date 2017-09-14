@@ -17,7 +17,7 @@ from rpctools.analyst.standortkonkurrenz.osm_einlesen import (OSMShopsReader,
 class MarktEinlesen(Tool):
     _param_projectname = 'projectname'
     _workspace = 'FGDB_Standortkonkurrenz_Supermaerkte.gdb'
-    
+
     def __init__(self, params=None, parent_tbx=None, projectname=None):
         super(MarktEinlesen, self).__init__(params=params,
                                             parent_tbx=parent_tbx,
@@ -113,7 +113,7 @@ class MarktEinlesen(Tool):
                         market.adresse,
                         int(is_buffer),
                         int(is_osm),
-                        vkfl, 
+                        vkfl,
                         market.adresse
                     ))
 
@@ -154,13 +154,13 @@ class MarktEinlesen(Tool):
                 if fit_idx.sum() > 0:
                     market.id_betriebstyp = self.df_bt[fit_idx]['id_betriebstyp'].values[0]
         return markets
-    
+
     def betriebstyp_to_vkfl(self, market):
         """
         return the sales area (vkfl) matching the type of use (betriebstyp)
         of a single market
         """
-        # some discounters have (since there is no specific betriebstyp and 
+        # some discounters have (since there is no specific betriebstyp and
         # therefore no hint on possible vkfl for them)
         if market.id_betriebstyp == 7:
             default_vkfl = self.df_chains[
@@ -173,11 +173,11 @@ class MarktEinlesen(Tool):
         vkfl = self.df_bt[idx]['default_vkfl'].values[0]
         return vkfl
 
-    def parse_meta(self, markets, field='name', known_only=False):
+    def parse_meta(self, markets, field='name'):
         """
         use the name of the markets to parse and assign chain-ids and
         betriebstyps
-        
+
         known_only: str, optional
             only return markets that belong to known chains if True
         """
@@ -216,12 +216,7 @@ class MarktEinlesen(Tool):
                 break
             # markets that didn't match (keep defaults)
             if not match_found:
-                if known_only:
-                    arcpy.AddMessage(
-                        u'  - Markt "{}" gehört zu keiner bekannten Kette. '
-                        u'wird übersprungen'.format(market.name))
-                else:
-                    ret_markets.append(market)
+                ret_markets.append(market)
         return ret_markets
 
     def delete_area_market(self, id_area):
@@ -252,16 +247,16 @@ class OSMMarktEinlesen(MarktEinlesen):
     def run(self):
 
         tbx = self.parent_tbx
-        
+
         # get amrkets in minimal bounding polygon (in fact multiple rectangles,
         # as always there is no basic function for minimal bounding polygon)
         communities = self.folders.get_table('Zentren')
         multi_poly = minimal_bounding_poly(communities, where='"Auswahl"<>0')
-        
+
         epsg = self.parent_tbx.config.epsg
         multi_poly = [[Point(p.X, p.Y, epsg=epsg) for p in poly if p]
                       for poly in multi_poly]
-        
+
         epsg = tbx.config.epsg
         arcpy.AddMessage('Sende Standortanfrage an Geoserver...')
         reader = OSMShopsReader(epsg=epsg)
@@ -280,7 +275,7 @@ class OSMMarktEinlesen(MarktEinlesen):
                 arcpy.AddMessage(u'Keine OSM-Märkte vorhanden.')
         #if self.par.count.value == 0:
             #return
-        
+
         markets = []
         for poly in multi_poly:
             m = reader.get_shops(poly, count=self._max_count-len(markets))
@@ -288,11 +283,11 @@ class OSMMarktEinlesen(MarktEinlesen):
         arcpy.AddMessage(u'{} Märkte gefunden'.format(len(markets)))
         arcpy.AddMessage(u'Analysiere gefundene Märkte...'
                          .format(len(markets)))
-        
-        markets = self.parse_meta(markets, known_only=self.par.known_only.value)
+
+        markets = self.parse_meta(markets)
         arcpy.AddMessage(u'Schreibe {} Märkte in die Datenbank...'
                          .format(len(markets)))
-    
+
         markets_tmp = self.folders.get_table('markets_tmp', check=False)
         auswahl_tmp = self.folders.get_table('auswahl_tmp', check=False)
         clipped_tmp = self.folders.get_table('clipped_tmp', check=False)
@@ -300,7 +295,7 @@ class OSMMarktEinlesen(MarktEinlesen):
             for table in [markets_tmp, clipped_tmp, auswahl_tmp]:
                 arcpy.Delete_management(table)
         del_tmp()
-    
+
         markets_table = self.folders.get_table('Maerkte', check=False)
         ids = [id for id, in self.parent_tbx.query_table(markets_table, ['id'])]
         start_id = max(ids) + 1 if ids else 0
@@ -315,17 +310,17 @@ class OSMMarktEinlesen(MarktEinlesen):
                            is_buffer=False,
                            is_osm=True,
                            start_id=start_id)
-        
+
         arcpy.FeatureClassToFeatureClass_conversion(
             communities, *os.path.split(auswahl_tmp),
             where_clause='Auswahl<>0')
         arcpy.Clip_analysis(markets_tmp, auswahl_tmp, clipped_tmp)
-        
+
         arcpy.Append_management(clipped_tmp, markets_table)
         del_tmp()
         arcpy.AddMessage('Entferne Duplikate...')
         n = remove_duplicates(self.folders.get_table(self._markets_table),
-                              'id', match_field='id_kette', 
+                              'id', match_field='id_kette',
                               where='is_osm=1', distance=50)
         arcpy.AddMessage('{} Duplikate entfernt...'.format(n))
         arcpy.AddMessage(u'Aktualisiere die AGS der Märkte...')
@@ -372,14 +367,14 @@ class TbxOSMMarktEinlesen(Tbx):
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'
-    
-        param = self.add_parameter('known_only')
-        param.name = encode(u'known_only')
-        param.displayName = encode(u'Nur Märkte großer Ketten hinzufügen')
-        param.parameterType = 'Optional'
-        param.direction = 'Input'
-        param.datatype = u'GPBoolean'
-        param.value = True
+
+        #param = self.add_parameter('known_only')
+        #param.name = encode(u'known_only')
+        #param.displayName = encode(u'Nur Märkte großer Ketten hinzufügen')
+        #param.parameterType = 'Optional'
+        #param.direction = 'Input'
+        #param.datatype = u'GPBoolean'
+        #param.value = True
 
         return params
 
