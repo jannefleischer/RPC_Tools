@@ -35,7 +35,7 @@ class TbxProjectFolder(Tbx):
 
     @property
     def label(self):
-        return encode(u'Projektpfad setzen')
+        return 'Speicherort der Projekte'
 
     @property
     def Tool(self):
