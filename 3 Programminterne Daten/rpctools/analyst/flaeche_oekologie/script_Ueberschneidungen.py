@@ -55,8 +55,6 @@ class Ueberschneidungen(Tool):
                 template_folder="oekologie", zoom=False, disable_other = True,
                 show_wms_legends=True
             )
-            self.output.show_layers()
-
             arcpy.RefreshTOC()
             arcpy.RefreshActiveView()
 

@@ -785,11 +785,8 @@ class Output(object):
                 fn = name + '.png'
                 fp = os.path.join(os.path.split(template_layer)[0], fn)
                 arcpy.Delete_management(fp)
-                print(fp)
                 title = l.serviceProperties['WMSTitle'].encode('utf-8')
                 r = requests.get(legend_url, stream=True)
-                print(legend_url)
-                print(r)
                 if r.status_code == 200:
                     with open(fp, 'wb') as f:
                         r.raw.decode_content = True
