@@ -1200,13 +1200,15 @@ class Tbx(object):
 
         """
         self._is_executing = True
-        #try:
-        self._commit_temporaries()
+        try:
+            self._commit_temporaries()
+        except:
+            pass        
         self.tool.main(self.par, parameters, messages)
-        self.clear_temporary_dbs()
-        #except Exception as e:
-            #raise e
-        #finally:
+        try:
+            self.clear_temporary_dbs()
+        except:
+            pass
         self._is_executing = False
         self.show_outputs()
 
