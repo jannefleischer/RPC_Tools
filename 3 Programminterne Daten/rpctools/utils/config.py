@@ -127,7 +127,7 @@ class Folders(object):
     def __init__(self, params=None, projectname=None, workspace=None):
         """class that returns path"""
         try:
-            self.BASE_PATH = _winreg.QueryValue( _winreg.HKEY_CURRENT_USER,
+            self.BASE_PATH = _winreg.QueryValue( _winreg.HKEY_LOCAL_MACHINE,
                                                  "Software\ProjektCheck PROFI")
         except WindowsError:
 
@@ -288,7 +288,7 @@ class Folders(object):
             path = join(base_path, f)
             if isdir(path) and f != self._TEST_TMP_PROJECT:
                 subfolders = listdir(path)
-                # folder has to contain at least one template file-geodatabase 
+                # folder has to contain at least one template file-geodatabase
                 # (starting with FGDB_)
                 for s in subfolders:
                     if (s.startswith('FGDB_')):
@@ -543,7 +543,7 @@ class Folders(object):
                                            subfolder,
                                            filename)
         return diagram_path
-    
+
 if __name__ == '__main__':
     c = Config()
     f = Folders(projectname=c.active_project)

@@ -12,7 +12,7 @@
   InstallDir "$PROGRAMFILES\Projekt-Check Profi"
 
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\ProjektCheck PROFI" ""
+  InstallDirRegKey HKLM "Software\ProjektCheck PROFI" ""
 
   ;Request application privileges for Windows Vista
   ;RequestExecutionLevel user
@@ -59,7 +59,7 @@
 	;relative path 
 	File /r  /x *.exe /x .git /x .gitignore /x rpctools.egg-info /x *.pyc "..\..\*"
 	;Store installation folder
-	WriteRegStr HKCU "Software\ProjektCheck Profi" "" $INSTDIR
+	WriteRegStr HKLM "Software\ProjektCheck Profi" "" $INSTDIR
 	
     ;Create uninstaller
     WriteUninstaller "$INSTDIR\Uninstall.exe"
