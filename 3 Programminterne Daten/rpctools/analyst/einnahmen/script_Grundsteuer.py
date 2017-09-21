@@ -50,11 +50,19 @@ class Grundsteuer(Tool):
             gemeindetyp = row[1]
 
         tablepath_gemeinden = self.folders.get_base_table("FGDB_Basisdaten_deutschland.gdb", "bkg_gemeinden")
-        fields = ["AGS", "Hebesatz_GrStB"]
-        where_clause = '"AGS"' + "='" + ags + "'"
-        cursor = arcpy.da.UpdateCursor(tablepath_gemeinden, fields, where_clause)
-        for row in cursor:
-            row[1] = params.slider1.value
+        tablepath_einkommen = self.folders.get_db("FGDB_Einnahmen.gdb", params.name.value)
+        tablepath_hebesteuer = os.path.join(tablepath_einkommen, "GrSt_Hebesatz_B")
+        fields = ["Hebesatz_GrStB"]
+        if arcpy.Exists(tablepath_hebesteuer):
+            cursor = arcpy.da.UpdateCursor(tablepath_hebesteuer, fields)
+            for row in cursor:
+                row[0] = params.slider1.value
+                cursor.updateRow(row)
+        else:
+            arcpy.CreateTable_management(self.folders.get_db("FGDB_Einnahmen.gdb", params.name.value), "GrSt_Hebesatz_B")
+            arcpy.AddField_management(tablepath_hebesteuer, "Hebesatz_GrStB", "LONG")
+            cursor = arcpy.da.InsertCursor(tablepath_hebesteuer, fields)
+            cursor.insertRow([params.slider1.value])
 
         fields = ["EFH_Rohmiete", 'DHH_Rohmiete', 'RHW_Rohmiete', 'MFH_Rohmiete', 'Bodenwert_Sachwertverfahren', 'qm_Grundstueck_pro_WE_EFH', 'BGF_Buero', 'BGF_Halle']
         tablepath_basisdaten = self.folders.get_table('GrSt_Basisdaten', "FGDB_Einnahmen.gdb")

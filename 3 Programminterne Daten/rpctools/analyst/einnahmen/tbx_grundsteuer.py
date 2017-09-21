@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import arcpy
-
+import os
 from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 from rpctools.utils.constants import Nutzungsart
@@ -148,11 +148,21 @@ class TbxGrundsteuer(Tbx):
             ags = row[0]
             gemeindetyp = row[1]
 
+
+        tablepath_einkommen = folder.get_db("FGDB_Einnahmen.gdb", params.name.value)
+        tablepath_hebesteuer = os.path.join(tablepath_einkommen, "GrSt_Hebesatz_B")
         fields = ['AGS', 'Hebesatz_GrStB']
         where_clause = '"AGS"' + "= '" + ags + "'"
-        cursor = self.query_table('bkg_gemeinden', fields, "FGDB_Basisdaten_deutschland.gdb", where_clause, is_base_table = True)
-        for row in cursor:
-            params.slider1.value = row[1]
+        if not arcpy.Exists(tablepath_hebesteuer):
+            cursor = self.query_table('bkg_gemeinden', fields, "FGDB_Basisdaten_deutschland.gdb", where_clause, is_base_table = True)
+            for row in cursor:
+                params.slider1.value = row[1]
+        else:
+            fields = ['Hebesatz_GrStB']
+            cursor = self.query_table('GrSt_Hebesatz_B', fields, "FGDB_Einnahmen.gdb", is_base_table = False)
+            for row in cursor:
+                params.slider1.value = row[0]
+
 
         fields = ["EFH_Rohmiete", 'DHH_Rohmiete', 'RHW_Rohmiete', 'MFH_Rohmiete', 'Bodenwert_Sachwertverfahren', 'qm_Grundstueck_pro_WE_EFH', 'BGF_Buero', 'BGF_Halle']
         cursor = self.query_table('GrSt_Basisdaten', fields)
