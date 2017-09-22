@@ -272,10 +272,13 @@ class ProjektwirkungMarkets(Tool):
             where_clause='Auswahl<>0')
 
         arcpy.AddMessage('Analysiere Pufferbereich...')
-        # create buffer area
-        arcpy.Buffer_analysis(sel_comm, output,
-                              radius,
-                              dissolve_option='ALL')
+        if radius > 0:
+            # create buffer area
+            arcpy.Buffer_analysis(sel_comm, output,
+                                  radius,
+                                  dissolve_option='ALL')
+        else:
+            arcpy.CopyFeatures_management(sel_comm, output)
 
         bbox = self.get_bbox(output)
         arcpy.Delete_management(sel_comm)
