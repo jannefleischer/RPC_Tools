@@ -149,8 +149,8 @@ class MarktEinlesen(Tool):
             if is_discounter:
                 market.id_betriebstyp = 7
             elif market.vkfl is not None:
-                fit_idx = ((self.df_bt['von_m2'] <= market.vkfl) &
-                           (self.df_bt['bis_m2'] > market.vkfl))
+                fit_idx = ((self.df_bt['von_m2'] < market.vkfl) &
+                           (self.df_bt['bis_m2'] >= market.vkfl))
                 if fit_idx.sum() > 0:
                     market.id_betriebstyp = self.df_bt[fit_idx]['id_betriebstyp'].values[0]
         return markets
