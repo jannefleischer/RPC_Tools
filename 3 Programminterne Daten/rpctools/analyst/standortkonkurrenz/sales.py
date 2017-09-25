@@ -92,13 +92,13 @@ class Sales(object):
             arcpy.AddMessage('DEBUG: Schreibe Zwischenergebnisse')
             if setting == self.NULLFALL:
                 self.write_intermediate_results(dist_matrix.transpose(),
-                                                'debug_Distanzmatrix')
+                                                'Distanzmatrix')
             self.write_intermediate_results(
                 attraction_matrix.transpose(),
-                u'debug_Attraktivität_{}'.format(setting_str))
+                u'{}_erstes_Zwischenergebnis_KK_Anteile_Wahrsch'.format(setting_str))
             self.write_intermediate_results(
                 competitor_matrix.transpose(),
-                u'debug_Aenderung_gleiche_Anbieter_{}'.format(setting_str))
+                u'{}_zweites_Zwischenergebnis_Attraktivitaet'.format(setting_str))
             arcpy.AddMessage('DEBUG: Berechnung')
 
         # include competition between same market types in attraction_matrix
@@ -112,13 +112,13 @@ class Sales(object):
             arcpy.AddMessage('DEBUG: Schreibe weitere Zwischenergebnisse')
             self.write_intermediate_results(
                 attraction_matrix.transpose(),
-                u'debug_Verteilungsmassstab_erster_Schritt_{}'.format(setting_str))
+                u'{}_drittes_Zwischenergebnis_Verteilungsmassstab_erster_Schritt'.format(setting_str))
             self.write_intermediate_results(
                 probabilities.transpose(),
-                u'debug_Verteilungsmassstab_zweiter_Schritt_{}'.format(setting_str))
+                u'{}_viertes_Zwischenergebnis_Verteilungsmassstab_zweiter_Schritt'.format(setting_str))
             self.write_intermediate_results(
                 kk_flow.transpose(),
-                u'debug_Kaufkraftstroeme_{}'.format(setting_str))
+                u'{}_fuenftes_Zwischenergebnis_Kaufkraftstroeme'.format(setting_str))
 
         return kk_flow
 
@@ -132,11 +132,11 @@ class Sales(object):
         """
         account competition through other markets of the same brand
         """
-        cut_off_time = self.relation_dist
-        dist_matrix = dist_matrix.T
-        dist_matrix = dist_matrix.mask(dist_matrix < 0)
-        results = pd.DataFrame(data=1., index=dist_matrix.index,
-                               columns=dist_matrix.columns)
+        cutoff_dist = self.relation_dist
+        masked_dist_matrix = dist_matrix.T
+        masked_dist_matrix = masked_dist_matrix.mask(masked_dist_matrix < 0)
+        results = pd.DataFrame(data=1., index=masked_dist_matrix.index,
+                               columns=masked_dist_matrix.columns)
         competing_markets = df_markets[['id_kette']]
         for id_kette in np.unique(competing_markets['id_kette']):
             markets_of_same_type = \
@@ -145,7 +145,7 @@ class Sales(object):
                 continue
             indices = list(markets_of_same_type.index)
             number_of_competing_markets = len(indices)
-            same_type_dist_matrix = dist_matrix[indices]
+            same_type_dist_matrix = masked_dist_matrix[indices]
             df_ranking = same_type_dist_matrix.rank(axis=1, method='first')
             nearest_three_mask = df_ranking <= 3
             df_ranking = df_ranking.mask((nearest_three_mask==False))
@@ -156,7 +156,7 @@ class Sales(object):
                 same_type_dist_matrix['Minimum'], axis=0)
             del same_type_dist_matrix['Minimum']
             same_type_dist_matrix = same_type_dist_matrix.mask((nearest_three_mask==False))
-            is_near = same_type_dist_matrix < cut_off_time
+            is_near = same_type_dist_matrix < cutoff_dist
             df_ranking['Umkreis'] = is_near.sum(axis=1)
             #same_type_dist_ranking['Abstand'] = \
                 #number_of_competing_markets - is_near['Umkreis']
@@ -206,7 +206,9 @@ class Sales(object):
             results.loc[:, (indices)] = results.loc[:, indices].mask(
                 nearest_three_mask==False, 0.)
         # Return results in shape of dist_matrix
-        return results.T
+        res = results.T
+        res[dist_matrix < 0] = 0
+        return res
 
     def get_dist_matrix(self):
         # Dataframe for distances

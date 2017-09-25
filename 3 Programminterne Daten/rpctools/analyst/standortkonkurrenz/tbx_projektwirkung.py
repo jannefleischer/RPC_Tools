@@ -528,6 +528,7 @@ if __name__ == "__main__":
     t.getParameterInfo()
     t.set_active_project()
     t.par.recalculate.value = False
+    t.par.radius_sz.value = 0
     #t.show_outputs()
     t.execute()
 
