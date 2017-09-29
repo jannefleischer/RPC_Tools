@@ -85,7 +85,17 @@ class Sales(object):
 
         unreachable = dist_matrix < 0
         attraction_matrix[unreachable] = 0
-        competitor_matrix = self.calc_competitors(dist_matrix, df_markets)
+        betriebstyp_col = 'id_betriebstyp_nullfall' \
+            if setting == self.NULLFALL else 'id_betriebstyp_planfall'
+        is_sm = df_markets[betriebstyp_col] == 2
+        small_smarkets = df_markets[is_sm]
+        big_markets = df_markets[df_markets[betriebstyp_col] > 2]
+        small_comp_matrix = self.calc_competitors(dist_matrix, small_smarkets)
+        big_comp_matrix = self.calc_competitors(dist_matrix, big_markets)
+        big_comp_matrix.loc[is_sm] = small_comp_matrix
+        competitor_matrix = big_comp_matrix
+
+        #competitor_matrix = self.calc_competitors(dist_matrix, df_markets)
 
         if self.debug:
             setting_str = 'Nullfall' if setting == self.NULLFALL else 'Planfall'
