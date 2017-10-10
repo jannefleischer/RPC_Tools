@@ -134,6 +134,8 @@ class MatplotDiagram(Diagram):
         self.figure = self._create(**self.kwargs)
 
     def show_external(self, plot, filename):
+        filename = str(filename)
+
         if plot is None:
             return
         with open(filename,'wb') as f:
