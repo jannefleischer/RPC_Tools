@@ -3,9 +3,7 @@
 import arcpy
 
 from rpctools.utils.params import Tbx
-from rpctools.utils.encoding import encode
 from rpctools.analyst.flaeche_oekologie.script_Schutzgebiete import Schutzgebiete
-from rpctools.utils.constants import Nutzungsart
 from rpctools.utils.params import Tool
 
 class TbxSchutzgebiete(Tbx):
@@ -13,7 +11,7 @@ class TbxSchutzgebiete(Tbx):
 
     @property
     def label(self):
-        return u'Ueberschneidungen anzeigen'
+        return u'Details aufrufen'
 
     @property
     def Tool(self):

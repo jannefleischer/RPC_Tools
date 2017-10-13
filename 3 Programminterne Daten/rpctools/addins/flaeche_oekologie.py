@@ -4,6 +4,7 @@ from rpctools.addins.outputs import BodenbedeckungAnzeigen_Nullfall
 from rpctools.addins.outputs import BodenbedeckungAnzeigen_Planfall
 from rpctools.addins.outputs import GrenzlinieAnzeigen
 from rpctools.addins.common import FileButton
+from rpctools.analyst.flaeche_oekologie.script_Schutzgebiete import Schutzgebiete
 import pythonaddins
 import arcpy
 
@@ -58,9 +59,6 @@ class Schutzgebiete(ToolboxButton):
     _toolbox_name = 'TbxSchutzgebiete'
     _message = u"Nach dem Schließen dieser Meldung wird in Ihrem Webbrowser eine Online-Karte des BfN zu den Schutzgebieten in Deutschland aufgerufen und auf den Bereich des Plangebiets gezoomt. \n\n In dieser Online-Karte finden Sie Detailangaben zu den Schutzgebieten im Umfeld des Plangebiets."
 
-    def onClick(self, coord=None):
-        self.show_message()
-        
     def show_message(self):
         if self._message:
             pythonaddins.MessageBox(self._message, 'Hinweis', 0)
@@ -150,7 +148,7 @@ class Grenze_zeichnen(ToolboxButton):
     def onClick(self, coord=None):
         self.output.show()
         self.show_message()
-        
+
     def show_message(self):
         if self._message:
             pythonaddins.MessageBox(self._message, 'Hinweis', 0)
