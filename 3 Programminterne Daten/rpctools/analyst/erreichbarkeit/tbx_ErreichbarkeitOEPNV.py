@@ -2,7 +2,7 @@
 import pandas as pd
 import arcpy
 import requests
-
+import sys
 from rpctools.utils.params import Tbx, Tool
 from rpctools.utils.encoding import encode
 from rpctools.analyst.erreichbarkeit.tbx_fahrplaene import TbxHaltestellen
@@ -77,12 +77,16 @@ class ErreichbarkeitOEPNV(Tool):
             df_centers.loc[index, 'id_destination'] = id_destination
             df_centers.loc[index, 'ziel'] = destination
             df_centers.loc[index, 'abfahrt'] = departure
-            df_centers.loc[index, 'dauer'] = duration
+            if duration != sys.maxint:
+                df_centers.loc[index, 'dauer'] = str(duration)
+            else:
+                df_centers.loc[index, 'dauer'] = "???"
             df_centers.loc[index, 'umstiege'] = changes
             df_centers.loc[index, 'verkehrsmittel'] = modes
             df_centers.loc[index, 'update'] = True
 
         arcpy.AddMessage(u'Schreibe Ergebnisse in die Datenbank...')
+
         df_update = df_centers[df_centers['update'] == True]
         if len(df_update) > 0:
             self.parent_tbx.dataframe_to_table(
