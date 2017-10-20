@@ -170,7 +170,9 @@ class BahnQuery(object):
 
                 # departure
                 content = row.find('td', {'class': 'time'}).contents
-                departure = str(content[1]).replace('\n', '')
+                if '\n' in content:
+                    content.remove('\n')
+                departure = str(content[1])
 
                 # modes
                 content = row.find('td', {'class': 'products'}).contents
