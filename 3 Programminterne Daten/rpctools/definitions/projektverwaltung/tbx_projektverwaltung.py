@@ -6,7 +6,7 @@ from rpctools.utils.params import Tbx
 from rpctools.utils.encoding import encode
 from rpctools.definitions.projektverwaltung.projektverwaltung \
      import ProjektLoeschen, ProjektAnlegen, ProjektKopieren
-
+import re
 
 class TbxProjektVerwaltung(Tbx):
     """Toolbox Projektverwaltung"""
@@ -59,6 +59,14 @@ class TbxProjektAnlegen(TbxProjektVerwaltung):
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
         has been changed."""
+        pass
+
+    def _updateMessages(self, params):
+
+        name = self.par.name.value
+        regexp = re.compile(u'[äöüß/\:*\?"<>|]')
+        if name and regexp.search(name):
+            self.par.name.setErrorMessage("Der Projektname darf keines der folgenden Zeichen enthalten: äöüß/\:*?\"<>| ")
 
 
 class TbxProjektKopieren(TbxProjektVerwaltung):
@@ -75,7 +83,7 @@ class TbxProjektKopieren(TbxProjektVerwaltung):
     @property
     def Tool(self):
         return ProjektKopieren
-    
+
     def _open(self, params):
         projects = self.folders.get_projects()
         p = self.par.existing_project
