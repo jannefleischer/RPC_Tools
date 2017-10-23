@@ -17,7 +17,7 @@ try:
 except:
     def log(x): print(x)
     messagebox = log
-    
+
 import os, sys
 import subprocess
 from collections import OrderedDict
@@ -37,9 +37,9 @@ def get_python_path():
                             .format(min_requirement))
 
         desktop_reg_path = os.path.join(esri_reg_path,
-                                       'Desktop{v}'.format(v=version))
+                                        'Desktop{v}'.format(v=version))
         desktop_key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
-                                     desktop_reg_path,
+                                      desktop_reg_path,
                                      0)
         desktop_dir = _winreg.QueryValueEx(desktop_key, 'InstallDir')[0]
 
@@ -61,7 +61,7 @@ def get_python_path():
         python_pathes = []
         for path in possible_pathes:
             if os.path.exists(path):
-		        python_pathes.append(path)
+                python_pathes.append(path)
 
         return python_pathes
 
@@ -142,11 +142,11 @@ def install_packages(python_path):
     wheel_path = os.path.join(base_path, 'wheels')
     log('Install or upgrade pip')
     process = subprocess.Popen([os.path.join(python_path, 'python'),
-                     os.path.join(wheel_path, "pip-9.0.1-py2.py3-none-any.whl", "pip"),
+                                os.path.join(wheel_path, "pip-9.0.1-py2.py3-none-any.whl", "pip"),
                      'install',
                      '--upgrade',
                      os.path.join(wheel_path, "pip-9.0.1-py2.py3-none-any.whl")],
-                           shell=True)
+                               shell=True)
     ret = process.wait()
     if ret:
         log('pip nicht richtig installiert')
@@ -189,6 +189,6 @@ def install_packages(python_path):
 if __name__ == '__main__':
     python_pathes = get_python_path()
     if python_pathes:
-		for path in python_pathes:
-			install_packages(path)
+        for path in python_pathes:
+            install_packages(path)
     #install_packages('C:\\Python27-ArcGIS\\ArcGISx6410.4')
