@@ -12,10 +12,10 @@ import os
 class TbxBodenBewertung(Tbx):
     """'Bodenbedeckung bewerte"""
 
-    values = [u"Bodenbedeckungsanteile manuell festlegen", u"Bodenbedeckungsanteile aus Zeichnungen importieren"] 
+    values = [u"Bodenbedeckungsanteile manuell festlegen", u"Bodenbedeckungsanteile aus Zeichnungen importieren"]
     mode = "manuell"
     changed_mode = False
-    
+
     @property
     def label(self):
         return u'Bodenbedeckung bewerten'
@@ -358,19 +358,20 @@ class TbxBodenBewertung(Tbx):
                 elif row[1] == 0 and row[0] == 4:
                 	 params['baeume_alt'].value = row[2]
                 elif row[1] == 0 and row[0] == 5:
-                	 params['rasengittersteine_alt'].value = row[2]
-                elif row[1] == 0 and row[0] == 6:
                 	 params['stauden_alt'].value = row[2]
-                elif row[1] == 0 and row[0] == 7:
+                elif row[1] == 0 and row[0] == 6:
                 	 params['wiese_alt'].value = row[2]
-                elif row[1] == 0 and row[0] == 8:
-                	 params['beton_alt'].value = row[2]
-                elif row[1] == 0 and row[0] == 9:
-                	 params['acker_alt'].value = row[2]
-                elif row[1] == 0 and row[0] == 10:
-                	 params['kleinpflaster_alt'].value = row[2]
-                elif row[1] == 0 and row[0] == 11:
+                elif row[1] == 0 and row[0] == 7:
                 	 params['rasen_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 8:
+                	 params['rasengittersteine_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 9:
+                	 params['beton_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 10:
+                	 params['acker_alt'].value = row[2]
+                elif row[1] == 0 and row[0] == 11:
+                	 params['kleinpflaster_alt'].value = row[2]
+
                 elif row[1] == 0 and row[0] == 12:
                 	 params['undefiniert_alt'].value = row[2]
                 elif row[1] == 1 and row[0] == 1:
@@ -397,21 +398,21 @@ class TbxBodenBewertung(Tbx):
                 	 params['rasen_neu'].value = row[2]
                 elif row[1] == 1 and row[0] == 12:
                 	 params['undefiniert_neu'].value = row[2]
-                	 
+
         elif type == "zeichnung":
-            
+
             anteile_nullfall, anteile_planfall = lib_oeko.import_zeichenanteile(projektname)
             listeSliderID = ['ueberbauteflaechen_alt',
                      'wasser_alt',
                      'platten_alt',
                      'baeume_alt',
-                     'rasengittersteine_alt',
                      'stauden_alt',
                      'wiese_alt',
+                     'rasen_alt',
+                     'rasengittersteine_alt',
                      'beton_alt',
                      'acker_alt',
                      'kleinpflaster_alt',
-                     'rasen_alt',
                       'undefiniert_alt']
             pointer = 0
             for slider in listeSliderID:
@@ -422,14 +423,14 @@ class TbxBodenBewertung(Tbx):
                          'wasser_neu',
                          'platten_neu',
                          'baeume_neu',
-                         'rasengittersteine_neu',
                          'stauden_neu',
                          'wiese_neu',
+                         'rasen_neu',
+                         'rasengittersteine_neu',
                          'beton_neu',
                          'acker_neu',
                          'kleinpflaster_neu',
-                         'rasen_neu',
-			'undefiniert_neu']                
+			'undefiniert_neu']
             pointer = 0
             for slider in listeSliderID:
                 params[slider].value = anteile_planfall[pointer]
@@ -439,14 +440,14 @@ class TbxBodenBewertung(Tbx):
                          u'Wasser',
                          u'Platten',
                          u'Bäume',
-                         u'Gittersteine',
                          u'Stauden',
                          u'Wiese',
+                         u'Rasen',
+                         u'Gittersteine',
                          u'Beton',
                          u'Acker',
                          u'Kleinpflaster',
-                         u'Rasen',
-			u'Undefiniert']  
+			u'Undefiniert']
 
             self.delete_rows_in_table("Bodenbedeckung_Zeichnung")
             column_values = {"Nullfall": anteile_nullfall,
@@ -465,7 +466,7 @@ class TbxBodenBewertung(Tbx):
         if params.name.altered and not params.name.hasBeenValidated:
             self.eingaben_auslesen("manuell")
             self.par.quelle.value = self.values[0]
-            
+
         listeSliderID_alt = ['ueberbauteflaechen_alt',
                          'wasser_alt',
                          'platten_alt',
@@ -492,7 +493,7 @@ class TbxBodenBewertung(Tbx):
                          'kleinpflaster_neu',
                          'rasen_neu',
 						 'undefiniert_neu']
-        
+
         if params.quelle.altered and not params.quelle.hasBeenValidated:
             if self.par.quelle.value == self.values[1]:
                 self.eingaben_auslesen("zeichnung")
@@ -519,7 +520,7 @@ class TbxBodenBewertung(Tbx):
                         self.mode = "zeichnung"
                         self.par.quelle.value = self.values[1]
                 self.sliderSummenKontrolle(listeSliderID_alt, zielwertSlidersumme)
-            
+
         for r in listeSliderID_neu:
             if params[r].altered:
                 if self.changed_mode == False:

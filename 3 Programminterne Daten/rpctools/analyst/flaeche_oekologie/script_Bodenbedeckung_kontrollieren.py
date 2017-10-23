@@ -39,19 +39,19 @@ class BodenbedeckungKontrolle(Tool):
             elif row[1] == 0 and row[0] == 4:
                  row[2] = params.baeume_alt.value
             elif row[1] == 0 and row[0] == 5:
-                 row[2] = params.rasengittersteine_alt.value
-            elif row[1] == 0 and row[0] == 6:
                  row[2] = params.stauden_alt.value
-            elif row[1] == 0 and row[0] == 7:
+            elif row[1] == 0 and row[0] == 6:
                  row[2] = params.wiese_alt.value
-            elif row[1] == 0 and row[0] == 8:
-                 row[2] = params.beton_alt.value
-            elif row[1] == 0 and row[0] == 9:
-                 row[2] =params.acker_alt.value
-            elif row[1] == 0 and row[0] == 10:
-                 row[2] = params.kleinpflaster_alt.value
-            elif row[1] == 0 and row[0] == 11:
+            elif row[1] == 0 and row[0] == 7:
                  row[2] = params.rasen_alt.value
+            elif row[1] == 0 and row[0] == 8:
+                 row[2] = params.rasengittersteine_alt.value
+            elif row[1] == 0 and row[0] == 9:
+                 row[2] = params.beton_alt.value
+            elif row[1] == 0 and row[0] == 10:
+                 row[2] =params.acker_alt.value
+            elif row[1] == 0 and row[0] == 11:
+                 row[2] = params.kleinpflaster_alt.value
             elif row[1] == 1 and row[0] == 1:
                  row[2] = params.ueberbauteflaechen_neu.value
             elif row[1] == 1 and row[0] == 2:
@@ -61,19 +61,20 @@ class BodenbedeckungKontrolle(Tool):
             elif row[1] == 1 and row[0] == 4:
                  row[2] =params.baeume_neu.value
             elif row[1] == 1 and row[0] == 5:
-                 row[2] = params.rasengittersteine_neu.value
-            elif row[1] == 1 and row[0] == 6:
                  row[2] = params.stauden_neu.value
-            elif row[1] == 1 and row[0] == 7:
+            elif row[1] == 1 and row[0] == 6:
                  row[2] = params.wiese_neu.value
-            elif row[1] == 1 and row[0] == 8:
-                 row[2] = params.beton_neu.value
-            elif row[1] == 1 and row[0] == 9:
-                 row[2] = params.acker_neu.value
-            elif row[1] == 1 and row[0] == 10:
-                 row[2] = params.kleinpflaster_neu.value
-            elif row[1] == 1 and row[0] == 11:
+            elif row[1] == 1 and row[0] == 7:
                  row[2] = params.rasen_neu.value
+            elif row[1] == 1 and row[0] == 8:
+                 row[2] = params.rasengittersteine_neu.value
+            elif row[1] == 1 and row[0] == 9:
+                 row[2] = params.beton_neu.value
+            elif row[1] == 1 and row[0] == 10:
+                 row[2] = params.acker_neu.value
+            elif row[1] == 1 and row[0] == 11:
+                 row[2] = params.kleinpflaster_neu.value
+
             cursor.updateRow(row)
 
 
@@ -147,14 +148,14 @@ class BodenbedeckungZeichnen(Tool):
              u'Wasser',
              u'Platten',
              u'Bäume',
-             u'Gittersteine',
              u'Stauden',
              u'Wiese',
+             u'Rasen',
+             u'Gittersteine',
              u'Beton',
              u'Acker',
              u'Kleinpflaster',
-             u'Rasen',
-            u'Undefiniert']  
+            u'Undefiniert']
         column_values = {"Nullfall": anteile_nullfall,
                          "Planfall": anteile_planfall,
                          "Bodenbedeckung": bodenarten}
