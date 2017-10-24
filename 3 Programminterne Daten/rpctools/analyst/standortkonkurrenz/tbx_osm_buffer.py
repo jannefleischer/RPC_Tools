@@ -92,7 +92,7 @@ class OSMMarktBuffer(OSMMarktEinlesen):
             )
             ids = [id for id, in self.parent_tbx.query_table(markets_table, ['id'])]
             start_id = max(ids) + 1 if ids else 0
-            markets = self.parse_meta(markets, known_only=True)
+            markets = self.parse_meta(markets)
             self.markets_to_db(markets,
                                tablename=os.path.split(markets_tmp)[1],
                                is_buffer=True, start_id=start_id, is_osm=True)

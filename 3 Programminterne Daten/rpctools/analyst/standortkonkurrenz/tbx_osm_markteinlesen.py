@@ -177,9 +177,6 @@ class MarktEinlesen(Tool):
         """
         use the name of the markets to parse and assign chain-ids and
         betriebstyps
-
-        known_only: str, optional
-            only return markets that belong to known chains if True
         """
 
         ret_markets = []
