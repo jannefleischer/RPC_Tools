@@ -26,35 +26,35 @@ class HilfeNutzungen(FileButton):
 
 
 class HilfeBewohnerArbeitsplaetze(FileButton):
-    _file = u'ProjektCheck_Anleitung_Bewohner_und_Arbeitsplätze.pdf'
+    _file = u'ProjektCheck_Anleitung_WB1_Bewohner_und_Arbeitsplätze.pdf'
 
 
 class HilfeInfrastruktur(FileButton):
-    _file = 'ProjektCheck_Anleitung_Infrastrukturfolgekosten.pdf'
+    _file = 'ProjektCheck_Anleitung_WB5_Infrastrukturfolgekosten.pdf'
 
 
 class HilfeEinnahmen(FileButton):
-    _file = 'ProjektCheck_Anleitung_Kommunale_Steuereinnahmen.pdf'
+    _file = 'ProjektCheck_Anleitung_WB6_Kommunale_Steuereinnahmen.pdf'
 
 
 class HilfeVerkehr(FileButton):
-    _file = 'ProjektCheck_Anleitung_Verkehr_im_Umfeld.pdf'
+    _file = 'ProjektCheck_Anleitung_WB3_Verkehr_im_Umfeld.pdf'
 
 
 class HilfeStandortkonkurrenz(FileButton):
-    _file = 'ProjektCheck_Anleitung_Standortkonkurrenz_Supermaerkte.pdf'
+    _file = 'ProjektCheck_Anleitung_WB7_Standortkonkurrenz_Supermaerkte.pdf'
 
 
 class HilfeFlaeche(FileButton):
-    _file = 'ProjektCheck_Anleitung_Flaecheninanspruchnahme.pdf'
+    _file = 'ProjektCheck_Anleitung_WB4_Flaecheninanspruchnahme.pdf'
 
 
 class HilfeOekologie(FileButton):
-    _file = 'ProjektCheck_Anleitung_Oekologie.pdf'
+    _file = 'ProjektCheck_Anleitung_WB4_Oekologie.pdf'
 
 
 class HilfeErreichbarkeit(FileButton):
-    _file = 'ProjektCheck_Anleitung_Erreichbarkeit.pdf'
+    _file = 'ProjektCheck_Anleitung_WB2_Erreichbarkeit.pdf'
 
 
 class HinweiseBilanzen(FileButton):
