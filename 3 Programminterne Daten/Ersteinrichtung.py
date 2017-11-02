@@ -134,6 +134,9 @@ def install_packages(python_path):
     used_packages['pypiwin32-219'] = 'pypiwin32-219-cp27-none-{}.whl'.format(platform)
     used_packages['pyproj'] = 'pyproj-1.9.5.1-cp27-cp27m-{}.whl'.format(platform)
 
+    used_packages['scipy'] = 'scipy-0.19.1-cp27-cp27m-{}.whl'.format(platform)
+    used_packages['pandas'] = 'pandas-0.19.1-cp27-cp27m-{}.whl'.format(platform)
+
 
     missing = OrderedDict()
 
