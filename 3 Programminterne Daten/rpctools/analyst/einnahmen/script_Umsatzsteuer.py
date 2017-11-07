@@ -26,7 +26,7 @@ class Umsatzsteuer(Tool):
             featureclass = "Gemeindebilanzen",
             template_layer = symbology,
             template_folder = "einnahmen",
-            name = "Umsatzsteuer",
+            name = "Umsatzsteuer in €",
             disable_other = True,
             symbology = {'valueField': "USt"},
             label_replace = {'Einw_Saldo': 'USt'}

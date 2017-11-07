@@ -26,7 +26,7 @@ class Einkommensteuer(Tool):
             featureclass = "Gemeindebilanzen",
             template_layer = symbology,
             template_folder = "einnahmen",
-            name = "ESt",
+            name = "Einkommensteuer in €",
             disable_other = True,
             symbology = {'valueField': "ESt"},
             label_replace = {'Einw_Saldo': 'ESt'}

@@ -28,7 +28,7 @@ class Gewerbesteuer(Tool):
             featureclass = "Gemeindebilanzen",
             template_layer = symbology,
             template_folder = "einnahmen",
-            name = "GewSt",
+            name = "Gewerbesteuer in €",
             disable_other = True,
             symbology = {'valueField': "GewSt"},
             label_replace = {'Einw_Saldo': 'GewSt'}
@@ -137,7 +137,7 @@ class Gewerbesteuer(Tool):
 
         Gewerbesteuermessbetrag_pro_SvB_Projekt = Gewerbesteuermessbetrag_Projekt / (SvB_Branchen + SvB_Verkaufsflaechen)
         #arcpy.AddMessage("Gewerbesteuermessbetrag_pro_SvB_Projekt: " + str(Gewerbesteuermessbetrag_pro_SvB_Projekt))
-        
+
         table_bilanzen = self.folders.get_table("Gemeindebilanzen", "FGDB_Einnahmen.gdb")
         fields = ["AGS", "GewSt", "Hebesatz_GewSt", "SvB_Saldo"]
         cursor = arcpy.da.UpdateCursor(table_bilanzen, fields)
@@ -154,7 +154,7 @@ class Gewerbesteuer(Tool):
             #arcpy.AddMessage("Summe Bundes- und Landesvervielfältiger plus Erhöhungszahl: " + str(bvv_plus_lvv_plus_ehz))
             umlagesatz = bvv_plus_lvv_plus_ehz / row[2]
             #arcpy.AddMessage("Umlagesatz Gewerbesteuerumlage: " + str(umlagesatz))
-            
+
             if row[0] == ags:
                 row[1] = (Gewerbesteuermessbetrag_pro_SvB_Projekt * (row[2] / 100.0) * (row[3] + SvB_Verkaufsflaechen)) * (1 - umlagesatz)
             else:

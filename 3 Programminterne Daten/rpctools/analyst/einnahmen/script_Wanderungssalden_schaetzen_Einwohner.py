@@ -31,7 +31,7 @@ class Wanderungssalden1(Tool):
             featureclass = "Gemeindebilanzen",
             template_layer = symbology,
             template_folder = "einnahmen",
-            name = "Einw_Saldo",
+            name = "Einw-Saldo",
             disable_other = True,
             symbology = {'valueField': "Einw_Saldo"},
             label_replace = {'Einw_Saldo': 'Einw_Saldo'}
@@ -249,7 +249,7 @@ class Wanderungssalden1(Tool):
                 Summe_Zugeordneter_Zuzug_AP += gemeinde[5]
             Differenz_Ew = Summe_Zugeordneter_Zuzug_Ew + Summe_Zugeordneter_Fortzug_Ew
             Differenz_AP = Summe_Zugeordneter_Zuzug_AP + Summe_Zugeordneter_Fortzug_AP
-            
+
             #Neugruendungen (nur Gewerbe)
             Neugruendungen_AP = ap * Randsummen_Gewerbe[3] + 0.5
 
@@ -262,7 +262,7 @@ class Wanderungssalden1(Tool):
 
             self.parent_tbx.delete_rows_in_table("Zuzugsstatistik_Ew")
             column_values = {"Kategorie": [u"Projektgemeinde/Region", u"Restliches Bundesgebiet/Ausland"],
-                                "Anzahl": [int(round(Summe_Zugeordneter_Fortzug_Ew * -1)), int(round(-1 * Differenz_Ew))]}
+                                "Anzahl": [int(round(Summe_Zugeordneter_Fortzug_Ew * -1)), int(round(Differenz_Ew))]}
             self.parent_tbx.insert_rows_in_table("Zuzugsstatistik_Ew", column_values)
 
             self.parent_tbx.delete_rows_in_table("Zuzugsstatistik_SvB")

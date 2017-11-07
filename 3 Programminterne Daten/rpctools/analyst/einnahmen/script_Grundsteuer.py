@@ -26,7 +26,7 @@ class Grundsteuer(Tool):
             featureclass = "Gemeindebilanzen",
             template_layer = symbology,
             template_folder = "einnahmen",
-            name = "GrSt",
+            name = "Grundsteuer in €",
             disable_other = True,
             symbology = {'valueField': "GrSt"},
             label_replace = {'Einw_Saldo': 'GrSt'}

@@ -142,7 +142,7 @@ def install_packages(python_path):
 
     #Installing pip
     base_path = os.path.dirname(__file__)
-    wheel_path = os.path.join(base_path, 'wheels')
+    wheel_path = os.path.join(base_path, 'installer', 'wheels')
     log('Install or upgrade pip')
     process = subprocess.Popen([os.path.join(python_path, 'python'),
                                 os.path.join(wheel_path, "pip-9.0.1-py2.py3-none-any.whl", "pip"),

@@ -26,7 +26,7 @@ class Gesamtsumme(Tool):
             featureclass = "Gemeindebilanzen",
             template_layer = symbology,
             template_folder = "einnahmen",
-            name = "Gesamtsumme",
+            name = "Gesamtsumme in €",
             disable_other = True,
             symbology = {'valueField': "Summe_Einnahmenbilanz"},
             label_replace = {'Einw_Saldo': 'Summe_Einnahmenbilanz'}

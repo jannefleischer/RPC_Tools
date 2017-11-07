@@ -26,7 +26,7 @@ class Familienleistungsausgleich(Tool):
             featureclass = "Gemeindebilanzen",
             template_layer = symbology,
             template_folder = "einnahmen",
-            name = "FamLeistAusgl",
+            name = "FamLeistAusgl in €",
             disable_other = True,
             symbology = {'valueField': "FamLeistAusgl"},
             label_replace = {'Einw_Saldo': 'FamLeistAusgl'}
