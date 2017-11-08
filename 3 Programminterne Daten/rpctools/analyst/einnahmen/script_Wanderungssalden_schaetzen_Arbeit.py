@@ -218,12 +218,12 @@ class Wanderungssalden2(Tool):
                         Summe_Wichtungsfaktoren_Gemeinde_Gewerbe += raum[2]
                 Einw_Fortzug_neu = -1 * (bewohner * Randsummen_Wohnen[1] * Summe_Wichtungsfaktoren_Gemeinde_Wohnen / Summe_Wichtungsfaktoren_Gesamtraum_Wohnen)
                 if Einw_Fortzug_neu != 0:
-                    gemeinde[2] = Einw_Fortzug_neu - 0.5
+                    gemeinde[2] = Einw_Fortzug_neu# - 0.5
                 else:
                     gemeinde[2] = Einw_Fortzug_neu
                 SvB_Fortzug_neu = -1 * (ap * Randsummen_Gewerbe[1] * Summe_Wichtungsfaktoren_Gemeinde_Gewerbe / Summe_Wichtungsfaktoren_Gesamtraum_Gewerbe)
                 if SvB_Fortzug_neu != 0:
-                    gemeinde[3] = SvB_Fortzug_neu - 0.5
+                    gemeinde[3] = SvB_Fortzug_neu# - 0.5
                 else:
                     gemeinde[3] = SvB_Fortzug_neu
                 if gemeinde[0] == ags_projekt:
@@ -267,7 +267,7 @@ class Wanderungssalden2(Tool):
 
             self.parent_tbx.delete_rows_in_table("Zuzugsstatistik_SvB")
             column_values = {"Kategorie": [u"Projektgemeinde/Region", u"Restliches Bundesgebiet/Ausland", u"Neugründungen"],
-                             "Anzahl": [int(round(Summe_Zugeordneter_Fortzug_AP * -1)), int(round(-1 * (Differenz_AP - Neugruendungen_AP))), int(round(Neugruendungen_AP))]}
+                             "Anzahl": [int(round(Summe_Zugeordneter_Fortzug_AP * -1)), int(round((Differenz_AP - Neugruendungen_AP))), int(round(Neugruendungen_AP))]}
             self.parent_tbx.insert_rows_in_table("Zuzugsstatistik_SvB", column_values)
 
             c.set_chronicle("Wanderung Einwohner", self.folders.get_table(tablename='Chronik_Nutzung',workspace="FGDB_Einnahmen.gdb",project=projektname))
