@@ -87,15 +87,41 @@ class Sales(object):
         attraction_matrix[unreachable] = 0
         betriebstyp_col = 'id_betriebstyp_nullfall' \
             if setting == self.NULLFALL else 'id_betriebstyp_planfall'
+    
+        masked_dist_matrix = dist_matrix.T
+        masked_dist_matrix = masked_dist_matrix.mask(masked_dist_matrix < 0)
+        
+        # local providers 
+        # no real competition, but only closest three per cell (copy/paste from
+        # calc_competitors, had no time seperate implementation)
+        is_lp = df_markets[betriebstyp_col] == 1
+        local_markets = df_markets[is_lp]
+        indices = local_markets.index
+        local_masked_dist = masked_dist_matrix[local_markets.index]
+        df_ranking = local_masked_dist.rank(axis=1, method='first')
+        local_comp_matrix = pd.DataFrame(data=0, index=df_ranking.index,
+                                         columns=df_ranking.columns)
+        local_comp_matrix[df_ranking <= 3] = 1
+        local_comp_matrix[np.isnan(df_ranking)] = 0
+        local_comp_matrix = local_comp_matrix.T
+        
+        # small markets
         is_sm = df_markets[betriebstyp_col] == 2
-        small_smarkets = df_markets[is_sm]
+        small_markets = df_markets[is_sm]
+        small_comp_matrix = self.calc_competitors(
+            masked_dist_matrix, small_markets)
+        
+        # big markets
         big_markets = df_markets[df_markets[betriebstyp_col] > 2]
-        small_comp_matrix = self.calc_competitors(dist_matrix, small_smarkets)
-        big_comp_matrix = self.calc_competitors(dist_matrix, big_markets)
-        big_comp_matrix.loc[is_sm] = small_comp_matrix
+        big_comp_matrix = self.calc_competitors(
+            masked_dist_matrix, big_markets)
+        
+        # merge
+        big_comp_matrix.loc[is_lp] = local_comp_matrix
+        big_comp_matrix.loc[is_sm] = small_comp_matrix.loc[is_sm]
+        
         competitor_matrix = big_comp_matrix
-
-        #competitor_matrix = self.calc_competitors(dist_matrix, df_markets)
+        competitor_matrix[dist_matrix < 0] = 0
 
         if self.debug:
             setting_str = 'Nullfall' if setting == self.NULLFALL else 'Planfall'
@@ -138,13 +164,11 @@ class Sales(object):
             workspace='FGDB_Standortkonkurrenz_Supermaerkte.gdb',
             create=True)
 
-    def calc_competitors(self, dist_matrix, df_markets):
+    def calc_competitors(self, masked_dist_matrix, df_markets):
         """
         account competition through other markets of the same brand
         """
         cutoff_dist = self.relation_dist
-        masked_dist_matrix = dist_matrix.T
-        masked_dist_matrix = masked_dist_matrix.mask(masked_dist_matrix < 0)
         results = pd.DataFrame(data=1., index=masked_dist_matrix.index,
                                columns=masked_dist_matrix.columns)
         competing_markets = df_markets[['id_kette']]
@@ -217,7 +241,6 @@ class Sales(object):
                 nearest_three_mask==False, 0.)
         # Return results in shape of dist_matrix
         res = results.T
-        res[dist_matrix < 0] = 0
         return res
 
     def get_dist_matrix(self):
