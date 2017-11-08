@@ -664,7 +664,7 @@
                         <Button refID="rpc_tools.einwohnersalden_bearbeiten" />
                     </Items>
                 </Menu>
-                <Menu caption="Besch&#228;tigte" category="ProjektCheck" id="rpc_tools.wanderungssalden_beschaeftigte" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="Besch&#228;ftigte" category="ProjektCheck" id="rpc_tools.wanderungssalden_beschaeftigte" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Button refID="rpc_tools.beschaeftigtensalden_schaetzen" />
                         <Button refID="rpc_tools.beschaeftigtensalden_bearbeiten" />

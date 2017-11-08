@@ -101,7 +101,6 @@ class MassnahmenKostenDiagramm(MatplotDiagram):
                            patches.get_children()]) * 0.02
         for i, patch in enumerate(patches.get_children()):
             width = patch.get_x() + patch.get_width()
-            print(width)
             y = patch.get_y() + bar_width / 2
             ax.text(width + text_offset, y, str(int(round(width, 0))) + u' €',
                     color='black',ha='left', va='center')
