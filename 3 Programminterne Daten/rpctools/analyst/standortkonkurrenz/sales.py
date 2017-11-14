@@ -190,7 +190,7 @@ class Sales(object):
                 same_type_dist_matrix['Minimum'], axis=0)
             del same_type_dist_matrix['Minimum']
             same_type_dist_matrix = same_type_dist_matrix.mask((nearest_three_mask==False))
-            is_near = same_type_dist_matrix < cutoff_dist
+            is_near = same_type_dist_matrix <= cutoff_dist
             df_ranking['Umkreis'] = is_near.sum(axis=1)
             #same_type_dist_ranking['Abstand'] = \
                 #number_of_competing_markets - is_near['Umkreis']
