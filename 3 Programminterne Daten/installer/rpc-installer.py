@@ -12,7 +12,7 @@ from collections import OrderedDict
 import _winreg
 from argparse import ArgumentParser
 
-min_requirement = 10.4
+min_requirement = 10.3
 
 def get_python_path():
     try:
@@ -122,12 +122,12 @@ def install_packages(python_path, install_dir=''):
 
     used_packages['pypiwin32-219'] = 'pypiwin32-219-cp27-none-{}.whl'.format(platform)
     used_packages['pyproj'] = 'pyproj-1.9.5.1-cp27-cp27m-{}.whl'.format(platform)
-    
+
     used_packages['scipy'] = 'scipy-0.19.1-cp27-cp27m-{}.whl'.format(platform)
-    used_packages['pandas'] = 'pandas-0.19.1-cp27-cp27m-{}.whl'.format(platform)    
+    used_packages['pandas'] = 'pandas-0.19.1-cp27-cp27m-{}.whl'.format(platform)
 
     missing = OrderedDict()
-    
+
     try:
         base_path = os.path.dirname(__file__)
     # executed from nsis
@@ -152,29 +152,29 @@ def install_packages(python_path, install_dir=''):
 
     ##Installing packages
     log('wheel_path; {}'.format(wheel_path))
-    
-    def install_package(package, filename, upgrade=False): 
+
+    def install_package(package, filename, upgrade=False):
         log('{p}: {f}'.format(p=package, f=filename))
         args = [os.path.join(python_path, 'Scripts', 'pip.exe'),
-                'install', 
+                'install',
                 '-f', wheel_path,
                 os.path.join(wheel_path, filename)]
         if upgrade:
             args.append('--upgrade')
         process = subprocess.Popen(args,
                                    shell=True,
-                                   stdout=subprocess.PIPE, 
+                                   stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         out, err = process.communicate()
         log(out)
         log(err)
-        
+
         if process.returncode:
             log("Paket " + package + " konnte ggf. nicht installiert werden." + "\n")
-        
+
     for package, filename in used_packages.iteritems():
         install_package(package, filename)
-    
+
     install_package('rpctools', 'rpctools-0.9.6-py2-none-any.whl',
                     upgrade=True)
 
