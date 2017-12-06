@@ -183,14 +183,17 @@ class Sales(object):
             df_ranking = same_type_dist_matrix.rank(axis=1, method='first')
             nearest_three_mask = df_ranking <= 3
             df_ranking = df_ranking.mask((nearest_three_mask==False))
-            same_type_dist_matrix['Minimum'] = \
-                same_type_dist_matrix.loc[:, indices].min(axis=1)
-            # time differences between way to nearest market and other markets
-            same_type_dist_matrix = same_type_dist_matrix.sub(
-                same_type_dist_matrix['Minimum'], axis=0)
-            del same_type_dist_matrix['Minimum']
-            same_type_dist_matrix = same_type_dist_matrix.mask((nearest_three_mask==False))
-            is_near = same_type_dist_matrix <= cutoff_dist
+            cutoff_dist_matrix = same_type_dist_matrix.copy()
+            cutoff_dist_matrix['Minimum'] = \
+                cutoff_dist_matrix.loc[:, indices].min(axis=1)
+            # differences between way to nearest market and other markets
+            # set all distances relative to nearest market
+            cutoff_dist_matrix = cutoff_dist_matrix.sub(
+                cutoff_dist_matrix['Minimum'], axis=0)
+            del cutoff_dist_matrix['Minimum']
+            cutoff_dist_matrix = cutoff_dist_matrix.mask((nearest_three_mask==False))
+            cutoff_dist_matrix =  cutoff_dist_matrix.round(2)
+            is_near = cutoff_dist_matrix <= cutoff_dist
             df_ranking['Umkreis'] = is_near.sum(axis=1)
             #same_type_dist_ranking['Abstand'] = \
                 #number_of_competing_markets - is_near['Umkreis']
@@ -214,22 +217,23 @@ class Sales(object):
                             (df_ranking['Umkreis']==3),
                             market_id] = factor
                 # write data for far markets with:
-                # -> market is far; 1 near market exsists; no other far market
+                # -> market is far; 1 near market exists; 
+                # market is closer than posible other far markets
                 factor = df_markets.loc[market_id]\
                     ['zweiter_Markt_mit_Abstand_zum_ersten']
                 results.loc[(is_near[market_id]==False) &
                             (df_ranking['Umkreis']==1) &
                             (df_ranking[market_id]==2),
                             market_id] = factor
-                # -> market is far; 1 near market exsists;
-                # >1 far market exsists
+                # -> market is far; 1 near market exists;
+                # another far market exists that is closer to cell
                 factor = df_markets.loc[market_id]\
                     ['dritter_Markt_mit_Abstand_zum_ersten']
                 results.loc[(is_near[market_id]==False) &
                             (df_ranking['Umkreis']==1) &
                             (df_ranking[market_id]==3),
                             market_id] = factor
-                # -> market is far; >1 near market exsists
+                # -> market is far, 2 near markets
                 factor = df_markets.loc[market_id]\
                     ['dritter_Markt_mit_Abstand_zum_ersten_und_zweiten']
                 results.loc[(is_near[market_id]==False) & \
