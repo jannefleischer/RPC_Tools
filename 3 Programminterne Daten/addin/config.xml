@@ -1,4 +1,4 @@
-<ESRI.Configuration xmlns="http://schemas.esri.com/Desktop/AddIns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+﻿<ESRI.Configuration xmlns="http://schemas.esri.com/Desktop/AddIns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Name>ProjektCheck</Name>
     <AddInID>{9b0f33ed-0bf7-41aa-8957-a7ad885b6d31}</AddInID>
     <Description>Projekt-Check</Description>
@@ -8,7 +8,7 @@
     <Company>GGR</Company>
     <Date>04/28/2017</Date>
     <Targets>
-        <Target name="Desktop" version="10.4" />
+        <Target name="Desktop" version="10.3" />
     </Targets>
     <AddIn language="PYTHON" library="rpc_tools_addin.py" namespace="rpc_tools">
         <ArcMap>
