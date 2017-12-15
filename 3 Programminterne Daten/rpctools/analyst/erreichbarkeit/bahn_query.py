@@ -84,7 +84,7 @@ class BahnQuery(object):
         params['look_x'] = self._to_db_coord(point.x)
         params['look_y'] = self._to_db_coord(point.y)
 
-        r = requests.get(self.mobile_url, params=params)
+        r = requests.get(self.mobile_url, params=params, verify=False)
 
         soup = BeautifulSoup(r.text, "html.parser")
         rows = soup.findAll('a', {'class': 'uLine'})
@@ -132,7 +132,7 @@ class BahnQuery(object):
 
         def request_departure_table(time):
             params['time'] = time
-            r = requests.get(self.reiseauskunft_url, params=params)
+            r = requests.get(self.reiseauskunft_url, params=params, verify=False)
             soup = BeautifulSoup(r.text, "html.parser")
             table = soup.find('table', id='resultsOverview')
             return table
@@ -196,7 +196,7 @@ class BahnQuery(object):
 
         for id in stop_ids:
             params['evaId'] = id
-            r = requests.get(self.timetable_url, params=params)
+            r = requests.get(self.timetable_url, params=params, verify=False)
             soup = BeautifulSoup(r.text, "html.parser")
             rows = soup.findAll('tr', id=lambda x: x and 'journeyRow_' in x)
             n_departures.append(len(rows))
