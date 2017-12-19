@@ -15,7 +15,7 @@ class Feature(Point):
 
 class GeoserverQuery(object):
     feature_url = ('https://geoserver.ggr-planung.de/geoserver/projektcheck/wfs')
-    
+
     feature_params = {
         'service': 'WFS',
         'request': 'GetFeature',
@@ -26,7 +26,7 @@ class GeoserverQuery(object):
         'outputFormat': 'application/json',
         'srsname': 'EPSG:4326'
     }
-    
+
     def __init__(self):
         self.epsg = 3035
 
@@ -44,7 +44,7 @@ class GeoserverQuery(object):
                               x=point.x, y=point.y,
                               radius=radius))
         params['CQL_FILTER'] = cql_filter
-        r = requests.get(self.feature_url, params=params)
+        r = requests.get(self.feature_url, params=params, verify=False)
         r.raise_for_status()
         feat_dicts = r.json()['features']
         features = []

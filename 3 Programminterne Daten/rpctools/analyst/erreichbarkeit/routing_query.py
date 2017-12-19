@@ -32,7 +32,7 @@ class RoutingQuery(object):
         if point.epsg != self.epsg:
             point.transform(self.epsg)
         params['fromPlace'] = '{y},{x}'.format(y = point.y, x = point.x)
-        r = requests.get(self.isochrone_url, params=params)
+        r = requests.get(self.isochrone_url, params=params, verify=False)
         r.raise_for_status()
         geojson = r.json()
         geom_json = geojson['features'][0]['geometry']
