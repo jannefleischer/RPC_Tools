@@ -459,7 +459,7 @@ class OTPRouter(object):
                       toPlace=destination,
                       mode=mode,
                       maxPreTransitTime=1200)
-        r = requests.get(self.url, params=params)
+        r = requests.get(self.url, params=params, verify=False)
         return r.json()
 
     def decode_coords(self, json, route_id, source_id=0):
