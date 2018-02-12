@@ -97,7 +97,7 @@ class Zensus(object):
         del_tmp()
         return zensus_points, len(zensus_points)
 
-    def add_kk_ags(self, zensus_points, project, ags_auswahl=[]):
+    def get_ew_kk_per_ags(self, zensus_points, project, ags_auswahl=[]):
         """
         add kaufkraft and ags by joining to base tables
         return dictionary with ags_auswahl as keys values and

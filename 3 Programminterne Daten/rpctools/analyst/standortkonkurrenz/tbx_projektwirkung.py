@@ -14,11 +14,11 @@ from rpctools.analyst.standortkonkurrenz.zensus import Zensus, ZensusCell
 from rpctools.analyst.standortkonkurrenz.routing_distances import DistanceRouting
 from rpctools.utils.spatial_lib import (get_project_centroid, Point,
                                         extent_to_bbox, get_extent,
-                                        features_to_raster)
+                                        features_to_raster, get_ags)
 from rpctools.utils.config import Folders
 from rpctools.analyst.standortkonkurrenz.sales import Sales
 
-DEBUG = True
+DEBUG = False
 
 
 class ProjektwirkungMarkets(Tool):
@@ -87,10 +87,15 @@ class ProjektwirkungMarkets(Tool):
 
         # check the settings of last calculation
         set_table = 'Settings'
-        cur_ags = self.parent_tbx.query_table(
-            'Zentren', columns=['AGS'],
-            where='"Auswahl" <> 0 and nutzerdefiniert = 0')
-        cur_ags = zip(*cur_ags)[0]
+        # NEW: we take the "Verwaltungsgemeinschaften" with rs now 
+        # (still titled AGS to avoid changing the db structure)
+        # get the ags for all included VGs
+        cur_rs = get_ags(self.folders.get_table('Zentren'), 'AGS',
+                         where='"Auswahl" <> 0 and nutzerdefiniert = 0',
+                         match_option='CONTAINS', join_operation='JOIN_ONE_TO_MANY')
+        cur_ags = []
+        for key, value in cur_rs.iteritems():
+            cur_ags += [v[0] for v in value]
         cur_settings = {
             'sz_puffer': self.par.radius_sz.value,
             'betrachtungsraum': ','.join(cur_ags),
@@ -132,7 +137,26 @@ class ProjektwirkungMarkets(Tool):
                                                    columns=['id']))
         if sz_count == 0:
             # calculate cells with inhabitants (incl. 'teilflaechen')
-            self.calculate_zensus(cur_ags)
+            ags_res = self.calculate_zensus(cur_ags)
+
+            # NEW: we take the "Verwaltungsgemeinschaften" now, aggregate the
+            # results on "Gemeinde" level
+            for rs, ags_list in cur_rs.iteritems():
+                ew_agg = 0
+                kk_agg = 0
+                for ags, name in ags_list:
+                    ew, kk = ags_res[ags]
+                    ew_agg += ew
+                    kk_agg += kk
+                self.parent_tbx.update_table('Zentren',
+                                             column_values={'ew': ew_agg, 'kk': kk_agg},
+                                             where="ags='{}'".format(rs))
+                
+                    
+            #for ags, (ew, kk) in ags_res.iteritems():
+                #self.parent_tbx.update_table('Zentren',
+                                             #column_values={'ew': ew, 'kk': kk},
+                                             #where="ags='{}'".format(ags))
         else:
             arcpy.AddMessage('Siedlungszellen bereits vorhanden, '
                              'Berechnung wird übersprungen')
@@ -183,7 +207,10 @@ class ProjektwirkungMarkets(Tool):
 
     def calculate_zensus(self, ags_auswahl):
         '''extract zensus points (incl. points for planned areas)
-        and write them to the database'''
+        and write them to the database
+        return dictionary with ags_auswahl as keys values and
+        [inhabitants, kk] as values
+        '''
         buffered = self.folders.get_table('Siedlungszellen_Puffer', check=False)
         arcpy.Delete_management(buffered)
         bbox = self.buffer_area(self.par.radius_sz.value, buffered)
@@ -198,14 +225,11 @@ class ProjektwirkungMarkets(Tool):
         arcpy.AddMessage('Schreibe Siedlungszellen in Datenbank...')
         self.zensus_to_db(sz_points)
         project = self.parent_tbx.folders.projectname
-        ags_res = zensus.add_kk_ags(sz_points, project, ags_auswahl)
+        ags_res = zensus.get_ew_kk_per_ags(sz_points, project, ags_auswahl)
         # TODO: Update instead of rewrite
         self.zensus_to_db(sz_points)
-
-        for ags, (ew, kk) in ags_res.iteritems():
-            self.parent_tbx.update_table('Zentren',
-                                         column_values={'ew': ew, 'kk': kk},
-                                         where="ags='{}'".format(ags))
+        
+        return ags_res
 
     def get_tfl_points(self, start_id):
         '''get the centroids of the planned areas as zensus points, start_id
@@ -312,7 +336,7 @@ class ProjektwirkungMarkets(Tool):
                                     joined['ew'].values)]
         zensus = Zensus()
         project = self.parent_tbx.folders.projectname
-        zensus.add_kk_ags(points, project)
+        zensus.get_ew_kk_per_ags(points, project)
         kk = [point.kk for point in points]
         joined['kk'] = kk
         self.parent_tbx.dataframe_to_table(
@@ -386,7 +410,7 @@ class ProjektwirkungMarkets(Tool):
         cells = cells.merge(df_planfall,
                             on=['id_siedlungszelle', 'id_markt'], how='left')
         cells.fillna(0, inplace=True)
-        cells.sort(['id_markt', 'id_siedlungszelle'], inplace=True)
+        cells.sort_values(by=['id_markt', 'id_siedlungszelle'], inplace=True)
 
 
         # should be identical, but take both anyway

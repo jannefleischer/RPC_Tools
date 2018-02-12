@@ -105,7 +105,7 @@ class ProjektAnlegen(Projektverwaltung):
             project_path))
 
         # create 'Zentren'-table
-        arcpy.AddMessage('Ermittle Gemeinden im Umkreis von {} km...'.format(
+        arcpy.AddMessage('Ermittle Verwaltungsgemeinschaften im Umkreis von {} km...'.format(
             self._sk_radius/1000))
         self.communities_to_centers(self._project_centroid,
                                     radius=self._sk_radius)
@@ -323,8 +323,10 @@ class ProjektAnlegen(Projektverwaltung):
         the database'''
         import time
         start = time.time()
+        # NEW: we take the "Verwaltungsgemeinschaften" instead of "Gemeinden"
+        # for user selection (aggregation has to happen later)
         gemeinden = self.parent_tbx.folders.get_base_table(
-            table='bkg_gemeinden', workspace='FGDB_Basisdaten_deutschland.gdb')
+            table='Verwaltungsgemeinschaften', workspace='FGDB_Basisdaten_deutschland.gdb')
         centroid = Point(centroid[0], centroid[1])
         # circular buffer for clipping
         centroid.create_geom()
@@ -338,14 +340,14 @@ class ProjektAnlegen(Projektverwaltung):
             arcpy.Delete_management(fc_clipped)
         arcpy.CopyFeatures_management([circleGeom], fc_bbox)
         arcpy.Clip_analysis(gemeinden, fc_bbox, fc_clipped)
-        cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'AGS'])
+        cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'RS'])
         # add clipped communities as centers
-        for i, (shape, name, ags) in enumerate(cursor):
+        for i, (shape, name, rs) in enumerate(cursor):
             selection = 0
-            if ags == self._project_ags:
+            if rs == self._project_ags:
                 selection = -1
             c2 = arcpy.da.SearchCursor(gemeinden, ['SHAPE@'],
-                                       where_clause=''' "AGS"='{}' '''.format(ags))
+                                       where_clause=''' "RS"='{}' '''.format(rs))
             shape = c2.next()[0]
             del(c2)
             self.parent_tbx.insert_rows_in_table(
@@ -360,7 +362,7 @@ class ProjektAnlegen(Projektverwaltung):
                     'umsatz_nullfall': 0,
                     'id': i + 1,
                     'Auswahl': selection,
-                    'AGS': ags
+                    'AGS': rs
                 })
         del cursor
         arcpy.Delete_management(fc_bbox)

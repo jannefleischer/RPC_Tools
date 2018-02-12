@@ -230,8 +230,6 @@ class FieldSelection(ToolboxButton):
     def __init__(self):
         super(FieldSelection, self).__init__()
         self.enabled = True
-        netz_table = folders.get_base_table('FGDB_Kosten_Tool.gdb',
-                                            'Netze_und_Netzelemente')
         self.cursor = 3
 
     def onClick(self):

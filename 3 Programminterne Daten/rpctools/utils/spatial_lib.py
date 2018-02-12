@@ -274,7 +274,7 @@ def get_project_centroid(projectname):
     y = flaechen_df['INSIDE_Y'].mean()
     return x, y
 
-def get_ags(features, id_column):
+def get_ags(features, id_column, match_option='HAVE_THEIR_CENTER_IN', join_operation='JOIN_ONE_TO_ONE', where=None):
     """
     get the ags and names of the areas the centroids of all polygons in given
     feature table or layer lie in, the bkg_gemeinden table is taken as a source
@@ -301,12 +301,18 @@ def get_ags(features, id_column):
             arcpy.Delete_management(tmp_table)
 
         arcpy.SpatialJoin_analysis(features, gemeinden, tmp_table,
-                                   match_option='HAVE_THEIR_CENTER_IN')
+                                   join_operation=join_operation,
+                                   match_option=match_option)
 
-        cursor = arcpy.da.SearchCursor(tmp_table, [id_column, 'AGS_0', 'GEN'])
+        cursor = arcpy.da.SearchCursor(tmp_table, [id_column, 'AGS_0', 'GEN'], where_clause=where)
         ags_res = {}
         for row in cursor:
-            ags_res[row[0]] = row[1], row[2]
+            if join_operation == 'JOIN_ONE_TO_MANY':
+                if not ags_res.has_key(row[0]):
+                    ags_res[row[0]] = []
+                ags_res[row[0]].append((row[1], row[2]))
+            else:
+                ags_res[row[0]] = row[1], row[2]
 
         arcpy.Delete_management(tmp_table)
     return ags_res
