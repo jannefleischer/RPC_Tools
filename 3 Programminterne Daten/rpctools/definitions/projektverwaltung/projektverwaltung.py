@@ -323,6 +323,9 @@ class ProjektAnlegen(Projektverwaltung):
         the database'''
         import time
         start = time.time()
+        vg = self.parent_tbx.folders.get_base_table(
+            table='Verwaltungsgemeinschaften_dissolved',
+            workspace='FGDB_Basisdaten_deutschland.gdb')
         gemeinden = self.parent_tbx.folders.get_base_table(
             table='bkg_gemeinden', workspace='FGDB_Basisdaten_deutschland.gdb')
         centroid = Point(centroid[0], centroid[1])
@@ -337,15 +340,16 @@ class ProjektAnlegen(Projektverwaltung):
         if arcpy.Exists(fc_clipped):
             arcpy.Delete_management(fc_clipped)
         arcpy.CopyFeatures_management([circleGeom], fc_bbox)
-        arcpy.Clip_analysis(gemeinden, fc_bbox, fc_clipped)
-        cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'AGS'])
-        # add clipped communities as centers
-        for i, (shape, name, ags) in enumerate(cursor):
-            selection = 0
-            if ags == self._project_ags:
-                selection = -1
-            c2 = arcpy.da.SearchCursor(gemeinden, ['SHAPE@'],
-                                       where_clause=''' "AGS"='{}' '''.format(ags))
+        arcpy.Clip_analysis(vg, fc_bbox, fc_clipped)
+        
+        cursor = arcpy.da.SearchCursor(fc_clipped, ['SHAPE@', 'GEN', 'RS'])
+        id = 1
+        rs_list = []
+        # add clipped vg as centers
+        for shape, name, rs in cursor:
+            rs_list.append(rs)
+            c2 = arcpy.da.SearchCursor(vg, ['SHAPE@'],
+                                       where_clause=''' "RS"='{}' '''.format(rs))
             shape = c2.next()[0]
             del(c2)
             self.parent_tbx.insert_rows_in_table(
@@ -354,17 +358,41 @@ class ProjektAnlegen(Projektverwaltung):
                 column_values={
                     'SHAPE@': shape,
                     'name': name,
-                    'nutzerdefiniert': 0,
+                    'nutzerdefiniert': -1,  # -1 indicates that it is a vg for selection and output only
                     'umsatz_differenz': 0,
                     'umsatz_planfall': 0,
                     'umsatz_nullfall': 0,
-                    'id': i + 1,
-                    'Auswahl': selection,
-                    'AGS': ags
+                    'id': id,
+                    'Auswahl': 0,
+                    'AGS': '',
+                    'RS': rs
                 })
+            id += 1
+        
         del cursor
         arcpy.Delete_management(fc_bbox)
         arcpy.Delete_management(fc_clipped)
+        
+        cursor = arcpy.da.SearchCursor(gemeinden, ['SHAPE@', 'GEN', 'AGS', 'RS'])
+        for shape, name, ags, rs in cursor:
+            cut_rs = rs[:9]
+            if cut_rs in rs_list:self.parent_tbx.insert_rows_in_table(
+                'Zentren',
+                workspace='FGDB_Standortkonkurrenz_Supermaerkte.gdb',
+                column_values={
+                    'SHAPE@': shape,
+                    'name': name,
+                    'nutzerdefiniert': 0,  # 0 indicates gemeinden, for calculations only
+                    'umsatz_differenz': 0,
+                    'umsatz_planfall': 0,
+                    'umsatz_nullfall': 0,
+                    'id': id,
+                    'Auswahl': 0,
+                    'AGS': ags,
+                    'RS': cut_rs,
+                })
+            id += 1
+            
         print('Dauer: {}'.format(time.time() - start))
 
 

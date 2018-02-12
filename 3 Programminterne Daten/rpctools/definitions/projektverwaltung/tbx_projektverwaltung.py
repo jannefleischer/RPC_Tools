@@ -155,13 +155,22 @@ class TbxProjekteLoeschen(TbxProjektVerwaltung):
 
 if __name__ == '__main__':
     import numpy as np
-    t = TbxProjektKopieren()
+
+    t = TbxProjektAnlegen()
     params = t.getParameterInfo()
     t.par.name.value = 'Test' + str(np.random.randint(0, 10000))
     #t.set_active_project()
-    t._updateParameters(params)
+    #t._updateParameters(params)
     t.execute()
-    t.print_tool_parameters()
+    t.print_tool_parameters()    
+    
+    #t = TbxProjektKopieren()
+    #params = t.getParameterInfo()
+    #t.par.name.value = 'Test' + str(np.random.randint(0, 10000))
+    ##t.set_active_project()
+    #t._updateParameters(params)
+    #t.execute()
+    #t.print_tool_parameters()
 
     #t = TbxProjektKopieren()
     #params = t.getParameterInfo()
