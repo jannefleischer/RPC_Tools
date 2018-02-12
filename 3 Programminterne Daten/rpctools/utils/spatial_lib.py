@@ -274,7 +274,9 @@ def get_project_centroid(projectname):
     y = flaechen_df['INSIDE_Y'].mean()
     return x, y
 
-def get_ags(features, id_column, match_option='HAVE_THEIR_CENTER_IN', join_operation='JOIN_ONE_TO_ONE', where=None):
+def get_ags(features, id_column, match_option='HAVE_THEIR_CENTER_IN',
+            join_operation='JOIN_ONE_TO_ONE', where=None,
+            ags_table='bkg_gemeinden', ags_column='AGS'):
     """
     get the ags and names of the areas the centroids of all polygons in given
     feature table or layer lie in, the bkg_gemeinden table is taken as a source
@@ -295,7 +297,7 @@ def get_ags(features, id_column, match_option='HAVE_THEIR_CENTER_IN', join_opera
     with ArcpyEnv(addOutputsToMap=False):
         folders = Folders()
         gemeinden = folders.get_base_table('FGDB_Basisdaten_deutschland.gdb',
-                                           'bkg_gemeinden')
+                                           ags_table)
         tmp_table = join(arcpy.env.scratchGDB, 'tmp_join')
         if arcpy.Exists(tmp_table):
             arcpy.Delete_management(tmp_table)
@@ -304,7 +306,7 @@ def get_ags(features, id_column, match_option='HAVE_THEIR_CENTER_IN', join_opera
                                    join_operation=join_operation,
                                    match_option=match_option)
 
-        cursor = arcpy.da.SearchCursor(tmp_table, [id_column, 'AGS_0', 'GEN'], where_clause=where)
+        cursor = arcpy.da.SearchCursor(tmp_table, [id_column, ags_column + '_0', 'GEN'], where_clause=where)
         ags_res = {}
         for row in cursor:
             if join_operation == 'JOIN_ONE_TO_MANY':

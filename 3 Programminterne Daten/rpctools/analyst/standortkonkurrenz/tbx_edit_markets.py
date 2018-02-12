@@ -203,7 +203,8 @@ class TbxEditMarkets(Tbx):
         # market exists in planfall
         new_market['id_betriebstyp_planfall'] = 1
         self.insert_dataframe_in_table('Maerkte', new_market)
-        ags = get_ags(self.folders.get_table('Maerkte'), 'id')
+        ags = get_ags(self.folders.get_table('Maerkte'), 'id', 
+                      ags_table='Verwaltungsgemeinschaften', ags_column='RS')
         new_ags = ags[new_id][0]
         new_market['AGS'] = new_ags
         self.update_table('Maerkte', column_values={'AGS': new_ags},

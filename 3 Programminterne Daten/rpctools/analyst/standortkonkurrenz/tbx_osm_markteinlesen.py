@@ -37,7 +37,7 @@ class MarktEinlesen(Tool):
             'Ketten_Zuordnung',
             workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
             is_base_table=True)
-        self.df_chains_alloc.sort(columns='prioritaet', ascending=False)
+        self.df_chains_alloc.sort_values(by='prioritaet', ascending=False)
 
     def run(self):
         """"""
@@ -122,7 +122,9 @@ class MarktEinlesen(Tool):
         Assign community size to supermarkets
         """
         markets = self.folders.get_table('Maerkte')
-        ags = get_ags(markets, 'id')
+        # NEW: match it to VG instead of "Gemeinden"
+        ags = get_ags(markets, 'id',
+                      ags_table='Verwaltungsgemeinschaften', ags_column='RS')
         cursor = arcpy.da.UpdateCursor(markets, ['id', 'AGS'])
         for row in cursor:
             try:
