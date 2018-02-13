@@ -208,7 +208,7 @@
                 <Button caption="Kurzanleitung" category="ProjektCheck" class="HilfeStandortkonkurrenz" id="rpc_tools.hilfe_standortkonkurrenz" image="Images\HelpSystem_C_16.png" message="" tip="Zeigt eine Kurzanleitung (pdf) zu den Funktionen im Analysebereich “Standortkonkurrenz Supermärkte” an.">
                     <Help heading="" />
                 </Button>
-                <Button caption="M&#228;rkte und Versorgungsbereiche anzeigen" category="ProjektCheck" class="MaerkteZentrenAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="Bereits erzeugte, in der Karte aktuell aber nicht enthaltene Layer mit Märkten (Nullfall und Planfall) und Versorgungsbereichen wieder zur Karte hinzufügen.">
+                <Button caption="M&#228;rkte und Zentren anzeigen" category="ProjektCheck" class="MaerkteZentrenAnzeigen" id="rpc_tools.maerkte_anzeigen" image="Images\eye-2-16.png" message="" tip="Bereits erzeugte, in der Karte aktuell aber nicht enthaltene Layer mit Märkten (Nullfall und Planfall) und Zentren wieder zur Karte hinzufügen.">
                     <Help heading="" />
                 </Button>
                 <Button caption="Betrachtungsraum mit M&#228;rkten aus OSM erg&#228;nzen" category="ProjektCheck" class="BestandOSMEinlesen" id="rpc_tools.bestand_osm" image="Images\Openstreetmap_logo.svg.png" message="" tip="Den in OpenStreetMap verfügbaren Bestand an Lebensmittelmärkten innerhalb des Plangebiets online abfragen und einlesen">
@@ -241,13 +241,13 @@
                 <Tool caption="Geplanten Markt bearbeiten/entfernen" category="ProjektCheck" class="PlanfallMarktBearbeiten" id="rpc_tools.planfall_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="Einen bereits in der Karte für den Planfall eingetragenen geplanten neuen Lebensmittelmarkt bearbeiten (Name, Handelskette, Betriebstyp) oder löschen.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Versorgungsbereich zeichnen" category="ProjektCheck" class="ZentrumHinzu" id="rpc_tools.zentrum_hinzu" image="Images\GenericPencilArea16.png" message="" tip="Versorgungsbereiche in der Karte einzeichnen, um die räumliche Basis für die Bilanzierung der Auswirkungen im Planfall festzulegen.">
+                <Tool caption="Zentrum zeichnen" category="ProjektCheck" class="ZentrumHinzu" id="rpc_tools.zentrum_hinzu" image="Images\GenericPencilArea16.png" message="" tip="Zentren in der Karte einzeichnen, um die räumliche Basis für die Bilanzierung der Auswirkungen im Planfall festzulegen.">
                     <Help heading="" />
                 </Tool>
-                <Tool caption="Versorgungsbereich bearbeiten/entfernen" category="ProjektCheck" class="ZentrumBearbeiten" id="rpc_tools.zentrum_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="Bereits in die Karte eingezeichnete Versorgungsbereiche (um)benennen oder löschen">
+                <Tool caption="Zentrum bearbeiten/entfernen" category="ProjektCheck" class="ZentrumBearbeiten" id="rpc_tools.zentrum_bearbeiten" image="Images\GenericPencilTarget16.png" message="" tip="Bereits in die Karte eingezeichnete Zentren (um)benennen oder löschen">
                     <Help heading="" />
                 </Tool>
-                <Button caption="Projektwirkung sch&#228;tzen" category="ProjektCheck" class="StandortkonkurrenzProjektwirkung" id="rpc_tools.standortkonkurrenz_projektwirkung" image="Images\GenericCalculator16.png" message="" tip="Umsatzumverteilung zwischen Planfall und Nullfall bezogen auf die Gemeinden und die Versorgungsbereiche sowie weitere Kennwerte der Einzelhandelsplanung schätzen">
+                <Button caption="Projektwirkung sch&#228;tzen" category="ProjektCheck" class="StandortkonkurrenzProjektwirkung" id="rpc_tools.standortkonkurrenz_projektwirkung" image="Images\GenericCalculator16.png" message="" tip="Umsatzumverteilung zwischen Planfall und Nullfall bezogen auf die Gemeinden und die Zentren sowie weitere Kennwerte der Einzelhandelsplanung schätzen">
                     <Help heading="" />
                 </Button>
                 <Tool caption="Betrachtungsraum ausw&#228;hlen" category="ProjektCheck" class="FieldSelection" id="rpc_tools.select_ags" image="Images\CadastralFeatureSelect16.png" message="" tip="">
@@ -716,7 +716,7 @@
                         <Tool refID="rpc_tools.planfall_bearbeiten" />
                     </Items>
                 </Menu>
-                <Menu caption="Versorgungsbereiche" category="ProjektCheck" id="rpc_tools.menu_zentren" isRootMenu="false" isShortcutMenu="true" separator="true">
+                <Menu caption="Zentren" category="ProjektCheck" id="rpc_tools.menu_zentren" isRootMenu="false" isShortcutMenu="true" separator="true">
                     <Items>
                         <Tool refID="rpc_tools.zentrum_hinzu" />
                         <Tool refID="rpc_tools.zentrum_bearbeiten" />

@@ -152,8 +152,8 @@ class ZentrumBearbeiten(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxEditCenters'
-    _message = (u'Klicken Sie nach dem Schließen dieser Meldung auf den '
-                u'Versorgungsbereich in der Karte, den Sie (um)benennen oder '
+    _message = (u'Klicken Sie nach dem Schließen dieser Meldung auf das '
+                u'Zentrum in der Karte, das Sie (um)benennen oder '
                 u'löschen möchten. \n\n'
                 u'Warten Sie anschließend bis sich ein entsprechendes '
                 u'Dialogfenster öffnet.')
@@ -175,21 +175,21 @@ class ZentrumBearbeiten(ToolboxButton):
 
 
 class ZentrumHinzu(ZentrumBearbeiten):
-    _new_center_name = 'unbenannter Versorgungsbereich'
+    _new_center_name = 'unbenanntes Zentrum'
     _message = (u'Zeichnen Sie nach dem Schließen dieser Meldung in der Karte '
-                u'Versorgungsbereiche ein.\n\n'
+                u'Zentren ein.\n\n'
                 u'Klicken Sie dazu mehrfach in die Karte, um Stützpunkte für '
-                u'die Form eines Versorgungsbereichs zu setzen. Schließen Sie '
-                u'das Einzeichnen jedes Versorgungsbereichs mit einem '
+                u'die Form eines Zentrums zu setzen. Schließen Sie '
+                u'das Einzeichnen jedes Zentrums mit einem '
                 u'Doppelklick ab.\n\n'
-                u'Sie können unmittelbar danach einen weiteren weiteren '
-                u'Versorgungsbereich einzeichnen. Wenn Sie mit dem Einzeichnen '
-                u'der Versorgungsbereiche fertig sind, klicken Sie auf das '
+                u'Sie können unmittelbar danach ein weiteres '
+                u'Zentrum einzeichnen. Wenn Sie mit dem Einzeichnen '
+                u'der Zentren fertig sind, klicken Sie auf das '
                 u'grüne Häkchen ganz rechts in der Projekt-Check-Toolbox.\n\n'
                 u'Über die Funktion "Analysieren > Standortkonkurrenz '
-                u'Supermärkte > Versorgungsbereiche > Versorgungsbereiche '
+                u'Supermärkte > Zentren > Zentren '
                 u'bearbeiten / entfernen" können Sie bereits gezeichnete '
-                u'Versorgungsbereiche (um)benennen oder löschen.')
+                u'Zentren (um)benennen oder löschen.')
 
     def __init__(self):
         super(ZentrumHinzu, self).__init__()

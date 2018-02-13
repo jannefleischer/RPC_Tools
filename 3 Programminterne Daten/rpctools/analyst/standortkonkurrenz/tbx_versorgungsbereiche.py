@@ -28,7 +28,7 @@ class EditCenters(Tool):
         delete_df = centers_df.loc[centers_df['do_delete'] == True]
         update_df = centers_df.loc[centers_df['do_delete'] == False]
         if len(delete_df) > 0:
-            arcpy.AddMessage(u'Lösche Versorgungsbereiche')
+            arcpy.AddMessage(u'Lösche Zentren')
         for idx, center in delete_df.iterrows():
             arcpy.AddMessage(u' - {}'.format(center['pretty']))
             self.parent_tbx.delete_rows_in_table(
@@ -44,7 +44,7 @@ class TbxEditCenters(Tbx):
 
     @property
     def label(self):
-        return 'Versorgungsbereiche bearbeiten oder entfernen'
+        return 'Zentren bearbeiten oder entfernen'
 
     @property
     def Tool(self):
@@ -62,8 +62,8 @@ class TbxEditCenters(Tbx):
         param.filter.list = []
 
         param = self.add_parameter('centers')
-        param.name = encode(u'Versorgungsbereiche')
-        param.displayName = encode(u'Versorgungsbereich auswählen')
+        param.name = encode(u'Zentren')
+        param.displayName = encode(u'Zentrum auswählen')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
@@ -71,14 +71,14 @@ class TbxEditCenters(Tbx):
 
         param = self.add_parameter('name')
         param.name = encode(u'Name')
-        param.displayName = encode(u'Name des Versorgungsbereichs')
+        param.displayName = encode(u'Name des Zentrums')
         param.parameterType = 'Required'
         param.direction = 'Input'
         param.datatype = u'GPString'
 
         param = self.add_parameter('do_delete')
         param.name = encode(u'Löschen')
-        param.displayName = encode(u'Versorgungsbereich entfernen')
+        param.displayName = encode(u'Zentrum entfernen')
         param.parameterType = 'Optional'
         param.direction = 'Input'
         param.datatype = u'GPBoolean'
