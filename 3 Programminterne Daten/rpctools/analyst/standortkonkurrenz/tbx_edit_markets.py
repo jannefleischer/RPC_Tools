@@ -131,7 +131,7 @@ class TbxEditMarkets(Tbx):
             custom_row['id_betriebstyp'] = [0]
             custom_row['pretty'] = custom_row['name'] = [u'Schließung']
             self.df_types = self.df_types.append(
-                custom_row, ignore_index=True).sort('id_betriebstyp')
+                custom_row, ignore_index=True).sort_values(by='id_betriebstyp')
 
         param = self.add_parameter('type_name')
         param.name = encode(u'Betriebstyp')
@@ -197,11 +197,15 @@ class TbxEditMarkets(Tbx):
         new_market['name'] = name
         new_market['SHAPE'] = [coords]
         new_market['id_teilflaeche'] = -1
+        default_typ = 1
+        vkfl = self.betriebstyp_to_vkfl(default_typ, None)
+        new_market['vkfl'] = vkfl if self.setting == NULLFALL else 0
         if self.setting == NULLFALL:
             # market exists in nullfall
-            new_market['id_betriebstyp_nullfall'] = 1
+            new_market['id_betriebstyp_nullfall'] = default_typ
         # market exists in planfall
-        new_market['id_betriebstyp_planfall'] = 1
+        new_market['id_betriebstyp_planfall'] = default_typ
+        new_market['vkfl_planfall'] = vkfl
         self.insert_dataframe_in_table('Maerkte', new_market)
         ags = get_ags(self.folders.get_table('Maerkte'), 'id')
         new_ags = ags[new_id][0]
@@ -231,7 +235,7 @@ class TbxEditMarkets(Tbx):
         # reset markets dataframe on opening of toolbox
         self.markets_df = self.get_markets()
         self.markets_df['do_delete'] = False
-        self.markets_df.sort(columns='id', inplace=True)
+        self.markets_df.sort_values(by='id', inplace=True)
         if len(self.markets_df) == 0:
             return
 
@@ -344,15 +348,16 @@ class TbxEditMarkets(Tbx):
         elif self.par.changed('type_name'):
             id_typ = self.df_types['id_betriebstyp'][
                 self.df_types['pretty'] == self.par.type_name.value].values[0]
+            # ToDo: set different type/vkfl for planfall if nullfall is edited?
+            self.markets_df.loc[market_idx, 'id_betriebstyp_planfall'] = id_typ
+            id_kette = self.markets_df.loc[market_idx, 'id_kette'].values[0]
+            vkfl = self.betriebstyp_to_vkfl(id_typ, id_kette)
+            self.markets_df.loc[market_idx, 'vkfl_planfall'] = vkfl
             # only change nullfall type when toolbox is set to nullfall
             # in case of planfall it stays 0
             if self.setting == NULLFALL:
                 self.markets_df.loc[market_idx, 'id_betriebstyp_nullfall'] = id_typ
-            # ToDo: set different type for planfall if nullfall is edited?
-            self.markets_df.loc[market_idx, 'id_betriebstyp_planfall'] = id_typ
-            id_kette = self.markets_df.loc[market_idx, 'id_kette'].values[0]
-            vkfl = self.betriebstyp_to_vkfl(id_typ, id_kette)
-            self.markets_df.loc[market_idx, 'vkfl'] = vkfl
+                self.markets_df.loc[market_idx, 'vkfl'] = vkfl
 
         elif self.par.changed('do_delete'):
             do_delete = self.par.do_delete.value
@@ -429,7 +434,7 @@ class TbxExtendMarkets(TbxEditMarkets):
                 vkfl = 0
             else:
                 vkfl = self.betriebstyp_to_vkfl(id_typ, id_kette)
-            self.markets_df.loc[market_idx, 'vkfl'] = vkfl
+            self.markets_df.loc[market_idx, 'vkfl_planfall'] = vkfl
             i = np.where(market_idx == True)[0][0]
             pretty = self.get_pretty_market_name(
                 self.markets_df.iloc[i])
