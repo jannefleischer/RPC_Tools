@@ -131,7 +131,7 @@ class TbxEditMarkets(Tbx):
             custom_row['id_betriebstyp'] = [0]
             custom_row['pretty'] = custom_row['name'] = [u'Schließung']
             self.df_types = self.df_types.append(
-                custom_row, ignore_index=True).sort('id_betriebstyp')
+                custom_row, ignore_index=True).sort_values(by='id_betriebstyp')
 
         param = self.add_parameter('type_name')
         param.name = encode(u'Betriebstyp')
@@ -231,7 +231,7 @@ class TbxEditMarkets(Tbx):
         # reset markets dataframe on opening of toolbox
         self.markets_df = self.get_markets()
         self.markets_df['do_delete'] = False
-        self.markets_df.sort(columns='id', inplace=True)
+        self.markets_df.sort_values(by='id', inplace=True)
         if len(self.markets_df) == 0:
             return
 

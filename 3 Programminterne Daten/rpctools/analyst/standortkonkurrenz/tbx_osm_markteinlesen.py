@@ -37,7 +37,7 @@ class MarktEinlesen(Tool):
             'Ketten_Zuordnung',
             workspace='FGDB_Standortkonkurrenz_Supermaerkte_Tool.gdb',
             is_base_table=True)
-        self.df_chains_alloc.sort(columns='prioritaet', ascending=False)
+        self.df_chains_alloc.sort_values(by='prioritaet', ascending=False)
 
     def run(self):
         """"""
