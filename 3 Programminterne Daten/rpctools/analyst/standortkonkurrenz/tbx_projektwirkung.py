@@ -100,6 +100,8 @@ class ProjektwirkungMarkets(Tool):
         selected_rs = self.parent_tbx.query_table(
             'Zentren', columns=['RS'],
             where='"Auswahl" <> 0 and nutzerdefiniert = -1')
+        self.parent_tbx.update_table('Zentren', {'Auswahl': 0},
+                                     where='nutzerdefiniert = 0')
         
         selected_rs = ["'{}'".format(r[0]) for r in selected_rs]
         self.parent_tbx.update_table(

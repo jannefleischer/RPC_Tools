@@ -373,25 +373,38 @@ class ProjektAnlegen(Projektverwaltung):
         arcpy.Delete_management(fc_bbox)
         arcpy.Delete_management(fc_clipped)
         
+        rs_project = None
+        
         cursor = arcpy.da.SearchCursor(gemeinden, ['SHAPE@', 'GEN', 'AGS', 'RS'])
         for shape, name, ags, rs in cursor:
             cut_rs = rs[:9]
-            if cut_rs in rs_list:self.parent_tbx.insert_rows_in_table(
-                'Zentren',
-                workspace='FGDB_Standortkonkurrenz_Supermaerkte.gdb',
-                column_values={
-                    'SHAPE@': shape,
-                    'name': name,
-                    'nutzerdefiniert': 0,  # 0 indicates gemeinden, for calculations only
-                    'umsatz_differenz': 0,
-                    'umsatz_planfall': 0,
-                    'umsatz_nullfall': 0,
-                    'id': id,
-                    'Auswahl': 0,
-                    'AGS': ags,
-                    'RS': cut_rs,
-                })
+            if cut_rs in rs_list:
+                if ags == self._project_ags:
+                    rs_project = cut_rs
+                self.parent_tbx.insert_rows_in_table(
+                    'Zentren',
+                    workspace='FGDB_Standortkonkurrenz_Supermaerkte.gdb',
+                    column_values={
+                        'SHAPE@': shape,
+                        'name': name,
+                        'nutzerdefiniert': 0,  # 0 indicates gemeinden, for calculations only
+                        'umsatz_differenz': 0,
+                        'umsatz_planfall': 0,
+                        'umsatz_nullfall': 0,
+                        'id': id,
+                        'Auswahl': 0,
+                        'AGS': ags,
+                        'RS': cut_rs,
+                    }
+                ) 
             id += 1
+        
+        # preselect the VG the project is in
+        if rs_project:
+            self.parent_tbx.update_table(
+                'Zentren', {'Auswahl': -1},  # -1 : not unselectable
+                where='"RS" = \'{}\''.format(rs_project),
+                workspace='FGDB_Standortkonkurrenz_Supermaerkte.gdb')
             
         print('Dauer: {}'.format(time.time() - start))
 
