@@ -76,7 +76,8 @@ class MarktEinlesen(Tool):
             'adresse',
             'is_buffer',
             'is_osm',
-            'vkfl',
+            'vkfl', 
+            'vkfl_planfall',
             'adresse'
         ]
         table = self.folders.get_table(tablename)
@@ -101,6 +102,8 @@ class MarktEinlesen(Tool):
                 market.create_geom()
                 # set sales area, if not set yet (esp. osm markets)
                 vkfl = market.vkfl or self.betriebstyp_to_vkfl(market)
+                vkfl_nullfall = vkfl if not planfall else 0
+                vkfl_planfall = vkfl
                 if market.geom:
                     rows.insertRow((
                         market.name,
@@ -113,7 +116,8 @@ class MarktEinlesen(Tool):
                         market.adresse,
                         int(is_buffer),
                         int(is_osm),
-                        vkfl,
+                        vkfl_nullfall,
+                        vkfl_planfall,
                         market.adresse
                     ))
 

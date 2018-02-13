@@ -35,10 +35,14 @@ class ProjektwirkungMarkets(Tool):
         fc_maerkte = 'Maerkte'
         layer_maerkte = u'Umsatzveränderung Märkte'
         fc_zentren = 'Zentren'
-        layer_vb = u'Umsatzveränderung Bestand Versorgungsbereiche'
-        layer_gem = u'Umsatzveränderung Bestand Gemeinden'
-        layer_zen = u'Zentralität Planfall'
-        layer_vkfl = u'Verkaufsflächendichte Planfall'
+        layer_vb = u'Umsatzveränderung Bestand Zentren'
+        layer_gem = u'Umsatzveränderung Bestand Verwaltungsgemeinschaften'
+        layer_zen_n = u'Zentralität Nullfall'
+        layer_zen_p = u'Zentralität Planfall'
+        layer_zen_e = u'Entwicklung Zentralität'
+        layer_vkfl_n = u'Verkaufsflächendichte Nullfall'
+        layer_vkfl_p = u'Verkaufsflächendichte Planfall'
+        layer_vkfl_e = u'Entwicklung Verkaufsflächendichte'
 
         #self.output.add_layer(group_layer, layer_maerkte, fc_maerkte,
                               #template_folder=folder, zoom=False)
@@ -71,14 +75,21 @@ class ProjektwirkungMarkets(Tool):
                                   name=layer_name,
                                   template_folder=folder,
                                   zoom=False)
-
         self.output.add_layer(group_layer, layer_vb, fc_zentren,
                               template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_gem, fc_zentren,
                               template_folder=folder, zoom=False)
-        self.output.add_layer(group_layer, layer_zen, fc_zentren,
+        self.output.add_layer(group_layer, layer_zen_n, fc_zentren,
                               template_folder=folder, zoom=False)
-        self.output.add_layer(group_layer, layer_vkfl, fc_zentren,
+        self.output.add_layer(group_layer, layer_zen_p, fc_zentren,
+                              template_folder=folder, zoom=False)
+        self.output.add_layer(group_layer, layer_zen_e, fc_zentren,
+                              template_folder=folder, zoom=False)
+        self.output.add_layer(group_layer, layer_vkfl_n, fc_zentren,
+                              template_folder=folder, zoom=False)
+        self.output.add_layer(group_layer, layer_vkfl_p, fc_zentren,
+                              template_folder=folder, zoom=False)
+        self.output.add_layer(group_layer, layer_vkfl_e, fc_zentren,
                               template_folder=folder, zoom=False)
 
     def run(self):
@@ -193,7 +204,7 @@ class ProjektwirkungMarkets(Tool):
         kk_planfall = sales.calculate_planfall()
         arcpy.AddMessage(u'Berechne Kenngrößen...')
         self.sales_to_db(kk_nullfall, kk_planfall)
-        arcpy.AddMessage(u'Werte Ergebnisse auf Gemeindeebene aus...')
+        arcpy.AddMessage(u'Werte Ergebnisse auf Verwaltungsgemeinschaftsebene aus...')
         self.update_centers()
 
     def calculate_zensus(self, ags_auswahl):
@@ -424,9 +435,17 @@ class ProjektwirkungMarkets(Tool):
 
     def update_centers(self):
         '''calculate the sales of the defined centers'''
+        
         df_markets = self.parent_tbx.table_to_dataframe(
             'Maerkte',
-            columns=['AGS', 'umsatz_planfall', 'umsatz_nullfall', 'vkfl'])
+            columns=['AGS', 'umsatz_planfall', 'umsatz_nullfall', 'vkfl',
+                     'vkfl_planfall', 'id_betriebstyp_nullfall',
+                     'id_betriebstyp_planfall'])
+    
+        # exclude turnovers of new markets
+        new_market_idx = df_markets['id_betriebstyp_nullfall'] == 0
+        df_markets.loc[new_market_idx, 'umsatz_planfall'] = 0
+        
         df_centers = self.parent_tbx.table_to_dataframe(
             'Zentren', columns=['id', 'AGS', 'RS', 'ew', 'kk', 'nutzerdefiniert'])
         summed = df_markets.groupby('AGS').sum().reset_index()
@@ -435,7 +454,8 @@ class ProjektwirkungMarkets(Tool):
         # sum up ags based results to rs
         df_ags_res = df_centers_res[df_centers_res['nutzerdefiniert'] == 0]
         df_ags_agg = df_ags_res.groupby('RS')['ew', 'kk', 'umsatz_planfall',
-                                              'umsatz_nullfall', 'vkfl'].sum()
+                                              'umsatz_nullfall', 'vkfl',
+                                              'vkfl_planfall'].sum()
         rs_idx = df_centers_res['nutzerdefiniert'] == -1
         for index, row in df_ags_agg.iterrows():
             r_idx = rs_idx & (df_centers_res['RS'] == index)
@@ -445,10 +465,23 @@ class ProjektwirkungMarkets(Tool):
         df_centers_res['umsatz_differenz'] = (
             100 * (df_centers_res['umsatz_planfall'] /
                    df_centers_res['umsatz_nullfall']) - 100)
-        df_centers_res['vkfl_dichte'] = (
+        
+        df_centers_res['vkfl_dichte_nullfall'] = (
             df_centers_res['vkfl'] / df_centers_res['ew'])
-        df_centers_res['zentralitaet'] = (
+        df_centers_res['vkfl_dichte_planfall'] = (
+            df_centers_res['vkfl_planfall'] / df_centers_res['ew'])
+        df_centers_res['vkfl_dichte_differenz'] = (
+            df_centers_res['vkfl_dichte_planfall']
+            - df_centers_res['vkfl_dichte_nullfall'])
+        
+        df_centers_res['zentralitaet_planfall'] = (
             100 * df_centers_res['umsatz_planfall'] / df_centers_res['kk'])
+        df_centers_res['zentralitaet_nullfall'] = (
+            100 * df_centers_res['umsatz_nullfall'] / df_centers_res['kk'])
+        df_centers_res['zentralitaet_differenz'] = (
+            df_centers_res['zentralitaet_planfall']
+            - df_centers_res['zentralitaet_nullfall'])
+        
         df_centers_res.replace([np.inf, -np.inf], np.nan, inplace=True)
         df_centers_res.fillna(0, inplace=True)
         self.parent_tbx.dataframe_to_table('Zentren', df_centers_res,
