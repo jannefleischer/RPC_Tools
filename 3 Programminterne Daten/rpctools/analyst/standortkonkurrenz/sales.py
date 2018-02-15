@@ -205,41 +205,43 @@ class Sales(object):
                 # write data for near markets with:
                 # -> 1 near market
                 factor = df_markets.loc[market_id]['ein_Markt_in_Naehe']
-                results.loc[(is_near[market_id]==True) &
-                            (df_ranking['Umkreis']==1),
+                results.loc[np.logical_and(is_near[market_id]==True,
+                                           df_ranking['Umkreis']==1),
                             market_id] = factor
                 # -> 2 near markets
                 factor = df_markets.loc[market_id]['zwei_Maerkte_in_Naehe']
-                results.loc[(is_near[market_id]==True) &
-                            (df_ranking['Umkreis']==2),
+                results.loc[np.logical_and(is_near[market_id]==True,
+                                            df_ranking['Umkreis']==2),
                             market_id] = factor
                 # -> more than 2 near markets
                 factor = df_markets.loc[market_id]['drei_Maerkte_in_Naehe']
-                results.loc[(is_near[market_id]==True) &
-                            (df_ranking['Umkreis']==3),
+                results.loc[np.logical_and(is_near[market_id]==True,
+                                           df_ranking['Umkreis']==3),
                             market_id] = factor
                 # write data for far markets with:
                 # -> market is far; 1 near market exists; 
                 # market is closer than posible other far markets
                 factor = df_markets.loc[market_id]\
                     ['zweiter_Markt_mit_Abstand_zum_ersten']
-                results.loc[(is_near[market_id]==False) &
-                            (df_ranking['Umkreis']==1) &
-                            (df_ranking[market_id]==2),
+                results.loc[np.logical_and(
+                    is_near[market_id]==False,
+                    np.logical_and(df_ranking['Umkreis']==1,
+                                   df_ranking[market_id]==2)),
                             market_id] = factor
                 # -> market is far; 1 near market exists;
                 # another far market exists that is closer to cell
                 factor = df_markets.loc[market_id]\
                     ['dritter_Markt_mit_Abstand_zum_ersten']
-                results.loc[(is_near[market_id]==False) &
-                            (df_ranking['Umkreis']==1) &
-                            (df_ranking[market_id]==3),
+                results.loc[np.logical_and(
+                    is_near[market_id]==False,
+                    np.logical_and(df_ranking['Umkreis']==1,
+                                   df_ranking[market_id]==3)),
                             market_id] = factor
                 # -> market is far, 2 near markets
                 factor = df_markets.loc[market_id]\
                     ['dritter_Markt_mit_Abstand_zum_ersten_und_zweiten']
-                results.loc[(is_near[market_id]==False) & \
-                            (df_ranking['Umkreis']==2),
+                results.loc[np.logical_and(is_near[market_id]==False,
+                                           df_ranking['Umkreis']==2),
                             market_id] = factor
             # if more than 3 markets: markets 4 to end set to 0
             # if market 3 and 4 have same distance: keep both

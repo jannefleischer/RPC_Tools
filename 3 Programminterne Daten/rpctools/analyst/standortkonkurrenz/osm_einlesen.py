@@ -74,6 +74,7 @@ class OSMShopsReader(object):
             param = '='.join([urllib.quote(k), urllib.quote(v)])
             new_params.append(param)
         param_str = '&'.join(new_params)
+        arcpy.AddMessage(param_str)
         r = requests.get(self.url, params=param_str)
         try:
             json = r.json()
@@ -133,9 +134,3 @@ if __name__ == '__main__':
     #source.transform(3035)
     supermarkets = o.get_shops()
     o.create_supermarket_features(supermarkets)
-
-
-
-
-
-    u'<ows:ExceptionReport xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0.0" xsi:schemaLocation="Could not parse CQL filter list.\nPoints of LinearRing do not form a closed linestring Parsing : DISJOINT(geom,POLYGON((4279232.71478 3319275.58031, 4280073.39017 3379519.62277, 4334285.73117 3378761.16243, 4333441.76038 3318521.71001))).</ows:ExceptionText>\n  </ows:Exception>\n</ows:ExceptionReport>\n'

@@ -51,7 +51,7 @@ class ProjektwirkungMarkets(Tool):
         df_markets = self.parent_tbx.table_to_dataframe('Maerkte')
         id_nullfall = df_markets['id_betriebstyp_nullfall']
         id_planfall = df_markets['id_betriebstyp_planfall']
-        planfall_idx = (id_nullfall != id_planfall) & (id_planfall > 0)
+        planfall_idx = np.logical_and((id_nullfall != id_planfall), (id_planfall > 0))
 
         for index, plan_market in df_markets[planfall_idx].iterrows():
             layer_name = u'Kaufkraftbindung {m} ({i})'.format(
@@ -444,9 +444,17 @@ class ProjektwirkungMarkets(Tool):
                      'vkfl_planfall', 'id_betriebstyp_nullfall',
                      'id_betriebstyp_planfall'])
     
-        # exclude turnovers of new markets
+        # exclude new markets by setting their turnovers to zero
         new_market_idx = df_markets['id_betriebstyp_nullfall'] == 0
         df_markets.loc[new_market_idx, 'umsatz_planfall'] = 0
+        
+        # ignore turnover changes for existing markets that have been changed
+        changed_market_idx = np.logical_and(
+            (df_markets['id_betriebstyp_nullfall']
+             != df_markets['id_betriebstyp_planfall']), 
+            df_markets['id_betriebstyp_nullfall'] != 0)
+        df_markets.loc[changed_market_idx, 'umsatz_planfall'] = \
+            df_markets.loc[changed_market_idx, 'umsatz_nullfall']
         
         df_centers = self.parent_tbx.table_to_dataframe(
             'Zentren', columns=['id', 'AGS', 'RS', 'ew', 'kk', 'nutzerdefiniert'])
@@ -460,7 +468,7 @@ class ProjektwirkungMarkets(Tool):
                                               'vkfl_planfall'].sum()
         rs_idx = df_centers_res['nutzerdefiniert'] == -1
         for index, row in df_ags_agg.iterrows():
-            r_idx = rs_idx & (df_centers_res['RS'] == index)
+            r_idx = np.logical_and(rs_idx, (df_centers_res['RS'] == index))
             for col in row.keys():
                 df_centers_res.loc[r_idx, col] = row[col]
                 
