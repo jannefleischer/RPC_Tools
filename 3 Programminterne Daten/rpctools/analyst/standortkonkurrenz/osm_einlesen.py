@@ -74,7 +74,6 @@ class OSMShopsReader(object):
             param = '='.join([urllib.quote(k), urllib.quote(v)])
             new_params.append(param)
         param_str = '&'.join(new_params)
-        arcpy.AddMessage(param_str)
         r = requests.get(self.url, params=param_str)
         try:
             json = r.json()
