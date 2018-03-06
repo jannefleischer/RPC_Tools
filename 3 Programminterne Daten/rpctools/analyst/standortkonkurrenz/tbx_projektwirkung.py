@@ -75,22 +75,22 @@ class ProjektwirkungMarkets(Tool):
                                   name=layer_name,
                                   template_folder=folder,
                                   zoom=False)
-        self.output.add_layer(group_layer, layer_vb, fc_zentren,
+        self.output.add_layer(group_layer, layer_vb, fc_zentren, visible=False, 
                               template_folder=folder, zoom=False)
-        self.output.add_layer(group_layer, layer_gem, fc_zentren,
+        self.output.add_layer(group_layer, layer_gem, fc_zentren, visible=False,
                               template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_zen_n, fc_zentren,
-                              template_folder=folder, zoom=False)
+                              visible=False, template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_zen_p, fc_zentren,
-                              template_folder=folder, zoom=False)
+                              visible=False, template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_zen_e, fc_zentren,
-                              template_folder=folder, zoom=False)
+                              visible=False, template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_vkfl_n, fc_zentren,
-                              template_folder=folder, zoom=False)
+                              visible=False, template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_vkfl_p, fc_zentren,
-                              template_folder=folder, zoom=False)
+                              visible=False, template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_vkfl_e, fc_zentren,
-                              template_folder=folder, zoom=False)
+                              visible=False, template_folder=folder, zoom=False)
 
     def run(self):
         folders = Folders(self.par)

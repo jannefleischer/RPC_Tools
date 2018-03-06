@@ -207,6 +207,7 @@ class Layer(object):
                  workspace='',
                  template_folder='',
                  disable_other=False,
+                 visible=True, 
                  subgroup="",
                  in_project=True,
                  query="",
@@ -220,6 +221,7 @@ class Layer(object):
         self.template_layer = template_layer
         self.featureclass = featureclass
         self.disable_other = disable_other
+        self.visible = visible
         self.subgroup = subgroup
         self.in_project = in_project
         self.zoom = zoom
@@ -494,6 +496,7 @@ class Output(object):
                   template_folder='',
                   name='',
                   disable_other=False,
+                  visible=True, 
                   subgroup="",
                   in_project=True,
                   query="",
@@ -557,7 +560,8 @@ class Output(object):
             name = template_layer
         layer = Layer(groupname, template_layer, name=name,
                       featureclass=featureclass, workspace=workspace,
-                      disable_other=disable_other, subgroup=subgroup,
+                      disable_other=disable_other, visible=visible,
+                      subgroup=subgroup,
                       in_project=in_project, zoom=zoom,
                       zoom_extent=zoom_extent, query=query,
                       template_folder=template_folder, symbology=symbology,
@@ -743,9 +747,9 @@ class Output(object):
             num_symclasses, column = layer.symbology_classes
             self.update_layersymbology(new_layer, num_symclasses, column)
 
-        new_layer.visible = True
+        new_layer.visible = layer.visible
         for lyr in arcpy.mapping.ListLayers(new_layer):
-            lyr.visible = True
+            lyr.visible = layer.visible
         new_layer.name = layer.name
         if layer.query:
             new_layer.definitionQuery = layer.query
