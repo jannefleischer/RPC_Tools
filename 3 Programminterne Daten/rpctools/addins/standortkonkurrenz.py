@@ -248,7 +248,6 @@ class FieldSelection(ToolboxButton):
         for row in cursor:
             shape, object_id, selection = row
             if shape.contains(coords):
-                print object_id
                 found = True
                 break
         if not found:
@@ -259,7 +258,6 @@ class FieldSelection(ToolboxButton):
             new_selection = 0
         else:
             new_selection = selection
-        print new_selection
         del(cursor)
         tbx.update_table(self._table,
                          column_values={'Auswahl': new_selection},

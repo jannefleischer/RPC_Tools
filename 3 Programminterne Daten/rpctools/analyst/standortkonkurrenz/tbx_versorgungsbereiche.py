@@ -86,17 +86,17 @@ class TbxEditCenters(Tbx):
         self.centers_df = []
         return self.par
 
-    def get_centers(self):
+    def get_centers(self, user_only=True):
         '''return the centers in db as a dataframe, filtered by existance
         in nullfall and planfall (dependent on setting of this toolbox)'''
-        df_centers = self.table_to_dataframe('Zentren',
-                                             where='nutzerdefiniert=1')
+        where = 'nutzerdefiniert=1' if user_only else None
+        df_centers = self.table_to_dataframe('Zentren', where=where)
         return df_centers
 
     def add_center_to_db(self, name, polygon):
         '''add a center to the database with given polygon as shape
         '''
-        df_centers = self.get_centers()
+        df_centers = self.get_centers(user_only=False)
         if len(df_centers) == 0:
             new_id = 1
         else:
