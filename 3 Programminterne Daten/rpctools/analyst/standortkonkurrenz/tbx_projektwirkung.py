@@ -77,7 +77,7 @@ class ProjektwirkungMarkets(Tool):
                                   zoom=False)
         self.output.add_layer(group_layer, layer_vb, fc_zentren, visible=False, 
                               template_folder=folder, zoom=False)
-        self.output.add_layer(group_layer, layer_gem, fc_zentren, visible=False,
+        self.output.add_layer(group_layer, layer_gem, fc_zentren,
                               template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_zen_n, fc_zentren,
                               visible=False, template_folder=folder, zoom=False)
