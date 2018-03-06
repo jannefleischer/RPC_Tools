@@ -443,10 +443,17 @@ class ProjektwirkungMarkets(Tool):
             columns=['AGS', 'umsatz_planfall', 'umsatz_nullfall', 'vkfl',
                      'vkfl_planfall', 'id_betriebstyp_nullfall',
                      'id_betriebstyp_planfall'])
+        
+        # Zentralität needs turnovers including new and changed markets
+        # copy column for use in Zentralität, as it will be changed in the next step
+        df_markets['umsatz_planfall_full'] = df_markets['umsatz_planfall']
     
         # exclude new markets by setting their turnovers to zero
         new_market_idx = df_markets['id_betriebstyp_nullfall'] == 0
         df_markets.loc[new_market_idx, 'umsatz_planfall'] = 0
+        
+        df_centers = self.parent_tbx.table_to_dataframe(
+            'Zentren', columns=['id', 'AGS', 'RS', 'ew', 'kk', 'nutzerdefiniert'])
         
         # ignore turnover changes for existing markets that have been changed
         changed_market_idx = np.logical_and(
@@ -455,18 +462,17 @@ class ProjektwirkungMarkets(Tool):
             df_markets['id_betriebstyp_nullfall'] != 0)
         df_markets.loc[changed_market_idx, 'umsatz_planfall'] = \
             df_markets.loc[changed_market_idx, 'umsatz_nullfall']
-        
-        df_centers = self.parent_tbx.table_to_dataframe(
-            'Zentren', columns=['id', 'AGS', 'RS', 'ew', 'kk', 'nutzerdefiniert'])
         summed = df_markets.groupby('AGS').sum().reset_index()
         df_centers_res = df_centers.merge(summed, how='left', on='AGS')
         
         # sum up ags based results to rs
         df_ags_res = df_centers_res[df_centers_res['nutzerdefiniert'] == 0]
         df_ags_agg = df_ags_res.groupby('RS')['ew', 'kk', 'umsatz_planfall',
-                                              'umsatz_nullfall', 'vkfl',
+                                              'umsatz_nullfall',
+                                              'umsatz_planfall_full', 'vkfl',
                                               'vkfl_planfall'].sum()
-        rs_idx = df_centers_res['nutzerdefiniert'] == -1
+        # -1 indicate the "Verwaltungsgemeinschaften"
+        rs_idx = df_centers_res['nutzerdefiniert'] == -1 
         for index, row in df_ags_agg.iterrows():
             r_idx = np.logical_and(rs_idx, (df_centers_res['RS'] == index))
             for col in row.keys():
@@ -485,7 +491,7 @@ class ProjektwirkungMarkets(Tool):
             - df_centers_res['vkfl_dichte_nullfall'])
         
         df_centers_res['zentralitaet_planfall'] = (
-            100 * df_centers_res['umsatz_planfall'] / df_centers_res['kk'])
+            100 * df_centers_res['umsatz_planfall_full'] / df_centers_res['kk'])
         df_centers_res['zentralitaet_nullfall'] = (
             100 * df_centers_res['umsatz_nullfall'] / df_centers_res['kk'])
         df_centers_res['zentralitaet_differenz'] = (
