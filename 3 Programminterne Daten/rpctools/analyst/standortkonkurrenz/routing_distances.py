@@ -152,7 +152,6 @@ class DistanceRouting(object):
     def _request_dist_raster(self, origin, kmh=30):        
         if origin.epsg != self.epsg:
             origin.transform(self.epsg)
-#https://projektcheck.ggr-planung.de/otp/surfaces?batch=true&layers=traveltime&styles=color30&time=17:46&date=07-26-2017&mode=WALK&maxWalkDistance=750&fromPlace=53.47333527412444,9.715690612792967&toPlace=53.47333527412444,9.715690612792967
         params = {
             'batch': True,
             'routerId': self.ROUTER,
