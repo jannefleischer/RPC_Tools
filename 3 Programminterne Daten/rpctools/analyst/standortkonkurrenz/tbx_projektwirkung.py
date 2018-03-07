@@ -434,13 +434,31 @@ class ProjektwirkungMarkets(Tool):
         arcpy.AddMessage(u'Schreibe Kenngrößen in Datenbank...')
         self.parent_tbx.insert_dataframe_in_table(
             'Beziehungen_Maerkte_Zellen', cells)
+    
+    def get_markets_in_user_centers(self):
+        ''' find markets in user defined centers by spatial joining '''
+        tmp_table = os.path.join(arcpy.env.scratchGDB, 'tmp_join')
+        if arcpy.Exists(tmp_table):
+            arcpy.Delete_management(tmp_table)
+        arcpy.SpatialJoin_analysis(self.folders.get_table('Zentren'), self.folders.get_table('Maerkte'), tmp_table,
+                                   join_operation='JOIN_ONE_TO_MANY', match_option='CONTAINS')
+        where = 'nutzerdefiniert = 1'
+        columns = ['id', 'id_1']
+        cursor = arcpy.da.SearchCursor(tmp_table, columns, where_clause=where)
+        mapping = {}
+        for row in cursor:
+            center_id, market_id = row
+            if center_id not in mapping:
+                mapping[center_id] = []
+            mapping[center_id].append(market_id)
+        return mapping
 
     def update_centers(self):
         '''calculate the sales of the defined centers'''
         
         df_markets = self.parent_tbx.table_to_dataframe(
             'Maerkte',
-            columns=['AGS', 'umsatz_planfall', 'umsatz_nullfall', 'vkfl',
+            columns=['id', 'AGS', 'umsatz_planfall', 'umsatz_nullfall', 'vkfl',
                      'vkfl_planfall', 'id_betriebstyp_nullfall',
                      'id_betriebstyp_planfall'])
         
@@ -464,6 +482,8 @@ class ProjektwirkungMarkets(Tool):
             df_markets.loc[changed_market_idx, 'umsatz_nullfall']
         summed = df_markets.groupby('AGS').sum().reset_index()
         df_centers_res = df_centers.merge(summed, how='left', on='AGS')
+        # pandas gives left table suffix '_x' by default after joining
+        df_centers_res.rename(columns={'id_x': 'id'}, inplace=True)
         
         # sum up ags based results to rs
         df_ags_res = df_centers_res[df_centers_res['nutzerdefiniert'] == 0]
@@ -477,6 +497,21 @@ class ProjektwirkungMarkets(Tool):
             r_idx = np.logical_and(rs_idx, (df_centers_res['RS'] == index))
             for col in row.keys():
                 df_centers_res.loc[r_idx, col] = row[col]
+        
+        # get markets in user centers and sum up their values.
+        # this spatial joining could be done for ALL centers instead of joining 
+        # by ags (actually it once was before ags centers were selectable), but
+        # for having it done fast, it is only applied for user defined centers
+        # now
+        user_center_markets = self.get_markets_in_user_centers()
+        sum_cols = ['umsatz_planfall', 'umsatz_nullfall',
+                    'umsatz_planfall_full', 'vkfl', 'vkfl_planfall']
+        for center_id, market_ids in user_center_markets.iteritems():
+            mic_idx = df_markets['id'].isin(market_ids)
+            markets_in_center = df_markets.loc[mic_idx, sum_cols].sum()
+            center_idx = df_centers_res['id'] == center_id
+            summed = df_markets.loc[mic_idx, sum_cols].sum().values
+            df_centers_res.loc[center_idx, sum_cols] = summed
                 
         df_centers_res['umsatz_differenz'] = (
             100 * (df_centers_res['umsatz_planfall'] /
