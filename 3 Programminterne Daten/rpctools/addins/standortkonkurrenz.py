@@ -218,6 +218,13 @@ class StandortkonkurrenzProjektwirkung(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxProjektwirkungMarkets'
+    _message = (u'Bitte beachten Sie, vor der Berechnung auch die Anbieter der '
+                u'neuen Lebensmittelmärkte auf den geplanten Flächen festzulegen '
+                u'(unter Analysieren -> Standortkonkurrenz Supermärkte -> '
+                u'Veränderungen durch Planung -> Geplanten Markt bearbeiten).'
+                u'\n\n'
+                u'Die Auswahl des Anbieters ist wichtig für korrekte '
+                u'Berechnungsergebnisse.')
 
 
 class FieldSelection(ToolboxButton):

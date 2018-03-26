@@ -93,7 +93,7 @@ class TbxEditMarkets(Tbx):
 
             param = self.add_parameter('chain')
             param.name = encode(u'Kette')
-            param.displayName = encode(u'Handelskette')
+            param.displayName = encode(u'Anbieter')
             param.parameterType = 'Required'
             param.direction = 'Input'
             param.datatype = u'GPString'

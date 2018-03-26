@@ -35,6 +35,7 @@ class ProjektwirkungMarkets(Tool):
         fc_maerkte = 'Maerkte'
         layer_maerkte = u'Umsatzveränderung Märkte'
         fc_zentren = 'Zentren'
+        layer_auswahl = ''
         layer_vb = u'Umsatzveränderung Bestand Zentren'
         layer_gem = u'Umsatzveränderung Bestand Verwaltungsgemeinschaften'
         layer_zen_n = u'Zentralität Nullfall'
@@ -75,6 +76,8 @@ class ProjektwirkungMarkets(Tool):
                                   name=layer_name,
                                   template_folder=folder,
                                   zoom=False)
+        self.output.hide_layer(u'Ausgewählte Gemeinden im Betrachtungsraum')
+        self.output.hide_layer(u'Nicht ausgewählte Gemeinden')
         self.output.add_layer(group_layer, layer_vb, fc_zentren, visible=False, 
                               template_folder=folder, zoom=False)
         self.output.add_layer(group_layer, layer_gem, fc_zentren,
