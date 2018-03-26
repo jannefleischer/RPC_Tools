@@ -598,6 +598,7 @@ class TbxProjektwirkungMarkets(Tbx):
         p.direction = 'Input'
         p.datatype = u'GPString'
         p.value = self.config.active_project
+        p.enabled = False
 
         # markets radius
         p = self.add_parameter('radius_sz')
