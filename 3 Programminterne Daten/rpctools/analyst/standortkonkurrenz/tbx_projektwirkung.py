@@ -629,6 +629,27 @@ class TbxProjektwirkungMarkets(Tbx):
         self.par.radius_sz.value = (2000 if len(prev_settings) == 0
                                     else prev_settings[0][0])
 
+    def validate_inputs(self):
+        df_markets = self.table_to_dataframe('Maerkte')
+        id_nullfall = df_markets['id_betriebstyp_nullfall']
+        id_planfall = df_markets['id_betriebstyp_planfall']
+        planfall_idx = np.logical_and((id_nullfall != id_planfall),
+                                      (id_planfall > 0))
+        planfall_markets = df_markets[planfall_idx]
+        unset_markets = planfall_markets[planfall_markets['id_kette'] == 0]
+        if len(unset_markets) > 0:
+            m_str = ''
+            for idx, market in unset_markets.iterrows():
+                m_str += u'  - "{}"\n'.format(market['name'])
+            msg = (u'Bei folgenden geplanten Märkten ist der Anbieter zur Zeit '
+                   u'noch unbekannt:\n' + m_str + '\n'
+                   u'Bitte setzen sie vor der Berechnung die Anbieter für alle '
+                   u'geplanten Märkte (unter Analysieren -> '
+                   u'Standortkonkurrenz Supermärkte -> Veränderungen durch '
+                   u'Planung -> Geplanten Markt bearbeiten)\n\n')
+            return False, msg
+        return True, ''
+
     def _updateParameters(self, params):
         pass
 
@@ -640,6 +661,7 @@ if __name__ == "__main__":
     t.set_active_project()
     t.par.recalculate.value = False
     t.par.radius_sz.value = 0
+    t.validate_inputs()
     #t.show_outputs()
     t.execute()
 
