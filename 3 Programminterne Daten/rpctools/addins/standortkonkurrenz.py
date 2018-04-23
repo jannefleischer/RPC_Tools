@@ -2,7 +2,7 @@
 import arcpy
 
 from rpctools.addins.common import ToolboxButton, folders, config
-from rpctools.addins.outputs import MaerkteAnzeigen, ZentrenAnzeigen
+from rpctools.addins.outputs import MaerkteAnzeigen, ZentrenAnzeigen, StandortkonkurrenzAnzeigen
 from rpctools.utils.params import DummyTbx
 
 __all__ = [
@@ -12,7 +12,8 @@ __all__ = [
     "PlanfallMarktBearbeiten", "BestandMarktHinzu",
     "PlanfallMarktHinzu", "PlanfallMarktErweiterung",
     "ZentrumBearbeiten", "ZentrumHinzu", "StandortkonkurrenzProjektwirkung",
-    "MaerkteZentrenAnzeigen",  "FieldSelection", "BestandOSMBuffer"
+    "MaerkteZentrenAnzeigen",  "FieldSelection", "BestandOSMBuffer",
+    "StandortkonkurrenzErgebnisse"
 ]
 
 
@@ -22,6 +23,12 @@ class BestandOSMEinlesen(ToolboxButton):
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxOSMMarktEinlesen'
     _do_show = True
+    _message = (u"Vorsicht, die Verwendung von OSM-Daten ist mit "
+                u"Unsicherheiten verbunden. Bitte überprüfen Sie den Datensatz "
+                u"nach Ausführung auf Vollständigkeit, prüfen und ergänzen Sie "
+                u"die Verkaufsflächen (Betriebstypen) der eingelesenen "
+                u"Lebensmittelmärkte und entfernen Sie ggf. Märkte, die "
+                u"fälschlicherweise als Lebensmittelmärkte eingelesen wurden")
 
 
 class BestandOSMBuffer(ToolboxButton):
@@ -30,6 +37,12 @@ class BestandOSMBuffer(ToolboxButton):
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxOSMBuffer'
     _do_show = True
+    _message = (u"Vorsicht, die Verwendung von OSM-Daten ist mit "
+                u"Unsicherheiten verbunden. Bitte überprüfen Sie den Datensatz "
+                u"nach Ausführung auf Vollständigkeit, prüfen und ergänzen Sie "
+                u"die Verkaufsflächen (Betriebstypen) der eingelesenen "
+                u"Lebensmittelmärkte und entfernen Sie ggf. Märkte, die "
+                u"fälschlicherweise als Lebensmittelmärkte eingelesen wurden")
 
 
 class TemplateErzeugen(ToolboxButton):
@@ -218,6 +231,15 @@ class StandortkonkurrenzProjektwirkung(ToolboxButton):
     _path = folders.ANALYST_PYT_PATH
     _pyt_file = 'Standortkonkurrenz_Supermaerkte.pyt'
     _toolbox_name = 'TbxProjektwirkungMarkets'
+
+
+class StandortkonkurrenzErgebnisse(ToolboxButton):
+    def __init__(self):
+        self.outputs = [StandortkonkurrenzAnzeigen()]
+
+    def onClick(self, coord=None):
+        for o in self.outputs:
+            o.show()
 
 
 class FieldSelection(ToolboxButton):
