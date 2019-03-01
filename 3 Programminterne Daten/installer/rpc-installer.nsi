@@ -35,7 +35,7 @@
 
 ;Languages
   !insertmacro MUI_LANGUAGE "German"
- 
+
 ;Files reserved
   ReserveFile "python27.dll"
   ;ReserveFile "rpc-installer.py"
@@ -45,7 +45,7 @@
 	;Extract Install Options files
 	;$PLUGINSDIR will automatically be removed when the installer closes
 	InitPluginsDir
-	
+
 	File "/oname=$PLUGINSDIR\python27.dll" "python27.dll"
 	;File "/oname=$PLUGINSDIR\rpc-installer.py" "rpc-installer.py"
   FunctionEnd
@@ -55,18 +55,18 @@
   FunctionEnd
 
   Section "Projektcheck-Tools installieren"
-    SetOutPath "$INSTDIR" 
-	;relative path 
+    SetOutPath "$INSTDIR"
+	;relative path
 	File /r  /x *.exe /x .git /x .gitignore /x rpctools.egg-info /x *.pyc "..\..\*"
 	;Store installation folder
 	WriteRegStr HKLM "Software\ProjektCheck Profi" "" $INSTDIR
-	
+
     ;Create uninstaller
     WriteUninstaller "$INSTDIR\Uninstall.exe"
   SectionEnd
 
   Section "Bibliotheken installieren"
-    
+
     nsPython::execFile "$INSTDIR\3 Programminterne Daten\installer\rpc-installer.py"
     Pop $0
     DetailPrint "Result: $0"
@@ -75,7 +75,7 @@
   Section "AddIn installieren"
 	ExecShell "" "$INSTDIR\3 Programminterne Daten\addin\addin.esriaddin"
   SectionEnd
-  
+
 Section "Uninstall"
 
   Delete "$INSTDIR\Uninstall.exe"

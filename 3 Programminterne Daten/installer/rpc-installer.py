@@ -43,16 +43,13 @@ def get_python_path():
         is_64b = os.path.exists(os.path.join(desktop_dir, "bin64"))
         bitstr = 'x64' if is_64b else ''
 
-        possible_pathes = []
-        possible_pathes.append(os.path.join(python_dir, 'ArcGIS{v}'.format(v=version)))
-        possible_pathes.append(os.path.join(python_dir, 'ArcGISx64{v}'.format(v=version)))
-
-        python_pathes = []
-        for path in possible_pathes:
+        python_paths = []
+        for bstr in ['ArcGIS', 'ArcGISx64']:
+            path = os.path.join(python_dir, bstr + version)
             if os.path.exists(path):
-                python_pathes.append(path)
+                python_paths.append(path)
 
-        return python_pathes
+        return python_paths
 
     except WindowsError:
         log('Keine ArcGIS-Pythoninstallation gefunden.')
