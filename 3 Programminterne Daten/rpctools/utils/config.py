@@ -121,6 +121,7 @@ class Config(object):
         if attribute in self._callbacks:
             self._callbacks.pop(attribute)
 
+
 ########################################################################
 class Folders(object):
     """"""
@@ -129,9 +130,11 @@ class Folders(object):
         try:
             self.BASE_PATH = _winreg.QueryValue( _winreg.HKEY_LOCAL_MACHINE,
                                                  "Software\ProjektCheck PROFI")
+            if not exists(self.BASE_PATH):
+                raise WindowsError
         except WindowsError:
-
             self.BASE_PATH = abspath(join(dirname(__file__), '..', '..', '..'))
+
         self._INTERN = '3 Programminterne Daten'
         self._BASE_DBS = 'workspaces'
         self._TEMPORARY_GDB_PATH = 'temp_gdb'

@@ -132,7 +132,8 @@ class BahnQuery(object):
 
         def request_departure_table(time):
             params['time'] = time
-            r = requests.get(self.reiseauskunft_url, params=params, verify=False)
+            r = requests.get(self.reiseauskunft_url, params=params,
+                             verify=False)
             soup = BeautifulSoup(r.text, "html.parser")
             table = soup.find('table', id='resultsOverview')
             return table
@@ -170,9 +171,9 @@ class BahnQuery(object):
 
                 # departure
                 content = row.find('td', {'class': 'time'}).contents
-                if '\n' in content:
-                    content.remove('\n')
-                departure = str(content[1])
+
+                matches = re.findall( r'\d{1,2}:\d{1,2}', ' - '.join(content))
+                departure = matches[0] if len(matches) > 0 else ''
 
                 # modes
                 content = row.find('td', {'class': 'products'}).contents
