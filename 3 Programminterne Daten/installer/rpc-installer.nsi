@@ -4,12 +4,14 @@
 ;--------------------------------
 ;General
 
+  RequestExecutionLevel user
+
   ;Name and file
   Name "Projekt-Check Profi"
   OutFile "projekt-check-profi-installer.exe"
 
   ;Default installation folder
-  InstallDir "$PROGRAMFILES\Projekt-Check Profi"
+  InstallDir "$DOCUMENTS\Projekt-Check Profi"
 
   ;Get installation folder from registry if available
   InstallDirRegKey HKLM "Software\ProjektCheck PROFI" ""
